@@ -70,14 +70,16 @@ export default function lesson18(): LessonData {
     // Exercise 2: approval on 2 November, 17 days used.
     given("ex2.used", 17),
     left("ex2.answer", WINDOW, 17),
-    left("ex2.err_inclusive", WINDOW, 18),
-    left("ex2.err_twelve", WINDOW_NO_LIEN, 17),
+    // Counting to day 25, the first day the bank is no longer bound: a window of 25.
+    left("ex2.err_day_25", WINDOW + 1, 17),
+    // Using the 12-day window: it closed already; a learner types 0.
+    given("ex2.err_closed", 0),
 
-    // Exercise 5: a refinance with no new lien, approval on 9 November.
-    given("ex5.approved", "2026-11-09"),
-    calendarAfter("ex5.answer", "2026-11-09", WINDOW_NO_LIEN),
-    calendarAfter("ex5.err_24", "2026-11-09", WINDOW),
-    calendarAfter("ex5.err_day_one", "2026-11-09", WINDOW_NO_LIEN - 1),
+    // Exercise 5: a refinance with no new lien, approval on Friday 23 October (the window crosses into November).
+    given("ex5.approved", "2026-10-23"),
+    calendarAfter("ex5.answer", "2026-10-23", WINDOW_NO_LIEN),
+    calendarAfter("ex5.err_24", "2026-10-23", WINDOW),
+    calendarAfter("ex5.err_day_one", "2026-10-23", WINDOW_NO_LIEN - 1),
 
     // Exercise 6: three banks, three approval dates, the same 24-day rule.
     given("ex6.bank_a", "2026-10-14"),
@@ -86,6 +88,8 @@ export default function lesson18(): LessonData {
     calendarAfter("ex6.end_a", "2026-10-14", WINDOW),
     calendarAfter("ex6.end_b", "2026-10-16", WINDOW),
     calendarAfter("ex6.end_c", "2026-10-12", WINDOW),
+    // Counting bank C's approval day as day 1.
+    calendarAfter("ex6.err_day_one", "2026-10-12", WINDOW - 1),
   ];
 
   return {

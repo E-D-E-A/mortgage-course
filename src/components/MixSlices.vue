@@ -109,7 +109,7 @@ const colour = (i: number) => (moving[i] ? "var(--mogi-turquoise-2)" : "var(--mo
 
     <div class="mt-4 grid gap-2 rounded-md bg-n50 p-3 text-body-m text-n800 sm:grid-cols-2">
       <p>כל המסלולים יחד: <span class="ltr font-semibold text-n900">{{ formatShekels(total) }}</span></p>
-      <p>החלק שבו אחוז הריבית יכול לזוז: <span class="ltr font-semibold text-n900">{{ movingShare }}%</span> (<span class="ltr">{{ formatShekelsText(movingAmount) }}</span>)</p>
+      <p>החלק שבו אחוז הריבית יכול לזוז: <span class="ltr font-semibold text-n900">{{ movingShare }}%</span> <span class="whitespace-nowrap">(<span class="ltr">{{ formatShekelsText(movingAmount) }}</span>)</span></p>
     </div>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">

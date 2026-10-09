@@ -67,6 +67,8 @@ const printing = ref(false);
 const confirmReset = ref(false);
 
 const checkable = (g: Group) => g.tone !== "known";
+/** A pitfall is ticked when you have checked that it does not happen to you; the list says so. */
+const noteOf = (g: Group) => g.note ?? (g.tone === "warning" ? "סמנו כשבדקתם שזה לא קורה לכם." : undefined);
 const sourcesOf = (item: Item): Source[] => (item.source ? (Array.isArray(item.source) ? item.source : [item.source]) : []);
 const keyOf = (s: Step, item: Item) => `${s.id}.${item.id}`;
 const itemsOf = (s: Step) => s.groups.filter(checkable).flatMap((g) => g.items.map((i) => keyOf(s, i)));
@@ -144,8 +146,8 @@ function endPrint() {
       <button type="button" class="min-h-11 text-body-m text-navy underline" :aria-pressed="printView" @click="printView = !printView">
         {{ printView ? "חזרה לרשימה" : "תצוגה להדפסה" }}
       </button>
-      <button type="button" class="min-h-11 text-body-m text-navy underline" @click="printNow">הדפסה</button>
-      <button type="button" class="min-h-11 text-body-m text-n600 underline" @click="reset">
+      <button type="button" class="min-h-11 min-w-11 px-1 text-body-m text-navy underline" @click="printNow">הדפסה</button>
+      <button type="button" class="min-h-11 min-w-11 px-1 text-body-m text-n600 underline" @click="reset">
         {{ confirmReset ? "בטוחים? לחצו שוב כדי למחוק את הסימונים וההערות" : "איפוס" }}
       </button>
     </div>
@@ -159,7 +161,7 @@ function endPrint() {
         <p v-if="s.summary" class="mt-1 text-n700">{{ s.summary }}</p>
         <div v-for="g in s.groups" :key="g.label" class="mt-3">
           <p class="font-semibold text-n900">{{ g.label }}</p>
-          <p v-if="g.note" class="text-caption text-n600">{{ g.note }}</p>
+          <p v-if="noteOf(g)" class="text-caption text-n600">{{ noteOf(g) }}</p>
           <ul class="list-reset mt-1">
             <li v-for="item in g.items" :key="item.id" class="flex gap-2 py-0.5">
               <span v-if="g.tone !== 'known'" aria-hidden="true">{{ checked[keyOf(s, item)] ? "☑" : "☐" }}</span>
@@ -207,7 +209,7 @@ function endPrint() {
             </svg>
           </button>
         </h3>
-        <div v-show="open[s.id]" :id="`diy-${id}-${s.id}`" class="px-4 pb-4">
+        <div v-show="open[s.id]" :id="`diy-${id}-${s.id}`" class="px-4 pb-4" data-diy-step-body>
           <p v-if="s.summary" class="text-body-m text-n700">{{ s.summary }}</p>
           <div
             v-for="g in s.groups"
@@ -216,7 +218,7 @@ function endPrint() {
             :class="g.tone === 'warning' ? 'border-s-4 border-warning bg-warning-bg' : g.tone === 'known' ? 'bg-n50' : 'border border-n100'"
           >
             <p class="text-body-m font-semibold text-n900">{{ g.label }}</p>
-            <p v-if="g.note" class="mt-0.5 text-caption text-n600">{{ g.note }}</p>
+            <p v-if="noteOf(g)" class="mt-0.5 text-caption text-n600">{{ noteOf(g) }}</p>
             <ul class="list-reset mt-1">
               <li v-for="item in g.items" :key="item.id">
                 <label v-if="g.tone !== 'known'" class="flex min-h-11 cursor-pointer items-start gap-3 py-1.5">
@@ -276,6 +278,13 @@ function endPrint() {
   }
   html.diy-printing .diy-print-step {
     break-inside: avoid;
+  }
+  /* Printing from the browser menu prints the working view: open every step, drop the controls. */
+  [data-diy-step-body] {
+    display: block !important;
+  }
+  .diy-no-print {
+    display: none !important;
   }
 }
 </style>

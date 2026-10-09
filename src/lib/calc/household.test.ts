@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { daysLeft, disposableIncome, disposableTable, monthlyTotal } from "./household.ts";
+import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, disposableTable, monthlyTotal } from "./household.ts";
 
 describe("monthlyTotal", () => {
   it("adds monthly amounts", () => {
@@ -66,5 +66,23 @@ describe("disposableTable", () => {
 
   it("refuses a row without exactly two incomes", () => {
     expect(() => disposableTable([{ household: "1", incomes: [1000], fixedPayments: [] }])).toThrow(RangeError);
+  });
+});
+
+describe("calendar days", () => {
+  it("adds days across a month end", () => {
+    // 24 November + 7 days = 1 December; + 24 days from 10 November = 4 December (by hand).
+    expect(addCalendarDays("2026-11-24", 7)).toBe("2026-12-01");
+    expect(addCalendarDays("2026-11-10", 24)).toBe("2026-12-04");
+  });
+
+  it("counts the days between two dates", () => {
+    // 10 November → 2 December: 20 days left in November + 2 = 22.
+    expect(calendarDaysBetween("2026-11-10", "2026-12-02")).toBe(22);
+    expect(calendarDaysBetween("2026-11-10", "2026-11-10")).toBe(0);
+  });
+
+  it("refuses a date that is not ISO", () => {
+    expect(() => addCalendarDays("10/11/2026", 1)).toThrow(RangeError);
   });
 });

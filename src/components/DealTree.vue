@@ -5,7 +5,7 @@
 // answers given so far stay on screen and any of them can be changed. The
 // table view lists every path through the tree. The page passes the whole tree,
 // so the lesson's term check reads every word of it.
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { save } from "../lib/progress.ts";
 
 interface Option {
@@ -34,13 +34,18 @@ const currentId = computed(() => {
 });
 const current = computed(() => props.nodes[currentId.value]);
 
+// After an answer or a change, focus moves to the new question or the result, never to the page body.
+const stepEl = ref<HTMLElement | null>(null);
+const focusStep = () => nextTick(() => stepEl.value?.focus());
 function answer(i: number) {
   path.value = [...path.value, { node: currentId.value, pick: i }];
   const next = props.nodes[currentId.value];
   if (next.result) save(`exercise:${props.id}`, { reached: currentId.value });
+  focusStep();
 }
 function backTo(step: number) {
   path.value = path.value.slice(0, step);
+  focusStep();
 }
 
 /** Every path from the start to a result, for the table view. */
@@ -60,18 +65,25 @@ const allPaths = computed(() => {
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <!-- The answers so far. -->
     <ol v-if="path.length" class="list-reset grid gap-2" aria-label="התשובות שלכם עד עכשיו">
-      <li v-for="(step, i) in path" :key="i" class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-n50 px-3 py-2">
-        <span class="text-caption text-n600">{{ nodes[step.node].question }}</span>
-        <span class="flex items-center gap-3">
+      <li v-for="(step, i) in path" :key="i" class="rounded-md bg-n50 px-3 py-2">
+        <span class="block text-caption text-n600">{{ nodes[step.node].question }}</span>
+        <span class="flex items-center justify-between gap-3">
           <span class="text-body-m font-semibold text-n900">{{ nodes[step.node].options![step.pick].label }}</span>
-          <button type="button" class="min-h-11 text-caption text-navy underline" @click="backTo(i)">לשנות</button>
+          <button
+            type="button"
+            class="min-h-11 min-w-11 shrink-0 px-2 text-caption text-navy underline"
+            :aria-label="`לשנות את התשובה לשאלה: ${nodes[step.node].question}`"
+            @click="backTo(i)"
+          >
+            לשנות
+          </button>
         </span>
       </li>
     </ol>
 
     <!-- The next question. -->
     <div v-if="current.question" class="mt-4">
-      <p class="text-body-l font-semibold text-n900">{{ current.question }}</p>
+      <p ref="stepEl" tabindex="-1" class="text-body-l font-semibold text-n900">{{ current.question }}</p>
       <div class="mt-3 grid gap-2" role="group" :aria-label="current.question">
         <button
           v-for="(o, i) in current.options"
@@ -88,7 +100,7 @@ const allPaths = computed(() => {
     <!-- The result. -->
     <div v-else-if="current.result" class="mt-4 rounded-md border-s-4 border-teal-deep bg-n50 p-4" aria-live="polite">
       <p class="text-caption font-semibold text-n600">העסקה</p>
-      <p class="text-h3 text-navy">{{ current.result.title }}</p>
+      <p ref="stepEl" tabindex="-1" class="text-h3 text-navy">{{ current.result.title }}</p>
       <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-body-m">
         <template v-for="[k, v] in current.result.fields" :key="k">
           <dt class="text-n600">{{ k }}</dt>

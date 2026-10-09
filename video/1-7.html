@@ -52,6 +52,7 @@
         window: fact("clock.window"),
         window12: fact("clock.window_no_lien"),
         appraisal: fact("clock.appraisal"),
+        asOf: fact("data_date"),
         sent: fact("worked.sent"),
         answerBy: fact("worked.answer_by"),
         approved: fact("worked.approved"),
@@ -85,15 +86,15 @@
         [61, 70, `השעון הראשון: הבנק עונה תוך ${V.answer} ימי עסקים.`],
         [70, 78, `${V.answer7} ימי עסקים: רק לסוגי הלוואות שהבנק הגדיר מראש.`],
         [78, 85, "שבת וחגים לא נספרים. שישי נספר, לפי הנחת הקורס."],
-        [85, 91, `בקשה ב־${dayMonth(V.sent)}: תשובה עד ${dayMonth(V.answerBy)}.`],
+        [85, 91, `בקשה ב־${dayMonth(V.sent)} (יום 0): תשובה עד ${dayMonth(V.answerBy)}.`],
         [93, 102, `השעון השני: התנאים שבאישור נשמרים לפחות ${V.window} יום.`],
         [102, 110, "כאן סופרים כל יום, גם שבת וחג."],
         [110, 117, `בלי שעבוד חדש: ${V.window12} יום בלבד.`],
-        [117, 123, "כל מה שעד החתימה רץ מול השעון הזה."],
+        [117, 123, "לפי הצוות, כל מה שעד החתימה רץ מול השעון הזה."],
         [125, 133, "השעון השלישי: שמאות שנעשתה בשביל בנק אחד."],
         [133, 141, `בנק אחר לא יסרב לה בלי סיבה סבירה, עד ${V.appraisal} יום.`],
         [143, 150, "לשאר הצעדים לא מצאנו שעון כתוב."],
-        [150, 159, "המספרים לפי תעתיק של הצוות. הם עוד לא אומתו."],
+        [150, 159, `לפי תעתיק של הצוות; לא אומתו. נכון ל־${fullDate(V.asOf)}.`],
       ];
 
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -219,7 +220,7 @@
             if (a <= 0) return;
             const x = right - (k + 1) * W - k * G;
             const sat = isSaturday(c.date);
-            el("rect", { x, y, width: W, height: 52, rx: 6, fill: C.tq2, opacity: a * (sat ? 0.55 : 1) });
+            el("rect", { x, y, width: W, height: 52, rx: 6, fill: C.tq2, opacity: a });
             txt(x + W / 2, y + 33, String(c.n), 16, { w: 600, fill: C.navy, o: a, ltr: true });
             if (sat) txt(x + W / 2, y + 78, "שבת", 14, { fill: C.n600, o: a });
             if (c.n === V.window12) {
@@ -269,7 +270,7 @@
             txt(x - 150, 345, how, 18, { fill: C.n600, o: a });
           });
           const o2 = Math.min(o, after(t, 150, 0.8));
-          txt(640, 460, "לפי תעתיק של הצוות מהוראה של בנק ישראל. לא אומת מול המקור.", 22, { fill: C.n700, o: o2 });
+          txt(640, 460, `לפי תעתיק של הצוות מהוראה של בנק ישראל (אוגוסט 2026). לא אומת; נכון ל־${fullDate(V.asOf)}.`, 22, { fill: C.n700, o: o2 });
         }
       };
 

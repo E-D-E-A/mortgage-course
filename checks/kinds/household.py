@@ -3,6 +3,7 @@
 Plain Python Decimal; nothing is imported from src/lib/calc. Lists of amounts
 arrive as "a|b|c" strings; an empty string is an empty list.
 """
+from datetime import date, timedelta
 from decimal import Decimal
 
 from kinds.common import agorot
@@ -58,7 +59,22 @@ def hh_disposable_table(i, _facts=None):
     return rows
 
 
+def _date(text):
+    y, m, d = (int(x) for x in str(text).split("-"))
+    return date(y, m, d)
+
+
+def hh_add_days(i, _facts=None):
+    return (_date(i["date"]) + timedelta(days=int(i["days"]))).isoformat()
+
+
+def hh_days_between(i, _facts=None):
+    return (_date(i["to"]) - _date(i["from"])).days
+
+
 KINDS = {
+    "hh_add_days": hh_add_days,
+    "hh_days_between": hh_days_between,
     "hh_sum": hh_sum,
     "hh_disposable_income": hh_disposable_income,
     "hh_days_left": hh_days_left,

@@ -52,3 +52,20 @@ export function disposableTable(rows: HouseholdRow[]) {
     };
   });
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const parseDate = (iso: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) throw new RangeError(`not an ISO date: ${iso}`);
+  return Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)));
+};
+
+/** A date `days` calendar days after an ISO date: 2026-11-24 + 7 → 2026-12-01. */
+export function addCalendarDays(iso: string, days: number): string {
+  if (!Number.isInteger(days)) throw new RangeError("days are whole numbers");
+  return new Date(parseDate(iso) + days * DAY_MS).toISOString().slice(0, 10);
+}
+
+/** Calendar days from one ISO date to a later one: 2026-11-10 → 2026-12-02 is 22. */
+export function calendarDaysBetween(from: string, to: string): number {
+  return Math.round((parseDate(to) - parseDate(from)) / DAY_MS);
+}

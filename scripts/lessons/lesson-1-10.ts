@@ -12,9 +12,9 @@
  *    official rules come from the team's transcriptions in the Brain and are
  *    "לא אומת"; field numbers wait for Eylon's approval.
  */
-import { daysLeft, disposableIncome, monthlyTotal } from "../../src/lib/calc/household.ts";
+import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, monthlyTotal } from "../../src/lib/calc/household.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
-import { percentString, sharePercent } from "../../src/lib/calc/percent.ts";
+import { percentOf, percentString, sharePercent } from "../../src/lib/calc/percent.ts";
 import Decimal from "decimal.js";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -49,6 +49,20 @@ const left = (id: string, window: number, used: number): Fact => ({
   value: daysLeft(window, used),
 });
 
+const addDays = (id: string, date: string, days: number): Fact => ({
+  id,
+  kind: "hh_add_days",
+  inputs: { date, days },
+  value: addCalendarDays(date, days),
+});
+
+const between = (id: string, from: string, to: string): Fact => ({
+  id,
+  kind: "hh_days_between",
+  inputs: { from, to },
+  value: calendarDaysBetween(from, to),
+});
+
 // Case A, course-map section 8 (teaching assumptions).
 const NOAM = "12400";
 const SHIRA = "9300";
@@ -61,6 +75,15 @@ export default function lesson110(): LessonData {
   const equity = given("case.equity", EQUITY);
   const gift = given("case.gift", "200000");
   const loan = difference("case.loan", price, equity);
+  const reserve = given("case.reserve", "50000");
+  const equityToPrice = difference("case.equity_to_price", equity, reserve);
+  const loanWithReserve = difference("case.loan_with_reserve", price, equityToPrice);
+  const capLoan: Fact = {
+    id: "case.cap_loan",
+    kind: "percent_of",
+    inputs: { amount: PRICE, rate_percent: "75" },
+    value: moneyString(percentOf(PRICE, "75")),
+  };
   const WINDOW = 24;
   const NO_LIEN = 12;
   const USED = 11;
@@ -88,6 +111,18 @@ export default function lesson110(): LessonData {
       inputs: { incomes: list([NOAM, SHIRA]), payments: CAR },
       value: moneyString(disposableIncome([NOAM, SHIRA], [CAR])),
     },
+
+    // Money kept aside for the costs around the deal and for emergencies: a stated
+    // teaching assumption (not an estimate of real costs). With it, less equity goes
+    // to the price, and the loan grows.
+    reserve,
+    equityToPrice,
+    loanWithReserve,
+    share("case.ltv_with_reserve", loanWithReserve.value as string, PRICE),
+    // The cap for a only home, as lesson 1.2 teaches it (Directive 329 via the Brain; לא אומת).
+    given("ref.cap_only_home", "75"),
+    capLoan,
+    difference("case.cap_room", capLoan, loan),
 
     // The LTV exercise's common mistakes.
     share("ex.ltv_equity", EQUITY, PRICE),
@@ -129,6 +164,18 @@ export default function lesson110(): LessonData {
       inputs: { window_days: WINDOW, used_days: USED },
       value: WINDOW + USED,
     },
+
+    // Exercise: planning against the window (invented 2026 dates).
+    given("plan.approved", "2026-11-10"),
+    given("plan.appraisal", "2026-11-24"),
+    given("plan.underwriting_days", 7),
+    addDays("plan.underwriting_end", "2026-11-24", 7),
+    addDays("plan.signing", addCalendarDays("2026-11-24", 7), 1),
+    between("plan.used", "2026-11-10", addCalendarDays("2026-11-24", 8)),
+    left("plan.left", WINDOW, calendarDaysBetween("2026-11-10", addCalendarDays("2026-11-24", 8))),
+    addDays("plan.window_end", "2026-11-10", WINDOW),
+    // The mistake of counting only to the end of underwriting (1 December), not to the signing.
+    left("plan.err_to_underwriting", WINDOW, calendarDaysBetween("2026-11-10", "2026-12-01")),
 
     // Exercise: which payment day. The salaries arrive on the 9th (teaching assumption).
     given("ex.salary_day", "9"),

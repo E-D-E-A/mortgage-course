@@ -93,7 +93,7 @@ export default function lesson17(): LessonData {
   // Worked example: נועם ושירה (the course's synthetic case), בנק א׳.
   const sent = "2026-10-11"; // a Sunday
   const approved = "2026-10-14";
-  const appraisal = "2026-10-20";
+  const appraisal = "2026-10-29"; // the same date as the half-worked table
   const signing = "2026-11-05";
   const used = calendarDaysBetween(approved, signing);
 
@@ -171,12 +171,19 @@ export default function lesson17(): LessonData {
     between("ex5.err_both_ends", "2026-08-31", "2026-11-15"),
     calendarAfter("ex5.last_day", "2026-09-01", APPRAISAL),
 
-    // Exercise 6: a request sent on Thursday 17 September, before Yom Kippur.
-    given("ex6.sent", "2026-09-17"),
-    businessAfter("ex6.answer", "2026-09-17", ANSWER),
-    businessAfter("ex6.err_no_friday", "2026-09-17", ANSWER, NO_FRIDAY),
-    businessAfter("ex6.err_no_holidays", "2026-09-17", ANSWER, NO_HOLIDAYS),
-    calendarAfter("ex6.err_calendar", "2026-09-17", ANSWER),
+    // The illustration's task 2: a request sent on Thursday 17 September, before Yom Kippur.
+    given("task.sent", "2026-09-17"),
+    businessAfter("task.answer", "2026-09-17", ANSWER),
+    businessAfter("task.err_no_holidays", "2026-09-17", ANSWER, NO_HOLIDAYS),
+
+    // Exercise 6: a request sent on Thursday 16 April, before Independence Day (Wednesday 22 April).
+    given("calendar.independence", "2026-04-22"),
+    given("ex6.sent", "2026-04-16"),
+    businessAfter("ex6.answer", "2026-04-16", ANSWER),
+    businessAfter("ex6.err_no_friday", "2026-04-16", ANSWER, NO_FRIDAY),
+    businessAfter("ex6.err_no_holidays", "2026-04-16", ANSWER, NO_HOLIDAYS),
+    // Counting ordinary days (16 + 5), the same date as counting the sending day as day 1.
+    calendarAfter("ex6.err_calendar", "2026-04-16", ANSWER),
   ];
 
   return {

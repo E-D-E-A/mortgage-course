@@ -108,6 +108,63 @@
       "value": "20250.00"
     },
     {
+      "id": "case.reserve",
+      "kind": "given",
+      "inputs": {},
+      "value": "50000"
+    },
+    {
+      "id": "case.equity_to_price",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.equity",
+        "subtrahend": "case.reserve"
+      },
+      "value": "510000.00"
+    },
+    {
+      "id": "case.loan_with_reserve",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "case.equity_to_price"
+      },
+      "value": "1690000.00"
+    },
+    {
+      "id": "case.ltv_with_reserve",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "1690000.00",
+        "whole": "2200000"
+      },
+      "value": "76.82"
+    },
+    {
+      "id": "ref.cap_only_home",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "case.cap_loan",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2200000",
+        "rate_percent": "75"
+      },
+      "value": "1650000.00"
+    },
+    {
+      "id": "case.cap_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.cap_loan",
+        "subtrahend": "case.loan"
+      },
+      "value": "10000.00"
+    },
+    {
       "id": "ex.ltv_equity",
       "kind": "share_percent",
       "inputs": {
@@ -253,6 +310,78 @@
         "used_days": 11
       },
       "value": 35
+    },
+    {
+      "id": "plan.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-10"
+    },
+    {
+      "id": "plan.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-24"
+    },
+    {
+      "id": "plan.underwriting_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "plan.underwriting_end",
+      "kind": "hh_add_days",
+      "inputs": {
+        "date": "2026-11-24",
+        "days": 7
+      },
+      "value": "2026-12-01"
+    },
+    {
+      "id": "plan.signing",
+      "kind": "hh_add_days",
+      "inputs": {
+        "date": "2026-12-01",
+        "days": 1
+      },
+      "value": "2026-12-02"
+    },
+    {
+      "id": "plan.used",
+      "kind": "hh_days_between",
+      "inputs": {
+        "from": "2026-11-10",
+        "to": "2026-12-02"
+      },
+      "value": 22
+    },
+    {
+      "id": "plan.left",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 24,
+        "used_days": 22
+      },
+      "value": 2
+    },
+    {
+      "id": "plan.window_end",
+      "kind": "hh_add_days",
+      "inputs": {
+        "date": "2026-11-10",
+        "days": 24
+      },
+      "value": "2026-12-04"
+    },
+    {
+      "id": "plan.err_to_underwriting",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 24,
+        "used_days": 21
+      },
+      "value": 3
     },
     {
       "id": "ex.salary_day",

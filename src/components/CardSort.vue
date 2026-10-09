@@ -5,7 +5,7 @@
 // a right pick explains why and files the card. Buttons, not dragging, so it
 // works by touch, keyboard and screen reader alike. The piles below are the
 // table view. The page passes every text, so the lesson's term check reads it.
-import { computed, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
 import { save } from "../lib/progress.ts";
 
 interface Card {
@@ -36,6 +36,11 @@ const mistakes = ref(0);
 const current = computed(() => (placed.length < props.cards.length ? props.cards[placed.length] : null));
 const done = computed(() => current.value === null);
 const lastCard = computed(() => props.cards[placed.length - 1]);
+// Focus targets: the card to sort, the explanation after a right pick, the finish message.
+const cardEl = ref<HTMLElement | null>(null);
+const explainEl = ref<HTMLElement | null>(null);
+const doneEl = ref<HTMLElement | null>(null);
+const focusSoon = (el: () => HTMLElement | null) => nextTick(() => el()?.focus());
 const pile = (b: number) => props.cards.filter((c, i) => i < placed.length && c.bin === b);
 
 function pick(b: number) {
@@ -45,6 +50,7 @@ function pick(b: number) {
     wrongPick.value = null;
     justPlaced.value = true;
     if (done.value) save(`exercise:${props.id}`, { done: true, mistakes: mistakes.value });
+    focusSoon(() => explainEl.value);
   } else {
     wrongPick.value = b;
     mistakes.value++;
@@ -52,12 +58,14 @@ function pick(b: number) {
 }
 function next() {
   justPlaced.value = false;
+  focusSoon(() => cardEl.value);
 }
 function restart() {
   placed.splice(props.given);
   wrongPick.value = null;
   justPlaced.value = false;
   mistakes.value = 0;
+  focusSoon(() => cardEl.value);
 }
 </script>
 
@@ -69,7 +77,7 @@ function restart() {
     </p>
 
     <!-- The card to sort, or the explanation of the one just sorted. -->
-    <div v-if="justPlaced && lastCard" class="mt-3 rounded-md border-s-4 border-success bg-success-bg p-4" aria-live="polite">
+    <div v-if="justPlaced && lastCard" ref="explainEl" tabindex="-1" class="mt-3 rounded-md border-s-4 border-success bg-success-bg p-4" aria-live="polite">
       <p class="text-body-l font-semibold text-n900">״{{ lastCard.text }}״</p>
       <p class="mt-1 text-body-m text-n800"><strong>נכון: {{ bins[lastCard.bin] }}.</strong> {{ lastCard.why }}</p>
       <button
@@ -82,7 +90,7 @@ function restart() {
       </button>
     </div>
     <div v-else-if="current" class="mt-3">
-      <p class="rounded-md border border-n300 bg-n50 p-4 text-body-l font-semibold text-n900">״{{ current.text }}״</p>
+      <p ref="cardEl" tabindex="-1" class="rounded-md border border-n300 bg-n50 p-4 text-body-l font-semibold text-n900">״{{ current.text }}״</p>
       <p class="mt-3 text-caption font-semibold text-n600">לאיזו ערימה הקלף הזה שייך?</p>
       <div class="mt-2 grid gap-2 sm:grid-cols-3" role="group" aria-label="הערימות">
         <button
@@ -102,7 +110,7 @@ function restart() {
       </p>
     </div>
 
-    <p v-if="done" class="mt-4 rounded-md bg-success-bg p-3 text-body-m text-n800" role="status">
+    <p v-if="done" ref="doneEl" class="mt-4 rounded-md bg-success-bg p-3 text-body-m text-n800" role="status">
       <strong class="text-n900">כל הקלפים ממוינים{{ mistakes ? ` (עם ${mistakes === 1 ? "טעות אחת" : `${mistakes} טעויות`} בדרך)` : ", בלי טעות" }}.</strong>
       {{ success }}
     </p>
