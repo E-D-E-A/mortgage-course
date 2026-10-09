@@ -68,7 +68,8 @@ const pct = (v: number) => `${(v / scale.value) * 100}%`;
         <p class="text-caption text-n600">המכירה</p>
         <div class="mt-1 flex h-8 w-full overflow-hidden rounded-sm bg-n50">
           <div class="h-full" :style="{ width: pct(split.toLender.toNumber()), background: 'var(--mogi-teal-deep)' }"></div>
-          <div class="h-full border-s-2 border-n0" :style="{ width: pct(split.toBorrower.toNumber()), background: 'var(--mogi-turquoise-2)' }"></div>
+          <!-- No segment (and no white divider) when nothing is left to the borrower. -->
+          <div v-if="split.toBorrower.gt(0)" class="h-full border-s-2 border-n0" :style="{ width: pct(split.toBorrower.toNumber()), background: 'var(--mogi-turquoise-2)' }"></div>
         </div>
       </div>
       <div>

@@ -47,11 +47,11 @@ const incoming = computed(() => props.links.filter((l) => l.to === props.node.id
         <li v-for="l in outgoing" :key="`o-${l.to}`">
           <span class="font-semibold">{{ node.label }}</span>
           <span aria-hidden="true"> ← </span><span class="sr-only"> אל </span>
-          <button type="button" class="min-h-11 text-navy underline" @click="emit('select', l.to)">{{ byId.get(l.to)?.label }}</button>:
+          <button type="button" class="min-h-11 min-w-11 px-1 text-navy underline" @click="emit('select', l.to)">{{ byId.get(l.to)?.label }}</button>:
           {{ l.label }}
         </li>
         <li v-for="l in incoming" :key="`i-${l.from}`">
-          <button type="button" class="min-h-11 text-navy underline" @click="emit('select', l.from)">{{ byId.get(l.from)?.label }}</button>
+          <button type="button" class="min-h-11 min-w-11 px-1 text-navy underline" @click="emit('select', l.from)">{{ byId.get(l.from)?.label }}</button>
           <span aria-hidden="true"> ← </span><span class="sr-only"> אל </span>
           <span class="font-semibold">{{ node.label }}</span>:
           {{ l.label }}

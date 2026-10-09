@@ -143,6 +143,8 @@ export default function lesson110(): LessonData {
     given("rule.window_days", String(WINDOW)),
     given("rule.window_no_lien_days", String(NO_LIEN)),
     given("rule.appraisal_days", "90"),
+    // Insurance bought outside the bank: the bank answers within 14 days (Brain 9797633, לא אומת).
+    given("rule.insurance_days", "14"),
     given("rule.payday_1", "1"),
     given("rule.payday_2", "10"),
     given("rule.payday_3", "15"),

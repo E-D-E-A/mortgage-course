@@ -55,6 +55,12 @@ const setButton = (id: string) => (el: unknown) => {
   if (el instanceof HTMLElement) buttons.set(id, el);
   else buttons.delete(id);
 };
+// The list view's node buttons, for moving focus to a node opened from a card.
+const listButtons = new Map<string, HTMLElement>();
+const setListButton = (id: string) => (el: unknown) => {
+  if (el instanceof HTMLElement) listButtons.set(id, el);
+  else listButtons.delete(id);
+};
 const lines = ref<{ id: string; x1: number; y1: number; x2: number; y2: number }[]>([]);
 const size = ref({ w: 0, h: 0 });
 function measure() {
@@ -75,19 +81,37 @@ function measure() {
       return { id: String(k), x1: a.x, y1: a.y, x2: b.x, y2: b.y };
     });
 }
+// The map element is re-created when the learner goes list → map, so it is re-observed each time.
 let observer: ResizeObserver | null = null;
 onMounted(() => {
+  if (typeof ResizeObserver !== "undefined") observer = new ResizeObserver(() => measure());
   measure();
-  if (typeof ResizeObserver !== "undefined" && mapEl.value) {
-    observer = new ResizeObserver(() => measure());
-    observer.observe(mapEl.value);
-  }
 });
+watch(
+  mapEl,
+  (el, old) => {
+    if (old) observer?.unobserve(old);
+    if (el) observer?.observe(el);
+  },
+  { flush: "post" },
+);
 onBeforeUnmount(() => observer?.disconnect());
 watch([selected, asList], () => nextTick(measure));
 
 function select(id: string) {
   selected.value = id;
+}
+/** A node chosen from a card's links: the card that held the link is replaced, so focus moves to the new node, in view. */
+function selectFromCard(id: string) {
+  selected.value = id;
+  nextTick(() => {
+    const inList = listButtons.get(id);
+    const listShown = !!inList && inList.offsetParent !== null;
+    const target = listShown ? inList : buttons.get(id);
+    if (!target) return;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: listShown ? "start" : "nearest" });
+  });
 }
 function toggleInList(id: string) {
   selected.value = selected.value === id ? "" : id;
@@ -126,7 +150,7 @@ function toggleInList(id: string) {
         </svg>
         <div class="relative grid grid-cols-3 gap-3">
           <section v-for="r in regions" :key="r.id" class="rounded-lg border border-n200 p-3" :class="grid[r.id]" :aria-label="r.label">
-            <h3 class="text-caption font-semibold text-n600">{{ r.label }}</h3>
+            <h3 class="relative inline-block bg-n0 px-1 text-caption font-semibold text-n600">{{ r.label }}</h3>
             <div v-if="inRegion(r.id).length" class="mt-2 flex flex-wrap gap-2">
               <button
                 v-for="n in inRegion(r.id)"
@@ -153,7 +177,7 @@ function toggleInList(id: string) {
           :links="links"
           :region-label="regionLabel(current.region)"
           :lesson="lesson"
-          @select="select"
+          @select="selectFromCard"
         />
         <p v-else class="text-body-m text-n600">לחצו על צומת כדי לראות מה הוא עושה.</p>
       </div>
@@ -166,8 +190,9 @@ function toggleInList(id: string) {
         <ul v-if="inRegion(r.id).length" class="list-reset mt-2 grid gap-2">
           <li v-for="n in inRegion(r.id)" :key="n.id">
             <button
+              :ref="setListButton(n.id)"
               type="button"
-              class="flex min-h-11 w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
+              class="flex min-h-11 w-full scroll-mt-4 items-center justify-between gap-2 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
               :class="nodeClass(n)"
               :aria-expanded="n.id === selected"
               @click="toggleInList(n.id)"
@@ -176,7 +201,7 @@ function toggleInList(id: string) {
               <span aria-hidden="true">{{ n.id === selected ? "−" : "+" }}</span>
             </button>
             <div v-if="n.id === selected" class="mt-2">
-              <BigPictureCard :node="n" :nodes="nodes" :links="links" :region-label="r.label" :lesson="lesson" @select="select" />
+              <BigPictureCard :node="n" :nodes="nodes" :links="links" :region-label="r.label" :lesson="lesson" @select="selectFromCard" />
             </div>
           </li>
         </ul>

@@ -25,9 +25,12 @@ const equity = ref(props.equity);
 const picked = ref(0);
 const showTable = ref(false);
 
-// Equity can't be more than the price; keep it inside when the price moves down.
-watch(price, (p) => {
-  if (equity.value > p) equity.value = p;
+// Both sliders share one fixed scale, so the equity thumb stays put when the price moves.
+// Equity can't be more than the price: whichever slider moves, equity is kept at or below the price.
+const PRICE_MIN = 500000;
+const PRICE_MAX = 4000000;
+watch([price, equity], ([p, e]) => {
+  if (e > p) equity.value = p;
 });
 
 const ceiling = computed(() => props.ceilings[picked.value]);
@@ -48,13 +51,14 @@ const loanShare = computed(() => `${ratio.value.toNumber()}%`);
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">מחיר הדירה</span>
-        <input v-model.number="price" type="range" min="500000" max="4000000" step="10000" />
+        <input v-model.number="price" type="range" :min="PRICE_MIN" :max="PRICE_MAX" step="10000" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekelsText(price) }}</span></span>
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">ההון העצמי: הכסף שלכם</span>
-        <input v-model.number="equity" type="range" min="0" :max="price" step="10000" />
-        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekelsText(equity) }}</span></span>
+        <input v-model.number="equity" type="range" min="0" :max="PRICE_MAX" step="10000" />
+        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekelsText(own) }}</span></span>
+        <span class="text-caption text-n600">לא יותר ממחיר הדירה.</span>
       </label>
     </div>
 
@@ -93,11 +97,13 @@ const loanShare = computed(() => `${ratio.value.toNumber()}%`);
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ההלוואה</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>ההון העצמי</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-3 w-0 border-s-2 border-dashed border-navy"></span>התקרה</li>
+      <li class="flex items-center gap-2">
+        <svg class="h-4 w-3" viewBox="0 0 12 16" aria-hidden="true"><line x1="6" y1="0" x2="6" y2="16" stroke="var(--mogi-navy)" stroke-width="2" stroke-dasharray="3 2" /></svg>התקרה
+      </li>
     </ul>
 
     <!-- The whole bar is the price. The loan starts at the right; the ceiling is a dashed line at its percent of the price. -->
-    <div class="relative mt-8" role="img" :aria-label="`מחיר ${formatShekelsText(price)}: הלוואה ${formatShekelsText(loan)}, הון עצמי ${formatShekelsText(equity)}, שיעור מימון ${percentString(ratio)}%.`">
+    <div class="relative mt-8" role="img" :aria-label="`מחיר ${formatShekelsText(price)}: הלוואה ${formatShekelsText(loan)}, הון עצמי ${formatShekelsText(own)}, שיעור מימון ${percentString(ratio)}%.`">
       <div class="flex h-10 w-full overflow-hidden rounded-sm bg-n50">
         <div class="h-full" :style="{ width: loanShare, background: 'var(--mogi-teal-deep)' }"></div>
         <div class="h-full flex-1 border-s-2 border-n0" style="background: var(--mogi-turquoise-2)"></div>
@@ -126,7 +132,7 @@ const loanShare = computed(() => `${ratio.value.toNumber()}%`);
       <table class="w-full border-collapse text-body-m">
         <tbody>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">מחיר הדירה</th><td class="py-1"><span class="ltr">{{ formatShekels(price) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הון עצמי</th><td class="py-1"><span class="ltr">{{ formatShekels(equity) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הון עצמי</th><td class="py-1"><span class="ltr">{{ formatShekels(own) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה</th><td class="py-1"><span class="ltr">{{ formatShekels(loan) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">שיעור מימון</th><td class="py-1"><span class="ltr">{{ percentString(ratio) }}%</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">התקרה ({{ ceiling.label }})</th><td class="py-1"><span class="ltr">{{ ceiling.value }}%</span></td></tr>
