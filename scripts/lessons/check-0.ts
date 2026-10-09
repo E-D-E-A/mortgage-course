@@ -10,7 +10,7 @@ import { approxRealRate, changePercent, indexedBalance, plainNumber, realRate } 
 import { primeFromPolicy, PRIME_ADDITION, spread } from "../../src/lib/calc/lending.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentagePoints, percentOf, percentString, relativeChangePercent } from "../../src/lib/calc/percent.ts";
-import { percentOffMistake, streamValueToday, valueToday } from "../../src/lib/calc/present-value.ts";
+import { percentOffCompoundMistake, percentOffMistake, streamValueToday, valueToday } from "../../src/lib/calc/present-value.ts";
 import { effectiveAnnualRate, periodicRateByDivision, roundedString } from "../../src/lib/calc/rates.ts";
 import { simpleInterest } from "../../src/lib/calc/simple.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -98,6 +98,13 @@ export default function check0(): LessonData {
         kind: "percent_off_mistake",
         inputs: { amount: "10816", rate_percent: "4", periods: 2 },
         value: moneyString(percentOffMistake("10816", "4", 2)),
+      },
+
+      {
+        id: "q8.percent_off_repeated",
+        kind: "percent_off_compound_mistake",
+        inputs: { amount: "10816", rate_percent: "4", periods: 2 },
+        value: moneyString(percentOffCompoundMistake("10816", "4", 2)),
       },
 
       // q9 (0.6): 1,000 ₪ at the end of each of 3 years, at 5%.

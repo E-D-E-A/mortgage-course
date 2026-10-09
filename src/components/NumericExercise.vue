@@ -90,7 +90,7 @@ function unlockSolution() {
     <div class="mt-3 text-body-l text-n800"><slot /></div>
     <form class="mt-4 flex flex-wrap items-end gap-3" @submit.prevent="check">
       <label :for="inputId" class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">התשובה שלך ({{ unit }})</span>
+        <span class="text-caption font-semibold text-n600">התשובה שלכם ({{ unit }})</span>
         <input
           :id="inputId"
           v-model="text"

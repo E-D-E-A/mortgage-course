@@ -99,9 +99,11 @@ A learner carries the letters from lesson to lesson, so a letter keeps its meani
 | i | the rate before inflation (nominal), beside r for the rate after it (real) | 0.8 |
 | F | a bond's principal, repaid at the end | 0.11 |
 | y | a bond's yield; on a curve y₁, y₂ by length | 0.11 |
-| s | a spread, in percentage points | 0.9 |
+| s | a spread: written like r (as a decimal) and spoken in percentage points | 0.9 |
+| M | an index value (מדד), M₀ at the start; write "M (מדד)" at first use, since m is the monthly rate | 0.7 |
+| K | a basket's cost | 0.7 |
 
-0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. Never a table letter for something else.
+0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. Never a table letter for something else, not even as a subscript (r_F would reuse F): subscripts are words or numbers defined in the box.
 
 ## Equations and direction
 
