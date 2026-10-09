@@ -3,7 +3,9 @@ import { moneyString } from "./money.ts";
 import {
   discountFactor,
   loanBalanceTable,
+  percentOffCompoundMistake,
   percentOffMistake,
+  streamPercentOffMistake,
   streamTable,
   streamValueToday,
   valueLater,
@@ -95,5 +97,21 @@ describe("loanBalanceTable", () => {
     const rows = loanBalanceTable("2486.85", "10", 1000, 3);
     expect(rows.map((r) => moneyString(r.interest))).toEqual(["248.69", "173.55", "90.91"]);
     expect(rows.map((r) => moneyString(r.closing))).toEqual(["1735.54", "909.09", "0.00"]);
+  });
+});
+
+describe("percentOffCompoundMistake", () => {
+  it("takes r% off n times in a row", () => {
+    // 5,000 × 0.96³ = 5,000 × 0.884736 = 4,423.68 (worked by hand).
+    expect(percentOffCompoundMistake(5000, "4", 3).toString()).toBe("4423.68");
+  });
+});
+
+describe("streamPercentOffMistake", () => {
+  it("adds the percent-off values of each payment", () => {
+    // simple: 5,000 × 0.96 + 5,000 × 0.92 = 4,800 + 4,600 = 9,400
+    expect(streamPercentOffMistake(5000, "4", 2, "simple").toString()).toBe("9400");
+    // compound: 5,000 × 0.96 + 5,000 × 0.9216 = 4,800 + 4,608 = 9,408
+    expect(streamPercentOffMistake(5000, "4", 2, "compound").toString()).toBe("9408");
   });
 });

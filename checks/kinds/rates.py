@@ -85,7 +85,40 @@ def rate_conversion_table(i, _facts=None):
     ]
 
 
+def fraction_as_percent(i, facts):
+    return shown(Decimal(facts[i["fraction"]]["value"]) * 100, 10)
+
+
+def compound_table_closing(i, _facts=None):
+    # Statement convention: each period's interest rounded to the agora, then added.
+    balance = Decimal(i["principal"])
+    r = Decimal(i["rate_percent"]) / 100
+    for _ in range(int(i["periods"])):
+        balance += agorot(balance * r)
+    return str(agorot(balance))
+
+
+def share_in_percent(i, facts):
+    part = Decimal(facts[i["part"]]["value"])
+    whole = Decimal(facts[i["whole"]]["value"])
+    return shown(part / whole * 100, i["decimals"])
+
+
+def accumulated_interest(i, _facts=None):
+    p = Decimal(i["principal"])
+    n = int(i["periods"])
+    if i["method"] == "division":
+        factor = (1 + by_division(i["annual_percent"], 12) / 100) ** n
+    else:
+        factor = growth(i["annual_percent"]) ** (Decimal(n) / 12)
+    return str(agorot(p * factor - p))
+
+
 KINDS = {
+    "fraction_as_percent": fraction_as_percent,
+    "compound_table_closing": compound_table_closing,
+    "share_in_percent": share_in_percent,
+    "accumulated_interest": accumulated_interest,
     "monthly_rate_by_division": monthly_rate_by_division,
     "effective_annual_rate": effective_annual_rate,
     "monthly_rate_from_effective": monthly_rate_from_effective,

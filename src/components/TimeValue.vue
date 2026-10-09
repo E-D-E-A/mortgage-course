@@ -60,13 +60,15 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
     </div>
 
     <!-- Two banknotes on a timeline: today on the right, later on the left. Areas are in proportion to value. -->
-    <div class="mt-6 flex items-center justify-between gap-2" aria-hidden="true">
+    <div class="mt-6 flex items-center justify-between gap-2" aria-hidden="true"><!-- amounts are also in the cards below -->
       <div class="flex min-w-0 flex-1 flex-col items-center gap-2">
         <div class="flex h-28 w-full items-center justify-center">
           <div
-            class="rounded-md border-2 border-teal-deep bg-mint/50"
+            class="flex items-center justify-center rounded-md border-2 border-teal-deep bg-mint/50"
             :style="{ width: `calc(min(160px, 100%) * ${Math.max(0.15, noteScale)})`, aspectRatio: '160 / 84' }"
-          ></div>
+          >
+            <span class="ltr whitespace-nowrap text-caption font-semibold text-n900">{{ formatWholeShekels(today) }}</span>
+          </div>
         </div>
         <p class="text-caption font-semibold text-n600">שווה היום</p>
       </div>
@@ -76,7 +78,9 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
       </div>
       <div class="flex min-w-0 flex-1 flex-col items-center gap-2">
         <div class="flex h-28 w-full items-center justify-center">
-          <div class="rounded-md border-2 border-n400 bg-n100" style="width: min(160px, 100%); aspect-ratio: 160 / 84"></div>
+          <div class="flex items-center justify-center rounded-md border-2 border-n400 bg-n100" style="width: min(160px, 100%); aspect-ratio: 160 / 84">
+            <span class="ltr whitespace-nowrap text-body-m font-semibold text-n900">{{ formatWholeShekels(amount) }}</span>
+          </div>
         </div>
         <p class="text-center text-caption font-semibold text-n600">מגיע בעוד {{ years }} שנים</p>
       </div>

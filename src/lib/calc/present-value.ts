@@ -58,6 +58,28 @@ export function percentOffMistake(amount: Numeric, ratePercent: Numeric, periods
   return new D(amount).mul(ONE.minus(new D(ratePercent).div(HUNDRED).mul(periods)));
 }
 
+/**
+ * The same mistake made period by period: r% taken off n times in a row —
+ * amount × (1 − r)^n. Closer to the right answer, still not the value today.
+ */
+export function percentOffCompoundMistake(amount: Numeric, ratePercent: Numeric, periods: number): Decimal {
+  assertPeriods(periods);
+  return new D(amount).mul(ONE.minus(new D(ratePercent).div(HUNDRED)).pow(periods));
+}
+
+/**
+ * Equal payments "discounted" by taking percents off instead of dividing:
+ * "simple" takes r × k off payment k; "compound" takes r off k times.
+ */
+export function streamPercentOffMistake(payment: Numeric, ratePercent: Numeric, periods: number, method: "simple" | "compound"): Decimal {
+  assertPeriods(periods, 1);
+  let total = new D(0);
+  for (let k = 1; k <= periods; k++) {
+    total = total.plus(method === "simple" ? percentOffMistake(payment, ratePercent, k) : percentOffCompoundMistake(payment, ratePercent, k));
+  }
+  return total;
+}
+
 /** The value today of `periods` equal payments, one at the end of each period. Exact, unrounded. */
 export function streamValueToday(payment: Numeric, ratePercent: Numeric, periods: number): Decimal {
   assertPeriods(periods, 1);

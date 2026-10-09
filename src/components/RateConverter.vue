@@ -66,15 +66,15 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
         <p class="text-h2 text-navy"><span class="ltr">{{ roundedString(byDivision, 4) }}%</span></p>
         <p class="mt-1 text-caption text-n600">מצטבר בשנה (הריבית האפקטיבית)</p>
         <p class="text-h3 text-navy"><span class="ltr">{{ roundedString(effective, 2) }}%</span></p>
-        <p class="text-caption text-n600">ריבית אחרי 12 חודשים: <span class="ltr">{{ formatShekels(months[11].division) }}</span></p>
+        <p class="text-caption text-n600">סכום הסכום הריבית אחרי 12 חודשים: <span class="ltr">{{ formatShekels(months[11].division) }}</span></p>
       </div>
       <div class="rounded-md bg-n50 p-3">
-        <p class="text-caption font-semibold text-n700">דרך 2: שורש 12</p>
+        <p class="text-caption font-semibold text-n700">דרך 2: השורש ה־12</p>
         <p class="mt-1 text-caption text-n600">ריבית חודשית</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ roundedString(byRoot, 4) }}%</span></p>
         <p class="mt-1 text-caption text-n600">מצטבר בשנה</p>
         <p class="text-h3 text-navy"><span class="ltr">{{ rateText }}%</span></p>
-        <p class="text-caption text-n600">ריבית אחרי 12 חודשים: <span class="ltr">{{ formatShekels(months[11].root) }}</span></p>
+        <p class="text-caption text-n600">סכום הסכום הריבית אחרי 12 חודשים: <span class="ltr">{{ formatShekels(months[11].root) }}</span></p>
       </div>
     </div>
 
@@ -82,7 +82,7 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
 
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ריבית שנצברה — חלוקה ב־12</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>ריבית שנצברה — שורש 12</li>
+      <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>ריבית שנצברה — השורש ה־12</li>
       <li class="flex items-center gap-2"><span class="inline-block h-0 w-5 border-t-2 border-dashed border-navy"></span>הריבית השנתית, פעם אחת בשנה</li>
     </ul>
 
@@ -106,7 +106,7 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
       >
         <p class="font-semibold text-n900">אחרי {{ months[hover].month }} חודשים</p>
         <p>חלוקה ב־12: <span class="ltr">{{ formatShekels(months[hover].division) }}</span></p>
-        <p>שורש 12: <span class="ltr">{{ formatShekels(months[hover].root) }}</span></p>
+        <p>השורש ה־12: <span class="ltr">{{ formatShekels(months[hover].root) }}</span></p>
       </div>
       <p class="mt-1 text-center text-caption text-n600">חודשים (מימין לשמאל)</p>
     </div>
@@ -120,7 +120,7 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-2 text-start">חודש</th>
             <th class="py-2 text-start">ריבית שנצברה — חלוקה ב־12</th>
-            <th class="py-2 text-start">ריבית שנצברה — שורש 12</th>
+            <th class="py-2 text-start">ריבית שנצברה — השורש ה־12</th>
           </tr>
         </thead>
         <tbody>

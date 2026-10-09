@@ -134,6 +134,41 @@ const difference = (id: string, minuend: Fact, subtrahend: Fact): Fact => ({
 
 const given = (id: string, value: string): Fact => ({ id, kind: "given", inputs: {}, value });
 
+/** A decimal written as a percent: "1.126825" → "112.6825" (the "forgot to subtract 1" mistake). */
+const asPercent = (id: string, of: Fact): Fact => ({
+  id,
+  kind: "fraction_as_percent",
+  inputs: { fraction: of.id },
+  value: new Decimal(of.value as string).mul(100).toFixed(),
+});
+
+/** The final balance of the statement-style table (each period's interest rounded, then added). */
+const tableClosing = (id: string, principal: string, rate: string, periods: number): Fact => ({
+  id,
+  kind: "compound_table_closing",
+  inputs: { principal, rate_percent: rate, periods },
+  value: moneyString(compoundTable(principal, rate, periods).at(-1)!.closing),
+});
+
+/** What share of `whole` `part` is, in percent: (616.79, 10,000) → "6.17". */
+const percentOf = (id: string, part: Fact, whole: Fact, decimals: number): Fact => ({
+  id,
+  kind: "share_in_percent",
+  inputs: { part: part.id, whole: whole.id, decimals },
+  value: roundedString(new Decimal(part.value as string).div(whole.value as string).mul(100), decimals),
+});
+
+/** Interest gathered on `principal` after `periods` months, by ÷ 12 or by the twelfth root. */
+const gathered = (id: string, principal: string, annual: string, periods: number, method: "division" | "root"): Fact => {
+  const monthly = method === "division" ? periodicRateByDivision(annual, 12) : periodicRateFromEffective(annual, 12);
+  return {
+    id,
+    kind: "accumulated_interest",
+    inputs: { principal, annual_percent: annual, periods, method },
+    value: moneyString(new Decimal(principal).mul(growthFactor(monthly, periods)).minus(principal)),
+  };
+};
+
 export default function lesson04(): LessonData {
   // The running example: 10,000 ₪ at 6% a year, interest added every month.
   const principal = given("explain.principal", "10000.00");
@@ -151,6 +186,14 @@ export default function lesson04(): LessonData {
   const ex4Principal = given("ex4.principal", "50000.00");
 
   const monthly6 = byDivision("rate.monthly_6", "6", 4);
+  const effective6Long = effective("rate.effective_6_long", "6", 4);
+  const root6 = fromEffective("rate.root_6", "6", 4);
+  const tableAfter12 = tableClosing("explain.table_after_12", "10000", "0.5", 12);
+  const tableInterest = difference("explain.table_interest", tableAfter12, principal);
+  const ex3 = effective("ex3.answer", "12", 2);
+  const ex3Factor = factor("ex3.factor", "1", 12, 6);
+  const ex5 = fromEffective("ex5.answer", "5", 4);
+  const ex5Root = rootFactor("ex5.root_factor", "5", 6);
 
   const facts: Fact[] = [
     asFraction("rate.monthly_6_fraction", monthly6),
@@ -168,9 +211,14 @@ export default function lesson04(): LessonData {
     difference("explain.interest_once", onceAYear, principal),
     difference("explain.extra", after12, onceAYear),
     effective("rate.effective_6", "6", 2),
-    effective("rate.effective_6_long", "6", 4),
+    effective6Long,
+    asFraction("rate.effective_6_fraction", effective6Long),
+    tableAfter12,
+    tableInterest,
+    percentOf("explain.table_percent", tableInterest, principal, 2),
     factor("rate.factor_6", "0.5", 12, 6),
-    fromEffective("rate.root_6", "6", 4),
+    root6,
+    asFraction("rate.root_6_fraction", root6),
     rootFactor("rate.root_factor_6", "6", 6),
     atEffective("explain.root_after_12", "10000", "6", 12),
     series("video.series_6", "10000", "6", 12),
@@ -180,6 +228,8 @@ export default function lesson04(): LessonData {
     byDivision("slider.monthly_12", "12", 4),
     fromEffective("slider.root_12", "12", 4),
     effective("slider.effective_1", "1", 4),
+    gathered("slider.interest_1_division", "10000", "1", 12, "division"),
+    gathered("slider.interest_1_root", "10000", "1", 12, "root"),
 
     // Worked example.
     byDivision("worked.monthly_a", "4.8", 4),
@@ -196,8 +246,10 @@ export default function lesson04(): LessonData {
     ex1,
     asFraction("ex1.err_fraction", ex1),
     timesTwelve("ex1.err_times", "9"),
-    effective("ex3.answer", "12", 2),
-    factor("ex3.factor", "1", 12, 6),
+    ex3,
+    ex3Factor,
+    asFraction("ex3.err_fraction", ex3),
+    asPercent("ex3.err_factor_percent", ex3Factor),
     byDivision("ex3.err_monthly", "12", 4),
     ex4,
     ex4Principal,
@@ -206,8 +258,10 @@ export default function lesson04(): LessonData {
     compound("ex4.err_one_month", "50000", "0.3", 1),
     byDivision("ex4.monthly", "3.6", 4),
     factor("ex4.factor", "0.3", 12, 6),
-    fromEffective("ex5.answer", "5", 4),
-    rootFactor("ex5.root_factor", "5", 6),
+    ex5,
+    ex5Root,
+    asFraction("ex5.err_fraction", ex5),
+    asPercent("ex5.err_factor_percent", ex5Root),
     byDivision("ex5.err_division", "5", 4),
     effective("ex6.effective_a", "5.4", 2),
     factor("ex6.factor_a", "0.45", 12, 6),

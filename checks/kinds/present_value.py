@@ -2,7 +2,7 @@
 
 Recomputed with Python's Decimal; nothing here comes from src/lib/calc.
 """
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 
 from kinds.common import agorot, growth
 
@@ -74,7 +74,29 @@ def sum_of_facts(i, facts):
     return str(agorot(sum(Decimal(facts[t]["value"]) for t in str(i["terms"]).split(","))))
 
 
+def percent_off_compound_mistake(i, _facts=None):
+    r = Decimal(i["rate_percent"]) / 100
+    return str(agorot(Decimal(i["amount"]) * (1 - r) ** int(i["periods"])))
+
+
+def stream_percent_off_mistake(i, _facts=None):
+    p, r = Decimal(i["payment"]), Decimal(i["rate_percent"]) / 100
+    ks = range(1, int(i["periods"]) + 1)
+    if i["method"] == "simple":
+        return str(agorot(sum(p * (1 - r * k) for k in ks)))
+    return str(agorot(sum(p * (1 - r) ** k for k in ks)))
+
+
+def thousand_bound(i, facts):
+    v = Decimal(facts[i["of"]]["value"]) / 1000
+    rounding = ROUND_CEILING if i["direction"] == "up" else ROUND_FLOOR
+    return str(agorot(v.quantize(Decimal(1), rounding=rounding) * 1000))
+
+
 KINDS = {
+    "percent_off_compound_mistake": percent_off_compound_mistake,
+    "stream_percent_off_mistake": stream_percent_off_mistake,
+    "thousand_bound": thousand_bound,
     "value_today": value_today,
     "percent_off_mistake": percent_off_mistake,
     "value_today_table": value_today_table,

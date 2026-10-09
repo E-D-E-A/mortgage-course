@@ -9,7 +9,7 @@
  */
 import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
-import { loanBalanceTable, streamValueToday, valueToday } from "../../src/lib/calc/present-value.ts";
+import { loanBalanceTable, streamPercentOffMistake, streamValueToday, valueToday } from "../../src/lib/calc/present-value.ts";
 import { growthFactor, roundedString } from "../../src/lib/calc/rates.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -60,6 +60,25 @@ const loan = (id: string, principal: string, rate: string, payment: string, peri
 });
 
 /** The sum of other facts' money values (each already rounded to the agora). */
+/** Payments "discounted" by taking percents off instead of dividing (the mistake from lesson 0.5). */
+const percentOffStream = (id: string, payment: string, rate: string, periods: number, method: "simple" | "compound"): Fact => ({
+  id,
+  kind: "stream_percent_off_mistake",
+  inputs: { payment, rate_percent: rate, periods, method },
+  value: moneyString(streamPercentOffMistake(payment, rate, periods, method)),
+});
+
+/** A value rounded down or up to the thousand, for a range in an answer choice: 7,721.73 → 7,000 / 8,000. */
+const thousandBound = (id: string, of: Fact, direction: "down" | "up"): Fact => {
+  const k = new Decimal(of.value as string).div(1000);
+  return {
+    id,
+    kind: "thousand_bound",
+    inputs: { of: of.id, direction },
+    value: moneyString((direction === "up" ? k.ceil() : k.floor()).mul(1000)),
+  };
+};
+
 const sum = (id: string, terms: Fact[]): Fact => ({
   id,
   kind: "sum_of_facts",
@@ -82,7 +101,12 @@ export default function lesson06(): LessonData {
   const p2 = given("explain.pay_2", "1210.00");
   const v1 = today("explain.today_1", "1100", "10", 1);
   const v2 = today("explain.today_2", "1210", "10", 2);
-  const v2Once = today("ex2.err_once", "1210", "10", 1);
+  // Exercise 2: 2,200 after a year and 2,420 after two, at 10%.
+  const ex2p1 = given("ex2.pay_1", "2200.00");
+  const ex2p2 = given("ex2.pay_2", "2420.00");
+  const ex2v1 = today("ex2.today_1", "2200", "10", 1);
+  const ex2v2 = today("ex2.today_2", "2420", "10", 2);
+  const ex2v2Once = today("ex2.err_once", "2420", "10", 1);
 
   // Part 2: three payments of 1,000 at 10%.
   const threeTotal = total("explain.three_total", "1000", 3);
@@ -124,6 +148,8 @@ export default function lesson06(): LessonData {
     todayTable("video.table_10", "1000", "5", 10, 6),
     today("prediction.lump", "10000", "5", 10),
     difference("prediction.gap", predTotal, predToday),
+    thousandBound("prediction.low", predToday, "down"),
+    thousandBound("prediction.high", predToday, "up"),
 
     // The slider's guided tasks.
     stream("slider.today_30", "1000", "5", 30),
@@ -145,17 +171,27 @@ export default function lesson06(): LessonData {
     stream("half.total", "2000", "5", 3),
 
     // Exercises (exercise 2's answer is explain.sum_today).
-    v2Once,
-    sum("ex2.err_both_once", [v1, v2Once]),
+    ex2p1,
+    ex2p2,
+    ex2v1,
+    ex2v2,
+    ex2v2Once,
+    sum("ex2.answer", [ex2v1, ex2v2]),
+    sum("ex2.err_nominal", [ex2p1, ex2p2]),
+    sum("ex2.err_both_once", [ex2v1, ex2v2Once]),
     ex3a,
     ex3b,
     stream("ex3.answer", "5000", "4", 2),
     total("ex3.err_total", "5000", 2),
     sum("ex3.err_both_one_year", [ex3a, ex3a]),
     sum("ex3.err_both_two_years", [ex3b, ex3b]),
+    percentOffStream("ex3.err_off", "5000", "4", 2, "simple"),
+    percentOffStream("ex3.err_off_repeated", "5000", "4", 2, "compound"),
     stream("ex4.answer", "1000", "6", 4),
     total("ex4.err_total", "1000", 4),
     today("ex4.err_lump", "4000", "6", 4),
+    percentOffStream("ex4.err_off", "1000", "6", 4, "simple"),
+    percentOffStream("ex4.err_off_repeated", "1000", "6", 4, "compound"),
     ex5Today,
     ex5Lent,
     ex5Total,

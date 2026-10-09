@@ -253,6 +253,24 @@
       "value": "2278.27"
     },
     {
+      "id": "prediction.low",
+      "kind": "thousand_bound",
+      "inputs": {
+        "of": "prediction.today",
+        "direction": "down"
+      },
+      "value": "7000.00"
+    },
+    {
+      "id": "prediction.high",
+      "kind": "thousand_bound",
+      "inputs": {
+        "of": "prediction.today",
+        "direction": "up"
+      },
+      "value": "8000.00"
+    },
+    {
       "id": "slider.today_30",
       "kind": "stream_value_today",
       "inputs": {
@@ -415,22 +433,70 @@
       "value": "5446.50"
     },
     {
-      "id": "ex2.err_once",
+      "id": "ex2.pay_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200.00"
+    },
+    {
+      "id": "ex2.pay_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "2420.00"
+    },
+    {
+      "id": "ex2.today_1",
       "kind": "value_today",
       "inputs": {
-        "amount": "1210",
+        "amount": "2200",
         "rate_percent": "10",
         "periods": 1
       },
-      "value": "1100.00"
+      "value": "2000.00"
+    },
+    {
+      "id": "ex2.today_2",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "2420",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "ex2.err_once",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "2420",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "2200.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "ex2.today_1,ex2.today_2"
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "ex2.err_nominal",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "ex2.pay_1,ex2.pay_2"
+      },
+      "value": "4620.00"
     },
     {
       "id": "ex2.err_both_once",
       "kind": "sum_of_facts",
       "inputs": {
-        "terms": "explain.today_1,ex2.err_once"
+        "terms": "ex2.today_1,ex2.err_once"
       },
-      "value": "2100.00"
+      "value": "4200.00"
     },
     {
       "id": "ex3.first",
@@ -488,6 +554,28 @@
       "value": "9245.56"
     },
     {
+      "id": "ex3.err_off",
+      "kind": "stream_percent_off_mistake",
+      "inputs": {
+        "payment": "5000",
+        "rate_percent": "4",
+        "periods": 2,
+        "method": "simple"
+      },
+      "value": "9400.00"
+    },
+    {
+      "id": "ex3.err_off_repeated",
+      "kind": "stream_percent_off_mistake",
+      "inputs": {
+        "payment": "5000",
+        "rate_percent": "4",
+        "periods": 2,
+        "method": "compound"
+      },
+      "value": "9408.00"
+    },
+    {
       "id": "ex4.answer",
       "kind": "stream_value_today",
       "inputs": {
@@ -515,6 +603,28 @@
         "periods": 4
       },
       "value": "3168.37"
+    },
+    {
+      "id": "ex4.err_off",
+      "kind": "stream_percent_off_mistake",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "6",
+        "periods": 4,
+        "method": "simple"
+      },
+      "value": "3400.00"
+    },
+    {
+      "id": "ex4.err_off_repeated",
+      "kind": "stream_percent_off_mistake",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "6",
+        "periods": 4,
+        "method": "compound"
+      },
+      "value": "3434.93"
     },
     {
       "id": "ex5.today",

@@ -10,7 +10,7 @@
 import Decimal from "decimal.js";
 import { simpleBalance } from "../../src/lib/calc/compound.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
-import { percentOffMistake, valueLater, valueToday } from "../../src/lib/calc/present-value.ts";
+import { percentOffCompoundMistake, percentOffMistake, valueLater, valueToday } from "../../src/lib/calc/present-value.ts";
 import { growthFactor, roundedString } from "../../src/lib/calc/rates.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -33,6 +33,14 @@ const percentOff = (id: string, amount: string, rate: string, periods: number): 
   kind: "percent_off_mistake",
   inputs: { amount, rate_percent: rate, periods },
   value: moneyString(percentOffMistake(amount, rate, periods)),
+});
+
+/** r% taken off n times in a row: amount × (1 − r)^n. */
+const percentOffRepeated = (id: string, amount: string, rate: string, periods: number): Fact => ({
+  id,
+  kind: "percent_off_compound_mistake",
+  inputs: { amount, rate_percent: rate, periods },
+  value: moneyString(percentOffCompoundMistake(amount, rate, periods)),
 });
 
 const factor = (id: string, rate: string, periods: number, decimals: number): Fact => ({
@@ -133,10 +141,10 @@ export default function lesson05(): LessonData {
     // Exercises.
     ex2,
     ex2Principal,
-    later("ex3.err_grown", "990", "10", 1),
-    today("ex3.answer", "1100", "10", 1),
-    percentOff("ex3.err_off", "1100", "10", 1),
-    later("ex3.err_times", "1100", "10", 1),
+    later("ex3.err_grown", "1485", "10", 1),
+    today("ex3.answer", "1650", "10", 1),
+    percentOff("ex3.err_off", "1650", "10", 1),
+    later("ex3.err_times", "1650", "10", 1),
     later("ex4.answer", "1000", "6", 3),
     {
       id: "ex4.err_simple",
@@ -148,6 +156,7 @@ export default function lesson05(): LessonData {
     today("ex5.answer", "5000", "4", 3),
     factor("ex5.factor", "4", 3, 6),
     percentOff("ex5.err_off", "5000", "4", 3),
+    percentOffRepeated("ex5.err_off_repeated", "5000", "4", 3),
     later("ex5.err_times", "5000", "4", 3),
     today("ex5.err_once", "5000", "4", 1),
     ex6Today,
