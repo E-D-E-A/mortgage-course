@@ -142,6 +142,12 @@ export default function lesson12(): LessonData {
   const aEquity = given("caseA.equity", "560000");
   const aLoan = loan("caseA.loan", "2200000", "560000");
   const aMaxLoan = maxLoanFact("caseA.max_loan", "2200000", onlyHome);
+  const aMinValue: Fact = {
+    id: "caseA.min_value",
+    kind: "ltv_min_value",
+    inputs: { loan: aLoan.value as string, ceiling: onlyHome },
+    value: moneyString(new Decimal(aLoan.value as string).mul(100).div(onlyHome)),
+  };
   const aMinEquity = minEquityFact("caseA.min_equity", "2200000", "2200000", onlyHome);
 
   // The price-against-value example: price 1,000,000, value 950,000.
@@ -211,7 +217,12 @@ export default function lesson12(): LessonData {
     // Rounding near the ceiling: 1,500,050 on 2,000,000.
     given("round.loan", "1500050"),
     given("round.value", "2000000"),
-    ltv("round.ltv2", "1500050", "2000000"),
+    {
+      id: "round.ltv2_shown",
+      kind: "ltv_percent_fixed",
+      inputs: { loan: "1500050", value: "2000000" },
+      value: ltvPercent("1500050", "2000000").toFixed(2, Decimal.ROUND_HALF_UP),
+    },
     ltv("round.ltv4", "1500050", "2000000", 4),
 
     // The illustration's guided tasks.
@@ -229,7 +240,9 @@ export default function lesson12(): LessonData {
     aEquity,
     aLoan,
     ltv("caseA.ltv", aLoan.value as string, "2200000"),
-    ltv("caseA.ltv1", aLoan.value as string, "2200000", 1),
+    // The lowest value that keeps the loan within the ceiling: loan ÷ ceiling × 100, and its distance below the price.
+    aMinValue,
+    difference("caseA.value_room", aPrice, aMinValue),
     pointsGap("caseA.gap_points", onlyHome, aLoan.value as string, "2200000"),
     aMaxLoan,
     difference("caseA.loan_room", aMaxLoan, aLoan),
@@ -264,6 +277,7 @@ export default function lesson12(): LessonData {
     share("ex3.equity_share", "392000", "1400000"),
     share("ex3.equity_over_loan", "392000", e3Loan.value as string),
     share("ex3.loan_over_equity", e3Loan.value as string, "392000"),
+    fraction("ex3.as_decimal", percentString(ltvPercent(e3Loan.value as string, "1400000"))),
 
     // Exercise 4: the largest loan on 1,800,000 under the 75% ceiling.
     given("ex4.price", "1800000"),
@@ -285,6 +299,8 @@ export default function lesson12(): LessonData {
     e6Equity,
     e6Loan,
     ltv("ex6.answer", e6Loan.value as string, "2200000"),
+    ltv("ex6.one_decimal", e6Loan.value as string, "2200000", 1),
+    fraction("ex6.as_decimal", percentString(ltvPercent(e6Loan.value as string, "2200000"))),
     share("ex6.equity_share", e6Equity.value as string, "2200000"),
 
     // Exercise 7: the dearest home 560,000 can buy under 75%.
@@ -296,6 +312,8 @@ export default function lesson12(): LessonData {
     },
     times("ex7.times_three", "560000", "3"),
     divide("ex7.divided", "560000", "0.75"),
+    divide("ex7.divided_by_25", "560000", "25"),
+    times("ex7.times_125", "560000", "1.25"),
     fraction("ex7.loan_fraction", onlyHome),
     fraction("ex7.own_fraction", complementValue(onlyHome)),
     maxLoanFact("ex7.check_loan", moneyString(maxPrice("560000", onlyHome)), onlyHome),

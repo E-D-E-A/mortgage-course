@@ -198,3 +198,155 @@ Items below: severity (**חוסם** / **חשוב** / **קטן**), the exact quot
 
 6. **קטן.** The worked example's family is "דנה ויואב". "דנה" was already the borrower who lost her income in 1.1's worked example. A reader who goes back to 1.1 meets two different Danas.
    - Fix: rename this one, for example "מיכל ויואב".
+
+---
+
+## Lesson 1.10: סדנה: עושים את זה לבד
+
+**Does it deliver the stage's three products?** Mostly.
+- The first-meeting questions (14 items) and the do-it-yourself list (12 steps, 64 items) are real take-aways: saved in the browser, with notes, and printable.
+- The deal map is a reading table plus a `FillTable`. `FillTable` saves only a done flag (`save(exercise:…, {done})`), not the values. The map vanishes on reload and is left out of the print view. See item 3.
+- The stage check is linked from the summary and from the footer button.
+
+1. **חשוב.** Exercise 5 (line 693): the salary arrives on the 9th, and the payment day can be the 1st, 10th or 15th. "איזה יום מסוכן להם?" The answer is "the 1st", but its explanation is wrong, and the question has two defensible answers.
+   - The feedback says "ב־1 בחודש המשכורות עוד לא נכנסו, והתשלום יורד מחשבון שעוד לא קיבל אותן". But on the 1st, last month's salary has been in the account for 22 days.
+   - The real risk on the 1st is that the account is at its lowest at the end of the pay cycle.
+   - The 10th is also risky, with one day of margin if a salary is late, and the feedback calls it only "אפשרי".
+   - Fix:
+     - The question: "איזה יום הכי רחוק מיום המשכורת, ולכן הכי מסוכן?"
+     - The feedback: "ב־1 בחודש עברו 22 יום מאז שהמשכורות נכנסו, ובחשבון נשאר בדרך כלל הכי מעט כסף."
+     - Under the 10th, add: "יום אחד של מרווח: אם משכורת מתעכבת, גם זה מסוכן."
+   - Also add "(בנקים רשאים להציע גם ימים אחרים)". The notes on J-160 say so, and the lesson implies the three days are the only choice.
+
+2. **חשוב.** Exercise 2, feedback on "אין צורך בשמאי בדירה יד שנייה" (line 644): "בנק לא מלווה לפני שיש לו שמאות של הנכס. זה נכון לכל דירה." The notes say otherwise.
+   - J-140 / J-160 (`brain-product-journey.md` line 851): "internal refinance needs no appraisal".
+   - FK-H-036: in a developer's project or מחיר למשתכן, a project-level report replaces an individual appraisal.
+   - The feedback on "מיד, לפני ההגשה" also says "בנק **מתחייב** רק לגבי שמאות של שמאי שברשימה שלו". The rule as copied is only "לא יסרב שלא באופן סביר".
+   - Fix:
+     - "בקנייה של דירה יד שנייה הבנק מבקש שמאות לפני שהוא מלווה. (יש מקרים אחרים, כמו מחזור באותו בנק, שבהם לפי הצוות לא תמיד צריך.)"
+     - "…בנק לא יסרב שלא באופן סביר רק לשמאות של שמאי שברשימה שלו."
+
+3. **חשוב.** Product 1, the deal map ("תוצר 1: מפת העסקה"):
+   - **It is not kept.** Its four computed numbers are not saved, and the summary says only the two lists can be printed ("אפשר להדפיס את שתי הרשימות"). The learner ends the stage without the first product.
+   - **It breaks on the phone.** The two-column table has no row lines. "(אם יש)" splits from "יועץ משכנתאות" and lands beside the next cell's text. The prefix "ו" of "ומשכנתא" sits alone at the end of a line. "טאבו, או / רשות מקרקעי ישראל / , או חברה משכנת" starts a line with a comma.
+   - Fix:
+     - Render the map as cards, or give each row a border.
+     - Keep the prefix and the parenthesis inside a `whitespace-nowrap` span.
+     - After "בדיקה", show the completed numbers, and add the map, people and numbers both, to the printable view, or to a `DiyChecklist`-style saved block.
+
+4. **חשוב.** Difficulty order of the six "איפה נופלים" exercises (lines 629 on) is not honest.
+   - Exercise 2 is labelled **קל**, but it is the one question the lesson calls an open contradiction ("זו סתירה פתוחה (ראו צעד 8)").
+   - Exercises 6 and 7 are labelled **מאתגר**, but each is a multiple choice where one option is plainly sensible and the others are absurd ("לוותר על הביטוחים", "לוותר על הדירה").
+   - Fix: relabel 2 as בינוני and 6–7 as קל or בינוני. For a real מאתגר, add a planning item that mixes two clocks.
+     - Example: "האישור הגיע ב־X; האיסוף לקח N ימים; השמאי פנוי רק ב־Y. האם החתימה ב־Z עוד בתוך החלון?" Add the dates as facts.
+
+5. **חשוב.** "המספרים החשובים": "הלוואה שצריך" = price − all the equity (1,640,000 ₪). This silently uses every shekel for the price.
+   - Lesson 1.9 has just taught "יש הוצאות סביב העסקה, מעבר למחיר הדירה… גם הן צריכות כסף זמין" and "כמה יישאר בצד אחרי העסקה".
+   - The table also lists "מזה: מתנה, עוד לא הגיעה" one line above. A do-it-yourself reader copies this and under-borrows, or plans to spend money that is not there yet.
+   - Fix: label the row "הלוואה שצריך, אם כל ההון העצמי הולך למחיר", with a line under the table: "בפועל צריך להשאיר גם כסף להוצאות סביב העסקה ולמקרה חירום (שיעור 1.9) — ואז ההלוואה גדלה, ושיעור המימון עולה. נחזור לזה בשלב 6."
+
+6. **קטן.** Line 496: "אין בה הסבר חדש". The checklist brings several new facts and terms with no explanation:
+   - "חיוב או זיכוי על הימים שבין העברת הכסף לתחילת ההלוואה" (step 12). "Start of the loan" reads as the same moment as the money moving.
+   - "מוטב" (step 10, line 431); 1.6 said "רשום כמי שמקבל את הכסף".
+   - "ספח" (step 2, line 188).
+   - "דיווח לרשויות המס על העסקה" (step 7).
+   - The file-opening fee, and the 3–4 months for registration at רמ״י.
+   - Fix:
+     - Line 496: "אין בה נושא חדש, אבל ברשימה יש פרטים מעשיים חדשים, כל אחד עם המקור שלו."
+     - Step 12: "בין היום שבו הכסף עובר לבין היום שממנו הבנק סופר את התשלומים".
+     - Step 10: "כמוטב (מי שמקבל את הכסף מהביטוח)".
+     - Step 2: "ספח (הדף שמצורף לתעודה, עם הכתובת ובני המשפחה)".
+
+7. **קטן.** Line 591: "אלה שש השאלות של שיעור 1.9". The six topics here differ from 1.9's six.
+   - 1.9: יכולת החזר · ההכנסה · ההתחייבויות · הנזילות · לוחות הזמנים · התוכניות.
+   - 1.10: העסקה · יכולת החזר · ההכנסה · ההתחייבויות · הכסף והנזילות · זמנים ותוכניות. A new "העסקה" is added, and two topics are merged.
+   - Fix: "אלה שאלות הבירור של שיעור 1.9, בשישה נושאים: הוספנו את העסקה עצמה, וחיברנו את לוחות הזמנים והתוכניות."
+
+8. **קטן.** Exercise 1: "שימו לב למספר הזה: בשלב 4 נראה שהוא קרוב מאוד לסף חשוב." Lesson 1.2 already showed this: its summary has "נועם ושירה: שיעור מימון של 74.55%, 10,000 ₪ מתחת לגבול".
+   - Fix: "זה המספר משיעור 1.2: 10,000 ₪ מתחת לתקרה של 75%. בשלב 4 נראה למה זה חשוב."
+
+9. **קטן.** Line 742: "בשלב 2 נכיר את המסלולים". Lesson 1.4 already taught what a track is.
+   - Fix: "בשלב 2 נכיר את סוגי המסלולים ואת הריביות שלהם".
+
+10. **קטן.** In the checklists, the pitfalls ("איפה נופלים") have checkboxes and count toward "סימנתם 0 מתוך 64". It is unclear what ticking a pitfall means: "I fell in", or "I checked I avoided it".
+    - Fix: put a line above each pitfall group, "סמנו כשבדקתם שזה לא קורה לכם". Or leave pitfalls without checkboxes and count only "מה מביאים / מה שואלים".
+
+11. **קטן.** The slogan is inserted into a question and inverted into a pitfall, where it reads as a riddle.
+    - Question list, topic 2: "כמה אתם משלמים היום על דיור? המשכנתא אמורה להחליף את השכירות, לא את החיים."
+    - Step 1 (line 174): "בונים על תשלום שמחליף את החיים, לא את שכר הדירה."
+    - Fix:
+      - Topic 2: keep only the question, and put the quote in the source badge.
+      - Step 1: "קובעים תשלום חודשי שלא משאיר מספיק למחיה. אילון: ״המשכנתא אמורה להחליף את השכירות — לא את החיים״."
+
+12. **קטן.** Deal map row "עורכי דין — החוזה בין הקונים למוכר" (line 533). It names only the contract and puts the lawyers in the plural.
+    - 1.6 taught one buyers' lawyer, who checks the registry and has the caution note registered.
+    - Fix: "עורך הדין של הקונים — בודק מה רשום על הדירה, החוזה, והערת האזהרה לטובת הקונים".
+
+13. **קטן.** Step 10 lacks a pitfall the notes support. When a policy is bought outside the bank, the bank has up to **14 days** to say whether it meets the requirements (451 §11(ב)(2), in `brain-product-journey.md` line 867; directive 253 may have changed this deadline). Buying it in the last days before the signing is exactly the risk exercise 6 is about.
+    - Fix, a pitfall: "קונים ביטוח מחוץ לבנק ימים ספורים לפני החתימה. לפי ההוראה, כפי שהצוות העתיק, לבנק יש עד 14 יום לאשר פוליסה חיצונית (לא אומת; ייתכן ששונה בהוראת שעה)."
+
+14. **קטן.** Steps 11–12 and the timeline: "נרשמת הערת אזהרה לטובת הבנק". Per the J-170 notes, the security is a הערת אזהרה **or** a משכון זכויות when the rights are not registered (line 476). Exercise 7 (rights at רמ״י) is exactly that case.
+    - Fix, step 12: "נרשמת לטובת הבנק הערת אזהרה (או, כשהזכויות לא רשומות בטאבו, משכון זכויות)".
+
+15. **קטן.** The badge "ידע מהשטח — לא מיוחס" on step 10 (FK-H-049), "הפוליסה של הבנק היא בדרך כלל היקרה", is used in the checklist and in exercise 6's feedback. `eylon-list.md` marks FK-H-049 "אין דובר בשם — צריך ייחוס או מחיקה". Lesson 1.7 uses FK-H-079 ("משכנתא מהירה כ־21 יום"), which has the same mark.
+    - Fix: before publishing, attribute both or remove them, as the list asks. Until then, remove the claim from exercise 6's feedback, so that a graded answer does not rest on it.
+
+---
+
+## Cross-lesson items
+
+1. **חשוב. The purchase contract has no place in the process.**
+   - In 1.6's worked example, the contract and the caution note for the buyers come first, before the advisor is hired.
+   - 1.7's 12 steps (and 1.10's copy of them) have no contract step. The contract appears only as a document in step 2.
+   - 1.9 and 1.10 then ask "מתי נחתם החוזה" and "כבר נחתם חוזה?".
+   - A do-it-yourself reader is never told whether people usually sign before or after the pre-approval, or what the risk is either way. That is the stage's main practical question.
+   - The research does not settle it: J-020 only notes that "a signed contract marks a different client type".
+   - Fix:
+     - In 1.7, after the four parts: "ואיפה החוזה עם המוכר? הוא לא אחד מ־12 הצעדים, כי אין לו מקום קבוע: יש מי שחותמים לפני האישור העקרוני ויש מי שאחרי. מי שחותם לפני, מתחייב למועדי תשלום לפני שהוא יודע כמה בנק ילווה לו."
+     - Mark that sentence as the team's description, and add the question to `eylon-list.md`.
+     - In 1.10, step 1 or step 3, add the matching question: "חתמנו כבר על חוזה? אם כן, מה מועדי התשלום בו, ומה קורה אם האישור מתעכב?"
+
+2. **חשוב. When is the appraiser ordered? Three answers.**
+   - 1.6's worked example: from bank A's list, before a bank is chosen.
+   - 1.7: step 8, after "בחירת בנק ופתיחת תיק", with the card "מזמינים שמאי מהרשימה של הבנק" (singular).
+   - 1.10, exercise 2 (graded correct) and step 8: "אחרי שהאישורים מגיעים … שמאי שמופיע אצל כל הבנקים שעוד בתמונה", that is, between steps 4 and 7.
+   - Plus the field advice "להזמין שמאי מיד", shown as an open contradiction.
+   - Each answer is defensible, but nothing tells the reader they are alternatives. The 1.7 timeline, which the learner treats as the order, conflicts with the 1.10 exercise.
+   - Fix:
+     - In 1.7's step-8 card: "את השמאי אפשר להזמין כבר אחרי שהאישורים מגיעים, משמאי שנמצא ברשימות של כל הבנקים שעוד בתמונה (כך מציע הצוות); אז שמאות אחת משמשת כמה בנקים. בשטח יש מי שממליץ להזמין מיד (ראו שיעור 1.10)."
+     - In 1.6, see 1.6 item 2.
+
+3. **קטן. Eylon and Tobi are cited before anyone says who they are.**
+   - "לפי אילון" appears in 1.1, 1.2, 1.7 and 1.8. Eylon is first introduced in 1.9: "אילון, יועץ המשכנתאות של הצוות".
+   - In 1.7, "וטובי זמיר אמר…" has no description; 1.8 describes him as "בנקאי מחוץ לצוות".
+   - Fix: describe both at first use in stage 1 (lesson 1.1), and again at first use in 1.7: "אילון, יועץ המשכנתאות שמלווה את הצוות" and "טובי זמיר, בנקאי מחוץ לצוות".
+
+4. **קטן. The directive rules in the body carry "לא אומת" but no date.**
+   - 1.7, line 110: "המספרים כאן הם לפי תעתיק שהצוות עשה מההוראה, ועוד לא נבדקו".
+   - 1.8, line 131: "לפי התעתיק… (לא אומת מול ההוראה עצמה)".
+   - The date appears only in the widget notes ("נכון ל־9 באוקטובר 2026") and in the sources. AUTHORING asks for the date in the text.
+   - Fix: "…לפי תעתיק של הצוות מאוגוסט 2026, ועוד לא נבדקו מול ההוראה עצמה (נכון ל־9 באוקטובר 2026)".
+
+5. **קטן. The maqaf is missing between a prefix and a date.**
+   - 1.7, illustration answer 3 and the half-solved intro: "ב14 באוקטובר".
+   - 1.8, exercise 6: "ב14 / ב16 / ב12 באוקטובר".
+   - The cause is MDX of the form `ב{dm(…)}`. Other places use `ב{dw(…)}`, which starts with "יום", so the problem never shows there.
+   - Fix: write `ב־{dm(…)}` in those four places. Or make `dm` return its value with a leading "־" when it follows a letter.
+
+6. **קטן. The correct option is often the longest, most balanced one.**
+   - Examples: 1.6 exercises 1 and 6, the 1.9 prediction, and 1.10 exercises 2, 6 and 7.
+   - A reader can score well by picking the longest option, which hides whether they learned the rule.
+   - Fix: give at least one wrong option the same length and the same careful tone in each of these items.
+
+7. **קטן. The clocks: one vague description.**
+   - The clocks are described the same way in 1.7, 1.8 and 1.10:
+     - 5 business days, 7 only for loan types defined in advance, with the reason;
+     - at least 24 days, 12 with no new lien, calendar days;
+     - 90 days, from an appraiser on the receiving bank's list, "לא יסרב שלא באופן סביר".
+   - The exception is 1.10's short step list, item 4: "האישורים מגיעים — בתוך כמה ימי עסקים".
+   - Fix: "תוך 5 ימי עסקים (7 רק בסוגי הלוואות שהבנק הגדיר מראש)".
+   - The other gaps in counting are in 1.7 item 14 (the video does not say day 0) and 1.8 items 3 and 4 (the worked example does not say day 0; the start day is stated as settled).
+
+---
+
+**Totals:** 1 חוסם, 17 חשוב, 41 קטן.

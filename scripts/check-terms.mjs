@@ -97,6 +97,24 @@ for (const { file, url } of pages) {
   }
 }
 
+// An equation in Hebrew prose must sit in <M> (or eq() in a string): outside it the
+// right-to-left text reverses it ("120,000 ÷ 10 = 12,000" shows as "12,000 = 10 ÷ 120,000").
+for (const { file, url } of pages) {
+  const prose = readFileSync(url, "utf8")
+    .replace(/^---[\s\S]*?---/, "")
+    .replace(/^(import|export) [\s\S]*?^$/gm, "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`\n]*`/g, "")
+    .replace(/<M>[\s\S]*?<\/M>/g, "")
+    .replace(/<span class="ltr"[^>]*>[\s\S]*?<\/span>/g, "")
+    .replace(/\{[^{}\n]*\}/g, "0")
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
+  for (const line of prose.split("\n")) {
+    if (/^\s*(<|\{|[a-z]+:|\/\/|\]|\))/.test(line)) continue; // component props and JSX, not prose
+    if (/\d[\d,.%]*\s*[×÷+−]\s*[\d(][^=\n]*=\s*-?[\d(]/.test(line)) fail(file, `equation outside <M> — wrap it so it reads left to right: ${line.trim().slice(0, 90)}`);
+  }
+}
+
 if (failures) {
   console.error(`\n${failures} term problem(s).`);
   process.exit(1);

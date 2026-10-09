@@ -123,53 +123,57 @@
   }
 }
 
-/* Lesson prose: long-form Hebrew reading, tokens only. */
-.prose-lesson {
-  font-size: var(--mogi-text-body-l-size);
-  line-height: 1.75;
-  color: var(--mogi-n800);
-}
-.prose-lesson p {
-  margin-block: var(--mogi-space-4);
-}
-.prose-lesson h2 {
-  font-size: var(--mogi-text-h2-size);
-  line-height: var(--mogi-text-h2-line);
-  font-weight: var(--mogi-text-h2-weight);
-  color: var(--mogi-n900);
-  margin-block: var(--mogi-space-10) var(--mogi-space-4);
-}
-.prose-lesson h3 {
-  font-size: var(--mogi-text-h3-size);
-  line-height: var(--mogi-text-h3-line);
-  font-weight: var(--mogi-text-h3-weight);
-  color: var(--mogi-n900);
-  margin-block: var(--mogi-space-8) var(--mogi-space-3);
-}
-.prose-lesson ul,
-.prose-lesson ol {
-  padding-inline-start: var(--mogi-space-6);
-  margin-block: var(--mogi-space-4);
-}
-.prose-lesson ul {
-  list-style: disc;
-}
-.prose-lesson ol {
-  list-style: decimal;
-}
-.prose-lesson li {
-  margin-block: var(--mogi-space-2);
-}
-.prose-lesson strong {
-  font-weight: 600;
-  color: var(--mogi-n900);
+/* Lesson prose: long-form Hebrew reading, tokens only. In a layer, so a utility class
+   on an element wins; and never inside an interactive component (an Astro island),
+   which lays itself out — except the lesson text a component receives (its slot). */
+@layer components {
+  .prose-lesson {
+    font-size: var(--mogi-text-body-l-size);
+    line-height: 1.75;
+    color: var(--mogi-n800);
+  }
+  .prose-lesson p:is(:not(astro-island p), astro-slot p) {
+    margin-block: var(--mogi-space-4);
+  }
+  .prose-lesson h2:is(:not(astro-island h2), astro-slot h2) {
+    font-size: var(--mogi-text-h2-size);
+    line-height: var(--mogi-text-h2-line);
+    font-weight: var(--mogi-text-h2-weight);
+    color: var(--mogi-n900);
+    margin-block: var(--mogi-space-10) var(--mogi-space-4);
+  }
+  .prose-lesson h3:is(:not(astro-island h3), astro-slot h3) {
+    font-size: var(--mogi-text-h3-size);
+    line-height: var(--mogi-text-h3-line);
+    font-weight: var(--mogi-text-h3-weight);
+    color: var(--mogi-n900);
+    margin-block: var(--mogi-space-8) var(--mogi-space-3);
+  }
+  .prose-lesson ul:is(:not(astro-island ul), astro-slot ul),
+  .prose-lesson ol:is(:not(astro-island ol), astro-slot ol) {
+    padding-inline-start: var(--mogi-space-6);
+    margin-block: var(--mogi-space-4);
+  }
+  .prose-lesson ul:is(:not(astro-island ul), astro-slot ul) {
+    list-style: disc;
+  }
+  .prose-lesson ol:is(:not(astro-island ol), astro-slot ol) {
+    list-style: decimal;
+  }
+  .prose-lesson li:is(:not(astro-island li), astro-slot li) {
+    margin-block: var(--mogi-space-2);
+  }
+  .prose-lesson strong:is(:not(astro-island strong), astro-slot strong) {
+    font-weight: 600;
+    color: var(--mogi-n900);
+  }
 }
 
 /* Range sliders: a neutral track and a teal thumb, no native fill. In RTL the
    browser draws the fill from the wrong end, so the course draws none. */
 input[type="range"] {
   appearance: none;
-  height: 24px;
+  height: 44px; /* the touch target; the visible track stays 6px */
   background: transparent;
   cursor: pointer;
 }

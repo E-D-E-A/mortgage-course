@@ -145,6 +145,8 @@ export default function lesson14(): LessonData {
     slice("ex2.answer", "800000", "30"),
     rest("ex2.other_part", "800000", [moneyString(sliceAmount("800000", "30"))]),
     slice("ex2.three_percent", "800000", "3"),
+    slice("ex2.no_hundred", "800000", "3000"),
+    slice("ex2.divided", "800000", "1", "30"),
 
     // Exercise 3: tracks of 450,000, 300,000 and 250,000; the second one's share.
     amountSum("ex3.loan", ["450000", "300000", "250000"]),

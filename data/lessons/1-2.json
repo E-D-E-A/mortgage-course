@@ -240,13 +240,13 @@
       "value": "2000000.00"
     },
     {
-      "id": "round.ltv2",
-      "kind": "ltv_percent",
+      "id": "round.ltv2_shown",
+      "kind": "ltv_percent_fixed",
       "inputs": {
         "loan": "1500050",
         "value": "2000000"
       },
-      "value": "75"
+      "value": "75.00"
     },
     {
       "id": "round.ltv4",
@@ -358,14 +358,22 @@
       "value": "74.55"
     },
     {
-      "id": "caseA.ltv1",
-      "kind": "ltv_percent",
+      "id": "caseA.min_value",
+      "kind": "ltv_min_value",
       "inputs": {
         "loan": "1640000.00",
-        "value": "2200000",
-        "decimals": 1
+        "ceiling": "75"
       },
-      "value": "74.5"
+      "value": "2186666.67"
+    },
+    {
+      "id": "caseA.value_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.price",
+        "subtrahend": "caseA.min_value"
+      },
+      "value": "13333.33"
     },
     {
       "id": "caseA.gap_points",
@@ -569,6 +577,14 @@
       "value": "257.14"
     },
     {
+      "id": "ex3.as_decimal",
+      "kind": "ltv_fraction",
+      "inputs": {
+        "percent": "72"
+      },
+      "value": "0.72"
+    },
+    {
       "id": "ex4.price",
       "kind": "given",
       "inputs": {},
@@ -696,6 +712,24 @@
       "value": "75.45"
     },
     {
+      "id": "ex6.one_decimal",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1660000.00",
+        "value": "2200000",
+        "decimals": 1
+      },
+      "value": "75.5"
+    },
+    {
+      "id": "ex6.as_decimal",
+      "kind": "ltv_fraction",
+      "inputs": {
+        "percent": "75.45"
+      },
+      "value": "0.7545"
+    },
+    {
       "id": "ex6.equity_share",
       "kind": "ltv_share",
       "inputs": {
@@ -730,6 +764,24 @@
         "divisor": "0.75"
       },
       "value": "746666.67"
+    },
+    {
+      "id": "ex7.divided_by_25",
+      "kind": "ltv_divide",
+      "inputs": {
+        "amount": "560000",
+        "divisor": "25"
+      },
+      "value": "22400.00"
+    },
+    {
+      "id": "ex7.times_125",
+      "kind": "ltv_times",
+      "inputs": {
+        "amount": "560000",
+        "factor": "1.25"
+      },
+      "value": "700000.00"
     },
     {
       "id": "ex7.loan_fraction",

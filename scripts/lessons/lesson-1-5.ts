@@ -19,6 +19,9 @@ export default function lesson15(): LessonData {
     // The registry's purposes: רכישת דירה, רכישת מגרש, בנייה עצמית, מחזור מבנק אחר, מחזור מאותו בנק,
     // הלוואה לכל מטרה, שיפוצים, הרחבת נכס, בניית ממ"ד.
     given("purposes.count", "9"),
+    // The investment-home ceiling, as lesson 1.2 shows it (Directive 329 per the team's Brain transcription,
+    // page 7503881, 2026-10-08; not yet checked against the directive). Same value as 1.2's ceiling.investment.
+    given("ceiling.investment", "50"),
 
     // Case C: an existing mortgage, and an addition for renovation.
     given("caseC.existing", "700000"),

@@ -154,6 +154,12 @@ export default function lesson11(): LessonData {
 
     // Exercise 6: worth 1,600,000, 1,040,000 owed — how far can the value fall?
     cushion("ex6.answer", "1600000", "1040000"),
+    {
+      id: "ex6.as_decimal",
+      kind: "ltv_fraction",
+      inputs: { percent: percentString(cushionPercent("1600000", "1040000")) },
+      value: new Decimal(percentString(cushionPercent("1600000", "1040000"))).div(100).toFixed(),
+    },
     share("ex6.debt_share", "1040000", "1600000"),
     ex6value,
     ex6debt,

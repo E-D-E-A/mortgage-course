@@ -30,7 +30,7 @@ export const source = "התקרות לפי תעתיק של הצוות ב־Brain 
 export const ceilings = [
   { value: f.plain("ceiling.only_home"), label: "אין לכם דירה אחרת" },
   { value: f.plain("ceiling.replacement"), label: "מחליפים דירה" },
-  { value: f.plain("ceiling.investment"), label: "דירה להשקעה" },
+  { value: f.plain("ceiling.investment"), label: "יש לכם דירה ומשאירים אותה" },
 ];
 export const predictionOptions = [
   pct("explain.equity_share"),
@@ -113,34 +113,34 @@ export const predictionOptions = [
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-2 text-start font-semibold">התקרה</th>
         <th class="py-2 pe-2 text-start font-semibold">סוג העסקה (בפישוט)</th>
-        <th class="py-2 pe-2 text-start font-semibold">דירה ב־{f.shekels("explain.price")}: הלוואה מרבית</th>
-        <th class="py-2 text-start font-semibold">הון עצמי מינימלי</th>
+        <th class="py-2 pe-2 text-start font-semibold">דירה ב־{f.shekels("explain.price")}: הון עצמי מינימלי</th>
+        <th class="py-2 text-start font-semibold">הלוואה מרבית</th>
       </tr>
     </thead>
     <tbody>
       <tr class="border-b border-n100">
         <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[0].ceiling}%</span></td>
         <td class="py-2 pe-2"><Later lesson="1.5">דירה יחידה</Later>: קונים דירה, ואין לכם דירה אחרת</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[0].max_loan)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[0].min_equity)}</span></td>
+        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[0].min_equity)}</span></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[0].max_loan)}</span></td>
       </tr>
       <tr class="border-b border-n100">
         <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[1].ceiling}%</span></td>
         <td class="py-2 pe-2"><Later lesson="1.5">דירה חליפית</Later>: יש לכם דירה, ואתם מוכרים אותה כשעוברים לחדשה</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[1].max_loan)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[1].min_equity)}</span></td>
+        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[1].min_equity)}</span></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[1].max_loan)}</span></td>
       </tr>
       <tr>
         <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[2].ceiling}%</span></td>
-        <td class="py-2 pe-2">דירה להשקעה: למשל עוד דירה, כשהדירה הקיימת נשארת שלכם</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[2].max_loan)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[2].min_equity)}</span></td>
+        <td class="py-2 pe-2"><Later lesson="1.5">דירה נוספת</Later>: יש לכם דירה, והיא נשארת שלכם (בהוראה ובחלק מהטפסים אומרים ״דירה להשקעה״)</td>
+        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[2].min_equity)}</span></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[2].max_loan)}</span></td>
       </tr>
     </tbody>
   </table>
 </div>
 
-ההגדרות המדויקות של כל סוג עסקה — בשיעור 1.5. שלושה דברים חשובים כבר עכשיו:
+ההגדרות של כל סוג עסקה — בשיעור 1.5 (גם הן לפי תעתיק, עוד לא אומתו). שלושה דברים חשובים כבר עכשיו:
 
 - **התקרה היא מקסימום, לא הבטחה.** מלווה לא חייב לממן עד התקרה, ויכול לדרוש יותר הון עצמי. ההבדל בין תקרה של בנק ישראל לכלל של בנק מסוים — כשנגיע ל<Later lesson="4.5">מדיניות בנק</Later>.
 - **ככל שהתקרה נמוכה יותר, צריך יותר הון עצמי** — באותה דירה, {T(limits[0].min_equity)}, {T(limits[1].min_equity)} או {T(limits[2].min_equity)}.
@@ -156,14 +156,17 @@ export const predictionOptions = [
 
 **המחיר** הוא מה שסיכמתם עם המוכר. <Term t="שווי הנכס" lesson="1.2">שווי הנכס</Term> הוא כמה הדירה שווה לפי הערכה בלתי תלויה. המלווה בודק את השווי בעצמו, דרך <Later lesson="1.6">שמאי</Later>, בשלב שנקרא <Later lesson="1.7">שמאות</Later>.
 
-**שיעור המימון נמדד מול השווי**, לא מול המחיר. כך אמר גם אילון: המימון נמדד מול הערך שנקבע בהערכה (ידע מהשטח, 2026-08-05; ממתין לאישור אילון).
+**מול מה מחשבים את שיעור המימון כשהשווי והמחיר שונים? זו שאלה פתוחה.** יש לנו שני מקורות, והם מושכים לכיוונים שונים:
+- **לטובת השווי:** בפגישה עם בנקאי נאמר שהמימון נמדד מול השווי שנקבע בהערכה (ידע מהשטח, 2026-08-05, ככל הנראה אילון — בהקלטה לא ברור בוודאות מי הדובר; ממתין לאישור אילון).
+- **לטובת המחיר:** לפי תקצירים של ההוראה של בנק ישראל שהצוות ריכז, ההוראה מתירה לחשב לפי השווי שקבע <Later lesson="1.6" quiet>שמאי</Later> במקרה מיוחד — <Later lesson="4.4">דירה במחיר מופחת</Later>. מכאן משתמע שבדרך כלל מחשבים לפי המחיר (לא אומת; לפי תקציר של מקור רשמי, ממתין לבדיקה).
+- **ומה קורה כשהשווי גבוה מהמחיר?** אף אחד מהמקורות שלנו לא אומר. השאלה נשלחה לאילון.
 
-**מה זה משנה?** דירה במחיר {f.shekels("explain.price")}, אבל השווי שנקבע הוא רק {f.shekels("pv.value")}. התקרה: {pct("ceiling.only_home")}.
+**אם מחשבים מול השווי — מה זה משנה?** דירה במחיר {f.shekels("explain.price")}, אבל השווי שנקבע הוא רק {f.shekels("pv.value")}. התקרה: {pct("ceiling.only_home")}.
 - ההלוואה המרבית: <M>{n("pv.value")} × {f.plain("ceiling.only_home")}% = {f.shekels("pv.max_loan")}</M>.
 - את המוכר צריך לשלם את כל המחיר, ולכן ההון העצמי: <M>{n("explain.price")} − {n("pv.max_loan")} = {f.shekels("pv.min_equity")}</M>.
 - זה {f.shekels("pv.extra")} יותר מ־{f.shekels("pv.min_equity_at_price")}, שהיו מספיקים אילו השווי היה שווה למחיר.
 
-**בשיעור הזה, כשלא כתוב אחרת, השווי שווה למחיר.**
+**בשיעור הזה, כשלא כתוב אחרת, השווי שווה למחיר — ואז שתי הדרכים נותנות אותה תשובה.**
 
 <Section kind="המחשה: הזיזו בעצמכם">
 
@@ -184,7 +187,7 @@ export const predictionOptions = [
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>ההלוואה היא {f.shekels("slider.loan")}, ושיעור המימון {pct("slider.ltv")} — מעל התקרה. צריך לפחות {f.shekels("slider.min_equity_75")} הון עצמי, כלומר עוד {f.shekels("slider.more_75")}.</li>
-    <li>{f.shekels("slider.min_equity_70")}. התקרה ירדה, והחלק שלכם עלה באותו מספר נקודות אחוז.</li>
+    <li>{f.shekels("slider.min_equity_70")}. התקרה ירדה, והחלק שלכם עלה באותו מספר <Term t="נקודת אחוז" lesson="1.2">נקודות אחוז</Term>.</li>
     <li>{f.shekels("slider.min_equity_50")}: {pct("own.investment")} מהמחיר. התקרה היא החלק שמותר לממן; כל השאר — עליכם. תקרה נמוכה משאירה לכם חלק גדול.</li>
   </ol>
 </details>
@@ -204,7 +207,7 @@ export const predictionOptions = [
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="ltr text-h2 text-navy">P = V − H</p>
   <p class="text-h3 mt-2 text-navy">שיעור מימון = <span class="ltr">P ÷ V × 100</span></p>
-  <p class="text-h3 mt-2 text-navy">הלוואה מרבית = <span class="ltr">V × </span>התקרה<span class="ltr"> ÷ 100</span></p>
+  <p class="text-h3 mt-2 text-navy">הלוואה מרבית: השווי כפול התקרה, חלקי 100</p>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
     <dt class="ltr font-semibold text-n900">P</dt><dd>ההלוואה — הקרן, כמו בשיעור 0.2 — בשקלים</dd>
     <dt class="ltr font-semibold text-n900">V</dt><dd>שווי הנכס, בשקלים (כמו בשיעור 1.1: V כמו value, ״שווי״)</dd>
@@ -215,7 +218,7 @@ export const predictionOptions = [
 </div>
 
 **מתי הנוסחאות נכונות?**
-1. <span class="ltr">P = V − H</span> נכונה רק כשהשווי שווה למחיר. כשהם שונים: ההון העצמי הוא המחיר פחות ההלוואה, ושיעור המימון עדיין מחלקים בשווי — כמו בדוגמה של {f.shekels("pv.value")}.
+1. <span class="ltr">P = V − H</span> נכונה רק כשהשווי שווה למחיר. כשהם שונים, ההון העצמי הוא המחיר פחות ההלוואה; ובמה מחלקים כדי לקבל את שיעור המימון — זו השאלה הפתוחה שלמעלה.
 2. P היא כל ההלוואה שהנכס הזה הוא הבטוחה שלה.
 3. הוצאות נוספות של הקנייה (עורך דין ועוד) לא נכנסות לנוסחה.
 
@@ -226,7 +229,7 @@ export const predictionOptions = [
 
 <Callout title="ליד התקרה משווים את המספר המדויק" tone="warning">
 <p>בקורס מעגלים אחוזים לשתי ספרות אחרי הנקודה. ליד תקרה זה מסוכן. הלוואה של {f.shekels("round.loan")} על דירה ששווה {f.shekels("round.value")}: <M>{n("round.loan")} ÷ {n("round.value")} × 100 = {f.plain("round.ltv4")}</M>.</p>
-<p>בעיגול לשתי ספרות זה {pct("round.ltv2")} — ונראה כאילו בדיוק בתקרה. אבל המספר המדויק גבוה מ־{pct("ceiling.only_home")}, וההלוואה עוברת את התקרה. ליד התקרה, משווים את ההלוואה להלוואה המרבית בשקלים, או את שיעור המימון בלי עיגול.</p>
+<p>בעיגול לשתי ספרות זה {pct("round.ltv2_shown")} — ונראה כאילו בדיוק בתקרה. אבל המספר המדויק גבוה מ־{pct("ceiling.only_home")}, וההלוואה עוברת את התקרה. ליד התקרה, משווים את ההלוואה להלוואה המרבית בשקלים, או את שיעור המימון בלי עיגול.</p>
 </Callout>
 
 <PredictionReveal
@@ -252,7 +255,7 @@ export const predictionOptions = [
 
 ההון העצמי המינימלי הוא מה שהתקרה לא מממנת: 100 פחות התקרה, באחוזים מהשווי.
 בתקרה של {pct("ceiling.only_home")} — {pct("own.only_home")} מהשווי, רבע. בתקרה של {pct("ceiling.replacement")} — {pct("own.replacement")}. בתקרה של {pct("ceiling.investment")} — {pct("own.investment")}, חצי.
-זה חישוב מדויק כשהשווי שווה למחיר. כשהשווי נמוך מהמחיר, צריך יותר — כמו בדוגמה של {f.shekels("pv.value")}.
+זה חישוב מדויק כשהשווי שווה למחיר. אם מחשבים מול שווי שנמוך מהמחיר, צריך יותר — כמו בדוגמה של {f.shekels("pv.value")}.
 
 <Section kind="דוגמה פתורה">
 
@@ -271,15 +274,16 @@ export const predictionOptions = [
 
 **צעד 1 — ההלוואה.** <M>{n("caseA.price")} − {n("caseA.equity")} = {f.shekels("caseA.loan")}</M>.
 
-**צעד 2 — שיעור המימון.** <M>{n("caseA.loan")} ÷ {n("caseA.price")} × 100 = {f.plain("caseA.ltv")}</M>, כלומר {pct("caseA.ltv")}. (בעיגול לספרה אחת אחרי הנקודה: {pct("caseA.ltv1")}. כך תראו אותו לפעמים בהמשך הקורס.)
+**צעד 2 — שיעור המימון.** <M>{n("caseA.loan")} ÷ {n("caseA.price")} × 100 = {f.plain("caseA.ltv")}</M>, כלומר {pct("caseA.ltv")} (בעיגול לשתי ספרות אחרי הנקודה, כמו בכל הקורס).
 
-**צעד 3 — מול התקרה.** אין להם דירה אחרת, ולכן התקרה היא {pct("ceiling.only_home")}. הם מתחתיה ב־{f.plain("caseA.gap_points")} <Term t="נקודת אחוז" lesson="1.2">נקודות אחוז</Term> בלבד: <M>{f.plain("ceiling.only_home")} − {f.plain("caseA.ltv")} = {f.plain("caseA.gap_points")}</M>.
+**צעד 3 — מול התקרה.** אין להם דירה אחרת, ולכן התקרה היא {pct("ceiling.only_home")}. הם מתחתיה ב־{f.plain("caseA.gap_points")} נקודות אחוז בלבד: <M>{f.plain("ceiling.only_home")} − {f.plain("caseA.ltv")} = {f.plain("caseA.gap_points")}</M>.
 
 **צעד 4 — כמה מקום נשאר, בשקלים.** ההלוואה המרבית: <M>{n("caseA.price")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("caseA.max_loan")}</M>. הם צריכים {f.shekels("caseA.loan")}, כלומר נשארו <M>{n("caseA.max_loan")} − {n("caseA.loan")} = {f.shekels("caseA.loan_room")}</M>.
 ומהצד של ההון העצמי: המינימום הוא {f.shekels("caseA.min_equity")}, ויש להם <M>{n("caseA.equity")} − {n("caseA.min_equity")} = {f.shekels("caseA.equity_room")}</M> מעליו.
 
 <Callout title="תיק על הקצה" tone="warning">
-<p>{f.shekels("caseA.equity_room")} הם מעט מאוד, ביחס להון עצמי של {f.shekels("caseA.equity")}. אם ההון העצמי יקטן ביותר מזה, או שהשווי שייקבע יהיה נמוך מהמחיר אפילו במעט — שיעור המימון יעבור את התקרה. נחזור לתיק הזה בשלבים הבאים, וגם לשאלה מה עושים כשהוא על הקצה.</p>
+<p>{f.shekels("caseA.equity_room")} הם מעט מאוד, ביחס להון עצמי של {f.shekels("caseA.equity")}. אם ההון העצמי יקטן ביותר מזה, שיעור המימון יעבור את התקרה.</p>
+<p>ואם יתברר שמחשבים מול השווי (השאלה הפתוחה למעלה)? ההלוואה שלהם נשארת בתוך התקרה כל עוד השווי הוא לפחות <M>{n("caseA.loan")} ÷ {f.plain("ceiling.only_home")} × 100 = {f.shekels("caseA.min_value")}</M> — כלומר עד {f.shekels("caseA.value_room")} מתחת למחיר. שווי נמוך מזה יעביר אותם את התקרה. נחזור לתיק הזה בשלבים הבאים, וגם לשאלה מה עושים כשהוא על הקצה.</p>
 </Callout>
 
 <Section kind="דוגמה חצי פתורה">
@@ -311,7 +315,7 @@ export const predictionOptions = [
 
 </Section>
 
-הסכומים בתרגילים הם מספרים להמחשה, והתקרות הן לפי התעתיק של הצוות (לא אומת). התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם, ואת האחוזים בלי הסימן %. כדאי מחשבון.
+הסכומים בתרגילים הם מספרים להמחשה, והתקרות הן לפי התעתיק של הצוות (לא אומת). התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם, ואת האחוזים בלי הסימן %, בעיגול לשתי ספרות אחרי הנקודה. כדאי מחשבון.
 
 <ChoiceExercise
   client:visible
@@ -325,7 +329,7 @@ export const predictionOptions = [
     { text: `הבנק אישר ${pct("ex1.ltv")} מהסכום שביקשתם`, feedback: "שיעור המימון נמדד ביחס לשווי הדירה, לא ביחס לבקשה." },
   ]}
 >
-  בעסקה מסוימת שיעור המימון הוא {pct("ex1.ltv")}. מה זה אומר?
+  קיבלתם אישור למשכנתא בשיעור מימון של {pct("ex1.ltv")}. מה זה אומר?
 </ChoiceExercise>
 
 <NumericExercise
@@ -361,9 +365,10 @@ export const predictionOptions = [
     { value: f.raw("ex3.equity_over_loan"), message: "חילקתם את ההון העצמי בהלוואה. מחשבים קודם את ההלוואה, ואז מחלקים אותה במחיר." },
     { value: f.raw("ex3.loan_over_equity"), message: "חילקתם את ההלוואה בהון העצמי. שיעור המימון מחלק את ההלוואה בשווי הדירה כולה." },
     { value: f.raw("ex3.loan"), tolerance: 1, message: "זו ההלוואה בשקלים. השאלה שואלת באחוזים: כמה זה מתוך המחיר?" },
+    { value: f.raw("ex3.as_decimal"), tolerance: 0.001, message: `כתבתם כמספר עשרוני. באחוזים כופלים ב־100: ${f.plain("ex3.answer")}.` },
   ]}
 >
-  קונה מביא {f.shekels("ex3.equity_paid")} הון עצמי לדירה ב־{f.shekels("ex3.price")}. מה שיעור המימון?
+  קונה מביא {f.shekels("ex3.equity_paid")} הון עצמי לדירה ב־{f.shekels("ex3.price")}. מה שיעור המימון (באחוזים, בעיגול לשתי ספרות אחרי הנקודה)?
 </NumericExercise>
 
 <Solution for="1.2-3">
@@ -391,28 +396,9 @@ export const predictionOptions = [
 
 <NumericExercise
   client:visible
-  id="1.2-5"
+  id="1.2-6"
   n={5}
   level="בינוני"
-  answer={f.raw("ex5.answer")}
-  errors={[
-    { value: f.raw("ex5.at_price"), message: "חישבתם את התקרה מול המחיר. שיעור המימון נמדד מול השווי — והשווי כאן נמוך מהמחיר." },
-    { value: f.raw("ex5.value_quarter"), message: `זה ${pct("own.only_home")} מהשווי. אבל למוכר משלמים את כל המחיר: ההון העצמי הוא המחיר פחות ההלוואה המרבית.` },
-    { value: f.raw("ex5.max_loan"), message: "זו ההלוואה המרבית. השאלה היא כמה הון עצמי צריך כדי להשלים את המחיר." },
-  ]}
->
-  אתם קונים דירה ב־{f.shekels("ex5.price")}, ואין לכם דירה אחרת. השווי שנקבע לדירה הוא {f.shekels("ex5.value")}, ושיעור המימון נמדד מול השווי. מה ההון העצמי המינימלי?
-</NumericExercise>
-
-<Solution for="1.2-5">
-ההלוואה המרבית: <M>{n("ex5.value")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("ex5.max_loan")}</M>. את המוכר משלמים לפי המחיר: <M>{n("ex5.price")} − {n("ex5.max_loan")} = {f.shekels("ex5.answer")}</M>.
-</Solution>
-
-<NumericExercise
-  client:visible
-  id="1.2-6"
-  n={6}
-  level="מאתגר"
   unit="%"
   tolerance={0.01}
   near={0}
@@ -421,13 +407,34 @@ export const predictionOptions = [
     { value: f.raw("caseA.ltv"), message: "זה שיעור המימון לפני השינוי. כשההון העצמי קטן, ההלוואה גדלה." },
     { value: f.raw("ex6.equity_share"), message: "זה החלק של ההון העצמי החדש. שיעור המימון הוא החלק של ההלוואה." },
     { value: f.raw("ex6.loan"), tolerance: 1, message: "זו ההלוואה החדשה, בשקלים. מה היא באחוזים מהמחיר?" },
+    { value: f.raw("ex6.one_decimal"), tolerance: 0.001, message: `עיגלתם לספרה אחת. כאן מעגלים לשתי ספרות אחרי הנקודה: ${f.plain("ex6.answer")}. ליד התקרה כל ספרה חשובה.` },
+    { value: f.raw("ex6.as_decimal"), tolerance: 0.0001, message: `כתבתם כמספר עשרוני. באחוזים כופלים ב־100: ${f.plain("ex6.answer")}.` },
   ]}
 >
-  נועם ושירה שוקלים להשתמש ב־{f.shekels("ex6.less")} מההון העצמי שלהם לדבר אחר. המחיר נשאר {f.shekels("caseA.price")}. מה יהיה שיעור המימון? והאם הוא עדיין בתוך התקרה?
+  נועם ושירה שוקלים להשתמש ב־{f.shekels("ex6.less")} מההון העצמי שלהם לדבר אחר. המחיר נשאר {f.shekels("caseA.price")}. מה יהיה שיעור המימון (באחוזים, בעיגול לשתי ספרות אחרי הנקודה)? והאם הוא עדיין בתוך התקרה?
 </NumericExercise>
 
 <Solution for="1.2-6">
 הון עצמי: <M>{n("caseA.equity")} − {n("ex6.less")} = {f.shekels("ex6.equity")}</M>. ההלוואה: <M>{n("caseA.price")} − {n("ex6.equity")} = {f.shekels("ex6.loan")}</M>. שיעור המימון: <M>{n("ex6.loan")} ÷ {n("caseA.price")} × 100 = {f.plain("ex6.answer")}</M>, כלומר {pct("ex6.answer")} — מעל התקרה של {pct("ceiling.only_home")}. המקום שהיה להם מעל המינימום, {f.shekels("caseA.equity_room")}, קטן מהסכום שהוציאו.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="1.2-5"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.at_price"), message: "חישבתם את התקרה מול המחיר. בתרגיל הזה הבנק מחשב מול השווי — והשווי כאן נמוך מהמחיר." },
+    { value: f.raw("ex5.value_quarter"), message: `זה ${pct("own.only_home")} מהשווי. אבל למוכר משלמים את כל המחיר: ההון העצמי הוא המחיר פחות ההלוואה המרבית.` },
+    { value: f.raw("ex5.max_loan"), message: "זו ההלוואה המרבית. השאלה היא כמה הון עצמי צריך כדי להשלים את המחיר." },
+  ]}
+>
+  אתם קונים דירה ב־{f.shekels("ex5.price")}, ואין לכם דירה אחרת. השווי שנקבע לדירה הוא {f.shekels("ex5.value")}. נניח שהבנק מחשב את שיעור המימון מול השווי (הצד הראשון של השאלה הפתוחה). מה ההון העצמי המינימלי?
+</NumericExercise>
+
+<Solution for="1.2-5">
+ההלוואה המרבית: <M>{n("ex5.value")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("ex5.max_loan")}</M>. את המוכר משלמים לפי המחיר: <M>{n("ex5.price")} − {n("ex5.max_loan")} = {f.shekels("ex5.answer")}</M>.
 </Solution>
 
 <NumericExercise
@@ -438,6 +445,8 @@ export const predictionOptions = [
   answer={f.raw("ex7.answer")}
   errors={[
     { value: f.raw("ex7.times_three"), message: "זו ההלוואה המרבית: פי 3 מההון העצמי. המחיר הוא ההלוואה ועוד ההון העצמי." },
+    { value: f.raw("ex7.divided_by_25"), message: `חילקתם ב־25 במקום ב־${f.plain("ex7.own_fraction")}. ${pct("own.only_home")} כמספר עשרוני הם ${f.plain("ex7.own_fraction")}.` },
+    { value: f.raw("ex7.times_125"), message: `הוספתם ${pct("own.only_home")} על ההון העצמי. אבל ההון העצמי הוא ${pct("own.only_home")} מהמחיר — המחיר גדול ממנו פי ארבעה, לא ב־${pct("own.only_home")}.` },
     { value: f.raw("ex7.divided"), message: `חילקתם ב־${f.plain("ex7.loan_fraction")}. אבל ההון העצמי הוא ${pct("own.only_home")} מהמחיר, לא ${pct("ceiling.only_home")}: מחלקים ב־${f.plain("ex7.own_fraction")}.` },
   ]}
 >
@@ -464,11 +473,11 @@ export const predictionOptions = [
 
 - **מחיר = הון עצמי + הלוואה.** הון עצמי הוא הכסף שאתם מביאים משלכם.
 - **שיעור מימון** = ההלוואה חלקי שווי הנכס, כפול 100. הוא מדבר על ההלוואה, לא על הכסף שלכם.
-- **שווי הנכס** אינו תמיד המחיר. שיעור המימון נמדד מול השווי; כשהשווי נמוך מהמחיר, צריך יותר הון עצמי.
-- **התקרות** (לפי תעתיק של הצוות, לא אומת): {pct("ceiling.only_home")} כשאין דירה אחרת, {pct("ceiling.replacement")} כשמחליפים דירה, {pct("ceiling.investment")} בדירה להשקעה. התקרה היא מקסימום, לא הבטחה.
+- **שווי הנכס** אינו תמיד המחיר. מול מה מחשבים את שיעור המימון כשהם שונים — שאלה פתוחה; אם מול השווי, שווי נמוך מהמחיר דורש יותר הון עצמי.
+- **התקרות** (לפי תעתיק של הצוות, לא אומת): {pct("ceiling.only_home")} כשאין דירה אחרת, {pct("ceiling.replacement")} כשמחליפים דירה, {pct("ceiling.investment")} כשיש לכם דירה ומשאירים אותה. התקרה היא מקסימום, לא הבטחה.
 - **הון עצמי מינימלי** = המחיר פחות ההלוואה המרבית (השווי כפול התקרה, חלקי 100).
 - **ליד התקרה משווים את המספר המדויק**, לא את המעוגל.
-- **נועם ושירה:** שיעור מימון של {pct("caseA.ltv")}, {f.shekels("caseA.equity_room")} מתחת לגבול.
+- **נועם ושירה:** שיעור מימון של {pct("caseA.ltv")}; ההלוואה שלהם קטנה ב־{f.shekels("caseA.loan_room")} מההלוואה המרבית.
 
 **בשיעור הבא — 1.3, שלושה דברים נפרדים:** <Later lesson="1.3" quiet>מטרת ההלוואה</Later>, <Later lesson="1.3" quiet>מנגנון הריבית</Later> ו<Later lesson="1.3" quiet>שיטת ההחזר</Later> — שלוש שאלות שונות על כל משכנתא, ולמה לא מערבבים ביניהן.
 
@@ -481,11 +490,12 @@ export const predictionOptions = [
 <Sources
   items={[
     { kind: "ידע מתמטי כללי", text: "פירוק מחיר להון עצמי ולהלוואה, ושיעור מימון כאחוז (שיעור 0.1).", code: ["P = V − H", "שיעור מימון = P ÷ V × 100", "הלוואה מרבית = V × תקרה ÷ 100"] },
-    { kind: "לא אומת", text: "התקרות לשיעור מימון (75% כשאין דירה אחרת, 70% כשמחליפים דירה, 50% לדירה להשקעה), מתוך ההוראה של בנק ישראל על הגבלות במתן הלוואות לדיור (מספר 329): לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08), ממתין לבדיקה מול המקור. אותם מספרים מופיעים גם בתקצירי חיפוש של גרסאות 11 ו־12 של ההוראה ושל הגרסה האנגלית; גם אלה לא נפתחו במקור.", date: "2026-10-09" },
-    { kind: "לא אומת", text: "התיאור של כל סוג עסקה בטבלת התקרות מפושט. ההגדרות המדויקות — בשיעור 1.5, אחרי בדיקה מול המקור." },
+    { kind: "לא אומת", text: "התקרות לשיעור מימון (75% כשאין דירה אחרת, 70% כשמחליפים דירה, 50% כשיש דירה והיא נשארת), מתוך ההוראה של בנק ישראל על הגבלות במתן הלוואות לדיור (מספר 329): לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08), ממתין לבדיקה מול המקור. אותם מספרים מופיעים גם בתקצירי חיפוש של גרסאות 11 ו־12 של ההוראה ושל הגרסה האנגלית; גם אלה לא נפתחו במקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "התיאור של כל סוג עסקה בטבלת התקרות מפושט. ההגדרות — בשיעור 1.5, גם הן לפי תעתיק, עוד לא אומתו." },
     { kind: "ידע כלכלי כללי", text: "בפישוט של רמת מבוא: תקרה על שיעור המימון שומרת כרית מינימלית לכל משכנתא, כדי שירידת מחירים לא תפגע במלווים ובמפקידים." },
     { kind: "ידע מהשטח", text: "אילון, 2026-07-27 (פגישת המבוא; סיכום ב־Brain, דף 2949123): בדירה ראשונה נדרש הון עצמי של 25%, ״כל שקל שאני אביא, הבנק יביא לי 3 שקלים״. ממתין לאישור אילון." },
-    { kind: "ידע מהשטח", text: "אילון, 2026-08-05 (פגישה עם בנקאי; בהקלטה לא ברור מי הדובר), בפרפרזה: המימון נמדד מול השווי שנקבע בהערכת הנכס, לא מול המחיר. ממתין לאישור אילון." },
+    { kind: "ידע מהשטח", text: "2026-08-05, בפגישה עם בנקאי; ככל הנראה אילון — בהקלטה לא ברור בוודאות מי הדובר. בפרפרזה: המימון נמדד מול השווי שנקבע בהערכת הנכס, לא מול המחיר. מה קורה כשהשווי גבוה מהמחיר — לא נאמר. ממתין לאישור אילון." },
+    { kind: "לא אומת", text: "הצד השני של השאלה הפתוחה: לפי תקצירי חיפוש של ההוראה שהצוות ריכז (research/notes/official-sources.md, סעיף 1), ההוראה מתירה לחשב לפי שווי של הערכה רק במקרה מיוחד של דירות שנמכרות בהנחה מהמדינה, ומכאן משתמע שהמחיר הוא ברירת המחדל. לפי תקציר של מקור רשמי; ממתין לבדיקה." },
     { kind: "ידע מהשטח", text: "טובי זמיר, בנקאי שאינו בצוות, 2026-08-05, בפרפרזה: מדרגות של שיעור מימון קשורות להקצאת ההון של הבנק. ממקור יחיד; הספים לא נבדקו. ממתין לאישור אילון." },
     { kind: "הנחת חישוב", text: "נועם ושירה הם התיק הלימודי המרכזי של הקורס (מפת הקורס, סעיף 8): דוגמה לימודית; נתוני הלקוח להמחשה בלבד, ואינם הצעת בנק או נתוני שוק עדכניים. כל שאר הסכומים בשיעור בדויים." },
     { kind: "בדיקת חישוב", text: "כל המספרים בשיעור ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },

@@ -140,6 +140,16 @@ def fraction(i, _facts=None):
     return s.rstrip("0").rstrip(".") if "." in s else s
 
 
+def ltv_fixed(i, _facts=None):
+    # Shown with exactly two decimals, trailing zeros kept: "75.00".
+    q = (Decimal(i["loan"]) / Decimal(i["value"]) * HUNDRED).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return format(q, "f")
+
+
+def min_value(i, _facts=None):
+    return money(Decimal(i["loan"]) * HUNDRED / Decimal(i["ceiling"]))
+
+
 KINDS = {
     "ltv_sale_part": sale_part,
     "ltv_sale_table": sale_table,
@@ -159,6 +169,8 @@ KINDS = {
     "ltv_sum": add,
     "ltv_complement": complement,
     "ltv_fraction": fraction,
+    "ltv_percent_fixed": ltv_fixed,
+    "ltv_min_value": min_value,
     "ltv_price_table": price_table,
     "ltv_ceiling_table": ceiling_table,
 }
