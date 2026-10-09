@@ -105,8 +105,9 @@ const loanShare = computed(() => `${ratio.value.toNumber()}%`);
     <!-- The whole bar is the price. The loan starts at the right; the ceiling is a dashed line at its percent of the price. -->
     <div class="relative mt-8" role="img" :aria-label="`מחיר ${formatShekelsText(price)}: הלוואה ${formatShekelsText(loan)}, הון עצמי ${formatShekelsText(own)}, שיעור מימון ${percentString(ratio)}%.`">
       <div class="flex h-10 w-full overflow-hidden rounded-sm bg-n50">
-        <div class="h-full" :style="{ width: loanShare, background: 'var(--mogi-teal-deep)' }"></div>
-        <div class="h-full flex-1 border-s-2 border-n0" style="background: var(--mogi-turquoise-2)"></div>
+        <!-- A segment only when its share is above zero, so no white divider is left at an edge. -->
+        <div v-if="loan.gt(0)" class="h-full" :style="{ width: loanShare, background: 'var(--mogi-teal-deep)' }"></div>
+        <div v-if="own > 0" class="h-full flex-1" :class="loan.gt(0) ? 'border-s-2 border-n0' : ''" style="background: var(--mogi-turquoise-2)"></div>
       </div>
       <div class="absolute -top-6 bottom-0 border-s-2 border-dashed border-navy" :style="{ insetInlineStart: `${ceiling.value}%` }">
         <span class="absolute -top-0.5 start-1 whitespace-nowrap text-caption text-n700">תקרה <span class="ltr">{{ ceiling.value }}%</span></span>
