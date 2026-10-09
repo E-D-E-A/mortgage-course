@@ -1,37 +1,67 @@
 <script setup lang="ts">
-// The half-worked example: a table with some cells left for the learner.
-// Cells are checked to the agora (within a small tolerance for rounding).
+// The half-worked example: a table with some cells left for the learner. The
+// page names the columns; each column says how its values are shown and
+// checked — shekels to the agora (within 2 agorot, so a total from rounded
+// rows and one from the formula both count), percent or points to 0.005,
+// a date shown only. The first rows are usually given; the learner fills the rest.
 import { reactive, ref } from "vue";
 import { formatShekels } from "../lib/calc/money.ts";
 import { parseAnswer, save } from "../lib/progress.ts";
 
-interface Row {
-  period: number;
-  opening: string;
-  interest: string;
-  closing: string;
+type Format = "shekels" | "percent" | "points" | "number" | "date";
+interface Column {
+  key: string;
+  label: string;
+  /** Default: shekels. */
+  format?: Format;
 }
-const props = defineProps<{ id: string; rows: Row[]; blanks: string[]; periodLabel?: string }>();
-const columns: { key: keyof Row; label: string }[] = [
-  { key: "opening", label: "יתרה בתחילת השנה" },
-  { key: "interest", label: "ריבית השנה" },
-  { key: "closing", label: "יתרה בסוף השנה" },
-];
+type Row = Record<string, string | number>;
+const props = withDefaults(
+  defineProps<{
+    id: string;
+    columns: Column[];
+    rows: Row[];
+    /** "<row>.<column>", the row named by its rowKey value (or its number from 1 when it has none): "2.interest". */
+    blanks: string[];
+    /** The field that names a row, shown in the first column when periodLabel is given. */
+    rowKey?: string;
+    periodLabel?: string;
+    /** Shown when every blank is right: what the table just showed. */
+    success: string;
+    /** Shown when a blank is wrong: where to look. */
+    hint: string;
+  }>(),
+  { rowKey: "period", periodLabel: undefined },
+);
+
 const entered = reactive<Record<string, string>>({});
 const result = reactive<Record<string, "ok" | "bad" | undefined>>({});
 const revealed = ref(false);
-const isBlank = (row: Row, key: string) => props.blanks.includes(`${row.period}.${key}`);
+const nameOf = (row: Row, i: number) => String(row[props.rowKey] ?? i + 1);
+const keyOf = (row: Row, i: number, col: string) => `${nameOf(row, i)}.${col}`;
+const isBlank = (row: Row, i: number, col: string) => props.blanks.includes(keyOf(row, i, col));
+
+const dateFormat = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
+const percentFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4, useGrouping: false });
+function show(value: string | number | undefined, format: Format = "shekels"): string {
+  if (value === undefined || value === "") return "";
+  if (format === "shekels") return formatShekels(String(value));
+  if (format === "percent") return `${percentFormat.format(Number(value))}%`;
+  if (format === "date") return dateFormat.format(new Date(`${value}T12:00:00Z`));
+  return String(value);
+}
+const tolerance = (format: Format = "shekels") => (format === "shekels" ? 0.02 : 0.005);
 
 function check() {
-  for (const row of props.rows) {
-    for (const c of columns) {
-      const k = `${row.period}.${c.key}`;
-      if (!isBlank(row, c.key)) continue;
-      const v = parseAnswer(entered[k] ?? "");
-      result[k] = v !== null && Math.abs(v - Number(row[c.key])) <= 0.02 ? "ok" : "bad";
+  props.rows.forEach((row, i) => {
+    for (const c of props.columns) {
+      if (!isBlank(row, i, c.key)) continue;
+      const k = keyOf(row, i, c.key);
+      const v = parseAnswer((entered[k] ?? "").replace("−", "-"));
+      result[k] = v !== null && Math.abs(v - Number(row[c.key])) <= tolerance(c.format) ? "ok" : "bad";
     }
-  }
-  save(`exercise:${props.id}`, { done: Object.values(result).every((r) => r === "ok") });
+  });
+  save(`exercise:${props.id}`, { done: allOk() });
 }
 const allOk = () => props.blanks.every((b) => result[b] === "ok");
 </script>
@@ -40,32 +70,34 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
   <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <table class="w-full min-w-[30rem] border-collapse text-body-m">
       <thead>
-        <tr class="border-b border-n200 text-start text-caption text-n600">
-          <th class="py-2 text-start font-semibold">{{ periodLabel ?? "שנה" }}</th>
+        <tr class="border-b border-n200 text-caption text-n600">
+          <th v-if="periodLabel" class="py-2 text-start font-semibold">{{ periodLabel }}</th>
           <th v-for="c in columns" :key="c.key" class="py-2 text-start font-semibold">{{ c.label }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in rows" :key="row.period" class="border-b border-n100">
-          <td class="py-2 text-n700">{{ row.period }}</td>
-          <td v-for="c in columns" :key="c.key" class="py-2">
-            <template v-if="isBlank(row, c.key) && !revealed">
+        <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
+          <td v-if="periodLabel" class="py-2 text-n700">{{ nameOf(row, i) }}</td>
+          <td v-for="c in columns" :key="c.key" class="py-2 pe-2">
+            <template v-if="isBlank(row, i, c.key) && !revealed">
               <input
-                v-model="entered[`${row.period}.${c.key}`]"
-                :aria-label="`${c.label}, שנה ${row.period}`"
+                v-model="entered[keyOf(row, i, c.key)]"
+                :aria-label="`${c.label}, ${periodLabel ?? 'שורה'} ${nameOf(row, i)}`"
                 inputmode="decimal"
                 dir="ltr"
-                class="h-10 w-32 rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
+                class="h-11 w-28 rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
                 :class="
-                  result[`${row.period}.${c.key}`] === 'bad'
+                  result[keyOf(row, i, c.key)] === 'bad'
                     ? 'border-danger shadow-ring-error'
-                    : result[`${row.period}.${c.key}`] === 'ok'
+                    : result[keyOf(row, i, c.key)] === 'ok'
                       ? 'border-success'
                       : 'border-n200'
                 "
               />
             </template>
-            <span v-else class="ltr text-n900" :class="isBlank(row, c.key) ? 'font-semibold' : ''">{{ formatShekels(row[c.key]) }}</span>
+            <span v-else :class="[c.format === 'date' ? '' : 'ltr', isBlank(row, i, c.key) ? 'font-semibold' : '', 'text-n900']">{{
+              show(row[c.key], c.format)
+            }}</span>
           </td>
         </tr>
       </tbody>
@@ -78,15 +110,18 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
       >
         בדיקה
       </button>
-      <button type="button" class="text-body-m text-navy underline" @click="revealed = !revealed">
+      <button type="button" class="min-h-11 text-body-m text-navy underline" @click="revealed = !revealed">
         {{ revealed ? "חזרה למילוי" : "הצגת הטבלה המלאה" }}
       </button>
     </div>
-    <p v-if="Object.keys(result).length" class="mt-3 rounded-md p-3 text-body-m text-n800" :class="allOk() ? 'bg-success-bg' : 'bg-warning-bg'" aria-live="polite">
-      <template v-if="allOk()"><strong class="text-n900">הכול נכון.</strong> ככה בדיוק עובדת ריבית דריבית: כל שנה מתחילה מהיתרה של סוף השנה הקודמת.</template>
-      <template v-else>
-        יש תאים שעוד לא נכונים (מסומנים באדום). בדקו: האם חישבתם את הריבית על <strong>היתרה של תחילת השנה</strong>, ולא על הסכום המקורי?
-      </template>
+    <p
+      v-if="Object.keys(result).length"
+      class="mt-3 rounded-md p-3 text-body-m text-n800"
+      :class="allOk() ? 'bg-success-bg' : 'bg-warning-bg'"
+      aria-live="polite"
+    >
+      <template v-if="allOk()"><strong class="text-n900">הכול נכון.</strong> {{ success }}</template>
+      <template v-else>יש תאים שעוד לא נכונים (מסומנים באדום). {{ hint }}</template>
     </p>
   </div>
 </template>

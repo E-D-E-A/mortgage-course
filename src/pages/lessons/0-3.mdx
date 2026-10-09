@@ -269,7 +269,20 @@ export const predictionOptions = [
 
 הפקדה של 8,000 ₪, בריבית של 4% לשנה, לשלוש שנים. השנה הראשונה כבר מלאה. השלימו את השאר.
 
-<FillTable client:visible id="0.3-half" rows={f.rows("half.table")} blanks={["2.interest", "2.closing", "3.opening", "3.interest", "3.closing"]} />
+<FillTable
+  client:visible
+  id="0.3-half"
+  periodLabel="שנה"
+  columns={[
+    { key: "opening", label: "יתרה בתחילת השנה" },
+    { key: "interest", label: "ריבית השנה" },
+    { key: "closing", label: "יתרה בסוף השנה" },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.interest", "2.closing", "3.opening", "3.interest", "3.closing"]}
+  success="ככה בדיוק עובדת ריבית דריבית: כל שנה מתחילה מהיתרה של סוף השנה הקודמת."
+  hint="בדקו: האם חישבתם את הריבית על היתרה של תחילת השנה, ולא על הסכום המקורי?"
+/>
 
 <Section kind="תרגול">
 

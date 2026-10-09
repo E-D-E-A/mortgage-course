@@ -80,7 +80,7 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 
 ## Components available (`src/components/`)
 
-`Term`, `Later`, `Callout` (tone info / warning), `Section`, `Prediction`, `PredictionReveal` (`notes`), `CompoundGrowth` (0.3 only), `FillTable`, `NumericExercise` (`errors`, `tolerance`, `near`, `unit`), `ChoiceExercise`, `Solution`, `M`, `LessonVideo`, `Sources` (`kind`, `text`, `code`, `date`, `href`).
+`Term`, `Later`, `Callout` (tone info / warning), `Section`, `Prediction`, `PredictionReveal` (`notes`), `CompoundGrowth` (0.3 only), `FillTable` (any columns: `columns`, `rows`, `blanks`, `success`, `hint`; see 0.11 for a total row), `NumericExercise` (`errors`, `tolerance`, `near`, `unit`), `ChoiceExercise`, `Solution`, `M`, `LessonVideo`, `Sources` (`kind`, `text`, `code`, `date`, `href`).
 
 A lesson that needs a **new interactive illustration**: write it as `src/components/<Name>.vue` (yours to own, name it after the lesson's idea), following `CompoundGrowth.vue`: tokens only (Tailwind theme names or `var(--mogi-…)`), logical properties, Hebrew labels, sliders with no native fill (the global CSS styles them), every number through the calc module, a legend, a "הצגה כטבלה" table view, labels in HTML rather than SVG `<text>` where they must stay readable on phone. Chart colours: teal-deep `#0A9396` and turquoise-2 `#00CECB` as the two series (validated pair), N300 grey for a neutral base, navy dashed line for a reference level; never status colours for series. Small text never in teal (contrast 3.7:1) — N600 or darker.
 

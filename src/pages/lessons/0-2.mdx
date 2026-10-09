@@ -10,7 +10,7 @@ import Section from "../../components/Section.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import LoanTimeline from "../../components/LoanTimeline.vue";
-import FillRows from "../../components/FillRows.vue";
+import FillTable from "../../components/FillTable.vue";
 import NumericExercise from "../../components/NumericExercise.vue";
 import ChoiceExercise from "../../components/ChoiceExercise.vue";
 import LessonVideo from "../../components/LessonVideo.astro";
@@ -260,17 +260,17 @@ export const predictionOptions = [
 
 לקחתם הלוואה של 4,000 ₪ לארבע שנים, בריבית פשוטה של 6% לשנה. השנה הראשונה כבר מלאה. השלימו את השאר.
 
-<FillRows
+<FillTable
   client:visible
   id="0.2-half"
   columns={[
-    { key: "period", label: "שנה", format: "plain" },
+    { key: "period", label: "שנה", format: "number" },
     { key: "interest", label: "ריבית השנה", format: "shekels" },
     { key: "total_interest", label: "כל הריבית עד סוף השנה", format: "shekels" },
   ]}
   rows={f.rows("half.table")}
   blanks={["2.interest", "2.total_interest", "3.interest", "3.total_interest", "4.interest", "4.total_interest"]}
-  done="בריבית פשוטה הריבית של כל שנה זהה, ולכן כל הריבית גדלה באותו סכום משנה לשנה."
+  success="בריבית פשוטה הריבית של כל שנה זהה, ולכן כל הריבית גדלה באותו סכום משנה לשנה."
   hint="בדקו: האם חישבתם 6% מהקרן — 4,000 ₪ — בכל שנה? בעמודה השלישית מוסיפים את ריבית השנה למה שהיה בשורה הקודמת."
 />
 

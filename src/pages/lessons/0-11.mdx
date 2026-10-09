@@ -10,7 +10,7 @@ import Section from "../../components/Section.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import PriceYieldSeesaw from "../../components/PriceYieldSeesaw.vue";
-import BondPriceFill from "../../components/BondPriceFill.vue";
+import FillTable from "../../components/FillTable.vue";
 import NumericExercise from "../../components/NumericExercise.vue";
 import ChoiceExercise from "../../components/ChoiceExercise.vue";
 import LessonVideo from "../../components/LessonVideo.astro";
@@ -322,12 +322,19 @@ export const predictionOptions = [
 
 אג״ח משלמת 6 ₪ בכל שנה במשך 3 שנים, ועם התשלום האחרון מחזירה גם 100 ₪. התשואה בשוק 4%. השנה הראשונה כבר מלאה. השלימו את השאר, ואת המחיר.
 
-<BondPriceFill
+<FillTable
   client:visible
   id="0.11-half"
-  rows={f.rows("half.table")}
-  total={f.raw("half.price")}
-  blanks={["2.pv", "3.payment", "3.pv", "total"]}
+  rowKey="year"
+  periodLabel="שנה"
+  columns={[
+    { key: "payment", label: "תשלום" },
+    { key: "rate", label: "תשואה", format: "percent" },
+    { key: "pv", label: "ערך נוכחי של התשלום" },
+  ]}
+  rows={[...f.rows("half.table"), { year: "המחיר", pv: f.raw("half.price") }]}
+  blanks={["2.pv", "3.payment", "3.pv", "המחיר.pv"]}
+  success="המחיר הוא סכום הערכים הנוכחיים של כל התשלומים."
   hint="בדקו: בשנה השלישית מגיעים גם התשלום וגם הקרן. ואת התשלום של שנה t מחלקים ב־1.04 t פעמים."
 />
 
@@ -524,4 +531,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/bonds.ts via scripts/lessons/lesson-0-11.ts → data/lessons/0-11.json, rechecked by checks/kinds/bonds.py (pnpm check:python). Illustration: src/components/PriceYieldSeesaw.vue; half-worked table: src/components/BondPriceFill.vue. */}
+{/* Internal note: numbers come from src/lib/calc/bonds.ts via scripts/lessons/lesson-0-11.ts → data/lessons/0-11.json, rechecked by checks/kinds/bonds.py (pnpm check:python). Illustration: src/components/PriceYieldSeesaw.vue; half-worked table: src/components/FillTable.vue. */}

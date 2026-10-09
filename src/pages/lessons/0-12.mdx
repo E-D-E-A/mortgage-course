@@ -10,7 +10,7 @@ import Section from "../../components/Section.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import YieldCurve from "../../components/YieldCurve.vue";
-import BondPriceFill from "../../components/BondPriceFill.vue";
+import FillTable from "../../components/FillTable.vue";
 import NumericExercise from "../../components/NumericExercise.vue";
 import ChoiceExercise from "../../components/ChoiceExercise.vue";
 import LessonVideo from "../../components/LessonVideo.astro";
@@ -293,12 +293,19 @@ export const predictionOptions = [
 
 אג״ח משלמת 4 ₪ בכל שנה במשך 3 שנים, ועם התשלום האחרון מחזירה גם 100 ₪. בעקום האפס: לשנה 2%, לשנתיים 3%, לשלוש שנים 4%. השנה הראשונה כבר מלאה. השלימו את השאר, ואת המחיר.
 
-<BondPriceFill
+<FillTable
   client:visible
   id="0.12-half"
-  rows={f.rows("half.table")}
-  total={f.raw("half.price")}
-  blanks={["2.pv", "3.payment", "3.pv", "total"]}
+  rowKey="year"
+  periodLabel="שנה"
+  columns={[
+    { key: "payment", label: "תשלום" },
+    { key: "rate", label: "תשואה", format: "percent" },
+    { key: "pv", label: "ערך נוכחי של התשלום" },
+  ]}
+  rows={[...f.rows("half.table"), { year: "המחיר", pv: f.raw("half.price") }]}
+  blanks={["2.pv", "3.payment", "3.pv", "המחיר.pv"]}
+  success="המחיר הוא סכום הערכים הנוכחיים של כל התשלומים."
   hint="בדקו: כל תשלום מהוונים בתשואה של האורך שלו — את שנה 2 ב־1.03 פעמיים, ואת שנה 3 ב־1.04 שלוש פעמים. ובשנה 3 מגיעה גם הקרן."
 />
 
@@ -488,4 +495,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/bonds.ts via scripts/lessons/lesson-0-12.ts → data/lessons/0-12.json, rechecked by checks/kinds/bonds.py (pnpm check:python). Illustration: src/components/YieldCurve.vue; half-worked table: src/components/BondPriceFill.vue. */}
+{/* Internal note: numbers come from src/lib/calc/bonds.ts via scripts/lessons/lesson-0-12.ts → data/lessons/0-12.json, rechecked by checks/kinds/bonds.py (pnpm check:python). Illustration: src/components/YieldCurve.vue; half-worked table: src/components/FillTable.vue. */}

@@ -10,7 +10,7 @@ import Section from "../../components/Section.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import ShrinkingPayments from "../../components/ShrinkingPayments.vue";
-import FillGrid from "../../components/FillGrid.vue";
+import FillTable from "../../components/FillTable.vue";
 import NumericExercise from "../../components/NumericExercise.vue";
 import ChoiceExercise from "../../components/ChoiceExercise.vue";
 import LessonVideo from "../../components/LessonVideo.astro";
@@ -277,7 +277,7 @@ export const predictionOptions = [
 
 תקבלו 2,000 ₪ בסוף כל שנה, שלוש שנים. הריבית היא 5% לשנה. השורה הראשונה כבר מלאה. השלימו את השאר, ואז חברו את העמודה האחרונה (תצטרכו מחשבון).
 
-<FillGrid
+<FillTable
   client:visible
   id="0.6-half"
   periodLabel="בסוף שנה"
@@ -445,4 +445,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/present-value.ts and rates.ts via scripts/lessons/lesson-0-6.ts → data/lessons/0-6.json, rechecked by checks/kinds/present_value.py through checks/independent_check.py (stream totals by the closed form, independently of the TypeScript sum). The illustration is src/components/ShrinkingPayments.vue; the half-worked table uses src/components/FillGrid.vue (written for lessons 0.7–0.10). */}
+{/* Internal note: numbers come from src/lib/calc/present-value.ts and rates.ts via scripts/lessons/lesson-0-6.ts → data/lessons/0-6.json, rechecked by checks/kinds/present_value.py through checks/independent_check.py (stream totals by the closed form, independently of the TypeScript sum). The illustration is src/components/ShrinkingPayments.vue; the half-worked table uses src/components/FillTable.vue. */}
