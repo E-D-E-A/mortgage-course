@@ -8,7 +8,7 @@ import Decimal from "decimal.js";
 import { compoundBalance, simpleBalance } from "../../src/lib/calc/compound.ts";
 import { disposableIncome } from "../../src/lib/calc/household.ts";
 import { indexedBalance } from "../../src/lib/calc/indexation.ts";
-import { ltvPercent, maxLoan, minEquity, saleSplit } from "../../src/lib/calc/ltv.ts";
+import { loanNeeded, ltvPercent, maxLoan, minEquity, saleSplit } from "../../src/lib/calc/ltv.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentagePoints, percentOf, percentString, sharePercent } from "../../src/lib/calc/percent.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -80,9 +80,10 @@ export default function check1(): LessonData {
       { id: "q5.max_loan", kind: "ltv_max_loan", inputs: { value: "2000000", ceiling: "75" }, value: moneyString(maxLoan("2000000", "75")) },
       { id: "q5.min_equity", kind: "ltv_min_equity", inputs: { price: "2000000", value: "2000000", ceiling: "75" }, value: moneyString(minEquity("2000000", "2000000", "75")) },
 
-      // q6 (1.2): price 2,000,000 ₪, value 1,900,000 ₪, ceiling 75% — the equity needed.
-      { id: "q6.answer", kind: "ltv_min_equity", inputs: { price: "2000000", value: "1900000", ceiling: "75" }, value: moneyString(minEquity("2000000", "1900000", "75")) },
-      { id: "q6.max_loan", kind: "ltv_max_loan", inputs: { value: "1900000", ceiling: "75" }, value: moneyString(maxLoan("1900000", "75")) },
+      // q6 (1.2): equity of 600,000 ₪ on a 2,000,000 ₪ home — the loan, and its share of the price.
+      { id: "q6.loan", kind: "ltv_loan_needed", inputs: { price: "2000000", equity: "600000" }, value: moneyString(loanNeeded("2000000", "600000")) },
+      ltv("q6.answer", "1400000", "2000000"),
+      ltv("q6.equity_share", "600000", "2000000"),
 
       // q8 (1.4): a 1,500,000 ₪ loan, 40% and 35% in two tracks — the third track.
       { id: "q8.first", kind: "percent_of", inputs: { amount: "1500000.00", rate_percent: "40" }, value: moneyString(percentOf("1500000", "40")) },

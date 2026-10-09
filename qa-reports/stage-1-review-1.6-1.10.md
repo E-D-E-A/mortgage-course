@@ -69,3 +69,74 @@ Items below: severity (**חוסם** / **חשוב** / **קטן**), the exact quot
 
 8. **קטן.** Sources, first line: "הוראת בנק ישראל 451, שנלמד בשיעור 5.1". הוראה is feminine, and the clause has no object. The same wording is in 1.7 and 1.8.
    - Fix: "שנלמד עליה בשיעור 5.1".
+
+---
+
+## Lesson 1.7: התהליך מקצה לקצה
+
+1. **חוסם.** Expected observation 3 of the timeline (MDX line 166): "12 יום במקום 24: אחרי אישור שהגיע ב14 באוקטובר, התנאים נשמרים עד 26 באוקטובר בלבד." The widget never shows this.
+   - The answer uses the worked example's approval date (`worked.approved`, 14 Oct).
+   - The widget's slider starts at "הבנק ענה אחרי 5 ימי עסקים", so its approval date is 16 Oct and the 12-day window ends on **28 Oct**.
+   - A learner who did task 2 first (send date 17 Sep) sees 25 Sep → 7 Oct.
+   - The learner sees one date and is told another, at the moment the lesson teaches careful counting.
+   - Fix, either way:
+     - Make task 3 say "החזירו את התאריך ל־11 באוקטובר, הזיזו את ״הבנק ענה אחרי״ ל־3 ימים, וכבו את ״נרשם שעבוד חדש״", so the widget shows 14 Oct → 26 Oct.
+     - Or keep the task, add facts for 16 Oct → 28 Oct, and use them.
+   - Also "ב14" is missing its maqaf (see the cross-lesson items).
+
+2. **חשוב.** Exercise 6 (מאתגר, line 395): a request on 17 Sep, before Yom Kippur. This is the same case as illustration task 2: "בחרו שהבקשה נשלחה ב־17 בספטמבר 2026. אילו ימים לא נספרו…".
+   - That task's answer, "יום שישי, 25 בספטמבר, ולא 23 בספטמבר", is printed in the "מה הייתם אמורים לראות" box above.
+   - The hardest exercise is a repeat with its answer already shown. This is the stage-0 0.7 finding again.
+   - Fix: move exercise 6 to another 2026 holiday from `calendar.closed_2026`.
+     - Example: a request on Thu 16 Apr 2026, with Independence Day on Wed 22 Apr. Then 17 (1), 19 (2), 20 (3), 21 (4), 23 (5) → Thu 23 Apr. Without the holiday → 22 Apr.
+     - Add these as facts. Or change the illustration task to another date.
+
+3. **חשוב.** Exercise 4 (line 340) has only one error: counting from day 1. It lacks the mistake the exercise exists to catch: using 24 days instead of 12.
+   - The fact `ex4.err_24` (3 Dec) exists, and the solution mentions it, but typing 3 gets no message.
+   - Fix: `{ value: day("ex4.err_24"), tolerance: 0, message: "השתמשתם ב־24 יום. בלי שעבוד חדש החלון הוא 12 יום." }`. Lesson 1.8, exercise 5 already has this error.
+
+4. **חשוב.** Exercises 3 and 6: "…אם זו הלוואה רגילה?" In 1.1, "הלוואה רגילה" was set against a mortgage (the map title of 1.1: "ומה ההבדל מהלוואה רגילה").
+   - Here it means "a loan type the bank did not define in advance for 7 days". A beginner can read it as "not a mortgage".
+   - Fix: "…אם הבנק לא הגדיר את סוג ההלוואה הזה מראש ל־7 ימי עסקים?"
+
+5. **חשוב.** The worked example and the half-solved table give case A two different appraisal dates.
+   - Step 5 (line 248): "השמאי ביקר ביום שלישי, 20 באוקטובר".
+   - The half-solved table: "התיק נפתח 26 באוקטובר", "השמאי ביקר 29 באוקטובר".
+   - In step 5, the appraisal also comes before the file is opened, against the lesson's own order (step 7 before step 8).
+   - Fix: use 29 Oct in step 5. 29 Oct + 90 days = 27 Jan 2027; add it as a fact.
+
+6. **חשוב.** The 12 steps never say where the purchase contract is signed. See cross-lesson item 1.
+   - Lesson 1.6 promised "באיזה סדר כל המשתתפים האלה נכנסים לעסקה". In 1.7 the seller and the lawyer never get a step; the contract appears only inside step 2's card, as a document ("חוזה ונסח טאבו").
+
+7. **קטן.** The guided date picker on the phone shows "10/11/2026" for 11 October. The headless browser uses a month-first locale. An Israeli reader reads it as 10 November.
+   - Fix: print the chosen date in words under the input, for example "יום ראשון, 11 באוקטובר 2026", as the result cards already do.
+
+8. **קטן.** Line 91: "לפי אילון, אצל רוב האנשים התשובה מגיעה מיד … (ידע מהשטח, ממתין לאישור אילון)". It has no date. Every other field claim in the lesson has one.
+   - Fix: "(ידע מהשטח, 2026-07-27, ממתין לאישור אילון)".
+
+9. **קטן.** "ב־Mogi הוחלט (2026-08-18) שהמערכת תזכיר את זה ליועץ ביום העסקים השישי." For a loan type with a 7-business-day limit, asking on day 6 is too early.
+   - Fix: add "(ובסוג הלוואה שהבנק הגדיר ל־7 ימים — ביום העסקים השמיני)". Or say the reminder is set for the usual 5-day case.
+
+10. **קטן.** Line 95: "ושם מתחיל העבודה האמיתית". עבודה is feminine. Fix: "ושם מתחילה העבודה האמיתית".
+
+11. **קטן.** Card of step 3 in the timeline: "בשלב הזה הבנק בודק גם את היסטוריית האשראי של הלווים."
+    - The term is new and not explained.
+    - It is stated as fact, while the source says only "בנקים **מפרסמים** שהם בודקים".
+    - Fix: "בנקים מפרסמים שבשלב הזה הם בודקים גם איך הלווים החזירו הלוואות בעבר (לא אומת)."
+
+12. **קטן.** "הוראת שעה … בזמן מבצע ״שאגת הארי״": the terms "הוראת שעה" and "מבצע" are not explained.
+    - Fix: "הוראה זמנית (הוראת שעה), בזמן המלחמה שהחלה בפברואר 2026 (מבצע ״שאגת הארי״)".
+
+13. **קטן.** Five-questions callout, line 404: "המטרה היא להגן על הלווים ולאפשר להם להשוות בין בנקים." This states the regulator's purpose as fact, with no source. Lesson 1.8, line 396, has the same pattern.
+    - Fix: "כנראה, המטרה היא…". Or cite the directive's stated purpose if the transcript has it.
+
+14. **קטן.** In the video:
+    - Cue 15 states "כל מה שעד החתימה רץ מול השעון הזה" as a rule. The text marks it "הערכה של הצוות… לא כלל כתוב".
+    - Cue 19 and the last frame ("לפי תעתיק של הצוות… לא אומת מול המקור") carry no date.
+    - In the 24-day strip, Saturdays are drawn lighter, which says "these count less" just as the cue says they count.
+    - Cue 11 computes a date but says nothing about day 0.
+    - Fix:
+      - Cue 15: "לפי הצוות, כל מה שעד החתימה רץ מול השעון הזה."
+      - Cue 19: "…לא אומתו. נכון ל־9 באוקטובר 2026."
+      - Draw all 24 days in one colour; keep the "שבת" label.
+      - Cue 11: "בקשה ב־11 באוקטובר (יום 0): תשובה עד 16 באוקטובר."
