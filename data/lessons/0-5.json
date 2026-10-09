@@ -1,0 +1,559 @@
+{
+  "lesson": "0.5",
+  "title": "ערך הזמן של כסף",
+  "note": "Teaching assumptions, not market rates. Money rounded to the agora only at the end of each calculation; table rows round each line.",
+  "facts": [
+    {
+      "id": "ex2.interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.answer",
+        "subtrahend": "ex2.principal"
+      },
+      "value": "200.00"
+    },
+    {
+      "id": "explain.next_year",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1100.00"
+    },
+    {
+      "id": "explain.two_years",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "1210.00"
+    },
+    {
+      "id": "explain.today_of_1100",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1100",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.today_of_1210",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1210",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.today_1y",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "909.09"
+    },
+    {
+      "id": "explain.check_1y",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "909.09",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.today_2y",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "826.45"
+    },
+    {
+      "id": "explain.today_3y",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 3
+      },
+      "value": "751.31"
+    },
+    {
+      "id": "explain.mistake",
+      "kind": "percent_off_mistake",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "900.00"
+    },
+    {
+      "id": "explain.mistake_grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "900",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "990.00"
+    },
+    {
+      "id": "explain.table",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 5,
+        "decimals": 5
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "1000.00",
+          "growth": "1.1",
+          "value_today": "909.09"
+        },
+        {
+          "period": 2,
+          "amount": "1000.00",
+          "growth": "1.21",
+          "value_today": "826.45"
+        },
+        {
+          "period": 3,
+          "amount": "1000.00",
+          "growth": "1.331",
+          "value_today": "751.31"
+        },
+        {
+          "period": 4,
+          "amount": "1000.00",
+          "growth": "1.4641",
+          "value_today": "683.01"
+        },
+        {
+          "period": 5,
+          "amount": "1000.00",
+          "growth": "1.61051",
+          "value_today": "620.92"
+        }
+      ]
+    },
+    {
+      "id": "prediction.grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "5",
+        "periods": 5
+      },
+      "value": "1276.28"
+    },
+    {
+      "id": "prediction.today",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1200",
+        "rate_percent": "5",
+        "periods": 5
+      },
+      "value": "940.23"
+    },
+    {
+      "id": "prediction.offer",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200.00"
+    },
+    {
+      "id": "prediction.now",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "prediction.gap_later",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "prediction.grown",
+        "subtrahend": "prediction.offer"
+      },
+      "value": "76.28"
+    },
+    {
+      "id": "prediction.gap_today",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "prediction.now",
+        "subtrahend": "prediction.today"
+      },
+      "value": "59.77"
+    },
+    {
+      "id": "slider.today_10",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "613.91"
+    },
+    {
+      "id": "slider.today_30",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "231.38"
+    },
+    {
+      "id": "slider.today_30_2",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "2",
+        "periods": 30
+      },
+      "value": "552.07"
+    },
+    {
+      "id": "formula.factor_3",
+      "kind": "growth_factor_rounded",
+      "inputs": {
+        "rate_percent": "10",
+        "periods": 3,
+        "decimals": 3
+      },
+      "value": "1.331"
+    },
+    {
+      "id": "worked.today",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "9245.56"
+    },
+    {
+      "id": "worked.now",
+      "kind": "given",
+      "inputs": {},
+      "value": "9000.00"
+    },
+    {
+      "id": "worked.grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "9000",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "9734.40"
+    },
+    {
+      "id": "worked.later",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "worked.factor",
+      "kind": "growth_factor_rounded",
+      "inputs": {
+        "rate_percent": "4",
+        "periods": 2,
+        "decimals": 4
+      },
+      "value": "1.0816"
+    },
+    {
+      "id": "worked.gain_today",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.today",
+        "subtrahend": "worked.now"
+      },
+      "value": "245.56"
+    },
+    {
+      "id": "worked.gain_later",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.later",
+        "subtrahend": "worked.grown"
+      },
+      "value": "265.60"
+    },
+    {
+      "id": "worked.gain_grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "245.56",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "265.60"
+    },
+    {
+      "id": "half.table",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "5",
+        "periods": 4,
+        "decimals": 6
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "2000.00",
+          "growth": "1.05",
+          "value_today": "1904.76"
+        },
+        {
+          "period": 2,
+          "amount": "2000.00",
+          "growth": "1.1025",
+          "value_today": "1814.06"
+        },
+        {
+          "period": 3,
+          "amount": "2000.00",
+          "growth": "1.157625",
+          "value_today": "1727.68"
+        },
+        {
+          "period": 4,
+          "amount": "2000.00",
+          "growth": "1.215506",
+          "value_today": "1645.40"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "2200.00"
+    },
+    {
+      "id": "ex2.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000.00"
+    },
+    {
+      "id": "ex3.err_grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "990",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1089.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1100",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "ex3.err_off",
+      "kind": "percent_off_mistake",
+      "inputs": {
+        "amount": "1100",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "990.00"
+    },
+    {
+      "id": "ex3.err_times",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1100",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1210.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "1191.02"
+    },
+    {
+      "id": "ex4.err_simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "1180.00"
+    },
+    {
+      "id": "ex4.err_today",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "839.62"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "4444.98"
+    },
+    {
+      "id": "ex5.factor",
+      "kind": "growth_factor_rounded",
+      "inputs": {
+        "rate_percent": "4",
+        "periods": 3,
+        "decimals": 6
+      },
+      "value": "1.124864"
+    },
+    {
+      "id": "ex5.err_off",
+      "kind": "percent_off_mistake",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "4400.00"
+    },
+    {
+      "id": "ex5.err_times",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "5000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "5624.32"
+    },
+    {
+      "id": "ex5.err_once",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "4",
+        "periods": 1
+      },
+      "value": "4807.69"
+    },
+    {
+      "id": "ex6.today",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "4",
+        "periods": 4
+      },
+      "value": "8548.04"
+    },
+    {
+      "id": "ex6.now",
+      "kind": "given",
+      "inputs": {},
+      "value": "8500.00"
+    },
+    {
+      "id": "ex6.grown",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "8500",
+        "rate_percent": "4",
+        "periods": 4
+      },
+      "value": "9943.80"
+    },
+    {
+      "id": "ex6.later",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "ex6.factor",
+      "kind": "growth_factor_rounded",
+      "inputs": {
+        "rate_percent": "4",
+        "periods": 4,
+        "decimals": 6
+      },
+      "value": "1.169859"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.today",
+        "subtrahend": "ex6.now"
+      },
+      "value": "48.04"
+    },
+    {
+      "id": "ex6.err_later",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.later",
+        "subtrahend": "ex6.grown"
+      },
+      "value": "56.20"
+    },
+    {
+      "id": "ex6.err_nominal",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.later",
+        "subtrahend": "ex6.now"
+      },
+      "value": "1500.00"
+    }
+  ]
+}

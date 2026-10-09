@@ -1,0 +1,563 @@
+{
+  "lesson": "0.6",
+  "title": "ערך נוכחי",
+  "note": "Teaching assumptions, not market rates. Each value today is rounded to the agora once, at the end; a stream's total is the exact sum, rounded once.",
+  "facts": [
+    {
+      "id": "explain.pay_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "1100.00"
+    },
+    {
+      "id": "explain.pay_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "1210.00"
+    },
+    {
+      "id": "explain.today_1",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1100",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.today_2",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1210",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.sum_today",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "explain.today_1,explain.today_2"
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "explain.sum_nominal",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "explain.pay_1,explain.pay_2"
+      },
+      "value": "2310.00"
+    },
+    {
+      "id": "explain.table",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "10",
+        "periods": 3,
+        "decimals": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "1000.00",
+          "growth": "1.1",
+          "value_today": "909.09"
+        },
+        {
+          "period": 2,
+          "amount": "1000.00",
+          "growth": "1.21",
+          "value_today": "826.45"
+        },
+        {
+          "period": 3,
+          "amount": "1000.00",
+          "growth": "1.331",
+          "value_today": "751.31"
+        }
+      ]
+    },
+    {
+      "id": "explain.three_total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1000",
+        "periods": 3
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "explain.three_today",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "10",
+        "periods": 3
+      },
+      "value": "2486.85"
+    },
+    {
+      "id": "explain.three_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.three_total",
+        "subtrahend": "explain.three_today"
+      },
+      "value": "513.15"
+    },
+    {
+      "id": "loan.table",
+      "kind": "loan_balance_table",
+      "inputs": {
+        "principal": "2486.85",
+        "rate_percent": "10",
+        "payment": "1000",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2486.85",
+          "interest": "248.69",
+          "payment": "1000.00",
+          "closing": "1735.54"
+        },
+        {
+          "period": 2,
+          "opening": "1735.54",
+          "interest": "173.55",
+          "payment": "1000.00",
+          "closing": "909.09"
+        },
+        {
+          "period": 3,
+          "opening": "909.09",
+          "interest": "90.91",
+          "payment": "1000.00",
+          "closing": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "prediction.today",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "7721.73"
+    },
+    {
+      "id": "prediction.total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1000",
+        "periods": 10
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "video.table_10",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5",
+        "periods": 10,
+        "decimals": 6
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "1000.00",
+          "growth": "1.05",
+          "value_today": "952.38"
+        },
+        {
+          "period": 2,
+          "amount": "1000.00",
+          "growth": "1.1025",
+          "value_today": "907.03"
+        },
+        {
+          "period": 3,
+          "amount": "1000.00",
+          "growth": "1.157625",
+          "value_today": "863.84"
+        },
+        {
+          "period": 4,
+          "amount": "1000.00",
+          "growth": "1.215506",
+          "value_today": "822.70"
+        },
+        {
+          "period": 5,
+          "amount": "1000.00",
+          "growth": "1.276282",
+          "value_today": "783.53"
+        },
+        {
+          "period": 6,
+          "amount": "1000.00",
+          "growth": "1.340096",
+          "value_today": "746.22"
+        },
+        {
+          "period": 7,
+          "amount": "1000.00",
+          "growth": "1.4071",
+          "value_today": "710.68"
+        },
+        {
+          "period": 8,
+          "amount": "1000.00",
+          "growth": "1.477455",
+          "value_today": "676.84"
+        },
+        {
+          "period": 9,
+          "amount": "1000.00",
+          "growth": "1.551328",
+          "value_today": "644.61"
+        },
+        {
+          "period": 10,
+          "amount": "1000.00",
+          "growth": "1.628895",
+          "value_today": "613.91"
+        }
+      ]
+    },
+    {
+      "id": "prediction.lump",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "6139.13"
+    },
+    {
+      "id": "prediction.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "prediction.total",
+        "subtrahend": "prediction.today"
+      },
+      "value": "2278.27"
+    },
+    {
+      "id": "slider.today_30",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "15372.45"
+    },
+    {
+      "id": "slider.total_30",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1000",
+        "periods": 30
+      },
+      "value": "30000.00"
+    },
+    {
+      "id": "slider.first",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5",
+        "periods": 1
+      },
+      "value": "952.38"
+    },
+    {
+      "id": "slider.last_30",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "231.38"
+    },
+    {
+      "id": "slider.today_10_8",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "8",
+        "periods": 10
+      },
+      "value": "6710.08"
+    },
+    {
+      "id": "worked.table",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "40000",
+        "rate_percent": "4",
+        "periods": 3,
+        "decimals": 6
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "40000.00",
+          "growth": "1.04",
+          "value_today": "38461.54"
+        },
+        {
+          "period": 2,
+          "amount": "40000.00",
+          "growth": "1.0816",
+          "value_today": "36982.25"
+        },
+        {
+          "period": 3,
+          "amount": "40000.00",
+          "growth": "1.124864",
+          "value_today": "35559.85"
+        }
+      ]
+    },
+    {
+      "id": "worked.today",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "40000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "111003.64"
+    },
+    {
+      "id": "worked.now",
+      "kind": "given",
+      "inputs": {},
+      "value": "110000.00"
+    },
+    {
+      "id": "worked.total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "40000",
+        "periods": 3
+      },
+      "value": "120000.00"
+    },
+    {
+      "id": "worked.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.today",
+        "subtrahend": "worked.now"
+      },
+      "value": "1003.64"
+    },
+    {
+      "id": "worked.nominal_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.total",
+        "subtrahend": "worked.now"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "value_today_table",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "5",
+        "periods": 3,
+        "decimals": 6
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "2000.00",
+          "growth": "1.05",
+          "value_today": "1904.76"
+        },
+        {
+          "period": 2,
+          "amount": "2000.00",
+          "growth": "1.1025",
+          "value_today": "1814.06"
+        },
+        {
+          "period": 3,
+          "amount": "2000.00",
+          "growth": "1.157625",
+          "value_today": "1727.68"
+        }
+      ]
+    },
+    {
+      "id": "half.total",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "2000",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "5446.50"
+    },
+    {
+      "id": "ex2.err_once",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "1210",
+        "rate_percent": "10",
+        "periods": 1
+      },
+      "value": "1100.00"
+    },
+    {
+      "id": "ex2.err_both_once",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "explain.today_1,ex2.err_once"
+      },
+      "value": "2100.00"
+    },
+    {
+      "id": "ex3.first",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "4",
+        "periods": 1
+      },
+      "value": "4807.69"
+    },
+    {
+      "id": "ex3.second",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "4622.78"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "5000",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "9430.47"
+    },
+    {
+      "id": "ex3.err_total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "5000",
+        "periods": 2
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "ex3.err_both_one_year",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "ex3.first,ex3.first"
+      },
+      "value": "9615.38"
+    },
+    {
+      "id": "ex3.err_both_two_years",
+      "kind": "sum_of_facts",
+      "inputs": {
+        "terms": "ex3.second,ex3.second"
+      },
+      "value": "9245.56"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "1000",
+        "rate_percent": "6",
+        "periods": 4
+      },
+      "value": "3465.11"
+    },
+    {
+      "id": "ex4.err_total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1000",
+        "periods": 4
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "ex4.err_lump",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "4000",
+        "rate_percent": "6",
+        "periods": 4
+      },
+      "value": "3168.37"
+    },
+    {
+      "id": "ex5.today",
+      "kind": "stream_value_today",
+      "inputs": {
+        "payment": "5500",
+        "rate_percent": "6",
+        "periods": 2
+      },
+      "value": "10083.66"
+    },
+    {
+      "id": "ex5.lent",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "ex5.total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "5500",
+        "periods": 2
+      },
+      "value": "11000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.today",
+        "subtrahend": "ex5.lent"
+      },
+      "value": "83.66"
+    },
+    {
+      "id": "ex5.err_nominal",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.total",
+        "subtrahend": "ex5.lent"
+      },
+      "value": "1000.00"
+    }
+  ]
+}

@@ -1,0 +1,518 @@
+{
+  "lesson": "0.12",
+  "title": "עקום התשואות",
+  "note": "Teaching curves, not market data. Money rounded to the agora at the end of each calculation; table rows rounded each on its own. Yields and implied rates shown to two decimal places.",
+  "facts": [
+    {
+      "id": "curve.rising",
+      "kind": "bond_curve",
+      "inputs": {
+        "points": "1:3,2:3.25,5:3.75,10:4.25,20:4.75"
+      },
+      "value": {
+        "points": [
+          {
+            "years": 1,
+            "yield": "3.00"
+          },
+          {
+            "years": 2,
+            "yield": "3.25"
+          },
+          {
+            "years": 5,
+            "yield": "3.75"
+          },
+          {
+            "years": 10,
+            "yield": "4.25"
+          },
+          {
+            "years": 20,
+            "yield": "4.75"
+          }
+        ],
+        "segments": [
+          {
+            "from": 1,
+            "to": 2,
+            "rate": "3.50"
+          },
+          {
+            "from": 2,
+            "to": 5,
+            "rate": "4.08"
+          },
+          {
+            "from": 5,
+            "to": 10,
+            "rate": "4.75"
+          },
+          {
+            "from": 10,
+            "to": 20,
+            "rate": "5.25"
+          }
+        ],
+        "shape": "rising"
+      }
+    },
+    {
+      "id": "curve.flat",
+      "kind": "bond_curve",
+      "inputs": {
+        "points": "1:4,2:4,5:4,10:4,20:4"
+      },
+      "value": {
+        "points": [
+          {
+            "years": 1,
+            "yield": "4.00"
+          },
+          {
+            "years": 2,
+            "yield": "4.00"
+          },
+          {
+            "years": 5,
+            "yield": "4.00"
+          },
+          {
+            "years": 10,
+            "yield": "4.00"
+          },
+          {
+            "years": 20,
+            "yield": "4.00"
+          }
+        ],
+        "segments": [
+          {
+            "from": 1,
+            "to": 2,
+            "rate": "4.00"
+          },
+          {
+            "from": 2,
+            "to": 5,
+            "rate": "4.00"
+          },
+          {
+            "from": 5,
+            "to": 10,
+            "rate": "4.00"
+          },
+          {
+            "from": 10,
+            "to": 20,
+            "rate": "4.00"
+          }
+        ],
+        "shape": "flat"
+      }
+    },
+    {
+      "id": "curve.falling",
+      "kind": "bond_curve",
+      "inputs": {
+        "points": "1:5,2:4.5,5:4,10:3.75,20:3.5"
+      },
+      "value": {
+        "points": [
+          {
+            "years": 1,
+            "yield": "5.00"
+          },
+          {
+            "years": 2,
+            "yield": "4.50"
+          },
+          {
+            "years": 5,
+            "yield": "4.00"
+          },
+          {
+            "years": 10,
+            "yield": "3.75"
+          },
+          {
+            "years": 20,
+            "yield": "3.50"
+          }
+        ],
+        "segments": [
+          {
+            "from": 1,
+            "to": 2,
+            "rate": "4.00"
+          },
+          {
+            "from": 2,
+            "to": 5,
+            "rate": "3.67"
+          },
+          {
+            "from": 5,
+            "to": 10,
+            "rate": "3.50"
+          },
+          {
+            "from": 10,
+            "to": 20,
+            "rate": "3.25"
+          }
+        ],
+        "shape": "falling"
+      }
+    },
+    {
+      "id": "pred.forward",
+      "kind": "bond_implied_rate",
+      "inputs": {
+        "short_percent": "3",
+        "short_years": 1,
+        "long_percent": "4",
+        "long_years": 2
+      },
+      "value": "5.01"
+    },
+    {
+      "id": "pred.forward_whole",
+      "kind": "bond_round_whole",
+      "inputs": {
+        "of": "pred.forward"
+      },
+      "value": "5"
+    },
+    {
+      "id": "two.long",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "4",
+        "periods": 2
+      },
+      "value": "108.16"
+    },
+    {
+      "id": "two.short",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "3",
+        "periods": 1
+      },
+      "value": "103.00"
+    },
+    {
+      "id": "two.needed",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "two.long",
+        "subtrahend": "two.short"
+      },
+      "value": "5.16"
+    },
+    {
+      "id": "zero.pv_2",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "4",
+        "years": 2
+      },
+      "value": "92.46"
+    },
+    {
+      "id": "worked.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yields": "3,4,5"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "5.00",
+          "rate": "3.00",
+          "pv": "4.85"
+        },
+        {
+          "year": 2,
+          "payment": "5.00",
+          "rate": "4.00",
+          "pv": "4.62"
+        },
+        {
+          "year": 3,
+          "payment": "105.00",
+          "rate": "5.00",
+          "pv": "90.70"
+        }
+      ]
+    },
+    {
+      "id": "worked.price",
+      "kind": "bond_curve_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "curve": "3,4,5"
+      },
+      "value": "100.18"
+    },
+    {
+      "id": "worked.flat_5",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yield_percent": "5"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "worked.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.price",
+        "subtrahend": "worked.flat_5"
+      },
+      "value": "0.18"
+    },
+    {
+      "id": "half.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 3,
+        "yields": "2,3,4"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "4.00",
+          "rate": "2.00",
+          "pv": "3.92"
+        },
+        {
+          "year": 2,
+          "payment": "4.00",
+          "rate": "3.00",
+          "pv": "3.77"
+        },
+        {
+          "year": 3,
+          "payment": "104.00",
+          "rate": "4.00",
+          "pv": "92.46"
+        }
+      ]
+    },
+    {
+      "id": "half.price",
+      "kind": "bond_curve_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "curve": "2,3,4"
+      },
+      "value": "100.15"
+    },
+    {
+      "id": "gap.nominal",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.00"
+    },
+    {
+      "id": "gap.real",
+      "kind": "given",
+      "inputs": {},
+      "value": "2.00"
+    },
+    {
+      "id": "gap.answer",
+      "kind": "bond_inflation_gap",
+      "inputs": {
+        "nominal_percent": "4",
+        "real_percent": "2"
+      },
+      "value": "1.96"
+    },
+    {
+      "id": "gap.simple",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "gap.nominal",
+        "subtrahend": "gap.real"
+      },
+      "value": "2.00"
+    },
+    {
+      "id": "ex2.long",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.50"
+    },
+    {
+      "id": "ex2.short",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.long",
+        "subtrahend": "ex2.short"
+      },
+      "value": "1.50"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "4",
+        "years": 2
+      },
+      "value": "92.46"
+    },
+    {
+      "id": "ex3.err_one_year",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "4",
+        "years": 1
+      },
+      "value": "96.15"
+    },
+    {
+      "id": "ex3.err_simple",
+      "kind": "bond_simple_discount",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "4",
+        "years": 2
+      },
+      "value": "92.59"
+    },
+    {
+      "id": "ex3.err_short_yield",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "3",
+        "years": 2
+      },
+      "value": "94.26"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "bond_implied_rate",
+      "inputs": {
+        "short_percent": "2",
+        "short_years": 1,
+        "long_percent": "3",
+        "long_years": 2
+      },
+      "value": "4.01"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "bond_inflation_gap",
+      "inputs": {
+        "nominal_percent": "4",
+        "real_percent": "1.5"
+      },
+      "value": "2.46"
+    },
+    {
+      "id": "ex5.nominal",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.00"
+    },
+    {
+      "id": "ex5.real",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.50"
+    },
+    {
+      "id": "ex6.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 3,
+        "yields": "3,3.5,4"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "4.00",
+          "rate": "3.00",
+          "pv": "3.88"
+        },
+        {
+          "year": 2,
+          "payment": "4.00",
+          "rate": "3.50",
+          "pv": "3.73"
+        },
+        {
+          "year": 3,
+          "payment": "104.00",
+          "rate": "4.00",
+          "pv": "92.46"
+        }
+      ]
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "bond_curve_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "curve": "3,3.5,4"
+      },
+      "value": "100.07"
+    },
+    {
+      "id": "ex6.err_flat_4",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 3,
+        "yield_percent": "4"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "ex4.answer_whole",
+      "kind": "bond_round_whole",
+      "inputs": {
+        "of": "ex4.answer"
+      },
+      "value": "4"
+    },
+    {
+      "id": "ex5.simple",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.nominal",
+        "subtrahend": "ex5.real"
+      },
+      "value": "2.50"
+    }
+  ]
+}

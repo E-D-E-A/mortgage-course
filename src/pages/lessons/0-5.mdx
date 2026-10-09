@@ -1,0 +1,416 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.5"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import TimeValue from "../../components/TimeValue.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatShekelsText as T } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.5");
+export const table = f.rows("explain.table");
+export const predictionOptions = [
+  "1,200 ₪ בעוד 5 שנים — זה יותר כסף",
+  "1,000 ₪ היום",
+  "שתי האפשרויות שוות בדיוק",
+  "אי אפשר להשוות סכומים שמגיעים בזמנים שונים",
+];
+
+בשיעור 0.3 ראינו <Term t="ריבית דריבית" lesson="0.5">ריבית דריבית</Term>: סכום שמופקד היום גדל משנה לשנה, כי בכל שנה הריבית מצטרפת אליו.
+בשיעור הזה נהפוך את הכיוון. נשאל: כמה שווה **היום** סכום שיגיע רק בעוד כמה שנים?
+התשובה תסביר למה שקל היום שווה יותר משקל בעתיד — ואיך משווים בין סכומים שמגיעים בזמנים שונים.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.5"
+  question="מציעים לכם לבחור: 1,000 ₪ היום, או 1,200 ₪ בעוד 5 שנים. בטוח שתקבלו את הכסף בכל אחת מהאפשרויות, ואפשר להפקיד כסף בריבית דריבית של 5% לשנה. מה שווה יותר?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שני שטרות על ציר הזמן
+
+</Section>
+
+<LessonVideo lesson="0-5" />
+
+<Section kind="ההסבר">
+
+## שקל היום, שקל בעוד שנה
+
+</Section>
+
+נניח שאפשר להפקיד כסף ב<Term t="ריבית" lesson="0.5">ריבית</Term> של 10% לשנה. (מספר עגול, כדי שיהיה קל לחשב בראש.)
+
+**קדימה בזמן.** הפקדתם היום 1,000 ₪. בעוד שנה יהיו לכם {f.shekels("explain.next_year")}, ובעוד שנתיים {f.shekels("explain.two_years")}.
+כלומר, מבחינתכם 1,000 ₪ היום ו־{f.shekels("explain.next_year")} בעוד שנה שווים אותו דבר: מאחד אפשר להגיע לשני.
+
+לכן 1,000 ₪ היום שווים **יותר** מ־1,000 ₪ בעוד שנה. מי שמקבל אותם היום, יכול להפקיד אותם ולהגיע בעוד שנה ל־{f.shekels("explain.next_year")}.
+לזה קוראים <Term t="ערך הזמן של כסף" lesson="0.5">ערך הזמן של כסף</Term>: לאותו סכום יש ערך שונה, לפי מתי הוא מגיע.
+
+יש לזה שלוש סיבות:
+1. **אפשר להרוויח ריבית בינתיים.** על הסיבה הזו נחשב בשיעור הזה.
+2. **מחירים עולים לאורך זמן**, ולכן שקל בעתיד קונה בדרך כלל פחות. נגיע לזה ב<Later lesson="0.7">אינפלציה</Later>.
+3. **הבטחה לשלם בעתיד לא תמיד מתקיימת.** כסף שכבר אצלכם, אצלכם.
+
+**אחורה בזמן.** עכשיו השאלה ההפוכה: מישהו מבטיח לתת לכם {f.shekels("explain.next_year")} בעוד שנה. כמה זה שווה היום?
+התשובה: הסכום שאם תפקידו אותו היום, יגדל בעוד שנה בדיוק ל־{f.shekels("explain.next_year")}. כלומר, {f.shekels("explain.today_of_1100")}.
+כדי ללכת קדימה שנה, הכפלנו ב־1.1. כדי ללכת אחורה שנה, **מחלקים** ב־1.1.
+
+**כמה שווים היום 1,000 ₪ שיגיעו בעוד שנה?**
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1,000 ÷ 1.1 = {f.shekels("explain.today_1y")}</M>
+</div>
+
+בדיקה: אם תפקידו היום {f.shekels("explain.today_1y")}, בעוד שנה יהיו לכם <M>{f.shekels("explain.today_1y")} × 1.1 = {f.shekels("explain.check_1y")}</M> (בעיגול לאגורה).
+
+<Callout title="הטעות הנפוצה: להוריד 10%" tone="warning">
+<p>הרבה אנשים מחשבים: ״10% פחות מ־1,000 ₪״, ומקבלים {f.shekels("explain.mistake")}. אבל {f.shekels("explain.mistake")} שמופקדים היום בריבית של 10% יהיו בעוד שנה רק {f.shekels("explain.mistake_grown")} — לא 1,000 ₪.</p>
+<p>לכן לא מורידים אחוזים. <strong>מחלקים</strong> ב־1 ועוד הריבית.</p>
+</Callout>
+
+**ומה אם הסכום רחוק יותר?** כל שנה נוספת היא עוד חלוקה ב־1.1:
+1,000 ₪ שיגיעו בעוד שנתיים שווים היום {f.shekels("explain.today_2y")}, ובעוד שלוש שנים — {f.shekels("explain.today_3y")}.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">בעוד כמה שנים</th>
+        <th class="py-2 text-start font-semibold">הסכום שיגיע</th>
+        <th class="py-2 text-start font-semibold">מחלקים ב־</th>
+        <th class="py-2 text-start font-semibold">שווה היום</th>
+      </tr>
+    </thead>
+    <tbody>
+      {table.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.amount)}</span></td>
+          <td class="py-2"><span class="ltr">{r.growth}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+המספר בעמודה השלישית הוא בדיוק מה ש־1 ₪ גדל אליו באותו מספר שנים, בריבית דריבית של 10%. שם הכפלנו בו; כאן מחלקים בו.
+ככל שהסכום רחוק יותר בזמן, הוא שווה היום פחות.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## כמה שווה היום סכום שיגיע בעתיד
+
+</Section>
+
+הזיזו את שלושת המחוונים. השטר הימני הוא מה שהסכום שווה היום, והשמאלי הוא הסכום שיגיע. גודל השטר מראה כמה הוא שווה.
+בגרף, כל עמודה היא אותו סכום, אם הוא מגיע אחרי מספר השנים שמתחתיה: האפור הוא הסכום שיגיע, והכהה הוא כמה הוא שווה היום.
+
+<TimeValue client:visible amount={1000} rate={5} years={10} />
+
+נסו את שלושת אלה:
+1. השאירו 1,000 ₪, 5% ו־10 שנים. כמה שווים היום 1,000 ₪ שיגיעו בעוד 10 שנים?
+2. הזיזו ל־30 שנים. מה קרה לשטר הימני?
+3. השאירו 30 שנים, והורידו את הריבית ל־2%. האם הסכום שווה היום יותר או פחות?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.shekels("slider.today_10")}.</li>
+    <li>הוא התכווץ מאוד: 1,000 ₪ בעוד 30 שנים שווים היום רק {f.shekels("slider.today_30")}.</li>
+    <li>יותר: {f.shekels("slider.today_30_2")}. כשהריבית נמוכה, מה שמפסידים מההמתנה קטן יותר, ולכן סכום עתידי שווה היום יותר. בריבית 0% הוא שווה היום בדיוק את הסכום שיגיע.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — קדימה בזמן.** מהשיעור על ריבית דריבית: סכום S של היום, אחרי n שנים, יהיה <M>S × (1 + r)<sup>n</sup></M>. נקרא לסכום הזה F.
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>F = S × (1 + r)<sup>n</sup></M>
+</div>
+
+**צעד 2 — אחורה בזמן.** כשיודעים את F ורוצים את S, מחלקים את שני הצדדים ב־<M>(1 + r)<sup>n</sup></M>:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S = F ÷ (1 + r)<sup>n</sup></M>
+</div>
+
+**צעד 3 — בדוגמה שלנו.** 1,000 ₪ בעוד 3 שנים, בריבית של 10%:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1.1<sup>3</sup> = {f.plain("formula.factor_3")}</M>
+  <M>1,000 ÷ {f.plain("formula.factor_3")} = {f.shekels("explain.today_3y")}</M>
+</div>
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">S = F ÷ (1 + r)<sup>n</sup></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">S</dt><dd>כמה הסכום שווה היום, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">F</dt><dd>הסכום שיגיע בעתיד, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית לתקופה שאפשר לקבל בינתיים, כמספר עשרוני: 10% הם 0.1</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר התקופות עד שהסכום יגיע</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** רק כששלושה תנאים מתקיימים:
+1. הריבית זהה בכל התקופות עד שהסכום יגיע.
+2. בטוח שהסכום יגיע, בזמן ובמלואו. אם לא בטוח, הוא שווה היום פחות ממה שהנוסחה אומרת.
+3. ה־r וה־n מדברים על אותה תקופה: ריבית לשנה עם מספר שנים, ריבית לחודש עם מספר חודשים (ראו שיעור 0.4).
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> מחלקים ב־1.1 שוב ושוב — פעם לכל שנה. או: מחשבים קודם את <M>1.1<sup>3</sup></M> בכפתור <span class="ltr">x<sup>y</sup></span>, ומחלקים בתוצאה.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): כותבים בתא <span class="ltr">=1000/1.1^3</span>.</p>
+<p><strong>ביד:</strong> בשנה אחת או שתיים זה אפשרי. ליותר שנים — מחשבון.</p>
+</Callout>
+
+<Callout title="למה הבדיקה לא יוצאת בדיוק 1,000">
+<p>{f.shekels("explain.today_1y")} הוא מספר מעוגל לאגורה. בלי עיגול, החלוקה של 1,000 ב־1.1 ממשיכה בספרות בלי סוף. לכן כשמכפילים את המספר המעוגל בחזרה ב־1.1, יוצא קצת פחות מ־1,000, ורק אחרי עיגול לאגורה מתקבל {f.shekels("explain.check_1y")}.</p>
+<p>בכל החישובים בשיעור מעגלים לאגורה פעם אחת, בסוף.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.5"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `1,200 ₪ הם יותר שקלים, אבל הם מגיעים רק בעוד 5 שנים. 1,000 ₪ שמופקדים היום יגיעו עד אז ל־${f.shekels("prediction.grown")} — ${f.shekels("prediction.gap_later")} יותר.`,
+    "",
+    `הן היו שוות רק אם 1,000 ₪ היו גדלים בדיוק ל־1,200 ₪. ב־5% לשנה הם גדלים ל־${f.shekels("prediction.grown")}.`,
+    "אפשר, וזה בדיוק מה שלמדנו: מעבירים את שני הסכומים לאותו רגע — את שניהם להיום, או את שניהם לעוד 5 שנים — ואז משווים.",
+  ]}
+>
+  קדימה: <M>1,000 × 1.05<sup>5</sup> = {f.shekels("prediction.grown")}</M> — יותר מ־1,200 ₪. ואחורה: <M>1,200 ÷ 1.05<sup>5</sup> = {f.shekels("prediction.today")}</M> — פחות מ־1,000 ₪. בשתי הדרכים, 1,000 ₪ היום שווים יותר.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## עכשיו או בעוד שנתיים?
+
+</Section>
+
+חבר חייב לכם כסף. הוא מציע: {f.shekels("worked.now")} היום, או {f.shekels("worked.later")} בעוד שנתיים. אתם סומכים עליו, ואפשר להפקיד כסף בריבית דריבית של 4% לשנה. מה כדאי לבחור?
+
+**צעד 1 — כמה שווים היום {f.shekels("worked.later")} שיגיעו בעוד שנתיים?**
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1.04<sup>2</sup> = {f.plain("worked.factor")}</M>
+  <M>10,000 ÷ {f.plain("worked.factor")} = {f.shekels("worked.today")}</M>
+</div>
+
+**צעד 2 — משווים באותו רגע, היום.** {f.shekels("worked.today")} מול {f.shekels("worked.now")}. לחכות שווה יותר, ב־{f.shekels("worked.gain_today")} של היום.
+
+**צעד 3 — בדיקה בכיוון השני.** אם תיקחו {f.shekels("worked.now")} היום ותפקידו אותם, בעוד שנתיים יהיו לכם <M>9,000 × {f.plain("worked.factor")} = {f.shekels("worked.grown")}</M>. זה פחות מ־{f.shekels("worked.later")}, ב־{f.shekels("worked.gain_later")}.
+
+**צעד 4 — למה שני ההפרשים שונים?** {f.shekels("worked.gain_today")} נמדד היום, ו־{f.shekels("worked.gain_later")} נמדד בעוד שנתיים. הם אותו הפרש: <M>{f.shekels("worked.gain_today")} × {f.plain("worked.factor")} = {f.shekels("worked.gain_grown")}</M>. זה בדיוק ערך הזמן של כסף.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>החישוב הניח שבטוח שהחבר ישלם בעוד שנתיים. אם אתם לא בטוחים בזה, ההבטחה שווה היום פחות — והחישוב לבדו לא מחליט בשבילכם. הוא אומר רק מה המחיר של ההמתנה.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+2,000 ₪ יגיעו אליכם בעוד שנה, שנתיים, שלוש או ארבע שנים. הריבית היא 5% לשנה. השורה הראשונה כבר מלאה. השלימו את השאר (תצטרכו מחשבון).
+
+<FillGrid
+  client:visible
+  id="0.5-half"
+  periodLabel="בעוד כמה שנים"
+  rows={f.rows("half.table")}
+  columns={[
+    { key: "amount", label: "הסכום שיגיע", format: "shekels" },
+    { key: "growth", label: "מחלקים ב־", format: "number" },
+    { key: "value_today", label: "שווה היום", format: "shekels" },
+  ]}
+  blanks={["2.growth", "2.value_today", "3.growth", "3.value_today", "4.growth", "4.value_today"]}
+  success="ככל שהסכום רחוק יותר, מחלקים במספר גדול יותר, והוא שווה היום פחות."
+  hint="בדקו: האם המספר שמחלקים בו הוא 1.05 בחזקת מספר השנים? ואם הורדתם 5% במקום לחלק — חזרו ל״הטעות הנפוצה״ למעלה."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם.
+בתרגילים 4–6 תצטרכו מחשבון או גיליון (ראו ״איך מחשבים״ למעלה).
+
+<ChoiceExercise
+  client:visible
+  id="0.5-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "זה לא נכון — 1,000 ₪ הם 1,000 ₪, בכל זמן", feedback: "מספר השקלים אותו דבר, אבל את ה־1,000 של היום אפשר להפקיד, ובעוד שנה יהיו יותר מ־1,000. לכן הם שווים יותר." },
+    { text: "כי את הכסף של היום אפשר להפקיד ולקבל עליו ריבית עד אז", correct: true, feedback: "בדיוק. מי שמקבל את הכסף היום יכול להגדיל אותו עד אז. מי שמקבל אותו בעוד שנה — מפסיד את הריבית של השנה הזו." },
+    { text: "כי 1,000 ₪ בעוד שנה יהיו 900 ₪", feedback: "1,000 ₪ שיגיעו בעוד שנה הם עדיין 1,000 ₪. השאלה היא כמה הם שווים היום — וזה לא מחשבים בהורדת אחוזים, אלא בחלוקה." },
+  ]}
+>
+  אפשר להפקיד כסף בריבית. למה 1,000 ₪ היום שווים יותר מ־1,000 ₪ שיגיעו בעוד שנה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.5-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.interest"), message: "זו הריבית בלבד. השאלה היא כמה יהיה בחשבון בסוף השנה — הסכום שהפקדתם ועוד הריבית." },
+  ]}
+>
+  הפקדתם היום 2,000 ₪ בריבית של 10% לשנה. כמה יהיו לכם בעוד שנה?
+</NumericExercise>
+
+<Solution for="0.5-2">
+<M>2,000 × 1.1 = {f.shekels("ex2.answer")}</M>. כלומר, 2,000 ₪ היום ו־{f.shekels("ex2.answer")} בעוד שנה שווים אותו דבר, כשהריבית 10%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.5-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_off"), message: `הורדתם 10% מ־1,100. אבל ${f.shekels("ex3.err_off")} שיופקדו היום יהיו בעוד שנה רק ${f.shekels("ex3.err_grown")} — פחות מ־1,100 ₪. צריך לחלק ב־1.1.` },
+    { value: f.raw("ex3.err_times"), message: "הכפלתם ב־1.1 — זה הולך קדימה בזמן. כאן הסכום כבר בעתיד, וצריך ללכת אחורה: לחלק ב־1.1." },
+  ]}
+>
+  מישהו מבטיח לתת לכם 1,100 ₪ בעוד שנה. אפשר להפקיד כסף בריבית של 10% לשנה. כמה שווה ההבטחה היום?
+</NumericExercise>
+
+<Solution for="0.5-3">
+<M>1,100 ÷ 1.1 = {f.shekels("ex3.answer")}</M>. בדיקה: {f.shekels("ex3.answer")} שיופקדו היום יהיו בעוד שנה בדיוק 1,100 ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.5-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.err_simple"), message: "זה בריבית פשוטה: 6% מ־1,000 בכל שנה. כשהכסף מופקד, הריבית מצטרפת ומרוויחה ריבית — ריבית דריבית." },
+    { value: f.raw("ex4.err_today"), message: "חילקתם — זה הולך אחורה בזמן. כאן מתחילים מהיום ומחפשים סכום בעתיד: מכפילים." },
+  ]}
+>
+  אפשר להפקיד כסף בריבית דריבית של 6% לשנה. כמה צריך לקבל בעוד 3 שנים, כדי שזה יהיה שווה בדיוק ל־1,000 ₪ היום?
+</NumericExercise>
+
+<Solution for="0.5-4">
+<M>1,000 × 1.06<sup>3</sup> = {f.shekels("ex4.answer")}</M>. סכום קטן מזה בעוד 3 שנים שווה פחות מ־1,000 ₪ היום; סכום גדול ממנו — יותר.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.5-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_off"), message: "הורדתם 4% על כל שנה. אבל מחלקים, לא מורידים אחוזים: מחלקים ב־1.04 בחזקת 3." },
+    { value: f.raw("ex5.err_times"), message: "הכפלתם ב־1.04 בחזקת 3 — זה הולך קדימה בזמן. כאן צריך לחלק." },
+    { value: f.raw("ex5.err_once"), message: "חילקתם ב־1.04 פעם אחת, כאילו הסכום מגיע בעוד שנה. הוא מגיע בעוד 3 שנים: מחלקים ב־1.04 שלוש פעמים." },
+  ]}
+>
+  תקבלו 5,000 ₪ בעוד 3 שנים. אפשר להפקיד כסף בריבית דריבית של 4% לשנה. כמה שווה הסכום הזה היום?
+</NumericExercise>
+
+<Solution for="0.5-5">
+<M>1.04<sup>3</sup> = {f.plain("ex5.factor")}</M>. <M>5,000 ÷ {f.plain("ex5.factor")} = {f.shekels("ex5.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.5-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_nominal"), message: "זה ההפרש בשקלים, בלי להתחשב בזמן. 10,000 ₪ בעוד 4 שנים שווים היום פחות — העבירו אותם להיום, ורק אז השוו." },
+    { value: f.raw("ex6.err_later"), message: `ההשוואה נכונה, אבל נמדדה בעוד 4 שנים: ${f.shekels("ex6.grown")} מול 10,000 ₪. השאלה שואלת בשקלים של היום — העבירו את 10,000 ₪ להיום.` },
+    { value: f.raw("ex6.today"), message: "זה מה ש־10,000 ₪ בעוד 4 שנים שווים היום. השאלה היא בכמה זה יותר מ־8,500 ₪." },
+  ]}
+>
+  מציעים לכם 8,500 ₪ היום, או 10,000 ₪ בעוד 4 שנים. בטוח שתקבלו את הכסף, ואפשר להפקיד כסף בריבית דריבית של 4% לשנה. בכמה שקלים של היום האפשרות הטובה יותר שווה יותר מהשנייה?
+</NumericExercise>
+
+<Solution for="0.5-6">
+<M>1.04<sup>4</sup> = {f.plain("ex6.factor")}</M>. <M>10,000 ÷ {f.plain("ex6.factor")} = {f.shekels("ex6.today")}</M>. זה יותר מ־{f.shekels("ex6.now")}, ב־{f.shekels("ex6.answer")}: עדיף לחכות, אבל ההפרש קטן.
+</Solution>
+
+<Callout title="חמש שאלות על ערך הזמן של כסף">
+<p><strong>מה זה?</strong> הרעיון שלאותו סכום יש ערך שונה, לפי מתי הוא מגיע: שקל היום שווה יותר משקל בעתיד.</p>
+<p><strong>למה זה קיים?</strong> כסף שמגיע היום אפשר להפקיד ולקבל עליו ריבית. מי שמחכה לכסף מפסיד את הריבית הזו. בנוסף, מחירים עולים בדרך כלל עם הזמן, והבטחה לשלם בעתיד לא תמיד מתקיימת.</p>
+<p><strong>איך זה עובד?</strong> קדימה בזמן מכפילים ב־<M>(1 + r)<sup>n</sup></M>; אחורה בזמן מחלקים באותו מספר. כך מעבירים כל סכום לאותו רגע ומשווים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הצעה לקבל יותר כסף מאוחר יותר לא תמיד טובה יותר, והצעה לשלם פחות עכשיו לא תמיד זולה יותר. מה שקובע הוא כמה כל סכום שווה באותו רגע.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני שמשווים שני סכומים, בודקים מתי כל אחד מגיע. אם בזמנים שונים — מעבירים את שניהם לאותו רגע, באותה ריבית. כך בדיוק נבנה בהמשך הקורס את ההבנה של <Later lesson="1.1">משכנתא</Later>, שהתשלומים שלה מתפרסים על פני שנים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **ערך הזמן של כסף:** שקל היום שווה יותר משקל בעתיד, כי את השקל של היום אפשר להפקיד ולקבל עליו ריבית.
+- **קדימה בזמן מכפילים, אחורה בזמן מחלקים:** <M>F = S × (1 + r)<sup>n</sup></M>, ו־<M>S = F ÷ (1 + r)<sup>n</sup></M>.
+- **לא מורידים אחוזים.** כדי לדעת כמה שווה היום סכום עתידי, מחלקים ב־1 ועוד הריבית — לא מורידים ממנו את הריבית.
+- **ככל שהסכום רחוק יותר, הוא שווה היום פחות.** וככל שהריבית גבוהה יותר — גם כן.
+- **משווים סכומים רק באותו רגע.** את שניהם להיום, או את שניהם לאותו יום בעתיד.
+- **החישוב מניח שהכסף בטוח יגיע.** אם לא, הסכום העתידי שווה היום פחות.
+
+**בשיעור הבא — 0.6, <Later lesson="0.6">ערך נוכחי</Later>:** כמה שווים היום כמה תשלומים שמגיעים בזמנים שונים — ואיך זה קשור לסכום של הלוואה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "המעבר של סכום קדימה ואחורה בזמן בריבית דריבית הוא מתמטיקה פיננסית בסיסית.", code: ["F = S × (1 + r)ⁿ", "S = F ÷ (1 + r)ⁿ"] },
+    { kind: "ידע מתמטי כללי", text: "שלוש הסיבות לכך ששקל היום שווה יותר — ריבית שאפשר להרוויח בינתיים, עליית מחירים, והסיכוי שהבטחה לא תתקיים — הן ידע כלכלי כללי." },
+    { kind: "הנחת חישוב", text: "כל הסכומים והריביות בשיעור הם מספרים עגולים להמחשה. הם לא ריביות שוק ולא הצעה של בנק." },
+    { kind: "הנחת חישוב", text: "עיגול: כל סכום מעוגל לאגורה פעם אחת, בסוף החישוב." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/present-value.ts and rates.ts via scripts/lessons/lesson-0-5.ts → data/lessons/0-5.json, rechecked by checks/kinds/present_value.py and compound.py through checks/independent_check.py. The illustration is src/components/TimeValue.vue; the half-worked table uses src/components/FillGrid.vue (written for lessons 0.7–0.10). */}

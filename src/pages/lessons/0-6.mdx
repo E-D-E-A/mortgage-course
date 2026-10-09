@@ -1,0 +1,444 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.6"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import ShrinkingPayments from "../../components/ShrinkingPayments.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatShekelsText as T } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.6");
+export const three = f.rows("explain.table");
+export const loan = f.rows("loan.table");
+export const worked = f.rows("worked.table");
+export const predictionOptions = [
+  "בדיוק 10,000 ₪",
+  `בערך ${f.whole("prediction.lump")}`,
+  `קצת יותר מ־${f.floorThousands("prediction.today")}`,
+  "יותר מ־10,000 ₪",
+];
+
+בשיעור הקודם ראינו <Term t="ערך הזמן של כסף" lesson="0.6">ערך הזמן של כסף</Term>: סכום שיגיע בעוד כמה שנים שווה היום פחות, וכדי לדעת כמה — מחלקים אותו ב־1 ועוד ה<Term t="ריבית" lesson="0.6">ריבית</Term>, פעם אחת לכל שנה.
+אבל הרבה פעמים לא מגיע סכום אחד, אלא סדרה של תשלומים — למשל תשלום בסוף כל שנה.
+בשיעור הזה נלמד כמה שווה היום סדרה שלמה כזו. זה הבסיס להבנה של כל <Term t="הלוואה" lesson="0.6">הלוואה</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.6"
+  question="מישהו מתחייב לשלם לכם 1,000 ₪ בסוף כל שנה, במשך 10 שנים — בסך הכול 10,000 ₪. בטוח שישלם, ואפשר להפקיד כסף בריבית דריבית של 5% לשנה. כמה שווים היום כל התשלומים יחד?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## ערימת תשלומים שמתכווצת
+
+</Section>
+
+<LessonVideo lesson="0-6" />
+
+<Section kind="ההסבר">
+
+## כל תשלום בנפרד, ואז מחברים
+
+</Section>
+
+נתחיל מריבית של 10% לשנה, ומשני תשלומים שראינו כבר בשיעור הקודם.
+
+**תשלום ראשון:** {f.shekels("explain.pay_1")} בעוד שנה. היום הוא שווה <M>1,100 ÷ 1.1 = {f.shekels("explain.today_1")}</M>.
+
+**תשלום שני:** {f.shekels("explain.pay_2")} בעוד שנתיים. היום הוא שווה <M>1,210 ÷ 1.1<sup>2</sup> = {f.shekels("explain.today_2")}</M>.
+
+**ביחד:** שני התשלומים שווים היום <M>{f.shekels("explain.today_1")} + {f.shekels("explain.today_2")} = {f.shekels("explain.sum_today")}</M> — למרות שבשקלים הם מסתכמים ב־{f.shekels("explain.sum_nominal")}.
+
+זה כל הרעיון: מעבירים כל תשלום להיום **בנפרד**, לפי מתי שהוא מגיע, ורק אז מחברים.
+ההעברה של סכום עתידי להיום נקראת <Term t="היוון" lesson="0.6">היוון</Term>. מה שמתקבל כשמהוונים את כל התשלומים ומחברים נקרא <Term t="ערך נוכחי" lesson="0.6">ערך נוכחי</Term>: כמה שווים היום כל התשלומים יחד.
+
+**שלושה תשלומים שווים.** עכשיו 1,000 ₪ בסוף כל שנה, שלוש שנים, ב־10%:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">בסוף שנה</th>
+        <th class="py-2 text-start font-semibold">התשלום</th>
+        <th class="py-2 text-start font-semibold">מחלקים ב־</th>
+        <th class="py-2 text-start font-semibold">שווה היום</th>
+      </tr>
+    </thead>
+    <tbody>
+      {three.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.amount)}</span></td>
+          <td class="py-2"><span class="ltr">{r.growth}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+הערך הנוכחי של שלושת התשלומים: {f.shekels("explain.three_today")}. בשקלים הם מסתכמים ב־{f.shekels("explain.three_total")}; ההפרש, {f.shekels("explain.three_gap")}, הוא המחיר של לחכות להם.
+שימו לב לעמודה האחרונה: כל תשלום שווה היום פחות מזה שלפניו. זו הערימה שמתכווצת — התשלומים הרחוקים תורמים לערך הנוכחי פחות מהקרובים.
+
+### מה זה אומר על הלוואה
+
+הסתכלו על אותם מספרים מהצד של <Term t="מלווה" lesson="0.6">מלווה</Term>. הוא נותן היום ל<Term t="לווה" lesson="0.6">לווה</Term> {f.shekels("explain.three_today")} — בדיוק הערך הנוכחי של שלושת התשלומים. בתמורה הלווה משלם לו 1,000 ₪ בסוף כל שנה, שלוש שנים.
+בכל שנה החוב גדל ב־10% ריבית, והתשלום מוריד ממנו:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">חוב בתחילת השנה</th>
+        <th class="py-2 text-start font-semibold">ריבית (10%)</th>
+        <th class="py-2 text-start font-semibold">תשלום</th>
+        <th class="py-2 text-start font-semibold">חוב בסוף השנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {loan.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.opening)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.closing)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+אחרי התשלום השלישי החוב הוא {T(loan[2].closing)} בדיוק. כלומר, המלווה קיבל בדיוק 10% לשנה על הכסף שהיה אצל הלווה.
+זה הקשר החשוב של השיעור: **סכום ההלוואה הוא הערך הנוכחי של התשלומים שלה, בריבית של ההלוואה.**
+בשלב 3 נשתמש בזה בכיוון ההפוך: כשיודעים את סכום ההלוואה ואת הריבית, מחשבים ממנו את <Later lesson="3.1">ההחזר החודשי</Later>.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הערימה שמתכווצת
+
+</Section>
+
+הזיזו את שלושת המחוונים. כל עמודה היא תשלום אחד: האפור הוא התשלום כשיגיע, והכהה הוא כמה הוא שווה היום.
+למטה, הפס העליון הוא כל התשלומים יחד, והתחתון הוא הערך הנוכחי שלהם — כל חלק בו הוא תשלום אחד, אחרי היוון.
+
+<ShrinkingPayments client:visible payment={1000} count={10} rate={5} />
+
+נסו את שלושת אלה:
+1. השאירו 1,000 ₪, 10 תשלומים ו־5%. מה הערך הנוכחי?
+2. הזיזו ל־30 תשלומים. כמה שווה היום התשלום הראשון, וכמה האחרון?
+3. חזרו ל־10 תשלומים, והעלו את הריבית ל־8%. מה קרה לערך הנוכחי?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.shekels("prediction.today")}, מתוך {f.shekels("prediction.total")}.</li>
+    <li>הראשון שווה היום {f.shekels("slider.first")}, והאחרון רק {f.shekels("slider.last_30")}. כל 30 התשלומים, {f.shekels("slider.total_30")}, שווים היום {f.shekels("slider.today_30")}.</li>
+    <li>הוא ירד ל־{f.shekels("slider.today_10_8")}. בריבית גבוהה יותר כל תשלום מתכווץ יותר — והרחוקים מתכווצים הכי הרבה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — כל תשלום בנפרד.** מהשיעור הקודם: תשלום C שמגיע בסוף שנה k שווה היום <M>C ÷ (1 + r)<sup>k</sup></M>.
+
+**צעד 2 — מחברים את כולם.** בדוגמה של שלושת התשלומים:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1,000 ÷ {three[0].growth} = {T(three[0].value_today)}</M>
+  <M>1,000 ÷ {three[1].growth} = {T(three[1].value_today)}</M>
+  <M>1,000 ÷ {three[2].growth} = {T(three[2].value_today)}</M>
+  <M>V = {f.shekels("explain.three_today")}</M>
+</div>
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">V = C<sub>1</sub> ÷ (1 + r)<sup>1</sup> + C<sub>2</sub> ÷ (1 + r)<sup>2</sup> + … + C<sub>n</sub> ÷ (1 + r)<sup>n</sup></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">V</dt><dd>הערך הנוכחי — כמה שווים היום כל התשלומים, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום שמגיע בסוף תקופה k, בשקלים. המספר הקטן למטה הוא מספר התקופה, לא חזקה</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית לתקופה, כמספר עשרוני: 10% הם 0.1</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר התשלומים — והתקופה שבסופה מגיע האחרון</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** רק כששלושה תנאים מתקיימים:
+1. הריבית זהה בכל התקופות.
+2. כל תשלום מגיע בסוף התקופה שלו, ובטוח שיגיע.
+3. ה־r וה־n מדברים על אותה תקופה. בתשלומים חודשיים משתמשים בריבית חודשית ובמספר חודשים (ראו שיעור 0.4).
+
+כשכל התשלומים שווים, יש לנוסחה הזו גרסה מקוצרת. לא נצטרך אותה עכשיו; נגיע אליה בשלב 3.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel) — הכי נוח: בעמודה A מספרי השנים (1, 2, 3…). בתא B1 כותבים <span class="ltr">=1000/1.1^A1</span> ומעתיקים למטה. בסוף: <span class="ltr">=SUM(B1:B3)</span>.</p>
+<p><strong>במחשבון:</strong> מחשבים כל שורה בנפרד, כותבים את התוצאה, ומחברים.</p>
+<p><strong>ביד:</strong> אפשר בשניים־שלושה תשלומים. ליותר — גיליון.</p>
+</Callout>
+
+<Callout title="למה הסכום של השורות והערך הנוכחי נבדלים לפעמים באגורה">
+<p>בטבלאות, כל שורה מעוגלת לאגורה. הערך הנוכחי מחושב בלי עיגול, ומעוגל פעם אחת בסוף. לכן לפעמים סכום השורות המעוגלות שונה ממנו באגורה. בדוגמאות של השיעור הם יצאו שווים; בתרגילים שתי התשובות מתקבלות.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.6"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `10,000 ₪ הם סכום התשלומים, אבל הם מגיעים לאורך 10 שנים, וכל אחד מהם שווה היום פחות מ־1,000 ₪. יחד הם שווים ${f.shekels("prediction.gap")} פחות.`,
+    "זה מה ש־10,000 ₪ היו שווים אילו כולם היו מגיעים בסוף השנה העשירית. אבל רוב התשלומים מגיעים מוקדם יותר, ולכן שווים היום יותר.",
+    "",
+    "תשלומים עתידיים שווים היום פחות ממה שיגיע — לא יותר. ריבית מגדילה סכום רק כשהולכים איתו קדימה בזמן.",
+  ]}
+>
+  מהוונים כל תשלום ומחברים: <M>1,000 ÷ 1.05 + … + 1,000 ÷ 1.05<sup>10</sup> = {f.shekels("prediction.today")}</M>.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## לשלם עכשיו, או בתשלומים?
+
+</Section>
+
+קבלן שיפוצים מציע לכם שתי אפשרויות: {f.shekels("worked.now")} עכשיו, או 40,000 ₪ בסוף כל שנה, שלוש שנים.
+יש לכם את הכסף, ואם לא תשלמו עכשיו, תפקידו אותו בריבית דריבית של 4% לשנה. מה זול יותר?
+
+**צעד 1 — מהוונים כל תשלום.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">בסוף שנה</th>
+        <th class="py-2 text-start font-semibold">התשלום</th>
+        <th class="py-2 text-start font-semibold">מחלקים ב־</th>
+        <th class="py-2 text-start font-semibold">שווה היום</th>
+      </tr>
+    </thead>
+    <tbody>
+      {worked.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.amount)}</span></td>
+          <td class="py-2"><span class="ltr">{r.growth}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 2 — מחברים.** הערך הנוכחי של שלושת התשלומים: {f.shekels("worked.today")}.
+
+**צעד 3 — משווים באותו רגע.** {f.shekels("worked.today")} בתשלומים, מול {f.shekels("worked.now")} עכשיו. לשלם עכשיו זול יותר, ב־{f.shekels("worked.gap")} של היום.
+
+**צעד 4 — למה לא להשוות בשקלים פשוטים?** בשקלים, שלושת התשלומים הם {f.shekels("worked.total")} — {f.shekels("worked.nominal_gap")} יותר. ההשוואה הזו מגזימה, כי היא שוכחת שבינתיים הכסף שלכם מרוויח ריבית. ההפרש האמיתי, בשקלים של היום, הוא {f.shekels("worked.gap")}.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>התשובה תלויה בריבית שבה מהוונים. כאן הנחנו שהכסף שלכם יכול להרוויח 4% לשנה. אילו הייתם צריכים ללוות את הכסף כדי לשלם עכשיו, הריבית שרלוונטית היא ריבית ההלוואה — והתשובה עלולה להשתנות. לפני החישוב, שאלו: איזו ריבית באמת עומדת מולי?</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+תקבלו 2,000 ₪ בסוף כל שנה, שלוש שנים. הריבית היא 5% לשנה. השורה הראשונה כבר מלאה. השלימו את השאר, ואז חברו את העמודה האחרונה (תצטרכו מחשבון).
+
+<FillGrid
+  client:visible
+  id="0.6-half"
+  periodLabel="בסוף שנה"
+  rows={f.rows("half.table")}
+  columns={[
+    { key: "amount", label: "התשלום", format: "shekels" },
+    { key: "growth", label: "מחלקים ב־", format: "number" },
+    { key: "value_today", label: "שווה היום", format: "shekels" },
+  ]}
+  blanks={["2.growth", "2.value_today", "3.growth", "3.value_today"]}
+  success="כל תשלום שווה היום פחות מקודמו. עכשיו חברו את שלוש השורות — זה הערך הנוכחי."
+  hint="בדקו: האם המספר שמחלקים בו הוא 1.05 בחזקת מספר השנה?"
+/>
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">כמה צריך לצאת הערך הנוכחי</summary>
+  <p class="mt-2">{f.shekels("half.total")}.</p>
+</details>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם.
+בתרגילים 3–5 תצטרכו מחשבון או גיליון (ראו ״איך מחשבים״ למעלה).
+
+<ChoiceExercise
+  client:visible
+  id="0.6-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "3,000 ₪ היום", correct: true, feedback: "נכון. שלושת התשלומים מסתכמים באותו מספר שקלים, אבל הם מגיעים מאוחר יותר. את 3,000 ₪ של היום אפשר להפקיד, ולכן הם שווים יותר." },
+    { text: "שלושה תשלומים של 1,000 ₪", feedback: "בשקלים זה אותו סכום, אבל כל תשלום מגיע מאוחר יותר ולכן שווה היום פחות מ־1,000 ₪." },
+    { text: "שתי האפשרויות שוות", feedback: "הן שוות רק כשהריבית היא 0%. כשאפשר להפקיד בריבית, כסף שמגיע מוקדם שווה יותר." },
+  ]}
+>
+  אפשר להפקיד כסף בריבית. מה שווה יותר: 3,000 ₪ היום, או 1,000 ₪ בסוף כל שנה, שלוש שנים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.6-2"
+  n={2}
+  level="קל"
+  answer={f.raw("explain.sum_today")}
+  errors={[
+    { value: f.raw("explain.sum_nominal"), message: "חיברתם את התשלומים בלי להוון אותם. כל אחד מגיע בעתיד, ולכן שווה היום פחות." },
+    { value: f.raw("ex2.err_both_once"), message: "את התשלום השני חילקתם ב־1.1 פעם אחת בלבד. הוא מגיע בעוד שנתיים: מחלקים ב־1.1 בחזקת 2." },
+  ]}
+>
+  תקבלו 1,100 ₪ בעוד שנה, ו־1,210 ₪ בעוד שנתיים. אפשר להפקיד כסף בריבית דריבית של 10% לשנה. מה הערך הנוכחי של שני התשלומים?
+</NumericExercise>
+
+<Solution for="0.6-2">
+<M>1,100 ÷ 1.1 = {f.shekels("explain.today_1")}</M>. <M>1,210 ÷ 1.1<sup>2</sup> = {f.shekels("explain.today_2")}</M>. ביחד: {f.shekels("explain.sum_today")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.6-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_total"), message: "חיברתם את התשלומים בלי להוון אותם. כל תשלום שווה היום פחות מ־5,000 ₪." },
+    { value: f.raw("ex3.err_both_one_year"), message: "היוונתם את שני התשלומים שנה אחת. השני מגיע בעוד שנתיים: מחלקים אותו ב־1.04 בחזקת 2." },
+    { value: f.raw("ex3.err_both_two_years"), message: "היוונתם את שני התשלומים שנתיים. הראשון מגיע כבר בעוד שנה: מחלקים אותו ב־1.04 פעם אחת." },
+  ]}
+>
+  תקבלו 5,000 ₪ בסוף השנה הראשונה, ועוד 5,000 ₪ בסוף השנה השנייה. הריבית היא 4% לשנה. מה הערך הנוכחי של שני התשלומים?
+</NumericExercise>
+
+<Solution for="0.6-3">
+<M>5,000 ÷ 1.04 = {f.shekels("ex3.first")}</M>. <M>5,000 ÷ 1.04<sup>2</sup> = {f.shekels("ex3.second")}</M>. ביחד: {f.shekels("ex3.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.6-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.err_total"), message: "חיברתם את התשלומים בלי להוון אותם. בגלל ערך הזמן של כסף, כל אחד שווה היום פחות מ־1,000 ₪." },
+    { value: f.raw("ex4.err_lump"), message: "היוונתם את כל 4,000 ₪ כאילו הם מגיעים יחד בסוף השנה הרביעית. אבל שלושה מהתשלומים מגיעים מוקדם יותר: מהוונים כל אחד לפי השנה שלו." },
+  ]}
+>
+  תקבלו 1,000 ₪ בסוף כל שנה, ארבע שנים. הריבית היא 6% לשנה. מה הערך הנוכחי של כל התשלומים?
+</NumericExercise>
+
+<Solution for="0.6-4">
+מהוונים כל תשלום: <M>1,000 ÷ 1.06</M>, <M>1,000 ÷ 1.06<sup>2</sup></M>, <M>1,000 ÷ 1.06<sup>3</sup></M>, <M>1,000 ÷ 1.06<sup>4</sup></M>, ומחברים: {f.shekels("ex4.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.6-5"
+  n={5}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_nominal"), message: "זה ההפרש בשקלים, בלי להתחשב בזמן. התשלומים מגיעים בעוד שנה ושנתיים — הוונו אותם, ורק אז השוו ל־10,000 ₪." },
+    { value: f.raw("ex5.today"), message: "זה הערך הנוכחי של התשלומים. השאלה היא בכמה הוא גבוה מ־10,000 ₪ שנתתם." },
+  ]}
+>
+  חבר מבקש מכם הלוואה של 10,000 ₪ היום, ומציע להחזיר 5,500 ₪ בסוף כל שנה, שנתיים. בטוח שיחזיר. אם לא תלוו לו, תוכלו להפקיד את הכסף בריבית דריבית של 6% לשנה. בכמה שקלים של היום הערך הנוכחי של ההחזרים גבוה מ־10,000 ₪?
+</NumericExercise>
+
+<Solution for="0.6-5">
+<M>5,500 ÷ 1.06 + 5,500 ÷ 1.06<sup>2</sup> = {f.shekels("ex5.today")}</M>. זה יותר מ־10,000 ₪ ב־{f.shekels("ex5.answer")}. כלומר, ההלוואה נותנת לכם קצת יותר מ־6% לשנה. בשקלים פשוטים ההפרש נראה {f.shekels("ex5.err_nominal")} — הרבה יותר ממה שהוא באמת.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.6-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "התשלום הראשון", feedback: "התשלום הראשון מהוון שנה אחת בלבד, ולכן שינוי בריבית כמעט לא משנה את ערכו." },
+    { text: "התשלום האחרון", correct: true, feedback: "נכון. התשלום האחרון מהוון הכי הרבה פעמים, ולכן כל עלייה בריבית מכווצת אותו הכי הרבה. נסו במחוון: העלו את הריבית וראו אילו עמודות מתכווצות יותר." },
+    { text: "כולם מאבדים אותו אחוז מערכם", feedback: "לא. כל תשלום מחולק ב־1 ועוד הריבית מספר פעמים אחר. תשלום רחוק מחולק יותר פעמים, ולכן מאבד יותר." },
+    { text: "אף אחד — הריבית לא משנה את הערך הנוכחי", feedback: "הריבית משנה אותו: ככל שהיא גבוהה יותר, כל תשלום עתידי שווה היום פחות." },
+  ]}
+>
+  יש לכם 10 תשלומים שווים, אחד בסוף כל שנה. הריבית שבה מהוונים עולה מ־5% ל־8%. איזה תשלום מאבד את החלק הגדול ביותר מהערך הנוכחי שלו?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על ערך נוכחי">
+<p><strong>מה זה?</strong> כמה שווים היום כל התשלומים שיגיעו בעתיד, יחד. מחשבים אותו בהיוון: כל תשלום מחולק ב־1 ועוד הריבית, פעם לכל תקופה עד שיגיע, ואז מחברים.</p>
+<p><strong>למה זה קיים?</strong> תשלומים שמגיעים בזמנים שונים אי אפשר לחבר כמו שהם — שקל בעוד עשר שנים שווה פחות משקל בעוד שנה. הערך הנוכחי מעביר את כולם לאותו רגע, ואז אפשר לחבר ולהשוות.</p>
+<p><strong>איך זה עובד?</strong> <M>V = C<sub>1</sub> ÷ (1 + r) + C<sub>2</sub> ÷ (1 + r)<sup>2</sup> + …</M>. ככל שתשלום רחוק יותר, או שהריבית גבוהה יותר, הוא תורם פחות.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הלוואה בנויה כך: הסכום שמקבלים היום הוא הערך הנוכחי של כל התשלומים, בריבית של ההלוואה. בתשלומים פרוסים על שנים רבות, סכום התשלומים בשקלים גדול בהרבה מהסכום שקיבלתם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשמשווים ״עכשיו״ מול ״בתשלומים״, או שתי סדרות תשלומים שונות, מחשבים לכל אחת ערך נוכחי באותה ריבית ומשווים. ושואלים קודם: איזו ריבית באמת עומדת מולי — מה שהכסף שלי יכול להרוויח, או מה שאשלם אם אלווה?</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **היוון** = העברה של סכום עתידי להיום: מחלקים ב־<M>(1 + r)<sup>k</sup></M>, כש־k הוא מספר התקופות עד שיגיע.
+- **ערך נוכחי** = כמה שווים היום כל התשלומים יחד: מהוונים כל תשלום בנפרד, ואז מחברים.
+- **הערימה מתכווצת:** תשלום רחוק שווה היום פחות מתשלום קרוב. בריבית גבוהה יותר, כולם מתכווצים יותר — והרחוקים הכי הרבה.
+- **סכום התשלומים בשקלים מטעה.** משווים ערכים נוכחיים, באותה ריבית.
+- **סכום הלוואה = הערך הנוכחי של התשלומים שלה, בריבית שלה.** מזה נחשב בהמשך את <Later lesson="3.1">ההחזר החודשי</Later>.
+
+**בשיעור הבא — 0.7, <Later lesson="0.7">אינפלציה</Later> ו<Later lesson="0.7">מדד המחירים לצרכן</Later>:** למה מחירים עולים, איך מודדים את העלייה, מי מפרסם את המדידה ומתי.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ההגדרה של ערך נוכחי ושל היוון, והקשר בין סכום הלוואה לערך הנוכחי של התשלומים שלה, הם מתמטיקה פיננסית בסיסית.", code: ["V = Σ Cₖ ÷ (1 + r)ᵏ"] },
+    { kind: "הנחת חישוב", text: "כל הסכומים והריביות בשיעור הם מספרים עגולים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. הקבלן בדוגמה בדוי." },
+    { kind: "הנחת חישוב", text: "עיגול: כל ערך נוכחי מעוגל לאגורה פעם אחת, בסוף. בטבלאות כל שורה מעוגלת לאגורה; בטבלת ההלוואה הריבית של כל שנה מעוגלת לאגורה ורק אז נוספת לחוב." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/present-value.ts and rates.ts via scripts/lessons/lesson-0-6.ts → data/lessons/0-6.json, rechecked by checks/kinds/present_value.py through checks/independent_check.py (stream totals by the closed form, independently of the TypeScript sum). The illustration is src/components/ShrinkingPayments.vue; the half-worked table uses src/components/FillGrid.vue (written for lessons 0.7–0.10). */}

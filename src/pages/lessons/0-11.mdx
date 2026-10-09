@@ -1,0 +1,527 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.11"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import PriceYieldSeesaw from "../../components/PriceYieldSeesaw.vue";
+import BondPriceFill from "../../components/BondPriceFill.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatShekelsText as T } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.11");
+// A yield as the learner reads it: "4.76%", "10%". Formatting only — the value is the fact's.
+export const pct = (id) => `${Number(f.raw(id))}%`;
+// A plain number inside an equation, without ₪: "105". Formatting only.
+export const n = (v) => new Intl.NumberFormat("he-IL").format(Number(v));
+export const t6 = f.rows("explain.table_6");
+export const t5 = f.rows("explain.table_5");
+export const t4 = f.rows("explain.table_4");
+export const worked = f.rows("worked.table");
+export const ex6 = f.rows("ex6.table");
+export const predictionOptions = [
+  "יותר מ־100 ₪: התשואה בשוק עלתה, אז גם האג״ח שלכם שווה יותר",
+  "בדיוק 100 ₪: התשלומים שהובטחו לכם לא השתנו",
+  `פחות מ־100 ₪: בערך ${f.whole("pred.price_6")}`,
+  `פחות מ־100 ₪: בערך ${f.whole("pred.err_off")}, כי מורידים 6% מהמחיר`,
+];
+
+בשיעור 0.6 ראינו <Term t="ערך נוכחי" lesson="0.11">ערך נוכחי</Term>: כמה שווה היום סכום שיתקבל בעתיד. החישוב נקרא <Term t="היוון" lesson="0.11">היוון</Term> — מחלקים את הסכום ב־(1 + הריבית), פעם אחת לכל שנה.
+בשיעור 0.8 ראינו <Term t="הצמדה" lesson="0.11">הצמדה</Term> למדד, ואת ההבדל בין ריבית לפני אינפלציה לריבית אחריה.
+בשיעור הזה שני הרעיונות נפגשים ב<Term t="אג״ח" lesson="0.11">אג״ח</Term> — איגרת חוב: <Term t="הלוואה" lesson="0.11">הלוואה</Term> שנותנים למדינה או לחברה, בתמורה לתשלומים ידועים מראש, ושאפשר למכור למישהו אחר לפני הסוף.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.11"
+  question="קניתם ב־100 ₪ אג״ח חדשה. היא תשלם לכם 5 ₪ בכל שנה במשך 3 שנים, ובסוף השנה השלישית תחזיר לכם גם את ה־100 ₪. למחרת, אג״ח חדשות ודומות כבר נותנות 6 ₪ בשנה על כל 100 ₪. אם תרצו למכור את שלכם עכשיו, כמה בערך ישלמו לכם עליה?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## נדנדה של מחיר ותשואה
+
+</Section>
+
+<LessonVideo lesson="0-11" />
+
+<Section kind="ההסבר">
+
+## אג״ח עם תשלום אחד
+
+</Section>
+
+נתחיל מהאג״ח הפשוטה ביותר. יש לה תשלום אחד בלבד: היא מבטיחה לשלם {f.shekels("one.payment")} בעוד שנה, וזהו.
+כמה כדאי לשלם עליה היום? זה תלוי בכמה אתם רוצים להרוויח.
+
+**קניתם אותה ב־100 ₪.** בעוד שנה תקבלו {f.shekels("one.payment")}. הרווחתם {f.shekels("one.gain_100")} על {f.shekels("one.price_100")} — כלומר {pct("one.yield_100")} בשנה.
+
+לזה קוראים <Term t="תשואה" lesson="0.11">תשואה</Term>: הרווח לשנה, באחוזים מהמחיר ששילמתם — אם קונים במחיר הזה ומחזיקים עד הסוף, וכל התשלומים מתקבלים.
+
+**קניתם אותה ב־105 ₪.** תקבלו אותם {f.shekels("one.payment")}, אבל הרווח קטן: {f.shekels("one.gain_105")} על {f.shekels("one.price_105")}. התשואה: {pct("one.yield_105")}.
+
+**קניתם אותה ב־110 ₪.** תקבלו בדיוק את מה ששילמתם. התשואה: {pct("one.yield_110")}.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[24rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">המחיר ששילמתם</th>
+        <th class="py-2 text-start font-semibold">מה תקבלו בעוד שנה</th>
+        <th class="py-2 text-start font-semibold">התשואה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.price_100"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.payment"))}</span></td><td class="py-2 font-semibold text-n900"><span class="ltr">{pct("one.yield_100")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.price_105"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.payment"))}</span></td><td class="py-2 font-semibold text-n900"><span class="ltr">{pct("one.yield_105")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.price_110"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("one.payment"))}</span></td><td class="py-2 font-semibold text-n900"><span class="ltr">{pct("one.yield_110")}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+**המחיר עלה — והתשואה ירדה.** זו הנדנדה. מה שתקבלו בסוף קבוע, ולכן כל שקל נוסף שמשלמים במחיר הוא שקל פחות ברווח.
+
+בשוק עובדים בדרך כלל בכיוון ההפוך: קודם יודעים איזו תשואה הקונים דורשים, ומזה מחשבים את המחיר. ואת החישוב הזה כבר ראיתם — המחיר הוא הערך הנוכחי של התשלום:
+- אם הקונים דורשים 10%: <M>110 ÷ 1.10 = {f.shekels("one.pv_at_10")}</M>.
+- אם הם מסתפקים ב־5%: <M>110 ÷ 1.05 = {f.shekels("one.pv_at_5")}</M>.
+
+אותה נדנדה: תשואה נמוכה יותר — מחיר גבוה יותר.
+
+אג״ח עם תשלום אחד בלבד, בסוף, קיימת גם במציאות. דוגמה אחת היא <Term t="מק״מ" lesson="0.11">מק״מ</Term> — ״מלווה קצר מועד״, ש<Term t="בנק ישראל" lesson="0.11">בנק ישראל</Term> מנפיק לתקופות קצרות. קונים אותו בפחות מהסכום שיוחזר בסוף, וההפרש הוא הרווח.
+
+<Section kind="ההסבר">
+
+## אג״ח עם כמה תשלומים
+
+</Section>
+
+עכשיו האג״ח מהשאלה: 5 ₪ בכל שנה במשך 3 שנים, ובסוף גם 100 ₪. ה־100 ₪ שמוחזרים בסוף הם <Term t="קרן" lesson="0.11">הקרן</Term> של האג״ח — הסכום שהלוויתם.
+כך נראים התשלומים: {T(t6[0].payment)} בשנה הראשונה, {T(t6[1].payment)} בשנה השנייה, ו־{T(t6[2].payment)} בשנה השלישית — התשלום האחרון ועוד הקרן.
+
+המחיר הוא **הערך הנוכחי של כל התשלומים יחד**: מהוונים כל תשלום לפי מספר השנים עד שהוא מגיע, ומחברים.
+נניח שהתשואה בשוק היא 6%:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">תשלום</th>
+        <th class="py-2 text-start font-semibold">איך מהוונים</th>
+        <th class="py-2 text-start font-semibold">ערך נוכחי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">1</td><td class="py-2"><span class="ltr">{formatShekels(t6[0].payment)}</span></td><td class="py-2"><M>÷ 1.06</M></td><td class="py-2"><span class="ltr">{formatShekels(t6[0].pv)}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">2</td><td class="py-2"><span class="ltr">{formatShekels(t6[1].payment)}</span></td><td class="py-2"><M>÷ 1.06<sup>2</sup></M></td><td class="py-2"><span class="ltr">{formatShekels(t6[1].pv)}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">3</td><td class="py-2"><span class="ltr">{formatShekels(t6[2].payment)}</span></td><td class="py-2"><M>÷ 1.06<sup>3</sup></M></td><td class="py-2"><span class="ltr">{formatShekels(t6[2].pv)}</span></td></tr>
+      <tr><td class="py-2 font-semibold text-n900" colspan="3">המחיר: סכום הערכים הנוכחיים</td><td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(f.raw("pred.price_6"))}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+אותו חישוב, בתשואות אחרות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[24rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">התשואה בשוק</th>
+        <th class="py-2 text-start font-semibold">המחיר של האג״ח</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">4%</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("explain.price_4"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">5%</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("pred.price_5"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2"><span class="ltr">6%</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("pred.price_6"))}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+**למה ב־5% יוצא בדיוק {f.shekels("pred.price_5")}?** כי זו בדיוק התשואה שהאג״ח נותנת למי שמשלם עליה 100 ₪: 5 ₪ על כל 100 ₪, בכל שנה. כשהתשואה בשוק שווה לתשלום השנתי באחוזים, המחיר שווה לקרן.
+
+**למה זו נדנדה?** התשלומים של האג״ח קבועים מראש. התשואה היא הריבית שבה מהוונים אותם. כשמהוונים בריבית גבוהה יותר, כל תשלום שווה היום פחות — והמחיר יורד. כשמהוונים בריבית נמוכה יותר, המחיר עולה.
+
+**ומה מזיז את התשואה בשוק?** קונים משווים אג״ח למה שהם יכולים לקבל במקום אחר. כשהריבית במשק עולה — למשל אחרי ש<Term t="ריבית בנק ישראל" lesson="0.11">ריבית בנק ישראל</Term> עלתה — גם הקונים של אג״ח דורשים בדרך כלל תשואה גבוהה יותר. אג״ח ישנה, שהתשלומים שלה כבר קבועים, יכולה לתת תשואה כזו רק בדרך אחת: המחיר שלה יורד.
+
+<Section kind="ההסבר">
+
+## אג״ח ממשלתית: קבועה בשקלים, או צמודה למדד
+
+</Section>
+
+<Term t="אג״ח ממשלתי" lesson="0.11">אג״ח ממשלתית</Term> היא אג״ח שהמדינה מנפיקה: כך המדינה לווה כסף מהציבור. יש שני סוגים, והם נבדלים במה שקורה לתשלומים כשהמחירים עולים.
+
+**אג״ח לא צמודה.** התשלומים קבועים בשקלים. נניח שהיא מבטיחה 105 ₪ בעוד שנה, וקניתם אותה ב־100 ₪: התשואה שלה 5%. זו תשואה **לפני** <Term t="אינפלציה" lesson="0.11">אינפלציה</Term> — כמו <Term t="ריבית נומינלית" lesson="0.11">ריבית נומינלית</Term>.
+אם במהלך השנה המחירים עלו ב־3%, ה־105 ₪ שתקבלו קונים פחות. במחירים של היום הם שווים <M>105 ÷ 1.03 = {f.shekels("unidx.deflated_3")}</M>. הרווח האמיתי שלכם: {f.shekels("unidx.real_gain_3")} על 100 ₪.
+
+**אג״ח צמודה למדד.** כל תשלום נקבע במחירים של היום, ומוכפל בשינוי של <Term t="מדד המחירים לצרכן" lesson="0.11">מדד המחירים לצרכן</Term> — בדיוק כמו בהצמדה. נניח שהיא מבטיחה 102 ₪ בעוד שנה, במחירים של היום, וקניתם אותה ב־100 ₪.
+אם המדד עלה ב־3%, תקבלו <M>102 × 1.03 = {f.shekels("idx.received_3")}</M>. בשקלים הרווחתם {pct("idx.nominal_yield_3")}. אבל במחירים של היום הרווחתם 2% — בדיוק מה שהובטח, מעבר לעליית המחירים.
+לכן התשואה של אג״ח צמודה היא תשואה **אחרי** אינפלציה — כמו <Term t="ריבית ריאלית" lesson="0.11">ריבית ריאלית</Term>.
+
+**איזו מהשתיים הייתה טובה יותר?** תלוי באינפלציה שהייתה בפועל. אילו המדד עלה רק ב־1%, האג״ח הצמודה הייתה משלמת <M>102 × 1.01 = {f.shekels("idx.received_1")}</M> — פחות מ־105 ₪ של הלא צמודה. בשיעור הבא נראה איך מהפער בין שתי התשואות אפשר לקרוא כמה אינפלציה השוק מגלם.
+
+<Callout title="השמות בשוק הישראלי">
+<p>לפי תקציר של עמוד רשמי באתר בנק ישראל, שעוד לא נבדק מול העמוד עצמו: אג״ח ממשלתיות לא צמודות נקראות בשוק ״שחר״, ואג״ח ממשלתיות צמודות למדד נקראות ״גליל״. <strong>לא אומת.</strong></p>
+<p>גם הדוגמאות כאן פשוטות מהמציאות: תשלום אחד בשנה ושנים שלמות. המנגנון המדויק של ההצמדה באג״ח ממשלתיות לא נבדק כאן מול המקור.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הנדנדה
+
+</Section>
+
+הזיזו את שלושת המחוונים. המחיר הוא סכום הערכים הנוכחיים של כל התשלומים. בגרף, העמודה האפורה היא התשלום כפי שיתקבל, והעמודה הכהה היא כמה הוא שווה היום.
+
+<PriceYieldSeesaw client:visible face={100} payment={5} years={3} yieldPercent={5} />
+
+נסו את שלושת אלה:
+1. השאירו 3 שנים ותשלום של 5 ₪. הזיזו את התשואה מ־5% ל־6%, ואחר כך ל־4%. מה המחיר בכל פעם?
+2. באיזו תשואה הנדנדה מאוזנת? עכשיו שנו את התשלום ל־3 ₪ בשנה, ומצאו שוב את התשואה שבה היא מאוזנת.
+3. החזירו תשלום של 5 ₪ ותשואה של 5%. העלו את מספר השנים ל־20, ורק אז הזיזו את התשואה ל־6%. בכמה ירד המחיר, לעומת אג״ח של 3 שנים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ב־6% המחיר {f.shekels("pred.price_6")}, וב־4% הוא {f.shekels("explain.price_4")}. תשואה עולה — מחיר יורד.</li>
+    <li>הנדנדה מאוזנת כשהתשואה שווה לתשלום השנתי באחוזים: ב־5% לתשלום של 5 ₪, וב־3% לתשלום של 3 ₪. אז המחיר הוא בדיוק 100 ₪.</li>
+    <li>ב־3 שנים המחיר ירד ב־{f.shekels("pred.drop")}. ב־20 שנה הוא ירד ל־{f.shekels("guided.price_20_6")} — ירידה של {f.shekels("guided.drop_20")}. באג״ח ארוכה יש יותר תשלומים רחוקים, וההיוון משפיע עליהם יותר. לכן אותו שינוי בתשואה מזיז אותה יותר.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — הערך הנוכחי של תשלום אחד.** תשלום שמגיע בעוד t שנים מחלקים ב־(1 + התשואה), t פעמים. זה ההיוון מהשיעור על ערך נוכחי.
+
+**צעד 2 — מחברים את כל התשלומים.** בדוגמה, בתשואה של 6%:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>{n(t6[0].payment)} ÷ 1.06 + {n(t6[1].payment)} ÷ 1.06<sup>2</sup> + {n(t6[2].payment)} ÷ 1.06<sup>3</sup></M>
+  <M>= {T(t6[0].pv)} + {T(t6[1].pv)} + {T(t6[2].pv)}</M>
+  <M>= {f.shekels("pred.price_6")}</M>
+</div>
+
+**צעד 3 — הכללה.** אותו דבר, לכל אג״ח עם תשלום קבוע פעם בשנה:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">P = C ÷ (1 + y) + C ÷ (1 + y)<sup>2</sup> + … + (C + F) ÷ (1 + y)<sup>n</sup></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">P</dt><dd>המחיר של האג״ח היום, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>התשלום בכל שנה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">F</dt><dd>הקרן — הסכום שמוחזר בסוף, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">y</dt><dd>התשואה לשנה, כמספר עשרוני: 6% הם 0.06</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר השנים עד הסוף — מספר שלם</dd>
+    <dt class="ltr font-semibold text-n900">…</dt><dd>שלוש הנקודות פירושן: ממשיכים באותה צורה, שנה אחר שנה, עד שנה n</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** כשארבעה תנאים מתקיימים:
+1. יש תשלום אחד בכל שנה, והתשלום הבא מגיע בעוד שנה שלמה בדיוק.
+2. כל התשלומים מגיעים במלואם ובזמן. אם יש ספק בזה, הקונים ידרשו תשואה גבוהה יותר.
+3. מהוונים את כל התשלומים באותה תשואה. בשיעור הבא נראה מה עושים כשלכל אורך זמן יש תשואה משלו.
+4. באג״ח צמודה למדד: C ו־F הם במחירים של היום, ו־y היא תשואה אחרי אינפלציה.
+
+<Callout title="איך מחשבים מחיר של אג״ח">
+<p><strong>במחשבון:</strong> מחשבים כל תשלום בנפרד — למשל <M>{n(t6[2].payment)} ÷ 1.06 ÷ 1.06 ÷ 1.06</M> — ומחברים.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): כותבים את הנוסחה כמו שהיא, <span class="ltr">{`=${n(t6[0].payment)}/1.06+${n(t6[1].payment)}/1.06^2+${n(t6[2].payment)}/1.06^3`}</span>. או בפונקציה המוכנה <span class="ltr">=PV(0.06, 3, -5, -100)</span>: הריבית, מספר השנים, התשלום השנתי והסכום שמוחזר בסוף. הסימן מינוס לפני התשלום ולפני הקרן הוא מוסכמה של הגיליון; בלעדיו התוצאה יוצאת שלילית.</p>
+<p><strong>ביד:</strong> טבלה, כמו למעלה — שורה לכל תשלום.</p>
+</Callout>
+
+<Callout title="למה הטבלה והנוסחה נבדלות לפעמים באגורה">
+<p>בטבלה מעגלים כל ערך נוכחי לאגורה, ורק אז מחברים. הנוסחה מחברת בלי לעגל, ומעגלת פעם אחת בסוף.</p>
+<p>בתשואה של 4%, למשל, שלוש השורות מעוגלות הן {T(t4[0].pv)}, {T(t4[1].pv)} ו־{T(t4[2].pv)}, ויחד {f.shekels("explain.table_4_total")}. הנוסחה נותנת {f.shekels("explain.price_4")}. שני המספרים נכונים, כל אחד לפי כלל העיגול שלו. בתרגילים שתי התשובות מתקבלות.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.11"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "זו הטעות הנפוצה ביותר. התשלומים של האג״ח שלכם קבועים: 5 ₪ בשנה. כשאפשר לקבל 6 ₪ בשנה באג״ח חדשה, אף אחד לא ישלם 100 ₪ או יותר על 5 ₪ בשנה.",
+    "התשלומים אכן לא השתנו. אבל הקונה משווה אותם למה שהוא יכול לקבל במקום אחר. מול 6% בשוק, 5 ₪ בשנה שווים פחות מ־100 ₪.",
+    "",
+    `הכיוון נכון, אבל לא מורידים את התשואה מהמחיר. המחיר הוא הערך הנוכחי של התשלומים, ובאג״ח של 3 שנים הוא יורד רק ל־${f.shekels("pred.price_6")}.`,
+  ]}
+>
+  בתשואה של 6%, המחיר הוא הערך הנוכחי של שלושת התשלומים: {f.shekels("pred.price_6")}. הוא ירד ב־{f.shekels("pred.drop")}, אף שהתשלומים עצמם לא השתנו.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## למכור עכשיו, או להחזיק עד הסוף?
+
+</Section>
+
+לפני שנה קניתם ב־100 ₪ אג״ח ממשלתית לא צמודה. היא משלמת 4 ₪ בכל שנה, ונשארו לה 4 שנים: עוד 4 תשלומים של 4 ₪, ועם האחרון גם הקרן, 100 ₪.
+מאז התשואות בשוק עלו, ועל אג״ח כזו הקונים דורשים היום 6%. (מספרים להמחשה; אינם נתוני שוק.)
+כמה תקבלו אם תמכרו היום? ומה יקרה אם תחזיקו עד הסוף?
+
+**צעד 1 — רשימת התשלומים, וההיוון של כל אחד ב־6%.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">בעוד שנים</th>
+        <th class="py-2 text-start font-semibold">תשלום</th>
+        <th class="py-2 text-start font-semibold">ערך נוכחי ב־6%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {worked.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.year}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.pv)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 2 — המחיר היום.** מחברים את הערכים הנוכחיים: <M>{f.shekels("worked.price")}</M>. בגיליון: <span class="ltr">=PV(0.06, 4, -4, -100)</span> — אותה תוצאה.
+
+**צעד 3 — אם תמכרו היום.** תקבלו {f.shekels("worked.price")} — {f.shekels("worked.paper_loss")} פחות ממה ששילמתם. הסיבה היחידה: התשואה בשוק עלתה.
+
+**צעד 4 — אם תחזיקו עד הסוף.** תקבלו את כל מה שהובטח: ארבעה תשלומים, יחד {f.shekels("worked.total_payments")}. הירידה במחיר לא משנה את התשלומים — בתנאי שהמדינה משלמת את כולם, במועד.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>המחיר של אג״ח יכול לרדת גם כשהמנפיק משלם הכול. מי שמחזיק עד הסוף מקבל את מה שהובטח. מי שצריך למכור באמצע מקבל את המחיר של אותו יום — והוא תלוי בתשואה בשוק באותו יום.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+אג״ח משלמת 6 ₪ בכל שנה במשך 3 שנים, ועם התשלום האחרון מחזירה גם 100 ₪. התשואה בשוק 4%. השנה הראשונה כבר מלאה. השלימו את השאר, ואת המחיר.
+
+<BondPriceFill
+  client:visible
+  id="0.11-half"
+  rows={f.rows("half.table")}
+  total={f.raw("half.price")}
+  blanks={["2.pv", "3.payment", "3.pv", "total"]}
+  hint="בדקו: בשנה השלישית מגיעים גם התשלום וגם הקרן. ואת התשלום של שנה t מחלקים ב־1.04 t פעמים."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם, ותשואה — כמספר באחוזים (5 ולא 0.05).
+בתרגילים 6–7 תצטרכו מחשבון או גיליון (ראו ״איך מחשבים מחיר של אג״ח״ למעלה).
+
+<ChoiceExercise
+  client:visible
+  id="0.11-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "המחיר יורד, כי התשואות בשוק ירדו", feedback: "המחיר והתשואה זזים הפוך. כשהתשואות יורדות, תשלומים קבועים שווים היום יותר." },
+    { text: "המחיר עולה", correct: true, feedback: "נכון. התשלומים של האג״ח קבועים. כשמהוונים אותם בתשואה נמוכה יותר, הערך הנוכחי שלהם — המחיר — עולה." },
+    { text: "המחיר לא משתנה, כי התשלומים לא השתנו", feedback: "התשלומים לא השתנו, אבל הקונים משווים אותם למה שהם מקבלים במקום אחר. כשבמקום אחר מקבלים פחות, האג״ח הזו שווה יותר." },
+    { text: "התשלומים השנתיים של האג״ח קטנים", feedback: "התשלומים של אג״ח קיימת נקבעו מראש ולא משתנים. מה שמשתנה הוא המחיר שלה בשוק." },
+  ]}
+>
+  התשואות בשוק על אג״ח ממשלתיות ירדו. מה קורה למחיר של אג״ח ממשלתית שכבר קיימת, שהתשלומים שלה קבועים בשקלים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.11-2"
+  n={2}
+  level="קל"
+  unit="%"
+  tolerance={0.005}
+  near={0}
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: "105", message: "105 ₪ הם הסכום שתקבלו. התשואה היא הרווח, באחוזים מהמחיר ששילמתם." },
+    { value: "0.05", tolerance: 0.0001, message: `זו התשואה כמספר עשרוני. כתבו אותה באחוזים: ${eq("0.05 × 100")}.` },
+    { value: "1.05", tolerance: 0.0001, message: "1.05 הוא היחס בין מה שתקבלו למה ששילמתם. הורידו 1 וכתבו באחוזים." },
+  ]}
+>
+  קניתם ב־100 ₪ אג״ח עם תשלום אחד: 105 ₪ בעוד שנה. מה התשואה שלכם, באחוזים?
+</NumericExercise>
+
+<Solution for="0.11-2">
+הרווח: {f.shekels("ex2.gain")} על {f.shekels("ex2.price")} ששילמתם. התשואה: {pct("ex2.answer")} לשנה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.11-3"
+  n={3}
+  level="בינוני"
+  tolerance={0.02}
+  near={0.1}
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_times"), message: "הכפלתם ב־1.04. כך מחשבים כמה יהיו 110 ₪ בעוד שנה. כאן 110 ₪ הם התשלום בעתיד, ומחפשים כמה הם שווים היום — מחלקים." },
+    { value: f.raw("ex3.err_off"), message: "הורדתם 4% מ־110 ₪. זה קרוב, אבל לא מדויק: היוון הוא חלוקה ב־1.04, לא הורדה של 4%." },
+    { value: "106", message: "הורדתם 4 ₪. התשואה היא אחוז, לא סכום בשקלים. חלקו ב־1.04." },
+    { value: "110", message: "110 ₪ הם מה שתקבלו בעוד שנה. מי שמשלם 110 ₪ היום מרוויח 0%, לא 4%." },
+  ]}
+>
+  אג״ח עם תשלום אחד תשלם 110 ₪ בעוד שנה. הקונים בשוק דורשים תשואה של 4%. כמה תשלמו עליה היום?
+</NumericExercise>
+
+<Solution for="0.11-3">
+המחיר הוא הערך הנוכחי של התשלום: <M>110 ÷ 1.04 = {f.shekels("ex3.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.11-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "תרוויחו בדיוק 2% בשקלים", feedback: "בשקלים תרוויחו יותר: התשלומים צמודים למדד, ולכן גדלים כשהמחירים עולים. ה־2% הם מעבר לעליית המחירים." },
+    { text: "תרוויחו 2% לשנה מעבר לעליית המחירים, אם תקנו במחיר של היום ותחזיקו עד הסוף", correct: true, feedback: "נכון. התשואה של אג״ח צמודה למדד היא תשואה אחרי אינפלציה, כמו ריבית ריאלית." },
+    { text: "תרוויחו 2% פחות מהאינפלציה", feedback: "להפך: ההצמדה מחזירה לכם את עליית המחירים, וה־2% הם תוספת עליה." },
+    { text: "המחיר שלה בשוק לא ישתנה, כי היא צמודה למדד", feedback: "גם מחיר של אג״ח צמודה זז בשוק — כשהתשואה שהקונים דורשים אחרי אינפלציה משתנה. ההצמדה מגינה מאינפלציה, לא משינויים בתשואה." },
+  ]}
+>
+  אג״ח ממשלתית צמודה למדד נמכרת היום במחיר שנותן תשואה של 2% לשנה. מה זה אומר?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.11-5"
+  n={5}
+  level="בינוני"
+  tolerance={0.02}
+  near={0}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: "103", message: "שכחתם את ההצמדה. האג״ח צמודה למדד, ולכן ה־103 ₪ גדלים יחד עם המחירים." },
+    { value: "105", message: "הוספתם 2 ₪. ההצמדה מוסיפה 2% מהתשלום, לא 2 ₪." },
+    { value: f.raw("ex5.err_divided"), message: "חילקתם ב־1.02. בהצמדה מכפילים: המדד עלה, אז התשלום גדל." },
+  ]}
+>
+  קניתם אג״ח ממשלתית צמודה למדד עם תשלום אחד: 103 ₪ בעוד שנה, במחירים של היום. במהלך השנה מדד המחירים לצרכן עלה ב־2%. כמה שקלים תקבלו?
+</NumericExercise>
+
+<Solution for="0.11-5">
+מכפילים את התשלום בשינוי של המדד: <M>103 × 1.02 = {f.shekels("ex5.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.11-6"
+  n={6}
+  level="מאתגר"
+  tolerance={0.02}
+  near={0.05}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_once"), message: "היוונתם את שני התשלומים שנה אחת בלבד. התשלום של השנה השנייה מחלקים ב־1.05 פעמיים." },
+    { value: f.raw("ex6.err_no_first"), message: "זה הערך הנוכחי של התשלום האחרון בלבד. הוסיפו גם את התשלום של השנה הראשונה." },
+    { value: f.raw("ex6.err_at_3"), message: "היוונתם ב־3% — התשלום השנתי של האג״ח. מהוונים בתשואה שהקונים דורשים: 5%." },
+    { value: "106", message: "חיברתם את התשלומים בלי להוון. כסף שמגיע בעתיד שווה היום פחות." },
+  ]}
+>
+  אג״ח משלמת 3 ₪ בכל שנה במשך שנתיים, ועם התשלום השני מחזירה גם 100 ₪. הקונים בשוק דורשים תשואה של 5%. כמה תשלמו עליה היום?
+</NumericExercise>
+
+<Solution for="0.11-6">
+התשלומים: {T(ex6[0].payment)} בעוד שנה, ו־{T(ex6[1].payment)} בעוד שנתיים.
+<M>3 ÷ 1.05 = {T(ex6[0].pv)}</M>. <M>{n(ex6[1].payment)} ÷ 1.05<sup>2</sup> = {T(ex6[1].pv)}</M>. ביחד: {f.shekels("ex6.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.11-7"
+  n={7}
+  level="מאתגר"
+  tolerance={0.02}
+  near={0.05}
+  answer={f.raw("ex7.answer")}
+  errors={[
+    { value: f.raw("ex7.price_10"), message: "זה המחיר החדש של האג״ח הארוכה. השאלה היא בכמה הוא ירד." },
+    { value: f.raw("ex7.drop_2"), message: "זו הירידה של האג״ח הקצרה, עם שנתיים. השאלה היא על האג״ח של 10 שנים." },
+    { value: "1", message: "התשואה עלתה בנקודת אחוז אחת, אבל המחיר לא יורד בשקל אחד. חשבו את המחיר החדש בתשואה של 6%." },
+    { value: "6", message: "לא מורידים את התשואה מהמחיר. חשבו את המחיר החדש — הערך הנוכחי של כל התשלומים ב־6%." },
+  ]}
+>
+  יש שתי אג״ח. כל אחת משלמת 5 ₪ בשנה ומחזירה 100 ₪ בסוף, ושתיהן נמכרות היום ב־100 ₪ — בתשואה של 5%. לראשונה נשארו שנתיים, לשנייה 10 שנים. התשואה בשוק עולה ל־6%. בכמה שקלים יורד המחיר של האג״ח של 10 השנים?
+</NumericExercise>
+
+<Solution for="0.11-7">
+המחיר החדש של האג״ח הארוכה: <span class="ltr">=PV(0.06, 10, -5, -100)</span>, כלומר {f.shekels("ex7.price_10")}. הירידה: {f.shekels("ex7.answer")}.
+לשם השוואה, האג״ח הקצרה יורדת ל־{f.shekels("ex7.price_2")} — ירידה של {f.shekels("ex7.drop_2")} בלבד. אותה עלייה בתשואה מזיזה אג״ח ארוכה הרבה יותר.
+</Solution>
+
+<Callout title="חמש שאלות על אג״ח ותשואה">
+<p><strong>מה זה?</strong> אג״ח היא הלוואה למדינה או לחברה, עם תשלומים ידועים מראש, שאפשר למכור לפני הסוף. התשואה היא הרווח לשנה, באחוזים, של מי שקונה במחיר של היום ומחזיק עד הסוף.</p>
+<p><strong>למה זה קיים?</strong> המדינה צריכה ללוות סכומים גדולים. אג״ח מאפשרת לה ללוות מהרבה מלווים בבת אחת, ולמלווים — לקבל את הכסף בחזרה לפני הסוף, אם ימכרו. כיוון שאפשר לקנות ולמכור כל יום, המחיר והתשואה נקבעים בשוק כל יום מחדש.</p>
+<p><strong>איך זה עובד?</strong> התשלומים קבועים (באג״ח צמודה — קבועים במחירים של היום). המחיר הוא הערך הנוכחי שלהם בתשואה שהקונים דורשים. תשואה עולה — מחיר יורד, ולהפך. אג״ח ארוכה זזה יותר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מי שמחזיק אג״ח ומוכר לפני הסוף מקבל את מחיר השוק של אותו יום, גבוה או נמוך ממה ששילם. ובהמשך הקורס, תשואות של אג״ח ממשלתיות יחזרו כבסיס להבנת <Later lesson="2.2">ריבית קבועה</Later> ושל ריביות שמתעדכנות לפי תשואות של אג״ח (<Later lesson="2.7">משתנה צמודה</Later>).</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> תשואה של אג״ח ממשלתית באותו אורך זמן היא נקודת השוואה: כמה הייתם מקבלים מהלוואה למדינה לאותה תקופה. וכשמשווים אג״ח לא צמודה לצמודה, שואלים כמה אינפלציה תהיה בפועל — נחזור לזה בשיעור הבא.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **אג״ח** = הלוואה עם תשלומים ידועים מראש, שאפשר למכור לפני הסוף. **אג״ח ממשלתית** — המדינה היא הלווה.
+- **תשואה** = הרווח לשנה, באחוזים מהמחיר, למי שקונה היום ומחזיק עד הסוף, אם כל התשלומים מתקבלים.
+- **המחיר הוא הערך הנוכחי של התשלומים:** <M>P = C ÷ (1 + y) + … + (C + F) ÷ (1 + y)<sup>n</sup></M>.
+- **נדנדה:** התשלומים קבועים, ולכן מחיר עולה פירושו תשואה יורדת, ולהפך. כשהתשואה שווה לתשלום השנתי באחוזים, המחיר שווה לקרן.
+- **אג״ח ארוכה זזה יותר** מאג״ח קצרה, לאותו שינוי בתשואה.
+- **לא צמודה מול צמודה:** בלא צמודה התשלומים קבועים בשקלים, והתשואה היא לפני אינפלציה. בצמודה התשלומים גדלים עם המדד, והתשואה היא אחרי אינפלציה.
+- **מק״מ** = אג״ח קצרה שבנק ישראל מנפיק, עם תשלום אחד בסוף.
+
+**בשיעור הבא — 0.12:** לכל אורך זמן יש תשואה משלו — לשנה, לשנתיים, לעשר שנים. נצייר אותן כקו אחד, ונראה מה הצורה שלו מספרת על הריביות שהשוק מצפה להן בעתיד.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "המחיר של אג״ח הוא הערך הנוכחי של התשלומים שלה; לכן מחיר ותשואה זזים הפוך, ואג״ח ארוכה זזה יותר. מתמטיקה פיננסית בסיסית.", code: ["P = Σ C ÷ (1 + y)ᵗ + F ÷ (1 + y)ⁿ"] },
+    { kind: "ידע מתמטי כללי", text: "כשהריבית במשק עולה, הקונים של אג״ח דורשים בדרך כלל תשואה גבוהה יותר. ידע כללי בכלכלה; נאמר כאן בלי מספרים." },
+    { kind: "לא אומת", text: "מק״מ הוא מלווה קצר מועד שבנק ישראל מנפיק: לפי תקציר של מקור רשמי (עמוד התשואות באתר בנק ישראל, בגרסה האנגלית), ולפי תעתיק בצוות ב־Brain (דף 67436545, 2026-10-08). ממתין לבדיקה מול המקור.", href: "https://boi.org.il/en/economic-roles/statistics/bonds-and-central-bank-bills-makam/bonds-and-central-bank-bills-makam-yields-to-maturity/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "השמות ״שחר״ (אג״ח ממשלתיות לא צמודות) ו״גליל״ (צמודות למדד): לפי תקציר של מקור רשמי (עמוד התשואות באתר בנק ישראל); ממתין לבדיקה. המנגנון המדויק של ההצמדה באג״ח הממשלתיות לא נבדק.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "ריביות שמתעדכנות לפי תשואות של אג״ח ממשלתיות או של מק״מ: לפי תעתיק בצוות ב־Brain (דפים 7733250 ו־67436545), ממתין לבדיקה מול המקור. נלמד בשלב 2." },
+    { kind: "הנחת חישוב", text: "כל המחירים, התשלומים והתשואות בשיעור הם מספרים להמחשה. הם אינם נתוני שוק ואינם תשואות של אג״ח אמיתית." },
+    { kind: "הנחת חישוב", text: "אג״ח לימודית: תשלום אחד בשנה, שנים שלמות, והקרן מוחזרת עם התשלום האחרון. מחיר בנוסחה מעוגל לאגורה פעם אחת, בסוף; בטבלאות כל שורה מעוגלת לבד. תשואות מוצגות בשתי ספרות אחרי הנקודה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/bonds.ts via scripts/lessons/lesson-0-11.ts → data/lessons/0-11.json, rechecked by checks/kinds/bonds.py (pnpm check:python). Illustration: src/components/PriceYieldSeesaw.vue; half-worked table: src/components/BondPriceFill.vue. */}

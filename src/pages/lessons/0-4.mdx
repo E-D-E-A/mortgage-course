@@ -1,0 +1,463 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.4"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RateConverter from "../../components/RateConverter.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatShekelsText as T } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.4");
+export const explain = f.rows("explain.table");
+export const first = f.rows("worked.first_month");
+export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%", "קצת פחות מ־6%", "זה תלוי בגודל ההלוואה"];
+
+בשיעור הקודם ראינו <Term t="ריבית דריבית" lesson="0.4">ריבית דריבית</Term>: בכל <Term t="תקופה" lesson="0.4">תקופה</Term> הריבית מצטרפת ל<Term t="יתרה" lesson="0.4">יתרה</Term>, ומהתקופה הבאה מרוויחה ריבית בעצמה.
+ראינו גם תנאי אחד: הריבית ומספר התקופות צריכים לדבר על אותה תקופה.
+בשיעור הזה נראה מה עושים כשהריבית נאמרת לשנה, אבל מצטרפת כל חודש — ולמה יש לזה שתי דרכים, שנותנות שני מספרים שונים.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.4"
+  question="לקחתם הלוואה של 10,000 ₪ בריבית של 6% לשנה. הריבית מחושבת כל חודש ומצטרפת לחוב, ובמשך שנה שלמה לא שילמתם כלום. בכמה אחוזים גדל החוב בשנה הזו?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שתי דרכים לחלק שנה
+
+</Section>
+
+<LessonVideo lesson="0-4" />
+
+<Section kind="ההסבר">
+
+## חודש אחר חודש
+
+</Section>
+
+נתחיל מהשאלה: <Term t="הלוואה" lesson="0.4">הלוואה</Term> של 10,000 ₪, בריבית של 6% לשנה. המספר הזה, ״6% לשנה״, נקרא <Term t="ריבית שנתית" lesson="0.4">ריבית שנתית</Term>.
+
+אבל הריבית לא מחכה לסוף השנה. היא מחושבת ומצטרפת לחוב כל חודש. אז כמה ריבית לוקחים בכל חודש?
+
+**הדרך הראשונה: מחלקים ב־12.** בשנה יש 12 חודשים, ולכן:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>6% ÷ 12 = {f.plain("rate.monthly_6")}%</M>
+</div>
+
+זו <Term t="ריבית חודשית" lesson="0.4">הריבית החודשית</Term>: {f.plain("rate.monthly_6")}% בכל חודש.
+
+**החודש הראשון.** {f.plain("rate.monthly_6")}% מ־10,000 ₪ הם {T(explain[0].interest)}. בסוף החודש החוב הוא {T(explain[0].closing)}.
+
+**החודש השני.** עכשיו מחשבים {f.plain("rate.monthly_6")}% מכל החוב, {T(explain[1].opening)}. יוצא {T(explain[1].interest)} — קצת יותר מבחודש הראשון.
+מאיפה {T(explain[1].interest_on_interest)} הנוספים? הם {f.plain("rate.monthly_6")}% מ־{T(explain[0].interest)}, הריבית של החודש הראשון. זו ריבית על ריבית, בדיוק כמו בשיעור הקודם — רק שהתקופה היא חודש ולא שנה.
+
+כך זה נראה לאורך שנה שלמה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">חודש</th>
+        <th class="py-2 text-start font-semibold">חוב בתחילת החודש</th>
+        <th class="py-2 text-start font-semibold">ריבית החודש</th>
+        <th class="py-2 text-start font-semibold">מזה: ריבית על ריבית</th>
+        <th class="py-2 text-start font-semibold">חוב בסוף החודש</th>
+      </tr>
+    </thead>
+    <tbody>
+      {explain.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.opening)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.interest_on_interest)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.closing)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+בסוף החודש ה־12 החוב הוא {T(explain[11].closing)}.
+אילו 6% היו מצטרפים פעם אחת בלבד, בסוף השנה, החוב היה {f.shekels("explain.once_a_year")}.
+החוב גדל יותר מ־6%, כי בכל חודש נוספה גם ריבית על הריבית של החודשים הקודמים.
+
+בכמה אחוזים הוא גדל? בחישוב מדויק (נראה אותו בהמשך השיעור): ב־{f.plain("rate.effective_6")}%.
+לזה קוראים <Term t="ריבית אפקטיבית" lesson="0.4">ריבית אפקטיבית</Term>: כמה הסכום גדל בפועל בשנה שלמה, כשהריבית מצטרפת אליו כמה פעמים בשנה.
+
+### הדרך השנייה: שורש 12
+
+נהפוך את השאלה. נניח שרוצים שהחוב יגדל בשנה **בדיוק** ב־6%, לא יותר. איזו ריבית חודשית צריך?
+
+{f.plain("rate.monthly_6")}% גדולה מדי: ראינו שהיא מביאה ל־{f.plain("rate.effective_6")}%. צריך ריבית חודשית קצת קטנה יותר.
+להוסיף 6% זה להכפיל ב־1.06 (ראינו את זה בשיעור הקודם). אז מחפשים מספר שאם מכפילים בו 12 פעמים, אחת לכל חודש, יוצא בדיוק 1.06.
+המספר הזה נקרא **שורש 12 של 1.06**. הוא {f.plain("rate.root_factor_6")} (ויש לו עוד ספרות אחרי אלה).
+כלומר, הריבית החודשית היא {f.plain("rate.root_6")}% — קצת פחות מ־{f.plain("rate.monthly_6")}%.
+
+בדיקה: 10,000 ₪ שגדלים 12 חודשים בריבית הזו, בלי לעגל אותה, מגיעים בדיוק ל־{f.shekels("explain.root_after_12")}.
+
+שתי הדרכים, זו מול זו:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">הדרך</th>
+        <th class="py-2 text-start font-semibold">ריבית חודשית</th>
+        <th class="py-2 text-start font-semibold">בכמה הסכום גדל בשנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 text-n700">חלוקה ב־12</td>
+        <td class="py-2"><span class="ltr">{f.plain("rate.monthly_6")}%</span></td>
+        <td class="py-2 font-semibold text-n900"><span class="ltr">{f.plain("rate.effective_6")}%</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 text-n700">שורש 12</td>
+        <td class="py-2"><span class="ltr">{f.plain("rate.root_6")}%</span></td>
+        <td class="py-2 font-semibold text-n900"><span class="ltr">6%</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<Callout title="איזו דרך נכונה? תלוי מה המספר השנתי אומר" tone="warning">
+<p><strong>כשהמספר השנתי הוא הריבית שכתובה בחוזה הלוואה:</strong> מחלקים ב־12. כך חושבו לוחות התשלומים של שני בנקים בישראל שהצוות של Mogi בדק (ראו את המקור בסוף השיעור). בשנה שלמה מצטבר אז קצת יותר מהמספר השנתי — זו הריבית האפקטיבית.</p>
+<p><strong>כשהמספר השנתי הוא כבר ריבית אפקטיבית:</strong> לוקחים שורש 12. יש פרסומים רשמיים שמציגים ריביות כך, ונפגוש אותם בהמשך הקורס.</p>
+<p><strong>לא מערבבים.</strong> מי שמחלק ב־12 ריבית שהיא כבר אפקטיבית, מקבל ריבית חודשית גבוהה מדי. מי שלוקח שורש 12 מריבית של חוזה, מקבל ריבית חודשית נמוכה מדי. לכן, כשמישהו אומר ״ריבית של X% לשנה״, שאלו: איזו ריבית זו, ואיך מחשבים ממנה את החודשית?</p>
+</Callout>
+
+<Callout title="שימו לב למילה ״נומינלית״">
+<p>את הריבית השנתית שמחלקים ב־12 מכנים לפעמים <Later lesson="0.8">ריבית נומינלית</Later>.</p>
+<p>בשיעור 0.8 תפגשו את אותה מילה במשמעות אחרת לגמרי: ריבית לפני <Later lesson="0.7">אינפלציה</Later>. אלה שני דברים שונים. בקורס נקפיד לומר במה מדובר, ומומלץ שתעשו כך גם אתם.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## ממיר הריביות
+
+</Section>
+
+הזיזו את הריבית השנתית. בצד ימין: מה קורה כשמחלקים ב־12. בצד שמאל: מה קורה כשלוקחים שורש 12.
+הגרף מראה כמה ריבית נצברה עד כל חודש, בשתי הדרכים. הקו המקווקו הוא הריבית השנתית, אילו הייתה מצטרפת פעם אחת בסוף השנה.
+
+<RateConverter client:visible annual={6} amount={10000} />
+
+נסו את שלושת אלה:
+1. השאירו 6%. מה הריבית האפקטיבית? ומה הריבית החודשית בשורש 12?
+2. העלו ל־12%. מה קורה להפרש בין הריבית השנתית לאפקטיבית?
+3. הורידו ל־1%. האם עדיין יש הבדל של ממש בין שתי הדרכים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ריבית אפקטיבית של {f.plain("rate.effective_6")}%, וריבית חודשית בשורש 12 של {f.plain("rate.root_6")}%. העמודות של חלוקה ב־12 עוברות את הקו המקווקו בחודש ה־12; העמודות של שורש 12 נוגעות בו בדיוק.</li>
+    <li>ב־12%: ריבית חודשית של {f.plain("slider.monthly_12")}%, וריבית אפקטיבית של {f.plain("slider.effective_12")}%. ככל שהריבית גבוהה יותר, ההפרש גדל — יש יותר ריבית על ריבית.</li>
+    <li>ב־1% הריבית האפקטיבית היא {f.plain("slider.effective_1")}% — כמעט אותו מספר. בריביות נמוכות שתי הדרכים קרובות מאוד, ובריביות גבוהות הן מתרחקות.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחאות
+
+</Section>
+
+**צעד 1 — חלוקה.** הריבית החודשית היא הריבית השנתית חלקי 12: <M>6% ÷ 12 = {f.plain("rate.monthly_6")}%</M>.
+
+**צעד 2 — 12 חודשים של ריבית דריבית.** מהשיעור הקודם: להוסיף {f.plain("rate.monthly_6")}% זה להכפיל ב־{f.plain("base.monthly_6")}. אחרי 12 חודשים מכפילים 12 פעמים, כלומר ב־<Term t="חזקה" lesson="0.4">חזקת</Term> 12:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>{f.plain("base.monthly_6")}<sup>12</sup> = {f.plain("rate.factor_6")}</M>
+  <M>10,000 × {f.plain("base.monthly_6")}<sup>12</sup> = {f.shekels("explain.after_12")}</M>
+</div>
+
+**צעד 3 — הריבית האפקטיבית.** כל שקל הפך ל־{f.plain("rate.factor_6")} שקלים. מורידים את השקל המקורי, ונשאר מה שנוסף: {f.plain("rate.effective_6_long")}%, ובעיגול {f.plain("rate.effective_6")}%.
+
+**צעד 4 — הכיוון ההפוך: שורש 12.** כשיודעים את הריבית האפקטיבית ורוצים את החודשית, מחפשים מספר שבחזקת 12 נותן <M>1.06</M>. כותבים את זה כחזקה של שבר: <M>1.06<sup>1/12</sup></M>. ״בחזקת 1/12״ פירושו ״שורש 12״.
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1.06<sup>1/12</sup> = {f.plain("rate.root_factor_6")}…</M>
+</div>
+
+מורידים 1, ומקבלים ריבית חודשית של {f.plain("rate.root_6")}%.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">m = r ÷ 12</p>
+  <p class="ltr text-h3 text-navy">R = (1 + m)<sup>12</sup> − 1</p>
+  <p class="mt-3 text-body-m text-n600">ובכיוון ההפוך, כשהמספר השנתי הוא כבר ריבית אפקטיבית:</p>
+  <p class="ltr text-h3 text-navy">m = (1 + R)<sup>1/12</sup> − 1</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית השנתית, כמספר עשרוני: 6% הם 0.06</dd>
+    <dt class="ltr font-semibold text-n900">m</dt><dd>הריבית החודשית, כמספר עשרוני: {f.plain("rate.monthly_6")}% הם {f.plain("rate.monthly_6_fraction")}</dd>
+    <dt class="ltr font-semibold text-n900">R</dt><dd>הריבית האפקטיבית — בכמה הסכום גדל בשנה, כמספר עשרוני</dd>
+    <dt class="ltr font-semibold text-n900">12</dt><dd>מספר החודשים בשנה — מספר הפעמים שהריבית מצטרפת</dd>
+  </dl>
+</div>
+
+שימו לב: ה־m בשורה השלישית הוא לא אותו m של השורה הראשונה. אלה שתי הדרכים, והן נותנות שתי ריביות חודשיות שונות.
+
+**מתי הנוסחאות נכונות?** רק כששלושה תנאים מתקיימים:
+1. הריבית זהה לאורך כל השנה.
+2. הריבית מצטרפת כל חודש, 12 פעמים בשנה.
+3. יודעים איזה סוג מספר שנתי יש לכם: ריבית שמחלקים ב־12, או ריבית אפקטיבית.
+
+<Callout title="איך מחשבים חזקה ושורש">
+<p><strong>במחשבון:</strong> הכפתור <span class="ltr">x<sup>y</sup></span> (או <span class="ltr">^</span>). לחזקה: {f.plain("base.monthly_6")}, הכפתור, 12. לשורש 12: 1.06, הכפתור, ואז <span class="ltr">(1 ÷ 12)</span> בסוגריים. אל תעגלו את 1/12 לפני — זה משנה את התוצאה.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): ריבית אפקטיבית — <span class="ltr">=(1+6%/12)^12-1</span>. שורש 12 — <span class="ltr">=1.06^(1/12)-1</span>.</p>
+<p><strong>ביד:</strong> חזקה אפשר לחשב בהכפלות חוזרות. שורש 12 ביד קשה מאוד — לשם כך יש מחשבון.</p>
+</Callout>
+
+<Callout title="למה המספרים נבדלים לפעמים באגורה">
+<p>בטבלה, כמו בדף חשבון, הריבית של כל חודש מעוגלת לאגורה ורק אז נוספת לחוב. הנוסחה מחשבת בלי לעגל, ומעגלת פעם אחת בסוף.</p>
+<p>לכן אחרי 12 חודשים הטבלה מגיעה ל־{T(explain[11].closing)}, והנוסחה ל־{f.shekels("explain.after_12")}. שני המספרים נכונים, כל אחד לפי כלל העיגול שלו.</p>
+<p>גם הריביות מעוגלות להצגה בלבד: {f.plain("rate.effective_6")}% הוא {f.plain("rate.effective_6_long")}% בעיגול. בחישובים משתמשים במספר המלא.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.4"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "6% הוא המספר שכתוב בחוזה. אבל הריבית מצטרפת כל חודש, ומהחודש השני מחושבת ריבית גם על הריבית. לכן בשנה מצטבר קצת יותר.",
+    "",
+    `פחות מ־6% היה יוצא רק בריבית חודשית קטנה מ־${f.plain("rate.root_6")}%. כשמחלקים ב־12 היא ${f.plain("rate.monthly_6")}% — גדולה יותר.`,
+    "בהלוואה גדולה יותר גם הריבית בשקלים גדולה יותר, אבל באחוזים החוב גדל באותה מידה. האחוז תלוי בריבית ובמספר הפעמים שהיא מצטרפת — לא בגודל ההלוואה.",
+  ]}
+>
+  <M>{f.plain("base.monthly_6")}<sup>12</sup> = {f.plain("rate.factor_6")}</M>, כלומר החוב גדל ב־{f.plain("rate.effective_6")}% — זו הריבית האפקטיבית.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## שתי הצעות, שני סוגי ריבית
+
+</Section>
+
+אתם משווים שתי הצעות להלוואה של 100,000 ₪. בשתיהן הריבית מחושבת כל חודש.
+**בנק א׳** כותב: ״ריבית שנתית 4.8%״, ומחלק אותה ב־12. **בנק ב׳** כותב: ״ריבית אפקטיבית 4.9%״.
+על פניו, בנק א׳ זול יותר. האם זה נכון?
+
+**צעד 1 — הריבית החודשית בבנק א׳.** <M>4.8% ÷ 12 = {f.plain("worked.monthly_a")}%</M>. בחודש הראשון זו ריבית של {T(first[0].interest)}.
+
+**צעד 2 — הריבית האפקטיבית בבנק א׳.** <M>{f.plain("base.worked_a")}<sup>12</sup> = {f.plain("worked.factor_a")}</M>. כלומר, החוב בבנק א׳ גדל בשנה ב־{f.plain("worked.effective_a")}%.
+
+**צעד 3 — משווים מספרים מאותו סוג.** ריבית אפקטיבית מול ריבית אפקטיבית: {f.plain("worked.effective_a")}% בבנק א׳, מול 4.9% בבנק ב׳. בנק א׳ יקר במעט, למרות שהמספר שהוא כותב נמוך יותר.
+
+**צעד 4 — אותה בדיקה, בחודשים.** הריבית החודשית בבנק ב׳ היא שורש 12: <M>1.049<sup>1/12</sup> − 1</M>, כלומר {f.plain("worked.monthly_b")}% לחודש. זה פחות מ־{f.plain("worked.monthly_a")}% של בנק א׳. אותה מסקנה.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>ההפרש כאן קטן, אבל השיטה חשובה: משווים רק מספרים מאותו סוג. ריבית שנתית שמחלקים ב־12 נראית נמוכה יותר מהריבית האפקטיבית שלה. בהשוואה אמיתית בין הצעות יש גם דברים נוספים מלבד הריבית, ונגיע אליהם בהמשך הקורס.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+לכל ריבית שנתית בטבלה, הריבית מחושבת כל חודש ומתחלקת ב־12. השורה הראשונה כבר מלאה. השלימו את הריבית החודשית ואת הריבית האפקטיבית בשאר השורות, עד שתי ספרות אחרי הנקודה. תצטרכו מחשבון או גיליון.
+
+<FillGrid
+  client:visible
+  id="0.4-half"
+  rows={f.rows("half.table")}
+  columns={[
+    { key: "annual", label: "ריבית שנתית", format: "percent" },
+    { key: "monthly", label: "ריבית חודשית (חלוקה ב־12)", format: "percent" },
+    { key: "effective", label: "ריבית אפקטיבית", format: "percent" },
+  ]}
+  blanks={["2.monthly", "2.effective", "3.monthly", "3.effective", "4.monthly", "4.effective"]}
+  success="בכל שורה הריבית האפקטיבית גבוהה מהשנתית, וההפרש גדל ככל שהריבית גבוהה יותר."
+  hint="בדקו: האם חילקתם את הריבית השנתית ב־12, ואז העליתם את 1 ועוד הריבית החודשית (כמספר עשרוני) בחזקת 12?"
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם סימן אחוז או בלעדיו.
+בתרגילים 3–6 תצטרכו מחשבון או גיליון (ראו ״איך מחשבים חזקה ושורש״ למעלה).
+
+<NumericExercise
+  client:visible
+  id="0.4-1"
+  n={1}
+  level="קל"
+  unit="%"
+  tolerance={0.001}
+  near={0.001}
+  answer={f.raw("ex1.answer")}
+  errors={[
+    { value: f.raw("ex1.err_fraction"), tolerance: 0.00001, message: `כתבתם את הריבית כמספר עשרוני. באחוזים זה ${f.plain("ex1.answer")}%.` },
+    { value: f.raw("ex1.err_times"), message: "הכפלתם ב־12 במקום לחלק. חודש הוא חלק אחד מתוך 12 בשנה, ולכן הריבית שלו קטנה יותר." },
+  ]}
+>
+  לקחתם הלוואה בריבית שנתית של 9%, והריבית מחושבת כל חודש לפי חלוקה ב־12. מה הריבית החודשית, באחוזים?
+</NumericExercise>
+
+<Solution for="0.4-1">
+<M>9% ÷ 12 = {f.plain("ex1.answer")}%</M> בכל חודש.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.4-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "כשהריבית מצטרפת כל חודש", feedback: "כשהריבית מצטרפת כל חודש, נוספת ריבית על ריבית בתוך השנה, והריבית האפקטיבית גבוהה מהשנתית." },
+    { text: "כשהריבית מצטרפת פעם אחת בשנה, בסוף השנה", correct: true, feedback: "בדיוק. אם הריבית מצטרפת רק פעם אחת בשנה, אין בתוך השנה ריבית על ריבית, והסכום גדל בדיוק בריבית השנתית." },
+    { text: "כשסכום ההלוואה גדול", feedback: "גודל הסכום לא משנה את האחוזים. מה שמשנה הוא כמה פעמים בשנה הריבית מצטרפת." },
+    { text: "תמיד — אלה שני שמות לאותו מספר", feedback: "לא. ראינו ש־6% לשנה, כשהם מתחלקים ב־12 ומצטרפים כל חודש, מגדילים את הסכום ביותר מ־6% בשנה." },
+  ]}
+>
+  באיזה מקרה הריבית האפקטיבית שווה בדיוק לריבית השנתית?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.4-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  tolerance={0.006}
+  near={0.05}
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: "12", tolerance: 0.001, message: "12% היא הריבית השנתית. השאלה היא בכמה החוב גדל בפועל, כשהריבית מצטרפת כל חודש — כולל ריבית על ריבית." },
+    { value: f.raw("ex3.err_monthly"), tolerance: 0.001, message: "זו הריבית החודשית. עכשיו צרפו אותה 12 פעמים: 1 ועוד הריבית החודשית, בחזקת 12." },
+  ]}
+>
+  ריבית שנתית של 12%, מתחלקת ב־12 ומצטרפת כל חודש. מה הריבית האפקטיבית, באחוזים, עד שתי ספרות אחרי הנקודה?
+</NumericExercise>
+
+<Solution for="0.4-3">
+ריבית חודשית: <M>12% ÷ 12 = {f.plain("ex3.err_monthly")}%</M>. אחרי 12 חודשים: <M>{f.plain("base.ex3")}<sup>12</sup> = {f.plain("ex3.factor")}</M>. מורידים 1: {f.plain("ex3.answer")}%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.4-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.err_once"), message: "זה החוב אילו 3.6% היו מצטרפים פעם אחת, בסוף השנה. כאן הריבית מצטרפת כל חודש, ולכן החוב גדל קצת יותר." },
+    { value: f.raw("ex4.err_one_month"), message: "זה החוב אחרי חודש אחד. המשיכו עוד 11 חודשים — או השתמשו בחזקה 12." },
+    { value: f.raw("ex4.interest"), message: "זו הריבית שנצברה. השאלה היא על כל החוב: הסכום שלקחתם ועוד הריבית." },
+  ]}
+>
+  לקחתם הלוואה של 50,000 ₪ בריבית שנתית של 3.6%. הריבית מתחלקת ב־12 ומצטרפת לחוב כל חודש. במשך שנה לא שילמתם כלום. כמה תהיו חייבים בסוף השנה?
+</NumericExercise>
+
+<Solution for="0.4-4">
+ריבית חודשית: <M>3.6% ÷ 12 = {f.plain("ex4.monthly")}%</M>. אחרי 12 חודשים: <M>50,000 × {f.plain("base.ex4")}<sup>12</sup> = {f.shekels("ex4.answer")}</M>. מזה {f.shekels("ex4.interest")} ריבית.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.4-5"
+  n={5}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.0006}
+  near={0.002}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_division"), tolerance: 0.0006, message: "חילקתם ב־12. אבל 5% כאן היא כבר ריבית אפקטיבית — מה שמצטבר בשנה. ריבית חודשית כזו, כשמצטרפת 12 פעמים, הייתה נותנת יותר מ־5%. צריך שורש 12." },
+    { value: "5", tolerance: 0.001, message: "5% היא הריבית לשנה. השאלה היא על הריבית לחודש." },
+  ]}
+>
+  בפרסום מופיעה ריבית אפקטיבית של 5% לשנה. מה הריבית החודשית שמצטרפת כל חודש ומגיעה בשנה בדיוק ל־5%? כתבו באחוזים, עד ארבע ספרות אחרי הנקודה.
+</NumericExercise>
+
+<Solution for="0.4-5">
+שורש 12: <M>1.05<sup>1/12</sup> = {f.plain("ex5.root_factor")}…</M>. מורידים 1: {f.plain("ex5.answer")}% לחודש. חלוקה ב־12 הייתה נותנת {f.plain("ex5.err_division")}% — יותר מדי.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.4-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "בנק א׳, כי 5.4% פחות מ־5.5%", feedback: `5.4% של בנק א׳ מתחלקים ב־12 ומצטרפים כל חודש. בשנה זה מצטבר ל־${f.plain("ex6.effective_a")}% — יותר מ־5.5%. משווים מספרים מאותו סוג.` },
+    { text: "בנק ב׳", correct: true, feedback: `נכון. בבנק א׳ הריבית החודשית היא ${f.plain("ex6.monthly_a")}%, ובשנה: ${eq(`${f.plain("base.ex6")}^12 = ${f.plain("ex6.factor_a")}`)}, כלומר ריבית אפקטיבית של ${f.plain("ex6.effective_a")}% — יותר מ־5.5% של בנק ב׳. ובחודשים: ${f.plain("ex6.monthly_a")}% בבנק א׳, מול ${f.plain("ex6.monthly_b")}% בבנק ב׳.` },
+    { text: "הן זהות", feedback: `לא. כשמתרגמים את שתיהן לאותו סוג ריבית, בנק א׳ יוצא ${f.plain("ex6.effective_a")}% לשנה, ובנק ב׳ 5.5%.` },
+    { text: "אי אפשר להשוות ביניהן", feedback: "אפשר — אחרי שמתרגמים את שתיהן לאותו סוג: את שתיהן לריבית אפקטיבית, או את שתיהן לריבית חודשית." },
+  ]}
+>
+  בשתי הצעות להלוואה הריבית מצטרפת כל חודש. בנק א׳: ריבית שנתית 5.4%, מתחלקת ב־12. בנק ב׳: ריבית אפקטיבית 5.5%. איזו הצעה זולה יותר, אם הריבית היא ההבדל היחיד ביניהן?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על ריבית אפקטיבית">
+<p><strong>מה זה?</strong> כמה הסכום גדל בפועל בשנה שלמה, כשהריבית מצטרפת אליו כמה פעמים בשנה — למשל כל חודש.</p>
+<p><strong>למה זה קיים?</strong> הריבית נאמרת לשנה, אבל מחושבת ומצטרפת בתקופות קצרות יותר. הריבית האפקטיבית מתרגמת את זה למספר שנתי אחד, שמראה כמה הכסף גדל באמת — וכך אפשר להשוות בין הצעות שמחשבות ריבית בדרכים שונות.</p>
+<p><strong>איך זה עובד?</strong> מחלקים את הריבית השנתית ב־12, מצרפים אותה 12 פעמים, ובודקים בכמה גדל הסכום: <M>(1 + r ÷ 12)<sup>12</sup> − 1</M>. בכיוון ההפוך, מריבית אפקטיבית לחודשית, לוקחים שורש 12.</p>
+<p><strong>איך זה משפיע עליכם?</strong> בהלוואה שהריבית השנתית שלה מתחלקת ב־12 ומצטרפת כל חודש, החוב גדל בשנה קצת יותר מהמספר שכתוב בחוזה, כל עוד לא משלמים את הריבית. ההבדל קטן בריביות נמוכות, וגדל ככל שהריבית גבוהה יותר.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים רק מספרים מאותו סוג: שנתית מול שנתית, אפקטיבית מול אפקטיבית. כשמקבלים מספר שנתי, שואלים איזו ריבית זו ואיך מחשבים ממנה את החודשית.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **ריבית שנתית** היא הריבית שנאמרת לשנה. **ריבית חודשית** היא הריבית לחודש אחד.
+- **שתי דרכים לחלק שנה:** חלוקה ב־12 (<M>m = r ÷ 12</M>), או שורש 12 (<M>m = (1 + R)<sup>1/12</sup> − 1</M>). הן נותנות ריביות חודשיות שונות.
+- **בלוחות התשלומים של הבנקים שנבדקו מחלקים ב־12.** בשנה שלמה מצטבר אז יותר מהמספר השנתי: 6% לשנה הופכים ל־{f.plain("rate.effective_6")}%.
+- **ריבית אפקטיבית** = כמה הסכום גדל בפועל בשנה: <M>(1 + m)<sup>12</sup> − 1</M>.
+- **שורש 12** משמש כשהמספר השנתי הוא כבר ריבית אפקטיבית.
+- **לא מערבבים.** משווים רק מספרים מאותו סוג, ושואלים תמיד איזו ריבית כתובה.
+
+**בשיעור הבא — 0.5, ערך הזמן של כסף:** למה שקל היום שווה יותר משקל שיגיע בעוד כמה שנים, ואיך משווים סכומים שמגיעים בזמנים שונים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "חלוקת ריבית שנתית ב־12, הריבית האפקטיבית והמעבר ממנה לריבית חודשית בשורש 12 הם מתמטיקה פיננסית בסיסית.", code: ["m = r ÷ 12", "R = (1 + m)¹² − 1", "m = (1 + R)^(1/12) − 1"] },
+    { kind: "לא אומת", text: "בחוזי הלוואות בישראל הריבית החודשית היא הריבית השנתית חלקי 12. לפי בדיקה של הצוות ב־Linear (ENG-223, הערה מ־2026-10-04, ונכון גם בעדכון מ־2026-10-08): לוחות תשלומים שפרסמו לאומי ודיסקונט התאימו לחישוב הזה עד האגורה. ממתין לבדיקה מול מסמך של בנק.", date: "2026-10-04" },
+    { kind: "לא אומת", text: "חלק מהפרסומים הרשמיים של ריביות בישראל מציגים ריבית אפקטיבית, והמעבר מהם לריבית חודשית הוא בשורש 12. לפי תעתיק בצוות ב־Brain (דף 7798786, אוגוסט 2026), ממתין לבדיקה מול המקור.", date: "2026-08" },
+    { kind: "ידע מתמטי כללי", text: "המילה ״נומינלית״ משמשת בספרות גם לריבית שנתית שמחלקים לתקופות, וגם במשמעות אחרת, שתוסבר בשיעור 0.8." },
+    { kind: "הנחת חישוב", text: "כל הסכומים והריביות בשיעור הם מספרים עגולים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. בנק א׳ ובנק ב׳ בדויים." },
+    { kind: "הנחת חישוב", text: "עיגול: ריביות מחושבות בלי עיגול ומוצגות בעיגול לשתיים או ארבע ספרות אחרי הנקודה. סכומים מעוגלים לאגורה פעם אחת, בסוף. בטבלאות, כמו בדף חשבון, מעגלים את הריבית של כל חודש." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/rates.ts and compound.ts via scripts/lessons/lesson-0-4.ts → data/lessons/0-4.json, rechecked by checks/kinds/rates.py through checks/independent_check.py. The converter is src/components/RateConverter.vue; the half-worked table uses src/components/FillGrid.vue (written for lessons 0.7–0.10). */}

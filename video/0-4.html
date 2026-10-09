@@ -1,0 +1,218 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.4 — "שתי דרכים לחלק שנה".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-4.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.4 · שנתית מול חודשית</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-4.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+      const num = (v) => nf2.format(Number(v)).replace(".00", "");
+
+      const table = fact("explain.table");
+      const series = fact("video.series_6");
+      const V = {
+        p: "10,000 ₪",
+        m: fact("rate.monthly_6"), eff: fact("rate.effective_6"), root: fact("rate.root_6"),
+        m1: table[0], m2: table[1],
+        after12: fact("explain.after_12"), rootAfter: fact("explain.root_after_12"),
+        interest12: fact("explain.interest_12"), interestOnce: fact("explain.interest_once"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], split: [12, 36], months: [36, 76], root: [76, 112], compare: [112, 136], end: [136, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "ריבית של 6% לשנה — אבל מחושבת כל חודש."],
+        [6, 11.5, "איך מחלקים אותה ל־12 חודשים? יש שתי דרכים."],
+        [13, 23, `דרך ראשונה: מחלקים ב־12. בכל חודש ${V.m}%.`],
+        [23, 35, "בלוחות התשלומים שהצוות בדק, כך מחושבת הריבית."],
+        [37, 46, `חודש ראשון: ${V.m}% מ־${V.p} הם ${shek(V.m1.interest)}.`],
+        [46, 55, `חודש שני: ${V.m}% מ־${shek(V.m2.opening)} — ${shek(V.m2.interest)}.`],
+        [55, 64, "כל חודש הריבית מצטרפת, ומרוויחה ריבית בעצמה."],
+        [64, 70, `אחרי 12 חודשים נצברו ${shek(V.interest12)}: ${V.eff}% בשנה.`],
+        [70, 75.5, "זו הריבית האפקטיבית: כמה הסכום גדל בפועל."],
+        [77, 87, "דרך שנייה: איזו ריבית חודשית תיתן בדיוק 6% בשנה?"],
+        [87, 98, "מספר שבהכפלה 12 פעמים נותן 1.06. קוראים לו שורש 12."],
+        [98, 111, `${V.root}% לחודש — קצת פחות מ־${V.m}%. בסוף השנה: ${shek(V.rootAfter)}.`],
+        [113, 124, "שתי דרכים: שתי ריביות חודשיות, ושני מספרים לשנה."],
+        [124, 135, "ריבית של חוזה — מחלקים ב־12. ריבית אפקטיבית — שורש 12."],
+        [137, 149, "לכן תמיד שואלים: איזו ריבית שנתית כתובה כאן?"],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // The year as a strip of 12 months, month 1 at the right.
+      function yearStrip(y, o, labelled) {
+        const right = 1090, w = 75;
+        for (let i = 0; i < 12; i++) {
+          const x = right - (i + 1) * w;
+          const on = clamp(labelled - i);
+          el("rect", { x: x + 2, y, width: w - 4, height: 70, rx: 8, fill: on > 0 ? C.mint : C.n0, stroke: C.n200, opacity: o });
+          txt(x + w / 2, y + 96, String(i + 1), 18, { fill: C.n600, o });
+          if (on > 0) txt(x + w / 2, y + 43, `${V.m}%`, 20, { w: 600, fill: C.navy, o: o * on, ltr: true });
+        }
+        txt(right, y - 18, "חודש", 18, { anchor: "start", fill: C.n600, o });
+      }
+
+      // Accumulated interest month by month: one bar per month (two when `both`), with the once-a-year level dashed.
+      function interestChart(t, sc, o, both) {
+        const base = 520, right = 1100, left = 180, band = (right - left) / 12, top = 170;
+        const max = Number(V.interest12);
+        const scale = (base - top - 40) / max;
+        const shown = 1 + Math.floor(prog(t, sc, 1, both ? 6 : 26) * 11 + 0.0001);
+        for (let i = 0; i < 12; i++) {
+          if (i >= shown) break;
+          const row = series[i + 1];
+          const x = right - (i + 1) * band;
+          const dv = (Number(row.by_division) - 10000) * scale;
+          const w = both ? (band - 10) / 2 : band - 14;
+          el("rect", { x: x + 7 + (both ? w : 0), y: base - dv, width: w - 1, height: dv, rx: 3, fill: C.teal, opacity: both ? o * 0.5 : o });
+          if (both) {
+            const rv = (Number(row.by_root) - 10000) * scale;
+            el("rect", { x: x + 7, y: base - rv, width: w - 1, height: rv, rx: 3, fill: C.tq2, opacity: o });
+          }
+          txt(x + band / 2, base + 26, String(i + 1), 16, { fill: C.n600, o });
+        }
+        el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
+        const yOnce = base - Number(V.interestOnce) * scale;
+        el("line", { x1: left, x2: right, y1: yOnce, y2: yOnce, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: o });
+        txt(right, yOnce - 10, `6% פעם אחת בשנה: ${shek(V.interestOnce)}`, 18, { anchor: "start", fill: C.n700, o });
+        txt(right, 130, "ריבית שנצברה מתחילת השנה", 22, { anchor: "start", w: 600, fill: C.n700, o });
+        return { base, scale, left, right, band };
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שנתית מול חודשית", 80, { w: 700, o });
+          txt(640, 356, "שתי דרכים לחלק שנה", 34, { fill: C.n600, o });
+          const o2 = after(t, S.title, 4.5, o);
+          el("rect", { x: 490, y: 420, width: 300, height: 92, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(640, 465, "6% לשנה", 36, { w: 700, o: o2 });
+          txt(640, 497, "הריבית מצטרפת כל חודש", 20, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — divide by 12
+        if (inScene(t, S.split)) {
+          const o = vis(t, S.split);
+          txt(640, 140, "דרך ראשונה: חלוקה ב־12", 40, { w: 700, o });
+          const o2 = after(t, S.split, 2, o);
+          txt(640, 215, `6% ÷ 12 = ${V.m}%`, 44, { w: 700, fill: C.teal, o: o2, ltr: true });
+          yearStrip(300, o, prog(t, S.split, 4, 8) * 12);
+        }
+        // Scene 3 — month by month at annual ÷ 12
+        if (inScene(t, S.months)) {
+          const o = vis(t, S.months);
+          const g = interestChart(t, S.months, o, false);
+          const o2 = after(t, S.months, 9, o);
+          const x2 = g.right - 2 * g.band + g.band / 2;
+          txt(x2 + 30, g.base - 95, `ריבית חודש 2: ${shek(V.m2.interest)}`, 22, { w: 600, fill: C.teal, o: Math.min(o2, clamp((S.months[0] + 20 - t) / 0.6)) });
+          const o3 = after(t, S.months, 28, o);
+          const yEnd = g.base - Number(V.interest12) * g.scale;
+          txt(g.left + g.band / 2, yEnd - 14, shek(V.interest12), 26, { w: 700, o: o3, ltr: true });
+          el("rect", { x: 680, y: 225, width: 400, height: 86, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(880, 265, `${V.eff}% בשנה`, 34, { w: 700, o: o3 });
+          txt(880, 297, "הריבית האפקטיבית", 20, { fill: C.n700, o: o3 });
+        }
+        // Scene 4 — the twelfth root
+        if (inScene(t, S.root)) {
+          const o = vis(t, S.root);
+          const g = interestChart(t, S.root, o, true);
+          const o2 = after(t, S.root, 10, o);
+          el("rect", { x: 680, y: 225, width: 400, height: 120, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(880, 262, "דרך שנייה: שורש 12", 24, { w: 700, o: o2 });
+          txt(880, 300, `${V.root}% לחודש`, 30, { w: 700, fill: C.navy, o: o2 });
+          const o3 = after(t, S.root, 22, o);
+          txt(880, 332, `ריבית בשנה: בדיוק ${shek(V.interestOnce)}`, 20, { fill: C.n700, o: o3 });
+          // legend, beside the chart title
+          el("rect", { x: 700, y: 117, width: 16, height: 16, rx: 3, fill: C.tq2, opacity: o });
+          txt(690, 131, "שורש 12", 18, { anchor: "start", fill: C.n700, o });
+          el("rect", { x: 560, y: 117, width: 16, height: 16, rx: 3, fill: C.teal, opacity: o * 0.5 });
+          txt(550, 131, "חלוקה ב־12", 18, { anchor: "start", fill: C.n700, o });
+        }
+        // Scene 5 — the two side by side
+        if (inScene(t, S.compare)) {
+          const o = vis(t, S.compare);
+          txt(640, 140, "שתי דרכים, שני מספרים", 40, { w: 700, o });
+          const card = (cx, title, monthly, yearly, o2) => {
+            el("rect", { x: cx - 220, y: 200, width: 440, height: 300, rx: 16, fill: C.n0, stroke: C.n200, opacity: o2 });
+            txt(cx, 252, title, 30, { w: 700, o: o2 });
+            txt(cx, 320, "בכל חודש", 20, { fill: C.n600, o: o2 });
+            txt(cx, 365, `${monthly}%`, 44, { w: 700, fill: C.teal, o: o2, ltr: true });
+            txt(cx, 420, "בשנה שלמה", 20, { fill: C.n600, o: o2 });
+            txt(cx, 465, `${yearly}%`, 44, { w: 700, o: o2, ltr: true });
+          };
+          card(890, "חלוקה ב־12", V.m, V.eff, o);
+          card(390, "שורש 12", V.root, "6", after(t, S.compare, 2, o));
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 280, "״6% לשנה״ יכול להיות שני דברים.", 46, { w: 700, o });
+          const o2 = after(t, S.end, 3, o);
+          txt(640, 360, "שואלים איזו ריבית זו — ורק אז מחשבים.", 34, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

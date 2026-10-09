@@ -1,0 +1,213 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.5 — "שני שטרות על ציר הזמן".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-5.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.5 · ערך הזמן של כסף</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-5.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const table = fact("explain.table");
+      const V = {
+        p: "1,000 ₪",
+        next: fact("explain.next_year"), back1: fact("explain.today_1y"),
+        back2: fact("explain.today_2y"), back3: fact("explain.today_3y"),
+        f2: table[1].growth, f3: table[2].growth,
+        far10: fact("slider.today_10"), far30: fact("slider.today_30"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], forward: [12, 40], back: [40, 74], further: [74, 108], far: [108, 134], end: [134, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "שקל היום, או שקל בעוד שנה. מה שווה יותר?"],
+        [6, 11.5, "נשים שני שטרות על ציר הזמן."],
+        [13, 22, "נניח שאפשר להפקיד כסף בריבית של 10% לשנה."],
+        [22, 31, `${V.p} שמופקדים היום יהיו ${shek(V.next)} בעוד שנה.`],
+        [31, 39, "כלומר, מבחינתכם שני הסכומים שווים אותו דבר."],
+        [41, 50, `עכשיו הפוך: ${V.p} שיגיעו רק בעוד שנה.`],
+        [50, 60, `כמה הם שווים היום? מחלקים ב־1.1: ${shek(V.back1)}.`],
+        [60, 73, "לכן שקל היום שווה יותר משקל בעוד שנה."],
+        [75, 86, "כל שנה נוספת היא עוד חלוקה ב־1.1."],
+        [86, 97, `בעוד שנתיים: ${shek(V.back2)}. בעוד שלוש: ${shek(V.back3)}.`],
+        [97, 107, "ככל שהסכום רחוק יותר, הוא שווה היום פחות."],
+        [109, 120, `ב־5% לשנה: ${V.p} בעוד 10 שנים שווים היום ${shek(V.far10)}.`],
+        [120, 133, `ובעוד 30 שנה — רק ${shek(V.far30)}.`],
+        [135, 149, "כדי להשוות סכומים, מעבירים את כולם לאותו רגע."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const lerp = (a, b, k) => a + (b - a) * k;
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n400: "var(--mogi-n400)", n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // A banknote centred at (cx, cy); its area is in proportion to its value (1,000 ₪ = 220 × 110).
+      function note(cx, cy, value, label, o, today) {
+        const k = Math.sqrt(Number(value) / 1000);
+        const w = 220 * k, h = 110 * k;
+        el("rect", { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 10, fill: today ? C.mint : C.n100, stroke: today ? C.teal : C.n400, "stroke-width": 2, opacity: o });
+        txt(cx, cy + Math.min(12, 10 * k + 2), label, Math.max(18, 30 * k), { w: 700, o, ltr: true });
+      }
+
+      // The time axis: today at the right, later to the left.
+      function axis(y, ticks, o) {
+        el("line", { x1: 150, x2: 1130, y1: y, y2: y, stroke: C.n300, "stroke-width": 3, opacity: o });
+        for (const [x, label] of ticks) {
+          el("line", { x1: x, x2: x, y1: y - 10, y2: y + 10, stroke: C.n400, "stroke-width": 2, opacity: o });
+          txt(x, y + 38, label, 20, { fill: C.n600, o });
+        }
+      }
+      function arrow(x1, x2, y, label, o, color) {
+        el("line", { x1, x2, y1: y, y2: y, stroke: color, "stroke-width": 3, opacity: o });
+        const d = x2 < x1 ? 1 : -1;
+        el("path", { d: `M ${x2} ${y} l ${12 * d} -8 l 0 16 z`, fill: color, opacity: o });
+        txt((x1 + x2) / 2, y - 14, label, 26, { w: 700, fill: color, o, ltr: true });
+      }
+
+      const TODAY = 1020, YEAR1 = 260;
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ערך הזמן של כסף", 80, { w: 700, o });
+          txt(640, 356, "שני שטרות על ציר הזמן", 34, { fill: C.n600, o });
+          const o2 = after(t, S.title, 5, o);
+          note(820, 470, 1000, V.p, o2, true);
+          txt(820, 560, "היום", 22, { fill: C.n600, o: o2 });
+          note(460, 470, 1000, V.p, o2, false);
+          txt(460, 560, "בעוד שנה", 22, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — forward: 1,000 today becomes 1,100 next year
+        if (inScene(t, S.forward)) {
+          const o = vis(t, S.forward);
+          txt(640, 140, "קדימה בזמן", 40, { w: 700, o });
+          axis(470, [[TODAY, "היום"], [YEAR1, "בעוד שנה"]], o);
+          const g = prog(t, S.forward, 8, 6);
+          const x = lerp(TODAY, YEAR1, g);
+          const value = lerp(1000, Number(V.next), g);
+          note(x, 330, value, g < 0.98 ? V.p : shek(V.next), o, true);
+          const o2 = after(t, S.forward, 3, o);
+          arrow(TODAY - 140, YEAR1 + 140, 215, "× 1.1", o2, C.teal);
+          txt(640, 255, "ריבית של 10% לשנה", 22, { fill: C.n600, o: o2 });
+          if (g > 0.98) {
+            const o3 = after(t, S.forward, 19, o);
+            note(TODAY, 330, 1000, V.p, o3, true);
+            txt(640, 380, "=", 60, { w: 700, fill: C.n600, o: o3 });
+          }
+        }
+        // Scene 3 — back: 1,000 next year is worth 909.09 today
+        if (inScene(t, S.back)) {
+          const o = vis(t, S.back);
+          txt(640, 140, "אחורה בזמן", 40, { w: 700, o });
+          axis(470, [[TODAY, "היום"], [YEAR1, "בעוד שנה"]], o);
+          note(YEAR1, 330, 1000, V.p, o * 0.35, false);
+          const g = prog(t, S.back, 9, 6);
+          const x = lerp(YEAR1, TODAY, g);
+          const value = lerp(1000, Number(V.back1), g);
+          note(x, 330, value, g < 0.98 ? V.p : shek(V.back1), o, g > 0.5);
+          const o2 = after(t, S.back, 6, o);
+          arrow(YEAR1 + 140, TODAY - 140, 215, "÷ 1.1", o2, C.teal);
+          const o3 = after(t, S.back, 21, o);
+          txt(640, 428, `${V.p} בעוד שנה = ${shek(V.back1)} היום`, 28, { w: 600, fill: C.n700, o: o3 });
+        }
+        // Scene 4 — further away, worth less
+        if (inScene(t, S.further)) {
+          const o = vis(t, S.further);
+          txt(640, 118, "רחוק יותר — שווה פחות", 40, { w: 700, o });
+          const rows = [[1, V.back1, "1.1", "בעוד שנה"], [2, V.back2, V.f2, "בעוד שנתיים"], [3, V.back3, V.f3, "בעוד שלוש שנים"]];
+          rows.forEach(([n, today, factor, label], i) => {
+            const y = 240 + i * 115;
+            const oi = after(t, S.further, 1 + i * 6, o);
+            note(300, y, 1000, V.p, oi * 0.6, false);
+            txt(176, y + 8, label, 20, { anchor: "start", fill: C.n600, o: oi });
+            arrow(450, 860, y, `÷ ${factor}`, oi, C.teal);
+            note(1000, y, today, shek(today), oi, true);
+          });
+          txt(1000, 170, "שווה היום", 20, { w: 600, fill: C.n600, o });
+          txt(300, 170, "מגיע בעתיד", 20, { w: 600, fill: C.n600, o });
+        }
+        // Scene 5 — far away at 5%
+        if (inScene(t, S.far)) {
+          const o = vis(t, S.far);
+          txt(640, 130, "ב־5% לשנה", 40, { w: 700, o });
+          axis(520, [[TODAY, "היום"], [640, "בעוד 10 שנים"], [220, "בעוד 30 שנה"]], o);
+          const o1 = after(t, S.far, 1, o);
+          note(640, 380, 1000, V.p, o1 * 0.4, false);
+          note(TODAY, 300, V.far10, shek(V.far10), o1, true);
+          txt(TODAY, 230, "10 שנים", 20, { fill: C.n600, o: o1 });
+          const o2 = after(t, S.far, 12, o);
+          note(220, 380, 1000, V.p, o2 * 0.4, false);
+          note(TODAY, 420, V.far30, shek(V.far30), o2, true);
+          txt(TODAY - 110, 428, "30 שנה", 20, { anchor: "start", fill: C.n600, o: o2 });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "קדימה בזמן — מכפילים.", 46, { w: 700, o });
+          txt(640, 340, "אחורה בזמן — מחלקים.", 46, { w: 700, o });
+          const o2 = after(t, S.end, 4, o);
+          txt(640, 430, "משווים סכומים רק כשהם באותו רגע.", 30, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

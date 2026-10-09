@@ -1,0 +1,206 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.6 — "ערימת תשלומים שמתכווצת".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-6.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.6 · ערך נוכחי</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-6.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const three = fact("explain.table");
+      const ten = fact("video.table_10");
+      const V = {
+        p: "1,000 ₪",
+        total3: fact("explain.three_total"), pv3: fact("explain.three_today"),
+        total10: fact("prediction.total"), pv10: fact("prediction.today"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], payments: [12, 40], shrink: [40, 80], pile: [80, 108], ten: [108, 136], end: [136, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "כמה שווים היום כמה תשלומים שיגיעו בעתיד?"],
+        [6, 11.5, "נבנה ערימה — ונראה אותה מתכווצת."],
+        [13, 24, `שלושה תשלומים: ${V.p} בסוף כל שנה, שלוש שנים.`],
+        [24, 39, `בשקלים זה ${shek(V.total3)}. אבל כמה הם שווים היום?`],
+        [41, 53, "בריבית של 10%, מעבירים כל תשלום להיום בנפרד."],
+        [53, 66, "להעביר סכום עתידי להיום — זה נקרא היוון."],
+        [66, 79, "ככל שהתשלום רחוק יותר, הוא מתכווץ יותר."],
+        [81, 93, `מחברים את כל מה שהתכווץ: ${shek(V.pv3)}.`],
+        [93, 107, "זה הערך הנוכחי: כמה שווים היום כל התשלומים."],
+        [109, 121, `עשרה תשלומים של ${V.p}, בריבית של 5%.`],
+        [121, 135, `בשקלים ${shek(V.total10)}. היום הם שווים ${shek(V.pv10)}.`],
+        [137, 149, "סכום של הלוואה הוא הערך הנוכחי של התשלומים שלה."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const lerp = (a, b, k) => a + (b - a) * k;
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n400: "var(--mogi-n400)", n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // A payment as a block whose height is in proportion to its value (1,000 ₪ = 150px), bottom at baseY.
+      const H1000 = 150;
+      function block(cx, baseY, w, value, label, o, today) {
+        const h = (Number(value) / 1000) * H1000;
+        el("rect", { x: cx - w / 2, y: baseY - h, width: w, height: h, rx: 8, fill: today ? C.mint : C.n100, stroke: today ? C.teal : C.n400, "stroke-width": 2, opacity: o });
+        if (label) txt(cx, baseY - h / 2 + 9, label, 24, { w: 700, o, ltr: true });
+      }
+      function axis(y, ticks, o) {
+        el("line", { x1: 150, x2: 1130, y1: y, y2: y, stroke: C.n300, "stroke-width": 3, opacity: o });
+        for (const [x, label] of ticks) {
+          el("line", { x1: x, x2: x, y1: y - 10, y2: y + 10, stroke: C.n400, "stroke-width": 2, opacity: o });
+          txt(x, y + 38, label, 20, { fill: C.n600, o });
+        }
+      }
+
+      const BASE = 470, TODAY = 1010;
+      const YEARS = [700, 470, 240]; // end of year 1, 2, 3 — further left is later
+      const TICKS = [[TODAY, "היום"], [YEARS[0], "סוף שנה 1"], [YEARS[1], "סוף שנה 2"], [YEARS[2], "סוף שנה 3"]];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ערך נוכחי", 84, { w: 700, o });
+          txt(640, 356, "ערימת תשלומים שמתכווצת", 34, { fill: C.n600, o });
+        }
+        // Scene 2 — three payments in the future
+        if (inScene(t, S.payments)) {
+          const o = vis(t, S.payments);
+          txt(640, 140, "שלושה תשלומים", 40, { w: 700, o });
+          axis(BASE, TICKS, o);
+          YEARS.forEach((x, i) => block(x, BASE - 4, 150, three[i].amount, V.p, after(t, S.payments, 1 + i * 2, o), false));
+          const o2 = after(t, S.payments, 12, o);
+          txt(TODAY, 260, "?", 90, { w: 700, fill: C.teal, o: o2 });
+        }
+        // Scene 3 — each payment moved back to today, shrinking
+        if (inScene(t, S.shrink)) {
+          const o = vis(t, S.shrink);
+          txt(640, 140, "כל תשלום — להיום, בנפרד", 40, { w: 700, o });
+          axis(BASE, TICKS, o);
+          YEARS.forEach((x, i) => {
+            block(x, BASE - 4, 150, three[i].amount, V.p, o * 0.35, false);
+            const g = prog(t, S.shrink, 3 + i * 7, 4);
+            if (g <= 0) return;
+            const slot = TODAY - 90 + i * 90;
+            const cx = lerp(x, slot, g);
+            const value = lerp(1000, Number(three[i].value_today), g);
+            block(cx, BASE - 4, 80, value, null, o, true);
+            const ol = Math.min(o, clamp((g - 0.9) * 10));
+            txt(slot, BASE - 4 - (Number(three[i].value_today) / 1000) * H1000 - 14, shek(three[i].value_today), 17, { w: 700, o: ol, ltr: true });
+            txt(slot, 215, `÷ ${three[i].growth}`, 20, { w: 600, fill: C.teal, o: ol, ltr: true });
+          });
+        }
+        // Scene 4 — the pile
+        if (inScene(t, S.pile)) {
+          const o = vis(t, S.pile);
+          txt(640, 130, "הערימה", 40, { w: 700, o });
+          const scale = 0.1; // px per shekel in the piles
+          const g = prog(t, S.pile, 1, 3);
+          // the plain sum, grey, on the left
+          let top = 520;
+          for (let i = 0; i < 3; i++) {
+            const h = 1000 * scale;
+            el("rect", { x: 380, y: top - h, width: 160, height: h - 3, rx: 6, fill: C.n100, stroke: C.n400, "stroke-width": 2, opacity: o });
+            top -= h;
+          }
+          txt(460, top - 18, shek(V.total3), 28, { w: 700, fill: C.n600, o, ltr: true });
+          txt(460, 552, "כל התשלומים, בשקלים", 20, { fill: C.n600, o });
+          // the value today, stacked from the three shrunken payments
+          top = 520;
+          for (let i = 0; i < 3; i++) {
+            const h = Number(three[i].value_today) * scale * g;
+            el("rect", { x: 740, y: top - h, width: 160, height: Math.max(0, h - 3), rx: 6, fill: i % 2 ? C.tq2 : C.teal, opacity: o });
+            top -= h;
+          }
+          const o2 = after(t, S.pile, 4, o);
+          txt(820, top - 18, shek(V.pv3), 28, { w: 700, o: o2, ltr: true });
+          txt(820, 552, "שווים היום — הערך הנוכחי", 20, { fill: C.n700, o });
+        }
+        // Scene 5 — ten payments at 5%
+        if (inScene(t, S.ten)) {
+          const o = vis(t, S.ten);
+          txt(640, 130, "עשרה תשלומים, 5% לשנה", 40, { w: 700, o });
+          const right = 1100, left = 180, band = (right - left) / 10, base = 520, hFull = 260;
+          for (let i = 0; i < 10; i++) {
+            const x = right - (i + 1) * band + 8, w = band - 16;
+            el("rect", { x, y: base - hFull, width: w, height: hFull, rx: 4, fill: C.n300, opacity: o });
+            const g = prog(t, S.ten, 2 + i * 0.6, 2);
+            const h = hFull * lerp(1, Number(ten[i].value_today) / 1000, g);
+            el("rect", { x, y: base - h, width: w, height: h, rx: 4, fill: C.teal, opacity: o });
+            txt(x + w / 2, base + 26, String(ten[i].period), 16, { fill: C.n600, o });
+          }
+          el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, opacity: o });
+          txt(right, 180, "אפור: התשלום כשיגיע. כהה: כמה הוא שווה היום.", 20, { anchor: "start", fill: C.n700, o });
+          const o2 = after(t, S.ten, 13, o);
+          txt(640, 232, `${shek(V.total10)} בשקלים — ${shek(V.pv10)} היום`, 26, { w: 700, o: o2 });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "מהוונים כל תשלום, ומחברים.", 46, { w: 700, o });
+          const o2 = after(t, S.end, 3, o);
+          txt(640, 350, "כך מחשבים כמה שווים היום תשלומים עתידיים.", 32, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

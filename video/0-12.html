@@ -1,0 +1,246 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.12 — "קו אחד לכל אורכי הזמן".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-12.json (teaching curves, not market data).
+  The subtitle cues (window.cues) carry the explanatory sentences — the script for
+  narration, if it is ever added. No formula is shown: the video comes before the
+  lesson's formula section.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.12 · עקום התשואות</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-12.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // "100 ₪" when whole, "108.16 ₪" otherwise; "3.25%" / "4%" for yields.
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+      const pc = (v) => `${Number(v)}%`;
+      const lengthName = (y) => (y === 1 ? "שנה" : y === 2 ? "שנתיים" : `${y} שנים`);
+
+      const rising = fact("curve.rising"), flat = fact("curve.flat"), falling = fact("curve.falling");
+      const P = rising.points;
+      const V = {
+        long: fact("two.long"), short: fact("two.short"), needed: fact("two.needed"), fwd: fact("pred.forward"),
+        nominal: fact("gap.nominal"), real: fact("gap.real"), gap: fact("gap.answer"),
+      };
+      // The two-way example uses the prediction's yields: 3% for one year, 4% for two.
+      const fwdInputs = data.facts.find((f) => f.id === "pred.forward").inputs;
+      const Y1 = fwdInputs.short_percent, Y2 = fwdInputs.long_percent;
+
+      const S = { title: [0, 12], points: [12, 46], two: [46, 96], shapes: [96, 134], end: [134, 152] };
+      window.duration = 152;
+      window.cues = [
+        [1, 6, "אג״ח של שנה ואג״ח של עשר שנים."],
+        [6, 11.5, "האם יש להן אותה תשואה? בדרך כלל — לא."],
+        [13, 21, "לכל אורך זמן יש תשואה משלו."],
+        [21, 30, `לשנה: ${pc(P[0].yield)}. לשנתיים: ${pc(P[1].yield)}. ל־${P[P.length - 1].years} שנה: ${pc(P[P.length - 1].yield)}.`],
+        [30, 38, "מחברים את הנקודות — וזה עקום התשואות."],
+        [38, 45, "כאן הוא עולה: ככל שהזמן ארוך יותר, התשואה גבוהה יותר."],
+        [47, 55, "יש לכם 100 ₪ לשנתיים. שתי דרכים."],
+        [55, 64, `דרך א׳: אג״ח לשנתיים, ${Y2}% לשנה. בסוף: ${shek(V.long)}.`],
+        [64, 73, `דרך ב׳: אג״ח לשנה, ${Y1}%. אחרי שנה: ${shek(V.short)}.`],
+        [73, 83, `כדי להגיע לאותו סכום, השנה השנייה צריכה ${pc(V.fwd)}.`],
+        [83, 95, "זו הריבית שהעקום מגלם לשנה השנייה. לא הבטחה."],
+        [97, 106, "עקום עולה: המחירים מגלמים ריביות גבוהות יותר בהמשך."],
+        [106, 115, "עקום שטוח: אותה ריבית לכל אורך."],
+        [115, 124, "עקום יורד: המחירים מגלמים ריביות נמוכות יותר בהמשך."],
+        [124, 133, "בעקום יש גם תוספת על זמן. לכן הוא לא הבטחה."],
+        [135, 143, "יש עקום של תשואות לפני אינפלציה, ועקום של אחריה."],
+        [143, 151, `הפער ביניהם, כאן ${pc(V.gap)} לשנה: ציפיות האינפלציה.`],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const at = (t, a, d = 0.6) => clamp((t - a) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // A chart frame: length 0 at the right, 20 years at the left, as Hebrew is read.
+      function frame(box, lo, hi) {
+        const { left, right, top, bottom } = box;
+        const xOf = (years) => right - (years / 20) * (right - left);
+        const yOf = (v) => bottom - ((Number(v) - lo) / (hi - lo)) * (bottom - top);
+        return { xOf, yOf };
+      }
+      function drawCurve(curve, box, lo, hi, o, opts = {}) {
+        const { xOf, yOf } = frame(box, lo, hi);
+        el("line", { x1: box.left, x2: box.right, y1: box.bottom, y2: box.bottom, stroke: C.n300, "stroke-width": 2, opacity: o });
+        if (opts.segments) {
+          for (const s of curve.segments) {
+            el("line", { x1: xOf(s.from), x2: xOf(s.to), y1: yOf(s.rate), y2: yOf(s.rate), stroke: C.tq2, "stroke-width": 6, "stroke-linecap": "round", opacity: o * opts.segments });
+          }
+        }
+        const d = curve.points.map((p, i) => `${i ? "L" : "M"}${xOf(p.years)},${yOf(p.yield)}`).join(" ");
+        el("path", { d, fill: "none", stroke: C.teal, "stroke-width": opts.width ?? 4, opacity: o });
+        curve.points.forEach((p) => el("circle", { cx: xOf(p.years), cy: yOf(p.yield), r: opts.r ?? 6, fill: C.teal, opacity: o }));
+      }
+
+      // A box with a label inside, for the two-ways scene.
+      function box(cx, cy, w, label, o, fill = C.n0, size = 28, ltr = true) {
+        el("rect", { x: cx - w / 2, y: cy - 34, width: w, height: 68, rx: 14, fill, stroke: C.n200, opacity: o });
+        txt(cx, cy + 10, label, size, { w: 700, o, ltr });
+      }
+      function arrow(x1, x2, y, label, o) {
+        el("line", { x1, x2: x2 + 10, y1: y, y2: y, stroke: C.navy, "stroke-width": 3, opacity: o });
+        el("polygon", { points: `${x2},${y} ${x2 + 14},${y - 8} ${x2 + 14},${y + 8}`, fill: C.navy, opacity: o });
+        txt((x1 + x2) / 2, y - 16, label, 20, { fill: C.n700, o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 230, "עקום התשואות", 84, { w: 700, o });
+          txt(640, 290, "תשואה לכל אורך זמן", 34, { fill: C.n600, o });
+          drawCurve(rising, { left: 460, right: 820, top: 360, bottom: 520 }, 2.5, 5, Math.min(o, at(t, 3, 0.8)), { r: 5 });
+        }
+        // Scene 2 — the points, then the line
+        if (inScene(t, S.points)) {
+          const o = vis(t, S.points);
+          txt(640, 130, "תשואה לכל אורך זמן", 40, { w: 700, o });
+          const bx = { left: 300, right: 1080, top: 190, bottom: 480 };
+          const lo = 2, hi = 5.5;
+          const { xOf, yOf } = frame(bx, lo, hi);
+          el("line", { x1: bx.left, x2: bx.right, y1: bx.bottom, y2: bx.bottom, stroke: C.n300, "stroke-width": 2, opacity: o });
+          [2, 3, 4, 5].forEach((v) => {
+            el("line", { x1: bx.left, x2: bx.right, y1: yOf(v), y2: yOf(v), stroke: C.n200, "stroke-width": 1, opacity: o });
+            txt(bx.right + 16, yOf(v) + 7, `${v}%`, 18, { anchor: "start", fill: C.n600, o, ltr: true });
+          });
+          const lineP = clamp((t - 30) / 3);
+          if (lineP > 0) {
+            const d = P.map((p, i) => `${i ? "L" : "M"}${xOf(p.years)},${yOf(p.yield)}`).join(" ");
+            const path = el("path", { d, fill: "none", stroke: C.teal, "stroke-width": 5, opacity: o, pathLength: 1, "stroke-dasharray": 1, "stroke-dashoffset": 1 - lineP });
+          }
+          P.forEach((p, i) => {
+            const op = Math.min(o, at(t, 14 + i * 2.5));
+            el("circle", { cx: xOf(p.years), cy: yOf(p.yield), r: 9, fill: C.teal, opacity: op });
+            txt(xOf(p.years), yOf(p.yield) - 22, pc(p.yield), 22, { w: 700, o: op, ltr: true });
+            txt(xOf(p.years), bx.bottom + 32, String(p.years), 20, { fill: C.n600, o: op });
+          });
+          txt(660, bx.bottom + 70, "אורך הזמן בשנים (מימין לשמאל)", 20, { fill: C.n600, o });
+          if (t >= 38) {
+            const o3 = Math.min(o, at(t, 38));
+            el("rect", { x: 380, y: 370, width: 330, height: 64, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+            txt(545, 412, "העקום עולה", 30, { w: 700, o: o3 });
+          }
+        }
+        // Scene 3 — two ways to lend for two years
+        if (inScene(t, S.two)) {
+          const o = vis(t, S.two);
+          txt(640, 130, "שתי דרכים לשנתיים", 40, { w: 700, o });
+          const yA = 250, yB = 420;
+          const xs = [1040, 760, 480, 200];
+          // Way A
+          const oA = Math.min(o, at(t, 55));
+          txt(1180, yA + 8, "א׳", 30, { w: 700, o: oA, fill: C.teal });
+          box(xs[0], yA, 170, "100 ₪", Math.min(o, at(t, 48)));
+          arrow(xs[0] - 85, xs[3] + 85, yA, `שנתיים, ${Y2}% לשנה`, oA);
+          box(xs[3], yA, 190, shek(V.long), Math.min(o, at(t, 58)), C.mint);
+          // Way B
+          const oB = Math.min(o, at(t, 64));
+          txt(1180, yB + 8, "ב׳", 30, { w: 700, o: oB, fill: C.teal });
+          box(xs[0], yB, 170, "100 ₪", Math.min(o, at(t, 49)));
+          arrow(xs[0] - 85, xs[1] + 85, yB, `שנה, ${Y1}%`, oB);
+          box(xs[1], yB, 170, shek(V.short), Math.min(o, at(t, 66)));
+          const oQ = Math.min(o, at(t, 69));
+          const solved = at(t, 76, 0.8);
+          arrow(xs[1] - 85, xs[3] + 85, yB, solved > 0 ? `שנה, ${pc(V.fwd)}` : "שנה, ?", oQ);
+          box(xs[3], yB, 190, shek(V.long), Math.min(o, at(t, 73)), C.mint);
+          if (solved > 0) {
+            el("rect", { x: 470, y: 300, width: 340, height: 70, rx: 14, fill: C.n0, stroke: C.teal, "stroke-width": 2, opacity: Math.min(o, solved) });
+            txt(640, 346, `השנה השנייה: ${pc(V.fwd)}`, 32, { w: 700, o: Math.min(o, solved), fill: C.teal });
+          }
+          if (t >= 83) {
+            const o5 = Math.min(o, at(t, 83));
+            txt(640, 530, "הריבית שהעקום מגלם — לפי המחירים של היום", 26, { w: 600, o: o5, fill: C.n700 });
+          }
+        }
+        // Scene 4 — three shapes
+        if (inScene(t, S.shapes)) {
+          const o = vis(t, S.shapes);
+          txt(640, 130, "שלוש צורות", 40, { w: 700, o });
+          const panels = [
+            [rising, "עולה", 97, 900],
+            [flat, "שטוח", 106, 520],
+            [falling, "יורד", 115, 140],
+          ];
+          for (const [curve, name, start, x] of panels) {
+            const op = Math.min(o, at(t, start));
+            el("rect", { x, y: 175, width: 340, height: 330, rx: 16, fill: C.n0, stroke: C.n200, opacity: op });
+            txt(x + 170, 220, `עקום ${name}`, 30, { w: 700, o: op });
+            drawCurve(curve, { left: x + 30, right: x + 310, top: 270, bottom: 470 }, 2.5, 5.5, op, { segments: at(t, start + 3, 1), r: 5 });
+          }
+          // Legend
+          const oL = Math.min(o, at(t, 100));
+          el("rect", { x: 1104, y: 528, width: 24, height: 6, rx: 3, fill: C.teal, opacity: oL });
+          txt(1094, 538, "העקום", 18, { anchor: "start", fill: C.n700, o: oL });
+          el("rect", { x: 984, y: 528, width: 24, height: 6, rx: 3, fill: C.tq2, opacity: oL });
+          txt(974, 538, "הריבית שהוא מגלם לכל קטע", 18, { anchor: "start", fill: C.n700, o: oL });
+        }
+        // Scene 5 — before and after inflation
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 150, "לפני אינפלציה, ואחריה", 44, { w: 700, o });
+          const o1 = Math.min(o, at(t, 136));
+          box(860, 270, 380, `לפני אינפלציה: ${pc(V.nominal)}`, o1, C.n0, 30, false);
+          box(420, 270, 380, `אחרי אינפלציה: ${pc(V.real)}`, o1, C.n0, 30, false);
+          txt(640, 360, "ל־5 שנים, באותו אורך זמן", 22, { fill: C.n600, o: o1 });
+          const o2 = Math.min(o, at(t, 144));
+          el("rect", { x: 340, y: 400, width: 600, height: 100, rx: 16, fill: C.mint, opacity: o2 * 0.6 });
+          txt(640, 445, "ציפיות האינפלציה, לשנה", 26, { fill: C.n700, o: o2 });
+          txt(640, 485, pc(V.gap), 34, { w: 700, o: o2, ltr: true });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

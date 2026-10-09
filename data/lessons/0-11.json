@@ -1,0 +1,689 @@
+{
+  "lesson": "0.11",
+  "title": "אג״ח ותשואה",
+  "note": "Teaching numbers, not market yields. Money rounded to the agora at the end of each calculation; table rows rounded each on its own. Yields shown to two decimal places.",
+  "facts": [
+    {
+      "id": "pred.price_5",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yield_percent": "5"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "pred.price_6",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yield_percent": "6"
+      },
+      "value": "97.33"
+    },
+    {
+      "id": "explain.price_4",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yield_percent": "4"
+      },
+      "value": "102.78"
+    },
+    {
+      "id": "pred.drop",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pred.price_5",
+        "subtrahend": "pred.price_6"
+      },
+      "value": "2.67"
+    },
+    {
+      "id": "pred.err_off",
+      "kind": "bond_percent_off",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "6"
+      },
+      "value": "94.00"
+    },
+    {
+      "id": "explain.rise_4",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.price_4",
+        "subtrahend": "pred.price_5"
+      },
+      "value": "2.78"
+    },
+    {
+      "id": "one.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "110.00"
+    },
+    {
+      "id": "one.price_100",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "one.price_105",
+      "kind": "given",
+      "inputs": {},
+      "value": "105.00"
+    },
+    {
+      "id": "one.price_110",
+      "kind": "given",
+      "inputs": {},
+      "value": "110.00"
+    },
+    {
+      "id": "one.yield_100",
+      "kind": "bond_single_yield",
+      "inputs": {
+        "payment": "110",
+        "price": "100",
+        "years": 1
+      },
+      "value": "10.00"
+    },
+    {
+      "id": "one.yield_105",
+      "kind": "bond_single_yield",
+      "inputs": {
+        "payment": "110",
+        "price": "105",
+        "years": 1
+      },
+      "value": "4.76"
+    },
+    {
+      "id": "one.yield_110",
+      "kind": "bond_single_yield",
+      "inputs": {
+        "payment": "110",
+        "price": "110",
+        "years": 1
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "one.gain_100",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "one.payment",
+        "subtrahend": "one.price_100"
+      },
+      "value": "10.00"
+    },
+    {
+      "id": "one.gain_105",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "one.payment",
+        "subtrahend": "one.price_105"
+      },
+      "value": "5.00"
+    },
+    {
+      "id": "one.pv_at_10",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "110",
+        "rate_percent": "10",
+        "years": 1
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "one.pv_at_5",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "110",
+        "rate_percent": "5",
+        "years": 1
+      },
+      "value": "104.76"
+    },
+    {
+      "id": "explain.table_6",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yields": "6"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "5.00",
+          "rate": "6.00",
+          "pv": "4.72"
+        },
+        {
+          "year": 2,
+          "payment": "5.00",
+          "rate": "6.00",
+          "pv": "4.45"
+        },
+        {
+          "year": 3,
+          "payment": "105.00",
+          "rate": "6.00",
+          "pv": "88.16"
+        }
+      ]
+    },
+    {
+      "id": "explain.table_5",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yields": "5"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "5.00",
+          "rate": "5.00",
+          "pv": "4.76"
+        },
+        {
+          "year": 2,
+          "payment": "5.00",
+          "rate": "5.00",
+          "pv": "4.54"
+        },
+        {
+          "year": 3,
+          "payment": "105.00",
+          "rate": "5.00",
+          "pv": "90.70"
+        }
+      ]
+    },
+    {
+      "id": "explain.table_4",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yields": "4"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "5.00",
+          "rate": "4.00",
+          "pv": "4.81"
+        },
+        {
+          "year": 2,
+          "payment": "5.00",
+          "rate": "4.00",
+          "pv": "4.62"
+        },
+        {
+          "year": 3,
+          "payment": "105.00",
+          "rate": "4.00",
+          "pv": "93.34"
+        }
+      ]
+    },
+    {
+      "id": "explain.table_4_total",
+      "kind": "bond_table_total",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "yields": "4"
+      },
+      "value": "102.77"
+    },
+    {
+      "id": "video.series_3",
+      "kind": "bond_price_series",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 3,
+        "from_percent": 1,
+        "to_percent": 9
+      },
+      "value": [
+        {
+          "yield": "1.00",
+          "price": "111.76"
+        },
+        {
+          "yield": "2.00",
+          "price": "108.65"
+        },
+        {
+          "yield": "3.00",
+          "price": "105.66"
+        },
+        {
+          "yield": "4.00",
+          "price": "102.78"
+        },
+        {
+          "yield": "5.00",
+          "price": "100.00"
+        },
+        {
+          "yield": "6.00",
+          "price": "97.33"
+        },
+        {
+          "yield": "7.00",
+          "price": "94.75"
+        },
+        {
+          "yield": "8.00",
+          "price": "92.27"
+        },
+        {
+          "yield": "9.00",
+          "price": "89.87"
+        }
+      ]
+    },
+    {
+      "id": "face",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "idx.received_3",
+      "kind": "bond_indexed_amount",
+      "inputs": {
+        "amount": "102",
+        "index_change_percent": "3"
+      },
+      "value": "105.06"
+    },
+    {
+      "id": "idx.nominal_yield_3",
+      "kind": "bond_single_yield",
+      "inputs": {
+        "payment": "105.06",
+        "price": "100",
+        "years": 1
+      },
+      "value": "5.06"
+    },
+    {
+      "id": "idx.received_1",
+      "kind": "bond_indexed_amount",
+      "inputs": {
+        "amount": "102",
+        "index_change_percent": "1"
+      },
+      "value": "103.02"
+    },
+    {
+      "id": "unidx.deflated_3",
+      "kind": "bond_deflated_amount",
+      "inputs": {
+        "amount": "105",
+        "inflation_percent": "3"
+      },
+      "value": "101.94"
+    },
+    {
+      "id": "unidx.real_gain_3",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "unidx.deflated_3",
+        "subtrahend": "face"
+      },
+      "value": "1.94"
+    },
+    {
+      "id": "guided.price_20_5",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 20,
+        "yield_percent": "5"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "guided.price_20_6",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 20,
+        "yield_percent": "6"
+      },
+      "value": "88.53"
+    },
+    {
+      "id": "guided.drop_20",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "guided.price_20_5",
+        "subtrahend": "guided.price_20_6"
+      },
+      "value": "11.47"
+    },
+    {
+      "id": "worked.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 4,
+        "yields": "6"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "4.00",
+          "rate": "6.00",
+          "pv": "3.77"
+        },
+        {
+          "year": 2,
+          "payment": "4.00",
+          "rate": "6.00",
+          "pv": "3.56"
+        },
+        {
+          "year": 3,
+          "payment": "4.00",
+          "rate": "6.00",
+          "pv": "3.36"
+        },
+        {
+          "year": 4,
+          "payment": "104.00",
+          "rate": "6.00",
+          "pv": "82.38"
+        }
+      ]
+    },
+    {
+      "id": "worked.price",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 4,
+        "yield_percent": "6"
+      },
+      "value": "93.07"
+    },
+    {
+      "id": "worked.total_payments",
+      "kind": "bond_total_payments",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "4",
+        "years": 4
+      },
+      "value": "116.00"
+    },
+    {
+      "id": "worked.paper_loss",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "face",
+        "subtrahend": "worked.price"
+      },
+      "value": "6.93"
+    },
+    {
+      "id": "half.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "6",
+        "years": 3,
+        "yields": "4"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "6.00",
+          "rate": "4.00",
+          "pv": "5.77"
+        },
+        {
+          "year": 2,
+          "payment": "6.00",
+          "rate": "4.00",
+          "pv": "5.55"
+        },
+        {
+          "year": 3,
+          "payment": "106.00",
+          "rate": "4.00",
+          "pv": "94.23"
+        }
+      ]
+    },
+    {
+      "id": "half.price",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "6",
+        "years": 3,
+        "yield_percent": "4"
+      },
+      "value": "105.55"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "bond_single_yield",
+      "inputs": {
+        "payment": "105",
+        "price": "100",
+        "years": 1
+      },
+      "value": "5.00"
+    },
+    {
+      "id": "ex2.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "105.00"
+    },
+    {
+      "id": "ex2.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "110",
+        "rate_percent": "4",
+        "years": 1
+      },
+      "value": "105.77"
+    },
+    {
+      "id": "ex3.err_times",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "110",
+        "rate_percent": "4",
+        "periods": 1
+      },
+      "value": "114.40"
+    },
+    {
+      "id": "ex3.err_off",
+      "kind": "bond_percent_off",
+      "inputs": {
+        "amount": "110",
+        "rate_percent": "4"
+      },
+      "value": "105.60"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "bond_indexed_amount",
+      "inputs": {
+        "amount": "103",
+        "index_change_percent": "2"
+      },
+      "value": "105.06"
+    },
+    {
+      "id": "ex5.err_divided",
+      "kind": "bond_deflated_amount",
+      "inputs": {
+        "amount": "103",
+        "inflation_percent": "2"
+      },
+      "value": "100.98"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "3",
+        "years": 2,
+        "yield_percent": "5"
+      },
+      "value": "96.28"
+    },
+    {
+      "id": "ex6.table",
+      "kind": "bond_price_table",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "3",
+        "years": 2,
+        "yields": "5"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3.00",
+          "rate": "5.00",
+          "pv": "2.86"
+        },
+        {
+          "year": 2,
+          "payment": "103.00",
+          "rate": "5.00",
+          "pv": "93.42"
+        }
+      ]
+    },
+    {
+      "id": "ex6.err_once",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "106",
+        "rate_percent": "5",
+        "years": 1
+      },
+      "value": "100.95"
+    },
+    {
+      "id": "ex6.err_no_first",
+      "kind": "bond_present_value",
+      "inputs": {
+        "amount": "103",
+        "rate_percent": "5",
+        "years": 2
+      },
+      "value": "93.42"
+    },
+    {
+      "id": "ex6.err_at_3",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "3",
+        "years": 2,
+        "yield_percent": "3"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "ex7.price_at_5",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "ex7.price_2",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 2,
+        "yield_percent": "6"
+      },
+      "value": "98.17"
+    },
+    {
+      "id": "ex7.price_10",
+      "kind": "bond_price",
+      "inputs": {
+        "face": "100",
+        "payment_percent": "5",
+        "years": 10,
+        "yield_percent": "6"
+      },
+      "value": "92.64"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex7.price_at_5",
+        "subtrahend": "ex7.price_10"
+      },
+      "value": "7.36"
+    },
+    {
+      "id": "ex7.drop_2",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex7.price_at_5",
+        "subtrahend": "ex7.price_2"
+      },
+      "value": "1.83"
+    },
+    {
+      "id": "ex2.gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.payment",
+        "subtrahend": "ex2.price"
+      },
+      "value": "5.00"
+    }
+  ]
+}
