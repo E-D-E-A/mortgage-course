@@ -53,6 +53,7 @@ describe("banking business days", () => {
     expect(isBusinessDay("2026-10-09", noFriday)).toBe(false);
     expect(isBusinessDay("2026-09-21", CALENDAR_2026)).toBe(false); // Yom Kippur
     expect(isBusinessDay("2026-09-28", CALENDAR_2026)).toBe(true); // Sukkot's intermediate days are open
+    expect(isBusinessDay("2026-10-27", CALENDAR_2026)).toBe(false); // Knesset election day (news reports)
   });
 
   it("counts business days after a request (the request day is day 0)", () => {
@@ -60,11 +61,14 @@ describe("banking business days", () => {
     expect(addBusinessDays("2026-10-11", 5, CALENDAR_2026)).toBe("2026-10-16");
     // Without Friday: … Thu 15, Sun 18 → 18 Oct.
     expect(addBusinessDays("2026-10-11", 5, noFriday)).toBe("2026-10-18");
-    // Sent Thursday 22 Oct: Fri 23, Sun 25, Mon 26, Tue 27, Wed 28.
-    expect(addBusinessDays("2026-10-22", 5, CALENDAR_2026)).toBe("2026-10-28");
-    expect(addBusinessDays("2026-10-22", 5, noFriday)).toBe("2026-10-29");
-    // Seven: … Wed 28, Thu 29, Fri 30.
-    expect(addBusinessDays("2026-10-22", 7, CALENDAR_2026)).toBe("2026-10-30");
+    // Sent Thursday 22 Oct: Fri 23, Sun 25, Mon 26, (Tue 27 is election day, closed), Wed 28, Thu 29.
+    expect(addBusinessDays("2026-10-22", 5, CALENDAR_2026)).toBe("2026-10-29");
+    // Without Friday: Sun 25, Mon 26, Wed 28, Thu 29, Sun 1 Nov.
+    expect(addBusinessDays("2026-10-22", 5, noFriday)).toBe("2026-11-01");
+    // Seven: … Thu 29, Fri 30, Sun 1 Nov.
+    expect(addBusinessDays("2026-10-22", 7, CALENDAR_2026)).toBe("2026-11-01");
+    // Without the closed days: Fri 23, Sun 25, Mon 26, Tue 27, Wed 28.
+    expect(addBusinessDays("2026-10-22", 5, { fridayCounts: true, closed: [] })).toBe("2026-10-28");
   });
 
   it("skips Yom Kippur eve and Yom Kippur", () => {

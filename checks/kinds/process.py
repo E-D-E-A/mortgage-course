@@ -2,8 +2,9 @@
 
 Plain Python datetime arithmetic; nothing is imported from src/lib/calc.
 The day an event happens is day 0. Saturday is never a banking business day;
-Friday only when the fact says friday_counts = "yes"; the closed holidays are
-listed in each fact's inputs.
+Friday only when the fact says friday_counts = "yes"; the closed days are
+listed in each fact's inputs (the 2026 holidays, and Knesset election day
+2026-10-27, which is per news reports and not verified).
 """
 from datetime import date, timedelta
 

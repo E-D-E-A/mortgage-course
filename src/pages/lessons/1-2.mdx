@@ -108,39 +108,41 @@ export const predictionOptions = [
 נכון ל־9 באוקטובר 2026, לפי תעתיק של הצוות ב־Brain (לא אומת מול המקור), התקרות הן:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+  <p class="text-caption text-n600">בדירה ששווה {f.shekels("explain.price")}:</p>
+  <table class="mt-2 w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-2 text-start font-semibold">התקרה</th>
-        <th class="py-2 pe-2 text-start font-semibold">סוג העסקה (בפישוט)</th>
-        <th class="py-2 pe-2 text-start font-semibold">דירה ב־{f.shekels("explain.price")}: הון עצמי מינימלי</th>
-        <th class="py-2 text-start font-semibold">הלוואה מרבית</th>
+        <th class="py-2 pe-3 text-start font-semibold">התקרה</th>
+        <th class="py-2 pe-3 text-start font-semibold">סוג העסקה</th>
+        <th class="py-2 text-start font-semibold">הון עצמי מינימלי</th>
       </tr>
     </thead>
     <tbody>
       <tr class="border-b border-n100">
-        <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[0].ceiling}%</span></td>
-        <td class="py-2 pe-2"><Later lesson="1.5">דירה יחידה</Later>: קונים דירה, ואין לכם דירה אחרת</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[0].min_equity)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[0].max_loan)}</span></td>
+        <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{limits[0].ceiling}%</span></td>
+        <td class="py-2 pe-3"><Later lesson="1.5" quiet>דירה יחידה</Later></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[0].min_equity)}</span></td>
       </tr>
       <tr class="border-b border-n100">
-        <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[1].ceiling}%</span></td>
-        <td class="py-2 pe-2"><Later lesson="1.5">דירה חליפית</Later>: יש לכם דירה, ואתם מוכרים אותה כשעוברים לחדשה</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[1].min_equity)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[1].max_loan)}</span></td>
+        <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{limits[1].ceiling}%</span></td>
+        <td class="py-2 pe-3"><Later lesson="1.5" quiet>דירה חליפית</Later></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[1].min_equity)}</span></td>
       </tr>
       <tr>
-        <td class="py-2 pe-2 font-semibold text-n900"><span class="ltr">{limits[2].ceiling}%</span></td>
-        <td class="py-2 pe-2"><Later lesson="1.5">דירה נוספת</Later>: יש לכם דירה, והיא נשארת שלכם (בהוראה ובחלק מהטפסים אומרים ״דירה להשקעה״)</td>
-        <td class="py-2 pe-2"><span class="ltr">{formatShekels(limits[2].min_equity)}</span></td>
-        <td class="py-2"><span class="ltr">{formatShekels(limits[2].max_loan)}</span></td>
+        <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{limits[2].ceiling}%</span></td>
+        <td class="py-2 pe-3"><Later lesson="1.5" quiet>דירה נוספת</Later></td>
+        <td class="py-2"><span class="ltr">{formatShekels(limits[2].min_equity)}</span></td>
       </tr>
     </tbody>
   </table>
 </div>
 
-ההגדרות של כל סוג עסקה — בשיעור 1.5 (גם הן לפי תעתיק, עוד לא אומתו). שלושה דברים חשובים כבר עכשיו:
+מה כל שם אומר, בפישוט (ההגדרות — בשיעור 1.5):
+- **{pct("ceiling.only_home")}, <Later lesson="1.5">דירה יחידה</Later>:** קונים דירה, ואין לכם דירה אחרת. ההלוואה המרבית: {T(limits[0].max_loan)}.
+- **{pct("ceiling.replacement")}, <Later lesson="1.5">דירה חליפית</Later>:** יש לכם דירה, ואתם מוכרים אותה כשעוברים לחדשה. ההלוואה המרבית: {T(limits[1].max_loan)}.
+- **{pct("ceiling.investment")}, <Later lesson="1.5">דירה נוספת</Later>:** יש לכם דירה, והיא נשארת שלכם. בהוראה ובחלק מהטפסים אומרים ״דירה להשקעה״. ההלוואה המרבית: {T(limits[2].max_loan)}.
+
+גם ההגדרות בשיעור 1.5 הן לפי תעתיק, ועוד לא אומתו. שלושה דברים חשובים כבר עכשיו:
 
 - **התקרה היא מקסימום, לא הבטחה.** מלווה לא חייב לממן עד התקרה, ויכול לדרוש יותר הון עצמי. ההבדל בין תקרה של בנק ישראל לכלל של בנק מסוים — כשנגיע ל<Later lesson="4.5">מדיניות בנק</Later>.
 - **ככל שהתקרה נמוכה יותר, צריך יותר הון עצמי** — באותה דירה, {T(limits[0].min_equity)}, {T(limits[1].min_equity)} או {T(limits[2].min_equity)}.
@@ -283,7 +285,7 @@ export const predictionOptions = [
 
 <Callout title="תיק על הקצה" tone="warning">
 <p>{f.shekels("caseA.equity_room")} הם מעט מאוד, ביחס להון עצמי של {f.shekels("caseA.equity")}. אם ההון העצמי יקטן ביותר מזה, שיעור המימון יעבור את התקרה.</p>
-<p>ואם יתברר שמחשבים מול השווי (השאלה הפתוחה למעלה)? ההלוואה שלהם נשארת בתוך התקרה כל עוד השווי הוא לפחות <M>{n("caseA.loan")} ÷ {f.plain("ceiling.only_home")} × 100 = {f.shekels("caseA.min_value")}</M> — כלומר עד {f.shekels("caseA.value_room")} מתחת למחיר. שווי נמוך מזה יעביר אותם את התקרה. נחזור לתיק הזה בשלבים הבאים, וגם לשאלה מה עושים כשהוא על הקצה.</p>
+<p>ואם יתברר שמחשבים מול השווי (השאלה הפתוחה למעלה)? ההלוואה שלהם נשארת בתוך התקרה כל עוד השווי הוא לפחות <M>{n("caseA.loan")} ÷ {f.plain("ceiling.only_home")} × 100 = {f.shekels("caseA.min_value")}</M> — כלומר עד {f.shekels("caseA.value_room")} מתחת למחיר. שווי נמוך מזה יעביר את שיעור המימון שלהם מעל התקרה. נחזור לתיק הזה בשלבים הבאים, וגם לשאלה מה עושים כשהוא על הקצה.</p>
 </Callout>
 
 <Section kind="דוגמה חצי פתורה">
