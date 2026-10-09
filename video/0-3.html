@@ -18,6 +18,7 @@
       @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
       @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
       @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
       html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
       #stage { position: relative; width: 1280px; height: 720px; }
       .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
@@ -54,17 +55,22 @@
       const S = { title: [0, 14], y1: [14, 38], y2: [38, 66], ten: [66, 100], thirty: [100, 134], end: [134, 152] };
       window.duration = 152;
       window.cues = [
-        [1, 7, "ריבית דריבית: כשהריבית לא נשארת בצד, אלא מצטרפת לסכום."],
+        [1, 7, "ריבית דריבית: הריבית לא נשארת בצד."],
         [7, 13.5, `נתחיל בהפקדה של ${V.p}, בריבית של 5% לשנה.`],
-        [15, 24, `בשנה הראשונה הריבית היא 5% מ־${V.p}: ${shek(V.y1.interest)}.`],
+        [15, 24, `שנה ראשונה: 5% מ־${V.p} הם ${shek(V.y1.interest)}.`],
         [24, 36, `בסוף השנה יש ${shek(V.y1.closing)}. עד כאן — כמו בריבית פשוטה.`],
-        [39, 50, `בשנה השנייה מחשבים 5% מכל היתרה, ${shek(V.y2.opening)}: ${shek(V.y2.interest)}.`],
-        [50, 65, `${shek(V.y2.interest_on_interest)} מתוכם הם 5% מהריבית של השנה הראשונה. הריבית הרוויחה ריבית.`],
-        [67, 80, "כך זה ממשיך, שנה אחר שנה. החלק הכהה: הריבית שגם ריבית פשוטה הייתה נותנת. החלק הבהיר: ריבית על ריבית — והוא גדל בכל שנה."],
-        [80, 99, `אחרי 10 שנים: ${shek(V.c10)}. בריבית פשוטה היו ${shek(V.s10)}.`],
+        [39, 50, `שנה שנייה: 5% מכל היתרה, ${shek(V.y2.opening)}: ${shek(V.y2.interest)}.`],
+        [50, 57, `${shek(V.y2.interest_on_interest)} מתוכם הם 5% מהריבית של השנה הראשונה.`],
+        [57, 65, "הריבית הרוויחה ריבית."],
+        [67, 73, "כך זה ממשיך, שנה אחר שנה."],
+        [73, 80, "החלק הכהה: מה שגם ריבית פשוטה הייתה נותנת."],
+        [80, 88, "החלק הבהיר: ריבית על ריבית. הוא גדל בכל שנה."],
+        [88, 99, `אחרי 10 שנים: ${shek(V.c10)}. בריבית פשוטה: ${shek(V.s10)}.`],
         [101, 116, "עכשיו נמתח את הזמן ל־30 שנה."],
-        [116, 133, `אחרי 30 שנה: ${shek(V.c30)}, לעומת ${shek(V.s30)} בריבית פשוטה. ההפרש, ${shek(V.gap30)}, כולו ריבית על ריבית.`],
-        [135, 151, "זה נכון בחיסכון — וגם בחוב: ריבית שלא שולמה מצטרפת לחוב, ומשלמים ריבית גם עליה."],
+        [116, 124, `אחרי 30 שנה: ${shek(V.c30)}. בריבית פשוטה: ${shek(V.s30)}.`],
+        [124, 133, `ההפרש, ${shek(V.gap30)}, כולו ריבית על ריבית.`],
+        [135, 143, "ככל שהזמן ארוך יותר — ההבדל גדל מהר יותר."],
+        [143, 151, "זה נכון בחיסכון — וגם בחוב שלא משלמים."],
       ];
 
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -116,7 +122,7 @@
         // Scene 2 — year one
         if (inScene(t, S.y1)) {
           const o = vis(t, S.y1);
-          const base = 600, scale = 0.034, x = 760, w = 150;
+          const base = 540, scale = 0.030, x = 760, w = 150;
           txt(640, 140, "השנה הראשונה", 40, { w: 700, o });
           const g = prog(t, S.y1, 2, 3);
           bar(x, w, base, scale, 10000, 500 * g, 0, o);
@@ -129,7 +135,7 @@
         // Scene 3 — year two, the first interest on interest
         if (inScene(t, S.y2)) {
           const o = vis(t, S.y2);
-          const base = 600, scale = 0.034, w = 150;
+          const base = 540, scale = 0.030, w = 150;
           txt(640, 140, "השנה השנייה", 40, { w: 700, o });
           bar(900, w, base, scale, 10000, 500, 0, o * 0.55);
           txt(975, base + 34, "שנה 1", 20, { fill: C.n600, o });
@@ -149,12 +155,12 @@
         // Scene 4 — ten years
         if (inScene(t, S.ten)) {
           const o = vis(t, S.ten);
-          drawSeries(t, s10, S.ten, o, 10, V.c10, V.s10, 0.017);
+          drawSeries(t, s10, S.ten, o, 10, V.c10, V.s10, 0.0145);
         }
         // Scene 5 — thirty years
         if (inScene(t, S.thirty)) {
           const o = vis(t, S.thirty);
-          drawSeries(t, s30, S.thirty, o, 30, V.c30, V.s30, 0.0105, V.gap30);
+          drawSeries(t, s30, S.thirty, o, 30, V.c30, V.s30, 0.0090, V.gap30);
         }
         // Scene 6 — takeaway
         if (inScene(t, S.end)) {
@@ -168,7 +174,7 @@
       };
 
       function drawSeries(t, series, sc, o, years, compound, simple, scale, gap) {
-        const base = 610, left = 160, right = 1120;
+        const base = 545, left = 160, right = 1120;
         const band = (right - left) / series.length, w = band - 4;
         txt(640, 130, years === 10 ? "עשר שנים" : "שלושים שנה", 40, { w: 700, o });
         const shown = 1 + Math.floor(prog(t, sc, 1.5, years === 10 ? 12 : 10) * (series.length - 1) + 0.0001);

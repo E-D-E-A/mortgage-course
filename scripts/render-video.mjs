@@ -43,6 +43,10 @@ await page.waitForFunction(() => window.ready === true);
 if (errors.length) throw new Error(errors.join("\n"));
 const { duration, cues } = await page.evaluate(() => ({ duration: window.duration, cues: window.cues }));
 
+// One line per subtitle: a long cue wraps to two lines and covers the bottom of the scene.
+const tooLong = cues.filter(([, , text]) => text.length > 60);
+if (tooLong.length) throw new Error(`cues longer than 60 characters:\n${tooLong.map((c) => c[2]).join("\n")}`);
+
 const total = Math.round(duration * fps);
 for (let i = 0; i < total; i++) {
   await page.evaluate((t) => window.render(t), i / fps);
@@ -72,7 +76,8 @@ const ts = (s) => {
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = (s % 60).toFixed(3).padStart(6, "0");
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${sec}`;
 };
-const vtt = ["WEBVTT", "", ...cues.flatMap(([a, b, text], i) => [String(i + 1), `${ts(a)} --> ${ts(b)}`, text, ""])].join("\n");
+// Each cue starts with a right-to-left mark, so every player lays the line out right to left.
+const vtt = ["WEBVTT", "", ...cues.flatMap(([a, b, text], i) => [String(i + 1), `${ts(a)} --> ${ts(b)}`, `\u200F${text}`, ""])].join("\n");
 await writeFile(join(outDir, `${lesson}.he.vtt`), vtt);
 await rm(frames, { recursive: true, force: true });
 console.log(`video: public/video/${lesson}.mp4 (${duration}s at ${fps}fps), subtitles: ${cues.length} cues, key frames in qa/video/`);
