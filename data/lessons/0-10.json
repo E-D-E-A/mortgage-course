@@ -1,0 +1,259 @@
+{
+  "lesson": "0.10",
+  "title": "בנק ישראל וריבית בנק ישראל",
+  "note": "The 2026 decisions are from search-index summaries of Bank of Israel releases (official-sources.md §6, 2026-10-09), not yet read from the releases. Prime = rate + 1.5 points is arithmetic.",
+  "facts": [
+    {
+      "id": "decision.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.25"
+    },
+    {
+      "id": "decision.start_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2025-11-24"
+    },
+    {
+      "id": "decision.current",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.25"
+    },
+    {
+      "id": "decision.current_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-01"
+    },
+    {
+      "id": "decision.effective_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-03"
+    },
+    {
+      "id": "decision.schedule_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-08-31"
+    },
+    {
+      "id": "decision.upcoming",
+      "kind": "given",
+      "inputs": {},
+      "value": [
+        "2026-10-21",
+        "2026-11-23"
+      ]
+    },
+    {
+      "id": "decision.count",
+      "kind": "given",
+      "inputs": {},
+      "value": "8"
+    },
+    {
+      "id": "prime.addition",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.5"
+    },
+    {
+      "id": "target.low",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "target.high",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "timeline.path",
+      "kind": "lend_rate_path",
+      "inputs": {
+        "start": "4.25",
+        "addition": "1.5",
+        "date_1": "2026-01-05",
+        "rate_1": "4",
+        "date_2": "2026-02-23",
+        "rate_2": "4",
+        "date_3": "2026-03-30",
+        "rate_3": "4",
+        "date_4": "2026-05-25",
+        "rate_4": "3.75",
+        "date_5": "2026-07-06",
+        "rate_5": "3.5",
+        "date_6": "2026-09-01",
+        "rate_6": "3.25"
+      },
+      "value": [
+        {
+          "period": 1,
+          "date": "2026-01-05",
+          "before": "4.25",
+          "rate": "4",
+          "change": "-0.25",
+          "prime": "5.5"
+        },
+        {
+          "period": 2,
+          "date": "2026-02-23",
+          "before": "4",
+          "rate": "4",
+          "change": "0",
+          "prime": "5.5"
+        },
+        {
+          "period": 3,
+          "date": "2026-03-30",
+          "before": "4",
+          "rate": "4",
+          "change": "0",
+          "prime": "5.5"
+        },
+        {
+          "period": 4,
+          "date": "2026-05-25",
+          "before": "4",
+          "rate": "3.75",
+          "change": "-0.25",
+          "prime": "5.25"
+        },
+        {
+          "period": 5,
+          "date": "2026-07-06",
+          "before": "3.75",
+          "rate": "3.5",
+          "change": "-0.25",
+          "prime": "5"
+        },
+        {
+          "period": 6,
+          "date": "2026-09-01",
+          "before": "3.5",
+          "rate": "3.25",
+          "change": "-0.25",
+          "prime": "4.75"
+        }
+      ]
+    },
+    {
+      "id": "prime.current",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.25",
+        "addition": "1.5"
+      },
+      "value": "4.75"
+    },
+    {
+      "id": "prime.start",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "4.25",
+        "addition": "1.5"
+      },
+      "value": "5.75"
+    },
+    {
+      "id": "year.drop",
+      "kind": "lend_rate_drop",
+      "inputs": {
+        "before": "4.25",
+        "after": "3.25"
+      },
+      "value": "1"
+    },
+    {
+      "id": "year.relative_drop",
+      "kind": "lend_relative_drop",
+      "inputs": {
+        "before": "4.25",
+        "after": "3.25"
+      },
+      "value": "23.53"
+    },
+    {
+      "id": "explain.prime_example",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "1",
+        "addition": "1.5"
+      },
+      "value": "2.5"
+    },
+    {
+      "id": "ex2.wrong_subtract",
+      "kind": "lend_rate_drop",
+      "inputs": {
+        "before": "3.25",
+        "after": "1.5"
+      },
+      "value": "1.75"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "lend_rate_drop",
+      "inputs": {
+        "before": "4",
+        "after": "3.5"
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "ex4.relative",
+      "kind": "lend_relative_drop",
+      "inputs": {
+        "before": "4",
+        "after": "3.5"
+      },
+      "value": "12.5"
+    },
+    {
+      "id": "ex5.prime_drop",
+      "kind": "lend_rate_drop",
+      "inputs": {
+        "before": "5.75",
+        "after": "4.75"
+      },
+      "value": "1"
+    },
+    {
+      "id": "ex6.rate",
+      "kind": "lend_rate_after_cuts",
+      "inputs": {
+        "start": "3.25",
+        "cut": "0.25",
+        "count": 2
+      },
+      "value": "2.75"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "lend_prime_after_cuts",
+      "inputs": {
+        "start": "3.25",
+        "cut": "0.25",
+        "count": 2,
+        "addition": "1.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "ex6.one_cut",
+      "kind": "lend_prime_after_cuts",
+      "inputs": {
+        "start": "3.25",
+        "cut": "0.25",
+        "count": 1,
+        "addition": "1.5"
+      },
+      "value": "4.5"
+    }
+  ]
+}

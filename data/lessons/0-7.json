@@ -1,0 +1,621 @@
+{
+  "lesson": "0.7",
+  "title": "אינפלציה ומדד המחירים לצרכן",
+  "note": "Invented teaching numbers: the basket, its prices and every index value are illustrations, not CPI data.",
+  "facts": [
+    {
+      "id": "cbs.day",
+      "kind": "given",
+      "inputs": {},
+      "value": "15"
+    },
+    {
+      "id": "cbs.time",
+      "kind": "given",
+      "inputs": {},
+      "value": "18:30"
+    },
+    {
+      "id": "cbs.early_time",
+      "kind": "given",
+      "inputs": {},
+      "value": "14:00"
+    },
+    {
+      "id": "cbs.example_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-08-14"
+    },
+    {
+      "id": "cbs.next_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-15"
+    },
+    {
+      "id": "cbs.groups",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "cbs.house_prices_out",
+      "kind": "given",
+      "inputs": {},
+      "value": "1999"
+    },
+    {
+      "id": "cbs.base_year",
+      "kind": "given",
+      "inputs": {},
+      "value": "2024"
+    },
+    {
+      "id": "prediction.points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "120",
+        "new": "126"
+      },
+      "value": "6"
+    },
+    {
+      "id": "prediction.change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "120",
+        "new": "126"
+      },
+      "value": "5"
+    },
+    {
+      "id": "prediction.from_100",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "100",
+        "new": "126"
+      },
+      "value": "26"
+    },
+    {
+      "id": "prediction.factor",
+      "kind": "infl_growth_factor",
+      "inputs": {
+        "old": "120",
+        "new": "126"
+      },
+      "value": "1.05"
+    },
+    {
+      "id": "explain.base_line_1",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "10"
+      },
+      "value": "40.00"
+    },
+    {
+      "id": "explain.base_line_2",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 10,
+        "price_1": "6"
+      },
+      "value": "60.00"
+    },
+    {
+      "id": "explain.base_line_3",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 10,
+        "price_1": "10"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "explain.base_line_4",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 40,
+        "price_1": "5"
+      },
+      "value": "200.00"
+    },
+    {
+      "id": "explain.now_line_1",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "12"
+      },
+      "value": "48.00"
+    },
+    {
+      "id": "explain.now_line_2",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 10,
+        "price_1": "6.3"
+      },
+      "value": "63.00"
+    },
+    {
+      "id": "explain.now_line_3",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 10,
+        "price_1": "9.1"
+      },
+      "value": "91.00"
+    },
+    {
+      "id": "explain.now_line_4",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 40,
+        "price_1": "5.25"
+      },
+      "value": "210.00"
+    },
+    {
+      "id": "explain.item_change_1",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "10",
+        "new": "12"
+      },
+      "value": "20"
+    },
+    {
+      "id": "explain.item_change_2",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "6",
+        "new": "6.3"
+      },
+      "value": "5"
+    },
+    {
+      "id": "explain.item_change_3",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "10",
+        "new": "9.1"
+      },
+      "value": "-9"
+    },
+    {
+      "id": "explain.item_change_4",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "5",
+        "new": "5.25"
+      },
+      "value": "5"
+    },
+    {
+      "id": "explain.base_total",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "10",
+        "quantity_2": 10,
+        "price_2": "6",
+        "quantity_3": 10,
+        "price_3": "10",
+        "quantity_4": 40,
+        "price_4": "5"
+      },
+      "value": "400.00"
+    },
+    {
+      "id": "explain.now_total",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "12",
+        "quantity_2": 10,
+        "price_2": "6.3",
+        "quantity_3": 10,
+        "price_3": "9.1",
+        "quantity_4": 40,
+        "price_4": "5.25"
+      },
+      "value": "412.00"
+    },
+    {
+      "id": "explain.diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.now_total",
+        "subtrahend": "explain.base_total"
+      },
+      "value": "12.00"
+    },
+    {
+      "id": "explain.base_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "400.00",
+        "base_cost": "400.00"
+      },
+      "value": "100"
+    },
+    {
+      "id": "explain.now_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "412.00",
+        "base_cost": "400.00"
+      },
+      "value": "103"
+    },
+    {
+      "id": "explain.now_change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "100",
+        "new": "103"
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain.y2_cost",
+      "kind": "given",
+      "inputs": {},
+      "value": "424.36"
+    },
+    {
+      "id": "explain.y2_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "424.36",
+        "base_cost": "400.00"
+      },
+      "value": "106.09"
+    },
+    {
+      "id": "explain.y2_points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "103",
+        "new": "106.09"
+      },
+      "value": "3.09"
+    },
+    {
+      "id": "explain.y2_change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "103",
+        "new": "106.09"
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain.y2_factor",
+      "kind": "infl_growth_factor",
+      "inputs": {
+        "old": "103",
+        "new": "106.09"
+      },
+      "value": "1.03"
+    },
+    {
+      "id": "slider.bus10_cost",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "10",
+        "quantity_2": 10,
+        "price_2": "6",
+        "quantity_3": 10,
+        "price_3": "10",
+        "quantity_4": 40,
+        "price_4": "5.5"
+      },
+      "value": "420.00"
+    },
+    {
+      "id": "slider.bus10_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "420.00",
+        "base_cost": "400.00"
+      },
+      "value": "105"
+    },
+    {
+      "id": "slider.bread10_cost",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "11",
+        "quantity_2": 10,
+        "price_2": "6",
+        "quantity_3": 10,
+        "price_3": "10",
+        "quantity_4": 40,
+        "price_4": "5"
+      },
+      "value": "404.00"
+    },
+    {
+      "id": "slider.bread10_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "404.00",
+        "base_cost": "400.00"
+      },
+      "value": "101"
+    },
+    {
+      "id": "slider.mix_cost",
+      "kind": "infl_basket_cost",
+      "inputs": {
+        "quantity_1": 4,
+        "price_1": "15",
+        "quantity_2": 10,
+        "price_2": "6",
+        "quantity_3": 10,
+        "price_3": "8",
+        "quantity_4": 40,
+        "price_4": "5"
+      },
+      "value": "400.00"
+    },
+    {
+      "id": "slider.mix_index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "400.00",
+        "base_cost": "400.00"
+      },
+      "value": "100"
+    },
+    {
+      "id": "worked.change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "102",
+        "new": "105.06"
+      },
+      "value": "3"
+    },
+    {
+      "id": "worked.factor",
+      "kind": "infl_growth_factor",
+      "inputs": {
+        "old": "102",
+        "new": "105.06"
+      },
+      "value": "1.03"
+    },
+    {
+      "id": "worked.points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "102",
+        "new": "105.06"
+      },
+      "value": "3.06"
+    },
+    {
+      "id": "worked.basket_old",
+      "kind": "given",
+      "inputs": {},
+      "value": "5000.00"
+    },
+    {
+      "id": "worked.basket_new",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "5000",
+        "base_index": "102",
+        "new_index": "105.06"
+      },
+      "value": "5150.00"
+    },
+    {
+      "id": "worked.basket_diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.basket_new",
+        "subtrahend": "worked.basket_old"
+      },
+      "value": "150.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "infl_index_table",
+      "inputs": {
+        "index_0": "100",
+        "index_1": "104",
+        "index_2": "109.2",
+        "index_3": "114.66"
+      },
+      "value": [
+        {
+          "period": 1,
+          "start": "100",
+          "end": "104",
+          "points": "4",
+          "change": "4"
+        },
+        {
+          "period": 2,
+          "start": "104",
+          "end": "109.2",
+          "points": "5.2",
+          "change": "5"
+        },
+        {
+          "period": 3,
+          "start": "109.2",
+          "end": "114.66",
+          "points": "5.46",
+          "change": "5"
+        }
+      ]
+    },
+    {
+      "id": "ex2.old",
+      "kind": "given",
+      "inputs": {},
+      "value": "800.00"
+    },
+    {
+      "id": "ex2.new",
+      "kind": "given",
+      "inputs": {},
+      "value": "824.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "800",
+        "new": "824"
+      },
+      "value": "3"
+    },
+    {
+      "id": "ex2.factor",
+      "kind": "infl_growth_factor",
+      "inputs": {
+        "old": "800",
+        "new": "824"
+      },
+      "value": "1.03"
+    },
+    {
+      "id": "ex2.diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.new",
+        "subtrahend": "ex2.old"
+      },
+      "value": "24.00"
+    },
+    {
+      "id": "ex2.index",
+      "kind": "infl_index_value",
+      "inputs": {
+        "cost": "824",
+        "base_cost": "800"
+      },
+      "value": "103"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "110",
+        "new": "113.3"
+      },
+      "value": "3"
+    },
+    {
+      "id": "ex3.factor",
+      "kind": "infl_growth_factor",
+      "inputs": {
+        "old": "110",
+        "new": "113.3"
+      },
+      "value": "1.03"
+    },
+    {
+      "id": "ex3.points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "110",
+        "new": "113.3"
+      },
+      "value": "3.3"
+    },
+    {
+      "id": "ex3.from_100",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "100",
+        "new": "113.3"
+      },
+      "value": "13.3"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "2000",
+        "base_index": "100",
+        "new_index": "103.5"
+      },
+      "value": "2070.00"
+    },
+    {
+      "id": "ex5.old",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000.00"
+    },
+    {
+      "id": "ex5.points_as_shekels",
+      "kind": "infl_points_as_shekels",
+      "inputs": {
+        "amount": "2000",
+        "old_index": "100",
+        "new_index": "103.5"
+      },
+      "value": "2003.50"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "infl_chain_index",
+      "inputs": {
+        "base": "100",
+        "inflation_1": "4",
+        "inflation_2": "5"
+      },
+      "value": "109.2"
+    },
+    {
+      "id": "ex6.after_1",
+      "kind": "infl_chain_index",
+      "inputs": {
+        "base": "100",
+        "inflation_1": "4"
+      },
+      "value": "104"
+    },
+    {
+      "id": "ex6.added",
+      "kind": "infl_index_added",
+      "inputs": {
+        "base": "100",
+        "inflation_1": "4",
+        "inflation_2": "5"
+      },
+      "value": "109"
+    },
+    {
+      "id": "ex6.total_change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "100",
+        "new": "109.2"
+      },
+      "value": "9.2"
+    },
+    {
+      "id": "ex5.diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.answer",
+        "subtrahend": "ex5.old"
+      },
+      "value": "70.00"
+    }
+  ]
+}

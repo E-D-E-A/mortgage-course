@@ -1,0 +1,490 @@
+{
+  "lesson": "0.8",
+  "title": "הצמדה",
+  "note": "Invented teaching numbers: inflation rates and index values are illustrations, not CPI data or a forecast. Money rounded to the agora only at the end.",
+  "facts": [
+    {
+      "id": "explain.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000.00"
+    },
+    {
+      "id": "prediction.indexed",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 10
+      },
+      "value": "134391.64"
+    },
+    {
+      "id": "prediction.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "3",
+        "periods": 10
+      },
+      "value": "130000.00"
+    },
+    {
+      "id": "explain.one_step",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "100000",
+        "base_index": "100",
+        "new_index": "103"
+      },
+      "value": "103000.00"
+    },
+    {
+      "id": "explain.one_step_add",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.one_step",
+        "subtrahend": "explain.principal"
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "explain.odd_base",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "100000",
+        "base_index": "104",
+        "new_index": "107.12"
+      },
+      "value": "103000.00"
+    },
+    {
+      "id": "explain.odd_points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "104",
+        "new": "107.12"
+      },
+      "value": "3.12"
+    },
+    {
+      "id": "explain.after_2",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 2
+      },
+      "value": "106090.00"
+    },
+    {
+      "id": "explain.table",
+      "kind": "infl_indexation_table",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "100000.00",
+          "indexation": "3000.00",
+          "closing": "103000.00"
+        },
+        {
+          "period": 2,
+          "opening": "103000.00",
+          "indexation": "3090.00",
+          "closing": "106090.00"
+        },
+        {
+          "period": 3,
+          "opening": "106090.00",
+          "indexation": "3182.70",
+          "closing": "109272.70"
+        }
+      ]
+    },
+    {
+      "id": "explain.unindexed_real_10",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 10
+      },
+      "value": "74409.39"
+    },
+    {
+      "id": "explain.lost_10",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.principal",
+        "subtrahend": "explain.unindexed_real_10"
+      },
+      "value": "25590.61"
+    },
+    {
+      "id": "explain.real_rate",
+      "kind": "infl_real_rate",
+      "inputs": {
+        "nominal_percent": "5",
+        "inflation_percent": "2"
+      },
+      "value": "2.94"
+    },
+    {
+      "id": "explain.real_approx",
+      "kind": "infl_real_rate_approx",
+      "inputs": {
+        "nominal_percent": "5",
+        "inflation_percent": "2"
+      },
+      "value": "3"
+    },
+    {
+      "id": "slider.indexed_30",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 30
+      },
+      "value": "242726.25"
+    },
+    {
+      "id": "slider.real_30",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 30
+      },
+      "value": "41198.68"
+    },
+    {
+      "id": "video.series_10",
+      "kind": "infl_indexation_series",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "3",
+        "years": 10
+      },
+      "value": [
+        {
+          "year": 0,
+          "indexed": "100000.00",
+          "unindexed": "100000.00",
+          "unindexed_real": "100000.00"
+        },
+        {
+          "year": 1,
+          "indexed": "103000.00",
+          "unindexed": "100000.00",
+          "unindexed_real": "97087.38"
+        },
+        {
+          "year": 2,
+          "indexed": "106090.00",
+          "unindexed": "100000.00",
+          "unindexed_real": "94259.59"
+        },
+        {
+          "year": 3,
+          "indexed": "109272.70",
+          "unindexed": "100000.00",
+          "unindexed_real": "91514.17"
+        },
+        {
+          "year": 4,
+          "indexed": "112550.88",
+          "unindexed": "100000.00",
+          "unindexed_real": "88848.70"
+        },
+        {
+          "year": 5,
+          "indexed": "115927.41",
+          "unindexed": "100000.00",
+          "unindexed_real": "86260.88"
+        },
+        {
+          "year": 6,
+          "indexed": "119405.23",
+          "unindexed": "100000.00",
+          "unindexed_real": "83748.43"
+        },
+        {
+          "year": 7,
+          "indexed": "122987.39",
+          "unindexed": "100000.00",
+          "unindexed_real": "81309.15"
+        },
+        {
+          "year": 8,
+          "indexed": "126677.01",
+          "unindexed": "100000.00",
+          "unindexed_real": "78940.92"
+        },
+        {
+          "year": 9,
+          "indexed": "130477.32",
+          "unindexed": "100000.00",
+          "unindexed_real": "76641.67"
+        },
+        {
+          "year": 10,
+          "indexed": "134391.64",
+          "unindexed": "100000.00",
+          "unindexed_real": "74409.39"
+        }
+      ]
+    },
+    {
+      "id": "worked.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "50000.00"
+    },
+    {
+      "id": "worked.nominal",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "50000",
+        "rate_percent": "4",
+        "periods": 1
+      },
+      "value": "52000.00"
+    },
+    {
+      "id": "worked.basket",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "50000",
+        "inflation_percent": "3",
+        "years": 1
+      },
+      "value": "51500.00"
+    },
+    {
+      "id": "worked.gain_vs_basket",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.nominal",
+        "subtrahend": "worked.basket"
+      },
+      "value": "500.00"
+    },
+    {
+      "id": "worked.real_value",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "52000",
+        "inflation_percent": "3",
+        "years": 1
+      },
+      "value": "50485.44"
+    },
+    {
+      "id": "worked.real_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.real_value",
+        "subtrahend": "worked.start"
+      },
+      "value": "485.44"
+    },
+    {
+      "id": "worked.real_rate",
+      "kind": "infl_real_rate",
+      "inputs": {
+        "nominal_percent": "4",
+        "inflation_percent": "3"
+      },
+      "value": "0.97"
+    },
+    {
+      "id": "worked.real_approx",
+      "kind": "infl_real_rate_approx",
+      "inputs": {
+        "nominal_percent": "4",
+        "inflation_percent": "3"
+      },
+      "value": "1"
+    },
+    {
+      "id": "half.table",
+      "kind": "infl_indexation_table",
+      "inputs": {
+        "amount": "50000",
+        "inflation_percent": "2",
+        "years": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "50000.00",
+          "indexation": "1000.00",
+          "closing": "51000.00"
+        },
+        {
+          "period": 2,
+          "opening": "51000.00",
+          "indexation": "1020.00",
+          "closing": "52020.00"
+        },
+        {
+          "period": 3,
+          "opening": "52020.00",
+          "indexation": "1040.40",
+          "closing": "53060.40"
+        }
+      ]
+    },
+    {
+      "id": "ex1.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "10000",
+        "base_index": "100",
+        "new_index": "104"
+      },
+      "value": "10400.00"
+    },
+    {
+      "id": "ex1.add",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex1.answer",
+        "subtrahend": "ex1.start"
+      },
+      "value": "400.00"
+    },
+    {
+      "id": "ex3.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "80000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "80000",
+        "base_index": "105",
+        "new_index": "108.15"
+      },
+      "value": "82400.00"
+    },
+    {
+      "id": "ex3.add",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.answer",
+        "subtrahend": "ex3.start"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "ex3.base_100",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "80000",
+        "base_index": "100",
+        "new_index": "108.15"
+      },
+      "value": "86520.00"
+    },
+    {
+      "id": "ex3.points_as_percent",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "80000",
+        "base_index": "100",
+        "new_index": "103.15"
+      },
+      "value": "82520.00"
+    },
+    {
+      "id": "ex3.points",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "105",
+        "new": "108.15"
+      },
+      "value": "3.15"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "infl_real_rate",
+      "inputs": {
+        "nominal_percent": "6",
+        "inflation_percent": "4"
+      },
+      "value": "1.92"
+    },
+    {
+      "id": "ex4.approx",
+      "kind": "infl_real_rate_approx",
+      "inputs": {
+        "nominal_percent": "6",
+        "inflation_percent": "4"
+      },
+      "value": "2"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "2",
+        "years": 5
+      },
+      "value": "90573.08"
+    },
+    {
+      "id": "ex5.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "-2",
+        "periods": 5
+      },
+      "value": "90000.00"
+    },
+    {
+      "id": "ex5.indexed",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "100000",
+        "inflation_percent": "2",
+        "years": 5
+      },
+      "value": "110408.08"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "infl_nominal_rate",
+      "inputs": {
+        "real_percent": "3",
+        "inflation_percent": "2"
+      },
+      "value": "5.06"
+    },
+    {
+      "id": "ex6.approx",
+      "kind": "infl_nominal_rate_approx",
+      "inputs": {
+        "real_percent": "3",
+        "inflation_percent": "2"
+      },
+      "value": "5"
+    }
+  ]
+}

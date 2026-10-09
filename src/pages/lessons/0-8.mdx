@@ -1,0 +1,427 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.8"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import IndexationEffect from "../../components/IndexationEffect.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatShekelsText as T } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.8");
+export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
+export const pct = (id) => `${f.plain(id)}%`;
+export const explain = f.rows("explain.table");
+export const half = f.rows("half.table");
+export const predictionOptions = [
+  `בדיוק ${f.shekels("explain.principal")} — לא לקחתם כסף נוסף`,
+  `${f.whole("prediction.simple")}`,
+  `קצת יותר מ־${f.floorThousands("prediction.indexed")}`,
+  `פחות מ־${f.shekels("explain.principal")}, כי הכסף שווה פחות`,
+];
+
+בשיעור הקודם ראינו איך <Term t="מדד המחירים לצרכן" lesson="0.8">מדד המחירים לצרכן</Term> מודד <Term t="אינפלציה" lesson="0.8">אינפלציה</Term>: בכמה התייקר סל קבוע.
+ובשיעור 0.3 ראינו ש<Term t="ריבית דריבית" lesson="0.8">ריבית דריבית</Term> מצטברת שנה אחרי שנה.
+בשיעור הזה נחבר את השניים: מה קורה לחוב שקושרים למדד — ואיך יודעים כמה סכום כסף שווה באמת.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.8"
+  question="לקחתם הלוואה של 100,000 ₪, וסוכם שהחוב יעלה בכל שנה באותו אחוז שבו עלה המדד. נניח שאין ריבית בכלל ושלא משלמים כלום, ושהמדד עולה ב־3% בכל שנה. כמה תהיו חייבים, בשקלים, אחרי 10 שנים?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## חוב שגדל לבד
+
+</Section>
+
+<LessonVideo lesson="0-8" />
+
+<Section kind="ההסבר">
+
+## חוב שהולך עם המדד
+
+</Section>
+
+<Term t="הצמדה" lesson="0.8">הצמדה</Term> היא קשירה של סכום למדד: **כשהמדד עולה באחוז מסוים, גם הסכום עולה באותו אחוז.** חוב כזה נקרא ״מוצמד למדד״.
+
+**צעד 1 — מדד אחד.** לקחתם <Term t="הלוואה" lesson="0.8">הלוואה</Term> של {f.shekels("explain.principal")}, מוצמדת למדד. כדי לראות רק את ההצמדה, נניח שאין ריבית ושלא משלמים כלום.
+ביום ההלוואה המדד היה 100. זה <Term t="מדד בסיס" lesson="0.8">מדד הבסיס</Term> של החוב. אחרי שנה המדד 103 — עלייה של 3%.
+גם החוב עולה ב־3%: <M>100,000 × 103 ÷ 100 = {f.shekels("explain.one_step")}</M>. ההצמדה הוסיפה לחוב {f.shekels("explain.one_step_add")}.
+
+**צעד 2 — מדד בסיס שאינו 100.** בדרך כלל מדד הבסיס אינו 100. נניח שביום ההלוואה המדד היה 104, ועכשיו הוא 107.12. מחלקים את המדד החדש במדד הבסיס:
+<M>100,000 × 107.12 ÷ 104 = {f.shekels("explain.odd_base")}</M>. שוב 3%: המדד עלה ב־{f.plain("explain.odd_points")} נקודות, אבל ב־3% מעצמו (שיעור 0.7: נקודות אינן אחוזים).
+
+**צעד 3 — שנה אחרי שנה.** אם המדד עולה ב־3% גם בשנה השנייה, ההצמדה מחושבת על החוב שכבר עלה — בדיוק כמו בריבית דריבית:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">החוב בתחילת השנה</th>
+        <th class="py-2 text-start font-semibold">תוספת ההצמדה (3%)</th>
+        <th class="py-2 text-start font-semibold">החוב בסוף השנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {explain.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.opening)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.indexation)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.closing)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+אחרי 10 שנים כאלה: <M>100,000 × 1.03<sup>10</sup> = {f.shekels("prediction.indexed")}</M>. לא לקחתם שקל נוסף ולא שילמתם ריבית — ובכל זאת אתם חייבים יותר.
+
+בהלוואה אמיתית יש גם ריבית, והיא מחושבת על החוב המוצמד. איך השתיים פועלות יחד נלמד בהמשך, בנושא <Later lesson="3.5">הפרשי הצמדה</Later>.
+
+<Section kind="ההסבר">
+
+## על הנייר, ובאמת
+
+</Section>
+
+עכשיו נשווה לחוב **שלא מוצמד**: {f.shekels("explain.principal")}, בלי ריבית, 10 שנים. על הנייר, אחרי 10 שנים אתם חייבים {f.shekels("explain.principal")} — אותו מספר.
+אבל המחירים עלו. מה אפשר לקנות ב־{f.shekels("explain.principal")} אחרי 10 שנים של 3% אינפלציה? כדי לתרגם לשקלים של היום מחלקים במה שהמחירים עלו:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>100,000 ÷ 1.03<sup>10</sup> = {f.shekels("explain.unindexed_real_10")}</M>
+</div>
+
+כלומר, מי שהלווה לכם את הכסף יקבל בחזרה סכום שקונה כמו {f.whole("explain.unindexed_real_10")} היום. הוא איבד כוח קנייה של {f.shekels("explain.lost_10")}.
+בחוב המוצמד זה לא קורה: {f.shekels("prediction.indexed")} בעוד 10 שנים קונים בדיוק מה ש־{f.shekels("explain.principal")} קונים היום. **הצמדה שומרת על כוח הקנייה של הסכום.** לכן הלווה מחזיר יותר שקלים, אבל לא יותר ״סחורה״.
+
+לשתי הדרכים האלה למדוד יש שמות:
+- **נומינלי** — בשקלים כפי שהם כתובים, **לפני** שמביאים בחשבון את האינפלציה. זה מה שאומר הביטוי ״לפני אינפלציה״.
+- **ריאלי** — **אחרי** שמביאים בחשבון את האינפלציה: כמה הסכום שווה בכוח קנייה, למשל בשקלים של היום.
+
+אותו דבר עם ריבית. <Term t="ריבית נומינלית" lesson="0.8">ריבית נומינלית</Term> היא הריבית כפי שהיא כתובה: בכמה גדל מספר השקלים. <Term t="ריבית ריאלית" lesson="0.8">ריבית ריאלית</Term> היא בכמה גדל כוח הקנייה.
+
+**דוגמה.** הפקדתם בחיסכון בריבית נומינלית של 5% לשנה, והמחירים עלו ב־2%. על הנייר יש לכם 5% יותר שקלים. אבל כל שקל קונה פחות.
+הריבית הריאלית היא לא בדיוק <M>5 − 2</M>, אלא:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>(1.05 ÷ 1.02 − 1) × 100 = {f.plain("explain.real_rate")}</M>
+</div>
+
+כלומר {pct("explain.real_rate")} — קצת פחות מ־{pct("explain.real_approx")}. ההבדל קטן כשהמספרים קטנים, ולכן משתמשים לא פעם בקיצור ״נומינלית פחות אינפלציה״ — כקירוב, לא כחישוב מדויק.
+
+<Callout title="למילה ״נומינלית״ יש שני שימושים" tone="warning">
+<p><strong>בשיעור הזה:</strong> נומינלית = לפני אינפלציה, בשקלים כפי שהם כתובים.</p>
+<p><strong>שימוש אחר:</strong> ״ריבית שנתית נומינלית״ היא לפעמים ריבית לשנה שמחלקים ב־12 כדי לקבל ריבית לחודש (ראו שיעור 0.4). שם המילה מתארת <strong>שיטת חישוב</strong>, ואין לה קשר לאינפלציה.</p>
+<p>כשאתם פוגשים את המילה, בדקו מאיזה סוג היא.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## השפעת אינפלציה ומדד
+
+</Section>
+
+שני חובות, שניהם בלי ריבית ובלי תשלומים: אחד מוצמד למדד (בגוון הכהה), ואחד לא (בגוון הבהיר). הקו המקווקו הוא החוב בהתחלה.
+הזיזו את האינפלציה, את מספר השנים ואת הסכום. הכפתור למעלה מחליף בין ״בשקלים שעל הנייר״ לבין ״בשקלים של היום״.
+
+<IndexationEffect client:visible amount={100000} inflation={3} years={10} />
+
+נסו את שלושת אלה:
+1. הורידו את האינפלציה ל־0%. מה קורה לשני החובות?
+2. החזירו ל־3% ול־10 שנים, ועברו בין שתי התצוגות. איזה חוב ״זז״ בכל תצוגה?
+3. מתחו ל־30 שנה, ב־3%. כמה שווה החוב שלא מוצמד, בשקלים של היום?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>בלי אינפלציה המדד לא זז, ושני החובות זהים: ההצמדה לא מוסיפה כלום.</li>
+    <li>בשקלים שעל הנייר החוב המוצמד גדל ל־{f.whole("prediction.indexed")}, והשני נשאר {f.whole("explain.principal")}. בשקלים של היום זה הפוך: המוצמד נשאר {f.whole("explain.principal")}, והשני יורד ל־{f.whole("explain.unindexed_real_10")}.</li>
+    <li>בשקלים של היום הוא שווה רק {f.whole("slider.real_30")}. החוב המוצמד, על הנייר, כבר {f.whole("slider.indexed_30")}.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחאות
+
+</Section>
+
+**צעד 1 — סכום מוצמד.** בצעד 2 של ההסבר כפלנו במדד החדש וחילקנו במדד הבסיס: <M>100,000 × 107.12 ÷ 104</M>.
+
+**צעד 2 — אינפלציה קבועה.** כשהמדד עולה באותו אחוז בכל שנה, כל שנה עוד הכפלה — כמו בשיעור 0.3: <M>100,000 × 1.03<sup>10</sup></M>.
+
+**צעד 3 — מנומינלי לריאלי.** כדי לתרגם סכום עתידי לשקלים של היום, מחלקים באותו מספר: <M>100,000 ÷ 1.03<sup>10</sup></M>.
+
+**צעד 4 — ריבית ריאלית.** מחלקים את מה שהכסף גדל בו במה שהמחירים גדלו בו: <M>1.05 ÷ 1.02</M>, ומורידים 1.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">A<sub>1</sub> = A<sub>0</sub> × I<sub>1</sub> ÷ I<sub>0</sub></p>
+  <p class="ltr mt-2 text-h2 text-navy">A<sub>n</sub> = A<sub>0</sub> × (1 + π)<sup>n</sup></p>
+  <p class="ltr mt-2 text-h2 text-navy">1 + r = (1 + i) ÷ (1 + π)</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">A<sub>0</sub></dt><dd>הסכום ביום ההצמדה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">A<sub>1</sub>, A<sub>n</sub></dt><dd>הסכום המוצמד מאוחר יותר, בשקלים (n = אחרי n שנים)</dd>
+    <dt class="ltr font-semibold text-n900">I<sub>0</sub></dt><dd>מדד הבסיס: המדד ביום ההצמדה</dd>
+    <dt class="ltr font-semibold text-n900">I<sub>1</sub></dt><dd>המדד החדש</dd>
+    <dt class="ltr font-semibold text-n900">π</dt><dd>האינפלציה לשנה, כמספר עשרוני: 3% הם 0.03</dd>
+    <dt class="ltr font-semibold text-n900">i</dt><dd>הריבית הנומינלית לשנה, כמספר עשרוני: 5% הם 0.05</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית הריאלית לשנה, כמספר עשרוני</dd>
+  </dl>
+</div>
+
+**מתי הנוסחאות נכונות?**
+1. הנוסחה הראשונה תמיד, כל עוד שני המדדים מחושבים מול אותה תקופת בסיס.
+2. השנייה רק כשהאינפלציה זהה בכל השנים. במציאות היא משתנה משנה לשנה, ואז משתמשים בראשונה, עם המדדים שהתפרסמו בפועל.
+3. בשלישית, הריבית והאינפלציה צריכות להיות לאותה תקופה — שתיהן לשנה, או שתיהן לחודש.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> לסכום מוצמד — מקישים את הסכום, ×, המדד החדש, ÷, מדד הבסיס. לחזקה — הכפתור <span class="ltr">x<sup>y</sup></span>, כמו בשיעור 0.3.</p>
+<p><strong>בגיליון אלקטרוני:</strong> <span class="ltr">=100000*107.12/104</span>, או <span class="ltr">=100000/1.03^10</span>, או לריבית ריאלית <span class="ltr">=(1.05/1.02-1)*100</span>.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.8"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "לא לקחתם כסף נוסף, אבל החוב מוצמד: הוא עולה עם המדד, גם בלי ריבית.",
+    `${f.whole("prediction.simple")} יוצא אם מוסיפים 3% מ־100,000 בכל שנה. אבל ההצמדה של כל שנה מחושבת על החוב שכבר עלה — כמו בריבית דריבית.`,
+    "",
+    "בשקלים של היום החוב המוצמד נשאר בדיוק 100,000 ₪. אבל השאלה היא כמה שקלים תחזירו — ועל הנייר החוב גדל.",
+  ]}
+>
+  <M>100,000 × 1.03<sup>10</sup> = {f.shekels("prediction.indexed")}</M>. בשקלים של היום זה עדיין {f.shekels("explain.principal")} — ההצמדה שמרה על כוח הקנייה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הרווחתם, או רק נראה כך?
+
+</Section>
+
+הפקדתם {f.shekels("worked.start")} בתוכנית חיסכון, בריבית נומינלית של 4% לשנה. החיסכון לא מוצמד. במהלך השנה המחירים עלו ב־3% (מספרים להמחשה).
+כמה הרווחתם באמת?
+
+**צעד 1 — על הנייר.** <M>50,000 × 1.04 = {f.shekels("worked.nominal")}</M>.
+
+**צעד 2 — מה קרה למחירים.** מה שעלה {f.shekels("worked.start")} לפני שנה, עולה היום <M>50,000 × 1.03 = {f.shekels("worked.basket")}</M>.
+
+**צעד 3 — הרווח בשקלים של סוף השנה.** <M>{n("worked.nominal")} − {n("worked.basket")} = {f.shekels("worked.gain_vs_basket")}</M>. רק זה תוספת של כוח קנייה.
+
+**צעד 4 — בשקלים של היום.** מתרגמים את מה שיש בסוף השנה לשקלים של תחילתה: <M>{n("worked.nominal")} ÷ 1.03 = {f.shekels("worked.real_value")}</M>. הרווח הריאלי: <M>{n("worked.real_value")} − {n("worked.start")} = {f.shekels("worked.real_gain")}</M>.
+
+**צעד 5 — הריבית הריאלית.** <M>(1.04 ÷ 1.03 − 1) × 100 = {f.plain("worked.real_rate")}</M>, כלומר {pct("worked.real_rate")} — לא 4%, ובקירוב {pct("worked.real_approx")}.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>ריבית נומינלית חיובית אינה בהכרח רווח. כשהאינפלציה גבוהה מהריבית הנומינלית, הריבית הריאלית שלילית: יש יותר שקלים, אבל הם קונים פחות ממה שהיה קודם.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+חוב של 50,000 ₪, מוצמד למדד, בלי ריבית ובלי תשלומים. המדד עולה ב־2% בכל שנה (מספרים להמחשה). השנה הראשונה כבר מלאה. השלימו את השאר.
+
+<FillGrid
+  client:visible
+  id="0.8-half"
+  periodLabel="שנה"
+  rows={half}
+  columns={[
+    { key: "opening", label: "החוב בתחילת השנה", format: "shekels" },
+    { key: "indexation", label: "תוספת ההצמדה (2%)", format: "shekels" },
+    { key: "closing", label: "החוב בסוף השנה", format: "shekels" },
+  ]}
+  blanks={["2.indexation", "2.closing", "3.opening", "3.indexation", "3.closing"]}
+  success="כל שנה ההצמדה מחושבת על החוב של תחילת השנה — שכבר כולל את ההצמדה של השנים הקודמות."
+  hint="בדקו: האם חישבתם 2% מהחוב של תחילת השנה, ולא מ־50,000 ₪? ובכל שנה, החוב בתחילתה הוא החוב בסוף השנה הקודמת."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. תצטרכו מחשבון. אחוזים כתבו בלי הסימן %, בשתי ספרות אחרי הנקודה.
+
+<NumericExercise
+  client:visible
+  id="0.8-1"
+  n={1}
+  level="קל"
+  answer={f.raw("ex1.answer")}
+  errors={[
+    { value: f.raw("ex1.add"), message: "זו רק תוספת ההצמדה. השאלה היא כמה אתם חייבים — החוב המקורי ועוד התוספת." },
+    { value: f.raw("ex1.start"), message: "החוב מוצמד: כשהמדד עלה ב־4%, גם החוב עולה ב־4%." },
+  ]}
+>
+  לקחתם הלוואה של 10,000 ₪, מוצמדת למדד, בלי ריבית. מדד הבסיס היה 100, והיום המדד 104. כמה אתם חייבים היום?
+</NumericExercise>
+
+<Solution for="0.8-1">
+<M>10,000 × 104 ÷ 100 = {f.shekels("ex1.answer")}</M>. ההצמדה הוסיפה {f.shekels("ex1.add")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.8-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "בשקלים כפי שהם כתובים, בלי להביא בחשבון את עליית המחירים", correct: true, feedback: "נכון. זה ״נומינלי״: מספר השקלים, לפני שבודקים מה הם קונים." },
+    { text: "אחרי שהורידו את האינפלציה", feedback: "זה הפוך: ״אחרי אינפלציה״ הוא ריאלי. ״לפני אינפלציה״ פירושו שעוד לא הורידו אותה." },
+    { text: "לפני שהמחירים התחילו לעלות, בתקופת הבסיס", feedback: "לא. הביטוי לא מדבר על זמן, אלא על אופן המדידה: האם מביאים בחשבון את עליית המחירים או לא." },
+    { text: "ריבית שמחלקים ב־12 כדי לקבל ריבית לחודש", feedback: "זה שימוש אחר במילה ״נומינלית״ — שיטת חישוב. ״לפני אינפלציה״ מדבר על משהו אחר: האם מביאים בחשבון את עליית המחירים." },
+  ]}
+>
+  בהודעה כתוב: ״הריבית על החיסכון היא 4%, <strong>לפני אינפלציה</strong>״. מה פירוש ״לפני אינפלציה״?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.8-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.base_100"), message: "חילקתם ב־100. מדד הבסיס כאן הוא 105 — מחלקים בו." },
+    { value: f.raw("ex3.points_as_percent"), message: `הוספתם ${f.plain("ex3.points")}% — כמספר הנקודות שהמדד עלה. אבל ${f.plain("ex3.points")} נקודות מ־105 הן פחות מ־${f.plain("ex3.points")}%: מחלקים במדד הבסיס.` },
+    { value: f.raw("ex3.add"), message: "זו רק תוספת ההצמדה. השאלה היא על החוב כולו." },
+  ]}
+>
+  לקחתם הלוואה של 80,000 ₪, מוצמדת למדד, בלי ריבית. ביום ההלוואה המדד היה 105, והיום הוא 108.15. כמה אתם חייבים היום?
+</NumericExercise>
+
+<Solution for="0.8-3">
+<M>80,000 × 108.15 ÷ 105 = {f.shekels("ex3.answer")}</M>. המדד עלה ב־3%, ולכן גם החוב. התוספת: {f.shekels("ex3.add")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.8-4"
+  n={4}
+  level="בינוני"
+  unit="%"
+  tolerance={0.01}
+  near={0}
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.approx"), message: `${f.plain("ex4.approx")} הוא הקירוב, ״נומינלית פחות אינפלציה״. השאלה מבקשת את המספר המדויק: מחלקים, לא מחסרים.` },
+    { value: "6", message: "זו הריבית הנומינלית — כמה גדל מספר השקלים. הריאלית אומרת כמה גדל כוח הקנייה." },
+  ]}
+>
+  חיסכון נותן ריבית נומינלית של 6% לשנה, והמחירים עולים ב־4% לשנה. מה הריבית הריאלית, בדיוק (בשתי ספרות אחרי הנקודה)?
+</NumericExercise>
+
+<Solution for="0.8-4">
+<M>(1.06 ÷ 1.04 − 1) × 100 = {f.plain("ex4.answer")}</M>, כלומר {pct("ex4.answer")}. הקירוב נותן {pct("ex4.approx")} — קרוב, אבל לא מדויק.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.8-5"
+  n={5}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.simple"), message: "הורדתם 2% מ־100,000 בכל שנה. אבל כל שנה המחירים עולים על המחירים שכבר עלו: מחלקים ב־1.02 חמש פעמים." },
+    { value: f.raw("ex5.indexed"), message: "זה החוב אילו היה מוצמד, על הנייר. השאלה היא כמה החוב שלא מוצמד שווה בשקלים של היום." },
+    { value: "100000", message: "על הנייר החוב לא השתנה. אבל השאלה היא על כוח הקנייה: כמה הוא שווה בשקלים של היום." },
+  ]}
+>
+  הלוויתם לחבר 100,000 ₪, בלי ריבית ובלי הצמדה. הוא יחזיר את כל הסכום בעוד 5 שנים. נניח שהמחירים יעלו ב־2% בכל שנה. כמה שווה הסכום שתקבלו, בשקלים של היום?
+</NumericExercise>
+
+<Solution for="0.8-5">
+<M>100,000 ÷ 1.02<sup>5</sup> = {f.shekels("ex5.answer")}</M>. על הנייר תקבלו 100,000 ₪, אבל הם יקנו כמו {f.whole("ex5.answer")} היום.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.8-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.approx"), message: `${f.plain("ex6.approx")} הוא הקירוב, ״ריאלית ועוד אינפלציה״. המספר המדויק מכפילים: ${eq("1.03 × 1.02")}.` },
+  ]}
+>
+  אתם רוצים שהחיסכון שלכם יגדל ב־3% בשנה <strong>בכוח קנייה</strong>, והמחירים עולים ב־2% בשנה. איזו ריבית נומינלית אתם צריכים, בדיוק?
+</NumericExercise>
+
+<Solution for="0.8-6">
+<M>(1.03 × 1.02 − 1) × 100 = {f.plain("ex6.answer")}</M>, כלומר {pct("ex6.answer")}. זו הנוסחה של ריבית ריאלית, הפוכה: <M>1 + i = (1 + r) × (1 + π)</M>.
+</Solution>
+
+<Callout title="חמש שאלות על הצמדה">
+<p><strong>מה זה?</strong> קשירה של סכום למדד המחירים לצרכן: כשהמדד עולה באחוז מסוים, הסכום עולה באותו אחוז (וכשהמדד יורד, הסכום יורד).</p>
+<p><strong>למה זה קיים?</strong> כדי לשמור על כוח הקנייה של סכום לאורך זמן. מי שמלווה כסף לשנים רבות לא רוצה לקבל בחזרה שקלים שקונים פחות. ההצמדה מעבירה את הסיכון של אינפלציה מהמלווה ללווה.</p>
+<p><strong>איך זה עובד?</strong> קובעים מדד בסיס ביום ההצמדה. בכל פעם שמחשבים את הסכום, כופלים אותו במדד החדש ומחלקים במדד הבסיס.</p>
+<p><strong>איך זה משפיע עליכם?</strong> בחוב מוצמד מספר השקלים שתחזירו לא ידוע מראש: הוא תלוי באינפלציה שתהיה. בחיסכון מוצמד — הכסף שומר על כוח הקנייה שלו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים סכומים וריביות באותה שפה: נומינלי מול נומינלי, או ריאלי מול ריאלי. ריבית על חוב מוצמד וריבית על חוב שלא מוצמד הן לא אותו דבר, ואי אפשר להשוות ביניהן ישירות בלי להביא בחשבון את האינפלציה. כשנגיע ל<Later lesson="2.3">מסלול צמוד ומסלול לא צמוד במשכנתא</Later>, זו תהיה אחת השאלות המרכזיות.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הצמדה** = הסכום זז באותו אחוז שבו זז המדד: <M>A<sub>0</sub> × I<sub>1</sub> ÷ I<sub>0</sub></M>.
+- **חוב מוצמד גדל על הנייר** גם בלי ריבית ובלי כסף נוסף — ושנה אחרי שנה ההצמדה מצטברת, כמו ריבית דריבית.
+- **נומינלי** = בשקלים כפי שהם כתובים, לפני אינפלציה. **ריאלי** = אחרי אינפלציה, בכוח קנייה.
+- **ריבית ריאלית:** <M>(1 + i) ÷ (1 + π) − 1</M>. ״נומינלית פחות אינפלציה״ הוא רק קירוב.
+- **הצמדה שומרת על כוח הקנייה** של הסכום. מי שמלווה בלי הצמדה מקבל בחזרה שקלים שקונים פחות.
+- **למילה ״נומינלית״ יש גם שימוש אחר** — שיטת חישוב של ריבית לשנה (שיעור 0.4). בדקו תמיד באיזה מובן היא נאמרת.
+
+**בשיעור הבא — 0.9, מה זו הלוואה, ואיך בנק מרוויח:** מאיפה הבנק מביא את הכסף שהוא מלווה, כמה הכסף הזה עולה לו, ומה נשאר לו באמצע.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "הצמדה כיחס בין מדדים, והקשר בין ריבית נומינלית, ריבית ריאלית ואינפלציה (חלוקה של מקדמי צמיחה, לא חיסור). אותו כלל משמש גם בדף ה־Brain על מקורות הנתונים (7831553), שמציין שחיסור פשוט טועה בכמה מאיות האחוז.", code: ["A₁ = A₀ × I₁ ÷ I₀", "1 + r = (1 + i) ÷ (1 + π)"] },
+    { kind: "ידע מתמטי כללי", text: "לביטוי ״ריבית נומינלית״ שני שימושים: ״לפני אינפלציה״, ו״ריבית שנתית שמחלקים ב־12״. הבריף של הקורס דורש להפריד ביניהם." },
+    { kind: "הנחת חישוב", text: "כל הסכומים, הריביות, ערכי המדד ושיעורי האינפלציה בשיעור בדויים, להמחשה. הם לא נתוני הלמ״ס, לא ריביות שוק ולא תחזית." },
+    { kind: "הנחת חישוב", text: "בדוגמאות אין ריבית ואין תשלומים, כדי לבודד את ההצמדה. עיגול: לאגורה, בסוף החישוב; בטבלאות — את תוספת ההצמדה של כל שנה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/indexation.ts (and compound.ts) via scripts/lessons/lesson-0-8.ts and data/lessons/0-8.json, rechecked by checks/kinds/indexation.py. Illustration: src/components/IndexationEffect.vue. */}

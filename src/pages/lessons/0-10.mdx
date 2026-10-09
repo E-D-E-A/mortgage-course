@@ -1,0 +1,386 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.10"
+minutes: 25
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RateDecisions from "../../components/RateDecisions.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+export const f = facts("0.10");
+export const pct = (id) => `${f.plain(id)}%`;
+export const fmtDate = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+export const heDate = (id) => fmtDate(f.raw(id));
+export const path = f.rows("timeline.path");
+export const upcoming = f.raw("decision.upcoming");
+export const predictionOptions = [
+  "היא עולה",
+  "היא יורדת, כי הבנקים מתחרים על הלווים",
+  "היא לא משתנה: בנק ישראל משפיע רק על הממשלה",
+  "היא עולה, אבל רק בעוד כמה שנים",
+];
+
+בשיעור 0.7 ראינו איך מודדים <Term t="אינפלציה" lesson="0.10">אינפלציה</Term>. בשיעור 0.9 ראינו שהריבית על הלוואה בנויה מ<Term t="עלות הכסף" lesson="0.10">עלות הכסף</Term> של הבנק ועוד <Term t="מרווח" lesson="0.10">מרווח</Term>.
+בשיעור הזה נכיר את הגוף שמשפיע על עלות הכסף של כל הבנקים יחד — ונבין למה הוא עושה את זה: כדי לשלוט באינפלציה.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.10"
+  question="בנק ישראל מעלה את הריבית שלו. מה קורה, בדרך כלל, לריבית שהבנקים גובים על הלוואות חדשות?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## הכפתור של הכלכלה
+
+</Section>
+
+<LessonVideo lesson="0-10" />
+
+<Section kind="ההסבר">
+
+## הבנק של הבנקים
+
+</Section>
+
+<Term t="בנק ישראל" lesson="0.10">בנק ישראל</Term> הוא הבנק המרכזי של ישראל. אנשים פרטיים לא פותחים בו חשבון. הוא עובד מול הממשלה ומול הבנקים.
+יש לו כמה תפקידים. שניים חשובים לנו: הוא מפקח על הבנקים, והוא אחראי לכך שהמחירים במשק יעלו לאט ובאופן צפוי.
+
+**יעד האינפלציה.** בנק ישראל לא מנסה להגיע לאינפלציה של אפס. יש לו <Term t="יעד אינפלציה" lesson="0.10">יעד אינפלציה</Term>: טווח של {pct("target.low")} עד {pct("target.high")} לשנה. (לפי תקציר של הודעה רשמית; ממתין לבדיקה — ראו מקורות.)
+כשהאינפלציה בתוך הטווח, המחירים עולים, אבל לאט מספיק כדי שאפשר לתכנן. כשהיא גבוהה מדי, כסף מאבד מהר את כוח הקנייה שלו — כמו שראינו בשיעור 0.8.
+
+<Section kind="ההסבר">
+
+## הכפתור: ריבית בנק ישראל
+
+</Section>
+
+הכלי העיקרי שבידי בנק ישראל הוא <Term t="ריבית בנק ישראל" lesson="0.10">ריבית בנק ישראל</Term>: הריבית שהוא קובע לכסף שהוא מלווה לבנקים ומקבל מהם לזמן קצר.
+אנשים לא לווים בה ישירות. אבל היא משפיעה על כולם, בשרשרת:
+
+1. **בנק ישראל מעלה את הריבית שלו.**
+2. **עלות הכסף של הבנקים עולה** — הכסף שהם מקבלים ממנו, ומהמפקידים, עולה להם יותר.
+3. **הבנקים מעלים את הריביות** על הלוואות חדשות, וגם על פיקדונות.
+4. **אנשים ועסקים לווים פחות וחוסכים יותר** — הלוואה יקרה יותר, וחיסכון משתלם יותר.
+5. **הביקוש למוצרים ולשירותים נחלש**, ולכן **המחירים עולים לאט יותר**.
+
+הורדה של הריבית עובדת הפוך: הלוואות זולות יותר, יותר קניות, והמחירים עולים מהר יותר.
+**השרשרת לוקחת זמן** — חודשים, לא ימים. ולא רק הריבית משפיעה על המחירים, ולכן התוצאה לא מובטחת. הריבית היא כפתור שמזיז את הכלכלה, לא מתג שקובע אותה.
+
+<Section kind="ההסבר">
+
+## מי מחליט, ומתי
+
+</Section>
+
+את הריבית קובעת <Term t="ועדה מוניטרית" lesson="0.10">הוועדה המוניטרית</Term>, ועדה בבנק ישראל. היא מתכנסת במועדים שנקבעים מראש: {f.plain("decision.count")} החלטות בשנה. בכל החלטה היא יכולה להעלות את הריבית, להוריד אותה או להשאיר אותה.
+
+ב־2026 הריבית ירדה. השנה התחילה ב־{pct("decision.start")} (שנקבעו ב־{heDate("decision.start_date")}). ההחלטה האחרונה עד כה פורסמה ב־{heDate("decision.current_date")}: הורדה ל־**{pct("decision.current")}**, שנכנסה לתוקף ב־{heDate("decision.effective_date")}.
+ההחלטה הבאה קבועה ל־{fmtDate(upcoming[0])}, ואחריה עוד אחת, ב־{fmtDate(upcoming[1])}.
+
+**ריבית אחת שנגזרת ממנה.** בישראל יש ריבית שהבנקים משתמשים בה כבסיס להלוואות רבות: <Later lesson="2.1">ריבית הפריים</Later>. היא שווה תמיד לריבית בנק ישראל ועוד {f.plain("prime.addition")} נקודות אחוז.
+היום: <M>{f.plain("decision.current")}% + {f.plain("prime.addition")} = {pct("prime.current")}</M>. כשבנק ישראל מזיז את הריבית שלו, גם היא זזה, באותו מספר נקודות אחוז.
+
+<Callout title="מה כאן עוד לא נבדק מול המקור">
+<p>אתר בנק ישראל חסום בסביבה שבה נכתב השיעור. הריביות והתאריכים בשיעור נלקחו מתקצירים של הודעות בנק ישראל במנוע חיפוש, ולכן הם מסומנים ״לא אומת״. הנתונים נכונים ל־2026-10-09.</p>
+<p>הריבית הנוכחית ({pct("decision.current")}) והמועד הבא נמצאים גם בבדיקה שהצוות עשה מול שירות הנתונים שבנק ישראל מפעיל, כפי שתועדה ב־Brain (דף 67469313, 2026-10-08).</p>
+<p>שתי נקודות פתוחות: לפי לוח המועדים, ההחלטה האחרונה נקבעה ל־{heDate("decision.schedule_date")}, וההודעה עצמה מדברת על {heDate("decision.current_date")}. ומקור ה־{f.plain("prime.addition")} נקודות: דף הסבר באתר בנק ישראל מתאר אותן כתוספת קבועה, ודף ב־Brain מייחס אותן להוראה רגולטורית. לא הכרענו.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## ההחלטות של 2026
+
+</Section>
+
+כל נקודה בגרף היא החלטה של הוועדה המוניטרית ב־2026. הקו הכהה הוא ריבית בנק ישראל, והקו הבהיר — הריבית ועוד {f.plain("prime.addition")} נקודות אחוז. הזמן רץ מימין לשמאל.
+בחרו החלטה במחוון, או לחצו על נקודה.
+
+<RateDecisions
+  client:visible
+  rows={path}
+  upcoming={upcoming}
+  startPrime={f.raw("prime.start")}
+  note="לא אומת: לפי תקציר של מקור רשמי; ממתין לבדיקה. נכון ל־2026-10-09."
+  notes={{
+    [path[3].date]: "ההחלטה הזו נשענת על תקציר אחד בלבד (כותרת בעמוד הבית באתר בנק ישראל). כל השאר עלו ביותר מחיפוש אחד.",
+    [path[5].date]: `נכנסה לתוקף ב־${heDate("decision.effective_date")}. לוח המועדים מראש ציין את ${heDate("decision.schedule_date")}; ההודעה מדברת על ${heDate("decision.current_date")}.`,
+  }}
+/>
+
+נסו את שלושת אלה:
+1. מצאו את ההחלטות שבהן הריבית לא השתנתה.
+2. עברו מההחלטה הראשונה לאחרונה. כמה ירדה ריבית בנק ישראל, וכמה ירד הקו הבהיר?
+3. איזו החלטה נשענת על מקור אחד בלבד?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{fmtDate(path[1].date)} ו־{fmtDate(path[2].date)}: הריבית נשארה {path[1].rate}%.</li>
+    <li>מתחילת השנה ריבית בנק ישראל ירדה מ־{pct("decision.start")} ל־{pct("decision.current")}: ב־{f.plain("year.drop")} נקודת אחוז. הקו הבהיר ירד מ־{pct("prime.start")} ל־{pct("prime.current")} — באותה נקודת אחוז, כי הפער ביניהם קבוע.</li>
+    <li>ההחלטה של {fmtDate(path[3].date)}. לכן היא מסומנת בנפרד, עד שמישהו יבדוק אותה מול ההודעה הרשמית.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+ראינו שהריבית שנגזרת מריבית בנק ישראל היא תמיד הריבית ועוד {f.plain("prime.addition")} נקודות אחוז. בבנק ישראל נותנים דוגמה: אם הריבית היא 1%, הריבית שנגזרת ממנה היא {pct("explain.prime_example")}.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">P = R + 1.5</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">R</dt><dd>ריבית בנק ישראל, באחוזים לשנה</dd>
+    <dt class="ltr font-semibold text-n900">1.5</dt><dd>תוספת קבועה, בנקודות אחוז</dd>
+    <dt class="ltr font-semibold text-n900">P</dt><dd>הריבית שנגזרת ממנה (<Later lesson="2.1">הפריים</Later>), באחוזים לשנה</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** כל עוד התוספת נשארת {f.plain("prime.addition")} נקודות אחוז. היא מחברת נקודות אחוז לאחוזים — לא כופלת. ושימו לב לתאריך: הריבית החדשה נכנסת לתוקף כמה ימים אחרי ההחלטה (בהחלטה האחרונה — ב־{heDate("decision.effective_date")}).
+
+<Callout title="נקודות אחוז מול אחוזים, שוב" tone="warning">
+<p>ב־2026 הריבית ירדה מ־{pct("decision.start")} ל־{pct("decision.current")}. זו ירידה של {f.plain("year.drop")} <Term t="נקודת אחוז" lesson="0.10">נקודת אחוז</Term>. אבל ביחס לריבית שהייתה, זו ירידה של {pct("year.relative_drop")}. שני המשפטים נכונים — והם אומרים דברים שונים. בחדשות אומרים בדרך כלל ״הריבית ירדה ב־0.25%״ כשמתכוונים לנקודות אחוז.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.10"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    "תחרות בין בנקים משפיעה על המרווח. אבל כשעלות הכסף של כולם עולה, כולם מעלים ריביות.",
+    "בנק ישראל עובד מול הבנקים, והריבית שלו קובעת כמה הכסף עולה להם. משם היא עוברת לכולם.",
+    "על הלוואות חדשות ההשפעה מגיעה מהר. מה שלוקח זמן הוא ההשפעה על הקניות ועל המחירים.",
+  ]}
+>
+  כשריבית בנק ישראל עולה, עלות הכסף של הבנקים עולה, והם מעלים את הריבית על הלוואות חדשות. זה החוליה השלישית בשרשרת.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## שנה של הורדות
+
+</Section>
+
+מה קרה לריבית ב־2026, עד {heDate("decision.current_date")}?
+
+**צעד 1 — בנקודות אחוז.** <M>{f.plain("decision.start")} − {f.plain("decision.current")} = {f.plain("year.drop")}</M>. הריבית ירדה בנקודת אחוז אחת.
+
+**צעד 2 — באחוזים.** הירידה ביחס לריבית שהייתה: <M>{f.plain("year.drop")} ÷ {f.plain("decision.start")} × 100 = {f.plain("year.relative_drop")}</M>. כלומר, הריבית קטנה בכמעט רבע מעצמה.
+
+**צעד 3 — הריבית שנגזרת ממנה.** בתחילת השנה: <M>{f.plain("decision.start")} + 1.5 = {pct("prime.start")}</M>. היום: <M>{f.plain("decision.current")} + 1.5 = {pct("prime.current")}</M>. גם היא ירדה ב־{f.plain("ex5.prime_drop")} נקודת אחוז.
+
+**צעד 4 — מה זה אומר לבנקים.** עלות הכסף שלהם ירדה. אם המרווח שלהם לא השתנה, גם הריבית על הלוואות חדשות ירדה בערך באותו מספר נקודות אחוז.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+ההחלטות של 2026. השורות הראשונות מלאות. השלימו בשלוש השורות האחרונות את השינוי (בנקודות אחוז; ירידה כותבים עם מינוס, למשל <span class="ltr">-0.25</span>) ואת הריבית ועוד 1.5.
+
+<FillGrid
+  client:visible
+  id="0.10-half"
+  rows={path}
+  columns={[
+    { key: "date", label: "תאריך", format: "date" },
+    { key: "before", label: "הריבית לפני", format: "percent" },
+    { key: "rate", label: "הריבית אחרי", format: "percent" },
+    { key: "change", label: "השינוי (נקודות אחוז)", format: "points" },
+    { key: "prime", label: "הריבית ועוד 1.5", format: "percent" },
+  ]}
+  blanks={["4.change", "4.prime", "5.change", "5.prime", "6.change", "6.prime"]}
+  success="בכל אחת משלוש ההחלטות הריבית ירדה ברבע נקודת אחוז, והריבית שנגזרת ממנה ירדה באותו מספר נקודות."
+  hint="השינוי הוא הריבית אחרי פחות הריבית לפני (ירידה יוצאת במינוס). הריבית ועוד 1.5 מחושבת מהריבית אחרי ההחלטה."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. את האחוזים כתבו בלי הסימן %.
+
+<ChoiceExercise
+  client:visible
+  id="0.10-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "הממשלה, בהחלטה של שר האוצר", feedback: "לא. את הריבית קובע בנק ישראל, לא הממשלה." },
+    { text: "כל בנק לעצמו", feedback: "כל בנק קובע את הריביות שלו ללקוחות. את ריבית בנק ישראל קובע בנק ישראל." },
+    { text: "הוועדה המוניטרית, בבנק ישראל, במועדים קבועים מראש", correct: true, feedback: "נכון. היא מתכנסת לפי לוח מועדים שמתפרסם מראש, ומחליטה אם להעלות, להוריד או להשאיר." },
+    { text: "הלמ״ס, לפי המדד של כל חודש", feedback: "הלמ״ס מודדת את המחירים. היא לא קובעת ריבית — אבל בנק ישראל מסתכל על מה שהיא מפרסמת." },
+  ]}
+>
+  מי קובע את <Term t="ריבית בנק ישראל" lesson="0.10">ריבית בנק ישראל</Term>?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.10-2"
+  n={2}
+  level="קל"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("prime.current")}
+  errors={[
+    { value: f.raw("ex2.wrong_subtract"), message: "הורדתם 1.5. התוספת היא מעל ריבית בנק ישראל, לא מתחתיה." },
+    { value: f.raw("decision.current"), message: "זו ריבית בנק ישראל עצמה. הוסיפו לה את התוספת הקבועה." },
+  ]}
+>
+  ריבית בנק ישראל היא {pct("decision.current")}. מה <Later lesson="2.1">ריבית הפריים</Later>, שהיא ריבית בנק ישראל ועוד 1.5 נקודות אחוז?
+</NumericExercise>
+
+<Solution for="0.10-2">
+<M>{f.plain("decision.current")} + 1.5 = {f.plain("prime.current")}</M>, כלומר {pct("prime.current")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.10-3"
+  n={3}
+  level="בינוני"
+  options={[
+    { text: "להוריד את הריבית, כדי שאנשים יקנו יותר", feedback: "זה היה מגביר את הביקוש — והמחירים היו עולים עוד יותר מהר." },
+    { text: "להעלות את הריבית, כדי שהלוואות יתייקרו והביקוש ייחלש", correct: true, feedback: "נכון. זה הכיוון שהוועדה שוקלת בדרך כלל כשהאינפלציה מעל היעד. ההחלטה עצמה תלויה גם בגורמים אחרים." },
+    { text: "לא לעשות כלום — המחירים יירדו לבד", feedback: "יכול להיות שהאינפלציה תרד מעצמה, אבל זה לא מובטח. בשביל זה יש יעד ויש כלי." },
+    { text: "להורות לבנקים להוריד מחירים", feedback: "בנק ישראל לא קובע מחירים. הכלי שלו הוא הריבית." },
+  ]}
+>
+  האינפלציה בשנה האחרונה הייתה הרבה מעל טווח היעד שבנק ישראל קבע. מה הוועדה המוניטרית שוקלת בדרך כלל במצב כזה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.10-4"
+  n={4}
+  level="בינוני"
+  unit="נקודות אחוז"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.relative"), message: `${f.plain("ex4.relative")}% היא הירידה ביחס לריבית שהייתה. השאלה היא בנקודות אחוז: פשוט חיסור.` },
+  ]}
+>
+  הריבית ירדה מ־4% ל־3.5%. בכמה <strong>נקודות אחוז</strong> היא ירדה?
+</NumericExercise>
+
+<Solution for="0.10-4">
+<M>4 − 3.5 = {f.plain("ex4.answer")}</M> נקודת אחוז. (ביחס לריבית שהייתה, זו ירידה של {pct("ex4.relative")}.)
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.10-5"
+  n={5}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0.05}
+  answer={f.raw("year.relative_drop")}
+  errors={[
+    { value: f.raw("year.drop"), message: `${f.plain("year.drop")} היא הירידה בנקודות אחוז. השאלה היא באחוזים: בכמה הריבית קטנה ביחס לעצמה.` },
+  ]}
+>
+  ב־2026 הריבית ירדה מ־{pct("decision.start")} ל־{pct("decision.current")}. בכמה <strong>אחוזים</strong> היא קטנה, ביחס לריבית שהייתה בתחילת השנה? (שתי ספרות אחרי הנקודה)
+</NumericExercise>
+
+<Solution for="0.10-5">
+הירידה בנקודות: {f.plain("year.drop")}. ביחס לריבית שהייתה: <M>{f.plain("year.drop")} ÷ {f.plain("decision.start")} × 100 = {f.plain("year.relative_drop")}</M>, כלומר {pct("year.relative_drop")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.10-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.rate"), message: "זו ריבית בנק ישראל אחרי שתי ההורדות. השאלה היא על הריבית שנגזרת ממנה — הוסיפו 1.5." },
+    { value: f.raw("ex6.one_cut"), message: "זה אחרי הורדה אחת. בתרגיל יש שתיים." },
+    { value: f.raw("prime.current"), message: "זה המצב היום, לפני ההורדות שבתרגיל." },
+  ]}
+>
+  <strong>תרגיל מחשבה, לא תחזית:</strong> נניח שבשתי ההחלטות שנותרו ב־2026 הוועדה תוריד את הריבית ב־0.25 נקודת אחוז בכל פעם, מ־{pct("decision.current")}. מה תהיה אז הריבית ועוד 1.5 (<Later lesson="2.1">ריבית הפריים</Later>)?
+</NumericExercise>
+
+<Solution for="0.10-6">
+אחרי שתי הורדות: <M>{f.plain("decision.current")} − 2 × 0.25 = {f.plain("ex6.rate")}</M>. ועוד 1.5: <M>{f.plain("ex6.rate")} + 1.5 = {f.plain("ex6.answer")}</M>, כלומר {pct("ex6.answer")}. זה תרגיל בחשבון בלבד: אף אחד לא יודע מה הוועדה תחליט.
+</Solution>
+
+<Callout title="חמש שאלות על ריבית בנק ישראל">
+<p><strong>מה זה?</strong> הריבית שבנק ישראל קובע לכסף שהוא מלווה לבנקים ומקבל מהם לזמן קצר. הוועדה המוניטרית מחליטה עליה, {f.plain("decision.count")} פעמים בשנה.</p>
+<p><strong>למה זה קיים?</strong> כדי לשמור על אינפלציה בתוך טווח היעד. הריבית היא הכלי העיקרי שבידי בנק ישראל להאט את עליית המחירים או להאיץ את הפעילות במשק.</p>
+<p><strong>איך זה עובד?</strong> הריבית משנה את עלות הכסף של הבנקים. הם מעבירים את השינוי לריביות על הלוואות ופיקדונות, וזה משנה כמה אנשים ועסקים לווים וקונים — ובסוף את קצב עליית המחירים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> על הריבית שתקבלו על הלוואה חדשה ועל חיסכון. ויש ריביות שקשורות אליה ישירות, כמו הריבית שגדולה ממנה ב־{f.plain("prime.addition")} נקודות אחוז, וזזות איתה בכל החלטה.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> עוקבים אחרי מועדי ההחלטות ואחרי ההחלטות עצמן, ובודקים תמיד את התאריך של כל נתון. אבל אף אחד לא יודע מראש מה הוועדה תחליט — לכן לא בונים החלטה על ניחוש של ההחלטה הבאה. נלמד לבנות החלטות שמחזיקות גם כשהריבית זזה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **בנק ישראל** הוא הבנק המרכזי. אחד מתפקידיו: לשמור שהמחירים יעלו לאט ובאופן צפוי.
+- **יעד האינפלציה:** {pct("target.low")} עד {pct("target.high")} לשנה (לא אומת מול המקור).
+- **ריבית בנק ישראל** היא הכפתור: היא משנה את עלות הכסף של הבנקים, ודרכה את הריביות, את הביקוש ואת המחירים — לאט, ובלי הבטחה.
+- **הוועדה המוניטרית** מחליטה {f.plain("decision.count")} פעמים בשנה, במועדים קבועים מראש.
+- **היום:** {pct("decision.current")}, מ־{heDate("decision.effective_date")}. והריבית ועוד {f.plain("prime.addition")} נקודות אחוז: {pct("prime.current")}. ההחלטה הבאה: {fmtDate(upcoming[0])}. (לא אומת מול המקור.)
+- **נקודות אחוז אינן אחוזים:** ירידה מ־{pct("decision.start")} ל־{pct("decision.current")} היא {f.plain("year.drop")} נקודת אחוז, אבל {pct("year.relative_drop")}.
+
+**בשיעור הבא — 0.11:** איך הממשלה לווה כסף מהציבור, ולמה המחיר של חוב כזה זז כשהריבית זזה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "ריבית בנק ישראל 3.25%: הוועדה המוניטרית הודיעה ב־2026-09-01 על הורדה של 0.25 נקודת אחוז; בתוקף מ־2026-09-03. לפי תקציר של מקור רשמי; ממתין לבדיקה.", href: "https://www.boi.org.il/en/communication-and-publications/press-releases/01-9-26-en/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "הריבית הנוכחית 3.25% והמועד הבא 2026-10-21, לפי תעתיק בצוות ב־Brain (דף 67469313, 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "ההחלטות ב־2026: 4.25% מ־2025-11-24; 4.00% ב־2026-01-05; ללא שינוי ב־2026-02-23 וב־2026-03-30; 3.75% ב־2026-05-25 (תקציר אחד בלבד, מכותרת בעמוד הבית); 3.50% ב־2026-07-06; 3.25% ב־2026-09-01. לפי תקציר של מקור רשמי; ממתין לבדיקה.", href: "https://www.boi.org.il/en/communication-and-publications/press-releases/the-monetary-committee-decides-on-july-6-2026-to-lower-the-interest-rate-to-35-percent/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "לוח המועדים של 2026: 5 בינואר, 23 בפברואר, 30 במרץ, 25 במאי, 6 ביולי, 31 באוגוסט (הודעה ב־1 בספטמבר), 21 באוקטובר, 23 בנובמבר — שמונה החלטות, ״ייתכנו שינויים״. סתירה פתוחה: לוח המועדים מציין 31 באוגוסט, וההודעה מדברת על החלטה ב־1 בספטמבר. לפי תקציר של מקור רשמי; ממתין לבדיקה.", href: "https://www.boi.org.il/en/economic-roles/monetary-policy/interest-rate-announcement-dates-2026/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "יעד האינפלציה: טווח של בין 1% ל־3% לשנה, כפי שמוזכר בהודעת 2026-09-01. לפי תקציר של מקור רשמי (תקציר אחד); ממתין לבדיקה.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "הריבית שנלמד בשיעור 2.1 שווה לריבית בנק ישראל ועוד 1.5 נקודות אחוז; דף ההסבר לצרכן באתר בנק ישראל נותן דוגמה: כשריבית בנק ישראל 1%, היא 2.5%. לפי תקציר של מקור רשמי; ממתין לבדיקה. סתירה פתוחה: דף ב־Brain (7831553) מייחס את ה־1.5 להוראה רגולטורית. הערך 4.75% הוא חשבון, לא נתון שפורסם.", href: "https://www.boi.org.il/information/bank-paymnts/financial-education/competition-in-mortgages/", date: "2026-10-09" },
+    { kind: "ידע מתמטי כללי", text: "ידע כלכלי כללי, מכל מבוא לכלכלה: איך ריבית של בנק מרכזי עוברת לריביות במשק, לביקוש ולמחירים, ושהשפעתה מתעכבת ואינה ודאית." },
+    { kind: "הנחת חישוב", text: "בתרגיל 6, שתי ההורדות של 0.25 נקודת אחוז הן תרגיל בחשבון, לא תחזית ולא הערכה של מה שהוועדה תחליט." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/lending.ts via scripts/lessons/lesson-0-10.ts and data/lessons/0-10.json, rechecked by checks/kinds/lending.py. The 2026 decisions come from research/notes/official-sources.md §6. Illustration: src/components/RateDecisions.vue. */}

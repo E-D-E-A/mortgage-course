@@ -1,0 +1,238 @@
+{
+  "lesson": "0.9",
+  "title": "מה זו הלוואה, ואיך בנק מרוויח",
+  "note": "Invented teaching numbers for a made-up bank; not any real bank's rates, costs or spreads.",
+  "facts": [
+    {
+      "id": "explain.from_borrower",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "100000",
+        "rate_percent": "5"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "explain.to_depositors",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "100000",
+        "rate_percent": "2"
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "explain.spread_income",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.from_borrower",
+        "subtrahend": "explain.to_depositors"
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "explain.spread",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "5",
+        "cost_rate": "2"
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain.spread_check",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "100000",
+        "rate_percent": "3"
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "slider.equal",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "5",
+        "cost_rate": "5"
+      },
+      "value": "0"
+    },
+    {
+      "id": "slider.double",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "200000",
+        "rate_percent": "3"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "slider.both_up",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "6",
+        "cost_rate": "3"
+      },
+      "value": "3"
+    },
+    {
+      "id": "worked.received",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "4.5"
+      },
+      "value": "18000.00"
+    },
+    {
+      "id": "worked.paid",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "2.75"
+      },
+      "value": "11000.00"
+    },
+    {
+      "id": "worked.spread_income",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.received",
+        "subtrahend": "worked.paid"
+      },
+      "value": "7000.00"
+    },
+    {
+      "id": "worked.spread",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "4.5",
+        "cost_rate": "2.75"
+      },
+      "value": "1.75"
+    },
+    {
+      "id": "worked.spread_check",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "1.75"
+      },
+      "value": "7000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "lend_spread_table",
+      "inputs": {
+        "amount_1": "100000",
+        "loan_rate_1": "6",
+        "cost_rate_1": "4",
+        "amount_2": "250000",
+        "loan_rate_2": "5.5",
+        "cost_rate_2": "3",
+        "amount_3": "600000",
+        "loan_rate_3": "4.25",
+        "cost_rate_3": "2.5"
+      },
+      "value": [
+        {
+          "period": 1,
+          "amount": "100000.00",
+          "loan_rate": "6",
+          "cost_rate": "4",
+          "spread": "2",
+          "income": "2000.00"
+        },
+        {
+          "period": 2,
+          "amount": "250000.00",
+          "loan_rate": "5.5",
+          "cost_rate": "3",
+          "spread": "2.5",
+          "income": "6250.00"
+        },
+        {
+          "period": 3,
+          "amount": "600000.00",
+          "loan_rate": "4.25",
+          "cost_rate": "2.5",
+          "spread": "1.75",
+          "income": "10500.00"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "6",
+        "cost_rate": "3.5"
+      },
+      "value": "2.5"
+    },
+    {
+      "id": "ex2.sum",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "6",
+        "b": "3.5"
+      },
+      "value": "9.5"
+    },
+    {
+      "id": "ex3.received",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "200000",
+        "rate_percent": "5"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "ex3.paid",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "200000",
+        "rate_percent": "3"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "ex3.spread",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "5",
+        "cost_rate": "3"
+      },
+      "value": "2"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "200000",
+        "rate_percent": "2"
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "lend_rate_for_income",
+      "inputs": {
+        "amount": "300000",
+        "income": "6000",
+        "cost_rate": "2.5"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "ex5.spread_only",
+      "kind": "lend_spread",
+      "inputs": {
+        "loan_rate": "4.5",
+        "cost_rate": "2.5"
+      },
+      "value": "2"
+    }
+  ]
+}

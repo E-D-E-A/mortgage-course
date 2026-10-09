@@ -1,0 +1,180 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.9 — "הבנק באמצע".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/0-9.json; the rates and amounts are
+  invented teaching numbers for a made-up bank. The subtitle cues (window.cues) carry the
+  explanatory sentences — the narration script, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.9 · מה זו הלוואה, ואיך בנק מרוויח</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-9.json")).json();
+      const F = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => F(id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const borrower = F("explain.from_borrower"), depositors = F("explain.to_depositors");
+      const V = {
+        amount: borrower.inputs.amount, loan: borrower.inputs.rate_percent, cost: depositors.inputs.rate_percent,
+        received: borrower.value, paid: depositors.value, left: fact("explain.spread_income"), spread: fact("explain.spread"),
+      };
+
+      const S = { title: [0, 10], flow: [10, 60], spread: [60, 92], costs: [92, 122], end: [122, 134] };
+      window.duration = 134;
+      window.cues = [
+        [1, 5, "איך בנק מרוויח מהלוואות?"],
+        [5, 9.5, "המספרים כאן להמחשה, לבנק בדוי."],
+        [11, 20, `מפקידים שמים בבנק ${shek(V.amount)}.`],
+        [20, 30, "בפיקדון, הם המלווים — והבנק הוא הלווה."],
+        [30, 40, `הבנק משלם להם ${V.cost}% לשנה: ${shek(V.paid)}.`],
+        [40, 49, `את אותו כסף הבנק מלווה ללווה, ב־${V.loan}% לשנה.`],
+        [49, 59, `הלווה משלם לבנק ${shek(V.received)} ריבית בשנה.`],
+        [61, 70, `נשאר לבנק: ${shek(V.received)} פחות ${shek(V.paid)}.`],
+        [70, 80, `${shek(V.left)} בשנה. זה המרווח, בשקלים.`],
+        [80, 91, `באחוזים: ${V.loan}% פחות ${V.cost}% — ${V.spread} נקודות אחוז.`],
+        [93, 102, "אבל המרווח הוא לא הרווח."],
+        [102, 112, "ממנו הבנק משלם עובדים, סניפים ומערכות."],
+        [112, 121, "וממנו הוא מכסה הלוואות שלא יחזרו."],
+        [123, 133, "מה שנשאר אחרי כל אלה — זה הרווח."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (cx, y, w, h, o, stroke = C.n200, sw = 1) => el("rect", { x: cx - w / 2, y, width: w, height: h, rx: 16, fill: C.n0, stroke, "stroke-width": sw, opacity: o });
+      // A horizontal arrow pointing left (money moving from right to left).
+      const arrow = (x1, x2, y, o, label, value) => {
+        el("line", { x1, x2: x2 + 12, y1: y, y2: y, stroke: C.n500, "stroke-width": 3, opacity: o });
+        el("path", { d: `M ${x2} ${y} l 16 -9 l 0 18 z`, fill: C.n500, opacity: o });
+        if (label) txt((x1 + x2) / 2, y - 16, label, 20, { fill: C.n600, o });
+        if (value) txt((x1 + x2) / 2, y + 34, value, 24, { w: 700, fill: C.teal, o, ltr: true });
+      };
+
+      // Depositors at the right, the bank in the middle, the borrower at the left.
+      function scene(t, sc, o) {
+        box(1060, 200, 260, 150, o);
+        txt(1060, 260, "המפקידים", 32, { w: 700, o });
+        box(640, 200, 260, 150, o, C.teal, 3);
+        txt(640, 260, "הבנק", 32, { w: 700, o });
+        const oB = after(t, sc, 30, o);
+        box(220, 200, 260, 150, oB);
+        txt(220, 260, "הלווה", 32, { w: 700, o: oB });
+        arrow(925, 775, 300, after(t, sc, 1, o), "הכסף", shek(V.amount));
+        arrow(505, 355, 300, after(t, sc, 30, o), "הכסף", shek(V.amount));
+        // Interest flows back, drawn below (pointing right).
+        const oP = after(t, sc, 20, o);
+        el("line", { x1: 780, x2: 912, y1: 420, y2: 420, stroke: C.tq2, "stroke-width": 3, opacity: oP });
+        el("path", { d: `M 925 420 l -16 -9 l 0 18 z`, fill: C.tq2, opacity: oP });
+        txt(850, 404, `ריבית ${V.cost}%`, 20, { fill: C.n600, o: oP });
+        txt(850, 456, shek(V.paid), 26, { w: 700, o: oP, ltr: true });
+        const oR = after(t, sc, 39, o);
+        el("line", { x1: 360, x2: 492, y1: 420, y2: 420, stroke: C.tq2, "stroke-width": 3, opacity: oR });
+        el("path", { d: `M 505 420 l -16 -9 l 0 18 z`, fill: C.tq2, opacity: oR });
+        txt(430, 404, `ריבית ${V.loan}%`, 20, { fill: C.n600, o: oR });
+        txt(430, 456, shek(V.received), 26, { w: 700, o: oR, ltr: true });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "איך בנק מרוויח", 80, { w: 700, o });
+          txt(640, 360, "הבנק באמצע", 34, { fill: C.n600, o });
+          txt(640, 450, "מספרים להמחשה, לבנק בדוי", 22, { fill: C.n500, o: after(t, S.title, 4, o) });
+        }
+        if (inScene(t, S.flow)) {
+          const o = vis(t, S.flow);
+          txt(640, 140, "מי מלווה למי", 40, { w: 700, o });
+          scene(t, S.flow, o);
+        }
+        if (inScene(t, S.spread)) {
+          const o = vis(t, S.spread);
+          txt(640, 140, "מה נשאר לבנק", 40, { w: 700, o });
+          // Two bars: what the borrower pays (right), what the depositors get (left), the gap marked.
+          const base = 520, scale = 0.06;
+          const hR = Number(V.received) * scale, hP = Number(V.paid) * scale;
+          el("rect", { x: 760, y: base - hR, width: 140, height: hR, rx: 4, fill: C.teal, opacity: o });
+          txt(830, base + 32, "הלווה משלם", 22, { fill: C.n700, o });
+          txt(830, base - hR - 12, shek(V.received), 26, { w: 700, o, ltr: true });
+          el("rect", { x: 560, y: base - hP, width: 140, height: hP, rx: 4, fill: C.n300, opacity: o });
+          txt(630, base + 32, "המפקידים מקבלים", 22, { fill: C.n700, o });
+          txt(630, base - hP - 12, shek(V.paid), 26, { w: 700, o, ltr: true });
+          const o2 = after(t, S.spread, 9, o);
+          el("rect", { x: 560, y: base - hR, width: 140, height: hR - hP - 2, rx: 4, fill: C.mint, stroke: C.teal, "stroke-dasharray": "6 5", opacity: o2 });
+          el("rect", { x: 120, y: 250, width: 380, height: 170, rx: 16, fill: C.mint, opacity: o2 * 0.6 });
+          txt(310, 300, "נשאר לבנק בשנה", 24, { fill: C.n700, o: o2 });
+          txt(310, 350, shek(V.left), 44, { w: 700, o: o2, ltr: true });
+          const o3 = after(t, S.spread, 20, o);
+          txt(310, 385, `המרווח: ${V.spread} נקודות אחוז`, 22, { w: 600, fill: C.n700, o: o3 });
+        }
+        if (inScene(t, S.costs)) {
+          const o = vis(t, S.costs);
+          txt(640, 140, "המרווח הוא לא הרווח", 40, { w: 700, o });
+          el("rect", { x: 440, y: 180, width: 400, height: 70, rx: 14, fill: C.mint, opacity: o * 0.6 });
+          txt(640, 225, `${shek(V.left)} לפני הוצאות`, 30, { w: 700, o });
+          const rows = [["עובדים, סניפים ומערכות", 10], ["הלוואות שלא יחזרו", 20], ["מה שנשאר: הרווח", 29]];
+          rows.forEach(([s, at], i) => {
+            const oi = after(t, S.costs, at, o);
+            el("rect", { x: 400, y: 280 + i * 80, width: 480, height: 62, rx: 12, fill: C.n0, stroke: i === 2 ? C.teal : C.n200, "stroke-width": i === 2 ? 2 : 1, opacity: oi });
+            txt(850, 320 + i * 80, i < 2 ? `פחות ${s}` : s, 26, { anchor: "start", w: i === 2 ? 700 : 400, o: oi });
+          });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 280, "מרווח = הריבית על ההלוואה", 48, { w: 700, o });
+          txt(640, 345, "פחות עלות הכסף.", 48, { w: 700, o });
+          txt(640, 430, "והרווח הוא מה שנשאר ממנו בסוף.", 30, { fill: C.n700, o: after(t, S.end, 3, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

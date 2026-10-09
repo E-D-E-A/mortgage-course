@@ -1,0 +1,372 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.9"
+minutes: 25
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import BankMiddle from "../../components/BankMiddle.vue";
+import FillGrid from "../../components/FillGrid.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.9");
+export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
+export const pct = (id) => `${f.plain(id)}%`;
+export const half = f.rows("half.table");
+export const predictionOptions = [
+  `${f.shekels("explain.from_borrower")} — כל הריבית שהלווה משלם`,
+  `${f.shekels("explain.spread_income")} בדיוק`,
+  `פחות מ־${f.shekels("explain.spread_income")}`,
+  `${f.shekels("explain.to_depositors")}`,
+];
+
+בשיעור 0.2 הכרנו <Term t="הלוואה" lesson="0.9">הלוואה</Term>: <Term t="מלווה" lesson="0.9">מלווה</Term> נותן ל<Term t="לווה" lesson="0.9">לווה</Term> סכום — <Term t="קרן" lesson="0.9">הקרן</Term> — והלווה מחזיר אותו בהמשך, ועוד <Term t="ריבית" lesson="0.9">ריבית</Term>.
+בשיעור הזה נסתכל על מלווה מיוחד: בנק. מאיפה הוא מביא את הכסף שהוא מלווה, כמה הכסף הזה עולה לו, ואיך הוא מרוויח.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.9"
+  question="בנק משלם 2% לשנה למי שמפקיד אצלו כסף, ומלווה את אותו כסף ב־5% לשנה. הוא מלווה 100,000 ₪ לשנה אחת. כמה מזה נשאר לבנק כרווח?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## הבנק באמצע
+
+</Section>
+
+<LessonVideo lesson="0-9" />
+
+<Section kind="ההסבר">
+
+## מאיפה לבנק כסף להלוות
+
+</Section>
+
+בנק לא מלווה בעיקר כסף ״משלו״. הוא מלווה כסף שאחרים הפקידו אצלו.
+
+**הפיקדון.** כשאתם שמים כסף בבנק לתקופה, ומקבלים עליו ריבית, זה <Term t="פיקדון" lesson="0.9">פיקדון</Term>.
+שימו לב מי מלווה למי: **בפיקדון, אתם המלווים והבנק הוא הלווה.** אתם נותנים לו כסף לזמן מה, והוא מחזיר לכם אותו ועוד ריבית.
+
+**עלות הכסף.** הריבית שהבנק משלם למפקידים היא מחיר: כך עולה לו הכסף שהוא מלווה הלאה. לזה קוראים <Term t="עלות הכסף" lesson="0.9">עלות הכסף</Term>.
+לבנק יש גם מקורות כסף אחרים, והוא משלם ריבית גם עליהם. עלות הכסף היא המחיר הכולל, באחוזים לשנה.
+
+**הבנק באמצע.** נחזור לשאלה. הבנק מקבל 100,000 ₪ מהמפקידים ומשלם להם 2% לשנה. הוא מלווה את הסכום הזה ב־5% לשנה. בשנה אחת:
+
+- הלווה משלם לבנק ריבית: <M>5% × 100,000 = {f.shekels("explain.from_borrower")}</M>.
+- הבנק משלם למפקידים ריבית: <M>2% × 100,000 = {f.shekels("explain.to_depositors")}</M>.
+- נשאר לבנק: <M>{n("explain.from_borrower")} − {n("explain.to_depositors")} = {f.shekels("explain.spread_income")}</M>.
+
+**המרווח.** ההפרש בין הריבית שהבנק גובה לבין עלות הכסף שלו נקרא <Term t="מרווח" lesson="0.9">מרווח</Term>.
+כאן: <M>5% − 2% = {f.plain("explain.spread")}</M> <Term t="נקודת אחוז" lesson="0.9">נקודות אחוז</Term>. (הפרש בין שני אחוזים נמדד בנקודות אחוז, כמו שלמדנו בשיעור 0.1.)
+ובשקלים: {f.plain("explain.spread")} נקודות אחוז מ־100,000 ₪ הם {f.shekels("explain.spread_check")} — אותו סכום שיצא למעלה.
+
+<Section kind="ההסבר">
+
+## מרווח אינו רווח
+
+</Section>
+
+מה־{f.shekels("explain.spread_income")} האלה הבנק עוד משלם הרבה דברים:
+
+- **הוצאות:** עובדים, סניפים, מערכות מחשב.
+- **הפסדים:** חלק מהלווים לא מחזירים את ההלוואה, או לא את כולה. את ההפסד הזה צריך לכסות מהמרווח של כל ההלוואות.
+- **מה שנשאר** אחרי כל אלה — זה הרווח.
+
+לכן **המרווח הוא לא הרווח.** הוא הסכום שממנו הבנק צריך לכסות את כל השאר. (לבנקים יש גם הכנסות אחרות, למשל <Later lesson="3.9">עמלות</Later>, אבל בשיעור הזה נתמקד בריבית.)
+
+**למה המרווח לא זהה לכולם?** בדרך כלל, ככל שהסיכון שהלווה לא יחזיר גבוה יותר, המלווה דורש מרווח גבוה יותר — כדי לכסות את ההפסדים הצפויים.
+כשההלוואה מגובה בנכס, הסיכון של המלווה קטן יותר. זה הבסיס של <Later lesson="1.1">משכנתא, הלוואה עם בטוחה</Later>.
+
+**ומה מזיז את עלות הכסף?** הריבית שהבנק משלם למפקידים לא קבועה. היא מושפעת מגורם אחד חשוב במיוחד: <Later lesson="0.10">ריבית בנק ישראל</Later> — הנושא של השיעור הבא.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הבנק באמצע
+
+</Section>
+
+המחוונים קובעים את הסכום, את עלות הכסף (הריבית שהבנק משלם למפקידים) ואת הריבית על ההלוואה. הקופסה האמצעית מראה את המרווח, ומה נשאר לבנק בשנה — לפני הוצאות והפסדים.
+
+<BankMiddle client:visible amount={100000} cost={2} loan={5} />
+
+נסו את שלושת אלה:
+1. העלו את עלות הכסף עד שהיא שווה לריבית על ההלוואה, 5%. מה קורה?
+2. החזירו ל־2% ו־5%, והגדילו את הסכום ל־200,000 ₪. מה השתנה ומה לא?
+3. העלו את שתי הריביות בנקודת אחוז אחת: 3% ו־6%. מה קרה למרווח?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>המרווח {f.plain("slider.equal")}: כל מה שהלווה משלם עובר למפקידים, ולא נשאר כלום לכסות הוצאות. אם הריבית על ההלוואה יורדת מתחת לעלות הכסף, הבנק מפסיד.</li>
+    <li>המרווח נשאר {f.plain("explain.spread")} נקודות אחוז, אבל בשקלים נשאר עכשיו {f.shekels("slider.double")} — פי שניים. המרווח הוא אחוז; הסכום תלוי בגודל ההלוואה.</li>
+    <li>המרווח נשאר {f.plain("slider.both_up")} נקודות אחוז. כשהריביות עולות ויורדות יחד, המרווח לא זז.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — המרווח באחוזים.** מחסרים: הריבית על ההלוואה פחות עלות הכסף. <M>5% − 2% = {f.plain("explain.spread")}</M> נקודות אחוז.
+
+**צעד 2 — המרווח בשקלים, לשנה.** כופלים את הסכום במרווח: <M>100,000 × {f.plain("explain.spread")}% = {f.shekels("explain.spread_check")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">m = r<sub>L</sub> − r<sub>F</sub></p>
+  <p class="ltr mt-2 text-h2 text-navy">S = A × m</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">r<sub>L</sub></dt><dd>הריבית על ההלוואה, לשנה, באחוזים</dd>
+    <dt class="ltr font-semibold text-n900">r<sub>F</sub></dt><dd>עלות הכסף, לשנה, באחוזים</dd>
+    <dt class="ltr font-semibold text-n900">m</dt><dd>המרווח, בנקודות אחוז</dd>
+    <dt class="ltr font-semibold text-n900">A</dt><dd>הסכום שהולווה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">S</dt><dd>מה שנשאר לבנק בשנה לפני הוצאות והפסדים, בשקלים. בחישוב כותבים את m כמספר עשרוני: 3 נקודות אחוז הן 0.03</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** רק כששלושה תנאים מתקיימים:
+1. כל הסכום מולווה לאורך כל השנה, והלווה משלם את הריבית במלואה.
+2. שתי הריביות לאותה תקופה — כאן, לשנה.
+3. S הוא לפני הוצאות ולפני הפסדים. הוא לא הרווח.
+
+<Callout title="איך מחשבים">
+<p><strong>ביד או במחשבון:</strong> מרווח הוא חיסור של שני אחוזים. את הסכום בשקלים מחשבים כמו בשיעור 0.1: הסכום כפול האחוז חלקי 100.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם הסכום בתא A1, הריבית ב־B1 ועלות הכסף ב־C1 (באחוזים), כותבים <span class="ltr">=A1*(B1-C1)/100</span>.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.9"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `${f.shekels("explain.from_borrower")} הם כל הריבית שהלווה משלם. אבל מזה ${f.shekels("explain.to_depositors")} עוברים למפקידים — זו עלות הכסף.`,
+    `${f.shekels("explain.spread_income")} הם המרווח בשקלים, לפני הוצאות והפסדים. הרווח עצמו קטן יותר.`,
+    "",
+    `${f.shekels("explain.to_depositors")} הם מה שהבנק משלם למפקידים — לא מה שנשאר לו.`,
+  ]}
+>
+  הבנק מקבל {f.shekels("explain.from_borrower")} ומשלם {f.shekels("explain.to_depositors")}, ונשארים לו {f.shekels("explain.spread_income")}. מזה הוא עוד משלם הוצאות ומכסה הלוואות שלא יוחזרו — ולכן הרווח קטן מ־{f.shekels("explain.spread_income")}.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הלוואה אחת בבנק א׳
+
+</Section>
+
+״בנק א׳״, בנק בדוי, מלווה 400,000 ₪ לשנה, בריבית של 4.5% לשנה. עלות הכסף שלו היא 2.75% לשנה. המספרים להמחשה בלבד.
+כמה נשאר לבנק מההלוואה הזו בשנה, לפני הוצאות?
+
+**צעד 1 — מה הלווה משלם.** <M>4.5% × 400,000 = {f.shekels("worked.received")}</M>.
+
+**צעד 2 — מה עולה הכסף לבנק.** <M>2.75% × 400,000 = {f.shekels("worked.paid")}</M>.
+
+**צעד 3 — מה נשאר.** <M>{n("worked.received")} − {n("worked.paid")} = {f.shekels("worked.spread_income")}</M>.
+
+**צעד 4 — בדיקה דרך המרווח.** <M>4.5% − 2.75% = {f.plain("worked.spread")}</M> נקודות אחוז, ו־<M>{f.plain("worked.spread")}% × 400,000 = {f.shekels("worked.spread_check")}</M>. אותה תוצאה.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>המרווח נשמע קטן — {f.plain("worked.spread")} נקודות אחוז. אבל על סכום גדול הוא הרבה שקלים. ומצד הלווה, כל נקודת אחוז במרווח היא כסף שהוא משלם בכל שנה של ההלוואה.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+שלוש הלוואות בדויות. השורה הראשונה מלאה. השלימו את המרווח (בנקודות אחוז) ואת מה שנשאר לבנק בשנה (בשקלים).
+
+<FillGrid
+  client:visible
+  id="0.9-half"
+  periodLabel="הלוואה"
+  rows={half}
+  columns={[
+    { key: "amount", label: "סכום", format: "shekels" },
+    { key: "loan_rate", label: "ריבית על ההלוואה", format: "percent" },
+    { key: "cost_rate", label: "עלות הכסף", format: "percent" },
+    { key: "spread", label: "מרווח (נקודות אחוז)", format: "points" },
+    { key: "income", label: "נשאר לבנק בשנה", format: "shekels" },
+  ]}
+  blanks={["2.spread", "2.income", "3.spread", "3.income"]}
+  success="ההלוואה עם המרווח הנמוך ביותר נתנה את הסכום הגדול ביותר, כי היא הכי גדולה. מרווח ושקלים הם שני דברים שונים."
+  hint="בדקו: המרווח הוא הריבית על ההלוואה פחות עלות הכסף. מה שנשאר בשקלים הוא הסכום כפול המרווח, חלקי 100."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם, ואת האחוזים בלי הסימן %. בתרגילים המספריים כדאי מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="0.9-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "הבנק הוא המלווה, ואתם הלווים", feedback: "הפוך. אתם נותנים לבנק את הכסף, והוא מתחייב להחזיר אותו עם ריבית — כלומר, הוא הלווה." },
+    { text: "אתם המלווים, והבנק הוא הלווה", correct: true, feedback: "נכון. בפיקדון אתם מלווים לבנק כסף, והריבית שהוא משלם לכם היא חלק מעלות הכסף שלו." },
+    { text: "אין כאן הלוואה — רק שמירה של הכסף", feedback: "יש כאן הלוואה: הבנק משתמש בכסף, ומשלם עליו ריבית. זה בדיוק מה שהוא מלווה הלאה." },
+    { text: "המלווה הוא מי שיקבל בסוף הלוואה מהבנק", feedback: "בפיקדון יש שני צדדים בלבד: אתם והבנק. אתם נותנים את הכסף — אתם המלווים." },
+  ]}
+>
+  הפקדתם 10,000 ₪ ב<Term t="פיקדון" lesson="0.9">פיקדון</Term> לשנה, בריבית. מי כאן המלווה ומי הלווה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.9-2"
+  n={2}
+  level="קל"
+  unit="נקודות אחוז"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.sum"), message: "חיברתם את שתי הריביות. המרווח הוא ההפרש ביניהן: הריבית על ההלוואה פחות עלות הכסף." },
+    { value: "3.5", message: "זו עלות הכסף. המרווח הוא מה שנשאר מעליה, עד הריבית על ההלוואה." },
+    { value: "6", message: "זו הריבית על ההלוואה. כדי לקבל מרווח מורידים ממנה את עלות הכסף." },
+  ]}
+>
+  בנק מלווה בריבית של 6% לשנה, ועלות הכסף שלו היא 3.5% לשנה. מה המרווח?
+</NumericExercise>
+
+<Solution for="0.9-2">
+<M>6% − 3.5% = {f.plain("ex2.answer")}</M> נקודות אחוז.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.9-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.received"), message: "זו כל הריבית שהלווה משלם. מזה הבנק משלם למפקידים — הורידו את זה." },
+    { value: f.raw("ex3.paid"), message: "זה מה שהבנק משלם למפקידים. השאלה היא מה נשאר לו." },
+    { value: f.raw("ex3.spread"), message: `${f.plain("ex3.spread")} הוא המרווח בנקודות אחוז. השאלה היא בשקלים: כמה זה מתוך 200,000 ₪?` },
+  ]}
+>
+  בנק מלווה 200,000 ₪ לשנה, בריבית של 5% לשנה. עלות הכסף שלו היא 3% לשנה. כמה נשאר לבנק בשנה, לפני הוצאות?
+</NumericExercise>
+
+<Solution for="0.9-3">
+הלווה משלם <M>5% × 200,000 = {f.shekels("ex3.received")}</M>. הבנק משלם <M>3% × 200,000 = {f.shekels("ex3.paid")}</M>. נשאר: <M>{n("ex3.received")} − {n("ex3.paid")} = {f.shekels("ex3.answer")}</M>. או בקיצור: מרווח של {f.plain("ex3.spread")} נקודות אחוז מ־200,000 ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.9-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "המרווח גדל ב־0.5 נקודת אחוז", feedback: "הפוך. עלות הכסף עלתה, והריבית על ההלוואה לא — הפער ביניהן קטן." },
+    { text: "המרווח קטן ב־0.5 נקודת אחוז", correct: true, feedback: "נכון. הריבית על ההלוואה נשארה, ועלות הכסף התקרבה אליה בחצי נקודה." },
+    { text: "המרווח לא השתנה, כי הריבית על ההלוואה לא השתנתה", feedback: "המרווח הוא הפרש בין שני מספרים. כשאחד מהם זז, ההפרש זז." },
+    { text: "המרווח קטן ב־0.5%", feedback: "כמעט. הפרש בין אחוזים נמדד בנקודות אחוז. ״קטן ב־0.5%״ היה אומר: קטן בחצי אחוז מעצמו — דבר אחר." },
+  ]}
+>
+  עלות הכסף של בנק עלתה ב־0.5 נקודת אחוז, והוא לא שינה את הריבית על הלוואות שכבר נתן. מה קרה למרווח שלו על ההלוואות האלה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="0.9-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "כי הבנק נותן מחיר טוב יותר למי שהוא מכיר", feedback: "יכולות להיות לזה השפעות, אבל ההסבר העיקרי הוא אחר: כמה סביר שהכסף יחזור." },
+    { text: "כי הסיכון שלא יחזירו את ההלוואה שונה, והמרווח צריך לכסות הפסדים צפויים", correct: true, feedback: "נכון. מלווה שמעריך שהסיכון גבוה יותר דורש מרווח גבוה יותר, כדי לכסות את ההפסדים מההלוואות שלא יחזרו." },
+    { text: "כי עלות הכסף של הבנק שונה לכל לווה", feedback: "עלות הכסף היא של הבנק — מה עולה לו הכסף. היא לא תלויה בלווה. מה שמשתנה מלווה ללווה הוא המרווח." },
+    { text: "זו טעות; לכל הלווים צריכה להיות אותה ריבית", feedback: "לא. מלווים מתמחרים כל הלוואה לפי הסיכון שלה. זה קורה בכל שוק אשראי, לא רק בבנקים." },
+  ]}
+>
+  שני אנשים לוקחים הלוואה באותו סכום, מאותו בנק, באותו יום — ומקבלים ריביות שונות. מה ההסבר העיקרי?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.9-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.spread_only"), message: "זה המרווח שצריך. השאלה היא מה תהיה הריבית על ההלוואה — עלות הכסף ועוד המרווח." },
+    { value: "2.5", message: "זו עלות הכסף. בריבית כזו לא נשאר לבנק כלום." },
+  ]}
+>
+  בנק רוצה שיישארו לו 6,000 ₪ בשנה, לפני הוצאות, מהלוואה של 300,000 ₪. עלות הכסף שלו היא 2.5% לשנה. באיזו ריבית לשנה הוא צריך להלוות?
+</NumericExercise>
+
+<Solution for="0.9-6">
+המרווח הדרוש: 6,000 מתוך 300,000 הם <M>6,000 ÷ 300,000 × 100 = {f.plain("ex5.spread_only")}</M> נקודות אחוז. מוסיפים את עלות הכסף: <M>{f.plain("ex5.spread_only")} + 2.5 = {f.plain("ex5.answer")}</M>. כלומר {pct("ex5.answer")}.
+</Solution>
+
+<Callout title="חמש שאלות על המרווח">
+<p><strong>מה זה?</strong> ההפרש בין הריבית שמלווה גובה לבין עלות הכסף שלו, בנקודות אחוז.</p>
+<p><strong>למה זה קיים?</strong> בנק הוא עסק. הוא לוקח כסף ממפקידים וממקורות אחרים, ומלווה אותו הלאה. המרווח הוא מה שמשלם על העבודה הזו, על ההלוואות שלא יחזרו ועל הרווח.</p>
+<p><strong>איך זה עובד?</strong> הלווה משלם ריבית לבנק; הבנק משלם ריבית למפקידים. ההפרש נשאר בבנק. ככל שהסיכון בהלוואה גבוה יותר, בדרך כלל המרווח גבוה יותר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הריבית שאתם משלמים על הלוואה בנויה משני חלקים: עלות הכסף של הבנק, שלא בשליטתכם, והמרווח, שתלוי גם בכם — בסיכון שהבנק רואה בכם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשמשווים הצעות מכמה מלווים, עלות הכסף של כולם דומה בדרך כלל, וההבדל הוא בעיקר במרווח. שם יש מקום לשאול ולהשוות. נחזור לזה כשנגיע להצעות של בנקים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הלוואה** = מלווה נותן ללווה קרן, והלווה מחזיר אותה ועוד ריבית.
+- **פיקדון** = הלוואה שאתם נותנים לבנק. כאן אתם המלווים.
+- **עלות הכסף** = כמה עולה לבנק הכסף שהוא מלווה, בעיקר הריבית למפקידים.
+- **מרווח** = הריבית על ההלוואה פחות עלות הכסף, בנקודות אחוז. <M>m = r<sub>L</sub> − r<sub>F</sub></M>.
+- **מרווח אינו רווח.** ממנו הבנק מכסה הוצאות והלוואות שלא יוחזרו, ורק מה שנשאר הוא רווח.
+- **סיכון גבוה יותר — בדרך כלל מרווח גבוה יותר.**
+
+**בשיעור הבא — 0.10, הבנק המרכזי והריבית שלו:** מי משפיע על עלות הכסף של כל הבנקים יחד, למה, ומה הוחלט בשנה האחרונה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ידע כלכלי כללי, כפי שמלמדים אותו בכל מבוא לכלכלה ולבנקאות: בנק מקבל פיקדונות ומלווה אותם הלאה; ההפרש בין הריבית שהוא גובה לבין עלות הכסף מכסה הוצאות, הפסדי אשראי ורווח; מרווח גבוה יותר כשהסיכון גבוה יותר.", code: ["m = r_L − r_F", "S = A × m"] },
+    { kind: "הנחת חישוב", text: "״בנק א׳״ בדוי. כל הסכומים, הריביות, עלויות הכסף והמרווחים בשיעור הם מספרים עגולים להמחשה — לא נתונים של בנק אמיתי ולא ריביות שוק." },
+    { kind: "הנחת חישוב", text: "החישובים הם לשנה אחת, על כל הסכום, לפני הוצאות, הפסדים ומס." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/lending.ts via scripts/lessons/lesson-0-9.ts and data/lessons/0-9.json, rechecked by checks/kinds/lending.py. Illustration: src/components/BankMiddle.vue. */}

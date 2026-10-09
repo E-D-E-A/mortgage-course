@@ -1,0 +1,202 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.10 — "הכפתור של הכלכלה".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/0-10.json. The 2026 decisions are from
+  search summaries of Bank of Israel releases (not yet read from the releases),
+  so the scene marks them "לא אומת". The subtitle cues (window.cues) carry the
+  explanatory sentences — the narration script, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.10 · בנק ישראל וריבית בנק ישראל</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-10.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const dateFmt = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
+      const monthFmt = new Intl.DateTimeFormat("he-IL", { month: "short" });
+      const when = (iso) => new Date(`${iso}T12:00:00Z`);
+      const heDate = (iso) => dateFmt.format(when(iso));
+
+      const path = fact("timeline.path");
+      const V = {
+        start: fact("decision.start"), now: fact("decision.current"), eff: fact("decision.effective_date"),
+        next: fact("decision.upcoming")[0], count: fact("decision.count"), add: fact("prime.addition"),
+        p0: fact("prime.start"), p1: fact("prime.current"), drop: fact("year.drop"),
+        lo: fact("target.low"), hi: fact("target.high"),
+      };
+
+      const S = { title: [0, 10], bank: [10, 36], knob: [36, 80], committee: [80, 100], year: [100, 140], end: [140, 154] };
+      window.duration = 154;
+      window.cues = [
+        [1, 5, "בנק ישראל: הכפתור של הכלכלה."],
+        [5, 9.5, "מה הוא עושה, ולמה."],
+        [11, 19, "בנק ישראל הוא הבנק המרכזי. הוא עובד מול הבנקים."],
+        [19, 27, "אחד מתפקידיו: שהמחירים יעלו לאט ובאופן צפוי."],
+        [27, 35, `היעד: אינפלציה של ${V.lo}% עד ${V.hi}% בשנה.`],
+        [37, 45, "הכלי העיקרי שלו: ריבית בנק ישראל."],
+        [45, 53, "כשהיא עולה, הכסף עולה לבנקים יותר."],
+        [53, 61, "הבנקים מעלים את הריבית על הלוואות חדשות."],
+        [61, 70, "אנשים ועסקים לווים וקונים פחות."],
+        [70, 79, "והמחירים עולים לאט יותר. זה לוקח חודשים."],
+        [81, 90, "את הריבית קובעת הוועדה המוניטרית."],
+        [90, 99, `${V.count} החלטות בשנה, במועדים שנקבעים מראש.`],
+        [101, 110, `ב־2026 הריבית ירדה: מ־${V.start}% ל־${V.now}%.`],
+        [110, 120, `ירידה של ${V.drop} נקודת אחוז, בכמה החלטות.`],
+        [120, 130, `הקו הבהיר: הריבית ועוד ${V.add} נקודות אחוז.`],
+        [130, 139, `הוא ירד מ־${V.p0}% ל־${V.p1}% — באותו קצב.`],
+        [141, 147, `היום: ${V.now}%, מ־${heDate(V.eff)}.`],
+        [147, 153, `ההחלטה הבאה: ${heDate(V.next)}.`],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const note = (o, y = 548) => txt(640, y, "לא אומת: לפי תקציר של מקור רשמי; ממתין לבדיקה. נכון ל־2026-10-09.", 18, { fill: C.n500, o });
+
+      // 2026 from the right edge (January) to the left (December).
+      const L = 190, R = 1090, y0 = 2026;
+      const xOf = (iso) => R - ((when(iso) - Date.UTC(y0, 0, 1)) / (Date.UTC(y0 + 1, 0, 1) - Date.UTC(y0, 0, 1))) * (R - L);
+      const base = 520, top = 190, max = Number(V.p0) + 0.5;
+      const yOf = (v) => base - (Number(v) / max) * (base - top);
+      function steps(key, first, upto) {
+        let d = `M ${R} ${yOf(first)}`;
+        for (const r of path) {
+          const x = xOf(r.date);
+          if (x < upto) break;
+          d += ` H ${x} V ${yOf(r[key])}`;
+        }
+        return `${d} H ${Math.max(upto, xOf(V.next))}`;
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "בנק ישראל", 84, { w: 700, o });
+          txt(640, 360, "הכפתור של הכלכלה", 34, { fill: C.n600, o });
+        }
+        if (inScene(t, S.bank)) {
+          const o = vis(t, S.bank);
+          txt(640, 150, "הבנק המרכזי", 44, { w: 700, o });
+          el("rect", { x: 500, y: 200, width: 280, height: 90, rx: 16, fill: C.n0, stroke: C.teal, "stroke-width": 3, opacity: o });
+          txt(640, 256, "בנק ישראל", 34, { w: 700, o });
+          ["בנק א׳", "בנק ב׳", "בנק ג׳"].forEach((b, i) => {
+            const cx = 900 - i * 260;
+            el("rect", { x: cx - 90, y: 340, width: 180, height: 64, rx: 12, fill: C.n0, stroke: C.n200, opacity: o });
+            txt(cx, 382, b, 26, { o });
+            el("line", { x1: 640, y1: 290, x2: cx, y2: 340, stroke: C.n300, "stroke-width": 2, opacity: o });
+          });
+          const o2 = after(t, S.bank, 17, o);
+          el("rect", { x: 390, y: 440, width: 500, height: 80, rx: 14, fill: C.mint, opacity: o2 * 0.6 });
+          txt(640, 492, `יעד: אינפלציה של ${V.lo}% עד ${V.hi}% בשנה`, 32, { w: 700, o: o2 });
+          note(o2);
+        }
+        if (inScene(t, S.knob)) {
+          const o = vis(t, S.knob);
+          txt(640, 140, "השרשרת", 44, { w: 700, o });
+          const chain = ["ריבית בנק ישראל עולה", "עלות הכסף של הבנקים עולה", "הריבית על הלוואות חדשות עולה", "לווים וקונים פחות", "המחירים עולים לאט יותר"];
+          chain.forEach((s, i) => {
+            const oi = after(t, S.knob, 1 + i * 8, o);
+            const y = 180 + i * 72;
+            el("rect", { x: 380, y, width: 520, height: 56, rx: 12, fill: i === 4 ? C.mint : C.n0, stroke: i === 0 ? C.teal : C.n200, "stroke-width": i === 0 ? 3 : 1, opacity: oi });
+            txt(640, y + 37, s, 26, { w: i === 0 || i === 4 ? 700 : 400, o: oi });
+            if (i < 4) txt(640, y + 70, "↓", 20, { fill: C.n500, o: after(t, S.knob, 1 + (i + 1) * 8, o) });
+          });
+        }
+        if (inScene(t, S.committee)) {
+          const o = vis(t, S.committee);
+          txt(640, 160, "הוועדה המוניטרית", 48, { w: 700, o });
+          const o2 = after(t, S.committee, 9, o);
+          for (let i = 0; i < Number(V.count); i++) {
+            const cx = 1010 - i * 105;
+            el("circle", { cx, cy: 300, r: 30, fill: C.n0, stroke: C.teal, "stroke-width": 3, opacity: o2 });
+            txt(cx, 310, String(i + 1), 26, { w: 700, o: o2, ltr: true });
+          }
+          txt(640, 400, `${V.count} החלטות בשנה, במועדים קבועים מראש`, 30, { fill: C.n700, o: o2 });
+          note(o2);
+        }
+        if (inScene(t, S.year)) {
+          const o = vis(t, S.year);
+          txt(640, 130, "ההחלטות ב־2026", 40, { w: 700, o });
+          const reveal = R - clamp((t - S.year[0] - 1) / 12) * (R - L);
+          el("line", { x1: L, x2: R, y1: base, y2: base, stroke: C.n300, opacity: o });
+          for (let m = 0; m < 12; m++) {
+            const x = xOf(`2026-${String(m + 1).padStart(2, "0")}-15`);
+            txt(x, base + 26, monthFmt.format(when(`2026-${String(m + 1).padStart(2, "0")}-15`)), 16, { fill: C.n600, o });
+          }
+          const oP = after(t, S.year, 20, o);
+          el("path", { d: steps("prime", V.p0, reveal), fill: "none", stroke: C.tq2, "stroke-width": 4, opacity: oP });
+          el("path", { d: steps("rate", V.start, reveal), fill: "none", stroke: C.teal, "stroke-width": 4, opacity: o });
+          for (const r of path) {
+            if (xOf(r.date) < reveal) continue;
+            el("circle", { cx: xOf(r.date), cy: yOf(r.rate), r: 6, fill: C.teal, stroke: C.n0, "stroke-width": 2, opacity: o });
+          }
+          for (const d of fact("decision.upcoming")) {
+            el("circle", { cx: xOf(d), cy: base - 12, r: 6, fill: C.n0, stroke: C.n500, "stroke-width": 2, opacity: after(t, S.year, 12, o) });
+          }
+          txt(R + 10, yOf(V.start) + 8, `${V.start}%`, 22, { anchor: "start", w: 700, fill: C.teal, o, ltr: true });
+          txt(R + 10, yOf(V.p0) + 8, `${V.p0}%`, 22, { anchor: "start", w: 700, fill: C.n700, o: oP, ltr: true });
+          const oEnd = after(t, S.year, 13, o);
+          const xl = xOf(path[path.length - 1].date);
+          txt(xl - 14, yOf(V.now) + 34, `${V.now}%`, 24, { anchor: "middle", w: 700, fill: C.teal, o: oEnd, ltr: true });
+          txt(xl - 14, yOf(V.p1) - 16, `${V.p1}%`, 24, { anchor: "middle", w: 700, fill: C.n700, o: Math.min(oEnd, oP), ltr: true });
+          note(o, 172);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 260, `היום: ${V.now}%`, 64, { w: 700, o });
+          txt(640, 320, `בתוקף מ־${heDate(V.eff)}`, 28, { fill: C.n700, o });
+          txt(640, 400, `ההחלטה הבאה: ${heDate(V.next)}`, 32, { w: 600, o: after(t, S.end, 6, o) });
+          note(o);
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

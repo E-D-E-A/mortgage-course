@@ -1,0 +1,203 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.7 — "הסל של הלמ״ס".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/0-7.json; the basket and every index value
+  are invented teaching numbers. The subtitle cues (window.cues) carry the
+  explanatory sentences — the narration script, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.7 · אינפלציה ומדד המחירים לצרכן</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-7.json")).json();
+      const F = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => F(id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+      const pct = (v) => `${v}%`.replace("-", "−");
+      const signed = (v) => (Number(v) > 0 ? `+${v}%` : pct(v));
+
+      // The basket: names are labels; quantities and prices are the inputs of the facts.
+      const names = ["לחם", "חלב", "ירקות", "אוטובוס"];
+      const items = names.map((name, i) => {
+        const base = F(`explain.base_line_${i + 1}`).inputs;
+        const now = F(`explain.now_line_${i + 1}`).inputs;
+        return {
+          name, q: base.quantity_1, p0: base.price_1, p1: now.price_1,
+          c0: fact(`explain.base_line_${i + 1}`), c1: fact(`explain.now_line_${i + 1}`),
+          ch: fact(`explain.item_change_${i + 1}`),
+        };
+      });
+      const V = {
+        base: fact("explain.base_total"), now: fact("explain.now_total"),
+        i0: fact("explain.base_index"), i1: fact("explain.now_index"), infl: fact("explain.now_change"),
+        y2cost: fact("explain.y2_cost"), i2: fact("explain.y2_index"), pts: fact("explain.y2_points"), infl2: fact("explain.y2_change"),
+        day: fact("cbs.day"), time: fact("cbs.time"), out: fact("cbs.house_prices_out"),
+      };
+
+      const S = { title: [0, 12], basket: [12, 44], year1: [44, 78], year2: [78, 110], who: [110, 140], end: [140, 154] };
+      window.duration = 154;
+      window.cues = [
+        [1, 6, "המחירים עולים. אבל בכמה?"],
+        [6, 11.5, "כדי לענות, מסתכלים על סל קבוע של קניות."],
+        [13, 21, "סל קטן ובדוי, לחודש אחד: לחם, חלב, ירקות ואוטובוס."],
+        [21, 31, "בכל שורה: הכמות כפול המחיר."],
+        [31, 43, `כל הסל עולה ${shek(V.base)}. קובעים: זה ${V.i0} נקודות.`],
+        [45, 55, "שנה אחר כך, אותו סל בדיוק. חלק התייקר, חלק הוזל."],
+        [55, 66, `עכשיו הסל עולה ${shek(V.now)}. המדד: ${V.i1}.`],
+        [66, 77, `המחירים עלו ב־${pct(V.infl)}. לזה קוראים אינפלציה.`],
+        [79, 88, `בשנה השנייה הסל עולה ${shek(V.y2cost)}. המדד: ${V.i2}.`],
+        [88, 98, `המדד עלה ב־${V.pts} נקודות — אבל ב־${pct(V.infl2)} בלבד.`],
+        [98, 109, "כי מחלקים במדד הישן, לא ב־100."],
+        [111, 120, "בישראל את המדד מפרסמת הלמ״ס, פעם בחודש."],
+        [120, 130, `ב־${V.day} בחודש, על החודש הקודם.`],
+        [130, 139, "מחירי הדירות עצמם לא בתוך המדד."],
+        [141, 147, "המדד: כמה עולה אותו סל, ביחס לנקודת ההתחלה."],
+        [147, 153, "ואינפלציה: בכמה אחוזים הוא התייקר."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // One card per item; the first item at the right, as Hebrew is read.
+      function cards(o, now, g = 1) {
+        items.forEach((it, i) => {
+          const cx = 1060 - i * 280, y0 = 170;
+          el("rect", { x: cx - 120, y: y0, width: 240, height: 190, rx: 14, fill: C.n0, stroke: C.n200, opacity: o });
+          txt(cx, y0 + 44, it.name, 30, { w: 700, o });
+          txt(cx, y0 + 86, `${it.q} × ${shek(now ? it.p1 : it.p0)}`, 24, { fill: C.n600, o, ltr: true });
+          txt(cx, y0 + 140, shek(now ? it.c1 : it.c0), 38, { w: 700, fill: now ? C.teal : C.navy, o, ltr: true });
+          if (now) {
+            const og = Math.min(o, g);
+            el("rect", { x: cx - 50, y: y0 + 156, width: 100, height: 26, rx: 13, fill: C.mint, opacity: og * 0.8 });
+            txt(cx, y0 + 175, signed(it.ch), 18, { w: 600, fill: C.n700, o: og, ltr: true });
+          }
+        });
+      }
+      function total(o, label, cost, index, y = 430) {
+        el("rect", { x: 340, y, width: 600, height: 110, rx: 16, fill: C.n0, stroke: C.n200, opacity: o });
+        txt(780, y + 48, label, 24, { fill: C.n600, o });
+        txt(780, y + 88, shek(cost), 36, { w: 700, o, ltr: true });
+        el("line", { x1: 640, x2: 640, y1: y + 20, y2: y + 90, stroke: C.n200, "stroke-width": 2, opacity: o });
+        txt(500, y + 48, "המדד", 24, { fill: C.n600, o });
+        txt(500, y + 88, String(index), 40, { w: 700, fill: C.teal, o, ltr: true });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "אינפלציה ומדד המחירים", 72, { w: 700, o });
+          txt(640, 360, "הסל של הלמ״ס", 34, { fill: C.n600, o });
+          txt(640, 450, "מספרים להמחשה: הסל והמחירים בדויים", 22, { fill: C.n500, o: after(t, S.title, 5, o) });
+        }
+        if (inScene(t, S.basket)) {
+          const o = vis(t, S.basket);
+          txt(640, 130, "הסל לפני שנה", 40, { w: 700, o });
+          cards(o, false);
+          total(after(t, S.basket, 18, o), "כל הסל", V.base, V.i0);
+        }
+        if (inScene(t, S.year1)) {
+          const o = vis(t, S.year1);
+          txt(640, 130, "אותו סל, שנה אחר כך", 40, { w: 700, o });
+          cards(o, true, clamp((t - S.year1[0] - 4) / 0.8));
+          total(after(t, S.year1, 10, o), "כל הסל", V.now, V.i1);
+          const o3 = after(t, S.year1, 21, o);
+          el("rect", { x: 980, y: 445, width: 240, height: 80, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(1100, 478, "אינפלציה", 22, { fill: C.n700, o: o3 });
+          txt(1100, 512, pct(V.infl), 32, { w: 700, o: o3, ltr: true });
+        }
+        if (inScene(t, S.year2)) {
+          const o = vis(t, S.year2);
+          txt(640, 130, "השנה השנייה", 40, { w: 700, o });
+          // Three index boxes, right to left in time: base, year one, year two.
+          const boxes = [[V.i0, "בסיס"], [V.i1, "שנה 1"], [V.i2, "שנה 2"]];
+          boxes.forEach(([v, label], i) => {
+            const cx = 1000 - i * 330, oi = after(t, S.year2, i * 1.5, o);
+            el("rect", { x: cx - 120, y: 190, width: 240, height: 130, rx: 14, fill: C.n0, stroke: i === 2 ? C.teal : C.n200, "stroke-width": i === 2 ? 3 : 1, opacity: oi });
+            txt(cx, 232, label, 24, { fill: C.n600, o: oi });
+            txt(cx, 292, String(v), 46, { w: 700, o: oi, ltr: true });
+          });
+          const o2 = after(t, S.year2, 10, o);
+          txt(505, 380, `${V.pts} נקודות`, 30, { w: 600, fill: C.n700, o: o2 });
+          el("line", { x1: 620, x2: 390, y1: 355, y2: 355, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "6 6", opacity: o2 });
+          const o3 = after(t, S.year2, 20, o);
+          el("rect", { x: 330, y: 420, width: 620, height: 110, rx: 16, fill: C.mint, opacity: o3 * 0.6 });
+          txt(640, 465, `מ־${V.i1} ל־${V.i2}: עלייה של ${pct(V.infl2)}`, 34, { w: 700, o: o3 });
+          txt(640, 508, "נקודות אינן אחוזים", 24, { fill: C.n700, o: o3 });
+        }
+        if (inScene(t, S.who)) {
+          const o = vis(t, S.who);
+          txt(640, 150, "הלמ״ס", 64, { w: 700, o });
+          txt(640, 200, "הלשכה המרכזית לסטטיסטיקה", 28, { fill: C.n600, o });
+          const rows = [
+            [`פעם בחודש: ב־${V.day} בחודש, ב־${V.time}`, 10],
+            ["המדד מתאר את החודש הקודם", 10],
+            [`מחירי הדירות לא בסל (מאז ${V.out})`, 20],
+          ];
+          rows.forEach(([s, at], i) => {
+            const oi = after(t, S.who, at + i * 0, o);
+            el("rect", { x: 300, y: 250 + i * 80, width: 680, height: 62, rx: 12, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(940, 290 + i * 80, s, 28, { anchor: "start", o: oi });
+          });
+          txt(640, 530, "לא אומת: לפי תקציר של אתר הלמ״ס; ממתין לבדיקה", 20, { fill: C.n500, o });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "מדד: כמה עולה אותו סל", 52, { w: 700, o });
+          txt(640, 340, `ביחס לנקודת ההתחלה, שהיא ${V.i0}.`, 40, { w: 600, fill: C.n700, o });
+          txt(640, 430, "אינפלציה: בכמה אחוזים הסל התייקר.", 32, { fill: C.n700, o: after(t, S.end, 4, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
