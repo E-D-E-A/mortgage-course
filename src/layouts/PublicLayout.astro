@@ -1,0 +1,25 @@
+---
+// The layout of the only two public pages (sign-in and its callback): no
+// navigation into the course, and no script or style from the gated /_astro/ folder.
+import "../styles/main.css";
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} · קורס המשכנתאות של Mogi</title>
+  </head>
+  <body class="grid min-h-dvh place-items-center bg-n50 px-4">
+    <main class="w-full max-w-md rounded-lg border border-n200 bg-n0 p-8 text-center shadow-md">
+      <img src="/brand/mogi-logo.png" alt="Mogi" class="mx-auto h-14 w-auto" width="198" height="197" />
+      <slot />
+    </main>
+  </body>
+</html>

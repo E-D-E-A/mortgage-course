@@ -1,0 +1,33 @@
+---
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout title="נכנסים…">
+  <p id="status" class="mt-6 text-body-l text-n700" role="status">נכנסים לקורס…</p>
+  <script is:inline>
+    // Supabase returns the session in the URL fragment, which never reaches a server.
+    // The server checks it (token and company domain) and sets the course's cookies.
+    (async () => {
+      const hash = new URLSearchParams(location.hash.slice(1));
+      history.replaceState(null, "", location.pathname);
+      const access_token = hash.get("access_token");
+      const refresh_token = hash.get("refresh_token");
+      if (!access_token || !refresh_token) return location.replace("/login/?error=1");
+      const res = await fetch("/auth/session", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ access_token, refresh_token }),
+      });
+      if (res.status === 403) {
+        const body = await res.json().catch(() => ({}));
+        return location.replace(body.error === "wrong-domain" ? "/login/?error=domain" : "/login/?error=1");
+      }
+      if (!res.ok) return location.replace("/login/?error=1");
+      // The progress store talks to Supabase from the browser under row-level security.
+      try { localStorage.setItem("mogi-course:sb-session", JSON.stringify({ access_token, refresh_token })); } catch {}
+      let next = "/";
+      try { next = sessionStorage.getItem("mogi-course:next") || "/"; } catch {}
+      location.replace(next.startsWith("/") && !next.startsWith("//") ? next : "/");
+    })();
+  </script>
+</PublicLayout>

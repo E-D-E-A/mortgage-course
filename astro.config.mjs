@@ -11,4 +11,6 @@ export default defineConfig({
   integrations: [vue(), mdx()],
   vite: { plugins: [tailwindcss()] },
   devToolbar: { enabled: false },
+  // Styles go inline so the public sign-in page needs nothing from the gated /_astro/ folder.
+  build: { inlineStylesheets: "always" },
 });

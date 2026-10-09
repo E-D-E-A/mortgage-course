@@ -20,7 +20,7 @@ const server = createServer(async (req, res) => {
   }
 }).listen(4399);
 
-const pages = ["/", "/lessons/0-3/", "/glossary/"];
+const pages = ["/", "/lessons/0-3/", "/glossary/", "/login/"];
 const viewports = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
 const out = new URL("../qa/screens/", import.meta.url).pathname;
 await mkdir(out, { recursive: true });
