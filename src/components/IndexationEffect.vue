@@ -103,7 +103,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
       {{ real ? "בשקלים של היום: כמה הסכום שווה בכוח קנייה, במחירים של היום." : "בשקלים שעל הנייר: כמה שקלים תחזירו בפועל." }} המחוון מעגל לשקל שלם.
     </p>
 
-    <ul class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>חוב מוצמד</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>חוב לא מוצמד</li>
       <li class="flex items-center gap-2"><span class="inline-block h-0.5 w-4" style="border-top: 2px dashed var(--mogi-navy)"></span>החוב בהתחלה</li>

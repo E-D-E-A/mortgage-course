@@ -67,7 +67,7 @@ const months = ["ינו׳", "פבר׳", "מרץ", "אפר׳", "מאי", "יונ�
 
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
-    <ul class="flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-4 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ריבית בנק ישראל</li>
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-4 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>הריבית ועוד 1.5 נקודות אחוז</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-pill border-2" style="border-color: var(--mogi-n500)"></span>החלטה שעוד לא התקבלה</li>

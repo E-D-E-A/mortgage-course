@@ -108,7 +108,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
       <p class="mt-1 text-center text-caption text-n600">הנדנדה מאוזנת כשהתשואה שווה לתשלום השנתי באחוזים. תשואה גבוהה יותר מורידה את המחיר.</p>
     </div>
 
-    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-n300)"></span>התשלום, כפי שיתקבל</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>הערך הנוכחי שלו — כמה הוא שווה היום</li>
     </ul>

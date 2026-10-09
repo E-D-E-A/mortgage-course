@@ -80,7 +80,7 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
 
     <p class="mt-2 text-caption text-n600">הריביות מעוגלות להצגה בלבד. החישוב נעשה בלי לעגל.</p>
 
-    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ריבית שנצברה — חלוקה ב־12</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>ריבית שנצברה — שורש 12</li>
       <li class="flex items-center gap-2"><span class="inline-block h-0 w-5 border-t-2 border-dashed border-navy"></span>הריבית השנתית, פעם אחת בשנה</li>

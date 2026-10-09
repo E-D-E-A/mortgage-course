@@ -107,7 +107,7 @@ const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
       </p>
     </div>
 
-    <ol class="grid gap-5">
+    <ol class="list-reset grid gap-5">
       <li v-for="(q, i) in questions" :key="q.id" class="rounded-lg border bg-n0 p-5 shadow-sm" :class="submitted ? (results[q.id]?.correct ? 'border-success' : 'border-warning') : 'border-n200'">
         <div class="flex flex-wrap items-center gap-3">
           <span class="text-body-m font-semibold text-navy">שאלה {{ i + 1 }}</span>

@@ -89,7 +89,7 @@ function reset() {
         </div>
       </div>
     </div>
-    <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-3 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li v-for="(it, i) in items" :key="it.name" class="flex items-center gap-2">
         <span class="inline-block h-3 w-3 rounded-sm" :style="{ background: fills[i % fills.length] }"></span>{{ it.name }}
       </li>

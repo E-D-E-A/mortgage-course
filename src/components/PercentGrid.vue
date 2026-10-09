@@ -86,7 +86,7 @@ const squares = Array.from({ length: 100 }, (_, i) => i);
     </div>
     <p class="mt-2 text-caption text-n600">המחשה מעגלת לאגורה. אחוזים מעוגלים לשתי ספרות אחרי הנקודה.</p>
 
-    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>{{ comparing ? "החלק המשותף לשני האחוזים" : "האחוז שבחרתם" }}</li>
       <li v-if="comparing" class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>נוסף באחוז השני</li>
       <li v-if="comparing" class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm border-2 border-teal-deep bg-n0"></span>ירד באחוז השני</li>

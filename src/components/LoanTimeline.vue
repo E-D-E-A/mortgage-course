@@ -66,7 +66,7 @@ const showValues = computed(() => years.value <= 5);
       </div>
     </div>
 
-    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-n300)"></span>קרן: עוברת מהמלווה ללווה היום, וחוזרת בסוף</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ריבית: הלווה משלם למלווה בסוף כל שנה</li>
     </ul>

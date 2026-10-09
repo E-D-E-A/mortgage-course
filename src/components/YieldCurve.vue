@@ -86,7 +86,7 @@ const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `${y} שנים`;
       <p class="text-body-m text-n700">{{ SHAPE_TEXT[shape].body }}</p>
     </div>
 
-    <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+    <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-5 rounded-sm" style="background: var(--mogi-teal-deep)"></span>העקום: התשואה לכל אורך זמן</li>
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-5 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>הריבית לשנה שהעקום מגלם לכל קטע</li>
     </ul>
