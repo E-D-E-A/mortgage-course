@@ -1,6 +1,6 @@
 // The brief's rule "no term appears before it is explained", as a check.
 //
-// For every lesson page (src/pages/lessons/<stage>-<n>.mdx):
+// For every lesson page (src/pages/lessons/<stage>-<n>.mdx) and stage check (src/pages/checks/<stage>.mdx):
 //  1. A glossary term whose lesson comes AFTER this one may appear only inside
 //     <Later ...>…</Later>, which tells the learner where it will be explained.
 //  2. A term this lesson introduces must appear at least once as <Term t="…">,
@@ -38,11 +38,22 @@ const fail = (file, msg) => {
   console.error(`✗ ${file}: ${msg}`);
 };
 
-for (const file of readdirSync(dir).filter((f) => /^\d+-\d+\.mdx$/.test(f))) {
-  const lesson = file.replace(".mdx", "").replace("-", ".");
+// A stage's completion check (src/pages/checks/<stage>.mdx) comes after all of
+// that stage's lessons, so it is checked as lesson "<stage>.999".
+const checksDir = new URL("../src/pages/checks/", import.meta.url);
+const pages = [
+  ...readdirSync(dir)
+    .filter((f) => /^\d+-\d+\.mdx$/.test(f))
+    .map((f) => ({ file: f, url: new URL(f, dir), lesson: f.replace(".mdx", "").replace("-", "."), video: f.replace(".mdx", "") })),
+  ...(existsSync(checksDir) ? readdirSync(checksDir) : [])
+    .filter((f) => /^\d+\.mdx$/.test(f))
+    .map((f) => ({ file: `checks/${f}`, url: new URL(f, checksDir), lesson: `${f.replace(".mdx", "")}.999`, video: null })),
+];
+
+for (const { file, url, lesson, video } of pages) {
   // The video's subtitles are lesson text too.
-  const vttPath = new URL(`../public/video/${file.replace(".mdx", "")}.he.vtt`, import.meta.url);
-  const raw = readFileSync(new URL(file, dir), "utf8") + (existsSync(vttPath) ? `\n${readFileSync(vttPath, "utf8")}` : "");
+  const vttPath = video && new URL(`../public/video/${video}.he.vtt`, import.meta.url);
+  const raw = readFileSync(url, "utf8") + (vttPath && existsSync(vttPath) ? `\n${readFileSync(vttPath, "utf8")}` : "");
   // Frontmatter, imports and code are not prose. <Later> blocks are allowed forward references.
   const prose = raw
     .replace(/^---[\s\S]*?---/, "")

@@ -4,6 +4,8 @@
  *
  * Each lesson has its own module, scripts/lessons/lesson-<stage>-<n>.ts, whose
  * default export returns its LessonData. New lessons are picked up by name.
+ * A stage's completion check is scripts/lessons/check-<stage>.ts, with
+ * lesson "check-<stage>", written to data/lessons/check-<stage>.json.
  *
  * Run: pnpm data
  */
@@ -31,7 +33,7 @@ const out = join(root, "data", "lessons");
 mkdirSync(out, { recursive: true });
 
 const lessonsDir = join(root, "scripts", "lessons");
-const modules = readdirSync(lessonsDir).filter((f) => /^lesson-\d+-\d+\.ts$/.test(f)).sort();
+const modules = readdirSync(lessonsDir).filter((f) => /^(lesson-\d+-\d+|check-\d+)\.ts$/.test(f)).sort();
 const lessons: LessonData[] = [];
 for (const file of modules) {
   const mod = (await import(join(lessonsDir, file))) as { default: () => LessonData };

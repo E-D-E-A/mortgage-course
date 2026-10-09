@@ -2,7 +2,7 @@
 
 Lesson 0.3 (`src/pages/lessons/0-3.mdx`) is the approved pilot (Dvir, 2026-10-09: look, tone and video style). **Read it in full before writing a lesson, and copy its structure.** This file says what it does and why, including every mistake the beginner-reader review caught in it.
 
-The brief is the authority on content (parts 1–8, especially §2 "how we teach", §6 practice, §7 videos, §9 reliability, §10 calculation). The approved map is `course/course-map.md`. The source material is `research/` (start with `source-map.md`; field knowledge in `field-knowledge.md`).
+The brief (`course/brief/part-1.md` … `part-8.md`) is the authority on content (parts 1–8, especially §2 "how we teach", §6 practice, §7 videos, §9 reliability, §10 calculation). The approved map is `course/course-map.md`. The source material is `research/` (start with `source-map.md`; field knowledge in `field-knowledge.md`).
 
 ## The files one lesson owns
 

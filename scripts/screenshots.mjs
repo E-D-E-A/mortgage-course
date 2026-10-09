@@ -21,8 +21,9 @@ const server = createServer(async (req, res) => {
 }).listen(4399);
 
 const lessonPages = (await readdir(join(root, "lessons")).catch(() => [])).map((d) => `/lessons/${d}/`);
-const only = process.argv[2]; // optional: one lesson, e.g. "0-4"
-const pages = only ? [`/lessons/${only}/`] : ["/", "/glossary/", "/login/", ...lessonPages];
+const checkPages = (await readdir(join(root, "checks")).catch(() => [])).map((d) => `/checks/${d}/`);
+const only = process.argv[2]; // optional: one lesson, e.g. "0-4", or a check, e.g. "checks/0"
+const pages = only ? [only.startsWith("checks/") ? `/${only}/` : `/lessons/${only}/`] : ["/", "/glossary/", "/login/", ...lessonPages, ...checkPages];
 const viewports = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
 const out = new URL("../qa/screens/", import.meta.url).pathname;
 await mkdir(out, { recursive: true });

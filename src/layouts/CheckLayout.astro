@@ -1,0 +1,26 @@
+---
+// The page of a stage's completion check (src/pages/checks/<stage>.mdx).
+import BaseLayout from "./BaseLayout.astro";
+import StageLock from "../components/StageLock.astro";
+import { stageById } from "../lib/course.ts";
+
+const { frontmatter } = Astro.props;
+const stage = stageById(Number(frontmatter.stage));
+if (!stage) throw new Error(`stage ${frontmatter.stage} is not in course/course-map.md`);
+---
+
+<BaseLayout title={`בדיקת סיום שלב ${stage.id}`}>
+  <div class="mx-auto max-w-3xl px-4 py-8">
+    <nav class="mb-4 text-caption text-n500" aria-label="פירורי לחם">
+      <a href="/" class="hover:text-navy">שלב {stage.id} · {stage.title}</a>
+      <span aria-hidden="true"> › </span>
+      <span>בדיקת סיום</span>
+    </nav>
+    <h1 class="text-h1 text-navy">בדיקת סיום — שלב {stage.id}: {stage.title}</h1>
+    <p class="mt-3 text-body-l text-n700">{stage.goal}</p>
+    <StageLock stage={stage.id} />
+    <div class="prose-lesson stage-lockable mt-8">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

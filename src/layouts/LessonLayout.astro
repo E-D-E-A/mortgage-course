@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import StageLock from "../components/StageLock.astro";
 import { isBuilt, lessonById, lessonHref, neighbours, stageOf } from "../lib/course.ts";
 
 const { frontmatter, headings = [] } = Astro.props;
@@ -56,7 +57,8 @@ const sections = headings.filter((h: { depth: number }) => h.depth === 2);
         }
       </div>
 
-      <div class="prose-lesson mt-8">
+      <StageLock stage={stage.id} />
+      <div class="prose-lesson stage-lockable mt-8">
         <slot />
       </div>
 

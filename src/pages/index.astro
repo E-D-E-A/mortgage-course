@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { isBuilt, lessonHref, stages } from "../lib/course.ts";
+import { checkHref, isBuilt, isCheckBuilt, lessonHref, stages } from "../lib/course.ts";
 ---
 
 <BaseLayout title="מפת הקורס">
@@ -16,6 +16,11 @@ import { isBuilt, lessonHref, stages } from "../lib/course.ts";
             <div class="flex flex-wrap items-baseline gap-3">
               <span class="rounded-pill bg-navy px-3 py-0.5 text-caption font-semibold text-turquoise">שלב {s.id}</span>
               <h2 class="text-h2 text-navy">{s.title}</h2>
+              {s.id > 0 && (
+                <span class="stage-closed hidden text-caption text-n600" data-after-check={s.id - 1}>
+                  ייפתח אחרי בדיקת הסיום של שלב {s.id - 1}
+                </span>
+              )}
             </div>
             <p class="mt-2 text-body-m text-n600">{s.goal}</p>
             <ol class="mt-4 grid gap-1 sm:grid-cols-2">
@@ -35,9 +40,35 @@ import { isBuilt, lessonHref, stages } from "../lib/course.ts";
                 </li>
               ))}
             </ol>
+            <p class="mt-3 text-body-m">
+              {isCheckBuilt(s.id) ? (
+                <a href={checkHref(s.id)} class="inline-flex gap-2 rounded-sm px-2 py-1 font-semibold text-navy hover:bg-mint/40">
+                  <span aria-hidden="true">✔</span>
+                  <span>בדיקת סיום שלב {s.id}</span>
+                  <span class="check-passed hidden font-normal text-n600" data-check={s.id}>· עברתם</span>
+                </a>
+              ) : (
+                <span class="inline-flex gap-2 px-2 py-1 text-n500">
+                  <span aria-hidden="true">✔</span>
+                  <span>בדיקת סיום שלב {s.id}</span>
+                </span>
+              )}
+            </p>
           </li>
         ))
       }
     </ol>
   </div>
 </BaseLayout>
+
+<script>
+  // Marks the stages still closed and the checks already passed, from this browser's progress.
+  import { load } from "../lib/progress.ts";
+  const passed = (stage: string) => load<{ passed: boolean }>(`check:${stage}`)?.passed === true;
+  for (const el of document.querySelectorAll<HTMLElement>("[data-after-check]")) {
+    if (!passed(el.dataset.afterCheck!)) el.classList.remove("hidden");
+  }
+  for (const el of document.querySelectorAll<HTMLElement>("[data-check]")) {
+    if (passed(el.dataset.check!)) el.classList.remove("hidden");
+  }
+</script>
