@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import StageLock from "../components/StageLock.astro";
-import { isBuilt, lessonById, lessonHref, neighbours, stageOf } from "../lib/course.ts";
+import { checkHref, isBuilt, isCheckBuilt, lessonById, lessonHref, neighbours, stageOf } from "../lib/course.ts";
 
 const { frontmatter, headings = [] } = Astro.props;
 const { lesson, minutes } = frontmatter;
@@ -9,6 +9,8 @@ const ref = lessonById(lesson);
 if (!ref) throw new Error(`lesson ${lesson} is not in course/course-map.md`);
 const stage = stageOf(lesson);
 const { prev, next } = neighbours(lesson);
+// The last lesson of a stage leads to the stage's completion check, not past it.
+const lastInStage = stage.lessons[stage.lessons.length - 1].id === lesson;
 const sections = headings.filter((h: { depth: number }) => h.depth === 2);
 ---
 
@@ -74,7 +76,15 @@ const sections = headings.filter((h: { depth: number }) => h.depth === 2);
           )
         }
         {
-          next && (
+          lastInStage && isCheckBuilt(stage.id) ? (
+            <a
+              href={checkHref(stage.id)}
+              class="rounded-md bg-turquoise px-5 py-3 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"
+            >
+              <span class="block text-caption">סוף השלב</span>
+              בדיקת הסיום של שלב {stage.id}
+            </a>
+          ) : next && (
             <a
               href={isBuilt(next.id) ? lessonHref(next.id) : "/"}
               class="rounded-md bg-turquoise px-5 py-3 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"

@@ -51,6 +51,13 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - Plain Hebrew, short sentences, **plural address** (הפקדתם, נסו, שימו לב). Glossary definitions too.
 - **Example before formula.** Small round numbers first.
 - **No slogans, no promises** ("הזמן הוא המנוע" was cut). Say under which conditions a statement is true.
+- "ריבית" is both the rate and the shekels. Where both appear, say which: **אחוז הריבית** (5% לשנה) or **סכום הריבית** (50 ₪).
+- Teaching rates and yields that could pass for market data get "מספרים להמחשה, לא נתוני שוק" above the exercise set, not only in the sources.
+- אג״ח is feminine (אג״ח ממשלתית, שלה).
+- **"בשקלים של היום"** means a value today found by discounting at an interest rate (0.5–0.6). A sum adjusted for inflation is **"בכוח קנייה של היום"** (0.8). Never mix the two.
+- **The "בשיעור הבא" line uses the next lesson's exact title** from the map. A stage's last lesson leads to the stage check (`/checks/<stage>/`); the layout's button does this.
+- **Tables:** a fill-in table must fit 340px (FillTable does). A wide reading table may scroll; the layout adds a "גררו שמאלה" hint on its own. Still, keep the column the text talks about early (on the right).
+- **Live official data** (a rate, a date) is written with its date in the text: "נכון ל־9 באוקטובר 2026, … (לא אומת)". Never "היום", never "תמיד".
 - Exercise wording always has the actor and the verb: "הפקדתם 30,000 ₪ ל־10 שנים…", not "30,000 ₪ ל־10 שנים".
 - Keep the brief's distinctions exact. 5% → 6% is **one percentage point** (נקודת אחוז), not "one percent". Name two near-identical terms apart when both appear (ריבית דריבית is the method; ריבית על ריבית is the extra amount).
 - Don't use symbols or notation before explaining them (superscripts, ≈ — write "בערך").
@@ -61,7 +68,7 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 
 - First use of a term **this lesson introduces**: `<Term t="term" lesson="X.Y">surface form</Term>`; it must have a definition in your definitions file.
 - First use of an **earlier lesson's term**: also `<Term>` (the popover reminds).
-- A **later lesson's term** may appear only as `<Later lesson="N.M">word</Later>`, and only when it helps; otherwise rephrase. `pnpm check:terms` enforces this over the lesson and its subtitles, with Hebrew prefixes.
+- A **later lesson's term** may appear only as `<Later lesson="N.M">word</Later>`, and only when it helps; otherwise rephrase. When the sentence already names the lesson (the "בשיעור הבא" line), use `<Later lesson="N.M" quiet>` so the note does not repeat it. `pnpm check:terms` enforces this over the lesson and its subtitles, with Hebrew prefixes.
 - The glossary is generated from the course map; your new terms should already be in the map's section 3 for your lesson. If the lesson really needs another, add it in your definitions file with `"lesson"` and report it.
 
 ## Numbers (brief §10)
@@ -71,6 +78,30 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - Formatting: in running text `T(...)` / `f.shekels(id)` (no ".00" on whole amounts); in tables `formatShekels` (always agorot); `f.whole` for rounded display; `f.plain` for counts and factors.
 - Teaching tables follow the statement convention: each period's interest rounded to the agora, then added. Formulas round once at the end. Exercises accept both: answers within `tolerance` (default 0.05 ₪) are exact, within `near` (default 1 ₪) are "נכון בקירוב" with the exact value shown. For whole-number answers set `tolerance={0} near={0}`.
 - Rates: contract rates are nominal annual; monthly = annual ÷ 12 (verified against Leumi and Discount tables, Brain ENG-223). Effective conversion uses the twelfth root. Never mix them silently.
+
+## Letters in formulas — one table for the whole course
+
+A learner carries the letters from lesson to lesson, so a letter keeps its meaning everywhere. When a lesson reuses an earlier formula, it says so in one line ("זו הנוסחה מ־0.5, כש…").
+
+| Letter | Meaning, everywhere | First |
+|---|---|---|
+| P | the amount **today**: a loan's principal, a deposit, a value today, a bond's price | 0.2 |
+| B | the amount **later**: the balance after n periods, a future amount | 0.3 |
+| r | an interest rate **per period, as a decimal** (5% → 0.05); say which period | 0.2 |
+| n | the number of periods | 0.2 |
+| I | interest in shekels | 0.2 |
+| C | one payment; a bond's yearly payment | 0.6 |
+| k | which payment (the k-th), when a formula sums several | 0.6 |
+| m | the monthly rate by dividing the annual rate by 12 | 0.4 |
+| e | the effective annual rate | 0.4 |
+| q | the monthly rate by the twelfth root of (1 + e) | 0.4 |
+| π | inflation, as a decimal | 0.8 |
+| i | the rate before inflation (nominal), beside r for the rate after it (real) | 0.8 |
+| F | a bond's principal, repaid at the end | 0.11 |
+| y | a bond's yield; on a curve y₁, y₂ by length | 0.11 |
+| s | a spread, in percentage points | 0.9 |
+
+0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. Never a table letter for something else.
 
 ## Equations and direction
 

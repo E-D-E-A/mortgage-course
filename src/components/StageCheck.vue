@@ -53,9 +53,12 @@ function grade(q: Question): { correct: boolean; note: string } {
   const value = parseAnswer(String(given ?? ""));
   if (value === null) return { correct: false, note: "לא נכתב מספר." };
   const target = Number(q.answer);
-  if (close(value, target, q.tolerance ?? 0.05) || close(value, target, q.near ?? 1)) return { correct: true, note: "" };
+  if (close(value, target, q.tolerance ?? 0.05)) return { correct: true, note: "" };
+  // A known mistake is named even when it lands near the answer (as in NumericExercise).
   const known = q.errors?.find((e) => close(value, Number(e.value), e.tolerance ?? q.tolerance ?? 0.05));
-  return { correct: false, note: known?.message ?? "" };
+  if (known) return { correct: false, note: known.message };
+  const near = q.near ?? ((q.unit ?? "₪") === "₪" ? 1 : 0);
+  return close(value, target, near) ? { correct: true, note: "" } : { correct: false, note: "" };
 }
 
 const results = computed(() => (submitted.value ? Object.fromEntries(props.questions.map((q) => [q.id, grade(q)])) : {}));

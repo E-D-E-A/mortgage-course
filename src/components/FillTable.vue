@@ -67,8 +67,8 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
 </script>
 
 <template>
-  <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
-    <table class="w-full min-w-[30rem] border-collapse text-body-m">
+  <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-5">
+    <table class="w-full border-collapse text-caption sm:text-body-m">
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
           <th v-if="periodLabel" class="py-2 text-start font-semibold">{{ periodLabel }}</th>
@@ -85,7 +85,7 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
                 :aria-label="`${c.label}, ${periodLabel ?? 'שורה'} ${nameOf(row, i)}`"
                 inputmode="decimal"
                 dir="ltr"
-                class="h-11 w-28 rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
+                class="h-11 w-full min-w-14 max-w-28 rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
                 :class="
                   result[keyOf(row, i, c.key)] === 'bad'
                     ? 'border-danger shadow-ring-error'

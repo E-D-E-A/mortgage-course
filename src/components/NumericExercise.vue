@@ -18,13 +18,14 @@ const props = withDefaults(
     level: "קל" | "בינוני" | "מאתגר";
     answer: string;
     tolerance?: number;
-    /** An answer this close (say, rounded to the shekel) counts as right, with the exact value shown. */
+    /** An answer this close counts as right, with the exact value shown. Default: 1 for shekels (rounded to
+     *  the shekel), 0 for any other unit — a whole percentage point off is not "about right". */
     near?: number;
     unit?: string;
     errors?: CommonError[];
     hint?: string;
   }>(),
-  { tolerance: 0.05, near: 1, unit: "₪", errors: () => [], hint: undefined },
+  { tolerance: 0.05, near: undefined, unit: "₪", errors: () => [], hint: undefined },
 );
 
 type State = "idle" | "correct" | "known-error" | "wrong" | "unreadable";
@@ -35,6 +36,7 @@ const tries = ref(0);
 const nearNote = ref("");
 const exact = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(props.answer));
 const inputId = `ex-${props.id}`;
+const near = props.near ?? (props.unit === "₪" ? 1 : 0);
 
 onMounted(() => {
   const saved = load<{ text: string; correct: boolean }>(`exercise:${props.id}`);
@@ -56,14 +58,16 @@ function check() {
   }
   tries.value++;
   const exactHit = close(value, Number(props.answer), props.tolerance);
-  if (exactHit || close(value, Number(props.answer), props.near)) {
-    nearNote.value = exactHit ? "" : `נכון בקירוב. התשובה המדויקת, עד האגורה: ${exact} ${props.unit}.`;
+  // A known mistake is named even when it lands near the answer, so it is checked before "about right".
+  const known = exactHit ? undefined : props.errors.find((e) => close(value, Number(e.value), e.tolerance ?? props.tolerance));
+  if (exactHit || (!known && close(value, Number(props.answer), near))) {
+    const precision = props.unit === "₪" ? ", עד האגורה" : "";
+    nearNote.value = exactHit ? "" : `נכון בקירוב. התשובה המדויקת${precision}: ${exact} ${props.unit}.`;
     state.value = "correct";
     save(`exercise:${props.id}`, { text: text.value, correct: true });
     unlockSolution();
     return;
   }
-  const known = props.errors.find((e) => close(value, Number(e.value), e.tolerance ?? props.tolerance));
   state.value = known ? "known-error" : "wrong";
   message.value = known ? known.message : props.hint ?? "עדיין לא. חזרו לדוגמה הפתורה ונסו שוב, צעד אחר צעד.";
   save(`exercise:${props.id}`, { text: text.value, correct: false });

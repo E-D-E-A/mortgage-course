@@ -59,5 +59,27 @@ const nav = [
         קורס פנימי של Mogi, לצוות בלבד. הקורס אינו רישיון ואינו הסמכה. כל התיקים בקורס סינתטיים.
       </div>
     </footer>
+    <script>
+      // A table wider than the screen scrolls sideways inside its box. On a phone
+      // nothing shows that, so the learner misses the columns past the edge: say it.
+      function markWideTables() {
+        for (const box of document.querySelectorAll<HTMLElement>("main .overflow-x-auto")) {
+          const wide = box.scrollWidth > box.clientWidth + 1;
+          let hint = box.previousElementSibling;
+          if (!hint?.classList.contains("scroll-hint")) {
+            if (!wide) continue;
+            hint = document.createElement("p");
+            hint.className = "scroll-hint";
+            hint.textContent = "הטבלה רחבה מהמסך: גררו אותה שמאלה כדי לראות את כל העמודות ←";
+            box.before(hint);
+          }
+          hint.toggleAttribute("hidden", !wide);
+        }
+      }
+      markWideTables();
+      addEventListener("resize", markWideTables);
+      // Interactive pieces render after load and can change width.
+      new ResizeObserver(markWideTables).observe(document.body);
+    </script>
   </body>
 </html>
