@@ -6,7 +6,7 @@
 // payments. Every number comes from the calc module.
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
-import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
+import { formatShekels, formatShekelsText, formatWholeShekels } from "../lib/calc/money.ts";
 import { streamTable } from "../lib/calc/present-value.ts";
 
 const props = withDefaults(defineProps<{ payment?: number; count?: number; rate?: number }>(), {
@@ -60,7 +60,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
     <div class="mt-5 grid gap-3 sm:grid-cols-3">
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">כל התשלומים יחד</p>
-        <p class="text-h2 text-n700"><span class="ltr">{{ formatShekels(total) }}</span></p>
+        <p class="text-h2 text-n700"><span class="ltr">{{ formatShekelsText(total) }}</span></p>
       </div>
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">הערך הנוכחי שלהם</p>

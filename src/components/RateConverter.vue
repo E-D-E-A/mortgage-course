@@ -8,7 +8,7 @@
 // The chart shows the interest gathered month by month under each, against the
 // annual rate taken once a year (dashed). Every number comes from the calc module.
 import { computed, ref } from "vue";
-import { formatShekels } from "../lib/calc/money.ts";
+import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
 import { effectiveAnnualRate, growthFactor, periodicRateByDivision, periodicRateFromEffective, roundedString } from "../lib/calc/rates.ts";
 
 const props = withDefaults(defineProps<{ annual?: number; amount?: number }>(), { annual: 6, amount: 10000 });
@@ -55,7 +55,7 @@ const xOf = (i: number) => W - PAD.side - (i + 1) * band + 3;
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">סכום</span>
         <input v-model.number="amount" type="range" min="1000" max="100000" step="1000" />
-        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekels(amount) }}</span></span>
+        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatWholeShekels(amount) }}</span></span>
       </label>
     </div>
 
