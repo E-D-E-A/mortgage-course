@@ -1,0 +1,679 @@
+{
+  "lesson": "2.11",
+  "title": "אותה יתרת חוב: ריבית מול הצמדה, כל אחד בנפרד",
+  "note": "Yearly teaching model: indexation, then interest on the indexed balance, then one payment at the end of the year. Invented teaching numbers, not market data. Money rounded to the agora only at the end; the half table rounds each year's parts.",
+  "facts": [
+    {
+      "id": "explain.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "explain.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000.00"
+    },
+    {
+      "id": "prediction.paid_only",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.balance",
+        "subtrahend": "explain.payment"
+      },
+      "value": "470000.00"
+    },
+    {
+      "id": "u.interest_5",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "5",
+        "inflation_percent": "0"
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "u.after_5",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "5",
+        "inflation_percent": "0",
+        "payment": "30000"
+      },
+      "value": "495000.00"
+    },
+    {
+      "id": "u.principal_paid_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.payment",
+        "subtrahend": "u.interest_5"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "u.interest_6",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "6",
+        "inflation_percent": "0"
+      },
+      "value": "30000.00"
+    },
+    {
+      "id": "u.change_extra",
+      "kind": "bal_rate_change_interest",
+      "inputs": {
+        "balance": "500000",
+        "old_rate_percent": "5",
+        "new_rate_percent": "6"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "u.after_6",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "6",
+        "inflation_percent": "0",
+        "payment": "30000"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "i.indexation",
+      "kind": "bal_indexation",
+      "inputs": {
+        "balance": "500000",
+        "inflation_percent": "2"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "i.indexed_balance",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "500000",
+        "base_index": "100",
+        "new_index": "102"
+      },
+      "value": "510000.00"
+    },
+    {
+      "id": "i.interest",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "2"
+      },
+      "value": "15300.00"
+    },
+    {
+      "id": "i.interest_base",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "0"
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "i.interest_on_indexation",
+      "kind": "bal_interest_on_indexation",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "2"
+      },
+      "value": "300.00"
+    },
+    {
+      "id": "i.after",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "2",
+        "payment": "30000"
+      },
+      "value": "495300.00"
+    },
+    {
+      "id": "i.down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.balance",
+        "subtrahend": "i.after"
+      },
+      "value": "4700.00"
+    },
+    {
+      "id": "i.after_no_index",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "0",
+        "payment": "30000"
+      },
+      "value": "485000.00"
+    },
+    {
+      "id": "i.index_effect",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "i.after",
+        "subtrahend": "i.after_no_index"
+      },
+      "value": "10300.00"
+    },
+    {
+      "id": "i.index_total",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "i.indexation",
+        "addend_2": "i.interest_on_indexation"
+      },
+      "value": "10300.00"
+    },
+    {
+      "id": "i.interest_and_index",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "i.interest",
+        "addend_2": "i.indexation"
+      },
+      "value": "25300.00"
+    },
+    {
+      "id": "i.principal_paid",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.payment",
+        "subtrahend": "i.interest_and_index"
+      },
+      "value": "4700.00"
+    },
+    {
+      "id": "thumb.both_rates",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "5",
+        "inflation_percent": "0"
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "thumb.approx_down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.payment",
+        "subtrahend": "thumb.both_rates"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "slider.idx6_after",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "6",
+        "payment": "30000"
+      },
+      "value": "515900.00"
+    },
+    {
+      "id": "worked.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "worked.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "24000.00"
+    },
+    {
+      "id": "worked.a.interest_base",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "5.5",
+        "inflation_percent": "0"
+      },
+      "value": "16500.00"
+    },
+    {
+      "id": "worked.a.change",
+      "kind": "bal_rate_change_interest",
+      "inputs": {
+        "balance": "300000",
+        "old_rate_percent": "5.5",
+        "new_rate_percent": "6"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "worked.a.interest",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "6",
+        "inflation_percent": "0"
+      },
+      "value": "18000.00"
+    },
+    {
+      "id": "worked.a.after",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "6",
+        "inflation_percent": "0",
+        "payment": "24000"
+      },
+      "value": "294000.00"
+    },
+    {
+      "id": "worked.a.down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.balance",
+        "subtrahend": "worked.a.after"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "worked.b.indexation",
+      "kind": "bal_indexation",
+      "inputs": {
+        "balance": "300000",
+        "inflation_percent": "2.5"
+      },
+      "value": "7500.00"
+    },
+    {
+      "id": "worked.b.indexed",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "worked.balance",
+        "addend_2": "worked.b.indexation"
+      },
+      "value": "307500.00"
+    },
+    {
+      "id": "worked.b.interest_base",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "3",
+        "inflation_percent": "0"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "worked.b.interest_on_indexation",
+      "kind": "bal_interest_on_indexation",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "3",
+        "inflation_percent": "2.5"
+      },
+      "value": "225.00"
+    },
+    {
+      "id": "worked.b.interest",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "3",
+        "inflation_percent": "2.5"
+      },
+      "value": "9225.00"
+    },
+    {
+      "id": "worked.b.after",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "3",
+        "inflation_percent": "2.5",
+        "payment": "24000"
+      },
+      "value": "292725.00"
+    },
+    {
+      "id": "worked.b.down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.balance",
+        "subtrahend": "worked.b.after"
+      },
+      "value": "7275.00"
+    },
+    {
+      "id": "worked.b.push",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "worked.b.indexation",
+        "addend_2": "worked.b.interest_on_indexation"
+      },
+      "value": "7725.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "bal_table",
+      "inputs": {
+        "balance": "100000",
+        "rate_percent": "3",
+        "inflation_percent": "2",
+        "payment": "8000",
+        "years": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "100000.00",
+          "indexation": "2000.00",
+          "interest": "3060.00",
+          "closing": "97060.00"
+        },
+        {
+          "period": 2,
+          "opening": "97060.00",
+          "indexation": "1941.20",
+          "interest": "2970.04",
+          "closing": "93971.24"
+        },
+        {
+          "period": 3,
+          "opening": "93971.24",
+          "indexation": "1879.42",
+          "interest": "2875.52",
+          "closing": "90726.18"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "4",
+        "inflation_percent": "0",
+        "payment": "24000"
+      },
+      "value": "288000.00"
+    },
+    {
+      "id": "ex2.interest",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "4",
+        "inflation_percent": "0"
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "ex2.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "ex2.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "24000.00"
+    },
+    {
+      "id": "ex2.no_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.balance",
+        "subtrahend": "ex2.payment"
+      },
+      "value": "276000.00"
+    },
+    {
+      "id": "ex2.no_payment",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "4",
+        "inflation_percent": "0",
+        "payment": "0"
+      },
+      "value": "312000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "400000",
+        "rate_percent": "2",
+        "inflation_percent": "3"
+      },
+      "value": "8240.00"
+    },
+    {
+      "id": "ex3.on_opening",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "400000",
+        "rate_percent": "2",
+        "inflation_percent": "0"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "ex3.indexation",
+      "kind": "bal_indexation",
+      "inputs": {
+        "balance": "400000",
+        "inflation_percent": "3"
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "ex3.indexed",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "ex3.balance",
+        "addend_2": "ex3.indexation"
+      },
+      "value": "412000.00"
+    },
+    {
+      "id": "ex3.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "ex3.rates_added",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "400000",
+        "rate_percent": "5",
+        "inflation_percent": "0"
+      },
+      "value": "20000.00"
+    },
+    {
+      "id": "ex4.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "ex4.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "36000.00"
+    },
+    {
+      "id": "ex4.indexation",
+      "kind": "bal_indexation",
+      "inputs": {
+        "balance": "600000",
+        "inflation_percent": "2"
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "ex4.indexed",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "ex4.balance",
+        "addend_2": "ex4.indexation"
+      },
+      "value": "612000.00"
+    },
+    {
+      "id": "ex4.interest_base",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "3.5",
+        "inflation_percent": "0"
+      },
+      "value": "21000.00"
+    },
+    {
+      "id": "ex4.interest",
+      "kind": "bal_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "3.5",
+        "inflation_percent": "2"
+      },
+      "value": "21420.00"
+    },
+    {
+      "id": "ex4.after",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "3.5",
+        "inflation_percent": "2",
+        "payment": "36000"
+      },
+      "value": "597420.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.balance",
+        "subtrahend": "ex4.after"
+      },
+      "value": "2580.00"
+    },
+    {
+      "id": "ex4.after_no_index",
+      "kind": "bal_after_year",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "3.5",
+        "inflation_percent": "0",
+        "payment": "36000"
+      },
+      "value": "585000.00"
+    },
+    {
+      "id": "ex4.no_index_down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.balance",
+        "subtrahend": "ex4.after_no_index"
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "ex4.forgot_cross_parts",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "ex4.indexation",
+        "addend_2": "ex4.interest_base"
+      },
+      "value": "33000.00"
+    },
+    {
+      "id": "ex4.forgot_cross",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.payment",
+        "subtrahend": "ex4.forgot_cross_parts"
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "ex5.rate",
+      "kind": "bal_rate_change_interest",
+      "inputs": {
+        "balance": "500000",
+        "old_rate_percent": "5",
+        "new_rate_percent": "6"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "ex5.indexation",
+      "kind": "bal_indexation",
+      "inputs": {
+        "balance": "500000",
+        "inflation_percent": "1"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "ex5.interest_on_indexation",
+      "kind": "bal_interest_on_indexation",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "3",
+        "inflation_percent": "1"
+      },
+      "value": "150.00"
+    },
+    {
+      "id": "ex5.index_total",
+      "kind": "bal_sum",
+      "inputs": {
+        "addend_1": "ex5.indexation",
+        "addend_2": "ex5.interest_on_indexation"
+      },
+      "value": "5150.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "infl_real_rate",
+      "inputs": {
+        "nominal_percent": "5",
+        "inflation_percent": "3"
+      },
+      "value": "1.94"
+    },
+    {
+      "id": "ex6.approx",
+      "kind": "infl_real_rate_approx",
+      "inputs": {
+        "nominal_percent": "5",
+        "inflation_percent": "3"
+      },
+      "value": "2"
+    }
+  ]
+}

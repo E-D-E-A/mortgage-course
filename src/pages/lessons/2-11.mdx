@@ -1,0 +1,427 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "2.11"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import BalanceForces from "../../components/BalanceForces.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("2.11");
+// A plain amount inside an equation, without ₪: "500,000". Formatting only — the value is the fact's.
+export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
+export const pct = (id) => `${f.plain(id)}%`;
+export const half = f.rows("half.table");
+export const predictionOptions = [
+  `${f.shekels("prediction.paid_only")} — שילמתם ${f.shekels("explain.payment")}, אז החוב ירד ב־${f.shekels("explain.payment")}`,
+  `${f.shekels("i.after_no_index")}`,
+  `קצת יותר מ־${f.floorThousands("i.after")}`,
+  `יותר מ־${f.shekels("explain.balance")} — החוב גדל`,
+];
+
+בשיעור 0.3 ראינו ש<Term t="יתרה" lesson="2.11">יתרה</Term> היא כמה חוב נשאר ברגע מסוים. בשיעור 0.8 ראינו ש<Term t="הצמדה" lesson="2.11">הצמדה</Term> מגדילה חוב גם בלי ריבית. בשיעור 2.3 הכרנו מסלול <Term t="צמוד" lesson="2.11">צמוד</Term> ומסלול <Term t="לא צמוד" lesson="2.11">לא צמוד</Term>, ובשיעור 2.6 את <Term t="מסלול פריים" lesson="2.11">מסלול הפריים</Term>, שהריבית בו זזה.
+בשיעור הזה נסתכל על חוב אחד, בשנה אחת, ונפריד בין שני הכוחות שפועלים עליו: <Term t="ריבית" lesson="2.11">הריבית</Term>, וההצמדה. כל אחד בנפרד, במספרים.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="2.11"
+  question="נשארו לכם 500,000 ₪ להחזיר במסלול צמוד, באחוז ריבית של 3% לשנה. השנה המדד עלה ב־2%, ושילמתם על ההלוואה 30,000 ₪. כמה תהיו חייבים בסוף השנה?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שני כוחות על אותו חוב
+
+</Section>
+
+<LessonVideo lesson="2-11" />
+
+<Section kind="ההסבר">
+
+## כוח ראשון: הריבית
+
+</Section>
+
+**<Term t="יתרת חוב" lesson="2.11">יתרת חוב</Term>** היא כמה עוד צריך להחזיר על הלוואה ברגע מסוים: הקרן שעוד לא הוחזרה. במסלול צמוד היא כוללת גם את ההצמדה שכבר נוספה.
+בשנה אחת, שלושה דברים מזיזים אותה: הריבית מוסיפה, התשלום מוריד, ובמסלול צמוד — ההצמדה מוסיפה (או מורידה, כשהמדד יורד).
+
+כדי לראות כל כוח בנפרד, נעבוד בשיעור הזה במודל של **שנה אחת**: סכום ריבית אחד לשנה, ותשלום אחד בסוף השנה, שהוא סך כל מה ששילמתם באותה שנה. בהלוואה אמיתית כל זה קורה בכל חודש. נגיע לזה בשלב 3. כל המספרים בשיעור הם מספרים להמחשה, לא נתוני שוק.
+
+**צעד 1 — ריבית, בלי הצמדה.** יתרת חוב של {f.shekels("explain.balance")} במסלול לא צמוד, באחוז ריבית של 5% לשנה. בסוף השנה שילמתם {f.shekels("explain.payment")}.
+סכום הריבית של השנה: <M>500,000 × 5% = {f.shekels("u.interest_5")}</M>.
+היתרה בסוף השנה: <M>500,000 + {n("u.interest_5")} − 30,000 = {f.shekels("u.after_5")}</M>.
+שילמתם {f.shekels("explain.payment")}, אבל היתרה ירדה רק ב־{f.shekels("u.principal_paid_5")}: <M>30,000 − {n("u.interest_5")} = {f.shekels("u.principal_paid_5")}</M>. רוב התשלום הלך לריבית.
+
+**צעד 2 — הריבית עולה.** עכשיו נניח שזה <Term t="מסלול פריים" lesson="2.11">מסלול פריים</Term>, ובתחילת השנה <Term t="פריים" lesson="2.11">הפריים</Term> עלה ב<Term t="נקודת אחוז" lesson="2.11">נקודת אחוז</Term>: הריבית שלכם עלתה מ־5% ל־6%.
+מה קרה ליתרה **ביום** שהריבית עלתה? כלום. היא עדיין {f.shekels("explain.balance")}. שינוי בריבית לא נוגע בחוב עצמו. הוא משנה את המחיר שמשלמים על החוב, מהיום והלאה.
+המחיר הזה מגיע לאורך השנה: <M>500,000 × 6% = {f.shekels("u.interest_6")}</M>, כלומר {f.shekels("u.change_extra")} יותר מקודם: <M>500,000 × 1% = {f.shekels("u.change_extra")}</M>.
+אם שילמתם שוב {f.shekels("explain.payment")}: <M>500,000 + {n("u.interest_6")} − 30,000 = {f.shekels("u.after_6")}</M>. כל התשלום הלך לריבית, והיתרה לא ירדה בכלל.
+
+<Callout title="בהלוואה אמיתית התשלום לא נשאר אותו דבר" tone="warning">
+<p>כשהריבית במסלול משתנה, הבנק מחשב מחדש גם את התשלום, כך שההלוואה עדיין תיגמר בזמן. כאן השארנו את התשלום קבוע לשנה אחת, כדי לראות רק את הכוח של הריבית. איך מחשבים את התשלום החדש — בשיעור 3.6.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## כוח שני: ההצמדה
+
+</Section>
+
+**צעד 3 — ההצמדה מזיזה את החוב עצמו.** אותה יתרה, {f.shekels("explain.balance")}, אבל עכשיו במסלול צמוד, באחוז ריבית של 3% לשנה. השנה המדד עלה מ־100 ל־102, כלומר ב־2%.
+כמו בשיעור 0.8, היתרה זזה עם המדד: <M>500,000 × 102 ÷ 100 = {f.shekels("i.indexed_balance")}</M>. ההצמדה הוסיפה לחוב עצמו {f.shekels("i.indexation")}.
+זה ההבדל הגדול מצעד 2: שינוי ריבית לא הזיז את היתרה. הצמדה **כן** מזיזה אותה.
+
+**צעד 4 — הריבית מחושבת על החוב המוצמד.** במסלול צמוד, הריבית מחושבת על היתרה אחרי ההצמדה: <M>{n("i.indexed_balance")} × 3% = {f.shekels("i.interest")}</M>.
+אפשר לפרק את הסכום הזה לשני חלקים:
+- ריבית על היתרה שהייתה: <M>500,000 × 3% = {f.shekels("i.interest_base")}</M>.
+- ריבית על תוספת ההצמדה: <M>{n("i.indexation")} × 3% = {f.shekels("i.interest_on_indexation")}</M>. החלק הזה קיים רק בגלל ההצמדה — הוא של שני הכוחות יחד.
+
+**צעד 5 — התשלום, והיתרה בסוף השנה.** <M>{n("i.indexed_balance")} + {n("i.interest")} − 30,000 = {f.shekels("i.after")}</M>.
+שילמתם {f.shekels("explain.payment")}, והיתרה ירדה רק ב־{f.shekels("i.down")}. בלי ההצמדה היא הייתה יורדת ל־{f.shekels("i.after_no_index")}. ההצמדה, יחד עם הריבית עליה, השאירה בחוב עוד <M>{n("i.indexation")} + {n("i.interest_on_indexation")} = {f.shekels("i.index_total")}</M>.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">מה זז בשנה</th>
+        <th class="py-2 text-start font-semibold">כמה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">היתרה בתחילת השנה</td><td class="py-2"><span class="ltr">{f.shekels("explain.balance")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">הצמדה</td><td class="py-2"><span class="ltr">+{f.shekels("i.indexation")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">ריבית על היתרה שהייתה</td><td class="py-2"><span class="ltr">+{f.shekels("i.interest_base")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">ריבית על תוספת ההצמדה</td><td class="py-2"><span class="ltr">+{f.shekels("i.interest_on_indexation")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700">התשלום</td><td class="py-2"><span class="ltr">−{f.shekels("explain.payment")}</span></td></tr>
+      <tr class="font-semibold"><td class="py-2 text-n900">היתרה בסוף השנה</td><td class="py-2"><span class="ltr">{f.shekels("i.after")}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+**מה למדנו משני הכוחות.**
+- **ריבית** היא המחיר של החוב לתקופה: אחוז הריבית כפול היתרה. כשאחוז הריבית משתנה, משתנה המחיר מהיום והלאה, והיתרה עצמה לא זזה ביום השינוי.
+- **הצמדה** משנה את החוב עצמו. ומכיוון שהריבית מחושבת על החוב, ההצמדה מגדילה גם את סכום הריבית.
+- **מה שהתשלום מוריד מהיתרה** הוא מה שנשאר ממנו אחרי הריבית ואחרי ההצמדה. כשהשתיים יחד גדולות מהתשלום, היתרה **גדלה**, למרות ששילמתם.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## פירוק השינוי בחוב
+
+</Section>
+
+חוב אחד, שנה אחת. בחרו מסלול צמוד או לא צמוד, והזיזו את היתרה, את אחוז הריבית, את השינוי בריבית, את עליית המדד ואת התשלום.
+כל כוח מופיע בשורה משלו, וכל פס מתחיל איפה שהקודם נגמר. השורה האחרונה היא השינוי ביתרה, הכול יחד. מה שמוסיף לחוב בגוון של ההצמדה (כהה) או של הריבית (בהיר).
+
+<BalanceForces client:visible balance={500000} rate={3} rateChange={0} indexed={true} inflation={2} payment={30000} />
+
+נסו את שלושת אלה:
+1. עברו ל״מסלול לא צמוד״, וקבעו ריבית של 5%. כמה מתוך {f.shekels("explain.payment")} הורידו את היתרה?
+2. עכשיו הזיזו את ״הריבית זזה״ ל־1+. מה קרה ליתרה ביום השינוי, ומה קרה לה בסוף השנה?
+3. חזרו ל״מסלול צמוד״, ריבית 3%, בלי שינוי. העלו את המדד ל־6%. מה קרה ליתרה, למרות ששילמתם {f.shekels("explain.payment")}?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>רק {f.shekels("u.principal_paid_5")}. השאר, {f.shekels("u.interest_5")}, הלך לריבית. היתרה בסוף השנה: {f.shekels("u.after_5")}.</li>
+    <li>ביום השינוי היתרה נשארה {f.shekels("explain.balance")}. בסוף השנה היא עדיין {f.shekels("u.after_6")}: נוספה שורה של {f.shekels("u.change_extra")} ריבית מהשינוי, והתשלום כיסה רק את הריבית.</li>
+    <li>היתרה גדלה ל־{f.shekels("slider.idx6_after")}. ההצמדה והריבית יחד היו גדולות מהתשלום, והפס של ״השינוי ביתרה״ עבר לצד של התוספת.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה של שנה אחת
+
+</Section>
+
+**צעד 1 — הצמדה.** בצעד 3 כפלנו את היתרה בעליית המדד: <M>500,000 × 1.02</M>. זו הנוסחה <M>B = P × (1 + π)<sup>n</sup></M> משיעור 0.8, לשנה אחת.
+
+**צעד 2 — ריבית על החוב המוצמד.** בצעד 4 כפלנו את מה שיצא באחוז הריבית: <M>{n("i.indexed_balance")} × 1.03</M> הוא החוב המוצמד ועוד הריבית עליו.
+
+**צעד 3 — התשלום.** בסוף השנה הורדנו אותו: <M>500,000 × 1.02 × 1.03 − 30,000 = {f.shekels("i.after")}</M>.
+
+**צעד 4 — פירוק לחלקים.** כשפותחים את הסוגריים, כל כוח מקבל חלק משלו:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>P × π = 500,000 × 0.02 = {f.shekels("i.indexation")}</M>
+  <M>P × r = 500,000 × 0.03 = {f.shekels("i.interest_base")}</M>
+  <M>P × π × r = {n("i.indexation")} × 0.03 = {f.shekels("i.interest_on_indexation")}</M>
+</div>
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">B = P × (1 + π) × (1 + r) − C</p>
+  <p class="ltr mt-2 text-h3 text-navy">B = P + P × π + P × r + P × π × r − C</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">P</dt><dd>יתרת החוב בתחילת השנה, בשקלים (הסכום ״עכשיו״, כמו מאז שיעור 0.2)</dd>
+    <dt class="ltr font-semibold text-n900">B</dt><dd>יתרת החוב בסוף השנה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">π</dt><dd>בכמה עלה המדד השנה, כמספר עשרוני: 2% הם 0.02. במסלול לא צמוד, π = 0</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>אחוז הריבית לשנה, כמספר עשרוני: 3% הם 0.03. אם הריבית השתנתה בתחילת השנה — הריבית החדשה</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>התשלום של השנה, בשקלים (סך כל מה ששילמתם)</dd>
+  </dl>
+</div>
+
+במסלול לא צמוד, π = 0, והנוסחה נעשית <M>B = P × (1 + r) − C</M>. שינוי של נקודת אחוז בריבית משנה את r, ולכן את הריבית של השנה ב־<M>P × 0.01</M>. את P עצמו הוא לא משנה.
+
+**מתי הנוסחה נכונה?**
+1. רק במודל של השיעור: שנה אחת, עליית מדד אחת לכל השנה, אחוז ריבית אחד לכל השנה, ותשלום אחד בסופה.
+2. בהלוואה אמיתית כל זה קורה בכל חודש: הריבית מחושבת על היתרה של אותו חודש, ההצמדה זזה עם כל מדד שמתפרסם, וגם התשלום במסלול צמוד עולה עם המדד. איך זה עובד חודש אחרי חודש — בשלב 3, בנושא <Later lesson="3.5">הפרשי הצמדה</Later>.
+3. הסדר — קודם הצמדה, אחר כך ריבית — הוא איך שהריבית במסלול צמוד מחושבת: על החוב המוצמד. בכפל הסדר לא משנה את התוצאה, אבל הוא מסביר למה יש חלק של ״ריבית על תוספת ההצמדה״.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> היתרה, ×, 1.02, ×, 1.03, −, התשלום. או חלק אחרי חלק: ההצמדה, הריבית על החוב המוצמד, ואז התשלום.</p>
+<p><strong>בגיליון אלקטרוני:</strong> <span class="ltr">{"=500000*1.02*1.03-30000"}</span>. ובחלקים: ההצמדה <span class="ltr">{"=500000*2%"}</span>, הריבית <span class="ltr">{`=${f.raw("i.indexed_balance").replace(".00", "")}*3%`}</span>.</p>
+</Callout>
+
+<Callout title="עיגול">
+<p>בנוסחה מעגלים לאגורה פעם אחת, בסוף. בטבלה שבהמשך, כמו בדף חשבון, מעגלים לאגורה את ההצמדה ואת הריבית של כל שנה, ורק אז מחברים. לכן בשורות מאוחרות שתי הדרכים יכולות להיבדל באגורה או שתיים.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="2.11"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `זה נכון רק אם אין ריבית ואין הצמדה. מתוך ${f.shekels("explain.payment")}, ${f.shekels("i.interest")} הלכו לריבית ו־${f.shekels("i.indexation")} כיסו את ההצמדה.`,
+    `זו היתרה בלי ההצמדה. אבל המסלול צמוד, והמדד עלה ב־2%: החוב עצמו גדל ב־${f.shekels("i.indexation")}, והריבית מחושבת על החוב הגדול יותר.`,
+    "",
+    `קרוב, אבל לא. הריבית וההצמדה יחד הן ${f.shekels("i.interest_and_index")}, פחות מהתשלום. לכן היתרה עוד ירדה, ב־${f.shekels("i.down")}.`,
+  ]}
+>
+  <M>500,000 × 1.02 × 1.03 − 30,000 = {f.shekels("i.after")}</M>. שילמתם {f.shekels("explain.payment")}, והחוב ירד רק ב־{f.shekels("i.down")}.
+</PredictionReveal>
+
+<Callout title="כלי לראש: קירוב">
+<p>בשנה אחת, השינוי ביתרה הוא בערך <M>P × (π + r) − C</M>: הצמדה ועוד ריבית, פחות התשלום. הקירוב מדלג על החלק הקטן <M>P × π × r</M>. בדוגמה: <M>500,000 × (2% + 3%) − 30,000</M> — ירידה של בערך {f.shekels("thumb.approx_down")}, ובאמת {f.shekels("i.down")}. זה קירוב, לא חישוב: ככל שהמדד והריבית גבוהים יותר, החלק שדילגנו עליו גדל.</p>
+</Callout>
+
+<Section kind="דוגמה פתורה">
+
+## אורי ומיכל: שני מסלולים, שני כוחות
+
+</Section>
+
+אורי ומיכל, זוג בדוי, בשנה השלישית של המשכנתא שלהם. יש להם שני <Term t="מסלול" lesson="2.11">מסלולים</Term>, ובתחילת השנה נשארו בכל אחד {f.shekels("worked.balance")}. השנה שילמו בכל מסלול {f.shekels("worked.payment")}. (מספרים להמחשה. בהלוואה אמיתית התשלום במסלול א׳ היה מחושב מחדש אחרי שהריבית עלתה; כאן הוא קבוע, כדי לראות את הכוח.)
+- **מסלול א׳:** מסלול פריים, לא צמוד. בתחילת השנה הריבית עלתה מ־5.5% ל־6%.
+- **מסלול ב׳:** <Term t="קבועה צמודה" lesson="2.11">קבועה צמודה</Term>, באחוז ריבית של 3%. המדד עלה השנה ב־2.5%.
+
+איזה כוח הזיז כל מסלול, וכמה?
+
+**צעד 1 — מסלול א׳, הריבית.** הריבית שהייתה: <M>300,000 × 5.5% = {f.shekels("worked.a.interest_base")}</M>. התוספת מהשינוי, חצי נקודת אחוז: <M>300,000 × 0.5% = {f.shekels("worked.a.change")}</M>. יחד: <M>300,000 × 6% = {f.shekels("worked.a.interest")}</M>.
+
+**צעד 2 — מסלול א׳, היתרה.** <M>300,000 + {n("worked.a.interest")} − 24,000 = {f.shekels("worked.a.after")}</M>. היתרה ירדה ב־{f.shekels("worked.a.down")}. השינוי בריבית לא נגע בחוב עצמו. הוא לקח {f.shekels("worked.a.change")} מהתשלום, שאחרת היו מורידים את היתרה.
+
+**צעד 3 — מסלול ב׳, ההצמדה.** <M>300,000 × 2.5% = {f.shekels("worked.b.indexation")}</M>. החוב עצמו גדל ל־{f.shekels("worked.b.indexed")}.
+
+**צעד 4 — מסלול ב׳, הריבית.** על החוב המוצמד: <M>{n("worked.b.indexed")} × 3% = {f.shekels("worked.b.interest")}</M>. מתוכם {f.shekels("worked.b.interest_base")} על היתרה שהייתה, ו־{f.shekels("worked.b.interest_on_indexation")} על תוספת ההצמדה.
+
+**צעד 5 — מסלול ב׳, היתרה.** <M>{n("worked.b.indexed")} + {n("worked.b.interest")} − 24,000 = {f.shekels("worked.b.after")}</M>. היתרה ירדה ב־{f.shekels("worked.b.down")}.
+
+**צעד 6 — ההשוואה.** השנה, היתרה במסלול ב׳ ירדה יותר מבמסלול א׳. אבל הכוחות שונים:
+- במסלול א׳ השינוי בריבית עלה {f.shekels("worked.a.change")} לשנה, וימשיך לעלות כל עוד הריבית גבוהה. היתרה עצמה לא קפצה.
+- במסלול ב׳ ההצמדה ״דחפה״ את החוב למעלה ב־<M>{n("worked.b.indexation")} + {n("worked.b.interest_on_indexation")} = {f.shekels("worked.b.push")}</M>. ההצמדה הזו נשארת ביתרה, ובשנה הבאה גם עליה תחושב ריבית.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>כשבודקים מה קרה למשכנתא בשנה, שואלים שתי שאלות נפרדות: כמה עלתה הריבית — זה המחיר של החוב; וכמה זזה היתרה עצמה בגלל המדד. מסלול לא צמוד חשוף רק לשאלה הראשונה, ורק אם הריבית בו יכולה להשתנות. מסלול צמוד חשוף תמיד לשנייה, גם כשהריבית שלו קבועה.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+מסלול צמוד, יתרת חוב של 100,000 ₪, באחוז ריבית של 3% לשנה. בכל שנה המדד עולה ב־2%, ובכל שנה משלמים 8,000 ₪ (מספרים להמחשה; בהלוואה אמיתית התשלום במסלול צמוד עולה עם המדד).
+בכל שנה: קודם ההצמדה (2% מהיתרה בהתחלה), אחר כך הריבית (3% מהחוב המוצמד), ואז מורידים את התשלום; מה שיוצא הוא היתרה בסוף השנה. עגלו כל הצמדה וכל ריבית לאגורה. השנה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="2.11-half"
+  periodLabel="שנה"
+  rows={half}
+  columns={[
+    { key: "opening", label: "יתרה בהתחלה", format: "shekels" },
+    { key: "indexation", label: "הצמדה", format: "shekels" },
+    { key: "interest", label: "ריבית", format: "shekels" },
+    { key: "closing", label: "יתרה בסוף", format: "shekels" },
+  ]}
+  blanks={["2.indexation", "2.interest", "2.closing", "3.opening", "3.indexation", "3.interest", "3.closing"]}
+  success="בכל שנה ההצמדה מחושבת על היתרה של תחילת השנה, והריבית — על היתרה אחרי ההצמדה. התשלום הוריד את החוב, אבל פחות מ־8,000 ₪ בכל שנה."
+  hint="בדקו: ההצמדה היא 2% מהיתרה בתחילת השנה, לא מ־100,000 ₪. הריבית היא 3% מהיתרה אחרי ההצמדה. בסוף השנה: היתרה, ועוד ההצמדה, ועוד הריבית, פחות 8,000 ₪. והיתרה בתחילת שנה היא היתרה בסוף השנה שלפניה."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. כל המספרים להמחשה, לא נתוני שוק. בכולם — המודל של השיעור: שנה אחת, קודם הצמדה, אחר כך ריבית, ותשלום אחד בסוף השנה. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. כדאי מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="2.11-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "היא עלתה באותו יום בנקודת אחוז מהיתרה", feedback: "שינוי בריבית לא מזיז את היתרה. הוא משנה את סכום הריבית שיתווסף מהיום והלאה." },
+    { text: "היא לא השתנתה באותו יום. מהיום תתווסף יותר ריבית", correct: true, feedback: "נכון. הריבית היא המחיר של החוב לתקופה. כשהיא עולה, המחיר עולה מהיום, והיתרה עצמה לא קופצת." },
+    { text: "היא עלתה באותו יום, כמו בהצמדה", feedback: "בהצמדה היתרה עצמה זזה עם המדד. בשינוי ריבית לא: משתנה רק מה שמשלמים עליה מהיום." },
+    { text: "היא ירדה, כי מעכשיו התשלום יהיה גבוה יותר", feedback: "תשלום גבוה יותר עוד לא שולם. ביום השינוי היתרה לא זזה לשום כיוון." },
+  ]}
+>
+  יש לכם מסלול פריים. היום הפריים עלה בנקודת אחוז. מה קרה היום ליתרת החוב שלכם במסלול הזה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="2.11-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.no_interest"), message: `הורדתם את התשלום ושכחתם את הריבית. קודם נוספת ריבית של ${eq("300,000 × 4%")}, ורק אז יורד התשלום.` },
+    { value: f.raw("ex2.no_payment"), message: "הוספתם את הריבית ושכחתם להוריד את התשלום של השנה." },
+  ]}
+>
+  יש לכם מסלול לא צמוד עם יתרת חוב של 300,000 ₪, באחוז ריבית של 4% לשנה. השנה שילמתם בסך הכול 24,000 ₪. כמה תהיה יתרת החוב בסוף השנה?
+</NumericExercise>
+
+<Solution for="2.11-2">
+הריבית: <M>300,000 × 4% = {f.shekels("ex2.interest")}</M>. היתרה בסוף השנה: <M>300,000 + {n("ex2.interest")} − 24,000 = {f.shekels("ex2.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.11-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.on_opening"), message: "חישבתם ריבית על היתרה שהייתה. במסלול צמוד הריבית מחושבת על היתרה אחרי ההצמדה." },
+    { value: f.raw("ex3.indexation"), message: "זו תוספת ההצמדה, לא הריבית. הריבית היא 2% מהיתרה אחרי ההצמדה." },
+    { value: f.raw("ex3.rates_added"), message: "חיברתם את הריבית ואת עליית המדד ל־5%. אלה שני כוחות נפרדים: קודם מצמידים, ואחר כך מחשבים 2% ריבית על מה שיצא." },
+  ]}
+>
+  יש לכם מסלול קבועה צמודה עם יתרת חוב של 400,000 ₪, באחוז ריבית של 2% לשנה. השנה המדד עלה ב־3%. כמה ריבית נוספה השנה?
+</NumericExercise>
+
+<Solution for="2.11-3">
+ההצמדה: <M>400,000 × 3% = {f.shekels("ex3.indexation")}</M>, והחוב המוצמד {f.shekels("ex3.indexed")}. הריבית: <M>{n("ex3.indexed")} × 2% = {f.shekels("ex3.answer")}</M>. מתוכה {f.shekels("ex3.on_opening")} על היתרה שהייתה, והשאר על תוספת ההצמדה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.11-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.payment"), message: "זה כל התשלום. אבל ממנו קודם יורדות הריבית וההצמדה, ורק מה שנשאר מוריד את היתרה." },
+    { value: f.raw("ex4.no_index_down"), message: "שכחתם את ההצמדה. המסלול צמוד: המדד עלה ב־2%, והחוב עצמו גדל." },
+    { value: f.raw("ex4.forgot_cross"), message: `כמעט. חישבתם ריבית על היתרה שהייתה. אבל הריבית מחושבת על החוב המוצמד, ולכן יש עוד ריבית על תוספת ההצמדה: ${eq(`${n("ex4.indexation")} × 3.5%`)}.` },
+  ]}
+>
+  יש לכם מסלול צמוד עם יתרת חוב של 600,000 ₪, באחוז ריבית של 3.5% לשנה. השנה המדד עלה ב־2%, ושילמתם בסך הכול 36,000 ₪. בכמה ירדה יתרת החוב השנה?
+</NumericExercise>
+
+<Solution for="2.11-4">
+ההצמדה: <M>600,000 × 2% = {f.shekels("ex4.indexation")}</M>. הריבית: <M>{n("ex4.indexed")} × 3.5% = {f.shekels("ex4.interest")}</M>. היתרה בסוף השנה: <M>{n("ex4.indexed")} + {n("ex4.interest")} − 36,000 = {f.shekels("ex4.after")}</M>. הירידה: <M>600,000 − {n("ex4.after")} = {f.shekels("ex4.answer")}</M>, מתוך {f.shekels("ex4.payment")} ששילמתם.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="2.11-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `העלייה בפריים: ${f.shekels("ex5.rate")} ריבית יותר, ומשהו נוסף לחוב עצמו`, feedback: "העלייה בפריים הוסיפה ריבית, אבל לא שינתה את היתרה עצמה." },
+    { text: `ההצמדה: ${f.shekels("ex5.index_total")}, ומה שנוסף נשאר ביתרה`, correct: true, feedback: `נכון. ${f.shekels("ex5.indexation")} הצמדה ועוד ${f.shekels("ex5.interest_on_indexation")} ריבית עליה. וההצמדה נשארת בחוב: בשנה הבאה תחושב גם עליה ריבית.` },
+    { text: "שתיהן אותו דבר, כי נקודת אחוז היא אחוז", feedback: `קרוב, אבל לא. ההצמדה מוסיפה גם ריבית על התוספת שלה (${f.shekels("ex5.interest_on_indexation")}), ומה שהיא הוסיפה נשאר בחוב.` },
+    { text: "אי אפשר להשוות ריבית להצמדה", feedback: "אפשר, בשקלים: כמה כל כוח הוסיף למה שאתם חייבים בשנה." },
+  ]}
+>
+  לשני חברים יש יתרת חוב של 500,000 ₪. לאחד מסלול פריים בריבית 5%, והפריים עלה בתחילת השנה בנקודת אחוז. לשני מסלול קבועה צמודה בריבית 3%, והמדד עלה השנה ב־1%. התשלומים שלהם לא השתנו. אצל מי השינוי הוסיף השנה יותר למה שהוא חייב, ומה עוד ההבדל?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="2.11-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.approx"), message: `${pct("ex6.approx")} הוא הקירוב, 5% פחות 3%. בדיוק, צריך ש־${eq("(1 + π) × 1.03")} יהיה שווה ל־1.05: מחלקים, לא מחסרים.` },
+  ]}
+>
+  לשני מסלולים אותה יתרת חוב ואותו תשלום השנה. מסלול א׳ לא צמוד, בריבית 5%. מסלול ב׳ צמוד, בריבית 3%. בכמה אחוזים צריך המדד לעלות השנה, כדי ששתי היתרות יהיו שוות בסוף השנה? כתבו באחוזים, בשתי ספרות אחרי הנקודה.
+</NumericExercise>
+
+<Solution for="2.11-6">
+במסלול א׳: <M>P × 1.05 − C</M>. במסלול ב׳: <M>P × (1 + π) × 1.03 − C</M>. היתרות שוות כש־<M>(1 + π) × 1.03 = 1.05</M>, כלומר <M>(1.05 ÷ 1.03 − 1) × 100 = {f.plain("ex6.answer")}</M>, {pct("ex6.answer")}. זו הנוסחה של ריבית ריאלית משיעור 0.8. אם המדד יעלה יותר מזה, היתרה במסלול הצמוד תהיה גבוהה יותר.
+</Solution>
+
+<Callout title="חמש שאלות על יתרת חוב">
+<p><strong>מה זה?</strong> כמה עוד צריך להחזיר על הלוואה ברגע מסוים. במסלול צמוד — כולל ההצמדה שכבר נוספה.</p>
+<p><strong>למה זה קיים?</strong> כי הלוואה מוחזרת לאורך זמן. בכל רגע צריך לדעת כמה עוד חייבים: כדי לחשב את הריבית של התקופה הבאה, וכדי לדעת כמה צריך אם רוצים לסגור את ההלוואה.</p>
+<p><strong>איך זה עובד?</strong> בכל תקופה נוספת ריבית על היתרה, התשלום מוריד ממנה, ובמסלול צמוד ההצמדה משנה אותה עצמה. שינוי באחוז הריבית לא מזיז את היתרה ביום השינוי — הוא משנה את הריבית שתתווסף מעכשיו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> במסלול צמוד, אפשר לשלם הרבה ולראות שהיתרה כמעט לא ירדה, ואפילו עלתה, כשהמדד עולה. במסלול שהריבית בו משתנה, עלייה בריבית מקטינה את החלק מהתשלום שמוריד את היתרה (או מגדילה את התשלום).</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשבוחרים מסלול, בודקים לאיזה כוח הוא חשוף: לשינוי בריבית, להצמדה, לשניהם, או לאף אחד. בשיעור הבא נסדר את כל המסלולים בטבלה אחת לפי זה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **יתרת חוב** = כמה עוד צריך להחזיר. ריבית מוסיפה, תשלום מוריד, הצמדה משנה אותה עצמה.
+- **שינוי בריבית** לא מזיז את היתרה ביום השינוי. הוא משנה את המחיר של החוב מהיום והלאה: בשנה, היתרה כפול השינוי.
+- **הצמדה** מזיזה את החוב עצמו, וגם את הריבית, כי הריבית מחושבת על החוב המוצמד.
+- **שנה אחת:** <M>B = P × (1 + π) × (1 + r) − C</M>. בפירוק: הצמדה <M>P × π</M>, ריבית <M>P × r</M>, ריבית על ההצמדה <M>P × π × r</M>, פחות התשלום.
+- **מה שהתשלום מוריד מהיתרה** הוא מה שנשאר ממנו אחרי הריבית וההצמדה. כשהן גדולות ממנו, היתרה גדלה.
+- זה מודל של שנה. בהלוואה אמיתית הכול קורה בכל חודש — שלב 3.
+
+**בשיעור הבא — 2.12, סיכום: טבלת המסלולים:** כל המסלולים בטבלה אחת — מה קבוע בכל אחד, מה משתנה ומתי, ומה הסיכון, במשפט אחד.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "פירוק השינוי ביתרה לשנה אחת: הצמדה, ריבית על היתרה, ריבית על תוספת ההצמדה, ותשלום. זו פתיחת סוגריים של מכפלת מקדמי הצמיחה.", code: ["B = P × (1 + π) × (1 + r) − C", "B = P + Pπ + Pr + Pπr − C"] },
+    { kind: "ידע כלכלי כללי", text: "בהלוואה צמודה הריבית מחושבת על הקרן המוצמדת, ושינוי באחוז הריבית משנה את הריבית מכאן והלאה ולא את היתרה עצמה. איך זה נעשה בכל חודש, ואיך מחושב מחדש התשלום אחרי שינוי ריבית — שלב 3 (שיעורים 3.5 ו־3.6)." },
+    { kind: "הנחת חישוב", text: "מודל של שנה אחת: עליית מדד אחת ואחוז ריבית אחד לכל השנה, ותשלום אחד בסוף השנה, שהוא סך התשלומים. התשלום לא מחושב מחדש אחרי שינוי ריבית, ולא עולה עם המדד, כדי לראות כל כוח בנפרד. כל היתרות, הריביות, עליות המדד והתשלומים בדויים, להמחשה: לא נתוני שוק ולא תחזית. אורי ומיכל — זוג בדוי." },
+    { kind: "הנחת חישוב", text: "עיגול: לאגורה, פעם אחת בסוף החישוב. בטבלה החצי פתורה — את ההצמדה ואת הריבית של כל שנה, ואז מחברים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/balance.ts (and indexation.ts for the indexed amount and ex 6) via scripts/lessons/lesson-2-11.ts and data/lessons/2-11.json, rechecked by checks/kinds/balance.py and indexation.py. Illustration: src/components/BalanceForces.vue. Video: video/2-11.html. No field knowledge used. */}

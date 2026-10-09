@@ -1,0 +1,267 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.11 — "שני כוחות על אותו חוב".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-11.json (the amounts are fact values, the
+  rates and the index rise are the facts' own inputs). The model is the lesson's
+  yearly one: indexation, then interest on the indexed balance, then one payment.
+  The subtitle cues (window.cues) carry the explanatory sentences — the script for
+  narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.11 · ריבית מול הצמדה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-11.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("495,000 ₪", "+300 ₪"), as the page's ltr spans do.
+      const iso = (x) => `\u2066${x}\u2069`;
+      const shek = (v) => iso(`${num(v)} ₪`);
+
+      const V = {
+        P: fact("explain.balance"), C: fact("explain.payment"),
+        u5: fact("u.interest_5"), uAfter5: fact("u.after_5"), uDown5: fact("u.principal_paid_5"),
+        u6: fact("u.interest_6"), uExtra: fact("u.change_extra"), uAfter6: fact("u.after_6"),
+        iIdx: fact("i.indexation"), iIndexed: fact("i.indexed_balance"), iInt: fact("i.interest"),
+        iBase: fact("i.interest_base"), iOnIdx: fact("i.interest_on_indexation"), iAfter: fact("i.after"), iDown: fact("i.down"),
+      };
+      // The rates and the index rise are the facts' own inputs.
+      const R = {
+        u5: get("u.interest_5").inputs.rate_percent,
+        u6: get("u.interest_6").inputs.rate_percent,
+        i: get("i.interest").inputs.rate_percent,
+        pi: get("i.interest").inputs.inflation_percent,
+      };
+
+      const S = { title: [0, 12], interest: [12, 46], change: [46, 84], index: [84, 128], end: [128, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "שני כוחות פועלים על אותו חוב."],
+        [6, 11.5, "ריבית, והצמדה. נראה כל אחד בנפרד."],
+        [13, 20, `חוב של ${shek(V.P)}, במסלול לא צמוד, בריבית ${R.u5}%.`],
+        [20, 28, `בשנה נוספת ריבית: ${shek(V.u5)}.`],
+        [28, 36, `שילמתם ${shek(V.C)}. היתרה ירדה רק ב־${shek(V.uDown5)}.`],
+        [36, 45, "רוב התשלום הלך לריבית."],
+        [47, 55, `הפריים עלה בנקודת אחוז: הריבית ${R.u6}%.`],
+        [55, 63, `ביום השינוי היתרה לא זזה: עדיין ${shek(V.P)}.`],
+        [63, 72, `השינוי מגיע דרך הריבית: עוד ${shek(V.uExtra)} בשנה.`],
+        [72, 83, "אותו תשלום כיסה רק ריבית. היתרה לא ירדה."],
+        [85, 93, `עכשיו מסלול צמוד, בריבית ${R.i}%. המדד עלה ב־${R.pi}%.`],
+        [93, 101, `כשהמדד מתפרסם, החוב עצמו גדל: ${shek(V.iIndexed)}.`],
+        [101, 110, `הריבית מחושבת על החוב המוצמד: ${shek(V.iInt)}.`],
+        [110, 118, `${num(V.iBase)} על היתרה, ו־${num(V.iOnIdx)} על תוספת ההצמדה.`],
+        [118, 127, `שילמתם ${shek(V.C)}, והיתרה ירדה רק ב־${shek(V.iDown)}.`],
+        [129, 138, "ריבית: המחיר של החוב. שינוי בה משנה את המחיר."],
+        [138, 149, "הצמדה: משנה את החוב עצמו, וגם את הריבית עליו."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text, parent = svg) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        parent.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      // The "of both forces" stripes, defined once per frame.
+      function defs() {
+        const d = el("defs", {});
+        const p = el("pattern", { id: "both", width: 12, height: 12, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, undefined, d);
+        el("rect", { width: 12, height: 12, fill: C.tq2 }, undefined, p);
+        el("rect", { width: 6, height: 12, fill: C.teal }, undefined, p);
+      }
+
+      // The waterfall: rows of forces, each starting where the one above ended.
+      // Zero (no change) at X0; what adds to the debt moves left, as time does in Hebrew.
+      const X0 = 800, K = 0.015, LABEL_X = 1190;
+      const xOf = (v) => X0 - Number(v) * K;
+      function waterfall(rows, t, sc, o, y0 = 270, gap = 62) {
+        el("line", { x1: X0, x2: X0, y1: y0 - 34, y2: y0 + gap * rows.length - 22, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "6 5", opacity: o * 0.8 });
+        let run = 0;
+        rows.forEach((r, i) => {
+          const oi = after(t, sc, r.at, o);
+          if (oi <= 0) { run += Number(r.v); return; }
+          const y = y0 + i * gap;
+          const from = run;
+          const grow = ease((t - sc[0] - r.at) / 1.2);
+          const to = from + Number(r.v) * grow;
+          run += Number(r.v);
+          const xa = xOf(from), xb = xOf(to);
+          txt(LABEL_X, y + 4, r.label, 24, { anchor: "start", fill: C.n700, o: oi, w: 600 });
+          el("rect", { x: Math.min(xa, xb), y: y - 18, width: Math.max(2, Math.abs(xb - xa)), height: 30, rx: 5, fill: r.fill, opacity: oi });
+          // The amount sits beside the bar's far end.
+          const far = Math.min(xa, xb);
+          const sign = Number(r.v) > 0 ? "+" : Number(r.v) < 0 ? "−" : "";
+          txt(far - 12, y + 6, iso(`${sign}${num(Math.abs(Number(r.v)))} ₪`), 24, { anchor: "end", ltr: true, w: 700, o: oi * clamp(grow * 2), fill: r.text ?? C.navy });
+        });
+      }
+      // The balance counter, top right.
+      function counter(label, value, o, note) {
+        txt(1190, 185, label, 24, { anchor: "start", fill: C.n600, o });
+        txt(1190, 228, shek(value), 40, { anchor: "end", ltr: true, w: 700, o, fill: C.navy });
+        if (note) txt(880, 214, note, 22, { anchor: "start", fill: C.teal, w: 600, o: o * (note.o ?? 1) });
+      }
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        defs();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שני כוחות על אותו חוב", 76, { w: 700, o });
+          txt(640, 355, "ריבית והצמדה, כל אחד בנפרד", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 5.5, o, 0.8);
+          el("rect", { x: 540, y: 410, width: 90, height: 34, rx: 6, fill: C.tq2, opacity: o2 });
+          txt(585, 470, "ריבית", 24, { fill: C.n700, o: o2 });
+          el("rect", { x: 650, y: 410, width: 90, height: 34, rx: 6, fill: C.teal, opacity: o2 });
+          txt(695, 470, "הצמדה", 24, { fill: C.n700, o: o2 });
+        }
+        // Scene 2 — interest alone, unindexed
+        if (inScene(t, S.interest)) {
+          const sc = S.interest, o = vis(t, sc);
+          txt(640, 115, "כוח ראשון: הריבית", 42, { w: 700, o });
+          txt(640, 152, `מסלול לא צמוד · ${R.u5}% לשנה · שנה אחת`, 24, { fill: C.n600, o });
+          counter("יתרת החוב", lerp(V.P, V.uAfter5, (t - sc[0] - 22) / 2), o);
+          waterfall(
+            [
+              { label: `ריבית ${R.u5}%`, v: V.u5, fill: C.tq2, at: 8 },
+              { label: "התשלום", v: -Number(V.C), fill: C.n300, at: 16 },
+            ],
+            t, sc, o,
+          );
+          const o3 = after(t, sc, 22, o);
+          const y = 270 + 2 * 62;
+          txt(LABEL_X, y + 4, "השינוי ביתרה", 24, { anchor: "start", w: 700, o: o3 });
+          el("rect", { x: X0, y: y - 18, width: Math.max(2, Number(V.uDown5) * K), height: 30, rx: 5, fill: C.navy, opacity: o3 });
+          txt(X0 + Number(V.uDown5) * K + 14, y + 6, iso(`−${num(V.uDown5)} ₪`), 24, { anchor: "start", ltr: true, w: 700, o: o3 });
+        }
+        // Scene 3 — the rate rises: the balance does not jump; the interest grows
+        if (inScene(t, S.change)) {
+          const sc = S.change, o = vis(t, sc);
+          txt(640, 115, `הריבית עולה: מ־${R.u5}% ל־${R.u6}%`, 42, { w: 700, o });
+          const dayOf = t - sc[0] < 17;
+          if (dayOf) {
+            const o1 = Math.min(o, clamp((sc[0] + 17 - t) / 0.6));
+            txt(640, 152, "ביום השינוי", 26, { fill: C.n600, o: o1, w: 600 });
+            el("rect", { x: 340, y: 230, width: 600, height: 90, rx: 12, fill: C.n0, stroke: C.n200, opacity: o1 });
+            txt(640, 270, "יתרת החוב", 24, { fill: C.n600, o: o1 });
+            txt(640, 306, shek(V.P), 40, { ltr: true, w: 700, o: o1 });
+            const o2 = after(t, sc, 8, o1);
+            el("rect", { x: 520, y: 360, width: 240, height: 56, rx: 28, fill: C.mint, opacity: o2 * 0.8 });
+            txt(640, 397, "לא זזה", 30, { w: 700, o: o2 });
+          } else {
+            const o1 = after(t, sc, 17, o);
+            txt(640, 152, `במשך השנה · התשלום נשאר ${shek(V.C)}, רק להמחשה`, 24, { fill: C.n600, o: o1 });
+            // The balance did not move on the day of the change, and ends the year where it started.
+            counter(t - sc[0] < 30 ? "יתרת החוב" : "יתרת החוב בסוף השנה", t - sc[0] < 30 ? V.P : V.uAfter6, o1);
+            waterfall(
+              [
+                { label: `ריבית ${R.u5}%`, v: V.u5, fill: C.tq2, at: 18 },
+                { label: "ריבית מהשינוי", v: V.uExtra, fill: C.tq2, at: 21 },
+                { label: "התשלום", v: -Number(V.C), fill: C.n300, at: 26 },
+              ],
+              t, sc, o1,
+            );
+            const o3 = after(t, sc, 30, o1);
+            const y = 270 + 3 * 62;
+            txt(LABEL_X, y + 4, "השינוי ביתרה", 24, { anchor: "start", w: 700, o: o3 });
+            txt(X0 - 14, y + 6, iso("0 ₪"), 24, { anchor: "end", ltr: true, w: 700, o: o3 });
+          }
+        }
+        // Scene 4 — indexation moves the debt itself
+        if (inScene(t, S.index)) {
+          const sc = S.index, o = vis(t, sc);
+          txt(640, 115, "כוח שני: ההצמדה", 42, { w: 700, o });
+          txt(640, 152, `מסלול צמוד · ${R.i}% לשנה · המדד עלה ב־${R.pi}%`, 24, { fill: C.n600, o });
+          const jump = ease((t - sc[0] - 10) / 1.5);
+          const end = ease((t - sc[0] - 36) / 2);
+          const shown = end > 0 ? lerp(V.iIndexed, V.iAfter, end) : lerp(V.P, V.iIndexed, jump);
+          counter(end > 0 ? "יתרת החוב בסוף השנה" : "יתרת החוב", shown, o);
+          const oj = Math.min(after(t, sc, 10, o), clamp((sc[0] + 34 - t) / 0.6));
+          if (oj > 0) {
+            el("rect", { x: 560, y: 174, width: 300, height: 44, rx: 22, fill: C.mint, opacity: oj * 0.8 });
+            txt(710, 204, "החוב עצמו זז", 24, { w: 700, o: oj });
+          }
+          waterfall(
+            [
+              { label: "הצמדה", v: V.iIdx, fill: C.teal, at: 10 },
+              { label: "ריבית על היתרה", v: V.iBase, fill: C.tq2, at: 18 },
+              { label: "ריבית על ההצמדה", v: V.iOnIdx, fill: "url(#both)", at: 26 },
+              { label: "התשלום", v: -Number(V.C), fill: C.n300, at: 34 },
+            ],
+            t, sc, o, 262, 58,
+          );
+          const o3 = after(t, sc, 36, o);
+          const y = 262 + 4 * 58;
+          txt(LABEL_X, y + 4, "השינוי ביתרה", 24, { anchor: "start", w: 700, o: o3 });
+          el("rect", { x: X0, y: y - 18, width: Math.max(2, Number(V.iDown) * K), height: 30, rx: 5, fill: C.navy, opacity: o3 });
+          txt(X0 + Number(V.iDown) * K + 14, y + 6, iso(`−${num(V.iDown)} ₪`), 24, { anchor: "start", ltr: true, w: 700, o: o3 });
+        }
+        // Scene 5 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "אותו חוב, שני כוחות", 44, { w: 700, o });
+          const cards = [
+            { x: 660, color: C.tq2, title: "ריבית", lines: ["המחיר של החוב לשנה.", "שינוי בריבית משנה את המחיר", "מעכשיו. היתרה לא קופצת."], at: 1 },
+            { x: 80, color: C.teal, title: "הצמדה", lines: ["משנה את החוב עצמו,", "ולכן גם את הריבית עליו.", "מה שנוסף נשאר ביתרה."], at: 10 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o, 0.8);
+            el("rect", { x: c.x, y: 180, width: 540, height: 330, rx: 16, fill: C.n0, stroke: C.n200, opacity: oc });
+            el("rect", { x: c.x + 540 - 70, y: 214, width: 40, height: 40, rx: 8, fill: c.color, opacity: oc });
+            txt(c.x + 540 - 90, 246, c.title, 36, { anchor: "start", w: 700, o: oc });
+            c.lines.forEach((line, k) => txt(c.x + 540 - 40, 320 + k * 50, line, 28, { anchor: "start", fill: C.n700, o: oc }));
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

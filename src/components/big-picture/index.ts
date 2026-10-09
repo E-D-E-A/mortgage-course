@@ -1,9 +1,10 @@
 /**
  * The big-picture map as it stands at a lesson. A later stage adds its own
- * stage-N.ts (nodes and links) and one import line here; nothing else changes.
+ * stage-N.ts (nodes and links), imports it here and adds it to STAGES; nothing else changes.
  */
 import * as stage0 from "./stage-0.ts";
 import * as stage1 from "./stage-1.ts";
+import * as stage2 from "./stage-2.ts";
 import type { BigPicture, MapLink, MapNode, Region } from "./types.ts";
 
 export type { BigPicture, MapLink, MapNode, Region, RegionId } from "./types.ts";
@@ -18,8 +19,9 @@ export const REGIONS: Region[] = [
   { id: "result", label: "התוצאה", empty: "יתמלא בשלבים 3, 5 ו־6." },
 ];
 
-const ALL_NODES: MapNode[] = [...stage0.nodes, ...stage1.nodes];
-const ALL_LINKS: MapLink[] = [...stage0.links, ...stage1.links];
+const STAGES = [stage0, stage1, stage2];
+const ALL_NODES: MapNode[] = STAGES.flatMap((s) => s.nodes);
+const ALL_LINKS: MapLink[] = STAGES.flatMap((s) => s.links);
 
 const order = (id: string) => id.split(".").map(Number);
 /** a ≤ b, comparing lesson numbers ("1.10" comes after "1.9"). */
