@@ -37,6 +37,19 @@ for (const [name, viewport] of Object.entries(viewports)) {
     if (overflow > 0) problems.push(`${name} ${p}: horizontal scroll of ${overflow}px`);
     const dir = await page.evaluate(() => document.documentElement.dir);
     if (dir !== "rtl") problems.push(`${name} ${p}: dir is ${dir}`);
+    // Equations must read left to right: the first character sits left of the last.
+    const reversed = await page.evaluate(() =>
+      [...document.querySelectorAll("span.ltr[dir=ltr]")]
+        .filter((span) => {
+          const node = span.firstChild;
+          if (!node || node.nodeType !== 3 || node.length < 3) return false;
+          const at = (i) => { const r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + 1); return r.getBoundingClientRect(); };
+          const a = at(0), b = at(node.length - 1);
+          return a.top === b.top && a.left > b.left;
+        })
+        .map((span) => span.textContent),
+    );
+    for (const text of reversed) problems.push(`${name} ${p}: equation drawn right to left: ${text}`);
     const file = `${name}${p.replaceAll("/", "_") || "_"}.png`;
     await page.screenshot({ path: join(out, file), fullPage: true });
     console.log(`shot ${file}`);
@@ -49,4 +62,4 @@ if (problems.length) {
   console.error(problems.join("\n"));
   process.exit(1);
 }
-console.log("no horizontal scroll, RTL on every page, no page errors");
+console.log("no horizontal scroll, RTL on every page, equations left to right, no page errors");

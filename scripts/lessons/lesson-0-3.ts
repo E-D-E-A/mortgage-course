@@ -87,6 +87,10 @@ export function lesson03(): LessonData {
     difference("prediction.gap", prediction, predictionSimple),
     table("explain.table", "10000", "5", 5),
     compound("explain.formula_5", "10000", "5", 5),
+    compound("explain.after_2", "10000", "5", 2),
+    { id: "explain.principal", kind: "given", inputs: {}, value: "10000.00" },
+    compound("slider.compound_30_6", "10000", "6", 30),
+    simple("slider.simple_30_6", "10000", "6", 30),
     series("explain.series_10", "10000", "5", 10),
     series("video.series_30", "10000", "5", 30),
     video30c,
@@ -138,6 +142,12 @@ export function lesson03(): LessonData {
     ex5b,
     difference("ex5.answer", ex5b, ex5a),
   ];
+
+  const byId = (id: string) => facts.find((f) => f.id === id)!;
+  facts.push(
+    difference("explain.interest_after_2", byId("explain.after_2"), byId("explain.principal")),
+    difference("slider.gap_30_6", byId("slider.compound_30_6"), byId("slider.simple_30_6")),
+  );
 
   return {
     lesson: "0.3",

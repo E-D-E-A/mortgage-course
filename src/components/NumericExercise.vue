@@ -18,11 +18,13 @@ const props = withDefaults(
     level: "קל" | "בינוני" | "מאתגר";
     answer: string;
     tolerance?: number;
+    /** An answer this close (say, rounded to the shekel) counts as right, with the exact value shown. */
+    near?: number;
     unit?: string;
     errors?: CommonError[];
     hint?: string;
   }>(),
-  { tolerance: 0.05, unit: "₪", errors: () => [], hint: undefined },
+  { tolerance: 0.05, near: 1, unit: "₪", errors: () => [], hint: undefined },
 );
 
 type State = "idle" | "correct" | "known-error" | "wrong" | "unreadable";
@@ -30,6 +32,8 @@ const text = ref("");
 const state = ref<State>("idle");
 const message = ref("");
 const tries = ref(0);
+const nearNote = ref("");
+const exact = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(props.answer));
 const inputId = `ex-${props.id}`;
 
 onMounted(() => {
@@ -51,7 +55,9 @@ function check() {
     return;
   }
   tries.value++;
-  if (close(value, Number(props.answer), props.tolerance)) {
+  const exactHit = close(value, Number(props.answer), props.tolerance);
+  if (exactHit || close(value, Number(props.answer), props.near)) {
+    nearNote.value = exactHit ? "" : `נכון בקירוב. התשובה המדויקת, עד האגורה: ${exact} ${props.unit}.`;
     state.value = "correct";
     save(`exercise:${props.id}`, { text: text.value, correct: true });
     unlockSolution();
@@ -101,7 +107,7 @@ function unlockSolution() {
     </form>
     <div :id="`${inputId}-feedback`" aria-live="polite">
       <p v-if="state === 'correct'" class="mt-3 rounded-md bg-success-bg p-3 text-body-m text-n800">
-        <strong class="text-n900">נכון.</strong> הפתרון המלא פתוח מתחת לתרגיל, להשוואה.
+        <strong class="text-n900">נכון.</strong> {{ nearNote }} הפתרון המלא פתוח מתחת לתרגיל, להשוואה.
       </p>
       <p v-else-if="state === 'known-error' || state === 'wrong'" class="mt-3 rounded-md bg-warning-bg p-3 text-body-m text-n800">
         {{ message }}

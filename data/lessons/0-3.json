@@ -94,6 +94,42 @@
       "value": "12762.82"
     },
     {
+      "id": "explain.after_2",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 2
+      },
+      "value": "11025.00"
+    },
+    {
+      "id": "explain.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "slider.compound_30_6",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "6",
+        "periods": 30
+      },
+      "value": "57434.91"
+    },
+    {
+      "id": "slider.simple_30_6",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "6",
+        "periods": 30
+      },
+      "value": "28000.00"
+    },
+    {
       "id": "explain.series_10",
       "kind": "growth_series",
       "inputs": {
@@ -719,6 +755,24 @@
         "subtrahend": "ex5.at_5"
       },
       "value": "142154.88"
+    },
+    {
+      "id": "explain.interest_after_2",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.after_2",
+        "subtrahend": "explain.principal"
+      },
+      "value": "1025.00"
+    },
+    {
+      "id": "slider.gap_30_6",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "slider.compound_30_6",
+        "subtrahend": "slider.simple_30_6"
+      },
+      "value": "29434.91"
     }
   ]
 }
