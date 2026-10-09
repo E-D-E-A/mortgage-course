@@ -1,0 +1,264 @@
+{
+  "lesson": "1.10",
+  "title": "סדנה: עושים את זה לבד",
+  "note": "Case A is the course's synthetic main case. Days, months and the fee are quoted from Brain transcriptions (not verified against the primary documents) or from field knowledge awaiting Eylon's approval.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-09"
+    },
+    {
+      "id": "case.noam_age",
+      "kind": "given",
+      "inputs": {},
+      "value": "31"
+    },
+    {
+      "id": "case.shira_age",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "case.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000"
+    },
+    {
+      "id": "case.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000"
+    },
+    {
+      "id": "case.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000"
+    },
+    {
+      "id": "case.cash_now",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.equity",
+        "subtrahend": "case.gift"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "case.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "case.equity"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "case.ltv",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "1640000.00",
+        "whole": "2200000"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "case.noam_income",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400"
+    },
+    {
+      "id": "case.shira_income",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300"
+    },
+    {
+      "id": "case.total_income",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|9300"
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "case.car_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450"
+    },
+    {
+      "id": "case.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "26"
+    },
+    {
+      "id": "case.disposable",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "12400|9300",
+        "payments": "1450"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "ex.ltv_equity",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "560000",
+        "whole": "2200000"
+      },
+      "value": "25.45"
+    },
+    {
+      "id": "ex.ltv_wrong_base",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "1640000.00",
+        "whole": "560000"
+      },
+      "value": "292.86"
+    },
+    {
+      "id": "steps.count",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "banks.max",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "docs.payslips",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "docs.statements_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "rule.answer_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "rule.answer_days_extended",
+      "kind": "given",
+      "inputs": {},
+      "value": "7"
+    },
+    {
+      "id": "rule.window_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "rule.window_no_lien_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "rule.appraisal_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "90"
+    },
+    {
+      "id": "rule.payday_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "rule.payday_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "rule.payday_3",
+      "kind": "given",
+      "inputs": {},
+      "value": "15"
+    },
+    {
+      "id": "fee.file_opening_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "field.rmi_months_low",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "field.rmi_months_high",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "field.validity_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "ex.used_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 11
+    },
+    {
+      "id": "ex.days_left",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 24,
+        "used_days": 11
+      },
+      "value": 13
+    },
+    {
+      "id": "ex.days_left_no_lien",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 12,
+        "used_days": 11
+      },
+      "value": 1
+    },
+    {
+      "id": "ex.days_added",
+      "kind": "hh_days_sum",
+      "inputs": {
+        "window_days": 24,
+        "used_days": 11
+      },
+      "value": 35
+    },
+    {
+      "id": "ex.salary_day",
+      "kind": "given",
+      "inputs": {},
+      "value": "9"
+    }
+  ]
+}

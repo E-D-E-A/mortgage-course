@@ -1,0 +1,303 @@
+{
+  "lesson": "1.9",
+  "title": "מה היועץ מברר לפני שמדברים על ריבית",
+  "note": "Case A is the course's synthetic main case (course-map section 8). All households and amounts are invented teaching numbers, not client data or bank rules.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-09"
+    },
+    {
+      "id": "case.noam_age",
+      "kind": "given",
+      "inputs": {},
+      "value": "31"
+    },
+    {
+      "id": "case.shira_age",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "case.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000"
+    },
+    {
+      "id": "case.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000"
+    },
+    {
+      "id": "case.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000"
+    },
+    {
+      "id": "case.noam_income",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400"
+    },
+    {
+      "id": "case.shira_income",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300"
+    },
+    {
+      "id": "case.car_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450"
+    },
+    {
+      "id": "case.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "26"
+    },
+    {
+      "id": "case.total_income",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|9300"
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "case.disposable",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "12400|9300",
+        "payments": "1450"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "case.cash_now",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.equity",
+        "subtrahend": "case.gift"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "explain.income_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "6000"
+    },
+    {
+      "id": "explain.income_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4000"
+    },
+    {
+      "id": "explain.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000"
+    },
+    {
+      "id": "explain.total",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "6000|4000"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "explain.disposable",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "6000|4000",
+        "payments": "1000"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "worked.income_dana",
+      "kind": "given",
+      "inputs": {},
+      "value": "10800"
+    },
+    {
+      "id": "worked.income_yoav",
+      "kind": "given",
+      "inputs": {},
+      "value": "7600"
+    },
+    {
+      "id": "worked.loan_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "900"
+    },
+    {
+      "id": "worked.leasing_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "600"
+    },
+    {
+      "id": "worked.total",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "10800|7600"
+      },
+      "value": "18400.00"
+    },
+    {
+      "id": "worked.payments",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "900|600"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "worked.disposable",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "10800|7600",
+        "payments": "900|600"
+      },
+      "value": "16900.00"
+    },
+    {
+      "id": "worked.deposit",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000"
+    },
+    {
+      "id": "worked.deposit_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "worked.checking",
+      "kind": "given",
+      "inputs": {},
+      "value": "120000"
+    },
+    {
+      "id": "worked.equity",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "300000|120000"
+      },
+      "value": "420000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "hh_disposable_table",
+      "inputs": {
+        "income_1_1": "8000",
+        "income_2_1": "7000",
+        "payments_1": "900",
+        "income_1_2": "11500",
+        "income_2_2": "6200",
+        "payments_2": "2300",
+        "income_1_3": "14800",
+        "income_2_3": "0",
+        "payments_3": "1100|650",
+        "income_1_4": "9600",
+        "income_2_4": "9600",
+        "payments_4": "2200"
+      },
+      "value": [
+        {
+          "household": "1",
+          "income_1": "8000.00",
+          "income_2": "7000.00",
+          "payments": "900.00",
+          "disposable": "14100.00"
+        },
+        {
+          "household": "2",
+          "income_1": "11500.00",
+          "income_2": "6200.00",
+          "payments": "2300.00",
+          "disposable": "15400.00"
+        },
+        {
+          "household": "3",
+          "income_1": "14800.00",
+          "income_2": "0.00",
+          "payments": "1750.00",
+          "disposable": "13050.00"
+        },
+        {
+          "household": "4",
+          "income_1": "9600.00",
+          "income_2": "9600.00",
+          "payments": "2200.00",
+          "disposable": "17000.00"
+        }
+      ]
+    },
+    {
+      "id": "ex.err_added",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|9300|1450"
+      },
+      "value": "23150.00"
+    },
+    {
+      "id": "ex.err_one_income",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "12400",
+        "payments": "1450"
+      },
+      "value": "10950.00"
+    },
+    {
+      "id": "ex.half_shira",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "9300",
+        "rate_percent": "50"
+      },
+      "value": "4650.00"
+    },
+    {
+      "id": "ex.half_disposable",
+      "kind": "hh_disposable_income",
+      "inputs": {
+        "incomes": "12400|4650.00",
+        "payments": "1450"
+      },
+      "value": "15600.00"
+    },
+    {
+      "id": "ex.half_no_payment",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|4650.00"
+      },
+      "value": "17050.00"
+    },
+    {
+      "id": "ex.half_all",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "20250",
+        "rate_percent": "50"
+      },
+      "value": "10125.00"
+    }
+  ]
+}
