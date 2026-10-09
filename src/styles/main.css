@@ -237,3 +237,12 @@ html[data-stage-locked] .stage-lockable {
 .prose-lesson .scroll-hint {
   margin-block: var(--mogi-space-4) calc(-1 * var(--mogi-space-4));
 }
+/* The same hint for a wide table inside an interactive component, drawn by CSS on the
+   component's wrapper so Vue's DOM is left untouched (BaseLayout marks the wrapper). */
+astro-island[data-wide-table]::before {
+  content: "בתוך הרכיב יש טבלה רחבה מהמסך: יש עוד עמודות משמאל. גללו אותה הצידה כדי לראות אותן.";
+  display: block;
+  margin-block: var(--mogi-space-4) 0;
+  font-size: 0.75rem;
+  color: var(--mogi-n600);
+}

@@ -113,6 +113,7 @@ A learner carries the letters from lesson to lesson, so a letter keeps its meani
 ## Equations and direction
 
 - Inline equations: `<M>10,000 × 1.05<sup>10</sup> = {f.shekels("…")}</M>` — an LTR isolate that does not wrap. Keep each `<M>` short (fits 340px). A long derivation goes on separate lines, one equality per line (see 0.3 "צעד 1").
+- Never name an MDX export `partial`, `prerender` or `getStaticPaths`: Astro reads them as page options (`partial` strips the page's CSS). `pnpm check:terms` fails on them.
 - Equations inside JS strings (exercise messages): `${eq("100 ÷ 6")}`.
 - Numbers in table cells: `<span class="ltr">…</span>` inside the cell, never `ltr` on the cell.
 

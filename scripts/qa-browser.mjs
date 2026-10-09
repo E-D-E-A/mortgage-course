@@ -2,7 +2,8 @@
 //  1. every half-worked table (FillTable) accepts its own right answers;
 //  2. every stage check scores 0 when all answers are wrong and all when all are right,
 //     records the pass, and opens the next stage's mark on the home page;
-//  3. at phone width, every fill-in table fits and every wider table shows the scroll hint.
+//  3. at phone width, every fill-in table fits, every wider table shows the scroll hint,
+//     and no interactive component reports a hydration mismatch.
 // Run: pnpm qa:browser
 import { createServer } from "node:http";
 import { readdir, readFile } from "node:fs/promises";
@@ -106,8 +107,14 @@ for (const stage of stages) {
 {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await openAll(page);
+  let current = "";
+  page.on("console", (m) => {
+    if (/hydration/i.test(m.text())) problems.push(`phone ${current}: ${m.text().slice(0, 120)}`);
+  });
+  page.on("pageerror", (e) => problems.push(`phone ${current}: page error: ${e.message}`));
   for (const f of lessonFiles) {
     const lesson = f.replace(".mdx", "");
+    current = lesson;
     await page.goto(`${base}/lessons/${lesson}/`, { waitUntil: "networkidle" });
     for (let y = 0; y < 40000; y += 700) await page.evaluate((y) => scrollTo(0, y), y);
     await page.waitForTimeout(300);
@@ -115,7 +122,11 @@ for (const stage of stages) {
       const boxes = [...document.querySelectorAll("main .overflow-x-auto")];
       const wide = boxes.filter((b) => b.scrollWidth > b.clientWidth + 1);
       return {
-        wideWithoutHint: wide.filter((b) => !(b.previousElementSibling?.classList.contains("scroll-hint") && !b.previousElementSibling.hidden)).length,
+        wideWithoutHint: wide.filter((b) => {
+          const island = b.closest("astro-island");
+          if (island) return !island.hasAttribute("data-wide-table");
+          return !(b.previousElementSibling?.classList.contains("scroll-hint") && !b.previousElementSibling.hidden);
+        }).length,
         fillTooWide: wide.filter((b) => b.querySelector("input")).length,
       };
     });

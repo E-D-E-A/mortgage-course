@@ -115,6 +115,13 @@ for (const { file, url } of pages) {
   }
 }
 
+// Astro reads some export names as page options: `export const partial` strips the page's
+// head and CSS (lesson 2.10 shipped unstyled). A lesson never uses these names.
+for (const { file, url } of pages) {
+  const m = readFileSync(url, "utf8").match(/^export (?:const|let|function|async function) (partial|prerender|getStaticPaths)\b/m);
+  if (m) fail(file, `"export ${m[1]}" is an Astro page option, not a lesson value — rename it`);
+}
+
 if (failures) {
   console.error(`\n${failures} term problem(s).`);
   process.exit(1);
