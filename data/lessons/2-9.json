@@ -11,80 +11,80 @@
     },
     {
       "id": "explain.monthly",
-      "kind": "rep_monthly_rate",
+      "kind": "monthly_rate_by_division",
       "inputs": {
-        "annual_percent": "6"
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
       },
       "value": "0.5"
     },
     {
       "id": "explain.equal",
-      "kind": "rep_schedule",
+      "kind": "amort_equal_statement",
       "inputs": {
-        "method": "equal_principal",
         "principal": "60000",
-        "annual_percent": "6",
+        "rate_percent": "6",
         "months": 3
       },
       "value": [
         {
           "period": 1,
           "opening": "60000.00",
-          "interest": "300.00",
-          "principal": "20000.00",
           "payment": "20300.00",
+          "interest": "300.00",
+          "principal_paid": "20000.00",
           "closing": "40000.00"
         },
         {
           "period": 2,
           "opening": "40000.00",
-          "interest": "200.00",
-          "principal": "20000.00",
           "payment": "20200.00",
+          "interest": "200.00",
+          "principal_paid": "20000.00",
           "closing": "20000.00"
         },
         {
           "period": 3,
           "opening": "20000.00",
-          "interest": "100.00",
-          "principal": "20000.00",
           "payment": "20100.00",
+          "interest": "100.00",
+          "principal_paid": "20000.00",
           "closing": "0.00"
         }
       ]
     },
     {
       "id": "explain.spitzer",
-      "kind": "rep_schedule",
+      "kind": "amort_annuity_statement",
       "inputs": {
-        "method": "spitzer",
         "principal": "60000",
-        "annual_percent": "6",
+        "rate_percent": "6",
         "months": 3
       },
       "value": [
         {
           "period": 1,
           "opening": "60000.00",
-          "interest": "300.00",
-          "principal": "19900.33",
           "payment": "20200.33",
+          "interest": "300.00",
+          "principal_paid": "19900.33",
           "closing": "40099.67"
         },
         {
           "period": 2,
           "opening": "40099.67",
-          "interest": "200.50",
-          "principal": "19999.83",
           "payment": "20200.33",
+          "interest": "200.50",
+          "principal_paid": "19999.83",
           "closing": "20099.84"
         },
         {
           "period": 3,
           "opening": "20099.84",
-          "interest": "100.50",
-          "principal": "20099.84",
           "payment": "20200.34",
+          "interest": "100.50",
+          "principal_paid": "20099.84",
           "closing": "0.00"
         }
       ]
@@ -117,10 +117,10 @@
     },
     {
       "id": "explain.spitzer_pay",
-      "kind": "rep_spitzer_payment",
+      "kind": "amort_payment",
       "inputs": {
         "principal": "60000",
-        "annual_percent": "6",
+        "rate_percent": "6",
         "months": 3
       },
       "value": "20200.33"
@@ -262,9 +262,11 @@
     },
     {
       "id": "slider.monthly",
-      "kind": "rep_monthly_rate",
+      "kind": "monthly_rate_by_division",
       "inputs": {
-        "annual_percent": "4.8"
+        "annual_percent": "4.8",
+        "periods_per_year": 12,
+        "decimals": 2
       },
       "value": "0.4"
     },
@@ -376,6 +378,19 @@
         "field": "interest"
       },
       "value": "15.52"
+    },
+    {
+      "id": "slider.spitzer_last",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 240,
+        "field": "payment"
+      },
+      "value": "3895.68"
     },
     {
       "id": "slider.spitzer_half",
@@ -501,3864 +516,3862 @@
     },
     {
       "id": "video.spitzer",
-      "kind": "rep_schedule",
+      "kind": "amort_annuity_statement",
       "inputs": {
-        "method": "spitzer",
         "principal": "600000",
-        "annual_percent": "4.8",
+        "rate_percent": "4.8",
         "months": 240
       },
       "value": [
         {
           "period": 1,
           "opening": "600000.00",
-          "interest": "2400.00",
-          "principal": "1493.74",
           "payment": "3893.74",
+          "interest": "2400.00",
+          "principal_paid": "1493.74",
           "closing": "598506.26"
         },
         {
           "period": 2,
           "opening": "598506.26",
-          "interest": "2394.03",
-          "principal": "1499.71",
           "payment": "3893.74",
+          "interest": "2394.03",
+          "principal_paid": "1499.71",
           "closing": "597006.55"
         },
         {
           "period": 3,
           "opening": "597006.55",
-          "interest": "2388.03",
-          "principal": "1505.71",
           "payment": "3893.74",
+          "interest": "2388.03",
+          "principal_paid": "1505.71",
           "closing": "595500.84"
         },
         {
           "period": 4,
           "opening": "595500.84",
-          "interest": "2382.00",
-          "principal": "1511.74",
           "payment": "3893.74",
+          "interest": "2382.00",
+          "principal_paid": "1511.74",
           "closing": "593989.10"
         },
         {
           "period": 5,
           "opening": "593989.10",
-          "interest": "2375.96",
-          "principal": "1517.78",
           "payment": "3893.74",
+          "interest": "2375.96",
+          "principal_paid": "1517.78",
           "closing": "592471.32"
         },
         {
           "period": 6,
           "opening": "592471.32",
-          "interest": "2369.89",
-          "principal": "1523.85",
           "payment": "3893.74",
+          "interest": "2369.89",
+          "principal_paid": "1523.85",
           "closing": "590947.47"
         },
         {
           "period": 7,
           "opening": "590947.47",
-          "interest": "2363.79",
-          "principal": "1529.95",
           "payment": "3893.74",
+          "interest": "2363.79",
+          "principal_paid": "1529.95",
           "closing": "589417.52"
         },
         {
           "period": 8,
           "opening": "589417.52",
-          "interest": "2357.67",
-          "principal": "1536.07",
           "payment": "3893.74",
+          "interest": "2357.67",
+          "principal_paid": "1536.07",
           "closing": "587881.45"
         },
         {
           "period": 9,
           "opening": "587881.45",
-          "interest": "2351.53",
-          "principal": "1542.21",
           "payment": "3893.74",
+          "interest": "2351.53",
+          "principal_paid": "1542.21",
           "closing": "586339.24"
         },
         {
           "period": 10,
           "opening": "586339.24",
-          "interest": "2345.36",
-          "principal": "1548.38",
           "payment": "3893.74",
+          "interest": "2345.36",
+          "principal_paid": "1548.38",
           "closing": "584790.86"
         },
         {
           "period": 11,
           "opening": "584790.86",
-          "interest": "2339.16",
-          "principal": "1554.58",
           "payment": "3893.74",
+          "interest": "2339.16",
+          "principal_paid": "1554.58",
           "closing": "583236.28"
         },
         {
           "period": 12,
           "opening": "583236.28",
-          "interest": "2332.95",
-          "principal": "1560.79",
           "payment": "3893.74",
+          "interest": "2332.95",
+          "principal_paid": "1560.79",
           "closing": "581675.49"
         },
         {
           "period": 13,
           "opening": "581675.49",
-          "interest": "2326.70",
-          "principal": "1567.04",
           "payment": "3893.74",
+          "interest": "2326.70",
+          "principal_paid": "1567.04",
           "closing": "580108.45"
         },
         {
           "period": 14,
           "opening": "580108.45",
-          "interest": "2320.43",
-          "principal": "1573.31",
           "payment": "3893.74",
+          "interest": "2320.43",
+          "principal_paid": "1573.31",
           "closing": "578535.14"
         },
         {
           "period": 15,
           "opening": "578535.14",
-          "interest": "2314.14",
-          "principal": "1579.60",
           "payment": "3893.74",
+          "interest": "2314.14",
+          "principal_paid": "1579.60",
           "closing": "576955.54"
         },
         {
           "period": 16,
           "opening": "576955.54",
-          "interest": "2307.82",
-          "principal": "1585.92",
           "payment": "3893.74",
+          "interest": "2307.82",
+          "principal_paid": "1585.92",
           "closing": "575369.62"
         },
         {
           "period": 17,
           "opening": "575369.62",
-          "interest": "2301.48",
-          "principal": "1592.26",
           "payment": "3893.74",
+          "interest": "2301.48",
+          "principal_paid": "1592.26",
           "closing": "573777.36"
         },
         {
           "period": 18,
           "opening": "573777.36",
-          "interest": "2295.11",
-          "principal": "1598.63",
           "payment": "3893.74",
+          "interest": "2295.11",
+          "principal_paid": "1598.63",
           "closing": "572178.73"
         },
         {
           "period": 19,
           "opening": "572178.73",
-          "interest": "2288.71",
-          "principal": "1605.03",
           "payment": "3893.74",
+          "interest": "2288.71",
+          "principal_paid": "1605.03",
           "closing": "570573.70"
         },
         {
           "period": 20,
           "opening": "570573.70",
-          "interest": "2282.29",
-          "principal": "1611.45",
           "payment": "3893.74",
+          "interest": "2282.29",
+          "principal_paid": "1611.45",
           "closing": "568962.25"
         },
         {
           "period": 21,
           "opening": "568962.25",
-          "interest": "2275.85",
-          "principal": "1617.89",
           "payment": "3893.74",
+          "interest": "2275.85",
+          "principal_paid": "1617.89",
           "closing": "567344.36"
         },
         {
           "period": 22,
           "opening": "567344.36",
-          "interest": "2269.38",
-          "principal": "1624.36",
           "payment": "3893.74",
+          "interest": "2269.38",
+          "principal_paid": "1624.36",
           "closing": "565720.00"
         },
         {
           "period": 23,
           "opening": "565720.00",
-          "interest": "2262.88",
-          "principal": "1630.86",
           "payment": "3893.74",
+          "interest": "2262.88",
+          "principal_paid": "1630.86",
           "closing": "564089.14"
         },
         {
           "period": 24,
           "opening": "564089.14",
-          "interest": "2256.36",
-          "principal": "1637.38",
           "payment": "3893.74",
+          "interest": "2256.36",
+          "principal_paid": "1637.38",
           "closing": "562451.76"
         },
         {
           "period": 25,
           "opening": "562451.76",
-          "interest": "2249.81",
-          "principal": "1643.93",
           "payment": "3893.74",
+          "interest": "2249.81",
+          "principal_paid": "1643.93",
           "closing": "560807.83"
         },
         {
           "period": 26,
           "opening": "560807.83",
-          "interest": "2243.23",
-          "principal": "1650.51",
           "payment": "3893.74",
+          "interest": "2243.23",
+          "principal_paid": "1650.51",
           "closing": "559157.32"
         },
         {
           "period": 27,
           "opening": "559157.32",
-          "interest": "2236.63",
-          "principal": "1657.11",
           "payment": "3893.74",
+          "interest": "2236.63",
+          "principal_paid": "1657.11",
           "closing": "557500.21"
         },
         {
           "period": 28,
           "opening": "557500.21",
-          "interest": "2230.00",
-          "principal": "1663.74",
           "payment": "3893.74",
+          "interest": "2230.00",
+          "principal_paid": "1663.74",
           "closing": "555836.47"
         },
         {
           "period": 29,
           "opening": "555836.47",
-          "interest": "2223.35",
-          "principal": "1670.39",
           "payment": "3893.74",
+          "interest": "2223.35",
+          "principal_paid": "1670.39",
           "closing": "554166.08"
         },
         {
           "period": 30,
           "opening": "554166.08",
-          "interest": "2216.66",
-          "principal": "1677.08",
           "payment": "3893.74",
+          "interest": "2216.66",
+          "principal_paid": "1677.08",
           "closing": "552489.00"
         },
         {
           "period": 31,
           "opening": "552489.00",
-          "interest": "2209.96",
-          "principal": "1683.78",
           "payment": "3893.74",
+          "interest": "2209.96",
+          "principal_paid": "1683.78",
           "closing": "550805.22"
         },
         {
           "period": 32,
           "opening": "550805.22",
-          "interest": "2203.22",
-          "principal": "1690.52",
           "payment": "3893.74",
+          "interest": "2203.22",
+          "principal_paid": "1690.52",
           "closing": "549114.70"
         },
         {
           "period": 33,
           "opening": "549114.70",
-          "interest": "2196.46",
-          "principal": "1697.28",
           "payment": "3893.74",
+          "interest": "2196.46",
+          "principal_paid": "1697.28",
           "closing": "547417.42"
         },
         {
           "period": 34,
           "opening": "547417.42",
-          "interest": "2189.67",
-          "principal": "1704.07",
           "payment": "3893.74",
+          "interest": "2189.67",
+          "principal_paid": "1704.07",
           "closing": "545713.35"
         },
         {
           "period": 35,
           "opening": "545713.35",
-          "interest": "2182.85",
-          "principal": "1710.89",
           "payment": "3893.74",
+          "interest": "2182.85",
+          "principal_paid": "1710.89",
           "closing": "544002.46"
         },
         {
           "period": 36,
           "opening": "544002.46",
-          "interest": "2176.01",
-          "principal": "1717.73",
           "payment": "3893.74",
+          "interest": "2176.01",
+          "principal_paid": "1717.73",
           "closing": "542284.73"
         },
         {
           "period": 37,
           "opening": "542284.73",
-          "interest": "2169.14",
-          "principal": "1724.60",
           "payment": "3893.74",
+          "interest": "2169.14",
+          "principal_paid": "1724.60",
           "closing": "540560.13"
         },
         {
           "period": 38,
           "opening": "540560.13",
-          "interest": "2162.24",
-          "principal": "1731.50",
           "payment": "3893.74",
+          "interest": "2162.24",
+          "principal_paid": "1731.50",
           "closing": "538828.63"
         },
         {
           "period": 39,
           "opening": "538828.63",
-          "interest": "2155.31",
-          "principal": "1738.43",
           "payment": "3893.74",
+          "interest": "2155.31",
+          "principal_paid": "1738.43",
           "closing": "537090.20"
         },
         {
           "period": 40,
           "opening": "537090.20",
-          "interest": "2148.36",
-          "principal": "1745.38",
           "payment": "3893.74",
+          "interest": "2148.36",
+          "principal_paid": "1745.38",
           "closing": "535344.82"
         },
         {
           "period": 41,
           "opening": "535344.82",
-          "interest": "2141.38",
-          "principal": "1752.36",
           "payment": "3893.74",
+          "interest": "2141.38",
+          "principal_paid": "1752.36",
           "closing": "533592.46"
         },
         {
           "period": 42,
           "opening": "533592.46",
-          "interest": "2134.37",
-          "principal": "1759.37",
           "payment": "3893.74",
+          "interest": "2134.37",
+          "principal_paid": "1759.37",
           "closing": "531833.09"
         },
         {
           "period": 43,
           "opening": "531833.09",
-          "interest": "2127.33",
-          "principal": "1766.41",
           "payment": "3893.74",
+          "interest": "2127.33",
+          "principal_paid": "1766.41",
           "closing": "530066.68"
         },
         {
           "period": 44,
           "opening": "530066.68",
-          "interest": "2120.27",
-          "principal": "1773.47",
           "payment": "3893.74",
+          "interest": "2120.27",
+          "principal_paid": "1773.47",
           "closing": "528293.21"
         },
         {
           "period": 45,
           "opening": "528293.21",
-          "interest": "2113.17",
-          "principal": "1780.57",
           "payment": "3893.74",
+          "interest": "2113.17",
+          "principal_paid": "1780.57",
           "closing": "526512.64"
         },
         {
           "period": 46,
           "opening": "526512.64",
-          "interest": "2106.05",
-          "principal": "1787.69",
           "payment": "3893.74",
+          "interest": "2106.05",
+          "principal_paid": "1787.69",
           "closing": "524724.95"
         },
         {
           "period": 47,
           "opening": "524724.95",
-          "interest": "2098.90",
-          "principal": "1794.84",
           "payment": "3893.74",
+          "interest": "2098.90",
+          "principal_paid": "1794.84",
           "closing": "522930.11"
         },
         {
           "period": 48,
           "opening": "522930.11",
-          "interest": "2091.72",
-          "principal": "1802.02",
           "payment": "3893.74",
+          "interest": "2091.72",
+          "principal_paid": "1802.02",
           "closing": "521128.09"
         },
         {
           "period": 49,
           "opening": "521128.09",
-          "interest": "2084.51",
-          "principal": "1809.23",
           "payment": "3893.74",
+          "interest": "2084.51",
+          "principal_paid": "1809.23",
           "closing": "519318.86"
         },
         {
           "period": 50,
           "opening": "519318.86",
-          "interest": "2077.28",
-          "principal": "1816.46",
           "payment": "3893.74",
+          "interest": "2077.28",
+          "principal_paid": "1816.46",
           "closing": "517502.40"
         },
         {
           "period": 51,
           "opening": "517502.40",
-          "interest": "2070.01",
-          "principal": "1823.73",
           "payment": "3893.74",
+          "interest": "2070.01",
+          "principal_paid": "1823.73",
           "closing": "515678.67"
         },
         {
           "period": 52,
           "opening": "515678.67",
-          "interest": "2062.71",
-          "principal": "1831.03",
           "payment": "3893.74",
+          "interest": "2062.71",
+          "principal_paid": "1831.03",
           "closing": "513847.64"
         },
         {
           "period": 53,
           "opening": "513847.64",
-          "interest": "2055.39",
-          "principal": "1838.35",
           "payment": "3893.74",
+          "interest": "2055.39",
+          "principal_paid": "1838.35",
           "closing": "512009.29"
         },
         {
           "period": 54,
           "opening": "512009.29",
-          "interest": "2048.04",
-          "principal": "1845.70",
           "payment": "3893.74",
+          "interest": "2048.04",
+          "principal_paid": "1845.70",
           "closing": "510163.59"
         },
         {
           "period": 55,
           "opening": "510163.59",
-          "interest": "2040.65",
-          "principal": "1853.09",
           "payment": "3893.74",
+          "interest": "2040.65",
+          "principal_paid": "1853.09",
           "closing": "508310.50"
         },
         {
           "period": 56,
           "opening": "508310.50",
-          "interest": "2033.24",
-          "principal": "1860.50",
           "payment": "3893.74",
+          "interest": "2033.24",
+          "principal_paid": "1860.50",
           "closing": "506450.00"
         },
         {
           "period": 57,
           "opening": "506450.00",
-          "interest": "2025.80",
-          "principal": "1867.94",
           "payment": "3893.74",
+          "interest": "2025.80",
+          "principal_paid": "1867.94",
           "closing": "504582.06"
         },
         {
           "period": 58,
           "opening": "504582.06",
-          "interest": "2018.33",
-          "principal": "1875.41",
           "payment": "3893.74",
+          "interest": "2018.33",
+          "principal_paid": "1875.41",
           "closing": "502706.65"
         },
         {
           "period": 59,
           "opening": "502706.65",
-          "interest": "2010.83",
-          "principal": "1882.91",
           "payment": "3893.74",
+          "interest": "2010.83",
+          "principal_paid": "1882.91",
           "closing": "500823.74"
         },
         {
           "period": 60,
           "opening": "500823.74",
-          "interest": "2003.29",
-          "principal": "1890.45",
           "payment": "3893.74",
+          "interest": "2003.29",
+          "principal_paid": "1890.45",
           "closing": "498933.29"
         },
         {
           "period": 61,
           "opening": "498933.29",
-          "interest": "1995.73",
-          "principal": "1898.01",
           "payment": "3893.74",
+          "interest": "1995.73",
+          "principal_paid": "1898.01",
           "closing": "497035.28"
         },
         {
           "period": 62,
           "opening": "497035.28",
-          "interest": "1988.14",
-          "principal": "1905.60",
           "payment": "3893.74",
+          "interest": "1988.14",
+          "principal_paid": "1905.60",
           "closing": "495129.68"
         },
         {
           "period": 63,
           "opening": "495129.68",
-          "interest": "1980.52",
-          "principal": "1913.22",
           "payment": "3893.74",
+          "interest": "1980.52",
+          "principal_paid": "1913.22",
           "closing": "493216.46"
         },
         {
           "period": 64,
           "opening": "493216.46",
-          "interest": "1972.87",
-          "principal": "1920.87",
           "payment": "3893.74",
+          "interest": "1972.87",
+          "principal_paid": "1920.87",
           "closing": "491295.59"
         },
         {
           "period": 65,
           "opening": "491295.59",
-          "interest": "1965.18",
-          "principal": "1928.56",
           "payment": "3893.74",
+          "interest": "1965.18",
+          "principal_paid": "1928.56",
           "closing": "489367.03"
         },
         {
           "period": 66,
           "opening": "489367.03",
-          "interest": "1957.47",
-          "principal": "1936.27",
           "payment": "3893.74",
+          "interest": "1957.47",
+          "principal_paid": "1936.27",
           "closing": "487430.76"
         },
         {
           "period": 67,
           "opening": "487430.76",
-          "interest": "1949.72",
-          "principal": "1944.02",
           "payment": "3893.74",
+          "interest": "1949.72",
+          "principal_paid": "1944.02",
           "closing": "485486.74"
         },
         {
           "period": 68,
           "opening": "485486.74",
-          "interest": "1941.95",
-          "principal": "1951.79",
           "payment": "3893.74",
+          "interest": "1941.95",
+          "principal_paid": "1951.79",
           "closing": "483534.95"
         },
         {
           "period": 69,
           "opening": "483534.95",
-          "interest": "1934.14",
-          "principal": "1959.60",
           "payment": "3893.74",
+          "interest": "1934.14",
+          "principal_paid": "1959.60",
           "closing": "481575.35"
         },
         {
           "period": 70,
           "opening": "481575.35",
-          "interest": "1926.30",
-          "principal": "1967.44",
           "payment": "3893.74",
+          "interest": "1926.30",
+          "principal_paid": "1967.44",
           "closing": "479607.91"
         },
         {
           "period": 71,
           "opening": "479607.91",
-          "interest": "1918.43",
-          "principal": "1975.31",
           "payment": "3893.74",
+          "interest": "1918.43",
+          "principal_paid": "1975.31",
           "closing": "477632.60"
         },
         {
           "period": 72,
           "opening": "477632.60",
-          "interest": "1910.53",
-          "principal": "1983.21",
           "payment": "3893.74",
+          "interest": "1910.53",
+          "principal_paid": "1983.21",
           "closing": "475649.39"
         },
         {
           "period": 73,
           "opening": "475649.39",
-          "interest": "1902.60",
-          "principal": "1991.14",
           "payment": "3893.74",
+          "interest": "1902.60",
+          "principal_paid": "1991.14",
           "closing": "473658.25"
         },
         {
           "period": 74,
           "opening": "473658.25",
-          "interest": "1894.63",
-          "principal": "1999.11",
           "payment": "3893.74",
+          "interest": "1894.63",
+          "principal_paid": "1999.11",
           "closing": "471659.14"
         },
         {
           "period": 75,
           "opening": "471659.14",
-          "interest": "1886.64",
-          "principal": "2007.10",
           "payment": "3893.74",
+          "interest": "1886.64",
+          "principal_paid": "2007.10",
           "closing": "469652.04"
         },
         {
           "period": 76,
           "opening": "469652.04",
-          "interest": "1878.61",
-          "principal": "2015.13",
           "payment": "3893.74",
+          "interest": "1878.61",
+          "principal_paid": "2015.13",
           "closing": "467636.91"
         },
         {
           "period": 77,
           "opening": "467636.91",
-          "interest": "1870.55",
-          "principal": "2023.19",
           "payment": "3893.74",
+          "interest": "1870.55",
+          "principal_paid": "2023.19",
           "closing": "465613.72"
         },
         {
           "period": 78,
           "opening": "465613.72",
-          "interest": "1862.45",
-          "principal": "2031.29",
           "payment": "3893.74",
+          "interest": "1862.45",
+          "principal_paid": "2031.29",
           "closing": "463582.43"
         },
         {
           "period": 79,
           "opening": "463582.43",
-          "interest": "1854.33",
-          "principal": "2039.41",
           "payment": "3893.74",
+          "interest": "1854.33",
+          "principal_paid": "2039.41",
           "closing": "461543.02"
         },
         {
           "period": 80,
           "opening": "461543.02",
-          "interest": "1846.17",
-          "principal": "2047.57",
           "payment": "3893.74",
+          "interest": "1846.17",
+          "principal_paid": "2047.57",
           "closing": "459495.45"
         },
         {
           "period": 81,
           "opening": "459495.45",
-          "interest": "1837.98",
-          "principal": "2055.76",
           "payment": "3893.74",
+          "interest": "1837.98",
+          "principal_paid": "2055.76",
           "closing": "457439.69"
         },
         {
           "period": 82,
           "opening": "457439.69",
-          "interest": "1829.76",
-          "principal": "2063.98",
           "payment": "3893.74",
+          "interest": "1829.76",
+          "principal_paid": "2063.98",
           "closing": "455375.71"
         },
         {
           "period": 83,
           "opening": "455375.71",
-          "interest": "1821.50",
-          "principal": "2072.24",
           "payment": "3893.74",
+          "interest": "1821.50",
+          "principal_paid": "2072.24",
           "closing": "453303.47"
         },
         {
           "period": 84,
           "opening": "453303.47",
-          "interest": "1813.21",
-          "principal": "2080.53",
           "payment": "3893.74",
+          "interest": "1813.21",
+          "principal_paid": "2080.53",
           "closing": "451222.94"
         },
         {
           "period": 85,
           "opening": "451222.94",
-          "interest": "1804.89",
-          "principal": "2088.85",
           "payment": "3893.74",
+          "interest": "1804.89",
+          "principal_paid": "2088.85",
           "closing": "449134.09"
         },
         {
           "period": 86,
           "opening": "449134.09",
-          "interest": "1796.54",
-          "principal": "2097.20",
           "payment": "3893.74",
+          "interest": "1796.54",
+          "principal_paid": "2097.20",
           "closing": "447036.89"
         },
         {
           "period": 87,
           "opening": "447036.89",
-          "interest": "1788.15",
-          "principal": "2105.59",
           "payment": "3893.74",
+          "interest": "1788.15",
+          "principal_paid": "2105.59",
           "closing": "444931.30"
         },
         {
           "period": 88,
           "opening": "444931.30",
-          "interest": "1779.73",
-          "principal": "2114.01",
           "payment": "3893.74",
+          "interest": "1779.73",
+          "principal_paid": "2114.01",
           "closing": "442817.29"
         },
         {
           "period": 89,
           "opening": "442817.29",
-          "interest": "1771.27",
-          "principal": "2122.47",
           "payment": "3893.74",
+          "interest": "1771.27",
+          "principal_paid": "2122.47",
           "closing": "440694.82"
         },
         {
           "period": 90,
           "opening": "440694.82",
-          "interest": "1762.78",
-          "principal": "2130.96",
           "payment": "3893.74",
+          "interest": "1762.78",
+          "principal_paid": "2130.96",
           "closing": "438563.86"
         },
         {
           "period": 91,
           "opening": "438563.86",
-          "interest": "1754.26",
-          "principal": "2139.48",
           "payment": "3893.74",
+          "interest": "1754.26",
+          "principal_paid": "2139.48",
           "closing": "436424.38"
         },
         {
           "period": 92,
           "opening": "436424.38",
-          "interest": "1745.70",
-          "principal": "2148.04",
           "payment": "3893.74",
+          "interest": "1745.70",
+          "principal_paid": "2148.04",
           "closing": "434276.34"
         },
         {
           "period": 93,
           "opening": "434276.34",
-          "interest": "1737.11",
-          "principal": "2156.63",
           "payment": "3893.74",
+          "interest": "1737.11",
+          "principal_paid": "2156.63",
           "closing": "432119.71"
         },
         {
           "period": 94,
           "opening": "432119.71",
-          "interest": "1728.48",
-          "principal": "2165.26",
           "payment": "3893.74",
+          "interest": "1728.48",
+          "principal_paid": "2165.26",
           "closing": "429954.45"
         },
         {
           "period": 95,
           "opening": "429954.45",
-          "interest": "1719.82",
-          "principal": "2173.92",
           "payment": "3893.74",
+          "interest": "1719.82",
+          "principal_paid": "2173.92",
           "closing": "427780.53"
         },
         {
           "period": 96,
           "opening": "427780.53",
-          "interest": "1711.12",
-          "principal": "2182.62",
           "payment": "3893.74",
+          "interest": "1711.12",
+          "principal_paid": "2182.62",
           "closing": "425597.91"
         },
         {
           "period": 97,
           "opening": "425597.91",
-          "interest": "1702.39",
-          "principal": "2191.35",
           "payment": "3893.74",
+          "interest": "1702.39",
+          "principal_paid": "2191.35",
           "closing": "423406.56"
         },
         {
           "period": 98,
           "opening": "423406.56",
-          "interest": "1693.63",
-          "principal": "2200.11",
           "payment": "3893.74",
+          "interest": "1693.63",
+          "principal_paid": "2200.11",
           "closing": "421206.45"
         },
         {
           "period": 99,
           "opening": "421206.45",
-          "interest": "1684.83",
-          "principal": "2208.91",
           "payment": "3893.74",
+          "interest": "1684.83",
+          "principal_paid": "2208.91",
           "closing": "418997.54"
         },
         {
           "period": 100,
           "opening": "418997.54",
-          "interest": "1675.99",
-          "principal": "2217.75",
           "payment": "3893.74",
+          "interest": "1675.99",
+          "principal_paid": "2217.75",
           "closing": "416779.79"
         },
         {
           "period": 101,
           "opening": "416779.79",
-          "interest": "1667.12",
-          "principal": "2226.62",
           "payment": "3893.74",
+          "interest": "1667.12",
+          "principal_paid": "2226.62",
           "closing": "414553.17"
         },
         {
           "period": 102,
           "opening": "414553.17",
-          "interest": "1658.21",
-          "principal": "2235.53",
           "payment": "3893.74",
+          "interest": "1658.21",
+          "principal_paid": "2235.53",
           "closing": "412317.64"
         },
         {
           "period": 103,
           "opening": "412317.64",
-          "interest": "1649.27",
-          "principal": "2244.47",
           "payment": "3893.74",
+          "interest": "1649.27",
+          "principal_paid": "2244.47",
           "closing": "410073.17"
         },
         {
           "period": 104,
           "opening": "410073.17",
-          "interest": "1640.29",
-          "principal": "2253.45",
           "payment": "3893.74",
+          "interest": "1640.29",
+          "principal_paid": "2253.45",
           "closing": "407819.72"
         },
         {
           "period": 105,
           "opening": "407819.72",
-          "interest": "1631.28",
-          "principal": "2262.46",
           "payment": "3893.74",
+          "interest": "1631.28",
+          "principal_paid": "2262.46",
           "closing": "405557.26"
         },
         {
           "period": 106,
           "opening": "405557.26",
-          "interest": "1622.23",
-          "principal": "2271.51",
           "payment": "3893.74",
+          "interest": "1622.23",
+          "principal_paid": "2271.51",
           "closing": "403285.75"
         },
         {
           "period": 107,
           "opening": "403285.75",
-          "interest": "1613.14",
-          "principal": "2280.60",
           "payment": "3893.74",
+          "interest": "1613.14",
+          "principal_paid": "2280.60",
           "closing": "401005.15"
         },
         {
           "period": 108,
           "opening": "401005.15",
-          "interest": "1604.02",
-          "principal": "2289.72",
           "payment": "3893.74",
+          "interest": "1604.02",
+          "principal_paid": "2289.72",
           "closing": "398715.43"
         },
         {
           "period": 109,
           "opening": "398715.43",
-          "interest": "1594.86",
-          "principal": "2298.88",
           "payment": "3893.74",
+          "interest": "1594.86",
+          "principal_paid": "2298.88",
           "closing": "396416.55"
         },
         {
           "period": 110,
           "opening": "396416.55",
-          "interest": "1585.67",
-          "principal": "2308.07",
           "payment": "3893.74",
+          "interest": "1585.67",
+          "principal_paid": "2308.07",
           "closing": "394108.48"
         },
         {
           "period": 111,
           "opening": "394108.48",
-          "interest": "1576.43",
-          "principal": "2317.31",
           "payment": "3893.74",
+          "interest": "1576.43",
+          "principal_paid": "2317.31",
           "closing": "391791.17"
         },
         {
           "period": 112,
           "opening": "391791.17",
-          "interest": "1567.16",
-          "principal": "2326.58",
           "payment": "3893.74",
+          "interest": "1567.16",
+          "principal_paid": "2326.58",
           "closing": "389464.59"
         },
         {
           "period": 113,
           "opening": "389464.59",
-          "interest": "1557.86",
-          "principal": "2335.88",
           "payment": "3893.74",
+          "interest": "1557.86",
+          "principal_paid": "2335.88",
           "closing": "387128.71"
         },
         {
           "period": 114,
           "opening": "387128.71",
-          "interest": "1548.51",
-          "principal": "2345.23",
           "payment": "3893.74",
+          "interest": "1548.51",
+          "principal_paid": "2345.23",
           "closing": "384783.48"
         },
         {
           "period": 115,
           "opening": "384783.48",
-          "interest": "1539.13",
-          "principal": "2354.61",
           "payment": "3893.74",
+          "interest": "1539.13",
+          "principal_paid": "2354.61",
           "closing": "382428.87"
         },
         {
           "period": 116,
           "opening": "382428.87",
-          "interest": "1529.72",
-          "principal": "2364.02",
           "payment": "3893.74",
+          "interest": "1529.72",
+          "principal_paid": "2364.02",
           "closing": "380064.85"
         },
         {
           "period": 117,
           "opening": "380064.85",
-          "interest": "1520.26",
-          "principal": "2373.48",
           "payment": "3893.74",
+          "interest": "1520.26",
+          "principal_paid": "2373.48",
           "closing": "377691.37"
         },
         {
           "period": 118,
           "opening": "377691.37",
-          "interest": "1510.77",
-          "principal": "2382.97",
           "payment": "3893.74",
+          "interest": "1510.77",
+          "principal_paid": "2382.97",
           "closing": "375308.40"
         },
         {
           "period": 119,
           "opening": "375308.40",
-          "interest": "1501.23",
-          "principal": "2392.51",
           "payment": "3893.74",
+          "interest": "1501.23",
+          "principal_paid": "2392.51",
           "closing": "372915.89"
         },
         {
           "period": 120,
           "opening": "372915.89",
-          "interest": "1491.66",
-          "principal": "2402.08",
           "payment": "3893.74",
+          "interest": "1491.66",
+          "principal_paid": "2402.08",
           "closing": "370513.81"
         },
         {
           "period": 121,
           "opening": "370513.81",
-          "interest": "1482.06",
-          "principal": "2411.68",
           "payment": "3893.74",
+          "interest": "1482.06",
+          "principal_paid": "2411.68",
           "closing": "368102.13"
         },
         {
           "period": 122,
           "opening": "368102.13",
-          "interest": "1472.41",
-          "principal": "2421.33",
           "payment": "3893.74",
+          "interest": "1472.41",
+          "principal_paid": "2421.33",
           "closing": "365680.80"
         },
         {
           "period": 123,
           "opening": "365680.80",
-          "interest": "1462.72",
-          "principal": "2431.02",
           "payment": "3893.74",
+          "interest": "1462.72",
+          "principal_paid": "2431.02",
           "closing": "363249.78"
         },
         {
           "period": 124,
           "opening": "363249.78",
-          "interest": "1453.00",
-          "principal": "2440.74",
           "payment": "3893.74",
+          "interest": "1453.00",
+          "principal_paid": "2440.74",
           "closing": "360809.04"
         },
         {
           "period": 125,
           "opening": "360809.04",
-          "interest": "1443.24",
-          "principal": "2450.50",
           "payment": "3893.74",
+          "interest": "1443.24",
+          "principal_paid": "2450.50",
           "closing": "358358.54"
         },
         {
           "period": 126,
           "opening": "358358.54",
-          "interest": "1433.43",
-          "principal": "2460.31",
           "payment": "3893.74",
+          "interest": "1433.43",
+          "principal_paid": "2460.31",
           "closing": "355898.23"
         },
         {
           "period": 127,
           "opening": "355898.23",
-          "interest": "1423.59",
-          "principal": "2470.15",
           "payment": "3893.74",
+          "interest": "1423.59",
+          "principal_paid": "2470.15",
           "closing": "353428.08"
         },
         {
           "period": 128,
           "opening": "353428.08",
-          "interest": "1413.71",
-          "principal": "2480.03",
           "payment": "3893.74",
+          "interest": "1413.71",
+          "principal_paid": "2480.03",
           "closing": "350948.05"
         },
         {
           "period": 129,
           "opening": "350948.05",
-          "interest": "1403.79",
-          "principal": "2489.95",
           "payment": "3893.74",
+          "interest": "1403.79",
+          "principal_paid": "2489.95",
           "closing": "348458.10"
         },
         {
           "period": 130,
           "opening": "348458.10",
-          "interest": "1393.83",
-          "principal": "2499.91",
           "payment": "3893.74",
+          "interest": "1393.83",
+          "principal_paid": "2499.91",
           "closing": "345958.19"
         },
         {
           "period": 131,
           "opening": "345958.19",
-          "interest": "1383.83",
-          "principal": "2509.91",
           "payment": "3893.74",
+          "interest": "1383.83",
+          "principal_paid": "2509.91",
           "closing": "343448.28"
         },
         {
           "period": 132,
           "opening": "343448.28",
-          "interest": "1373.79",
-          "principal": "2519.95",
           "payment": "3893.74",
+          "interest": "1373.79",
+          "principal_paid": "2519.95",
           "closing": "340928.33"
         },
         {
           "period": 133,
           "opening": "340928.33",
-          "interest": "1363.71",
-          "principal": "2530.03",
           "payment": "3893.74",
+          "interest": "1363.71",
+          "principal_paid": "2530.03",
           "closing": "338398.30"
         },
         {
           "period": 134,
           "opening": "338398.30",
-          "interest": "1353.59",
-          "principal": "2540.15",
           "payment": "3893.74",
+          "interest": "1353.59",
+          "principal_paid": "2540.15",
           "closing": "335858.15"
         },
         {
           "period": 135,
           "opening": "335858.15",
-          "interest": "1343.43",
-          "principal": "2550.31",
           "payment": "3893.74",
+          "interest": "1343.43",
+          "principal_paid": "2550.31",
           "closing": "333307.84"
         },
         {
           "period": 136,
           "opening": "333307.84",
-          "interest": "1333.23",
-          "principal": "2560.51",
           "payment": "3893.74",
+          "interest": "1333.23",
+          "principal_paid": "2560.51",
           "closing": "330747.33"
         },
         {
           "period": 137,
           "opening": "330747.33",
-          "interest": "1322.99",
-          "principal": "2570.75",
           "payment": "3893.74",
+          "interest": "1322.99",
+          "principal_paid": "2570.75",
           "closing": "328176.58"
         },
         {
           "period": 138,
           "opening": "328176.58",
-          "interest": "1312.71",
-          "principal": "2581.03",
           "payment": "3893.74",
+          "interest": "1312.71",
+          "principal_paid": "2581.03",
           "closing": "325595.55"
         },
         {
           "period": 139,
           "opening": "325595.55",
-          "interest": "1302.38",
-          "principal": "2591.36",
           "payment": "3893.74",
+          "interest": "1302.38",
+          "principal_paid": "2591.36",
           "closing": "323004.19"
         },
         {
           "period": 140,
           "opening": "323004.19",
-          "interest": "1292.02",
-          "principal": "2601.72",
           "payment": "3893.74",
+          "interest": "1292.02",
+          "principal_paid": "2601.72",
           "closing": "320402.47"
         },
         {
           "period": 141,
           "opening": "320402.47",
-          "interest": "1281.61",
-          "principal": "2612.13",
           "payment": "3893.74",
+          "interest": "1281.61",
+          "principal_paid": "2612.13",
           "closing": "317790.34"
         },
         {
           "period": 142,
           "opening": "317790.34",
-          "interest": "1271.16",
-          "principal": "2622.58",
           "payment": "3893.74",
+          "interest": "1271.16",
+          "principal_paid": "2622.58",
           "closing": "315167.76"
         },
         {
           "period": 143,
           "opening": "315167.76",
-          "interest": "1260.67",
-          "principal": "2633.07",
           "payment": "3893.74",
+          "interest": "1260.67",
+          "principal_paid": "2633.07",
           "closing": "312534.69"
         },
         {
           "period": 144,
           "opening": "312534.69",
-          "interest": "1250.14",
-          "principal": "2643.60",
           "payment": "3893.74",
+          "interest": "1250.14",
+          "principal_paid": "2643.60",
           "closing": "309891.09"
         },
         {
           "period": 145,
           "opening": "309891.09",
-          "interest": "1239.56",
-          "principal": "2654.18",
           "payment": "3893.74",
+          "interest": "1239.56",
+          "principal_paid": "2654.18",
           "closing": "307236.91"
         },
         {
           "period": 146,
           "opening": "307236.91",
-          "interest": "1228.95",
-          "principal": "2664.79",
           "payment": "3893.74",
+          "interest": "1228.95",
+          "principal_paid": "2664.79",
           "closing": "304572.12"
         },
         {
           "period": 147,
           "opening": "304572.12",
-          "interest": "1218.29",
-          "principal": "2675.45",
           "payment": "3893.74",
+          "interest": "1218.29",
+          "principal_paid": "2675.45",
           "closing": "301896.67"
         },
         {
           "period": 148,
           "opening": "301896.67",
-          "interest": "1207.59",
-          "principal": "2686.15",
           "payment": "3893.74",
+          "interest": "1207.59",
+          "principal_paid": "2686.15",
           "closing": "299210.52"
         },
         {
           "period": 149,
           "opening": "299210.52",
-          "interest": "1196.84",
-          "principal": "2696.90",
           "payment": "3893.74",
+          "interest": "1196.84",
+          "principal_paid": "2696.90",
           "closing": "296513.62"
         },
         {
           "period": 150,
           "opening": "296513.62",
-          "interest": "1186.05",
-          "principal": "2707.69",
           "payment": "3893.74",
+          "interest": "1186.05",
+          "principal_paid": "2707.69",
           "closing": "293805.93"
         },
         {
           "period": 151,
           "opening": "293805.93",
-          "interest": "1175.22",
-          "principal": "2718.52",
           "payment": "3893.74",
+          "interest": "1175.22",
+          "principal_paid": "2718.52",
           "closing": "291087.41"
         },
         {
           "period": 152,
           "opening": "291087.41",
-          "interest": "1164.35",
-          "principal": "2729.39",
           "payment": "3893.74",
+          "interest": "1164.35",
+          "principal_paid": "2729.39",
           "closing": "288358.02"
         },
         {
           "period": 153,
           "opening": "288358.02",
-          "interest": "1153.43",
-          "principal": "2740.31",
           "payment": "3893.74",
+          "interest": "1153.43",
+          "principal_paid": "2740.31",
           "closing": "285617.71"
         },
         {
           "period": 154,
           "opening": "285617.71",
-          "interest": "1142.47",
-          "principal": "2751.27",
           "payment": "3893.74",
+          "interest": "1142.47",
+          "principal_paid": "2751.27",
           "closing": "282866.44"
         },
         {
           "period": 155,
           "opening": "282866.44",
-          "interest": "1131.47",
-          "principal": "2762.27",
           "payment": "3893.74",
+          "interest": "1131.47",
+          "principal_paid": "2762.27",
           "closing": "280104.17"
         },
         {
           "period": 156,
           "opening": "280104.17",
-          "interest": "1120.42",
-          "principal": "2773.32",
           "payment": "3893.74",
+          "interest": "1120.42",
+          "principal_paid": "2773.32",
           "closing": "277330.85"
         },
         {
           "period": 157,
           "opening": "277330.85",
-          "interest": "1109.32",
-          "principal": "2784.42",
           "payment": "3893.74",
+          "interest": "1109.32",
+          "principal_paid": "2784.42",
           "closing": "274546.43"
         },
         {
           "period": 158,
           "opening": "274546.43",
-          "interest": "1098.19",
-          "principal": "2795.55",
           "payment": "3893.74",
+          "interest": "1098.19",
+          "principal_paid": "2795.55",
           "closing": "271750.88"
         },
         {
           "period": 159,
           "opening": "271750.88",
-          "interest": "1087.00",
-          "principal": "2806.74",
           "payment": "3893.74",
+          "interest": "1087.00",
+          "principal_paid": "2806.74",
           "closing": "268944.14"
         },
         {
           "period": 160,
           "opening": "268944.14",
-          "interest": "1075.78",
-          "principal": "2817.96",
           "payment": "3893.74",
+          "interest": "1075.78",
+          "principal_paid": "2817.96",
           "closing": "266126.18"
         },
         {
           "period": 161,
           "opening": "266126.18",
-          "interest": "1064.50",
-          "principal": "2829.24",
           "payment": "3893.74",
+          "interest": "1064.50",
+          "principal_paid": "2829.24",
           "closing": "263296.94"
         },
         {
           "period": 162,
           "opening": "263296.94",
-          "interest": "1053.19",
-          "principal": "2840.55",
           "payment": "3893.74",
+          "interest": "1053.19",
+          "principal_paid": "2840.55",
           "closing": "260456.39"
         },
         {
           "period": 163,
           "opening": "260456.39",
-          "interest": "1041.83",
-          "principal": "2851.91",
           "payment": "3893.74",
+          "interest": "1041.83",
+          "principal_paid": "2851.91",
           "closing": "257604.48"
         },
         {
           "period": 164,
           "opening": "257604.48",
-          "interest": "1030.42",
-          "principal": "2863.32",
           "payment": "3893.74",
+          "interest": "1030.42",
+          "principal_paid": "2863.32",
           "closing": "254741.16"
         },
         {
           "period": 165,
           "opening": "254741.16",
-          "interest": "1018.96",
-          "principal": "2874.78",
           "payment": "3893.74",
+          "interest": "1018.96",
+          "principal_paid": "2874.78",
           "closing": "251866.38"
         },
         {
           "period": 166,
           "opening": "251866.38",
-          "interest": "1007.47",
-          "principal": "2886.27",
           "payment": "3893.74",
+          "interest": "1007.47",
+          "principal_paid": "2886.27",
           "closing": "248980.11"
         },
         {
           "period": 167,
           "opening": "248980.11",
-          "interest": "995.92",
-          "principal": "2897.82",
           "payment": "3893.74",
+          "interest": "995.92",
+          "principal_paid": "2897.82",
           "closing": "246082.29"
         },
         {
           "period": 168,
           "opening": "246082.29",
-          "interest": "984.33",
-          "principal": "2909.41",
           "payment": "3893.74",
+          "interest": "984.33",
+          "principal_paid": "2909.41",
           "closing": "243172.88"
         },
         {
           "period": 169,
           "opening": "243172.88",
-          "interest": "972.69",
-          "principal": "2921.05",
           "payment": "3893.74",
+          "interest": "972.69",
+          "principal_paid": "2921.05",
           "closing": "240251.83"
         },
         {
           "period": 170,
           "opening": "240251.83",
-          "interest": "961.01",
-          "principal": "2932.73",
           "payment": "3893.74",
+          "interest": "961.01",
+          "principal_paid": "2932.73",
           "closing": "237319.10"
         },
         {
           "period": 171,
           "opening": "237319.10",
-          "interest": "949.28",
-          "principal": "2944.46",
           "payment": "3893.74",
+          "interest": "949.28",
+          "principal_paid": "2944.46",
           "closing": "234374.64"
         },
         {
           "period": 172,
           "opening": "234374.64",
-          "interest": "937.50",
-          "principal": "2956.24",
           "payment": "3893.74",
+          "interest": "937.50",
+          "principal_paid": "2956.24",
           "closing": "231418.40"
         },
         {
           "period": 173,
           "opening": "231418.40",
-          "interest": "925.67",
-          "principal": "2968.07",
           "payment": "3893.74",
+          "interest": "925.67",
+          "principal_paid": "2968.07",
           "closing": "228450.33"
         },
         {
           "period": 174,
           "opening": "228450.33",
-          "interest": "913.80",
-          "principal": "2979.94",
           "payment": "3893.74",
+          "interest": "913.80",
+          "principal_paid": "2979.94",
           "closing": "225470.39"
         },
         {
           "period": 175,
           "opening": "225470.39",
-          "interest": "901.88",
-          "principal": "2991.86",
           "payment": "3893.74",
+          "interest": "901.88",
+          "principal_paid": "2991.86",
           "closing": "222478.53"
         },
         {
           "period": 176,
           "opening": "222478.53",
-          "interest": "889.91",
-          "principal": "3003.83",
           "payment": "3893.74",
+          "interest": "889.91",
+          "principal_paid": "3003.83",
           "closing": "219474.70"
         },
         {
           "period": 177,
           "opening": "219474.70",
-          "interest": "877.90",
-          "principal": "3015.84",
           "payment": "3893.74",
+          "interest": "877.90",
+          "principal_paid": "3015.84",
           "closing": "216458.86"
         },
         {
           "period": 178,
           "opening": "216458.86",
-          "interest": "865.84",
-          "principal": "3027.90",
           "payment": "3893.74",
+          "interest": "865.84",
+          "principal_paid": "3027.90",
           "closing": "213430.96"
         },
         {
           "period": 179,
           "opening": "213430.96",
-          "interest": "853.72",
-          "principal": "3040.02",
           "payment": "3893.74",
+          "interest": "853.72",
+          "principal_paid": "3040.02",
           "closing": "210390.94"
         },
         {
           "period": 180,
           "opening": "210390.94",
-          "interest": "841.56",
-          "principal": "3052.18",
           "payment": "3893.74",
+          "interest": "841.56",
+          "principal_paid": "3052.18",
           "closing": "207338.76"
         },
         {
           "period": 181,
           "opening": "207338.76",
-          "interest": "829.36",
-          "principal": "3064.38",
           "payment": "3893.74",
+          "interest": "829.36",
+          "principal_paid": "3064.38",
           "closing": "204274.38"
         },
         {
           "period": 182,
           "opening": "204274.38",
-          "interest": "817.10",
-          "principal": "3076.64",
           "payment": "3893.74",
+          "interest": "817.10",
+          "principal_paid": "3076.64",
           "closing": "201197.74"
         },
         {
           "period": 183,
           "opening": "201197.74",
-          "interest": "804.79",
-          "principal": "3088.95",
           "payment": "3893.74",
+          "interest": "804.79",
+          "principal_paid": "3088.95",
           "closing": "198108.79"
         },
         {
           "period": 184,
           "opening": "198108.79",
-          "interest": "792.44",
-          "principal": "3101.30",
           "payment": "3893.74",
+          "interest": "792.44",
+          "principal_paid": "3101.30",
           "closing": "195007.49"
         },
         {
           "period": 185,
           "opening": "195007.49",
-          "interest": "780.03",
-          "principal": "3113.71",
           "payment": "3893.74",
+          "interest": "780.03",
+          "principal_paid": "3113.71",
           "closing": "191893.78"
         },
         {
           "period": 186,
           "opening": "191893.78",
-          "interest": "767.58",
-          "principal": "3126.16",
           "payment": "3893.74",
+          "interest": "767.58",
+          "principal_paid": "3126.16",
           "closing": "188767.62"
         },
         {
           "period": 187,
           "opening": "188767.62",
-          "interest": "755.07",
-          "principal": "3138.67",
           "payment": "3893.74",
+          "interest": "755.07",
+          "principal_paid": "3138.67",
           "closing": "185628.95"
         },
         {
           "period": 188,
           "opening": "185628.95",
-          "interest": "742.52",
-          "principal": "3151.22",
           "payment": "3893.74",
+          "interest": "742.52",
+          "principal_paid": "3151.22",
           "closing": "182477.73"
         },
         {
           "period": 189,
           "opening": "182477.73",
-          "interest": "729.91",
-          "principal": "3163.83",
           "payment": "3893.74",
+          "interest": "729.91",
+          "principal_paid": "3163.83",
           "closing": "179313.90"
         },
         {
           "period": 190,
           "opening": "179313.90",
-          "interest": "717.26",
-          "principal": "3176.48",
           "payment": "3893.74",
+          "interest": "717.26",
+          "principal_paid": "3176.48",
           "closing": "176137.42"
         },
         {
           "period": 191,
           "opening": "176137.42",
-          "interest": "704.55",
-          "principal": "3189.19",
           "payment": "3893.74",
+          "interest": "704.55",
+          "principal_paid": "3189.19",
           "closing": "172948.23"
         },
         {
           "period": 192,
           "opening": "172948.23",
-          "interest": "691.79",
-          "principal": "3201.95",
           "payment": "3893.74",
+          "interest": "691.79",
+          "principal_paid": "3201.95",
           "closing": "169746.28"
         },
         {
           "period": 193,
           "opening": "169746.28",
-          "interest": "678.99",
-          "principal": "3214.75",
           "payment": "3893.74",
+          "interest": "678.99",
+          "principal_paid": "3214.75",
           "closing": "166531.53"
         },
         {
           "period": 194,
           "opening": "166531.53",
-          "interest": "666.13",
-          "principal": "3227.61",
           "payment": "3893.74",
+          "interest": "666.13",
+          "principal_paid": "3227.61",
           "closing": "163303.92"
         },
         {
           "period": 195,
           "opening": "163303.92",
-          "interest": "653.22",
-          "principal": "3240.52",
           "payment": "3893.74",
+          "interest": "653.22",
+          "principal_paid": "3240.52",
           "closing": "160063.40"
         },
         {
           "period": 196,
           "opening": "160063.40",
-          "interest": "640.25",
-          "principal": "3253.49",
           "payment": "3893.74",
+          "interest": "640.25",
+          "principal_paid": "3253.49",
           "closing": "156809.91"
         },
         {
           "period": 197,
           "opening": "156809.91",
-          "interest": "627.24",
-          "principal": "3266.50",
           "payment": "3893.74",
+          "interest": "627.24",
+          "principal_paid": "3266.50",
           "closing": "153543.41"
         },
         {
           "period": 198,
           "opening": "153543.41",
-          "interest": "614.17",
-          "principal": "3279.57",
           "payment": "3893.74",
+          "interest": "614.17",
+          "principal_paid": "3279.57",
           "closing": "150263.84"
         },
         {
           "period": 199,
           "opening": "150263.84",
-          "interest": "601.06",
-          "principal": "3292.68",
           "payment": "3893.74",
+          "interest": "601.06",
+          "principal_paid": "3292.68",
           "closing": "146971.16"
         },
         {
           "period": 200,
           "opening": "146971.16",
-          "interest": "587.88",
-          "principal": "3305.86",
           "payment": "3893.74",
+          "interest": "587.88",
+          "principal_paid": "3305.86",
           "closing": "143665.30"
         },
         {
           "period": 201,
           "opening": "143665.30",
-          "interest": "574.66",
-          "principal": "3319.08",
           "payment": "3893.74",
+          "interest": "574.66",
+          "principal_paid": "3319.08",
           "closing": "140346.22"
         },
         {
           "period": 202,
           "opening": "140346.22",
-          "interest": "561.38",
-          "principal": "3332.36",
           "payment": "3893.74",
+          "interest": "561.38",
+          "principal_paid": "3332.36",
           "closing": "137013.86"
         },
         {
           "period": 203,
           "opening": "137013.86",
-          "interest": "548.06",
-          "principal": "3345.68",
           "payment": "3893.74",
+          "interest": "548.06",
+          "principal_paid": "3345.68",
           "closing": "133668.18"
         },
         {
           "period": 204,
           "opening": "133668.18",
-          "interest": "534.67",
-          "principal": "3359.07",
           "payment": "3893.74",
+          "interest": "534.67",
+          "principal_paid": "3359.07",
           "closing": "130309.11"
         },
         {
           "period": 205,
           "opening": "130309.11",
-          "interest": "521.24",
-          "principal": "3372.50",
           "payment": "3893.74",
+          "interest": "521.24",
+          "principal_paid": "3372.50",
           "closing": "126936.61"
         },
         {
           "period": 206,
           "opening": "126936.61",
-          "interest": "507.75",
-          "principal": "3385.99",
           "payment": "3893.74",
+          "interest": "507.75",
+          "principal_paid": "3385.99",
           "closing": "123550.62"
         },
         {
           "period": 207,
           "opening": "123550.62",
-          "interest": "494.20",
-          "principal": "3399.54",
           "payment": "3893.74",
+          "interest": "494.20",
+          "principal_paid": "3399.54",
           "closing": "120151.08"
         },
         {
           "period": 208,
           "opening": "120151.08",
-          "interest": "480.60",
-          "principal": "3413.14",
           "payment": "3893.74",
+          "interest": "480.60",
+          "principal_paid": "3413.14",
           "closing": "116737.94"
         },
         {
           "period": 209,
           "opening": "116737.94",
-          "interest": "466.95",
-          "principal": "3426.79",
           "payment": "3893.74",
+          "interest": "466.95",
+          "principal_paid": "3426.79",
           "closing": "113311.15"
         },
         {
           "period": 210,
           "opening": "113311.15",
-          "interest": "453.24",
-          "principal": "3440.50",
           "payment": "3893.74",
+          "interest": "453.24",
+          "principal_paid": "3440.50",
           "closing": "109870.65"
         },
         {
           "period": 211,
           "opening": "109870.65",
-          "interest": "439.48",
-          "principal": "3454.26",
           "payment": "3893.74",
+          "interest": "439.48",
+          "principal_paid": "3454.26",
           "closing": "106416.39"
         },
         {
           "period": 212,
           "opening": "106416.39",
-          "interest": "425.67",
-          "principal": "3468.07",
           "payment": "3893.74",
+          "interest": "425.67",
+          "principal_paid": "3468.07",
           "closing": "102948.32"
         },
         {
           "period": 213,
           "opening": "102948.32",
-          "interest": "411.79",
-          "principal": "3481.95",
           "payment": "3893.74",
+          "interest": "411.79",
+          "principal_paid": "3481.95",
           "closing": "99466.37"
         },
         {
           "period": 214,
           "opening": "99466.37",
-          "interest": "397.87",
-          "principal": "3495.87",
           "payment": "3893.74",
+          "interest": "397.87",
+          "principal_paid": "3495.87",
           "closing": "95970.50"
         },
         {
           "period": 215,
           "opening": "95970.50",
-          "interest": "383.88",
-          "principal": "3509.86",
           "payment": "3893.74",
+          "interest": "383.88",
+          "principal_paid": "3509.86",
           "closing": "92460.64"
         },
         {
           "period": 216,
           "opening": "92460.64",
-          "interest": "369.84",
-          "principal": "3523.90",
           "payment": "3893.74",
+          "interest": "369.84",
+          "principal_paid": "3523.90",
           "closing": "88936.74"
         },
         {
           "period": 217,
           "opening": "88936.74",
-          "interest": "355.75",
-          "principal": "3537.99",
           "payment": "3893.74",
+          "interest": "355.75",
+          "principal_paid": "3537.99",
           "closing": "85398.75"
         },
         {
           "period": 218,
           "opening": "85398.75",
-          "interest": "341.60",
-          "principal": "3552.14",
           "payment": "3893.74",
+          "interest": "341.60",
+          "principal_paid": "3552.14",
           "closing": "81846.61"
         },
         {
           "period": 219,
           "opening": "81846.61",
-          "interest": "327.39",
-          "principal": "3566.35",
           "payment": "3893.74",
+          "interest": "327.39",
+          "principal_paid": "3566.35",
           "closing": "78280.26"
         },
         {
           "period": 220,
           "opening": "78280.26",
-          "interest": "313.12",
-          "principal": "3580.62",
           "payment": "3893.74",
+          "interest": "313.12",
+          "principal_paid": "3580.62",
           "closing": "74699.64"
         },
         {
           "period": 221,
           "opening": "74699.64",
-          "interest": "298.80",
-          "principal": "3594.94",
           "payment": "3893.74",
+          "interest": "298.80",
+          "principal_paid": "3594.94",
           "closing": "71104.70"
         },
         {
           "period": 222,
           "opening": "71104.70",
-          "interest": "284.42",
-          "principal": "3609.32",
           "payment": "3893.74",
+          "interest": "284.42",
+          "principal_paid": "3609.32",
           "closing": "67495.38"
         },
         {
           "period": 223,
           "opening": "67495.38",
-          "interest": "269.98",
-          "principal": "3623.76",
           "payment": "3893.74",
+          "interest": "269.98",
+          "principal_paid": "3623.76",
           "closing": "63871.62"
         },
         {
           "period": 224,
           "opening": "63871.62",
-          "interest": "255.49",
-          "principal": "3638.25",
           "payment": "3893.74",
+          "interest": "255.49",
+          "principal_paid": "3638.25",
           "closing": "60233.37"
         },
         {
           "period": 225,
           "opening": "60233.37",
-          "interest": "240.93",
-          "principal": "3652.81",
           "payment": "3893.74",
+          "interest": "240.93",
+          "principal_paid": "3652.81",
           "closing": "56580.56"
         },
         {
           "period": 226,
           "opening": "56580.56",
-          "interest": "226.32",
-          "principal": "3667.42",
           "payment": "3893.74",
+          "interest": "226.32",
+          "principal_paid": "3667.42",
           "closing": "52913.14"
         },
         {
           "period": 227,
           "opening": "52913.14",
-          "interest": "211.65",
-          "principal": "3682.09",
           "payment": "3893.74",
+          "interest": "211.65",
+          "principal_paid": "3682.09",
           "closing": "49231.05"
         },
         {
           "period": 228,
           "opening": "49231.05",
-          "interest": "196.92",
-          "principal": "3696.82",
           "payment": "3893.74",
+          "interest": "196.92",
+          "principal_paid": "3696.82",
           "closing": "45534.23"
         },
         {
           "period": 229,
           "opening": "45534.23",
-          "interest": "182.14",
-          "principal": "3711.60",
           "payment": "3893.74",
+          "interest": "182.14",
+          "principal_paid": "3711.60",
           "closing": "41822.63"
         },
         {
           "period": 230,
           "opening": "41822.63",
-          "interest": "167.29",
-          "principal": "3726.45",
           "payment": "3893.74",
+          "interest": "167.29",
+          "principal_paid": "3726.45",
           "closing": "38096.18"
         },
         {
           "period": 231,
           "opening": "38096.18",
-          "interest": "152.38",
-          "principal": "3741.36",
           "payment": "3893.74",
+          "interest": "152.38",
+          "principal_paid": "3741.36",
           "closing": "34354.82"
         },
         {
           "period": 232,
           "opening": "34354.82",
-          "interest": "137.42",
-          "principal": "3756.32",
           "payment": "3893.74",
+          "interest": "137.42",
+          "principal_paid": "3756.32",
           "closing": "30598.50"
         },
         {
           "period": 233,
           "opening": "30598.50",
-          "interest": "122.39",
-          "principal": "3771.35",
           "payment": "3893.74",
+          "interest": "122.39",
+          "principal_paid": "3771.35",
           "closing": "26827.15"
         },
         {
           "period": 234,
           "opening": "26827.15",
-          "interest": "107.31",
-          "principal": "3786.43",
           "payment": "3893.74",
+          "interest": "107.31",
+          "principal_paid": "3786.43",
           "closing": "23040.72"
         },
         {
           "period": 235,
           "opening": "23040.72",
-          "interest": "92.16",
-          "principal": "3801.58",
           "payment": "3893.74",
+          "interest": "92.16",
+          "principal_paid": "3801.58",
           "closing": "19239.14"
         },
         {
           "period": 236,
           "opening": "19239.14",
-          "interest": "76.96",
-          "principal": "3816.78",
           "payment": "3893.74",
+          "interest": "76.96",
+          "principal_paid": "3816.78",
           "closing": "15422.36"
         },
         {
           "period": 237,
           "opening": "15422.36",
-          "interest": "61.69",
-          "principal": "3832.05",
           "payment": "3893.74",
+          "interest": "61.69",
+          "principal_paid": "3832.05",
           "closing": "11590.31"
         },
         {
           "period": 238,
           "opening": "11590.31",
-          "interest": "46.36",
-          "principal": "3847.38",
           "payment": "3893.74",
+          "interest": "46.36",
+          "principal_paid": "3847.38",
           "closing": "7742.93"
         },
         {
           "period": 239,
           "opening": "7742.93",
-          "interest": "30.97",
-          "principal": "3862.77",
           "payment": "3893.74",
+          "interest": "30.97",
+          "principal_paid": "3862.77",
           "closing": "3880.16"
         },
         {
           "period": 240,
           "opening": "3880.16",
-          "interest": "15.52",
-          "principal": "3880.16",
           "payment": "3895.68",
+          "interest": "15.52",
+          "principal_paid": "3880.16",
           "closing": "0.00"
         }
       ]
     },
     {
       "id": "video.equal",
-      "kind": "rep_schedule",
+      "kind": "amort_equal_statement",
       "inputs": {
-        "method": "equal_principal",
         "principal": "600000",
-        "annual_percent": "4.8",
+        "rate_percent": "4.8",
         "months": 240
       },
       "value": [
         {
           "period": 1,
           "opening": "600000.00",
-          "interest": "2400.00",
-          "principal": "2500.00",
           "payment": "4900.00",
+          "interest": "2400.00",
+          "principal_paid": "2500.00",
           "closing": "597500.00"
         },
         {
           "period": 2,
           "opening": "597500.00",
-          "interest": "2390.00",
-          "principal": "2500.00",
           "payment": "4890.00",
+          "interest": "2390.00",
+          "principal_paid": "2500.00",
           "closing": "595000.00"
         },
         {
           "period": 3,
           "opening": "595000.00",
-          "interest": "2380.00",
-          "principal": "2500.00",
           "payment": "4880.00",
+          "interest": "2380.00",
+          "principal_paid": "2500.00",
           "closing": "592500.00"
         },
         {
           "period": 4,
           "opening": "592500.00",
-          "interest": "2370.00",
-          "principal": "2500.00",
           "payment": "4870.00",
+          "interest": "2370.00",
+          "principal_paid": "2500.00",
           "closing": "590000.00"
         },
         {
           "period": 5,
           "opening": "590000.00",
-          "interest": "2360.00",
-          "principal": "2500.00",
           "payment": "4860.00",
+          "interest": "2360.00",
+          "principal_paid": "2500.00",
           "closing": "587500.00"
         },
         {
           "period": 6,
           "opening": "587500.00",
-          "interest": "2350.00",
-          "principal": "2500.00",
           "payment": "4850.00",
+          "interest": "2350.00",
+          "principal_paid": "2500.00",
           "closing": "585000.00"
         },
         {
           "period": 7,
           "opening": "585000.00",
-          "interest": "2340.00",
-          "principal": "2500.00",
           "payment": "4840.00",
+          "interest": "2340.00",
+          "principal_paid": "2500.00",
           "closing": "582500.00"
         },
         {
           "period": 8,
           "opening": "582500.00",
-          "interest": "2330.00",
-          "principal": "2500.00",
           "payment": "4830.00",
+          "interest": "2330.00",
+          "principal_paid": "2500.00",
           "closing": "580000.00"
         },
         {
           "period": 9,
           "opening": "580000.00",
-          "interest": "2320.00",
-          "principal": "2500.00",
           "payment": "4820.00",
+          "interest": "2320.00",
+          "principal_paid": "2500.00",
           "closing": "577500.00"
         },
         {
           "period": 10,
           "opening": "577500.00",
-          "interest": "2310.00",
-          "principal": "2500.00",
           "payment": "4810.00",
+          "interest": "2310.00",
+          "principal_paid": "2500.00",
           "closing": "575000.00"
         },
         {
           "period": 11,
           "opening": "575000.00",
-          "interest": "2300.00",
-          "principal": "2500.00",
           "payment": "4800.00",
+          "interest": "2300.00",
+          "principal_paid": "2500.00",
           "closing": "572500.00"
         },
         {
           "period": 12,
           "opening": "572500.00",
-          "interest": "2290.00",
-          "principal": "2500.00",
           "payment": "4790.00",
+          "interest": "2290.00",
+          "principal_paid": "2500.00",
           "closing": "570000.00"
         },
         {
           "period": 13,
           "opening": "570000.00",
-          "interest": "2280.00",
-          "principal": "2500.00",
           "payment": "4780.00",
+          "interest": "2280.00",
+          "principal_paid": "2500.00",
           "closing": "567500.00"
         },
         {
           "period": 14,
           "opening": "567500.00",
-          "interest": "2270.00",
-          "principal": "2500.00",
           "payment": "4770.00",
+          "interest": "2270.00",
+          "principal_paid": "2500.00",
           "closing": "565000.00"
         },
         {
           "period": 15,
           "opening": "565000.00",
-          "interest": "2260.00",
-          "principal": "2500.00",
           "payment": "4760.00",
+          "interest": "2260.00",
+          "principal_paid": "2500.00",
           "closing": "562500.00"
         },
         {
           "period": 16,
           "opening": "562500.00",
-          "interest": "2250.00",
-          "principal": "2500.00",
           "payment": "4750.00",
+          "interest": "2250.00",
+          "principal_paid": "2500.00",
           "closing": "560000.00"
         },
         {
           "period": 17,
           "opening": "560000.00",
-          "interest": "2240.00",
-          "principal": "2500.00",
           "payment": "4740.00",
+          "interest": "2240.00",
+          "principal_paid": "2500.00",
           "closing": "557500.00"
         },
         {
           "period": 18,
           "opening": "557500.00",
-          "interest": "2230.00",
-          "principal": "2500.00",
           "payment": "4730.00",
+          "interest": "2230.00",
+          "principal_paid": "2500.00",
           "closing": "555000.00"
         },
         {
           "period": 19,
           "opening": "555000.00",
-          "interest": "2220.00",
-          "principal": "2500.00",
           "payment": "4720.00",
+          "interest": "2220.00",
+          "principal_paid": "2500.00",
           "closing": "552500.00"
         },
         {
           "period": 20,
           "opening": "552500.00",
-          "interest": "2210.00",
-          "principal": "2500.00",
           "payment": "4710.00",
+          "interest": "2210.00",
+          "principal_paid": "2500.00",
           "closing": "550000.00"
         },
         {
           "period": 21,
           "opening": "550000.00",
-          "interest": "2200.00",
-          "principal": "2500.00",
           "payment": "4700.00",
+          "interest": "2200.00",
+          "principal_paid": "2500.00",
           "closing": "547500.00"
         },
         {
           "period": 22,
           "opening": "547500.00",
-          "interest": "2190.00",
-          "principal": "2500.00",
           "payment": "4690.00",
+          "interest": "2190.00",
+          "principal_paid": "2500.00",
           "closing": "545000.00"
         },
         {
           "period": 23,
           "opening": "545000.00",
-          "interest": "2180.00",
-          "principal": "2500.00",
           "payment": "4680.00",
+          "interest": "2180.00",
+          "principal_paid": "2500.00",
           "closing": "542500.00"
         },
         {
           "period": 24,
           "opening": "542500.00",
-          "interest": "2170.00",
-          "principal": "2500.00",
           "payment": "4670.00",
+          "interest": "2170.00",
+          "principal_paid": "2500.00",
           "closing": "540000.00"
         },
         {
           "period": 25,
           "opening": "540000.00",
-          "interest": "2160.00",
-          "principal": "2500.00",
           "payment": "4660.00",
+          "interest": "2160.00",
+          "principal_paid": "2500.00",
           "closing": "537500.00"
         },
         {
           "period": 26,
           "opening": "537500.00",
-          "interest": "2150.00",
-          "principal": "2500.00",
           "payment": "4650.00",
+          "interest": "2150.00",
+          "principal_paid": "2500.00",
           "closing": "535000.00"
         },
         {
           "period": 27,
           "opening": "535000.00",
-          "interest": "2140.00",
-          "principal": "2500.00",
           "payment": "4640.00",
+          "interest": "2140.00",
+          "principal_paid": "2500.00",
           "closing": "532500.00"
         },
         {
           "period": 28,
           "opening": "532500.00",
-          "interest": "2130.00",
-          "principal": "2500.00",
           "payment": "4630.00",
+          "interest": "2130.00",
+          "principal_paid": "2500.00",
           "closing": "530000.00"
         },
         {
           "period": 29,
           "opening": "530000.00",
-          "interest": "2120.00",
-          "principal": "2500.00",
           "payment": "4620.00",
+          "interest": "2120.00",
+          "principal_paid": "2500.00",
           "closing": "527500.00"
         },
         {
           "period": 30,
           "opening": "527500.00",
-          "interest": "2110.00",
-          "principal": "2500.00",
           "payment": "4610.00",
+          "interest": "2110.00",
+          "principal_paid": "2500.00",
           "closing": "525000.00"
         },
         {
           "period": 31,
           "opening": "525000.00",
-          "interest": "2100.00",
-          "principal": "2500.00",
           "payment": "4600.00",
+          "interest": "2100.00",
+          "principal_paid": "2500.00",
           "closing": "522500.00"
         },
         {
           "period": 32,
           "opening": "522500.00",
-          "interest": "2090.00",
-          "principal": "2500.00",
           "payment": "4590.00",
+          "interest": "2090.00",
+          "principal_paid": "2500.00",
           "closing": "520000.00"
         },
         {
           "period": 33,
           "opening": "520000.00",
-          "interest": "2080.00",
-          "principal": "2500.00",
           "payment": "4580.00",
+          "interest": "2080.00",
+          "principal_paid": "2500.00",
           "closing": "517500.00"
         },
         {
           "period": 34,
           "opening": "517500.00",
-          "interest": "2070.00",
-          "principal": "2500.00",
           "payment": "4570.00",
+          "interest": "2070.00",
+          "principal_paid": "2500.00",
           "closing": "515000.00"
         },
         {
           "period": 35,
           "opening": "515000.00",
-          "interest": "2060.00",
-          "principal": "2500.00",
           "payment": "4560.00",
+          "interest": "2060.00",
+          "principal_paid": "2500.00",
           "closing": "512500.00"
         },
         {
           "period": 36,
           "opening": "512500.00",
-          "interest": "2050.00",
-          "principal": "2500.00",
           "payment": "4550.00",
+          "interest": "2050.00",
+          "principal_paid": "2500.00",
           "closing": "510000.00"
         },
         {
           "period": 37,
           "opening": "510000.00",
-          "interest": "2040.00",
-          "principal": "2500.00",
           "payment": "4540.00",
+          "interest": "2040.00",
+          "principal_paid": "2500.00",
           "closing": "507500.00"
         },
         {
           "period": 38,
           "opening": "507500.00",
-          "interest": "2030.00",
-          "principal": "2500.00",
           "payment": "4530.00",
+          "interest": "2030.00",
+          "principal_paid": "2500.00",
           "closing": "505000.00"
         },
         {
           "period": 39,
           "opening": "505000.00",
-          "interest": "2020.00",
-          "principal": "2500.00",
           "payment": "4520.00",
+          "interest": "2020.00",
+          "principal_paid": "2500.00",
           "closing": "502500.00"
         },
         {
           "period": 40,
           "opening": "502500.00",
-          "interest": "2010.00",
-          "principal": "2500.00",
           "payment": "4510.00",
+          "interest": "2010.00",
+          "principal_paid": "2500.00",
           "closing": "500000.00"
         },
         {
           "period": 41,
           "opening": "500000.00",
-          "interest": "2000.00",
-          "principal": "2500.00",
           "payment": "4500.00",
+          "interest": "2000.00",
+          "principal_paid": "2500.00",
           "closing": "497500.00"
         },
         {
           "period": 42,
           "opening": "497500.00",
-          "interest": "1990.00",
-          "principal": "2500.00",
           "payment": "4490.00",
+          "interest": "1990.00",
+          "principal_paid": "2500.00",
           "closing": "495000.00"
         },
         {
           "period": 43,
           "opening": "495000.00",
-          "interest": "1980.00",
-          "principal": "2500.00",
           "payment": "4480.00",
+          "interest": "1980.00",
+          "principal_paid": "2500.00",
           "closing": "492500.00"
         },
         {
           "period": 44,
           "opening": "492500.00",
-          "interest": "1970.00",
-          "principal": "2500.00",
           "payment": "4470.00",
+          "interest": "1970.00",
+          "principal_paid": "2500.00",
           "closing": "490000.00"
         },
         {
           "period": 45,
           "opening": "490000.00",
-          "interest": "1960.00",
-          "principal": "2500.00",
           "payment": "4460.00",
+          "interest": "1960.00",
+          "principal_paid": "2500.00",
           "closing": "487500.00"
         },
         {
           "period": 46,
           "opening": "487500.00",
-          "interest": "1950.00",
-          "principal": "2500.00",
           "payment": "4450.00",
+          "interest": "1950.00",
+          "principal_paid": "2500.00",
           "closing": "485000.00"
         },
         {
           "period": 47,
           "opening": "485000.00",
-          "interest": "1940.00",
-          "principal": "2500.00",
           "payment": "4440.00",
+          "interest": "1940.00",
+          "principal_paid": "2500.00",
           "closing": "482500.00"
         },
         {
           "period": 48,
           "opening": "482500.00",
-          "interest": "1930.00",
-          "principal": "2500.00",
           "payment": "4430.00",
+          "interest": "1930.00",
+          "principal_paid": "2500.00",
           "closing": "480000.00"
         },
         {
           "period": 49,
           "opening": "480000.00",
-          "interest": "1920.00",
-          "principal": "2500.00",
           "payment": "4420.00",
+          "interest": "1920.00",
+          "principal_paid": "2500.00",
           "closing": "477500.00"
         },
         {
           "period": 50,
           "opening": "477500.00",
-          "interest": "1910.00",
-          "principal": "2500.00",
           "payment": "4410.00",
+          "interest": "1910.00",
+          "principal_paid": "2500.00",
           "closing": "475000.00"
         },
         {
           "period": 51,
           "opening": "475000.00",
-          "interest": "1900.00",
-          "principal": "2500.00",
           "payment": "4400.00",
+          "interest": "1900.00",
+          "principal_paid": "2500.00",
           "closing": "472500.00"
         },
         {
           "period": 52,
           "opening": "472500.00",
-          "interest": "1890.00",
-          "principal": "2500.00",
           "payment": "4390.00",
+          "interest": "1890.00",
+          "principal_paid": "2500.00",
           "closing": "470000.00"
         },
         {
           "period": 53,
           "opening": "470000.00",
-          "interest": "1880.00",
-          "principal": "2500.00",
           "payment": "4380.00",
+          "interest": "1880.00",
+          "principal_paid": "2500.00",
           "closing": "467500.00"
         },
         {
           "period": 54,
           "opening": "467500.00",
-          "interest": "1870.00",
-          "principal": "2500.00",
           "payment": "4370.00",
+          "interest": "1870.00",
+          "principal_paid": "2500.00",
           "closing": "465000.00"
         },
         {
           "period": 55,
           "opening": "465000.00",
-          "interest": "1860.00",
-          "principal": "2500.00",
           "payment": "4360.00",
+          "interest": "1860.00",
+          "principal_paid": "2500.00",
           "closing": "462500.00"
         },
         {
           "period": 56,
           "opening": "462500.00",
-          "interest": "1850.00",
-          "principal": "2500.00",
           "payment": "4350.00",
+          "interest": "1850.00",
+          "principal_paid": "2500.00",
           "closing": "460000.00"
         },
         {
           "period": 57,
           "opening": "460000.00",
-          "interest": "1840.00",
-          "principal": "2500.00",
           "payment": "4340.00",
+          "interest": "1840.00",
+          "principal_paid": "2500.00",
           "closing": "457500.00"
         },
         {
           "period": 58,
           "opening": "457500.00",
-          "interest": "1830.00",
-          "principal": "2500.00",
           "payment": "4330.00",
+          "interest": "1830.00",
+          "principal_paid": "2500.00",
           "closing": "455000.00"
         },
         {
           "period": 59,
           "opening": "455000.00",
-          "interest": "1820.00",
-          "principal": "2500.00",
           "payment": "4320.00",
+          "interest": "1820.00",
+          "principal_paid": "2500.00",
           "closing": "452500.00"
         },
         {
           "period": 60,
           "opening": "452500.00",
-          "interest": "1810.00",
-          "principal": "2500.00",
           "payment": "4310.00",
+          "interest": "1810.00",
+          "principal_paid": "2500.00",
           "closing": "450000.00"
         },
         {
           "period": 61,
           "opening": "450000.00",
-          "interest": "1800.00",
-          "principal": "2500.00",
           "payment": "4300.00",
+          "interest": "1800.00",
+          "principal_paid": "2500.00",
           "closing": "447500.00"
         },
         {
           "period": 62,
           "opening": "447500.00",
-          "interest": "1790.00",
-          "principal": "2500.00",
           "payment": "4290.00",
+          "interest": "1790.00",
+          "principal_paid": "2500.00",
           "closing": "445000.00"
         },
         {
           "period": 63,
           "opening": "445000.00",
-          "interest": "1780.00",
-          "principal": "2500.00",
           "payment": "4280.00",
+          "interest": "1780.00",
+          "principal_paid": "2500.00",
           "closing": "442500.00"
         },
         {
           "period": 64,
           "opening": "442500.00",
-          "interest": "1770.00",
-          "principal": "2500.00",
           "payment": "4270.00",
+          "interest": "1770.00",
+          "principal_paid": "2500.00",
           "closing": "440000.00"
         },
         {
           "period": 65,
           "opening": "440000.00",
-          "interest": "1760.00",
-          "principal": "2500.00",
           "payment": "4260.00",
+          "interest": "1760.00",
+          "principal_paid": "2500.00",
           "closing": "437500.00"
         },
         {
           "period": 66,
           "opening": "437500.00",
-          "interest": "1750.00",
-          "principal": "2500.00",
           "payment": "4250.00",
+          "interest": "1750.00",
+          "principal_paid": "2500.00",
           "closing": "435000.00"
         },
         {
           "period": 67,
           "opening": "435000.00",
-          "interest": "1740.00",
-          "principal": "2500.00",
           "payment": "4240.00",
+          "interest": "1740.00",
+          "principal_paid": "2500.00",
           "closing": "432500.00"
         },
         {
           "period": 68,
           "opening": "432500.00",
-          "interest": "1730.00",
-          "principal": "2500.00",
           "payment": "4230.00",
+          "interest": "1730.00",
+          "principal_paid": "2500.00",
           "closing": "430000.00"
         },
         {
           "period": 69,
           "opening": "430000.00",
-          "interest": "1720.00",
-          "principal": "2500.00",
           "payment": "4220.00",
+          "interest": "1720.00",
+          "principal_paid": "2500.00",
           "closing": "427500.00"
         },
         {
           "period": 70,
           "opening": "427500.00",
-          "interest": "1710.00",
-          "principal": "2500.00",
           "payment": "4210.00",
+          "interest": "1710.00",
+          "principal_paid": "2500.00",
           "closing": "425000.00"
         },
         {
           "period": 71,
           "opening": "425000.00",
-          "interest": "1700.00",
-          "principal": "2500.00",
           "payment": "4200.00",
+          "interest": "1700.00",
+          "principal_paid": "2500.00",
           "closing": "422500.00"
         },
         {
           "period": 72,
           "opening": "422500.00",
-          "interest": "1690.00",
-          "principal": "2500.00",
           "payment": "4190.00",
+          "interest": "1690.00",
+          "principal_paid": "2500.00",
           "closing": "420000.00"
         },
         {
           "period": 73,
           "opening": "420000.00",
-          "interest": "1680.00",
-          "principal": "2500.00",
           "payment": "4180.00",
+          "interest": "1680.00",
+          "principal_paid": "2500.00",
           "closing": "417500.00"
         },
         {
           "period": 74,
           "opening": "417500.00",
-          "interest": "1670.00",
-          "principal": "2500.00",
           "payment": "4170.00",
+          "interest": "1670.00",
+          "principal_paid": "2500.00",
           "closing": "415000.00"
         },
         {
           "period": 75,
           "opening": "415000.00",
-          "interest": "1660.00",
-          "principal": "2500.00",
           "payment": "4160.00",
+          "interest": "1660.00",
+          "principal_paid": "2500.00",
           "closing": "412500.00"
         },
         {
           "period": 76,
           "opening": "412500.00",
-          "interest": "1650.00",
-          "principal": "2500.00",
           "payment": "4150.00",
+          "interest": "1650.00",
+          "principal_paid": "2500.00",
           "closing": "410000.00"
         },
         {
           "period": 77,
           "opening": "410000.00",
-          "interest": "1640.00",
-          "principal": "2500.00",
           "payment": "4140.00",
+          "interest": "1640.00",
+          "principal_paid": "2500.00",
           "closing": "407500.00"
         },
         {
           "period": 78,
           "opening": "407500.00",
-          "interest": "1630.00",
-          "principal": "2500.00",
           "payment": "4130.00",
+          "interest": "1630.00",
+          "principal_paid": "2500.00",
           "closing": "405000.00"
         },
         {
           "period": 79,
           "opening": "405000.00",
-          "interest": "1620.00",
-          "principal": "2500.00",
           "payment": "4120.00",
+          "interest": "1620.00",
+          "principal_paid": "2500.00",
           "closing": "402500.00"
         },
         {
           "period": 80,
           "opening": "402500.00",
-          "interest": "1610.00",
-          "principal": "2500.00",
           "payment": "4110.00",
+          "interest": "1610.00",
+          "principal_paid": "2500.00",
           "closing": "400000.00"
         },
         {
           "period": 81,
           "opening": "400000.00",
-          "interest": "1600.00",
-          "principal": "2500.00",
           "payment": "4100.00",
+          "interest": "1600.00",
+          "principal_paid": "2500.00",
           "closing": "397500.00"
         },
         {
           "period": 82,
           "opening": "397500.00",
-          "interest": "1590.00",
-          "principal": "2500.00",
           "payment": "4090.00",
+          "interest": "1590.00",
+          "principal_paid": "2500.00",
           "closing": "395000.00"
         },
         {
           "period": 83,
           "opening": "395000.00",
-          "interest": "1580.00",
-          "principal": "2500.00",
           "payment": "4080.00",
+          "interest": "1580.00",
+          "principal_paid": "2500.00",
           "closing": "392500.00"
         },
         {
           "period": 84,
           "opening": "392500.00",
-          "interest": "1570.00",
-          "principal": "2500.00",
           "payment": "4070.00",
+          "interest": "1570.00",
+          "principal_paid": "2500.00",
           "closing": "390000.00"
         },
         {
           "period": 85,
           "opening": "390000.00",
-          "interest": "1560.00",
-          "principal": "2500.00",
           "payment": "4060.00",
+          "interest": "1560.00",
+          "principal_paid": "2500.00",
           "closing": "387500.00"
         },
         {
           "period": 86,
           "opening": "387500.00",
-          "interest": "1550.00",
-          "principal": "2500.00",
           "payment": "4050.00",
+          "interest": "1550.00",
+          "principal_paid": "2500.00",
           "closing": "385000.00"
         },
         {
           "period": 87,
           "opening": "385000.00",
-          "interest": "1540.00",
-          "principal": "2500.00",
           "payment": "4040.00",
+          "interest": "1540.00",
+          "principal_paid": "2500.00",
           "closing": "382500.00"
         },
         {
           "period": 88,
           "opening": "382500.00",
-          "interest": "1530.00",
-          "principal": "2500.00",
           "payment": "4030.00",
+          "interest": "1530.00",
+          "principal_paid": "2500.00",
           "closing": "380000.00"
         },
         {
           "period": 89,
           "opening": "380000.00",
-          "interest": "1520.00",
-          "principal": "2500.00",
           "payment": "4020.00",
+          "interest": "1520.00",
+          "principal_paid": "2500.00",
           "closing": "377500.00"
         },
         {
           "period": 90,
           "opening": "377500.00",
-          "interest": "1510.00",
-          "principal": "2500.00",
           "payment": "4010.00",
+          "interest": "1510.00",
+          "principal_paid": "2500.00",
           "closing": "375000.00"
         },
         {
           "period": 91,
           "opening": "375000.00",
-          "interest": "1500.00",
-          "principal": "2500.00",
           "payment": "4000.00",
+          "interest": "1500.00",
+          "principal_paid": "2500.00",
           "closing": "372500.00"
         },
         {
           "period": 92,
           "opening": "372500.00",
-          "interest": "1490.00",
-          "principal": "2500.00",
           "payment": "3990.00",
+          "interest": "1490.00",
+          "principal_paid": "2500.00",
           "closing": "370000.00"
         },
         {
           "period": 93,
           "opening": "370000.00",
-          "interest": "1480.00",
-          "principal": "2500.00",
           "payment": "3980.00",
+          "interest": "1480.00",
+          "principal_paid": "2500.00",
           "closing": "367500.00"
         },
         {
           "period": 94,
           "opening": "367500.00",
-          "interest": "1470.00",
-          "principal": "2500.00",
           "payment": "3970.00",
+          "interest": "1470.00",
+          "principal_paid": "2500.00",
           "closing": "365000.00"
         },
         {
           "period": 95,
           "opening": "365000.00",
-          "interest": "1460.00",
-          "principal": "2500.00",
           "payment": "3960.00",
+          "interest": "1460.00",
+          "principal_paid": "2500.00",
           "closing": "362500.00"
         },
         {
           "period": 96,
           "opening": "362500.00",
-          "interest": "1450.00",
-          "principal": "2500.00",
           "payment": "3950.00",
+          "interest": "1450.00",
+          "principal_paid": "2500.00",
           "closing": "360000.00"
         },
         {
           "period": 97,
           "opening": "360000.00",
-          "interest": "1440.00",
-          "principal": "2500.00",
           "payment": "3940.00",
+          "interest": "1440.00",
+          "principal_paid": "2500.00",
           "closing": "357500.00"
         },
         {
           "period": 98,
           "opening": "357500.00",
-          "interest": "1430.00",
-          "principal": "2500.00",
           "payment": "3930.00",
+          "interest": "1430.00",
+          "principal_paid": "2500.00",
           "closing": "355000.00"
         },
         {
           "period": 99,
           "opening": "355000.00",
-          "interest": "1420.00",
-          "principal": "2500.00",
           "payment": "3920.00",
+          "interest": "1420.00",
+          "principal_paid": "2500.00",
           "closing": "352500.00"
         },
         {
           "period": 100,
           "opening": "352500.00",
-          "interest": "1410.00",
-          "principal": "2500.00",
           "payment": "3910.00",
+          "interest": "1410.00",
+          "principal_paid": "2500.00",
           "closing": "350000.00"
         },
         {
           "period": 101,
           "opening": "350000.00",
-          "interest": "1400.00",
-          "principal": "2500.00",
           "payment": "3900.00",
+          "interest": "1400.00",
+          "principal_paid": "2500.00",
           "closing": "347500.00"
         },
         {
           "period": 102,
           "opening": "347500.00",
-          "interest": "1390.00",
-          "principal": "2500.00",
           "payment": "3890.00",
+          "interest": "1390.00",
+          "principal_paid": "2500.00",
           "closing": "345000.00"
         },
         {
           "period": 103,
           "opening": "345000.00",
-          "interest": "1380.00",
-          "principal": "2500.00",
           "payment": "3880.00",
+          "interest": "1380.00",
+          "principal_paid": "2500.00",
           "closing": "342500.00"
         },
         {
           "period": 104,
           "opening": "342500.00",
-          "interest": "1370.00",
-          "principal": "2500.00",
           "payment": "3870.00",
+          "interest": "1370.00",
+          "principal_paid": "2500.00",
           "closing": "340000.00"
         },
         {
           "period": 105,
           "opening": "340000.00",
-          "interest": "1360.00",
-          "principal": "2500.00",
           "payment": "3860.00",
+          "interest": "1360.00",
+          "principal_paid": "2500.00",
           "closing": "337500.00"
         },
         {
           "period": 106,
           "opening": "337500.00",
-          "interest": "1350.00",
-          "principal": "2500.00",
           "payment": "3850.00",
+          "interest": "1350.00",
+          "principal_paid": "2500.00",
           "closing": "335000.00"
         },
         {
           "period": 107,
           "opening": "335000.00",
-          "interest": "1340.00",
-          "principal": "2500.00",
           "payment": "3840.00",
+          "interest": "1340.00",
+          "principal_paid": "2500.00",
           "closing": "332500.00"
         },
         {
           "period": 108,
           "opening": "332500.00",
-          "interest": "1330.00",
-          "principal": "2500.00",
           "payment": "3830.00",
+          "interest": "1330.00",
+          "principal_paid": "2500.00",
           "closing": "330000.00"
         },
         {
           "period": 109,
           "opening": "330000.00",
-          "interest": "1320.00",
-          "principal": "2500.00",
           "payment": "3820.00",
+          "interest": "1320.00",
+          "principal_paid": "2500.00",
           "closing": "327500.00"
         },
         {
           "period": 110,
           "opening": "327500.00",
-          "interest": "1310.00",
-          "principal": "2500.00",
           "payment": "3810.00",
+          "interest": "1310.00",
+          "principal_paid": "2500.00",
           "closing": "325000.00"
         },
         {
           "period": 111,
           "opening": "325000.00",
-          "interest": "1300.00",
-          "principal": "2500.00",
           "payment": "3800.00",
+          "interest": "1300.00",
+          "principal_paid": "2500.00",
           "closing": "322500.00"
         },
         {
           "period": 112,
           "opening": "322500.00",
-          "interest": "1290.00",
-          "principal": "2500.00",
           "payment": "3790.00",
+          "interest": "1290.00",
+          "principal_paid": "2500.00",
           "closing": "320000.00"
         },
         {
           "period": 113,
           "opening": "320000.00",
-          "interest": "1280.00",
-          "principal": "2500.00",
           "payment": "3780.00",
+          "interest": "1280.00",
+          "principal_paid": "2500.00",
           "closing": "317500.00"
         },
         {
           "period": 114,
           "opening": "317500.00",
-          "interest": "1270.00",
-          "principal": "2500.00",
           "payment": "3770.00",
+          "interest": "1270.00",
+          "principal_paid": "2500.00",
           "closing": "315000.00"
         },
         {
           "period": 115,
           "opening": "315000.00",
-          "interest": "1260.00",
-          "principal": "2500.00",
           "payment": "3760.00",
+          "interest": "1260.00",
+          "principal_paid": "2500.00",
           "closing": "312500.00"
         },
         {
           "period": 116,
           "opening": "312500.00",
-          "interest": "1250.00",
-          "principal": "2500.00",
           "payment": "3750.00",
+          "interest": "1250.00",
+          "principal_paid": "2500.00",
           "closing": "310000.00"
         },
         {
           "period": 117,
           "opening": "310000.00",
-          "interest": "1240.00",
-          "principal": "2500.00",
           "payment": "3740.00",
+          "interest": "1240.00",
+          "principal_paid": "2500.00",
           "closing": "307500.00"
         },
         {
           "period": 118,
           "opening": "307500.00",
-          "interest": "1230.00",
-          "principal": "2500.00",
           "payment": "3730.00",
+          "interest": "1230.00",
+          "principal_paid": "2500.00",
           "closing": "305000.00"
         },
         {
           "period": 119,
           "opening": "305000.00",
-          "interest": "1220.00",
-          "principal": "2500.00",
           "payment": "3720.00",
+          "interest": "1220.00",
+          "principal_paid": "2500.00",
           "closing": "302500.00"
         },
         {
           "period": 120,
           "opening": "302500.00",
-          "interest": "1210.00",
-          "principal": "2500.00",
           "payment": "3710.00",
+          "interest": "1210.00",
+          "principal_paid": "2500.00",
           "closing": "300000.00"
         },
         {
           "period": 121,
           "opening": "300000.00",
-          "interest": "1200.00",
-          "principal": "2500.00",
           "payment": "3700.00",
+          "interest": "1200.00",
+          "principal_paid": "2500.00",
           "closing": "297500.00"
         },
         {
           "period": 122,
           "opening": "297500.00",
-          "interest": "1190.00",
-          "principal": "2500.00",
           "payment": "3690.00",
+          "interest": "1190.00",
+          "principal_paid": "2500.00",
           "closing": "295000.00"
         },
         {
           "period": 123,
           "opening": "295000.00",
-          "interest": "1180.00",
-          "principal": "2500.00",
           "payment": "3680.00",
+          "interest": "1180.00",
+          "principal_paid": "2500.00",
           "closing": "292500.00"
         },
         {
           "period": 124,
           "opening": "292500.00",
-          "interest": "1170.00",
-          "principal": "2500.00",
           "payment": "3670.00",
+          "interest": "1170.00",
+          "principal_paid": "2500.00",
           "closing": "290000.00"
         },
         {
           "period": 125,
           "opening": "290000.00",
-          "interest": "1160.00",
-          "principal": "2500.00",
           "payment": "3660.00",
+          "interest": "1160.00",
+          "principal_paid": "2500.00",
           "closing": "287500.00"
         },
         {
           "period": 126,
           "opening": "287500.00",
-          "interest": "1150.00",
-          "principal": "2500.00",
           "payment": "3650.00",
+          "interest": "1150.00",
+          "principal_paid": "2500.00",
           "closing": "285000.00"
         },
         {
           "period": 127,
           "opening": "285000.00",
-          "interest": "1140.00",
-          "principal": "2500.00",
           "payment": "3640.00",
+          "interest": "1140.00",
+          "principal_paid": "2500.00",
           "closing": "282500.00"
         },
         {
           "period": 128,
           "opening": "282500.00",
-          "interest": "1130.00",
-          "principal": "2500.00",
           "payment": "3630.00",
+          "interest": "1130.00",
+          "principal_paid": "2500.00",
           "closing": "280000.00"
         },
         {
           "period": 129,
           "opening": "280000.00",
-          "interest": "1120.00",
-          "principal": "2500.00",
           "payment": "3620.00",
+          "interest": "1120.00",
+          "principal_paid": "2500.00",
           "closing": "277500.00"
         },
         {
           "period": 130,
           "opening": "277500.00",
-          "interest": "1110.00",
-          "principal": "2500.00",
           "payment": "3610.00",
+          "interest": "1110.00",
+          "principal_paid": "2500.00",
           "closing": "275000.00"
         },
         {
           "period": 131,
           "opening": "275000.00",
-          "interest": "1100.00",
-          "principal": "2500.00",
           "payment": "3600.00",
+          "interest": "1100.00",
+          "principal_paid": "2500.00",
           "closing": "272500.00"
         },
         {
           "period": 132,
           "opening": "272500.00",
-          "interest": "1090.00",
-          "principal": "2500.00",
           "payment": "3590.00",
+          "interest": "1090.00",
+          "principal_paid": "2500.00",
           "closing": "270000.00"
         },
         {
           "period": 133,
           "opening": "270000.00",
-          "interest": "1080.00",
-          "principal": "2500.00",
           "payment": "3580.00",
+          "interest": "1080.00",
+          "principal_paid": "2500.00",
           "closing": "267500.00"
         },
         {
           "period": 134,
           "opening": "267500.00",
-          "interest": "1070.00",
-          "principal": "2500.00",
           "payment": "3570.00",
+          "interest": "1070.00",
+          "principal_paid": "2500.00",
           "closing": "265000.00"
         },
         {
           "period": 135,
           "opening": "265000.00",
-          "interest": "1060.00",
-          "principal": "2500.00",
           "payment": "3560.00",
+          "interest": "1060.00",
+          "principal_paid": "2500.00",
           "closing": "262500.00"
         },
         {
           "period": 136,
           "opening": "262500.00",
-          "interest": "1050.00",
-          "principal": "2500.00",
           "payment": "3550.00",
+          "interest": "1050.00",
+          "principal_paid": "2500.00",
           "closing": "260000.00"
         },
         {
           "period": 137,
           "opening": "260000.00",
-          "interest": "1040.00",
-          "principal": "2500.00",
           "payment": "3540.00",
+          "interest": "1040.00",
+          "principal_paid": "2500.00",
           "closing": "257500.00"
         },
         {
           "period": 138,
           "opening": "257500.00",
-          "interest": "1030.00",
-          "principal": "2500.00",
           "payment": "3530.00",
+          "interest": "1030.00",
+          "principal_paid": "2500.00",
           "closing": "255000.00"
         },
         {
           "period": 139,
           "opening": "255000.00",
-          "interest": "1020.00",
-          "principal": "2500.00",
           "payment": "3520.00",
+          "interest": "1020.00",
+          "principal_paid": "2500.00",
           "closing": "252500.00"
         },
         {
           "period": 140,
           "opening": "252500.00",
-          "interest": "1010.00",
-          "principal": "2500.00",
           "payment": "3510.00",
+          "interest": "1010.00",
+          "principal_paid": "2500.00",
           "closing": "250000.00"
         },
         {
           "period": 141,
           "opening": "250000.00",
-          "interest": "1000.00",
-          "principal": "2500.00",
           "payment": "3500.00",
+          "interest": "1000.00",
+          "principal_paid": "2500.00",
           "closing": "247500.00"
         },
         {
           "period": 142,
           "opening": "247500.00",
-          "interest": "990.00",
-          "principal": "2500.00",
           "payment": "3490.00",
+          "interest": "990.00",
+          "principal_paid": "2500.00",
           "closing": "245000.00"
         },
         {
           "period": 143,
           "opening": "245000.00",
-          "interest": "980.00",
-          "principal": "2500.00",
           "payment": "3480.00",
+          "interest": "980.00",
+          "principal_paid": "2500.00",
           "closing": "242500.00"
         },
         {
           "period": 144,
           "opening": "242500.00",
-          "interest": "970.00",
-          "principal": "2500.00",
           "payment": "3470.00",
+          "interest": "970.00",
+          "principal_paid": "2500.00",
           "closing": "240000.00"
         },
         {
           "period": 145,
           "opening": "240000.00",
-          "interest": "960.00",
-          "principal": "2500.00",
           "payment": "3460.00",
+          "interest": "960.00",
+          "principal_paid": "2500.00",
           "closing": "237500.00"
         },
         {
           "period": 146,
           "opening": "237500.00",
-          "interest": "950.00",
-          "principal": "2500.00",
           "payment": "3450.00",
+          "interest": "950.00",
+          "principal_paid": "2500.00",
           "closing": "235000.00"
         },
         {
           "period": 147,
           "opening": "235000.00",
-          "interest": "940.00",
-          "principal": "2500.00",
           "payment": "3440.00",
+          "interest": "940.00",
+          "principal_paid": "2500.00",
           "closing": "232500.00"
         },
         {
           "period": 148,
           "opening": "232500.00",
-          "interest": "930.00",
-          "principal": "2500.00",
           "payment": "3430.00",
+          "interest": "930.00",
+          "principal_paid": "2500.00",
           "closing": "230000.00"
         },
         {
           "period": 149,
           "opening": "230000.00",
-          "interest": "920.00",
-          "principal": "2500.00",
           "payment": "3420.00",
+          "interest": "920.00",
+          "principal_paid": "2500.00",
           "closing": "227500.00"
         },
         {
           "period": 150,
           "opening": "227500.00",
-          "interest": "910.00",
-          "principal": "2500.00",
           "payment": "3410.00",
+          "interest": "910.00",
+          "principal_paid": "2500.00",
           "closing": "225000.00"
         },
         {
           "period": 151,
           "opening": "225000.00",
-          "interest": "900.00",
-          "principal": "2500.00",
           "payment": "3400.00",
+          "interest": "900.00",
+          "principal_paid": "2500.00",
           "closing": "222500.00"
         },
         {
           "period": 152,
           "opening": "222500.00",
-          "interest": "890.00",
-          "principal": "2500.00",
           "payment": "3390.00",
+          "interest": "890.00",
+          "principal_paid": "2500.00",
           "closing": "220000.00"
         },
         {
           "period": 153,
           "opening": "220000.00",
-          "interest": "880.00",
-          "principal": "2500.00",
           "payment": "3380.00",
+          "interest": "880.00",
+          "principal_paid": "2500.00",
           "closing": "217500.00"
         },
         {
           "period": 154,
           "opening": "217500.00",
-          "interest": "870.00",
-          "principal": "2500.00",
           "payment": "3370.00",
+          "interest": "870.00",
+          "principal_paid": "2500.00",
           "closing": "215000.00"
         },
         {
           "period": 155,
           "opening": "215000.00",
-          "interest": "860.00",
-          "principal": "2500.00",
           "payment": "3360.00",
+          "interest": "860.00",
+          "principal_paid": "2500.00",
           "closing": "212500.00"
         },
         {
           "period": 156,
           "opening": "212500.00",
-          "interest": "850.00",
-          "principal": "2500.00",
           "payment": "3350.00",
+          "interest": "850.00",
+          "principal_paid": "2500.00",
           "closing": "210000.00"
         },
         {
           "period": 157,
           "opening": "210000.00",
-          "interest": "840.00",
-          "principal": "2500.00",
           "payment": "3340.00",
+          "interest": "840.00",
+          "principal_paid": "2500.00",
           "closing": "207500.00"
         },
         {
           "period": 158,
           "opening": "207500.00",
-          "interest": "830.00",
-          "principal": "2500.00",
           "payment": "3330.00",
+          "interest": "830.00",
+          "principal_paid": "2500.00",
           "closing": "205000.00"
         },
         {
           "period": 159,
           "opening": "205000.00",
-          "interest": "820.00",
-          "principal": "2500.00",
           "payment": "3320.00",
+          "interest": "820.00",
+          "principal_paid": "2500.00",
           "closing": "202500.00"
         },
         {
           "period": 160,
           "opening": "202500.00",
-          "interest": "810.00",
-          "principal": "2500.00",
           "payment": "3310.00",
+          "interest": "810.00",
+          "principal_paid": "2500.00",
           "closing": "200000.00"
         },
         {
           "period": 161,
           "opening": "200000.00",
-          "interest": "800.00",
-          "principal": "2500.00",
           "payment": "3300.00",
+          "interest": "800.00",
+          "principal_paid": "2500.00",
           "closing": "197500.00"
         },
         {
           "period": 162,
           "opening": "197500.00",
-          "interest": "790.00",
-          "principal": "2500.00",
           "payment": "3290.00",
+          "interest": "790.00",
+          "principal_paid": "2500.00",
           "closing": "195000.00"
         },
         {
           "period": 163,
           "opening": "195000.00",
-          "interest": "780.00",
-          "principal": "2500.00",
           "payment": "3280.00",
+          "interest": "780.00",
+          "principal_paid": "2500.00",
           "closing": "192500.00"
         },
         {
           "period": 164,
           "opening": "192500.00",
-          "interest": "770.00",
-          "principal": "2500.00",
           "payment": "3270.00",
+          "interest": "770.00",
+          "principal_paid": "2500.00",
           "closing": "190000.00"
         },
         {
           "period": 165,
           "opening": "190000.00",
-          "interest": "760.00",
-          "principal": "2500.00",
           "payment": "3260.00",
+          "interest": "760.00",
+          "principal_paid": "2500.00",
           "closing": "187500.00"
         },
         {
           "period": 166,
           "opening": "187500.00",
-          "interest": "750.00",
-          "principal": "2500.00",
           "payment": "3250.00",
+          "interest": "750.00",
+          "principal_paid": "2500.00",
           "closing": "185000.00"
         },
         {
           "period": 167,
           "opening": "185000.00",
-          "interest": "740.00",
-          "principal": "2500.00",
           "payment": "3240.00",
+          "interest": "740.00",
+          "principal_paid": "2500.00",
           "closing": "182500.00"
         },
         {
           "period": 168,
           "opening": "182500.00",
-          "interest": "730.00",
-          "principal": "2500.00",
           "payment": "3230.00",
+          "interest": "730.00",
+          "principal_paid": "2500.00",
           "closing": "180000.00"
         },
         {
           "period": 169,
           "opening": "180000.00",
-          "interest": "720.00",
-          "principal": "2500.00",
           "payment": "3220.00",
+          "interest": "720.00",
+          "principal_paid": "2500.00",
           "closing": "177500.00"
         },
         {
           "period": 170,
           "opening": "177500.00",
-          "interest": "710.00",
-          "principal": "2500.00",
           "payment": "3210.00",
+          "interest": "710.00",
+          "principal_paid": "2500.00",
           "closing": "175000.00"
         },
         {
           "period": 171,
           "opening": "175000.00",
-          "interest": "700.00",
-          "principal": "2500.00",
           "payment": "3200.00",
+          "interest": "700.00",
+          "principal_paid": "2500.00",
           "closing": "172500.00"
         },
         {
           "period": 172,
           "opening": "172500.00",
-          "interest": "690.00",
-          "principal": "2500.00",
           "payment": "3190.00",
+          "interest": "690.00",
+          "principal_paid": "2500.00",
           "closing": "170000.00"
         },
         {
           "period": 173,
           "opening": "170000.00",
-          "interest": "680.00",
-          "principal": "2500.00",
           "payment": "3180.00",
+          "interest": "680.00",
+          "principal_paid": "2500.00",
           "closing": "167500.00"
         },
         {
           "period": 174,
           "opening": "167500.00",
-          "interest": "670.00",
-          "principal": "2500.00",
           "payment": "3170.00",
+          "interest": "670.00",
+          "principal_paid": "2500.00",
           "closing": "165000.00"
         },
         {
           "period": 175,
           "opening": "165000.00",
-          "interest": "660.00",
-          "principal": "2500.00",
           "payment": "3160.00",
+          "interest": "660.00",
+          "principal_paid": "2500.00",
           "closing": "162500.00"
         },
         {
           "period": 176,
           "opening": "162500.00",
-          "interest": "650.00",
-          "principal": "2500.00",
           "payment": "3150.00",
+          "interest": "650.00",
+          "principal_paid": "2500.00",
           "closing": "160000.00"
         },
         {
           "period": 177,
           "opening": "160000.00",
-          "interest": "640.00",
-          "principal": "2500.00",
           "payment": "3140.00",
+          "interest": "640.00",
+          "principal_paid": "2500.00",
           "closing": "157500.00"
         },
         {
           "period": 178,
           "opening": "157500.00",
-          "interest": "630.00",
-          "principal": "2500.00",
           "payment": "3130.00",
+          "interest": "630.00",
+          "principal_paid": "2500.00",
           "closing": "155000.00"
         },
         {
           "period": 179,
           "opening": "155000.00",
-          "interest": "620.00",
-          "principal": "2500.00",
           "payment": "3120.00",
+          "interest": "620.00",
+          "principal_paid": "2500.00",
           "closing": "152500.00"
         },
         {
           "period": 180,
           "opening": "152500.00",
-          "interest": "610.00",
-          "principal": "2500.00",
           "payment": "3110.00",
+          "interest": "610.00",
+          "principal_paid": "2500.00",
           "closing": "150000.00"
         },
         {
           "period": 181,
           "opening": "150000.00",
-          "interest": "600.00",
-          "principal": "2500.00",
           "payment": "3100.00",
+          "interest": "600.00",
+          "principal_paid": "2500.00",
           "closing": "147500.00"
         },
         {
           "period": 182,
           "opening": "147500.00",
-          "interest": "590.00",
-          "principal": "2500.00",
           "payment": "3090.00",
+          "interest": "590.00",
+          "principal_paid": "2500.00",
           "closing": "145000.00"
         },
         {
           "period": 183,
           "opening": "145000.00",
-          "interest": "580.00",
-          "principal": "2500.00",
           "payment": "3080.00",
+          "interest": "580.00",
+          "principal_paid": "2500.00",
           "closing": "142500.00"
         },
         {
           "period": 184,
           "opening": "142500.00",
-          "interest": "570.00",
-          "principal": "2500.00",
           "payment": "3070.00",
+          "interest": "570.00",
+          "principal_paid": "2500.00",
           "closing": "140000.00"
         },
         {
           "period": 185,
           "opening": "140000.00",
-          "interest": "560.00",
-          "principal": "2500.00",
           "payment": "3060.00",
+          "interest": "560.00",
+          "principal_paid": "2500.00",
           "closing": "137500.00"
         },
         {
           "period": 186,
           "opening": "137500.00",
-          "interest": "550.00",
-          "principal": "2500.00",
           "payment": "3050.00",
+          "interest": "550.00",
+          "principal_paid": "2500.00",
           "closing": "135000.00"
         },
         {
           "period": 187,
           "opening": "135000.00",
-          "interest": "540.00",
-          "principal": "2500.00",
           "payment": "3040.00",
+          "interest": "540.00",
+          "principal_paid": "2500.00",
           "closing": "132500.00"
         },
         {
           "period": 188,
           "opening": "132500.00",
-          "interest": "530.00",
-          "principal": "2500.00",
           "payment": "3030.00",
+          "interest": "530.00",
+          "principal_paid": "2500.00",
           "closing": "130000.00"
         },
         {
           "period": 189,
           "opening": "130000.00",
-          "interest": "520.00",
-          "principal": "2500.00",
           "payment": "3020.00",
+          "interest": "520.00",
+          "principal_paid": "2500.00",
           "closing": "127500.00"
         },
         {
           "period": 190,
           "opening": "127500.00",
-          "interest": "510.00",
-          "principal": "2500.00",
           "payment": "3010.00",
+          "interest": "510.00",
+          "principal_paid": "2500.00",
           "closing": "125000.00"
         },
         {
           "period": 191,
           "opening": "125000.00",
-          "interest": "500.00",
-          "principal": "2500.00",
           "payment": "3000.00",
+          "interest": "500.00",
+          "principal_paid": "2500.00",
           "closing": "122500.00"
         },
         {
           "period": 192,
           "opening": "122500.00",
-          "interest": "490.00",
-          "principal": "2500.00",
           "payment": "2990.00",
+          "interest": "490.00",
+          "principal_paid": "2500.00",
           "closing": "120000.00"
         },
         {
           "period": 193,
           "opening": "120000.00",
-          "interest": "480.00",
-          "principal": "2500.00",
           "payment": "2980.00",
+          "interest": "480.00",
+          "principal_paid": "2500.00",
           "closing": "117500.00"
         },
         {
           "period": 194,
           "opening": "117500.00",
-          "interest": "470.00",
-          "principal": "2500.00",
           "payment": "2970.00",
+          "interest": "470.00",
+          "principal_paid": "2500.00",
           "closing": "115000.00"
         },
         {
           "period": 195,
           "opening": "115000.00",
-          "interest": "460.00",
-          "principal": "2500.00",
           "payment": "2960.00",
+          "interest": "460.00",
+          "principal_paid": "2500.00",
           "closing": "112500.00"
         },
         {
           "period": 196,
           "opening": "112500.00",
-          "interest": "450.00",
-          "principal": "2500.00",
           "payment": "2950.00",
+          "interest": "450.00",
+          "principal_paid": "2500.00",
           "closing": "110000.00"
         },
         {
           "period": 197,
           "opening": "110000.00",
-          "interest": "440.00",
-          "principal": "2500.00",
           "payment": "2940.00",
+          "interest": "440.00",
+          "principal_paid": "2500.00",
           "closing": "107500.00"
         },
         {
           "period": 198,
           "opening": "107500.00",
-          "interest": "430.00",
-          "principal": "2500.00",
           "payment": "2930.00",
+          "interest": "430.00",
+          "principal_paid": "2500.00",
           "closing": "105000.00"
         },
         {
           "period": 199,
           "opening": "105000.00",
-          "interest": "420.00",
-          "principal": "2500.00",
           "payment": "2920.00",
+          "interest": "420.00",
+          "principal_paid": "2500.00",
           "closing": "102500.00"
         },
         {
           "period": 200,
           "opening": "102500.00",
-          "interest": "410.00",
-          "principal": "2500.00",
           "payment": "2910.00",
+          "interest": "410.00",
+          "principal_paid": "2500.00",
           "closing": "100000.00"
         },
         {
           "period": 201,
           "opening": "100000.00",
-          "interest": "400.00",
-          "principal": "2500.00",
           "payment": "2900.00",
+          "interest": "400.00",
+          "principal_paid": "2500.00",
           "closing": "97500.00"
         },
         {
           "period": 202,
           "opening": "97500.00",
-          "interest": "390.00",
-          "principal": "2500.00",
           "payment": "2890.00",
+          "interest": "390.00",
+          "principal_paid": "2500.00",
           "closing": "95000.00"
         },
         {
           "period": 203,
           "opening": "95000.00",
-          "interest": "380.00",
-          "principal": "2500.00",
           "payment": "2880.00",
+          "interest": "380.00",
+          "principal_paid": "2500.00",
           "closing": "92500.00"
         },
         {
           "period": 204,
           "opening": "92500.00",
-          "interest": "370.00",
-          "principal": "2500.00",
           "payment": "2870.00",
+          "interest": "370.00",
+          "principal_paid": "2500.00",
           "closing": "90000.00"
         },
         {
           "period": 205,
           "opening": "90000.00",
-          "interest": "360.00",
-          "principal": "2500.00",
           "payment": "2860.00",
+          "interest": "360.00",
+          "principal_paid": "2500.00",
           "closing": "87500.00"
         },
         {
           "period": 206,
           "opening": "87500.00",
-          "interest": "350.00",
-          "principal": "2500.00",
           "payment": "2850.00",
+          "interest": "350.00",
+          "principal_paid": "2500.00",
           "closing": "85000.00"
         },
         {
           "period": 207,
           "opening": "85000.00",
-          "interest": "340.00",
-          "principal": "2500.00",
           "payment": "2840.00",
+          "interest": "340.00",
+          "principal_paid": "2500.00",
           "closing": "82500.00"
         },
         {
           "period": 208,
           "opening": "82500.00",
-          "interest": "330.00",
-          "principal": "2500.00",
           "payment": "2830.00",
+          "interest": "330.00",
+          "principal_paid": "2500.00",
           "closing": "80000.00"
         },
         {
           "period": 209,
           "opening": "80000.00",
-          "interest": "320.00",
-          "principal": "2500.00",
           "payment": "2820.00",
+          "interest": "320.00",
+          "principal_paid": "2500.00",
           "closing": "77500.00"
         },
         {
           "period": 210,
           "opening": "77500.00",
-          "interest": "310.00",
-          "principal": "2500.00",
           "payment": "2810.00",
+          "interest": "310.00",
+          "principal_paid": "2500.00",
           "closing": "75000.00"
         },
         {
           "period": 211,
           "opening": "75000.00",
-          "interest": "300.00",
-          "principal": "2500.00",
           "payment": "2800.00",
+          "interest": "300.00",
+          "principal_paid": "2500.00",
           "closing": "72500.00"
         },
         {
           "period": 212,
           "opening": "72500.00",
-          "interest": "290.00",
-          "principal": "2500.00",
           "payment": "2790.00",
+          "interest": "290.00",
+          "principal_paid": "2500.00",
           "closing": "70000.00"
         },
         {
           "period": 213,
           "opening": "70000.00",
-          "interest": "280.00",
-          "principal": "2500.00",
           "payment": "2780.00",
+          "interest": "280.00",
+          "principal_paid": "2500.00",
           "closing": "67500.00"
         },
         {
           "period": 214,
           "opening": "67500.00",
-          "interest": "270.00",
-          "principal": "2500.00",
           "payment": "2770.00",
+          "interest": "270.00",
+          "principal_paid": "2500.00",
           "closing": "65000.00"
         },
         {
           "period": 215,
           "opening": "65000.00",
-          "interest": "260.00",
-          "principal": "2500.00",
           "payment": "2760.00",
+          "interest": "260.00",
+          "principal_paid": "2500.00",
           "closing": "62500.00"
         },
         {
           "period": 216,
           "opening": "62500.00",
-          "interest": "250.00",
-          "principal": "2500.00",
           "payment": "2750.00",
+          "interest": "250.00",
+          "principal_paid": "2500.00",
           "closing": "60000.00"
         },
         {
           "period": 217,
           "opening": "60000.00",
-          "interest": "240.00",
-          "principal": "2500.00",
           "payment": "2740.00",
+          "interest": "240.00",
+          "principal_paid": "2500.00",
           "closing": "57500.00"
         },
         {
           "period": 218,
           "opening": "57500.00",
-          "interest": "230.00",
-          "principal": "2500.00",
           "payment": "2730.00",
+          "interest": "230.00",
+          "principal_paid": "2500.00",
           "closing": "55000.00"
         },
         {
           "period": 219,
           "opening": "55000.00",
-          "interest": "220.00",
-          "principal": "2500.00",
           "payment": "2720.00",
+          "interest": "220.00",
+          "principal_paid": "2500.00",
           "closing": "52500.00"
         },
         {
           "period": 220,
           "opening": "52500.00",
-          "interest": "210.00",
-          "principal": "2500.00",
           "payment": "2710.00",
+          "interest": "210.00",
+          "principal_paid": "2500.00",
           "closing": "50000.00"
         },
         {
           "period": 221,
           "opening": "50000.00",
-          "interest": "200.00",
-          "principal": "2500.00",
           "payment": "2700.00",
+          "interest": "200.00",
+          "principal_paid": "2500.00",
           "closing": "47500.00"
         },
         {
           "period": 222,
           "opening": "47500.00",
-          "interest": "190.00",
-          "principal": "2500.00",
           "payment": "2690.00",
+          "interest": "190.00",
+          "principal_paid": "2500.00",
           "closing": "45000.00"
         },
         {
           "period": 223,
           "opening": "45000.00",
-          "interest": "180.00",
-          "principal": "2500.00",
           "payment": "2680.00",
+          "interest": "180.00",
+          "principal_paid": "2500.00",
           "closing": "42500.00"
         },
         {
           "period": 224,
           "opening": "42500.00",
-          "interest": "170.00",
-          "principal": "2500.00",
           "payment": "2670.00",
+          "interest": "170.00",
+          "principal_paid": "2500.00",
           "closing": "40000.00"
         },
         {
           "period": 225,
           "opening": "40000.00",
-          "interest": "160.00",
-          "principal": "2500.00",
           "payment": "2660.00",
+          "interest": "160.00",
+          "principal_paid": "2500.00",
           "closing": "37500.00"
         },
         {
           "period": 226,
           "opening": "37500.00",
-          "interest": "150.00",
-          "principal": "2500.00",
           "payment": "2650.00",
+          "interest": "150.00",
+          "principal_paid": "2500.00",
           "closing": "35000.00"
         },
         {
           "period": 227,
           "opening": "35000.00",
-          "interest": "140.00",
-          "principal": "2500.00",
           "payment": "2640.00",
+          "interest": "140.00",
+          "principal_paid": "2500.00",
           "closing": "32500.00"
         },
         {
           "period": 228,
           "opening": "32500.00",
-          "interest": "130.00",
-          "principal": "2500.00",
           "payment": "2630.00",
+          "interest": "130.00",
+          "principal_paid": "2500.00",
           "closing": "30000.00"
         },
         {
           "period": 229,
           "opening": "30000.00",
-          "interest": "120.00",
-          "principal": "2500.00",
           "payment": "2620.00",
+          "interest": "120.00",
+          "principal_paid": "2500.00",
           "closing": "27500.00"
         },
         {
           "period": 230,
           "opening": "27500.00",
-          "interest": "110.00",
-          "principal": "2500.00",
           "payment": "2610.00",
+          "interest": "110.00",
+          "principal_paid": "2500.00",
           "closing": "25000.00"
         },
         {
           "period": 231,
           "opening": "25000.00",
-          "interest": "100.00",
-          "principal": "2500.00",
           "payment": "2600.00",
+          "interest": "100.00",
+          "principal_paid": "2500.00",
           "closing": "22500.00"
         },
         {
           "period": 232,
           "opening": "22500.00",
-          "interest": "90.00",
-          "principal": "2500.00",
           "payment": "2590.00",
+          "interest": "90.00",
+          "principal_paid": "2500.00",
           "closing": "20000.00"
         },
         {
           "period": 233,
           "opening": "20000.00",
-          "interest": "80.00",
-          "principal": "2500.00",
           "payment": "2580.00",
+          "interest": "80.00",
+          "principal_paid": "2500.00",
           "closing": "17500.00"
         },
         {
           "period": 234,
           "opening": "17500.00",
-          "interest": "70.00",
-          "principal": "2500.00",
           "payment": "2570.00",
+          "interest": "70.00",
+          "principal_paid": "2500.00",
           "closing": "15000.00"
         },
         {
           "period": 235,
           "opening": "15000.00",
-          "interest": "60.00",
-          "principal": "2500.00",
           "payment": "2560.00",
+          "interest": "60.00",
+          "principal_paid": "2500.00",
           "closing": "12500.00"
         },
         {
           "period": 236,
           "opening": "12500.00",
-          "interest": "50.00",
-          "principal": "2500.00",
           "payment": "2550.00",
+          "interest": "50.00",
+          "principal_paid": "2500.00",
           "closing": "10000.00"
         },
         {
           "period": 237,
           "opening": "10000.00",
-          "interest": "40.00",
-          "principal": "2500.00",
           "payment": "2540.00",
+          "interest": "40.00",
+          "principal_paid": "2500.00",
           "closing": "7500.00"
         },
         {
           "period": 238,
           "opening": "7500.00",
-          "interest": "30.00",
-          "principal": "2500.00",
           "payment": "2530.00",
+          "interest": "30.00",
+          "principal_paid": "2500.00",
           "closing": "5000.00"
         },
         {
           "period": 239,
           "opening": "5000.00",
-          "interest": "20.00",
-          "principal": "2500.00",
           "payment": "2520.00",
+          "interest": "20.00",
+          "principal_paid": "2500.00",
           "closing": "2500.00"
         },
         {
           "period": 240,
           "opening": "2500.00",
-          "interest": "10.00",
-          "principal": "2500.00",
           "payment": "2510.00",
+          "interest": "10.00",
+          "principal_paid": "2500.00",
           "closing": "0.00"
         }
       ]
@@ -4373,9 +4386,11 @@
     },
     {
       "id": "worked.monthly",
-      "kind": "rep_monthly_rate",
+      "kind": "monthly_rate_by_division",
       "inputs": {
-        "annual_percent": "5.4"
+        "annual_percent": "5.4",
+        "periods_per_year": 12,
+        "decimals": 2
       },
       "value": "0.45"
     },
@@ -4420,10 +4435,10 @@
     },
     {
       "id": "worked.spitzer_pay",
-      "kind": "rep_spitzer_payment",
+      "kind": "amort_payment",
       "inputs": {
         "principal": "400000",
-        "annual_percent": "5.4",
+        "rate_percent": "5.4",
         "months": 180
       },
       "value": "3247.15"
@@ -4496,36 +4511,35 @@
     },
     {
       "id": "half.equal",
-      "kind": "rep_schedule",
+      "kind": "amort_equal_statement",
       "inputs": {
-        "method": "equal_principal",
         "principal": "90000",
-        "annual_percent": "4.8",
+        "rate_percent": "4.8",
         "months": 3
       },
       "value": [
         {
           "period": 1,
           "opening": "90000.00",
-          "interest": "360.00",
-          "principal": "30000.00",
           "payment": "30360.00",
+          "interest": "360.00",
+          "principal_paid": "30000.00",
           "closing": "60000.00"
         },
         {
           "period": 2,
           "opening": "60000.00",
-          "interest": "240.00",
-          "principal": "30000.00",
           "payment": "30240.00",
+          "interest": "240.00",
+          "principal_paid": "30000.00",
           "closing": "30000.00"
         },
         {
           "period": 3,
           "opening": "30000.00",
-          "interest": "120.00",
-          "principal": "30000.00",
           "payment": "30120.00",
+          "interest": "120.00",
+          "principal_paid": "30000.00",
           "closing": "0.00"
         }
       ]
@@ -4650,10 +4664,10 @@
     },
     {
       "id": "ex5.payment",
-      "kind": "rep_spitzer_payment",
+      "kind": "amort_payment",
       "inputs": {
         "principal": "200000",
-        "annual_percent": "3.6",
+        "rate_percent": "3.6",
         "months": 240
       },
       "value": "1170.22"
@@ -4673,9 +4687,11 @@
     },
     {
       "id": "ex5.monthly",
-      "kind": "rep_monthly_rate",
+      "kind": "monthly_rate_by_division",
       "inputs": {
-        "annual_percent": "3.6"
+        "annual_percent": "3.6",
+        "periods_per_year": 12,
+        "decimals": 2
       },
       "value": "0.3"
     },
@@ -4792,9 +4808,11 @@
     },
     {
       "id": "ex3.monthly",
-      "kind": "rep_monthly_rate",
+      "kind": "monthly_rate_by_division",
       "inputs": {
-        "annual_percent": "6"
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
       },
       "value": "0.5"
     },

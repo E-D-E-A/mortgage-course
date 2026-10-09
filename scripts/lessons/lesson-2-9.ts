@@ -12,16 +12,8 @@ import { plainNumber } from "../../src/lib/calc/indexation.ts";
 import { shareOf, sliceAmount } from "../../src/lib/calc/mix.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentOf } from "../../src/lib/calc/percent.ts";
-import {
-  crossoverMonth,
-  type Method,
-  monthlyRatePercent,
-  type ScheduleRow,
-  schedule,
-  spitzerPayment,
-  totalInterest,
-  totalPaid,
-} from "../../src/lib/calc/repayment.ts";
+import { annuityPayment, annuityStatement, equalPrincipalStatement, monthlyRate } from "../../src/lib/calc/amortization.ts";
+import { crossoverMonth, type Method, type ScheduleRow, schedule, totalInterest, totalPaid } from "../../src/lib/calc/repayment.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
 export const given = (id: string, value: string): Fact => ({ id, kind: "given", inputs: {}, value });
@@ -47,13 +39,35 @@ const rowStrings = (r: ScheduleRow) => ({
 
 export type Field = "opening" | "interest" | "principal" | "payment" | "closing";
 
-/** The whole month-by-month table. */
-export const repSchedule = (id: string, method: Method, principal: string, annual: string, months: number, grace?: number): Fact => ({
-  id,
-  kind: "rep_schedule",
-  inputs: loanInputs(method, principal, annual, months, grace),
-  value: rowsOf(method, principal, annual, months, grace).map(rowStrings),
-});
+/**
+ * The whole month-by-month table. Spitzer and equal principal are the shared
+ * statement kinds of amortization.ts (amort_annuity_statement,
+ * amort_equal_statement); grace and bullet are this lesson group's rep_schedule.
+ */
+export const repSchedule = (id: string, method: Method, principal: string, annual: string, months: number, grace?: number): Fact => {
+  if (method === "spitzer" || method === "equal_principal") {
+    const rows = method === "spitzer" ? annuityStatement(principal, annual, months) : equalPrincipalStatement(principal, annual, months);
+    return {
+      id,
+      kind: method === "spitzer" ? "amort_annuity_statement" : "amort_equal_statement",
+      inputs: { principal, rate_percent: annual, months },
+      value: rows.map((r) => ({
+        period: r.month,
+        opening: moneyString(r.opening),
+        payment: moneyString(r.payment),
+        interest: moneyString(r.interest),
+        principal_paid: moneyString(r.principalPaid),
+        closing: moneyString(r.closing),
+      })),
+    };
+  }
+  return {
+    id,
+    kind: "rep_schedule",
+    inputs: loanInputs(method, principal, annual, months, grace),
+    value: rowsOf(method, principal, annual, months, grace).map(rowStrings),
+  };
+};
 
 /** One cell of the table: month `period`, column `field`. */
 export const repCell = (id: string, method: Method, principal: string, annual: string, months: number, period: number, field: Field, grace?: number): Fact => ({
@@ -77,18 +91,20 @@ export const repTotalInterest = (id: string, method: Method, principal: string, 
   value: moneyString(totalInterest(rowsOf(method, principal, annual, months, grace))),
 });
 
+/** The level payment, amortization.ts's kind. */
 export const repPayment = (id: string, principal: string, annual: string, months: number): Fact => ({
   id,
-  kind: "rep_spitzer_payment",
-  inputs: { principal, annual_percent: annual, months },
-  value: moneyString(spitzerPayment(principal, annual, months)),
+  kind: "amort_payment",
+  inputs: { principal, rate_percent: annual, months },
+  value: moneyString(annuityPayment(principal, annual, months)),
 });
 
+/** The monthly rate by division (lesson 0.4's kind), to two decimals. */
 export const repMonthly = (id: string, annual: string): Fact => ({
   id,
-  kind: "rep_monthly_rate",
-  inputs: { annual_percent: annual },
-  value: monthlyRatePercent(annual).toString(),
+  kind: "monthly_rate_by_division",
+  inputs: { annual_percent: annual, periods_per_year: 12, decimals: 2 },
+  value: monthlyRate(annual).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString(),
 });
 
 export const repMonths = (id: string, years: number): Fact => ({ id, kind: "rep_months_in_years", inputs: { years }, value: years * 12 });
@@ -150,7 +166,7 @@ export default function lesson29(): LessonData {
   const sEqualFirst = repCell("slider.equal_first", "equal_principal", ...S, 1, "payment");
   const sSpitzerInterest30 = repTotalInterest("slider.spitzer_interest_30", "spitzer", "600000", "4.8", 360);
   const sEqualPart = repCell("slider.equal_part", "equal_principal", ...S, 1, "principal");
-  const sEqualDrop = percentOfFact("slider.equal_drop", sEqualPart.value as string, monthlyRatePercent("4.8").toString());
+  const sEqualDrop = percentOfFact("slider.equal_drop", sEqualPart.value as string, monthlyRate("4.8").toString());
   const sEqualLast = repCell("slider.equal_last", "equal_principal", ...S, 240, "payment");
 
   // ── Worked example: 400,000 ₪ at 5.4% (0.45% a month) for 15 years. ──
@@ -206,6 +222,7 @@ export default function lesson29(): LessonData {
     sEqualDrop,
     sEqualLast,
     repCell("slider.spitzer_last_int", "spitzer", ...S, 240, "interest"),
+    repCell("slider.spitzer_last", "spitzer", ...S, 240, "payment"),
     repCell("slider.spitzer_half", "spitzer", ...S, 120, "closing"),
     repCell("slider.equal_half", "equal_principal", ...S, 120, "closing"),
     { id: "slider.crossover", kind: "rep_crossover_month", inputs: { principal: "600000", annual_percent: "4.8", months: 240 }, value: crossoverMonth(...S) },

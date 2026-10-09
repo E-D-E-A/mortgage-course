@@ -11,7 +11,7 @@
 import Decimal from "decimal.js";
 import { computed, ref, watch } from "vue";
 import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
-import { type Method, monthlyRatePercent, type ScheduleRow, schedule, totalInterest, totalPaid } from "../lib/calc/repayment.ts";
+import { type Method, monthlyRate, type ScheduleRow, schedule, totalInterest, totalPaid } from "../lib/calc/repayment.ts";
 
 const props = withDefaults(
   defineProps<{ mode?: "methods" | "grace"; principal?: number; rate?: number; years?: number; grace?: number }>(),
@@ -63,7 +63,7 @@ const results = computed(() =>
     return { way: w, rows, paid: totalPaid(rows), interest: totalInterest(rows) };
   }),
 );
-const monthly = computed(() => monthlyRatePercent(String(rate.value)).toDecimalPlaces(4).toString());
+const monthly = computed(() => monthlyRate(String(rate.value)).toDecimalPlaces(4).toString());
 
 // What each payment does: the interest it pays, and what is left of it for the debt.
 const interestPaid = (r: ScheduleRow) => Decimal.min(r.payment, r.interest);
@@ -185,7 +185,7 @@ const tableRows = computed(() => {
       </li>
     </ul>
     <p v-for="g in gaps" :key="g.name" class="mt-2 text-body-m text-n800">
-      {{ g.name }} מול {{ base.way.name }}: <span class="ltr font-semibold text-n900">{{ formatShekels(g.interest) }}</span>
+      {{ g.name }} מול {{ base.way.name }}: <span class="ltr font-semibold text-n900">{{ formatShekels(g.interest.abs()) }}</span>
       {{ g.interest.gte(0) ? "יותר ריבית" : "פחות ריבית" }}.
     </p>
 

@@ -110,7 +110,6 @@ export default function lesson24(): LessonData {
     effective("w.plain_effective", "5"),
     effective("w.indexed_effective", "3"),
     effectiveBeforeInflation("w.indexed_effective_before", "3", "2"),
-    beforeInflation("w.indexed_yearly_before", "3", "2"),
     breakEven("w.break_even_yearly", "5", "3"),
     breakEvenEffective("w.break_even_effective", "5", "3"),
     pointsSum("w.mixed", "3", "2"),

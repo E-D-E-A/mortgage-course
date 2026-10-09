@@ -115,7 +115,6 @@ export default function lesson23(): LessonData {
   // Worked example: 400,000 ₪, not indexed at 4.8% against indexed at 2.7%.
   const wAmount = given("worked.amount", "400000");
   const wIndexed3 = indexedAmt("worked.indexed_3", "400000", "3");
-  const wInterest3 = interest("worked.interest_3", "400000", "2.7");
 
   const facts: Fact[] = [
     // Prediction and explanation: 100,000 ₪ for a year, 5% not indexed against 3% indexed, inflation 2%.
@@ -155,7 +154,6 @@ export default function lesson23(): LessonData {
     indexedCost("worked.cost_3", "400000", "2.7", "3"),
     breakEven("worked.break_even", "4.8", "2.7"),
     difference("worked.debt_growth", wIndexed3, wAmount),
-    wInterest3,
 
     // Half-worked table: 200,000 ₪, 4.5% not indexed against 2.5% indexed.
     owedTable("half.table", "200000", "4.5", "2.5", ["0", "1", "2", "3"]),

@@ -37,7 +37,12 @@ const signed = (d: Decimal.Value) => {
   const v = new Decimal(d);
   return v.isZero() ? "0" : `${v.isNeg() ? "−" : "+"}${plainNumber(v.abs())}`;
 };
-const pointsWord = (d: Decimal.Value) => (new Decimal(d).abs().eq(1) ? "נקודת אחוז אחת" : `${plainNumber(new Decimal(d).abs())} נקודות אחוז`);
+/** "בנקודת אחוז אחת", "ב־0.25 נקודת אחוז", "ב־1.5 נקודות אחוז": below one point the course says נקודת (as in 0.10). */
+const byPoints = (d: Decimal.Value) => {
+  const v = new Decimal(d).abs();
+  if (v.eq(1)) return "בנקודת אחוז אחת";
+  return `ב־${plainNumber(v)} ${v.lt(1) ? "נקודת אחוז" : "נקודות אחוז"}`;
+};
 
 // The bars share one scale, from 0 at the start (right) side to a round top that fits the largest rate.
 const top = computed(() => Decimal.max(prime.value, rate.value, 1).plus(0.5).ceil().toNumber());
@@ -126,12 +131,12 @@ const low = computed(() => Decimal.min(prime.value, rate.value));
         <div class="text-caption text-n600">ביחס לריבית בנק ישראל</div>
         <div class="text-body-l font-semibold text-n900">
           <template v-if="aboveBoi.isZero()">בדיוק בגובה שלה</template>
-          <template v-else>{{ aboveBoi.isNeg() ? "מתחתיה" : "מעליה" }} ב־<span class="ltr">{{ plainNumber(aboveBoi.abs()) }}</span> נקודות אחוז</template>
+          <template v-else>{{ aboveBoi.isNeg() ? "מתחתיה" : "מעליה" }} {{ byPoints(aboveBoi) }}</template>
         </div>
       </div>
     </div>
     <p v-if="!moved.isZero()" class="mt-3 rounded-md bg-info-bg p-3 text-body-m text-n800" role="status">
-      ריבית בנק ישראל {{ moved.isNeg() ? "ירדה" : "עלתה" }} ב{{ pointsWord(moved) }} מאז ההתחלה. הפריים והריבית במסלול {{ moved.isNeg() ? "ירדו" : "עלו" }} באותו מספר נקודות, והמרווח לא זז.
+      ריבית בנק ישראל {{ moved.isNeg() ? "ירדה" : "עלתה" }} {{ byPoints(moved) }} מאז ההתחלה. הפריים והריבית במסלול {{ moved.isNeg() ? "ירדו" : "עלו" }} באותו מספר נקודות, והמרווח לא זז.
     </p>
     <p class="mt-3 text-caption text-n600">{{ note }}</p>
 

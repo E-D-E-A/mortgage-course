@@ -24,9 +24,9 @@ export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("2.10");
 export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
 export const nv = (v) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(v));
-export const none = f.rows("explain.none");
-export const partial = f.rows("explain.partial");
-export const full = f.rows("explain.full");
+export const noneRows = f.rows("explain.none");
+export const partialRows = f.rows("explain.partial");
+export const fullRows = f.rows("explain.full");
 export const bp = f.rows("bullet.partial");
 export const bf = f.rows("bullet.full");
 export const half = f.rows("half.full").slice(0, 3);
@@ -67,16 +67,16 @@ export const predictionOptions = [
 
 נראה את שלוש הדרכים על הלוואה קטנה: {f.shekels("explain.principal")}, ב־6% לשנה (<M>6% ÷ 12 = {f.plain("explain.monthly")}%</M> לחודש), ל־12 חודשים, מתוכם 3 חודשי גרייס.
 
-**בלי גרייס.** שפיצר על 12 חודשים: {nv(none[0].payment)} ₪ בכל חודש.
+**בלי גרייס.** שפיצר על 12 חודשים: {nv(noneRows[0].payment)} ₪ בכל חודש.
 
-**גרייס חלקי.** בכל אחד משלושת החודשים הראשונים: <M>{f.plain("explain.monthly")}% × {n("explain.principal")} = {nv(partial[0].payment)}</M> ₪, רק ריבית. היתרה נשארת {f.shekels("explain.principal")}. מהחודש הרביעי ועד ה־12: שפיצר על {f.shekels("explain.principal")} — {nv(partial[3].payment)} ₪ בחודש. יותר מבלי גרייס, כי את אותה קרן מחזירים בפחות חודשים.
+**גרייס חלקי.** בכל אחד משלושת החודשים הראשונים: <M>{f.plain("explain.monthly")}% × {n("explain.principal")} = {nv(partialRows[0].payment)}</M> ₪, רק ריבית. היתרה נשארת {f.shekels("explain.principal")}. מהחודש הרביעי ועד ה־12: שפיצר על {f.shekels("explain.principal")} — {nv(partialRows[3].payment)} ₪ בחודש. יותר מבלי גרייס, כי את אותה קרן מחזירים בפחות חודשים.
 
 **גרייס מלא.** שלושה חודשים בלי תשלום. הריבית מצטרפת לחוב, חודש אחר חודש:
-- חודש 1: <M>{f.plain("explain.monthly")}% × {nv(full[0].opening)} = {nv(full[0].interest)}</M>. החוב: {nv(full[0].closing)} ₪.
-- חודש 2: <M>{f.plain("explain.monthly")}% × {nv(full[1].opening)} = {n("explain.full_int_2")}</M>. החוב: {nv(full[1].closing)} ₪. כבר יש כאן ריבית על ריבית (שיעור 0.3).
-- חודש 3: הריבית {nv(full[2].interest)} ₪, והחוב: {f.shekels("explain.full_close_3")}.
+- חודש 1: <M>{f.plain("explain.monthly")}% × {nv(fullRows[0].opening)} = {nv(fullRows[0].interest)}</M>. החוב: {nv(fullRows[0].closing)} ₪.
+- חודש 2: <M>{f.plain("explain.monthly")}% × {nv(fullRows[1].opening)} = {n("explain.full_int_2")}</M>. החוב: {nv(fullRows[1].closing)} ₪. כבר יש כאן ריבית על ריבית (שיעור 0.3).
+- חודש 3: הריבית {nv(fullRows[2].interest)} ₪, והחוב: {f.shekels("explain.full_close_3")}.
 
-אחרי שלושה חודשים אתם חייבים {f.shekels("explain.full_added")} יותר ממה שלקחתם. מהחודש הרביעי ועד ה־12: שפיצר על כל החוב הזה — {nv(full[3].payment)} ₪ בחודש.
+אחרי שלושה חודשים אתם חייבים {f.shekels("explain.full_added")} יותר ממה שלקחתם. מהחודש הרביעי ועד ה־12: שפיצר על כל החוב הזה — {nv(fullRows[3].payment)} ₪ בחודש.
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full min-w-[30rem] border-collapse text-body-m">
@@ -89,12 +89,12 @@ export const predictionOptions = [
       </tr>
     </thead>
     <tbody>
-      {none.map((r, i) => (
+      {noneRows.map((r, i) => (
         <tr class="border-b border-n100">
           <td class="py-1.5 text-n700">{r.period}</td>
           <td class="py-1.5"><span class="ltr">{formatShekels(r.payment)}</span></td>
-          <td class="py-1.5"><span class="ltr">{formatShekels(partial[i].payment)}</span></td>
-          <td class="py-1.5"><span class="ltr">{formatShekels(full[i].payment)}</span></td>
+          <td class="py-1.5"><span class="ltr">{formatShekels(partialRows[i].payment)}</span></td>
+          <td class="py-1.5"><span class="ltr">{formatShekels(fullRows[i].payment)}</span></td>
         </tr>
       ))}
       <tr class="font-semibold text-n900">
@@ -233,21 +233,20 @@ export const predictionOptions = [
 
 </Section>
 
-לקחתם 50,000 ₪ ב־6% לשנה (0.5% לחודש), עם גרייס מלא. בשלושת החודשים הראשונים לא משלמים כלום. החודש הראשון כבר מלא. השלימו את החוב בחודשים 2 ו־3.
+לקחתם 50,000 ₪ ב־6% לשנה (0.5% לחודש), עם גרייס מלא. בשלושת החודשים הראשונים לא משלמים כלום, וכל חודש מתחיל מהחוב שבסוף החודש הקודם. החודש הראשון כבר מלא. השלימו את החוב בחודשים 2 ו־3.
 
 <FillTable
   client:visible
   id="2.10-half"
   periodLabel="חודש"
   columns={[
-    { key: "opening", label: "החוב בתחילת החודש" },
     { key: "interest", label: "ריבית החודש" },
     { key: "closing", label: "החוב בסוף החודש" },
   ]}
   rows={half}
-  blanks={["2.opening", "2.interest", "2.closing", "3.opening", "3.interest", "3.closing"]}
+  blanks={["2.interest", "2.closing", "3.interest", "3.closing"]}
   success="ככה גדל חוב בגרייס מלא: כל חודש הריבית מחושבת על החוב כולו, כולל הריבית שכבר הצטרפה."
-  hint="בדקו: האם חישבתם את הריבית על החוב של תחילת החודש, ולא על 50,000 ₪? ועיגלתם כל ריבית לאגורה?"
+  hint="בדקו: האם חישבתם את הריבית על החוב שבסוף החודש הקודם, ולא על 50,000 ₪? ועיגלתם כל ריבית לאגורה?"
 />
 
 <Section kind="תרגול">

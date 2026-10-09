@@ -5,40 +5,19 @@ import {
   cappedDiscount,
   cappedRateBelowAverage,
   crossoverMonth,
-  equalPrincipalSchedule,
   exchangeLinkedBalance,
   graceSchedule,
-  monthlyRatePercent,
   schedule,
-  spitzerPayment,
-  spitzerSchedule,
   totalInterest,
   totalPaid,
 } from "./repayment.ts";
 
+const spitzerSchedule = (p: number, a: string, n: number) => schedule("spitzer", { principal: p, annualPercent: a, months: n });
+const equalPrincipalSchedule = (p: number, a: string, n: number) => schedule("equal_principal", { principal: p, annualPercent: a, months: n });
+
 const m = (x: { toString(): string }) => moneyString(x.toString());
 
-describe("monthlyRatePercent", () => {
-  it("divides the annual rate by 12", () => {
-    expect(monthlyRatePercent("4.8").toString()).toBe("0.4");
-    expect(monthlyRatePercent("6").toString()).toBe("0.5");
-  });
-});
-
-describe("spitzerPayment", () => {
-  it("matches the Brain's worked examples to the agora", () => {
-    // Brain 7798786: 700,000 at 5.90% for 20 years → 4,974.72.
-    expect(m(spitzerPayment(700000, "5.9", 240))).toBe("4974.72");
-    // ENG-223 Q1: 1,000,000 at 3% for 25 years → about 4,742 (4,742.11).
-    expect(m(spitzerPayment(1000000, "3", 300))).toBe("4742.11");
-  });
-
-  it("is principal ÷ months at a zero rate", () => {
-    expect(spitzerPayment(12000, "0", 12).toString()).toBe("1000");
-  });
-});
-
-describe("spitzerSchedule", () => {
+describe("schedule: spitzer (from amortization.ts)", () => {
   // 60,000 at 6% a year (0.5% a month) for 3 months, worked by hand:
   // payment 20,200.33; interest 300.00, then 0.5% of 40,099.67 = 200.50, then 0.5% of 20,099.84 = 100.50.
   const rows = spitzerSchedule(60000, "6", 3);
@@ -63,7 +42,7 @@ describe("spitzerSchedule", () => {
   });
 });
 
-describe("equalPrincipalSchedule", () => {
+describe("schedule: equal principal (from amortization.ts)", () => {
   it("repays the same principal and pays less interest each month", () => {
     // 60,000 ÷ 3 = 20,000 a month; interest 300, 200, 100.
     const rows = equalPrincipalSchedule(60000, "6", 3);

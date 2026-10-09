@@ -61,7 +61,7 @@ export const predictionOptions = [
 
 **<Term t="לא צמוד" lesson="2.3">לא צמוד</Term>:** החוב בשקלים כפי שהם כתובים. המדד לא משנה אותו.
 
-השאלה הזו נפרדת מהשאלה של השיעור הקודם. יש מסלולים צמודים ב<Term t="ריבית קבועה" lesson="2.3">ריבית קבועה</Term> וב<Term t="ריבית משתנה" lesson="2.3">ריבית משתנה</Term>, ויש מסלולים לא צמודים בשתיהן. נכיר אותם בשמם בשיעורים 2.5 ו־2.7. מסלול שהעוגן שלו הוא <Term t="פריים" lesson="2.3">הפריים</Term> אינו צמוד (שיעור 2.6).
+השאלה הזו נפרדת מהשאלה של השיעור הקודם. יש מסלולים צמודים ב<Term t="ריבית קבועה" lesson="2.3">ריבית קבועה</Term> וב<Term t="ריבית משתנה" lesson="2.3">ריבית משתנה</Term>, ויש מסלולים לא צמודים בשתיהן. נכיר אותם בשמם בשיעורים 2.5 ו־2.7. מסלול שהעוגן שלו הוא <Term t="פריים" lesson="2.3">הפריים</Term> אינו צמוד (לא אומת; שיעור 2.6).
 
 <Callout title="איפה זה באפליקציית היועץ">
 <p>באפליקציית היועץ של Mogi אין שדה נפרד ל״צמוד או לא״: ההצמדה היא חלק מסוג המסלול, יחד עם השאלה אם הריבית קבועה או משתנה. בשיעור 1.3 ראינו שזו בחירה של האפליקציה, ושהשאלה אם ההצמדה היא חלק ממנגנון הריבית או שאלה נפרדת עוד פתוחה.</p>
@@ -114,9 +114,9 @@ export const predictionOptions = [
       {table.map((r) => (
         <tr class="border-b border-n100">
           <td class="py-2 pe-3 text-n700"><span class="ltr">{r.inflation}%</span></td>
-          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{signed(r.diff)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.indexed)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.plain)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr whitespace-nowrap">{signed(r.diff)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(r.indexed)}</span></td>
+          <td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(r.plain)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -181,11 +181,11 @@ export const predictionOptions = [
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="text-h3 text-navy">לא צמוד:</p>
-  <p class="ltr text-h2 text-navy">B = P × (1 + i)</p>
+  <p class="ltr text-h3 text-navy">B = P × (1 + i)</p>
   <p class="text-h3 mt-3 text-navy">צמוד:</p>
-  <p class="ltr text-h2 text-navy">B = P × (1 + π) × (1 + r)</p>
+  <p class="ltr text-h3 text-navy">B = P × (1 + π) × (1 + r)</p>
   <p class="text-h3 mt-3 text-navy">נקודת האיזון:</p>
-  <p class="ltr text-h2 text-navy">π = (1 + i) ÷ (1 + r) − 1</p>
+  <p class="ltr text-h3 text-navy">π = (1 + i) ÷ (1 + r) − 1</p>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
     <dt class="ltr font-semibold text-n900">P</dt><dd>החוב בהתחלה, בשקלים</dd>
     <dt class="ltr font-semibold text-n900">B</dt><dd>החוב ועוד הריבית בסוף השנה, בשקלים</dd>

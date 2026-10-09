@@ -180,7 +180,6 @@ export default function lesson21(): LessonData {
     // Exercise 5: a contract signed when the Bank of Israel rate was 4.5% (invented), prime − 0.5.
     given("ex5.boi_then", "4.5"),
     given("ex5.spread", "-0.5"),
-    prime("ex5.prime_then", "4.5"),
     track("ex5.rate_then", "4.5", "-0.5"),
     spreadOf("ex5.wrong_spread", plainNumber(primeTrackRate("4.5", "-0.5")), plainNumber(primeRate(BOI))),
     track("ex5.answer", BOI, "-0.5"),

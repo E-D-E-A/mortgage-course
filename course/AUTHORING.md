@@ -53,7 +53,8 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - **No slogans, no promises** ("הזמן הוא המנוע" was cut). Say under which conditions a statement is true.
 - "ריבית" is both the rate and the shekels. Where both appear, say which: **אחוז הריבית** (5% לשנה) or **סכום הריבית** (50 ₪).
 - Teaching rates and yields that could pass for market data get "מספרים להמחשה, לא נתוני שוק" above the exercise set, not only in the sources.
-- אג״ח is feminine (אג״ח ממשלתית, שלה).
+- אג״ח is feminine (אג״ח ממשלתית, שלה), and so is הפריים (היא זזה).
+- "נקודת אחוז" is singular up to one (0.25 נקודת אחוז, נקודת אחוז אחת) and plural above it (1.5 נקודות אחוז).
 - **"בשקלים של היום"** means a value today found by discounting at an interest rate (0.5–0.6). A sum adjusted for inflation is **"בכוח קנייה של היום"** (0.8). Never mix the two.
 - **The "בשיעור הבא" line uses the next lesson's exact title** from the map. A stage's last lesson leads to the stage check (`/checks/<stage>/`); the layout's button does this.
 - **Tables:** a fill-in table must fit 340px (FillTable does). A wide reading table may scroll; the layout adds a "יש עוד עמודות משמאל" hint on its own. Still, keep the column the text talks about early (on the right).
@@ -104,8 +105,10 @@ A learner carries the letters from lesson to lesson, so a letter keeps its meani
 | K | a basket's cost | 0.7 |
 | V | a property's value (in 1.1 also the price a pledged home sells for) | 1.1 |
 | H | equity (הון עצמי) | 1.2 |
+| A | an anchor rate (עוגן), as a decimal; a track's rate r = A + s | 2.1 |
+| S | a sum of discount factors (in a worked derivation) | 2.2 |
 
-0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. Never a table letter for something else, not even as a subscript (r_F would reuse F): subscripts are words or numbers defined in the box.
+0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. The market writes prime as P ("P−0.8"); the course quotes that shorthand in words and never uses P for prime in a formula. Never a table letter for something else, not even as a subscript (r_F would reuse F): subscripts are words or numbers defined in the box.
 
 ## Equations and direction
 

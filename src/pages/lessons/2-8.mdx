@@ -238,17 +238,15 @@ export const cards = [
 <FillTable
   client:visible
   id="2.8-half"
-  periodLabel="דירה"
   columns={[
     { key: "price", label: "מחיר לפני ההנחה" },
-    { key: "pct", label: `${f.plain("target.percent")}% מהמחיר` },
     { key: "discount", label: "ההנחה" },
     { key: "after", label: "המחיר אחרי ההנחה" },
   ]}
   rows={half}
-  blanks={["2.pct", "2.discount", "2.after", "3.pct", "3.discount", "3.after"]}
+  blanks={["2.discount", "2.after", "3.discount", "3.after"]}
   success="ההנחה היא הנמוך מבין שני מספרים: האחוז מהמחיר, והתקרה. בדירה יקרה התקרה היא שקובעת."
-  hint="בדקו: האם ההנחה גדולה מהתקרה? אם כן, ההנחה היא התקרה."
+  hint={`קודם ${f.plain("target.percent")}% מהמחיר. אם יצא יותר מהתקרה, ההנחה היא התקרה.`}
 />
 
 <Section kind="תרגול">

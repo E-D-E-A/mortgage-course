@@ -1,4 +1,11 @@
-"""Independent checks for repayment methods (lessons 2.8, 2.9, 2.10).
+"""Independent checks for deferred repayment and the special tracks (lessons 2.8, 2.9, 2.10).
+
+Whole Spitzer and equal-principal tables, the level payment and the monthly
+rate are checked by their own kinds (amortization.py, rates.py). The kinds here
+are grace and bullet tables, and single cells and totals of any method; for a
+cell or a total of a plain Spitzer or equal-principal loan this file rebuilds
+the schedule by its own route (the payment as the loan over the sum of discount
+factors), so it stays independent of the TypeScript.
 
 Python's Decimal only — no code from src/lib/calc. The conventions are the
 course's: monthly rate = annual rate / 12; each month's interest rounded to the
@@ -88,6 +95,9 @@ def _schedule(i):
 
 
 def schedule(i, _facts=None):
+    # Spitzer and equal principal tables are amortization.py's statement kinds.
+    if i["method"] in ("spitzer", "equal_principal"):
+        raise ValueError("use amort_annuity_statement / amort_equal_statement")
     return _schedule(i)
 
 
@@ -101,14 +111,6 @@ def total_paid(i, _facts=None):
 
 def total_interest(i, _facts=None):
     return str(agorot(sum(Decimal(r["interest"]) for r in _schedule(i))))
-
-
-def spitzer_payment(i, _facts=None):
-    return str(agorot(_spitzer_exact(i["principal"], i["annual_percent"], int(i["months"]))))
-
-
-def monthly_rate(i, _facts=None):
-    return _plain(Decimal(str(i["annual_percent"])) / 12)
 
 
 def months_in_years(i, _facts=None):
@@ -149,17 +151,11 @@ def sum_of(i, facts):
     return str(agorot(sum(Decimal(facts[f]["value"]) for f in str(i["facts"]).split("|"))))
 
 
-def times(i, facts):
-    return str(agorot(Decimal(facts[i["fact"]]["value"]) * int(i["count"])))
-
-
 KINDS = {
     "rep_schedule": schedule,
     "rep_cell": cell,
     "rep_total_paid": total_paid,
     "rep_total_interest": total_interest,
-    "rep_spitzer_payment": spitzer_payment,
-    "rep_monthly_rate": monthly_rate,
     "rep_months_in_years": months_in_years,
     "rep_crossover_month": crossover,
     "rep_capped_rate": capped_rate,
@@ -168,5 +164,4 @@ KINDS = {
     "rep_fx_balance": fx_balance,
     "rep_fx_units": fx_units,
     "rep_sum": sum_of,
-    "rep_times": times,
 }

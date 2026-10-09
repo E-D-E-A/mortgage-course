@@ -79,7 +79,7 @@ export const predictionOptions = [
 </Section>
 
 מחלקים את הקרן למספר החודשים: <M>{n("explain.loan")} ÷ 3 = {n("explain.equal_part")}</M> ₪. זה החלק שמחזירים בכל חודש. מעליו משלמים את הריבית של החודש.
-- **חודש 1.** היתרה {f.shekels("explain.loan")}. הריבית: <M>{f.plain("explain.monthly")}% × {nv(eqRows[0].opening)} = {nv(eqRows[0].interest)}</M> ₪. התשלום: <M>{nv(eqRows[0].principal)} + {nv(eqRows[0].interest)} = {nv(eqRows[0].payment)}</M> ₪.
+- **חודש 1.** היתרה {f.shekels("explain.loan")}. הריבית: <M>{f.plain("explain.monthly")}% × {nv(eqRows[0].opening)} = {nv(eqRows[0].interest)}</M> ₪. התשלום: <M>{nv(eqRows[0].principal_paid)} + {nv(eqRows[0].interest)} = {nv(eqRows[0].payment)}</M> ₪.
 - **חודש 2.** היתרה ירדה ל־{nv(eqRows[1].opening)} ₪, ולכן גם הריבית ירדה: {nv(eqRows[1].interest)} ₪. התשלום: {nv(eqRows[1].payment)} ₪.
 - **חודש 3.** היתרה {nv(eqRows[2].opening)} ₪, הריבית {nv(eqRows[2].interest)} ₪, התשלום {nv(eqRows[2].payment)} ₪. אחרי התשלום היתרה היא אפס.
 
@@ -93,9 +93,9 @@ export const predictionOptions = [
 
 בדרך השנייה קובעים תשלום אחד, שווה בכל חודש, שמביא את היתרה לאפס בדיוק בסוף התקופה. בהלוואה שלנו הוא {f.shekels("explain.spitzer_pay")}.
 איך מוצאים אותו? זו שאלה של <Later lesson="3.1">ההחזר החודשי</Later>, ונגזור אותו צעד אחר צעד בשיעור 3.1, מתוך הערך הנוכחי של שיעור 0.6. כאן נבדוק שהוא עובד:
-- **חודש 1.** היתרה {f.shekels("explain.loan")}, והריבית שוב {nv(spRows[0].interest)} ₪ — אותה ריבית כמו בדרך א׳, כי זו אותה יתרה. מהתשלום נשאר להחזרת הקרן: <M>{nv(spRows[0].payment)} − {nv(spRows[0].interest)} = {nv(spRows[0].principal)}</M> ₪. היתרה: <M>{nv(spRows[0].opening)} − {nv(spRows[0].principal)} = {nv(spRows[0].closing)}</M> ₪.
-- **חודש 2.** הריבית: <M>{f.plain("explain.monthly")}% × {nv(spRows[1].opening)} = {nv(spRows[1].interest)}</M> ₪ (מעוגל לאגורה). לקרן: <M>{nv(spRows[1].payment)} − {nv(spRows[1].interest)} = {nv(spRows[1].principal)}</M> ₪. היתרה: {nv(spRows[1].closing)} ₪.
-- **חודש 3.** הריבית {nv(spRows[2].interest)} ₪. התשלום האחרון מחזיר את כל מה שנשאר, {nv(spRows[2].principal)} ₪, ועוד הריבית: {nv(spRows[2].payment)} ₪ — אגורה אחת יותר משאר התשלומים, בגלל העיגול. היתרה: אפס.
+- **חודש 1.** היתרה {f.shekels("explain.loan")}, והריבית שוב {nv(spRows[0].interest)} ₪ — אותה ריבית כמו בדרך א׳, כי זו אותה יתרה. מהתשלום נשאר להחזרת הקרן: <M>{nv(spRows[0].payment)} − {nv(spRows[0].interest)} = {nv(spRows[0].principal_paid)}</M> ₪. היתרה: <M>{nv(spRows[0].opening)} − {nv(spRows[0].principal_paid)} = {nv(spRows[0].closing)}</M> ₪.
+- **חודש 2.** הריבית: <M>{f.plain("explain.monthly")}% × {nv(spRows[1].opening)} = {nv(spRows[1].interest)}</M> ₪ (מעוגל לאגורה). לקרן: <M>{nv(spRows[1].payment)} − {nv(spRows[1].interest)} = {nv(spRows[1].principal_paid)}</M> ₪. היתרה: {nv(spRows[1].closing)} ₪.
+- **חודש 3.** הריבית {nv(spRows[2].interest)} ₪. התשלום האחרון מחזיר את כל מה שנשאר, {nv(spRows[2].principal_paid)} ₪, ועוד הריבית: {nv(spRows[2].payment)} ₪ — אגורה אחת יותר משאר התשלומים, בגלל העיגול. היתרה: אפס.
 
 לשיטה הזו קוראים <Term t="שפיצר" lesson="2.9">שפיצר</Term>: התשלום שווה, ובתוכו החלוקה זזה. בכל חודש הריבית קטנה קצת, ולכן חלק גדול יותר מהתשלום הולך לקרן.
 
@@ -218,7 +218,7 @@ export const predictionOptions = [
 </Callout>
 
 <Callout title="למה החודש האחרון שונה לפעמים באגורה">
-<p>כל ריבית חודשית מעוגלת לאגורה, וגם התשלום בשפיצר. העיגולים הקטנים מצטברים, ולכן התשלום האחרון סוגר את מה שנשאר: בדוגמה שלנו {nv(spRows[2].payment)} ₪ במקום {nv(spRows[0].payment)} ₪. זו הנחת החישוב של הקורס; בנק יכול לסגור את האגורות בדרך אחרת. בתרגילים, תשובה שרחוקה באגורות מתקבלת.</p>
+<p>כל ריבית חודשית מעוגלת לאגורה, וגם התשלום בשפיצר. העיגולים הקטנים מצטברים, ולכן התשלום האחרון סוגר את מה שנשאר: בדוגמה שלנו {nv(spRows[2].payment)} ₪ במקום {nv(spRows[0].payment)} ₪. בהלוואה ארוכה ההפרש מצטבר לשקלים בודדים: בהמחשה (600,000 ₪, 20 שנה) התשלום האחרון בשפיצר הוא {f.shekels("slider.spitzer_last")}. זו הנחת החישוב של הקורס; בנק יכול לסגור את העיגול בדרך אחרת. בתרגילים, תשובה שרחוקה באגורות מתקבלת.</p>
 </Callout>
 
 <Section kind="דוגמה פתורה">
@@ -249,22 +249,21 @@ export const predictionOptions = [
 
 </Section>
 
-לקחתם 90,000 ₪ ב־4.8% לשנה (0.4% לחודש), לשלושה חודשים, בקרן שווה. בכל חודש מחזירים {f.shekels("half.part")} מהקרן. החודש הראשון כבר מלא. השלימו את השאר.
+לקחתם 90,000 ₪ ב־4.8% לשנה (0.4% לחודש), לשלושה חודשים, בקרן שווה. בכל חודש מחזירים {f.shekels("half.part")} מהקרן, והחודש מתחיל מהיתרה שבסוף החודש הקודם. החודש הראשון כבר מלא. השלימו את השאר.
 
 <FillTable
   client:visible
   id="2.9-half"
   periodLabel="חודש"
   columns={[
-    { key: "opening", label: "יתרה בתחילת החודש" },
     { key: "interest", label: "ריבית החודש" },
     { key: "payment", label: "התשלום" },
     { key: "closing", label: "יתרה בסוף החודש" },
   ]}
   rows={half}
-  blanks={["2.opening", "2.interest", "2.payment", "2.closing", "3.opening", "3.interest", "3.payment", "3.closing"]}
+  blanks={["2.interest", "2.payment", "2.closing", "3.interest", "3.payment", "3.closing"]}
   success="ככה בונים לוח סילוקין של קרן שווה: אותו חלק מהקרן בכל חודש, ריבית על מה שנשאר, והתשלום יורד."
-  hint="בדקו: האם חישבתם את הריבית על היתרה של תחילת החודש, ולא על 90,000 ₪? והאם התשלום הוא החלק של הקרן ועוד הריבית?"
+  hint="בדקו: האם חישבתם את הריבית על היתרה שבסוף החודש הקודם, ולא על 90,000 ₪? והאם התשלום הוא החלק של הקרן ועוד הריבית?"
 />
 
 <Section kind="תרגול">

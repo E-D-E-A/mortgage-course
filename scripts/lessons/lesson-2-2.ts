@@ -201,7 +201,6 @@ export default function lesson22(): LessonData {
     epMonth("worked.m121_interest", "360000", 360, "4.8", 121, "interest"),
     epMonth("worked.m121_payment", "360000", 360, "4.8", 121, "payment"),
     epMonth("worked.m360_balance", "360000", 360, "4.8", 360, "balance"),
-    epMonth("worked.m360_interest", "360000", 360, "4.8", 360, "interest"),
     epMonth("worked.m360_payment", "360000", 360, "4.8", 360, "payment"),
     epMonth("worked.m61_balance", "360000", 360, "4.8", 61, "balance"),
     epMonth("worked.m61_interest", "360000", 360, "4.8", 61, "interest"),

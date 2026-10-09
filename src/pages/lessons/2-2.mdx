@@ -97,9 +97,9 @@ export const predictionOptions = [
       {a.map((r) => (
         <tr class="border-b border-n100">
           <td class="py-2 pe-3 text-n700">{r.period}</td>
-          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(r.payment)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.opening)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr whitespace-nowrap">{formatShekels(r.payment)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(r.opening)}</span></td>
+          <td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(r.interest)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -132,10 +132,10 @@ export const predictionOptions = [
       {b.map((r) => (
         <tr class="border-b border-n100">
           <td class="py-2 pe-3 text-n700">{r.period}</td>
-          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(r.closing)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.opening)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.interest)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr whitespace-nowrap">{formatShekels(r.closing)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(r.opening)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(r.interest)}</span></td>
+          <td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(r.payment)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -144,7 +144,7 @@ export const predictionOptions = [
 
 החוב מגיע ל־{T(b[2].closing)} בדיוק. כאן **גם אחוז הריבית וגם התשלום לא זזים**. לשיטה הזו קוראים <Later lesson="2.9">שפיצר</Later>.
 
-**דרך ג׳ — אותם תשלומים שווים, אבל החוב <Term t="הצמדה" lesson="2.2">מוצמד</Term> ל<Term t="מדד המחירים לצרכן" lesson="2.2">מדד</Term>.** נניח שהמדד עולה ב־{pct("ex.inflation")} בכל שנה. אחוז הריבית עדיין {pct("ex.rate")}, ולא זז. אבל בחוב מוצמד גם התשלום מוצמד: בפישוט, כל תשלום הוא {f.shekels("b.payment")} כפול השינוי במדד מיום ההלוואה.
+**דרך ג׳ — אותם תשלומים שווים, אבל החוב <Term t="הצמדה" lesson="2.2">מוצמד</Term> למדד.** נניח שהמדד עולה ב־{pct("ex.inflation")} בכל שנה. אחוז הריבית עדיין {pct("ex.rate")}, ולא זז. אבל בחוב מוצמד גם התשלום מוצמד: בפישוט, כל תשלום הוא {f.shekels("b.payment")} כפול השינוי במדד מיום ההלוואה.
 - שנה 1: <M>{n("b.payment")} × 1.02 = {f.shekels("d.payment_1")}</M>.
 - שנה 2: <M>{n("b.payment")} × 1.02<sup>2</sup> = {f.shekels("d.payment_2")}</M>.
 - שנה 3: <M>{n("b.payment")} × 1.02<sup>3</sup> = {f.shekels("d.payment_3")}</M>.
@@ -197,19 +197,22 @@ export const predictionOptions = [
 
 </Section>
 
-**צעד 1 — חלק שווה מהקרן.** בכל תקופה מחזירים <M>P ÷ n</M> מהקרן. לפני התשלום ה־k כבר הוחזרו <M>k − 1</M> חלקים, ולכן החוב הוא <M>P − (k − 1) × P ÷ n</M>. התשלום הוא חלק הקרן ועוד ריבית על החוב הזה.
+**צעד 1 — חלק שווה מהקרן.** בכל תקופה מחזירים <M>P ÷ n</M> מהקרן. לפני התשלום ה־k כבר הוחזרו <M>k − 1</M> חלקים, ולכן החוב, B, הוא <M>P − (k − 1) × P ÷ n</M>. התשלום הוא חלק הקרן ועוד ריבית על החוב הזה.
 
-**צעד 2 — תשלומים שווים.** הסכום שווה לערך הנוכחי של התשלומים (שיעור 0.6). מחלקים אותו בסכום של מקדמי ההיוון.
+**צעד 2 — תשלומים שווים.** סכום ההלוואה שווה לערך הנוכחי של התשלומים (שיעור 0.6). מחברים את מקדמי ההיוון (S), ומחלקים בהם את הסכום.
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="text-h3 text-navy">חלק שווה מהקרן, התשלום ה־k:</p>
-  <p class="ltr text-h2 text-navy">C<sub>k</sub> = P ÷ n + (P − (k − 1) × P ÷ n) × r</p>
+  <p class="ltr text-h3 text-navy">B = P − (k − 1) × P ÷ n</p>
+  <p class="ltr text-h3 text-navy">C = P ÷ n + B × r</p>
   <p class="text-h3 mt-4 text-navy">תשלומים שווים:</p>
-  <p class="ltr text-h2 text-navy">C = P ÷ (1 ÷ (1 + r) + … + 1 ÷ (1 + r)<sup>n</sup>)</p>
+  <p class="ltr text-h3 text-navy">S = 1 ÷ (1 + r) + … + 1 ÷ (1 + r)<sup>n</sup></p>
+  <p class="ltr text-h3 text-navy">C = P ÷ S</p>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
-    <dt class="ltr font-semibold text-n900">C</dt><dd>תשלום אחד, בשקלים (כמו בשיעור 0.6)</dd>
-    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום ה־k, כשהתשלומים לא שווים</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>תשלום אחד, בשקלים (כמו בשיעור 0.6). בחלק שווה מהקרן — התשלום ה־k</dd>
+    <dt class="ltr font-semibold text-n900">B</dt><dd>החוב לפני התשלום ה־k, בשקלים (כמו בשיעור 0.3: היתרה)</dd>
     <dt class="ltr font-semibold text-n900">P</dt><dd>סכום ההלוואה — הקרן — בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">S</dt><dd>סכום מקדמי ההיוון: כמה שווים היום n תשלומים של שקל (שיעור 0.6)</dd>
     <dt class="ltr font-semibold text-n900">r</dt><dd>אחוז הריבית לתקופה אחת, כמספר עשרוני: 5% לשנה הם 0.05; לחודש — הריבית השנתית חלקי 12 (שיעור 0.4)</dd>
     <dt class="ltr font-semibold text-n900">n</dt><dd>מספר התשלומים</dd>
     <dt class="ltr font-semibold text-n900">k</dt><dd>מספר התשלום: 1 לראשון, 2 לשני, וכן הלאה</dd>
@@ -449,7 +452,7 @@ export const predictionOptions = [
 
 <Sources
   items={[
-    { kind: "ידע מתמטי כללי", text: "החזר בחלק שווה מהקרן ובתשלומים שווים; סכום ההלוואה כערך הנוכחי של התשלומים (שיעור 0.6); חישוב מחדש של תשלום שווה כשאחוז הריבית משתנה.", code: ["C_k = P ÷ n + (P − (k − 1) × P ÷ n) × r", "C = P ÷ (1 ÷ (1 + r) + … + 1 ÷ (1 + r)^n)"] },
+    { kind: "ידע מתמטי כללי", text: "החזר בחלק שווה מהקרן ובתשלומים שווים; סכום ההלוואה כערך הנוכחי של התשלומים (שיעור 0.6); חישוב מחדש של תשלום שווה כשאחוז הריבית משתנה.", code: ["B = P − (k − 1) × P ÷ n", "C = P ÷ n + B × r", "S = 1 ÷ (1 + r) + … + 1 ÷ (1 + r)^n", "C = P ÷ S"] },
     { kind: "ידע כלכלי כללי", text: "ריבית קבועה נקבעת ביום החתימה לכל המסלול; ריבית משתנה זזה לפי כלל שבחוזה — עם עוגן, או במועדי עדכון; בחוב מוצמד גם התשלום מוצמד." },
     { kind: "החלטה של Mogi", text: "״חמש שנים הן הזמן בין עדכוני ריבית, לא תקופת ההלוואה״; ומחזור העדכון אינו חל על שינויי פריים ועל ההצמדה החודשית, ולכן תשלום מוצמד יכול להשתנות גם בין מועדי העדכון. וכן: ליד תשלום של מסלול מוצמד או בריבית משתנה מסבירים שהוא יכול להשתנות, ותשלום מרבי חזוי הוא תחזית ולא תקרה מובטחת. אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08 (Brain, דף 67436545, תשובות 1 ו־4). המימוש לא הושלם." },
     { kind: "הנחת חישוב", text: "כל הסכומים, הריביות והאינפלציה בשיעור בדויים, להמחשה. בדוגמאות השנתיות משלמים בסוף כל שנה; בדוגמה הפתורה ובטבלה — כל חודש, בריבית שנתית חלקי 12 (שיעור 0.4; Brain ENG-223). בדרך ג׳ ההצמדה מוצגת בפישוט: כל תשלום כפול השינוי במדד מיום ההלוואה. כשאחוז הריבית משתנה, הדוגמאות מחשבות מחדש תשלום שווה על החוב ועל התקופה שנשארו. כלל העיגול: התשלום וסכום הריבית של כל תקופה מעוגלים לאגורה; אגורה שנשארת מתוקנת בתשלום האחרון. נועם ושירה (תיק א׳): דוגמה לימודית; נתוני הלקוח והריביות להמחשה בלבד, ואינם הצעת בנק או נתוני שוק עדכניים." },
