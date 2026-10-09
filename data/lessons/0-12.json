@@ -7,7 +7,7 @@
       "id": "curve.rising",
       "kind": "bond_curve",
       "inputs": {
-        "points": "1:3,2:3.25,5:3.75,10:4.25,20:4.75"
+        "points": "1:3,2:4,5:4.5,10:4.75,20:5"
       },
       "value": {
         "points": [
@@ -17,36 +17,36 @@
           },
           {
             "years": 2,
-            "yield": "3.25"
+            "yield": "4.00"
           },
           {
             "years": 5,
-            "yield": "3.75"
+            "yield": "4.50"
           },
           {
             "years": 10,
-            "yield": "4.25"
+            "yield": "4.75"
           },
           {
             "years": 20,
-            "yield": "4.75"
+            "yield": "5.00"
           }
         ],
         "segments": [
           {
             "from": 1,
             "to": 2,
-            "rate": "3.50"
+            "rate": "5.01"
           },
           {
             "from": 2,
             "to": 5,
-            "rate": "4.08"
+            "rate": "4.83"
           },
           {
             "from": 5,
             "to": 10,
-            "rate": "4.75"
+            "rate": "5.00"
           },
           {
             "from": 10,
@@ -230,7 +230,7 @@
         "face": "100",
         "payment_percent": "5",
         "years": 3,
-        "yields": "3,4,5"
+        "yields": "3,4,4.25"
       },
       "value": [
         {
@@ -248,8 +248,8 @@
         {
           "year": 3,
           "payment": "105.00",
-          "rate": "5.00",
-          "pv": "90.70"
+          "rate": "4.25",
+          "pv": "92.67"
         }
       ]
     },
@@ -259,29 +259,29 @@
       "inputs": {
         "face": "100",
         "payment_percent": "5",
-        "curve": "3,4,5"
+        "curve": "3,4,4.25"
       },
-      "value": "100.18"
+      "value": "102.15"
     },
     {
-      "id": "worked.flat_5",
+      "id": "worked.flat_3y",
       "kind": "bond_price",
       "inputs": {
         "face": "100",
         "payment_percent": "5",
         "years": 3,
-        "yield_percent": "5"
+        "yield_percent": "4.25"
       },
-      "value": "100.00"
+      "value": "102.07"
     },
     {
       "id": "worked.gap",
       "kind": "difference",
       "inputs": {
         "minuend": "worked.price",
-        "subtrahend": "worked.flat_5"
+        "subtrahend": "worked.flat_3y"
       },
-      "value": "0.18"
+      "value": "0.08"
     },
     {
       "id": "half.table",
@@ -521,9 +521,9 @@
         "face": "100",
         "payment_percent": "5",
         "years": 3,
-        "yields": "3,4,5"
+        "yields": "3,4,4.25"
       },
-      "value": "100.17"
+      "value": "102.14"
     },
     {
       "id": "two.ratio",
@@ -539,52 +539,52 @@
       "id": "long.f10",
       "kind": "bond_factor",
       "inputs": {
-        "rate_percent": "4.25",
+        "rate_percent": "4.75",
         "years": 10
       },
-      "value": "1.5162"
+      "value": "1.5905"
     },
     {
       "id": "long.f5",
       "kind": "bond_factor",
       "inputs": {
-        "rate_percent": "3.75",
+        "rate_percent": "4.5",
         "years": 5
       },
-      "value": "1.2021"
+      "value": "1.2462"
     },
     {
       "id": "long.ratio",
       "kind": "bond_factor_ratio",
       "inputs": {
-        "short_percent": "3.75",
+        "short_percent": "4.5",
         "short_years": 5,
-        "long_percent": "4.25",
+        "long_percent": "4.75",
         "long_years": 10
       },
-      "value": "1.2613"
+      "value": "1.2763"
     },
     {
       "id": "long.root",
       "kind": "bond_implied_factor",
       "inputs": {
-        "short_percent": "3.75",
+        "short_percent": "4.5",
         "short_years": 5,
-        "long_percent": "4.25",
+        "long_percent": "4.75",
         "long_years": 10
       },
-      "value": "1.0475"
+      "value": "1.0500"
     },
     {
       "id": "long.rate",
       "kind": "bond_implied_rate",
       "inputs": {
-        "short_percent": "3.75",
+        "short_percent": "4.5",
         "short_years": 5,
-        "long_percent": "4.25",
+        "long_percent": "4.75",
         "long_years": 10
       },
-      "value": "4.75"
+      "value": "5.00"
     },
     {
       "id": "ex8.answer",

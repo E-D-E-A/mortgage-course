@@ -101,32 +101,32 @@ export const predictionOptions = [
 </div>
 
 הערך הנוכחי של שלושת התשלומים: {f.shekels("explain.three_today")}. בשקלים הם מסתכמים ב־{f.shekels("explain.three_total")}; ההפרש, {f.shekels("explain.three_gap")}, הוא המחיר של לחכות להם.
-שימו לב לעמודה האחרונה: כל תשלום שווה היום פחות מזה שלפניו. זו הערימה שמתכווצת — התשלומים הרחוקים תורמים לערך הנוכחי פחות מהקרובים.
+שימו לב לעמודה ״שווה היום״: כל תשלום שווה היום פחות מזה שלפניו. זו הערימה שמתכווצת — התשלומים הרחוקים תורמים לערך הנוכחי פחות מהקרובים.
 
 ### מה זה אומר על הלוואה
 
 הסתכלו על אותם מספרים מהצד של <Term t="מלווה" lesson="0.6">מלווה</Term>. הוא נותן היום ל<Term t="לווה" lesson="0.6">לווה</Term> {f.shekels("explain.three_today")} — בדיוק הערך הנוכחי של שלושת התשלומים. בתמורה הלווה משלם לו 1,000 ₪ בסוף כל שנה, שלוש שנים.
-בכל שנה החוב גדל ב־10% ריבית, והתשלום מוריד ממנו:
+בכל שנה החוב גדל ב־10% ריבית, והתשלום מוריד ממנו. החוב בסוף כל שנה מופיע בעמודה השנייה:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full min-w-[34rem] border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">חוב בסוף השנה</th>
         <th class="py-2 text-start font-semibold">חוב בתחילת השנה</th>
         <th class="py-2 text-start font-semibold">סכום הריבית (10%)</th>
         <th class="py-2 text-start font-semibold">תשלום</th>
-        <th class="py-2 text-start font-semibold">חוב בסוף השנה</th>
       </tr>
     </thead>
     <tbody>
       {loan.map((r) => (
         <tr class="border-b border-n100">
           <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.closing)}</span></td>
           <td class="py-2"><span class="ltr">{formatShekels(r.opening)}</span></td>
           <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
           <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.closing)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -277,28 +277,23 @@ export const predictionOptions = [
 
 </Section>
 
-תקבלו 2,000 ₪ בסוף כל שנה, שלוש שנים. אפשר להפקיד כסף בריבית דריבית של 5% לשנה. השורה הראשונה כבר מלאה. השלימו את השאר, ואז חברו את העמודה ״שווה היום״ (תצטרכו מחשבון).
-כתבו את המספר שמחלקים בו עם כל הספרות (למשל 1.1025), ואל תעגלו אותו לפני החלוקה.
+תקבלו 3,000 ₪ בסוף כל שנה, שלוש שנים. אפשר להפקיד כסף בריבית דריבית של 6% לשנה. השורה הראשונה כבר מלאה. השלימו את השאר, ובשורה האחרונה כתבו את סכום העמודה ״שווה היום״ — הערך הנוכחי (תצטרכו מחשבון).
+כתבו את המספר שמחלקים בו עם כל הספרות (למשל {worked[1].growth}, ולא 1.08), ואל תעגלו אותו לפני החלוקה.
 
 <FillTable
   client:visible
   id="0.6-half"
   periodLabel="בסוף שנה"
-  rows={f.rows("half.table")}
+  rows={[...f.rows("half.table"), { period: "ערך נוכחי", value_today: f.raw("half.total") }]}
   columns={[
+    { key: "value_today", label: "שווה היום", format: "shekels" },
     { key: "amount", label: "התשלום", format: "shekels" },
     { key: "growth", label: "מחלקים ב־", format: "number" },
-    { key: "value_today", label: "שווה היום", format: "shekels" },
   ]}
-  blanks={["2.growth", "2.value_today", "3.growth", "3.value_today"]}
-  success="כל תשלום שווה היום פחות מקודמו. עכשיו חברו את שלוש השורות — זה הערך הנוכחי."
-  hint="בדקו: האם המספר שמחלקים בו הוא 1.05 בחזקת מספר השנה?"
+  blanks={["2.growth", "2.value_today", "3.growth", "3.value_today", "ערך נוכחי.value_today"]}
+  success="כל תשלום שווה היום פחות מקודמו, והערך הנוכחי הוא הסכום של כולם."
+  hint="בדקו: האם המספר שמחלקים בו הוא 1.06 בחזקת מספר השנה? ובשורה האחרונה — חיברתם את כל השורות בעמודה ״שווה היום״?"
 />
-
-<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
-  <summary class="cursor-pointer font-semibold text-n900">כמה צריך לצאת הערך הנוכחי</summary>
-  <p class="mt-2">{f.shekels("half.total")}.</p>
-</details>
 
 <Section kind="תרגול">
 
@@ -335,11 +330,11 @@ export const predictionOptions = [
     { value: f.raw("ex2.err_both_once"), message: "את התשלום השני חילקתם ב־1.1 פעם אחת בלבד. הוא מגיע בעוד שנתיים: מחלקים ב־1.1 בחזקת 2." },
   ]}
 >
-  תקבלו 2,200 ₪ בעוד שנה, ו־2,420 ₪ בעוד שנתיים. אפשר להפקיד כסף בריבית דריבית של 10% לשנה. מה הערך הנוכחי של שני התשלומים?
+  תקבלו 3,300 ₪ בעוד שנה, ו־2,420 ₪ בעוד שנתיים. אפשר להפקיד כסף בריבית דריבית של 10% לשנה. מה הערך הנוכחי של שני התשלומים?
 </NumericExercise>
 
 <Solution for="0.6-2">
-<M>2,200 ÷ 1.1 = {f.shekels("ex2.today_1")}</M>. <M>2,420 ÷ 1.1<sup>2</sup> = {f.shekels("ex2.today_2")}</M>. ביחד: {f.shekels("ex2.answer")}.
+<M>3,300 ÷ 1.1 = {f.shekels("ex2.today_1")}</M>. <M>2,420 ÷ 1.1<sup>2</sup> = {f.shekels("ex2.today_2")}</M>. ביחד: {f.shekels("ex2.answer")}.
 </Solution>
 
 <NumericExercise

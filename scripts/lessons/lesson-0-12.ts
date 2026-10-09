@@ -115,8 +115,8 @@ export default function lesson012(): LessonData {
   const twoLong = compound("two.long", "100", "4", 2);
   const twoShort = compound("two.short", "100", "3", 1);
 
-  const workedCurve = onCurve("worked.price", "100", "5", "3,4,5");
-  const workedFlat = price("worked.flat_5", "100", "5", 3, "5");
+  const workedCurve = onCurve("worked.price", "100", "5", "3,4,4.25");
+  const workedFlat = price("worked.flat_3y", "100", "5", 3, "4.25");
 
   const gapNominal = given("gap.nominal", "4");
   const gapReal = given("gap.real", "2");
@@ -125,7 +125,7 @@ export default function lesson012(): LessonData {
   const ex2short = given("ex2.short", "3");
 
   const facts: Fact[] = [
-    curve("curve.rising", "1:3,2:3.25,5:3.75,10:4.25,20:4.75"),
+    curve("curve.rising", "1:3,2:4,5:4.5,10:4.75,20:5"),
     curve("curve.flat", "1:4,2:4,5:4,10:4,20:4"),
     curve("curve.falling", "1:5,2:4.5,5:4,10:3.75,20:3.5"),
     forward,
@@ -134,7 +134,7 @@ export default function lesson012(): LessonData {
     twoShort,
     difference("two.needed", twoLong, twoShort),
     pv("zero.pv_2", "100", "4", 2),
-    curveTable("worked.table", "100", "5", "3,4,5"),
+    curveTable("worked.table", "100", "5", "3,4,4.25"),
     workedCurve,
     workedFlat,
     difference("worked.gap", workedCurve, workedFlat),
@@ -166,7 +166,7 @@ export default function lesson012(): LessonData {
     difference("ex5.simple", byId("ex5.nominal"), byId("ex5.real")),
   );
 
-  const workedRows = pricedPayments("100", "5", 3, ["3", "4", "5"]);
+  const workedRows = pricedPayments("100", "5", 3, ["3", "4", "4.25"]);
   const segment = (short: string, shortYears: number, long: string, longYears: number) => ({
     short_percent: short,
     short_years: shortYears,
@@ -192,17 +192,17 @@ export default function lesson012(): LessonData {
     {
       id: "worked.table_total",
       kind: "bond_table_total",
-      inputs: { face: "100", payment_percent: "5", years: 3, yields: "3,4,5" },
+      inputs: { face: "100", payment_percent: "5", years: 3, yields: "3,4,4.25" },
       value: moneyString(workedRows.reduce((s, r) => s.plus(moneyString(r.presentValue)), new Decimal(0))),
     },
     // 5.16 ÷ 103 as a decimal: (108.16 ÷ 103) − 1.
     yieldDecimal("two.ratio", twoLong.value as string, twoShort.value as string),
-    // The long segment, 5 to 10 years on the rising curve, step by step.
-    { id: "long.f10", kind: "bond_factor", inputs: { rate_percent: "4.25", years: 10 }, value: decimalString(growthFactor("4.25", 10)) },
-    { id: "long.f5", kind: "bond_factor", inputs: { rate_percent: "3.75", years: 5 }, value: decimalString(growthFactor("3.75", 5)) },
-    { id: "long.ratio", kind: "bond_factor_ratio", inputs: segment("3.75", 5, "4.25", 10), value: decimalString(ratioOf("3.75", 5, "4.25", 10)) },
-    { id: "long.root", kind: "bond_implied_factor", inputs: segment("3.75", 5, "4.25", 10), value: decimalString(impliedRate("3.75", 5, "4.25", 10).div(100).plus(1)) },
-    implied("long.rate", "3.75", 5, "4.25", 10),
+    // The long segment, 5 to 10 years on the rising curve (4.5% and 4.75%), step by step.
+    { id: "long.f10", kind: "bond_factor", inputs: { rate_percent: "4.75", years: 10 }, value: decimalString(growthFactor("4.75", 10)) },
+    { id: "long.f5", kind: "bond_factor", inputs: { rate_percent: "4.5", years: 5 }, value: decimalString(growthFactor("4.5", 5)) },
+    { id: "long.ratio", kind: "bond_factor_ratio", inputs: segment("4.5", 5, "4.75", 10), value: decimalString(ratioOf("4.5", 5, "4.75", 10)) },
+    { id: "long.root", kind: "bond_implied_factor", inputs: segment("4.5", 5, "4.75", 10), value: decimalString(impliedRate("4.5", 5, "4.75", 10).div(100).plus(1)) },
+    implied("long.rate", "4.5", 5, "4.75", 10),
     // Exercise 8: the stretch from 2 to 5 years.
     implied("ex8.answer", "3", 2, "4", 5),
     { id: "ex8.err_no_root", kind: "bond_ratio_gain_percent", inputs: segment("3", 2, "4", 5), value: percentString(ratioOf("3", 2, "4", 5).minus(1).mul(100)) },

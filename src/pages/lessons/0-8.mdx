@@ -192,7 +192,7 @@ export const predictionOptions = [
     <dt class="ltr font-semibold text-n900">P</dt><dd>הסכום ביום ההצמדה, בשקלים</dd>
     <dt class="ltr font-semibold text-n900">B</dt><dd>הסכום המוצמד מאוחר יותר, בשקלים</dd>
     <dt class="ltr font-semibold text-n900">n</dt><dd>מספר השנים</dd>
-    <dt class="ltr font-semibold text-n900">M<sub>0</sub></dt><dd>מדד הבסיס: המדד ביום ההצמדה (M כמו בשיעור 0.7)</dd>
+    <dt class="ltr font-semibold text-n900">M<sub>0</sub></dt><dd>M (מדד) — כמו בשיעור 0.7, ולא m, הריבית החודשית משיעור 0.4. M<sub>0</sub> הוא מדד הבסיס: המדד ביום ההצמדה</dd>
     <dt class="ltr font-semibold text-n900">M<sub>1</sub></dt><dd>המדד החדש</dd>
     <dt class="ltr font-semibold text-n900">π</dt><dd>האינפלציה לשנה, כמספר עשרוני: 3% הם 0.03</dd>
     <dt class="ltr font-semibold text-n900">i</dt><dd>הריבית הנומינלית לשנה, כמספר עשרוני: 5% הם 0.05</dd>
@@ -238,7 +238,7 @@ export const predictionOptions = [
 
 **צעד 2 — מה קרה למחירים.** מה שעלה {f.shekels("worked.start")} בתחילת השנה, עולה בסוף השנה <M>50,000 × 1.03 = {f.shekels("worked.basket")}</M>.
 
-**צעד 3 — הרווח בשקלים של סוף השנה.** <M>{n("worked.nominal")} − {n("worked.basket")} = {f.shekels("worked.gain_vs_basket")}</M>. רק זה תוספת של כוח קנייה.
+**צעד 3 — הרווח בכוח קנייה של סוף השנה.** <M>{n("worked.nominal")} − {n("worked.basket")} = {f.shekels("worked.gain_vs_basket")}</M>. רק זה תוספת של כוח קנייה.
 
 **צעד 4 — בכוח קנייה של תחילת השנה.** מתרגמים את מה שיש בסוף השנה למחירים של תחילתה: <M>{n("worked.nominal")} ÷ 1.03 = {f.shekels("worked.real_value")}</M>. הרווח הריאלי: <M>{n("worked.real_value")} − {n("worked.start")} = {f.shekels("worked.real_gain")}</M>.
 
@@ -409,7 +409,7 @@ export const predictionOptions = [
 
 </Section>
 
-- **הצמדה** = הסכום זז באותו אחוז שבו זז המדד: <M>B = P × M<sub>1</sub> ÷ M<sub>0</sub></M>.
+- **הצמדה** = הסכום זז באותו אחוז שבו זז המדד: <M>B = P × M<sub>1</sub> ÷ M<sub>0</sub></M> (M — מדד).
 - **חוב מוצמד גדל על הנייר** גם בלי ריבית ובלי כסף נוסף — ושנה אחרי שנה ההצמדה מצטברת, כמו ריבית דריבית.
 - **נומינלי** = בשקלים כפי שהם כתובים, לפני אינפלציה. **ריאלי** = אחרי אינפלציה, בכוח קנייה. **ריבית נומינלית** = בכמה גדל מספר השקלים, בלי להביא בחשבון את האינפלציה (ריבית שכתובה על חוב מוצמד היא משהו אחר — שיעור 2.3).
 - **ריבית ריאלית:** <M>(1 + i) ÷ (1 + π) − 1</M>. ״נומינלית פחות אינפלציה״ הוא רק קירוב.
