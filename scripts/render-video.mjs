@@ -23,7 +23,10 @@ const server = createServer(async (req, res) => {
   } catch {
     res.writeHead(404).end();
   }
-}).listen(4398);
+});
+// An ephemeral port, so several lessons can render at once.
+await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
+const port = server.address().port;
 
 const frames = join(root, ".video-frames", lesson);
 await rm(frames, { recursive: true, force: true });
@@ -38,7 +41,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, dev
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 page.on("requestfailed", (r) => errors.push(`failed: ${r.url()}`));
-await page.goto(`http://localhost:4398/video/${lesson}.html`);
+await page.goto(`http://127.0.0.1:${port}/video/${lesson}.html`);
 await page.waitForFunction(() => window.ready === true);
 if (errors.length) throw new Error(errors.join("\n"));
 const { duration, cues } = await page.evaluate(() => ({ duration: window.duration, cues: window.cues }));
