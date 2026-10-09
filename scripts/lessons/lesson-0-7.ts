@@ -93,7 +93,8 @@ const factor = (id: string, old: string, next: string): Fact => ({
   id,
   kind: "infl_growth_factor",
   inputs: { old, new: next },
-  value: plainNumber(new Decimal(next).div(old)),
+  // Four decimals: a growth factor such as 1.045 must not round to 1.05.
+  value: new Decimal(next).div(old).toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toString(),
 });
 
 /** The mistake exercise 5 names: adding the index points to the amount as if they were shekels. */
@@ -155,11 +156,11 @@ export default function lesson07(): LessonData {
   const sliderBread = cost("slider.bread10_cost", replace(BASE, 0, "11"));
   const sliderMix = cost("slider.mix_cost", replace(replace(BASE, 0, "15"), 2, "8"));
 
-  const workedNew = indexed("worked.basket_new", "5000", "102", "105.06");
+  const workedNew = indexed("worked.basket_new", "5000", "104", "106.08");
   const workedOld = given("worked.basket_old", "5000.00");
 
   const ex2old = given("ex2.old", "800.00");
-  const ex2new = given("ex2.new", "824.00");
+  const ex2new = given("ex2.new", "836.00");
 
   const facts: Fact[] = [
     // What the lesson says about the real index. Data, not computed; all from
@@ -206,10 +207,10 @@ export default function lesson07(): LessonData {
     sliderMix,
     index("slider.mix_index", sliderMix.value as string, base),
 
-    // Worked example: January index 102, December 105.06.
-    change("worked.change", "102", "105.06"),
-    factor("worked.factor", "102", "105.06"),
-    points("worked.points", "102", "105.06"),
+    // Worked example: January index 104, December 106.08.
+    change("worked.change", "104", "106.08"),
+    factor("worked.factor", "104", "106.08"),
+    points("worked.points", "104", "106.08"),
     workedOld,
     workedNew,
     difference("worked.basket_diff", workedNew, workedOld),
@@ -220,18 +221,18 @@ export default function lesson07(): LessonData {
     // Exercise 2: a basket from 800 to 824.
     ex2old,
     ex2new,
-    change("ex2.answer", "800", "824"),
-    factor("ex2.factor", "800", "824"),
+    change("ex2.answer", "800", "836"),
+    factor("ex2.factor", "800", "836"),
     difference("ex2.diff", ex2new, ex2old),
-    index("ex2.index", "824", "800"),
-    onNew("ex2.on_new", "800", "824"),
+    index("ex2.index", "836", "800"),
+    onNew("ex2.on_new", "800", "836"),
 
     // Exercise 3: index 110 → 113.3.
-    change("ex3.answer", "110", "113.3"),
-    factor("ex3.factor", "110", "113.3"),
-    points("ex3.points", "110", "113.3"),
-    points("ex3.from_100", "100", "113.3"),
-    onNew("ex3.on_new", "110", "113.3"),
+    change("ex3.answer", "125", "130"),
+    factor("ex3.factor", "125", "130"),
+    points("ex3.points", "125", "130"),
+    points("ex3.from_100", "100", "130"),
+    onNew("ex3.on_new", "125", "130"),
 
     // Exercise 5: index 100 → 103.5, a basket of 2,000.
     indexed("ex5.answer", "2000", "100", "103.5"),

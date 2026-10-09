@@ -126,7 +126,8 @@ def index_table(i, _facts=None):
 
 
 def growth_factor(i, _facts=None):
-    return plain(Decimal(i["new"]) / Decimal(i["old"]))
+    q = (Decimal(i["new"]) / Decimal(i["old"])).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP).normalize()
+    return format(q, "f")
 
 
 def points_as_shekels(i, _facts=None):
