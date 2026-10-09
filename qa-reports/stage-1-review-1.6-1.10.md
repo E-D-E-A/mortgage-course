@@ -140,3 +140,61 @@ Items below: severity (**חוסם** / **חשוב** / **קטן**), the exact quot
       - Cue 19: "…לא אומתו. נכון ל־9 באוקטובר 2026."
       - Draw all 24 days in one colour; keep the "שבת" label.
       - Cue 11: "בקשה ב־11 באוקטובר (יום 0): תשובה עד 16 באוקטובר."
+
+---
+
+## Lesson 1.8: אישור עקרוני מול העמדת כסף
+
+1. **חשוב.** Exercise 5 (בינוני) repeats lesson 1.7's exercise 4 word for word: "זוג ממחזר משכנתא, ובהלוואה החדשה לא נרשם שעבוד חדש. האישור העקרוני הגיע ביום שני, 9 בנובמבר…" The answer is again 21.
+   - Fix: use a new date and a new twist, for example a refinance approved on Fri 23 Oct (no lien, 12 days → Wed 4 Nov). Add it as a fact.
+
+2. **חשוב.** Exercise 2: "כמה ימים נשארו לפחות עד שהבנק כבר לא חייב בתנאים?" The question is ambiguous, and two of its error messages do not match a real mistake.
+   - The bank is still bound on day 24, so "until it is no longer bound" is 8 days (day 25), not 7.
+   - "לפחות" in that place has no clear meaning.
+   - `err_inclusive` = 6 says "ספרתם את יום האישור כיום 1", but the exercise gives the days already passed (17), so nothing is counted.
+   - `err_twelve` = −5 is a number nobody types.
+   - Fix, the question: "עברו 17 ימים מיום האישור. כמה ימים נשארו עד סוף החלון (היום ה־24)?"
+   - Fix, the errors: replace them with 8 ("ספרתם גם את יום 25. החלון נגמר ביום 24") and 0 ("השתמשתם ב־12 יום; כאן נרשם שעבוד חדש").
+
+3. **קטן.** Worked example, step 1: "24 יום מיום האישור: … עד יום שבת, 7 בנובמבר". This computes a date without restating the counting rule. Day 0 appears only above the exercises and in the sources.
+   - Fix: "יום האישור, 14 באוקטובר, הוא יום 0. 24 יום אחריו — כולל שבתות — הם יום שבת, 7 בנובמבר."
+
+4. **קטן.** Five-questions callout, line 397: "השעון מתחיל ביום האישור". This is stated as fact. Lesson 1.7 says it is open ("בצוות עוד פתוחה השאלה אם 24 הימים נספרים מהיום שבו האישור ניתן או מהיום שבו הגיע ללווים"), and `eylon-list.md` lists it as an open question.
+   - Fix: "בקורס סופרים מיום האישור (שאלה פתוחה, ראו שיעור 1.7)".
+
+5. **קטן.** Line 141: "לפי אילון, הבנק מודד את שיעור המימון מול השווי שהשמאי קבע". FK-H-005 and the lesson's own source say the speaker in the recording is uncertain ("זיהוי הדובר בהקלטה לא ודאי"). The body attributes the claim with certainty.
+   - Fix: "כך נאמר בפגישה עם בנקאי ב־2026-08-05 (הדובר לא ודאי; ידע מהשטח, ממתין לאישור אילון)".
+
+6. **קטן.** Line 162: "בהעמדת ההלוואה: הכסף עובר, ומעכשיו הלווים הם שחייבים." This suggests the borrowers owe nothing until the money moves, though the lesson has just said the signed agreement binds **both** sides.
+   - Fix: "בהעמדת ההלוואה: הכסף עובר, ומתחיל החוב — ואיתו התשלומים."
+
+7. **קטן.** Callout title, line 145: "ניסוח אחד, שני קריאות". קריאה is feminine. Fix: "ניסוח אחד, שתי קריאות".
+
+8. **קטן.** Worked example step 4 and the widget (line 92): "…או לבקש בקשה חדשה". The bank asks for a request; the subject is wrong.
+   - Fix: "…או לדרוש מכם להגיש בקשה חדשה".
+
+9. **קטן.** Exercise 6 (three banks) has errors for the latest bank and for bank A, but none for the classic mistake of counting from day 1 (4 Nov).
+   - Fix: add `ex6.err_day_one` (4 Nov) with "ספרתם את יום האישור כיום 1. הוא יום 0."
+   - Also "ב14 / ב16 / ב12 באוקטובר" lack the maqaf.
+
+---
+
+## Lesson 1.9: מה היועץ מברר לפני שמדברים על ריבית
+
+1. **חשוב.** Line 163: "לכל צעד בתהליך יש שעון (שיעור 1.7)". This contradicts 1.7, which says only three rules are clocks: "ושאר הצעדים? אין להם שעון", and in the summary, "לשאר הצעדים אין שעון שמצאנו".
+   - Fix: "לחלק מהצעדים יש שעון (שיעור 1.7) — ובעיקר 24 הימים שבהם האישור בתוקף — ולכן חשוב לדעת מראש מתי הכסף צריך להיות מוכן."
+
+2. **קטן.** The field claims in the body are marked only "(ידע מהשטח, ראו מקורות)", at lines 96 and 100 and in the five-questions callout. They have no date and no "ממתין לאישור אילון", unlike 1.7 and 1.8.
+   - Fix: "(ידע מהשטח, אילון, 2026-07-27; ממתין לאישור אילון)" and the matching dates for FK-H-034 (2026-08-26) and FK-H-062 (2026-09-16).
+
+3. **קטן.** Exercise 8, wrong option (line 384): "לבקש מהם לוותר על הלימודים, כדי שההלוואה תעבור." Shira's plan in exercise 7 is a move to half-time work. Nobody mentioned studies, so the reader wonders what was missed.
+   - Fix: "לבקש משירה לוותר על המעבר לחצי משרה, כדי שההלוואה תעבור."
+
+4. **קטן.** The prediction's correct option is three times longer than the others and repeats the lesson's title ("…ורק אחר כך לדבר על ריבית"). It can be picked without thinking. See the cross-lesson item on answer length.
+   - Fix: shorten it to "לברר קודם את המצב הכספי שלהם" and lengthen one wrong option to match.
+
+5. **קטן.** On the phone, the half-solved table's headers "משפחה" and "הכנסה 1" run together as "משפחההכנסה 1". In the income columns, the "₪" wraps to its own line.
+   - Fix: give the first column a minimum width and a gap. Or use "מס׳" as its header.
+
+6. **קטן.** The worked example's family is "דנה ויואב". "דנה" was already the borrower who lost her income in 1.1's worked example. A reader who goes back to 1.1 meets two different Danas.
+   - Fix: rename this one, for example "מיכל ויואב".
