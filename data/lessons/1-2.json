@@ -1,0 +1,760 @@
+{
+  "lesson": "1.2",
+  "title": "הון עצמי ושיעור מימון",
+  "note": "Invented teaching numbers; case A is the course's synthetic main case. Ceilings 75/70/50 per the team's Brain transcription of Directive 329 (page 7503881, 2026-10-08), not yet checked against the source.",
+  "facts": [
+    {
+      "id": "ceiling.only_home",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "ceiling.replacement",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "ceiling.investment",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "explain.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "explain.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "250000.00"
+    },
+    {
+      "id": "explain.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "1000000",
+        "equity": "250000"
+      },
+      "value": "750000.00"
+    },
+    {
+      "id": "explain.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "750000.00",
+        "value": "1000000"
+      },
+      "value": "75"
+    },
+    {
+      "id": "explain.equity_share",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "250000",
+        "whole": "1000000"
+      },
+      "value": "25"
+    },
+    {
+      "id": "pred.equity_over_loan",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "250000",
+        "whole": "750000"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "pred.loan_over_equity",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "750000",
+        "whole": "250000"
+      },
+      "value": "300"
+    },
+    {
+      "id": "explain.per_shekel",
+      "kind": "ltv_per_shekel",
+      "inputs": {
+        "loan": "750000",
+        "equity": "250000"
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain2.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "explain2.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "1000000",
+        "equity": "400000"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "explain2.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "600000",
+        "value": "1000000"
+      },
+      "value": "60"
+    },
+    {
+      "id": "explain2.cushion",
+      "kind": "ltv_cushion",
+      "inputs": {
+        "value": "1000000",
+        "debt": "600000"
+      },
+      "value": "40"
+    },
+    {
+      "id": "explain.max_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "ceiling": "75"
+      },
+      "value": "750000.00"
+    },
+    {
+      "id": "own.only_home",
+      "kind": "ltv_complement",
+      "inputs": {
+        "percent": "75"
+      },
+      "value": "25"
+    },
+    {
+      "id": "own.replacement",
+      "kind": "ltv_complement",
+      "inputs": {
+        "percent": "70"
+      },
+      "value": "30"
+    },
+    {
+      "id": "own.investment",
+      "kind": "ltv_complement",
+      "inputs": {
+        "percent": "50"
+      },
+      "value": "50"
+    },
+    {
+      "id": "limits.table",
+      "kind": "ltv_ceiling_table",
+      "inputs": {
+        "value": "1000000",
+        "ceiling_1": "75",
+        "ceiling_2": "70",
+        "ceiling_3": "50"
+      },
+      "value": [
+        {
+          "period": 1,
+          "ceiling": "75",
+          "max_loan": "750000.00",
+          "min_equity": "250000.00"
+        },
+        {
+          "period": 2,
+          "ceiling": "70",
+          "max_loan": "700000.00",
+          "min_equity": "300000.00"
+        },
+        {
+          "period": 3,
+          "ceiling": "50",
+          "max_loan": "500000.00",
+          "min_equity": "500000.00"
+        }
+      ]
+    },
+    {
+      "id": "pv.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "950000.00"
+    },
+    {
+      "id": "pv.max_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "950000",
+        "ceiling": "75"
+      },
+      "value": "712500.00"
+    },
+    {
+      "id": "pv.min_equity_at_price",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1000000",
+        "value": "1000000",
+        "ceiling": "75"
+      },
+      "value": "250000.00"
+    },
+    {
+      "id": "pv.min_equity",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1000000",
+        "value": "950000",
+        "ceiling": "75"
+      },
+      "value": "287500.00"
+    },
+    {
+      "id": "pv.extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pv.min_equity",
+        "subtrahend": "pv.min_equity_at_price"
+      },
+      "value": "37500.00"
+    },
+    {
+      "id": "round.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500050.00"
+    },
+    {
+      "id": "round.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000.00"
+    },
+    {
+      "id": "round.ltv2",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1500050",
+        "value": "2000000"
+      },
+      "value": "75"
+    },
+    {
+      "id": "round.ltv4",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1500050",
+        "value": "2000000",
+        "decimals": 4
+      },
+      "value": "75.0025"
+    },
+    {
+      "id": "slider.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "slider.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "slider.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "1500000",
+        "equity": "300000"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "slider.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1200000.00",
+        "value": "1500000"
+      },
+      "value": "80"
+    },
+    {
+      "id": "slider.min_equity_75",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1500000",
+        "value": "1500000",
+        "ceiling": "75"
+      },
+      "value": "375000.00"
+    },
+    {
+      "id": "slider.more_75",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "slider.min_equity_75",
+        "subtrahend": "slider.equity"
+      },
+      "value": "75000.00"
+    },
+    {
+      "id": "slider.min_equity_70",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1500000",
+        "value": "1500000",
+        "ceiling": "70"
+      },
+      "value": "450000.00"
+    },
+    {
+      "id": "slider.min_equity_50",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1500000",
+        "value": "1500000",
+        "ceiling": "50"
+      },
+      "value": "750000.00"
+    },
+    {
+      "id": "caseA.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "caseA.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000.00"
+    },
+    {
+      "id": "caseA.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "caseA.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "caseA.ltv1",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000",
+        "decimals": 1
+      },
+      "value": "74.5"
+    },
+    {
+      "id": "caseA.gap_points",
+      "kind": "ltv_points_gap",
+      "inputs": {
+        "ceiling": "75",
+        "loan": "1640000.00",
+        "value": "2200000"
+      },
+      "value": "0.45"
+    },
+    {
+      "id": "caseA.max_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "2200000",
+        "ceiling": "75"
+      },
+      "value": "1650000.00"
+    },
+    {
+      "id": "caseA.loan_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.max_loan",
+        "subtrahend": "caseA.loan"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "caseA.min_equity",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "2200000",
+        "value": "2200000",
+        "ceiling": "75"
+      },
+      "value": "550000.00"
+    },
+    {
+      "id": "caseA.equity_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.equity",
+        "subtrahend": "caseA.min_equity"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "caseA.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000.00"
+    },
+    {
+      "id": "caseA.age_noam",
+      "kind": "given",
+      "inputs": {},
+      "value": "31"
+    },
+    {
+      "id": "caseA.age_shira",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "half.table",
+      "kind": "ltv_price_table",
+      "inputs": {
+        "price_1": "1200000",
+        "equity_1": "360000",
+        "price_2": "2500000",
+        "equity_2": "875000",
+        "price_3": "1450000",
+        "equity_3": "420000"
+      },
+      "value": [
+        {
+          "period": 1,
+          "price": "1200000.00",
+          "equity": "360000.00",
+          "loan": "840000.00",
+          "ltv": "70"
+        },
+        {
+          "period": 2,
+          "price": "2500000.00",
+          "equity": "875000.00",
+          "loan": "1625000.00",
+          "ltv": "65"
+        },
+        {
+          "period": 3,
+          "price": "1450000.00",
+          "equity": "420000.00",
+          "loan": "1030000.00",
+          "ltv": "71.03"
+        }
+      ]
+    },
+    {
+      "id": "ex1.ltv",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "ex1.own",
+      "kind": "ltv_complement",
+      "inputs": {
+        "percent": "70"
+      },
+      "value": "30"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "900000",
+        "equity": "270000"
+      },
+      "value": "630000.00"
+    },
+    {
+      "id": "ex2.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "270000.00"
+    },
+    {
+      "id": "ex2.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "900000.00"
+    },
+    {
+      "id": "ex2.added",
+      "kind": "ltv_sum",
+      "inputs": {
+        "a": "900000",
+        "b": "270000"
+      },
+      "value": "1170000.00"
+    },
+    {
+      "id": "ex3.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1400000.00"
+    },
+    {
+      "id": "ex3.equity_paid",
+      "kind": "given",
+      "inputs": {},
+      "value": "392000.00"
+    },
+    {
+      "id": "ex3.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "1400000",
+        "equity": "392000"
+      },
+      "value": "1008000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1008000.00",
+        "value": "1400000"
+      },
+      "value": "72"
+    },
+    {
+      "id": "ex3.equity_share",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "392000",
+        "whole": "1400000"
+      },
+      "value": "28"
+    },
+    {
+      "id": "ex3.equity_over_loan",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "392000",
+        "whole": "1008000.00"
+      },
+      "value": "38.89"
+    },
+    {
+      "id": "ex3.loan_over_equity",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "1008000.00",
+        "whole": "392000"
+      },
+      "value": "257.14"
+    },
+    {
+      "id": "ex4.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "75"
+      },
+      "value": "1350000.00"
+    },
+    {
+      "id": "ex4.min_equity",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1800000",
+        "value": "1800000",
+        "ceiling": "75"
+      },
+      "value": "450000.00"
+    },
+    {
+      "id": "ex4.at_70",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "70"
+      },
+      "value": "1260000.00"
+    },
+    {
+      "id": "ex4.at_50",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "50"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "ex5.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "ex5.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1140000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1200000",
+        "value": "1140000",
+        "ceiling": "75"
+      },
+      "value": "345000.00"
+    },
+    {
+      "id": "ex5.at_price",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1200000",
+        "value": "1200000",
+        "ceiling": "75"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "ex5.max_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1140000",
+        "ceiling": "75"
+      },
+      "value": "855000.00"
+    },
+    {
+      "id": "ex5.value_quarter",
+      "kind": "ltv_min_equity",
+      "inputs": {
+        "price": "1140000",
+        "value": "1140000",
+        "ceiling": "75"
+      },
+      "value": "285000.00"
+    },
+    {
+      "id": "ex6.less",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "ex6.equity",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.equity",
+        "subtrahend": "ex6.less"
+      },
+      "value": "540000.00"
+    },
+    {
+      "id": "ex6.loan",
+      "kind": "ltv_loan_needed",
+      "inputs": {
+        "price": "2200000",
+        "equity": "540000.00"
+      },
+      "value": "1660000.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1660000.00",
+        "value": "2200000"
+      },
+      "value": "75.45"
+    },
+    {
+      "id": "ex6.equity_share",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "540000.00",
+        "whole": "2200000"
+      },
+      "value": "24.55"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "ltv_max_price",
+      "inputs": {
+        "equity": "560000",
+        "ceiling": "75"
+      },
+      "value": "2240000.00"
+    },
+    {
+      "id": "ex7.times_three",
+      "kind": "ltv_times",
+      "inputs": {
+        "amount": "560000",
+        "factor": "3"
+      },
+      "value": "1680000.00"
+    },
+    {
+      "id": "ex7.divided",
+      "kind": "ltv_divide",
+      "inputs": {
+        "amount": "560000",
+        "divisor": "0.75"
+      },
+      "value": "746666.67"
+    },
+    {
+      "id": "ex7.loan_fraction",
+      "kind": "ltv_fraction",
+      "inputs": {
+        "percent": "75"
+      },
+      "value": "0.75"
+    },
+    {
+      "id": "ex7.own_fraction",
+      "kind": "ltv_fraction",
+      "inputs": {
+        "percent": "25"
+      },
+      "value": "0.25"
+    },
+    {
+      "id": "ex7.check_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "2240000.00",
+        "ceiling": "75"
+      },
+      "value": "1680000.00"
+    }
+  ]
+}

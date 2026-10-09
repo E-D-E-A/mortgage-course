@@ -1,0 +1,432 @@
+{
+  "lesson": "1.4",
+  "title": "מסלול ותמהיל",
+  "note": "Case A is synthetic; every split is an invented teaching split, not a recommendation or a bank's offer.",
+  "facts": [
+    {
+      "id": "case.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "case.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000.00"
+    },
+    {
+      "id": "case.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "case.equity"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "explain.small_loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000"
+    },
+    {
+      "id": "explain.small_a",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "100000",
+        "weight": "60",
+        "total_weight": "100"
+      },
+      "value": "60000.00"
+    },
+    {
+      "id": "explain.small_b",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "100000",
+        "weight": "40",
+        "total_weight": "100"
+      },
+      "value": "40000.00"
+    },
+    {
+      "id": "explain.small_sum",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "60000.00",
+        "amount_2": "40000.00"
+      },
+      "value": "100000.00"
+    },
+    {
+      "id": "explain.small_share_back",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "60000",
+        "loan": "100000"
+      },
+      "value": "60"
+    },
+    {
+      "id": "explain.term_long",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "explain.term_short",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "slider.split",
+      "kind": "mix_split",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight_1": "40",
+        "weight_2": "35",
+        "weight_3": "25"
+      },
+      "value": [
+        {
+          "period": 1,
+          "share": "40",
+          "amount": "656000.00"
+        },
+        {
+          "period": 2,
+          "share": "35",
+          "amount": "574000.00"
+        },
+        {
+          "period": 3,
+          "share": "25",
+          "amount": "410000.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.sum",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "656000.00",
+        "amount_2": "574000.00",
+        "amount_3": "410000.00"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "slider.moving_share",
+      "kind": "mix_share_sum",
+      "inputs": {
+        "share_1": "35",
+        "share_2": "25"
+      },
+      "value": "60"
+    },
+    {
+      "id": "slider.evenish",
+      "kind": "mix_split",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight_1": "33",
+        "weight_2": "33",
+        "weight_3": "34"
+      },
+      "value": [
+        {
+          "period": 1,
+          "share": "33",
+          "amount": "541200.00"
+        },
+        {
+          "period": 2,
+          "share": "33",
+          "amount": "541200.00"
+        },
+        {
+          "period": 3,
+          "share": "34",
+          "amount": "557600.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.exact_third",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight": "1",
+        "total_weight": "3"
+      },
+      "value": "546666.67"
+    },
+    {
+      "id": "worked.split",
+      "kind": "mix_split",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight_1": "1",
+        "weight_2": "1",
+        "weight_3": "1"
+      },
+      "value": [
+        {
+          "period": 1,
+          "share": "33.33",
+          "amount": "546666.67"
+        },
+        {
+          "period": 2,
+          "share": "33.33",
+          "amount": "546666.67"
+        },
+        {
+          "period": 3,
+          "share": "33.33",
+          "amount": "546666.66"
+        }
+      ]
+    },
+    {
+      "id": "worked.third_digits",
+      "kind": "mix_slice_truncated",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight": "1",
+        "total_weight": "3",
+        "decimals": 4
+      },
+      "value": "546666.6666"
+    },
+    {
+      "id": "worked.naive_sum",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "546666.67",
+        "amount_2": "546666.67",
+        "amount_3": "546666.67"
+      },
+      "value": "1640000.01"
+    },
+    {
+      "id": "worked.sum",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "546666.67",
+        "amount_2": "546666.67",
+        "amount_3": "546666.66"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "worked.moving_share",
+      "kind": "mix_weight_share",
+      "inputs": {
+        "weight": "2",
+        "total_weight": "3"
+      },
+      "value": "66.67"
+    },
+    {
+      "id": "half.split",
+      "kind": "mix_split",
+      "inputs": {
+        "loan": "1640000.00",
+        "weight_1": "50",
+        "weight_2": "30",
+        "weight_3": "20"
+      },
+      "value": [
+        {
+          "period": 1,
+          "share": "50",
+          "amount": "820000.00"
+        },
+        {
+          "period": 2,
+          "share": "30",
+          "amount": "492000.00"
+        },
+        {
+          "period": 3,
+          "share": "20",
+          "amount": "328000.00"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "800000",
+        "weight": "30",
+        "total_weight": "100"
+      },
+      "value": "240000.00"
+    },
+    {
+      "id": "ex2.other_part",
+      "kind": "mix_remainder",
+      "inputs": {
+        "loan": "800000",
+        "amount_1": "240000.00"
+      },
+      "value": "560000.00"
+    },
+    {
+      "id": "ex2.three_percent",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "800000",
+        "weight": "3",
+        "total_weight": "100"
+      },
+      "value": "24000.00"
+    },
+    {
+      "id": "ex3.loan",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "450000",
+        "amount_2": "300000",
+        "amount_3": "250000"
+      },
+      "value": "1000000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "300000",
+        "loan": "1000000"
+      },
+      "value": "30"
+    },
+    {
+      "id": "ex3.of_first",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "300000",
+        "loan": "450000"
+      },
+      "value": "66.67"
+    },
+    {
+      "id": "ex3.fraction",
+      "kind": "mix_share_fraction",
+      "inputs": {
+        "amount": "300000",
+        "loan": "1000000"
+      },
+      "value": "0.3"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "mix_remainder",
+      "inputs": {
+        "loan": "1200000",
+        "amount_1": "500000",
+        "amount_2": "380000"
+      },
+      "value": "320000.00"
+    },
+    {
+      "id": "ex4.two_tracks",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "500000",
+        "amount_2": "380000"
+      },
+      "value": "880000.00"
+    },
+    {
+      "id": "ex4.first_only",
+      "kind": "mix_remainder",
+      "inputs": {
+        "loan": "1200000",
+        "amount_1": "500000"
+      },
+      "value": "700000.00"
+    },
+    {
+      "id": "ex4.added",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "1200000",
+        "amount_2": "500000",
+        "amount_3": "380000"
+      },
+      "value": "2080000.00"
+    },
+    {
+      "id": "ex5.term_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
+      "id": "ex5.term_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "15"
+    },
+    {
+      "id": "ex6.loan",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "550000",
+        "amount_2": "500000",
+        "amount_3": "450000"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex6.moving",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "500000",
+        "amount_2": "450000"
+      },
+      "value": "950000.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "950000.00",
+        "loan": "1500000.00"
+      },
+      "value": "63.33"
+    },
+    {
+      "id": "ex6.fixed_share",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "550000",
+        "loan": "1500000.00"
+      },
+      "value": "36.67"
+    },
+    {
+      "id": "ex6.boi_only",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "500000",
+        "loan": "1500000.00"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "ex6.fraction",
+      "kind": "mix_share_fraction",
+      "inputs": {
+        "amount": "950000.00",
+        "loan": "1500000.00"
+      },
+      "value": "0.63"
+    }
+  ]
+}

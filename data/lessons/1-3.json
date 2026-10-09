@@ -1,0 +1,332 @@
+{
+  "lesson": "1.3",
+  "title": "שלושה דברים נפרדים",
+  "note": "Invented round teaching loans, paid once a year; not market rates or any bank's terms.",
+  "facts": [
+    {
+      "id": "explain.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "120000"
+    },
+    {
+      "id": "explain.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "explain.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "explain.rate_up",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "explain.a_principal",
+      "kind": "mix_principal_part",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 1
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "explain.a_interest_1",
+      "kind": "mix_interest_part",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 1,
+        "rate_percent": "5"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "explain.a_pay_1",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 1,
+        "rate_percent": "5"
+      },
+      "value": "18000.00"
+    },
+    {
+      "id": "explain.b_principal_1",
+      "kind": "mix_principal_part",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "interest_only",
+        "year": 1
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "explain.b_pay_1",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "interest_only",
+        "year": 1,
+        "rate_percent": "5"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "explain.a_balance_2",
+      "kind": "mix_balance_at_start",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 2
+      },
+      "value": "108000.00"
+    },
+    {
+      "id": "explain.a_interest_2",
+      "kind": "mix_interest_part",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "5"
+      },
+      "value": "5400.00"
+    },
+    {
+      "id": "explain.a_interest_2_up",
+      "kind": "mix_interest_part",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "6"
+      },
+      "value": "6480.00"
+    },
+    {
+      "id": "explain.a_pay_2",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "5"
+      },
+      "value": "17400.00"
+    },
+    {
+      "id": "explain.a_pay_2_up",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "6"
+      },
+      "value": "18480.00"
+    },
+    {
+      "id": "explain.b_pay_2",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "interest_only",
+        "year": 2,
+        "rate_percent": "5"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "explain.b_pay_2_up",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "interest_only",
+        "year": 2,
+        "rate_percent": "6"
+      },
+      "value": "7200.00"
+    },
+    {
+      "id": "explain.b_pay_last",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "120000",
+        "years": 10,
+        "method": "interest_only",
+        "year": 10,
+        "rate_percent": "5"
+      },
+      "value": "126000.00"
+    },
+    {
+      "id": "explain.combos",
+      "kind": "mix_combinations",
+      "inputs": {
+        "count_1": 2,
+        "count_2": 2,
+        "count_3": 2
+      },
+      "value": "8"
+    },
+    {
+      "id": "explain.combos_if_tied",
+      "kind": "mix_combinations",
+      "inputs": {
+        "count_1": 2
+      },
+      "value": "2"
+    },
+    {
+      "id": "worked.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000"
+    },
+    {
+      "id": "worked.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "mix_combinations",
+      "inputs": {
+        "count_1": 3,
+        "count_2": 2
+      },
+      "value": "6"
+    },
+    {
+      "id": "ex3.added",
+      "kind": "mix_count_sum",
+      "inputs": {
+        "count_1": 3,
+        "count_2": 2
+      },
+      "value": "5"
+    },
+    {
+      "id": "ex4.principal",
+      "kind": "mix_principal_part",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 1
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "ex4.interest",
+      "kind": "mix_interest_part",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 1,
+        "rate_percent": "4"
+      },
+      "value": "9600.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 1,
+        "rate_percent": "4"
+      },
+      "value": "21600.00"
+    },
+    {
+      "id": "ex4.whole_principal",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "240000",
+        "amount_2": "9600.00"
+      },
+      "value": "249600.00"
+    },
+    {
+      "id": "ex5.balance",
+      "kind": "mix_balance_at_start",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 2
+      },
+      "value": "228000.00"
+    },
+    {
+      "id": "ex5.interest",
+      "kind": "mix_interest_part",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "5"
+      },
+      "value": "11400.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "5"
+      },
+      "value": "23400.00"
+    },
+    {
+      "id": "ex5.old_rate",
+      "kind": "mix_year_payment",
+      "inputs": {
+        "loan": "240000",
+        "years": 20,
+        "method": "equal_principal",
+        "year": 2,
+        "rate_percent": "4"
+      },
+      "value": "21120.00"
+    },
+    {
+      "id": "ex5.full_debt",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "12000.00",
+        "amount_2": "12000.00"
+      },
+      "value": "24000.00"
+    }
+  ]
+}

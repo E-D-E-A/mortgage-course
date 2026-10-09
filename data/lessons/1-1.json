@@ -1,0 +1,416 @@
+{
+  "lesson": "1.1",
+  "title": "משכנתא: הלוואה עם בטוחה",
+  "note": "Invented teaching numbers for a made-up bank. Sales are shown before the costs of the process and late-payment interest.",
+  "facts": [
+    {
+      "id": "pred.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "pred.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "pred.to_lender",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1200000",
+        "debt": "500000",
+        "part": "lender"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "pred.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1200000",
+        "debt": "500000",
+        "part": "borrower"
+      },
+      "value": "700000.00"
+    },
+    {
+      "id": "pred.half",
+      "kind": "ltv_times",
+      "inputs": {
+        "amount": "1200000",
+        "factor": "0.5"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "explain.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "explain.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "explain.full.to_lender",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1000000",
+        "debt": "600000",
+        "part": "lender"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "explain.full.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1000000",
+        "debt": "600000",
+        "part": "borrower"
+      },
+      "value": "400000.00"
+    },
+    {
+      "id": "explain.low_sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "550000.00"
+    },
+    {
+      "id": "explain.low.to_lender",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "550000",
+        "debt": "600000",
+        "part": "lender"
+      },
+      "value": "550000.00"
+    },
+    {
+      "id": "explain.low.still_owed",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "550000",
+        "debt": "600000",
+        "part": "owed"
+      },
+      "value": "50000.00"
+    },
+    {
+      "id": "explain.cushion",
+      "kind": "ltv_cushion",
+      "inputs": {
+        "value": "1000000",
+        "debt": "600000"
+      },
+      "value": "40"
+    },
+    {
+      "id": "slider.t2.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "slider.t2.still_owed",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "500000",
+        "debt": "600000",
+        "part": "owed"
+      },
+      "value": "100000.00"
+    },
+    {
+      "id": "slider.t3.big_debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "900000.00"
+    },
+    {
+      "id": "slider.t3.sale",
+      "kind": "ltv_after_drop",
+      "inputs": {
+        "amount": "1000000",
+        "drop_percent": "10"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "slider.t3.big_debt.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "900000",
+        "debt": "900000",
+        "part": "borrower"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "slider.t3.small_debt.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "900000",
+        "debt": "600000",
+        "part": "borrower"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "worked.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "worked.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "780000.00"
+    },
+    {
+      "id": "worked.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "1380000.00"
+    },
+    {
+      "id": "worked.fall",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.price",
+        "subtrahend": "worked.sale"
+      },
+      "value": "120000.00"
+    },
+    {
+      "id": "worked.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.price",
+        "subtrahend": "worked.debt"
+      },
+      "value": "720000.00"
+    },
+    {
+      "id": "worked.big.still_owed",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1380000",
+        "debt": "1400000",
+        "part": "owed"
+      },
+      "value": "20000.00"
+    },
+    {
+      "id": "worked.big_debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "1400000.00"
+    },
+    {
+      "id": "worked.drop",
+      "kind": "ltv_drop_percent",
+      "inputs": {
+        "from": "1500000",
+        "to": "1380000"
+      },
+      "value": "8"
+    },
+    {
+      "id": "worked.to_lender",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1380000",
+        "debt": "780000",
+        "part": "lender"
+      },
+      "value": "780000.00"
+    },
+    {
+      "id": "worked.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "1380000",
+        "debt": "780000",
+        "part": "borrower"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "worked.cushion",
+      "kind": "ltv_cushion",
+      "inputs": {
+        "value": "1500000",
+        "debt": "780000"
+      },
+      "value": "48"
+    },
+    {
+      "id": "half.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "720000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "ltv_sale_table",
+      "inputs": {
+        "debt": "720000",
+        "sale_1": "1000000",
+        "sale_2": "760000",
+        "sale_3": "690000"
+      },
+      "value": [
+        {
+          "period": 1,
+          "sale": "1000000.00",
+          "to_lender": "720000.00",
+          "to_borrower": "280000.00",
+          "still_owed": "0.00"
+        },
+        {
+          "period": 2,
+          "sale": "760000.00",
+          "to_lender": "720000.00",
+          "to_borrower": "40000.00",
+          "still_owed": "0.00"
+        },
+        {
+          "period": 3,
+          "sale": "690000.00",
+          "to_lender": "690000.00",
+          "to_borrower": "0.00",
+          "still_owed": "30000.00"
+        }
+      ]
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "950000",
+        "debt": "410000",
+        "part": "borrower"
+      },
+      "value": "540000.00"
+    },
+    {
+      "id": "ex3.to_lender",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "950000",
+        "debt": "410000",
+        "part": "lender"
+      },
+      "value": "410000.00"
+    },
+    {
+      "id": "ex3.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "950000.00"
+    },
+    {
+      "id": "ex3.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "410000.00"
+    },
+    {
+      "id": "ex3.added",
+      "kind": "ltv_sum",
+      "inputs": {
+        "a": "950000",
+        "b": "410000"
+      },
+      "value": "1360000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "640000",
+        "debt": "700000",
+        "part": "owed"
+      },
+      "value": "60000.00"
+    },
+    {
+      "id": "ex4.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "640000.00"
+    },
+    {
+      "id": "ex4.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "700000.00"
+    },
+    {
+      "id": "ex4.to_borrower",
+      "kind": "ltv_sale_part",
+      "inputs": {
+        "sale": "640000",
+        "debt": "700000",
+        "part": "borrower"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "ltv_cushion",
+      "inputs": {
+        "value": "1600000",
+        "debt": "1040000"
+      },
+      "value": "35"
+    },
+    {
+      "id": "ex6.debt_share",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "1040000",
+        "whole": "1600000"
+      },
+      "value": "65"
+    },
+    {
+      "id": "ex6.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1600000.00"
+    },
+    {
+      "id": "ex6.debt",
+      "kind": "given",
+      "inputs": {},
+      "value": "1040000.00"
+    },
+    {
+      "id": "ex6.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.value",
+        "subtrahend": "ex6.debt"
+      },
+      "value": "560000.00"
+    },
+    {
+      "id": "ex6.room_over_debt",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "560000.00",
+        "whole": "1040000"
+      },
+      "value": "53.85"
+    }
+  ]
+}

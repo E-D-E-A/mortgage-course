@@ -1,0 +1,466 @@
+{
+  "lesson": "1.7",
+  "title": "התהליך מקצה לקצה",
+  "note": "Clocks per the team's Brain transcription of Directive 451 (Aug 2026), not verified against the directive. Example dates are invented; banking days per the Brain's 2026 table, Friday counted (course assumption).",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-09"
+    },
+    {
+      "id": "steps.count",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "clock.answer",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "clock.answer_extended",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "clock.window",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "clock.window_no_lien",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "clock.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": 90
+    },
+    {
+      "id": "calendar.closed_2026",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+    },
+    {
+      "id": "claim.fast_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 21
+    },
+    {
+      "id": "claim.appraisal_low_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "claim.appraisal_high_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 14
+    },
+    {
+      "id": "claim.appraisal_between_banks_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 3
+    },
+    {
+      "id": "calendar.short_day_end",
+      "kind": "given",
+      "inputs": {},
+      "value": "14:00"
+    },
+    {
+      "id": "calendar.yk_eve",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-20"
+    },
+    {
+      "id": "calendar.yk",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-21"
+    },
+    {
+      "id": "worked.sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-11"
+    },
+    {
+      "id": "worked.answer_by",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-11",
+        "days": 5,
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-16"
+    },
+    {
+      "id": "worked.answer_by_no_friday",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-11",
+        "days": 5,
+        "friday_counts": "no",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-18"
+    },
+    {
+      "id": "worked.answer_by_7",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-11",
+        "days": 7,
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-19"
+    },
+    {
+      "id": "worked.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-14"
+    },
+    {
+      "id": "worked.answered_after",
+      "kind": "proc_business_days_between",
+      "inputs": {
+        "from": "2026-10-11",
+        "to": "2026-10-14",
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": 3
+    },
+    {
+      "id": "worked.window_end",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-14",
+        "days": 24
+      },
+      "value": "2026-11-07"
+    },
+    {
+      "id": "worked.window_end_no_lien",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-14",
+        "days": 12
+      },
+      "value": "2026-10-26"
+    },
+    {
+      "id": "worked.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-20"
+    },
+    {
+      "id": "worked.appraisal_end",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-20",
+        "days": 90
+      },
+      "value": "2027-01-18"
+    },
+    {
+      "id": "worked.signing",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-05"
+    },
+    {
+      "id": "worked.used",
+      "kind": "proc_calendar_days_between",
+      "inputs": {
+        "from": "2026-10-14",
+        "to": "2026-11-05"
+      },
+      "value": 22
+    },
+    {
+      "id": "worked.left",
+      "kind": "proc_days_left",
+      "inputs": {
+        "window": 24,
+        "used": 22
+      },
+      "value": 2
+    },
+    {
+      "id": "half.table",
+      "kind": "proc_window_table",
+      "inputs": {
+        "start": "2026-10-14",
+        "window": 24,
+        "event_1": "האישור הגיע",
+        "date_1": "2026-10-14",
+        "event_2": "ההצעות הגיעו",
+        "date_2": "2026-10-21",
+        "event_3": "התיק נפתח",
+        "date_3": "2026-10-26",
+        "event_4": "השמאי ביקר",
+        "date_4": "2026-10-29",
+        "event_5": "החתימה נקבעה",
+        "date_5": "2026-11-05"
+      },
+      "value": [
+        {
+          "period": 1,
+          "event": "האישור הגיע",
+          "date": "2026-10-14",
+          "days": 0,
+          "left": 24
+        },
+        {
+          "period": 2,
+          "event": "ההצעות הגיעו",
+          "date": "2026-10-21",
+          "days": 7,
+          "left": 17
+        },
+        {
+          "period": 3,
+          "event": "התיק נפתח",
+          "date": "2026-10-26",
+          "days": 12,
+          "left": 12
+        },
+        {
+          "period": 4,
+          "event": "השמאי ביקר",
+          "date": "2026-10-29",
+          "days": 15,
+          "left": 9
+        },
+        {
+          "period": 5,
+          "event": "החתימה נקבעה",
+          "date": "2026-11-05",
+          "days": 22,
+          "left": 2
+        }
+      ]
+    },
+    {
+      "id": "ex2.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-02"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 24
+      },
+      "value": "2026-11-26"
+    },
+    {
+      "id": "ex2.err_day_one",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 23
+      },
+      "value": "2026-11-25"
+    },
+    {
+      "id": "ex2.err_twelve",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 12
+      },
+      "value": "2026-11-14"
+    },
+    {
+      "id": "ex3.sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-22"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-22",
+        "days": 5,
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-28"
+    },
+    {
+      "id": "ex3.err_no_friday",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-22",
+        "days": 5,
+        "friday_counts": "no",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-29"
+    },
+    {
+      "id": "ex3.err_day_one",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-10-21",
+        "days": 5,
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-10-27"
+    },
+    {
+      "id": "ex3.err_calendar",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-22",
+        "days": 5
+      },
+      "value": "2026-10-27"
+    },
+    {
+      "id": "ex4.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-09"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-09",
+        "days": 12
+      },
+      "value": "2026-11-21"
+    },
+    {
+      "id": "ex4.err_day_one",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-09",
+        "days": 11
+      },
+      "value": "2026-11-20"
+    },
+    {
+      "id": "ex4.err_24",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-09",
+        "days": 24
+      },
+      "value": "2026-12-03"
+    },
+    {
+      "id": "ex5.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-01"
+    },
+    {
+      "id": "ex5.second_bank",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-15"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "proc_calendar_days_between",
+      "inputs": {
+        "from": "2026-09-01",
+        "to": "2026-11-15"
+      },
+      "value": 75
+    },
+    {
+      "id": "ex5.err_both_ends",
+      "kind": "proc_calendar_days_between",
+      "inputs": {
+        "from": "2026-08-31",
+        "to": "2026-11-15"
+      },
+      "value": 76
+    },
+    {
+      "id": "ex5.last_day",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-09-01",
+        "days": 90
+      },
+      "value": "2026-11-30"
+    },
+    {
+      "id": "ex6.sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-17"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-09-17",
+        "days": 5,
+        "friday_counts": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-09-25"
+    },
+    {
+      "id": "ex6.err_no_friday",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-09-17",
+        "days": 5,
+        "friday_counts": "no",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21"
+      },
+      "value": "2026-09-28"
+    },
+    {
+      "id": "ex6.err_no_holidays",
+      "kind": "proc_add_business_days",
+      "inputs": {
+        "start": "2026-09-17",
+        "days": 5,
+        "friday_counts": "yes",
+        "closed": ""
+      },
+      "value": "2026-09-23"
+    },
+    {
+      "id": "ex6.err_calendar",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-09-17",
+        "days": 5
+      },
+      "value": "2026-09-22"
+    }
+  ]
+}
