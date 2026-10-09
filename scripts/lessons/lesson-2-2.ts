@@ -147,6 +147,8 @@ export default function lesson22(): LessonData {
   const base = bPay.value as string;
 
   // Worked example: a 360,000 ₪ track over 360 months at a fixed 4.8%, equal principal.
+  const w1 = epMonth("worked.m1_payment", "360000", 360, "4.8", 1, "payment");
+  const w2 = epMonth("worked.m2_payment", "360000", 360, "4.8", 2, "payment");
   const w61 = epMonth("worked.m61_payment", "360000", 360, "4.8", 61, "payment");
   const w61Up = epMonth("worked.m61_payment_up", "360000", 360, "6", 61, "payment");
 
@@ -190,10 +192,11 @@ export default function lesson22(): LessonData {
     monthly("worked.monthly_rate_up", "6"),
     epMonth("worked.principal", "360000", 360, "4.8", 1, "principal"),
     epMonth("worked.m1_interest", "360000", 360, "4.8", 1, "interest"),
-    epMonth("worked.m1_payment", "360000", 360, "4.8", 1, "payment"),
+    w1,
     epMonth("worked.m2_balance", "360000", 360, "4.8", 2, "balance"),
     epMonth("worked.m2_interest", "360000", 360, "4.8", 2, "interest"),
-    epMonth("worked.m2_payment", "360000", 360, "4.8", 2, "payment"),
+    w2,
+    difference("worked.m2_drop", w1, w2),
     epMonth("worked.m121_balance", "360000", 360, "4.8", 121, "balance"),
     epMonth("worked.m121_interest", "360000", 360, "4.8", 121, "interest"),
     epMonth("worked.m121_payment", "360000", 360, "4.8", 121, "payment"),
@@ -212,6 +215,7 @@ export default function lesson22(): LessonData {
     given("half.months", "240"),
     given("half.rate", "6"),
     monthly("half.monthly_rate", "6"),
+    epMonth("half.principal", "240000", 240, "6", 1, "principal"),
     epMonthTable("half.table", "240000", 240, "6", [1, 2, 13, 121]),
 
     // Exercise 2: yearly equal principal, 60,000 ₪, 4 years, 6% — the payment in year 2.
@@ -226,6 +230,7 @@ export default function lesson22(): LessonData {
     epMonth("ex4.answer", "180000", 180, "6", 1, "payment"),
     epMonth("ex4.interest", "180000", 180, "6", 1, "interest"),
     epMonth("ex4.principal", "180000", 180, "6", 1, "principal"),
+    monthly("ex4.monthly", "6"),
 
     // Exercise 5: equal payments on 20,000 ₪ over 2 years at 6%.
     payment("ex5.answer", "20000", "6", 2),

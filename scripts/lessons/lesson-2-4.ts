@@ -135,6 +135,7 @@ export default function lesson24(): LessonData {
     // Exercise 5: an indexed track at 3.6% stated, inflation 2.5% — effective, before inflation.
     effectiveBeforeInflation("ex5.answer", "3.6", "2.5"),
     effective("ex5.effective", "3.6"),
+    monthly("ex5.monthly", "3.6"),
     pointsSum("ex5.added", "3.6", "2.5"),
     beforeInflation("ex5.no_compounding", "3.6", "2.5"),
     pointsSum("ex5.effective_added", plainNumber(effectiveFromStated("3.6")), "2.5"),

@@ -129,6 +129,10 @@ def capped_rate(i, _facts=None):
     return _plain(min(Decimal(str(i["average_percent"])) - Decimal(str(i["below_points"])), Decimal(str(i["cap_percent"]))))
 
 
+def rate_plus_points(i, _facts=None):
+    return _plain(Decimal(str(i["rate_percent"])) + Decimal(str(i["points"])))
+
+
 def capped_discount(i, _facts=None):
     return str(agorot(min(Decimal(str(i["price"])) * Decimal(str(i["percent"])) / 100, Decimal(str(i["cap"])))))
 
@@ -160,6 +164,7 @@ KINDS = {
     "rep_crossover_month": crossover,
     "rep_capped_rate": capped_rate,
     "rep_capped_discount": capped_discount,
+    "rep_rate_plus_points": rate_plus_points,
     "rep_fx_balance": fx_balance,
     "rep_fx_units": fx_units,
     "rep_sum": sum_of,

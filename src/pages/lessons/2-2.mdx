@@ -157,7 +157,7 @@ export const predictionOptions = [
 
 </Section>
 
-**דרך ד׳ — תשלומים שווים, וריבית משתנה.** השנה הראשונה כמו בדרך ב׳: {pct("ex.rate")}, תשלום של {f.shekels("b.payment")}, ובסוף השנה נשאר חוב של {f.shekels("c.table.0.closing")}.
+**דרך ד׳ — תשלומים שווים, וריבית משתנה.** השנה הראשונה כמו בדרך ב׳: {pct("ex.rate")}, תשלום של {f.shekels("b.payment")}, ובסוף השנה נשאר חוב של {T(c[0].closing)}.
 עכשיו נניח שבתחילת השנה השנייה אחוז הריבית עולה ל־{pct("ex.rate_up")}. בדוגמה שלנו מחשבים מחדש תשלום שווה לשנתיים שנשארו, על החוב שנשאר, באחוז החדש — באותה דרך כמו בדרך ב׳:
 
 <M>{num(c[0].closing)} ÷ (1 ÷ 1.07 + 1 ÷ 1.07<sup>2</sup>) = {n("c.payment_2")}</M>.
@@ -273,7 +273,7 @@ export const predictionOptions = [
 
 **צעד 3 — החודש הראשון.** סכום הריבית: <M>{n("worked.loan")} × {f.plain("worked.monthly_rate")}% = {n("worked.m1_interest")}</M>. התשלום: <M>{n("worked.principal")} + {n("worked.m1_interest")} = {f.shekels("worked.m1_payment")}</M>.
 
-**צעד 4 — החודש השני.** החוב קטן ל־{f.shekels("worked.m2_balance")}. סכום הריבית: <M>{n("worked.m2_balance")} × {f.plain("worked.monthly_rate")}% = {n("worked.m2_interest")}</M>. התשלום: {f.shekels("worked.m2_payment")} — {f.shekels("worked.monthly_rate_drop")} פחות.
+**צעד 4 — החודש השני.** החוב קטן ל־{f.shekels("worked.m2_balance")}. סכום הריבית: <M>{n("worked.m2_balance")} × {f.plain("worked.monthly_rate")}% = {n("worked.m2_interest")}</M>. התשלום: {f.shekels("worked.m2_payment")} — {f.shekels("worked.m2_drop")} פחות.
 
 **צעד 5 — אחרי 10 שנים, ובסוף.** בחודש 121 החוב הוא {f.shekels("worked.m121_balance")}, סכום הריבית {f.shekels("worked.m121_interest")}, והתשלום {f.shekels("worked.m121_payment")}. בחודש האחרון החוב הוא {f.shekels("worked.m360_balance")}, והתשלום {f.shekels("worked.m360_payment")}.
 **אחוז הריבית לא זז במשך 30 שנה, והתשלום ירד מ־{f.shekels("worked.m1_payment")} ל־{f.shekels("worked.m360_payment")}.**
@@ -304,7 +304,7 @@ export const predictionOptions = [
   ]}
   blanks={["2.opening", "2.interest", "2.payment", "13.opening", "13.interest", "13.payment", "121.opening", "121.interest", "121.payment"]}
   success="אחוז הריבית לא זז, והתשלום יורד בכל חודש: הריבית מחושבת על חוב שהולך וקטן, וחלק הקרן נשאר אותו דבר."
-  hint="בכל חודש מחזירים 1,000 ₪ מהקרן. לפני החודש ה־k כבר הוחזרו k פחות 1 חודשים. סכום הריבית: החוב כפול 0.5%. התשלום: 1,000 ועוד סכום הריבית."
+  hint={`בכל חודש מחזירים ${f.shekels("half.principal")} מהקרן. לפני החודש ה־k כבר הוחזרו k פחות 1 חלקים. סכום הריבית: החוב כפול ${pct("half.monthly_rate")}. התשלום: חלק הקרן ועוד סכום הריבית.`}
 />
 
 <Section kind="תרגול">
@@ -379,7 +379,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="2.2-4">
-חלק הקרן: <M>180,000 ÷ 180 = {n("ex4.principal")}</M>. הריבית לחודש: <M>6 ÷ 12 = 0.5</M>, כלומר 0.5%. סכום הריבית: <M>180,000 × 0.5% = {n("ex4.interest")}</M>. התשלום: <M>{n("ex4.principal")} + {n("ex4.interest")} = {f.shekels("ex4.answer")}</M>, במקום {f.shekels("ex4.before")} לפני העדכון.
+חלק הקרן: <M>180,000 ÷ 180 = {n("ex4.principal")}</M>. הריבית לחודש: <M>6 ÷ 12 = {f.plain("ex4.monthly")}</M>, כלומר {pct("ex4.monthly")}. סכום הריבית: <M>180,000 × {f.plain("ex4.monthly")}% = {n("ex4.interest")}</M>. התשלום: <M>{n("ex4.principal")} + {n("ex4.interest")} = {f.shekels("ex4.answer")}</M>, במקום {f.shekels("ex4.before")} לפני העדכון.
 </Solution>
 
 <NumericExercise

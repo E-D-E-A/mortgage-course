@@ -24,6 +24,14 @@ const rate = (id: string, average: string, below: string, cap: string): Fact => 
   value: cappedRateBelowAverage(average, below, cap).toString(),
 });
 
+/** A rate moved by some points, without the cap (the learner's mistakes, and the step before the cap). */
+const plusPoints = (id: string, ratePercent: string, points: string): Fact => ({
+  id,
+  kind: "rep_rate_plus_points",
+  inputs: { rate_percent: ratePercent, points },
+  value: new Decimal(ratePercent).plus(points).toString(),
+});
+
 const discount = (id: string, price: string, percent: string, cap: string): Fact => ({
   id,
   kind: "rep_capped_discount",
@@ -85,13 +93,15 @@ export default function lesson28(): LessonData {
     given("rule.base_low_2023", "54240.00"),
     given("rule.base_high_2023", "161665.00"),
     given("rule.ltv_cap", "75"),
+    given("rule.no_forecast_cap", "3"),
     given("target.percent", "20"),
     given("target.cap", "300000.00"),
 
     // The rate rule with teaching averages.
     rate("explain.rate_low", "3.2", "0.5", "3"),
+    plusPoints("explain.minus_low", "3.2", "-0.5"),
     rate("explain.rate_high", "4", "0.5", "3"),
-    given("explain.minus_high", "3.5"),
+    plusPoints("explain.minus_high", "4", "-0.5"),
 
     // Target price: two prices in the explanation.
     ...targetRow("target.a", "1200000"),
@@ -123,10 +133,10 @@ export default function lesson28(): LessonData {
 
     // Exercise 2: average 3.4 → 2.9.
     rate("ex2.answer", "3.4", "0.5", "3"),
-    given("ex2.err_plus", "3.9"),
+    plusPoints("ex2.err_plus", "3.4", "0.5"),
     // Exercise 3: average 3.8 → the cap.
     rate("ex3.answer", "3.8", "0.5", "3"),
-    given("ex3.err_uncapped", "3.3"),
+    plusPoints("ex3.err_uncapped", "3.8", "-0.5"),
     // Exercise 4: target price below the cap.
     ...targetRow("ex4", "1350000"),
     // Exercise 5: target price above the cap.
