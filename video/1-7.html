@@ -82,15 +82,15 @@
         [30, 38, "עם האישורים בונים תמהיל, ומבקשים הצעות."],
         [38, 48, "בוחרים בנק: פתיחת תיק, שמאות, חיתום, ביטוחים."],
         [48, 59, "ובסוף חתימה, ואז הבנק מעביר את הכסף."],
-        [61, 70, `שעון 1: הבנק עונה תוך ${V.answer} ימי עסקים.`],
+        [61, 70, `השעון הראשון: הבנק עונה תוך ${V.answer} ימי עסקים.`],
         [70, 78, `${V.answer7} ימי עסקים: רק לסוגי הלוואות שהבנק הגדיר מראש.`],
         [78, 85, "שבת וחגים לא נספרים. שישי נספר, לפי הנחת הקורס."],
         [85, 91, `בקשה ב־${dayMonth(V.sent)}: תשובה עד ${dayMonth(V.answerBy)}.`],
-        [93, 102, `שעון 2: התנאים שבאישור נשמרים לפחות ${V.window} יום.`],
+        [93, 102, `השעון השני: התנאים שבאישור נשמרים לפחות ${V.window} יום.`],
         [102, 110, "כאן סופרים כל יום, גם שבת וחג."],
         [110, 117, `בלי שעבוד חדש: ${V.window12} יום בלבד.`],
         [117, 123, "כל מה שעד החתימה רץ מול השעון הזה."],
-        [125, 133, "שעון 3: שמאות שנעשתה בשביל בנק אחד."],
+        [125, 133, "השעון השלישי: שמאות שנעשתה בשביל בנק אחד."],
         [133, 141, `בנק אחר לא יסרב לה בלי סיבה סבירה, עד ${V.appraisal} יום.`],
         [143, 150, "לשאר הצעדים לא מצאנו שעון כתוב."],
         [150, 159, "המספרים לפי תעתיק של הצוות. הם עוד לא אומתו."],
@@ -170,7 +170,7 @@
           drawSteps(t, o, { appear: true });
           // The four parts, under the grid.
           const parts = [
-            [13.5, "לפני הבנק: 1–2"], [22, "השאלה לבנקים: 3–4"], [31, "ההצעה: 5–6"], [39, "מהבחירה לכסף: 7–12"],
+            [13.5, "לפני הבנק"], [22, "השאלה לבנקים"], [31, "ההצעה"], [39, "מהבחירה לכסף"],
           ];
           parts.forEach(([start, label], k) => {
             const a = Math.min(o, after(t, start, 0.8));
@@ -185,7 +185,7 @@
         // Scene 3 — clock 1: business days to answer
         if (inScene(t, S.c1)) {
           const o = vis(t, S.c1);
-          txt(640, 88, `שעון 1: ${V.answer} ימי עסקים לתשובה`, 34, { w: 700, o });
+          txt(640, 88, `השעון הראשון: ${V.answer} ימי עסקים לתשובה`, 34, { w: 700, o });
           drawSteps(t, o, { dim: true, highlight: (n) => (["3", "4"].includes(n) ? { fill: C.n0, stroke: C.teal } : null) });
           // The week after the request: day 0, then each day, with the running count of business days.
           const cells = [{ date: V.sent, zero: true }, ...V.week];
@@ -210,7 +210,7 @@
         // Scene 4 — clock 2: calendar days the terms hold
         if (inScene(t, S.c2)) {
           const o = vis(t, S.c2);
-          txt(640, 88, `שעון 2: לפחות ${V.window} יום לתנאים`, 34, { w: 700, o });
+          txt(640, 88, `השעון השני: לפחות ${V.window} יום לתנאים`, 34, { w: 700, o });
           drawSteps(t, o, { dim: true, highlight: (n) => (["4", "5", "6", "7", "8", "9", "10", "11"].includes(n) ? { fill: C.n0, stroke: C.tq2 } : null) });
           const W = 38, G = 4, right = 1160, y = 430;
           txt(right, y - 22, `האישור: ${dayMonth(V.approved)}`, 20, { anchor: "start", w: 600, fill: C.n700, o });
@@ -235,7 +235,7 @@
         // Scene 5 — clock 3: an appraisal moves to another bank
         if (inScene(t, S.c3)) {
           const o = vis(t, S.c3);
-          txt(640, 88, `שעון 3: ${V.appraisal} יום לשמאות`, 34, { w: 700, o });
+          txt(640, 88, `השעון השלישי: ${V.appraisal} יום לשמאות`, 34, { w: 700, o });
           drawSteps(t, o, { dim: true, highlight: (n) => (n === "8" ? { fill: C.n0, stroke: C.navy, dashed: true } : null) });
           const o2 = Math.min(o, after(t, 126, 0.6));
           el("rect", { x: 760, y: 400, width: 360, height: 110, rx: 14, fill: C.n0, stroke: C.n300, opacity: o2 });
