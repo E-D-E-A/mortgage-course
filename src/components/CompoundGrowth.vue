@@ -7,6 +7,7 @@ import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { compoundBalance, simpleBalance } from "../lib/calc/compound.ts";
 import { formatWholeShekels } from "../lib/calc/money.ts";
+import { percentString } from "../lib/calc/percent.ts";
 
 const props = withDefaults(defineProps<{ principal?: number; rate?: number; years?: number }>(), {
   principal: 10000,
@@ -37,7 +38,7 @@ const rows = computed(() =>
 const last = computed(() => rows.value[rows.value.length - 1]);
 const ioiShare = computed(() => {
   const total = last.value.balance.minus(last.value.principal);
-  return total.isZero() ? 0 : last.value.interestOnInterest.div(total).mul(100).toDecimalPlaces(0).toNumber();
+  return total.isZero() ? "0" : percentString(last.value.interestOnInterest.div(total).mul(100));
 });
 
 // Chart geometry (viewBox units). Bars sit on the baseline; the start side is the right in RTL,
