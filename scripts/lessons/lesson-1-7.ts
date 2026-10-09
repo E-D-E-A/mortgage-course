@@ -106,8 +106,8 @@ export default function lesson17(): LessonData {
     given("clock.window_no_lien", WINDOW_NO_LIEN),
     given("clock.appraisal", APPRAISAL),
     given("calendar.closed_2026", CLOSED_2026.join(",")),
-    // An unattributed claim from the founders' meeting of 2026-10-01 (field knowledge, FK-H-079): shown as a claim.
-    given("claim.fast_days", 21),
+    // Knesset election day 2026, a day of rest: per news reports, not verified.
+    given("calendar.election", "2026-10-27"),
     // Eylon on appraisal validity (FK-H-037: 12–14 months, 2026-07-27; FK-H-038: 3 months between banks, 2026-08-05): claims, not rules.
     given("claim.appraisal_low_months", 12),
     given("claim.appraisal_high_months", 14),
@@ -149,13 +149,14 @@ export default function lesson17(): LessonData {
     calendarAfter("ex2.err_day_one", "2026-11-02", WINDOW - 1),
     calendarAfter("ex2.err_twelve", "2026-11-02", WINDOW_NO_LIEN),
 
-    // Exercise 3: a request sent on Thursday 22 October.
-    given("ex3.sent", "2026-10-22"),
-    businessAfter("ex3.answer", "2026-10-22", ANSWER),
-    businessAfter("ex3.err_no_friday", "2026-10-22", ANSWER, NO_FRIDAY),
+    // Exercise 3: a request sent on Thursday 5 November (a week with no closed day; 22 October
+    // would cross the election day of 27 October, which is not verified).
+    given("ex3.sent", "2026-11-05"),
+    businessAfter("ex3.answer", "2026-11-05", ANSWER),
+    businessAfter("ex3.err_no_friday", "2026-11-05", ANSWER, NO_FRIDAY),
     // Counting the sending day itself as day 1 = counting from the day before it.
-    businessAfter("ex3.err_day_one", "2026-10-21", ANSWER),
-    calendarAfter("ex3.err_calendar", "2026-10-22", ANSWER),
+    businessAfter("ex3.err_day_one", "2026-11-04", ANSWER),
+    calendarAfter("ex3.err_calendar", "2026-11-05", ANSWER),
 
     // Exercise 4: a refinance with no new lien, approval on Monday 9 November.
     given("ex4.approved", "2026-11-09"),

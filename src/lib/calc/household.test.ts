@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, disposableTable, monthlyTotal } from "./household.ts";
+import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, disposableTable, maxPriceForEquity, monthlyTotal } from "./household.ts";
 
 describe("monthlyTotal", () => {
   it("adds monthly amounts", () => {
@@ -84,5 +84,14 @@ describe("calendar days", () => {
 
   it("refuses a date that is not ISO", () => {
     expect(() => addCalendarDays("10/11/2026", 1)).toThrow(RangeError);
+  });
+});
+
+describe("maxPriceForEquity", () => {
+  it("finds the price that equity covers at a cap", () => {
+    // At 75% the buyers bring a quarter: 510,000 × 4 = 2,040,000; 560,000 × 4 = 2,240,000 (by hand).
+    expect(maxPriceForEquity(510000, "75").toString()).toBe("2040000");
+    expect(maxPriceForEquity(560000, "75").toString()).toBe("2240000");
+    expect(() => maxPriceForEquity(1, "100")).toThrow(RangeError);
   });
 });

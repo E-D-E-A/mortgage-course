@@ -69,3 +69,10 @@ export function addCalendarDays(iso: string, days: number): string {
 export function calendarDaysBetween(from: string, to: string): number {
   return Math.round((parseDate(to) - parseDate(from)) / DAY_MS);
 }
+
+/** The highest price that a given amount of equity covers at a financing cap: equity ÷ (1 − cap). 510,000 at 75% → 2,040,000. */
+export function maxPriceForEquity(equity: Numeric, capPercent: Numeric): Decimal {
+  const own = new Decimal(100).minus(capPercent);
+  if (own.lte(0)) throw new RangeError("the cap must be below 100%");
+  return new Decimal(equity).mul(100).div(own);
+}

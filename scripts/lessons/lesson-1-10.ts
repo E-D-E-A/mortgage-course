@@ -12,7 +12,7 @@
  *    official rules come from the team's transcriptions in the Brain and are
  *    "לא אומת"; field numbers wait for Eylon's approval.
  */
-import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, monthlyTotal } from "../../src/lib/calc/household.ts";
+import { addCalendarDays, calendarDaysBetween, daysLeft, disposableIncome, maxPriceForEquity, monthlyTotal } from "../../src/lib/calc/household.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentOf, percentString, sharePercent } from "../../src/lib/calc/percent.ts";
 import Decimal from "decimal.js";
@@ -84,6 +84,8 @@ export default function lesson110(): LessonData {
     inputs: { amount: PRICE, rate_percent: "75" },
     value: moneyString(percentOf(PRICE, "75")),
   };
+  const capEquity = difference("case.cap_equity", price, capLoan);
+  const capMoney = sum("case.cap_money", [capEquity.value as string, reserve.value as string]);
   const WINDOW = 24;
   const NO_LIEN = 12;
   const USED = 11;
@@ -121,8 +123,20 @@ export default function lesson110(): LessonData {
     share("case.ltv_with_reserve", loanWithReserve.value as string, PRICE),
     // The cap for a only home, as lesson 1.2 teaches it (Directive 329 via the Brain; לא אומת).
     given("ref.cap_only_home", "75"),
+    { id: "ref.own_share", kind: "percentage_point_change", inputs: { from_percent: "75", to_percent: "100" }, value: "25" },
     capLoan,
     difference("case.cap_room", capLoan, loan),
+    // Keeping the reserve aside AND staying at the cap: the buyers' share of the price is the
+    // price minus the largest loan; with the reserve on top, that is the money they need in all.
+    capEquity,
+    capMoney,
+    difference("case.cap_extra", capMoney, equity),
+    {
+      id: "case.cap_max_price",
+      kind: "hh_max_price",
+      inputs: { equity: equityToPrice.value as string, cap_percent: "75" },
+      value: moneyString(maxPriceForEquity(equityToPrice.value as string, "75")),
+    },
 
     // The LTV exercise's common mistakes.
     share("ex.ltv_equity", EQUITY, PRICE),
@@ -169,15 +183,15 @@ export default function lesson110(): LessonData {
 
     // Exercise: planning against the window (invented 2026 dates).
     given("plan.approved", "2026-11-10"),
-    given("plan.appraisal", "2026-11-24"),
+    given("plan.appraisal", "2026-11-25"),
     given("plan.underwriting_days", 7),
-    addDays("plan.underwriting_end", "2026-11-24", 7),
-    addDays("plan.signing", addCalendarDays("2026-11-24", 7), 1),
-    between("plan.used", "2026-11-10", addCalendarDays("2026-11-24", 8)),
-    left("plan.left", WINDOW, calendarDaysBetween("2026-11-10", addCalendarDays("2026-11-24", 8))),
+    addDays("plan.underwriting_end", "2026-11-25", 7),
+    addDays("plan.signing", addCalendarDays("2026-11-25", 7), 1),
+    between("plan.used", "2026-11-10", addCalendarDays("2026-11-25", 8)),
+    left("plan.left", WINDOW, calendarDaysBetween("2026-11-10", addCalendarDays("2026-11-25", 8))),
     addDays("plan.window_end", "2026-11-10", WINDOW),
     // The mistake of counting only to the end of underwriting (1 December), not to the signing.
-    left("plan.err_to_underwriting", WINDOW, calendarDaysBetween("2026-11-10", "2026-12-01")),
+    left("plan.err_to_underwriting", WINDOW, calendarDaysBetween("2026-11-10", addCalendarDays("2026-11-25", 7))),
 
     // Exercise: which payment day. The salaries arrive on the 9th (teaching assumption).
     given("ex.salary_day", "9"),

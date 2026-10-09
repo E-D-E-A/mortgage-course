@@ -72,7 +72,12 @@ def hh_days_between(i, _facts=None):
     return (_date(i["to"]) - _date(i["from"])).days
 
 
+def hh_max_price(i, _facts=None):
+    return str(agorot(Decimal(i["equity"]) * 100 / (100 - Decimal(i["cap_percent"]))))
+
+
 KINDS = {
+    "hh_max_price": hh_max_price,
     "hh_add_days": hh_add_days,
     "hh_days_between": hh_days_between,
     "hh_sum": hh_sum,

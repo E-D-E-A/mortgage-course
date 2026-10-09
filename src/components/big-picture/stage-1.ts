@@ -144,7 +144,7 @@ export const nodes: MapNode[] = [
     kind: "factor",
     card: {
       what: "כמה הנכס שווה.",
-      role: "הבנק מודד מולו כמה הוא מוכן להלוות (שיעור המימון). השמאי הוא מי שמעריך אותו בשביל הבנק.",
+      role: "הבנק בודק אותו לפני שהוא מלווה. השמאי הוא מי שמעריך אותו בשביל הבנק. אם שיעור המימון נמדד מול השווי או מול המחיר — שאלה פתוחה (שיעור 1.2).",
       note: "שיעור 1.2.",
     },
   },
@@ -177,7 +177,7 @@ export const links: MapLink[] = [
   { from: "borrowers", to: "appraiser", label: "מזמינים אותו (או שהיועץ מזמין) ומשלמים לו", lesson: "1.6" },
   { from: "appraiser", to: "bank", label: "שולח את הדוח ישירות לבנק", lesson: "1.6" },
   { from: "appraiser", to: "value", label: "מעריך אותו", lesson: "1.6" },
-  { from: "value", to: "bank", label: "הבנק מודד מולו כמה להלוות", lesson: "1.6" },
+  { from: "value", to: "bank", label: "הבנק בודק אותו לפני שהוא מלווה", lesson: "1.6" },
   { from: "borrowers", to: "insurer", label: "קונים ממנו את הביטוח, בבנק או מחוצה לו", lesson: "1.6" },
   { from: "insurer", to: "bank", label: "הבנק מקבל את הכסף מהביטוח אם קורה משהו", lesson: "1.6" },
   { from: "bank", to: "seller", label: "מעביר אליו את כסף ההלוואה", lesson: "1.6" },
