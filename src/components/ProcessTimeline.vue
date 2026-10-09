@@ -79,7 +79,7 @@ const short = new Intl.DateTimeFormat("he-IL", { weekday: "short", day: "numeric
 const when = (iso: string) => new Date(`${iso}T12:00:00Z`);
 const longDate = (iso: string) => (iso ? long.format(when(iso)) : "");
 const shortDate = (iso: string) => short.format(when(iso));
-const why = (iso: string) => (when(iso).getUTCDay() === 6 ? "שבת" : when(iso).getUTCDay() === 5 ? "שישי" : "חג");
+const why = (iso: string) => (when(iso).getUTCDay() === 6 ? "שבת" : when(iso).getUTCDay() === 5 ? "שישי" : "יום שבתון או חג");
 </script>
 
 <template>
