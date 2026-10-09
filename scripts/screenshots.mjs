@@ -2,7 +2,7 @@
 // RTL correct, nothing clipped, no horizontal scroll. Serves dist/ itself.
 // Run: pnpm build && pnpm screens   → qa/screens/*.png
 import { createServer } from "node:http";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, readdir } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { chromium } from "playwright-core";
 
@@ -20,7 +20,9 @@ const server = createServer(async (req, res) => {
   }
 }).listen(4399);
 
-const pages = ["/", "/lessons/0-3/", "/glossary/", "/login/"];
+const lessonPages = (await readdir(join(root, "lessons")).catch(() => [])).map((d) => `/lessons/${d}/`);
+const only = process.argv[2]; // optional: one lesson, e.g. "0-4"
+const pages = only ? [`/lessons/${only}/`] : ["/", "/glossary/", "/login/", ...lessonPages];
 const viewports = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
 const out = new URL("../qa/screens/", import.meta.url).pathname;
 await mkdir(out, { recursive: true });

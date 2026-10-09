@@ -2,12 +2,14 @@
  * Writes one data file per lesson to data/lessons/. The site, the videos and
  * the independent check all read these files, so each number has one source.
  *
+ * Each lesson has its own module, scripts/lessons/lesson-<stage>-<n>.ts, whose
+ * default export returns its LessonData. New lessons are picked up by name.
+ *
  * Run: pnpm data
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { lesson03 } from "./lessons/lesson-0-3.ts";
 
 export interface Fact {
   id: string;
@@ -28,7 +30,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(root, "data", "lessons");
 mkdirSync(out, { recursive: true });
 
-for (const lesson of [lesson03()]) {
+const lessonsDir = join(root, "scripts", "lessons");
+const modules = readdirSync(lessonsDir).filter((f) => /^lesson-\d+-\d+\.ts$/.test(f)).sort();
+const lessons: LessonData[] = [];
+for (const file of modules) {
+  const mod = (await import(join(lessonsDir, file))) as { default: () => LessonData };
+  lessons.push(mod.default());
+}
+
+for (const lesson of lessons) {
   const ids = new Set<string>();
   for (const fact of lesson.facts) {
     if (ids.has(fact.id)) throw new Error(`lesson ${lesson.lesson}: duplicate fact id ${fact.id}`);

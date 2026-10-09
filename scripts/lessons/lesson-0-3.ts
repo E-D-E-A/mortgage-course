@@ -59,7 +59,7 @@ const difference = (id: string, minuend: Fact, subtrahend: Fact): Fact => ({
   value: moneyString(new Decimal(minuend.value as string).minus(subtrahend.value as string)),
 });
 
-export function lesson03(): LessonData {
+export default function lesson03(): LessonData {
   const prediction = compound("prediction.compound", "10000", "5", 10);
   const predictionSimple = simple("prediction.simple", "10000", "5", 10);
 
