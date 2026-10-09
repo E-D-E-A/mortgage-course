@@ -48,6 +48,18 @@ const checks = ref<"pending" | "ok" | "gap">("pending");
 const changed = ref(false);
 const windowLength = computed(() => (newLien.value ? props.windowDays : props.windowNoLien));
 const left = computed(() => daysLeft(windowLength.value, day.value));
+/** "נשארו 3 ימים", in Hebrew that reads right for 0, 1 and 2 too. */
+function remaining(n: number): string {
+  if (n === 0) return "זה היום האחרון של החלון.";
+  if (n === 1) return "נשאר יום אחד.";
+  if (n === 2) return "נשארו יומיים.";
+  return `נשארו ${n} ימים.`;
+}
+function endedAgo(n: number): string {
+  if (n === 1) return "נגמר אתמול";
+  if (n === 2) return "נגמר לפני יומיים";
+  return `נגמר לפני ${n} ימים`;
+}
 const verdict = computed<{ status: Status; title: string; text: string }>(() => {
   if (changed.value)
     return {
@@ -59,7 +71,7 @@ const verdict = computed<{ status: Status; title: string; text: string }>(() => 
     return {
       status: "none",
       title: "לא מחויב לתנאים של האישור",
-      text: `החלון של ${windowLength.value} יום נגמר לפני ${-left.value} ימים. הבנק כבר לא חייב להחזיק בתנאים. הוא יכול להאריך, לתת תנאים חדשים, או לבקש בקשה חדשה.`,
+      text: `החלון של ${windowLength.value} יום ${endedAgo(-left.value)}. הבנק כבר לא חייב להחזיק בתנאים. הוא יכול להאריך, לתת תנאים חדשים, או לדרוש מכם להגיש בקשה חדשה.`,
     };
   if (checks.value === "gap")
     return {
@@ -71,12 +83,12 @@ const verdict = computed<{ status: Status; title: string; text: string }>(() => 
     return {
       status: "conditional",
       title: "מחויב לתנאים, בתנאי",
-      text: `יום ${day.value} מתוך ${windowLength.value}. הבנק מחזיק בתנאים, בתנאי שמה שמסרתם יתברר כנכון. נשארו ${left.value} ימים.`,
+      text: `יום ${day.value} מתוך ${windowLength.value}. הבנק מחזיק בתנאים, בתנאי שמה שמסרתם יתברר כנכון. ${remaining(left.value)}`,
     };
   return {
     status: "binding",
     title: "מחויב לתנאים",
-    text: `יום ${day.value} מתוך ${windowLength.value}, והבדיקה מצאה שמה שנמסר נכון. הבנק צריך להלוות לפי התנאים שבאישור. נשארו ${left.value} ימים לסגור את העסקה.`,
+    text: `יום ${day.value} מתוך ${windowLength.value}, והבדיקה מצאה שמה שנמסר נכון. הבנק צריך להלוות לפי התנאים שבאישור, אם תסגרו את העסקה בתוך החלון. ${remaining(left.value)}`,
   };
 });
 </script>
@@ -163,20 +175,20 @@ const verdict = computed<{ status: Status; title: string; text: string }>(() => 
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
-      <table class="w-full min-w-[36rem] border-collapse text-body-m">
+      <table class="w-full border-collapse text-caption sm:text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
-            <th class="py-2 text-start">הרגע</th>
-            <th class="py-2 text-start">מצב</th>
-            <th class="py-2 text-start">הבנק חייב</th>
+            <th class="py-2 pe-2 text-start">הרגע, ומצב הבנק</th>
+            <th class="py-2 pe-2 text-start">הבנק חייב</th>
+            <th class="py-2 pe-2 text-start">הבנק לא חייב</th>
             <th class="py-2 text-start">מה יכול לשנות את זה</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="m in moments" :key="m.title" class="border-b border-n100 align-top">
-            <td class="py-1 pe-2 font-semibold text-n900">{{ m.title }}</td>
-            <td class="py-1 pe-2">{{ m.label }}</td>
+            <td class="py-1 pe-2"><span class="block font-semibold text-n900">{{ m.title }}</span><span class="block text-n700">{{ m.label }}</span></td>
             <td class="py-1 pe-2"><span v-for="x in m.must" :key="x" class="block">{{ x }}</span><span v-if="!m.must.length">—</span></td>
+            <td class="py-1 pe-2"><span v-for="x in m.not" :key="x" class="block">{{ x }}</span><span v-if="!m.not.length">—</span></td>
             <td class="py-1"><span v-for="x in m.canChange" :key="x" class="block">{{ x }}</span><span v-if="!m.canChange.length">—</span></td>
           </tr>
         </tbody>

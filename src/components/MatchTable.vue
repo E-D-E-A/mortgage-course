@@ -3,7 +3,7 @@
 // situation, and the learner picks its answer from one shared list. The first
 // rows are usually given. Lessons 1.6 ("who does this?") and 1.8 ("does this
 // bind the bank?"). Every row carries a short reason, shown once it is checked.
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { save } from "../lib/progress.ts";
 
 interface Row {
@@ -27,17 +27,20 @@ const props = defineProps<{
 }>();
 
 const picked = reactive<Record<number, string>>({});
-const result = reactive<Record<number, "ok" | "bad" | undefined>>({});
+const result = reactive<Record<number, "ok" | "bad" | "empty" | undefined>>({});
 const revealed = ref(false);
 const open = props.rows.map((r, i) => (r.given ? -1 : i)).filter((i) => i >= 0);
 for (const i of open) picked[i] = "";
+// A changed answer is no longer the one that was checked: clear its mark until the next check.
+for (const i of open) watch(() => picked[i], () => (result[i] = undefined));
 
 function check() {
-  for (const i of open) result[i] = picked[i] === props.rows[i].answer ? "ok" : "bad";
+  for (const i of open) result[i] = picked[i] === "" ? "empty" : picked[i] === props.rows[i].answer ? "ok" : "bad";
   save(`exercise:${props.id}`, { done: allOk() });
 }
 const allOk = () => open.every((i) => result[i] === "ok");
 const checked = () => open.some((i) => result[i] !== undefined);
+const anyEmpty = () => open.some((i) => result[i] === "empty");
 </script>
 
 <template>
@@ -59,6 +62,8 @@ const checked = () => open.some((i) => result[i] !== undefined);
               <span class="text-caption font-semibold text-n600">{{ answerLabel }}</span>
               <select
                 v-model="picked[i]"
+                :aria-invalid="result[i] === 'bad' ? 'true' : undefined"
+                :aria-describedby="result[i] ? `${id}-row-${i}` : undefined"
                 class="h-11 w-full rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
                 :class="result[i] === 'bad' ? 'border-danger shadow-ring-error' : result[i] === 'ok' ? 'border-success' : 'border-n200'"
               >
@@ -66,7 +71,9 @@ const checked = () => open.some((i) => result[i] !== undefined);
                 <option v-for="o in options" :key="o" :value="o">{{ o }}</option>
               </select>
             </label>
-            <p v-if="result[i] === 'ok'" class="mt-1 text-caption text-n700">{{ r.why }}</p>
+            <p v-if="result[i] === 'ok'" :id="`${id}-row-${i}`" class="mt-1 text-caption text-n700"><strong class="text-n900">✓ נכון.</strong> {{ r.why }}</p>
+            <p v-else-if="result[i] === 'bad'" :id="`${id}-row-${i}`" class="mt-1 text-caption font-semibold text-n900"><span aria-hidden="true">✗ </span>לא נכון. נסו תשובה אחרת.</p>
+            <p v-else-if="result[i] === 'empty'" :id="`${id}-row-${i}`" class="mt-1 text-caption text-n700">עוד לא בחרתם תשובה בשורה הזו.</p>
           </template>
         </div>
       </li>
@@ -85,7 +92,8 @@ const checked = () => open.some((i) => result[i] !== undefined);
     </div>
     <p v-if="checked()" class="mt-3 rounded-md p-3 text-body-m text-n800" :class="allOk() ? 'bg-success-bg' : 'bg-warning-bg'" aria-live="polite">
       <template v-if="allOk()"><strong class="text-n900">הכול נכון.</strong> {{ success }}</template>
-      <template v-else>יש שורות שעוד לא נכונות (מסומנות באדום). {{ hint }}</template>
+      <template v-else-if="anyEmpty() && open.every((i) => result[i] !== 'bad')">בחרו תשובה בכל השורות, ואז בדקו.</template>
+      <template v-else>יש שורות שעוד לא נכונות (מסומנות ב״לא נכון״). {{ hint }}</template>
     </p>
   </div>
 </template>

@@ -6,7 +6,7 @@
 // day to answer (business days) and the last day the terms hold (calendar days).
 // Every date comes from src/lib/calc/process.ts; the clock lengths are props,
 // read by the page from data/lessons/1-7.json.
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { addBusinessDays, addCalendarDays, businessDaysBetween, skippedDays, type BankCalendar } from "../lib/calc/process.ts";
 
 interface Step {
@@ -37,6 +37,8 @@ const props = defineProps<{
   windowNoLien: number;
   closed: string[];
   defaultSent: string;
+  /** How many business days the bank took at first (the lesson's worked example). */
+  defaultAfter?: number;
   /** The calendar's year: the date picker stays inside it. */
   minDate: string;
   maxDate: string;
@@ -56,7 +58,11 @@ const extended = ref(false);
 const newLien = ref(true);
 const fridayCounts = ref(true);
 const limit = computed(() => (extended.value ? props.answerExtended : props.answerDays));
-const answeredAfter = ref(props.answerDays);
+const answeredAfter = ref(props.defaultAfter ?? props.answerDays);
+// Keep the number and the slider's thumb in step: when the limit drops, the value drops with it.
+watch(limit, (max) => {
+  if (answeredAfter.value > max) answeredAfter.value = max;
+});
 const after = computed(() => Math.min(answeredAfter.value, limit.value));
 const calendar = computed<BankCalendar>(() => ({ fridayCounts: fridayCounts.value, closed: props.closed }));
 const windowLength = computed(() => (newLien.value ? props.windowDays : props.windowNoLien));
@@ -143,7 +149,9 @@ const why = (iso: string) => (when(iso).getUTCDay() === 6 ? "שבת" : when(iso)
             :min="minDate"
             :max="maxDate"
             class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
+            aria-describedby="process-sent-words"
           />
+          <span id="process-sent-words" class="text-caption text-n700">{{ valid ? longDate(sent) : "" }}</span>
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-caption font-semibold text-n600">הבנק ענה אחרי {{ after }} ימי עסקים</span>
@@ -182,24 +190,24 @@ const why = (iso: string) => (when(iso).getUTCDay() === 6 ? "שבת" : when(iso)
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
-      <table class="w-full min-w-[30rem] border-collapse text-body-m">
+      <table class="w-full border-collapse text-caption sm:text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
-            <th class="py-2 text-start">צעד</th>
-            <th class="py-2 text-start">מה קורה</th>
+            <th class="py-2 pe-2 text-start">צעד</th>
+            <th class="py-2 pe-2 text-start">מה קורה</th>
+            <th class="py-2 pe-2 text-start">שעון</th>
             <th class="py-2 text-start">מי</th>
-            <th class="py-2 text-start">שעון</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(s, i) in steps" :key="i" class="border-b border-n100 align-top">
             <td class="py-1 pe-2">{{ i + 1 }}</td>
             <td class="py-1 pe-2">{{ s.title }}</td>
-            <td class="py-1 pe-2">{{ s.who }}</td>
-            <td class="py-1">
+            <td class="py-1 pe-2">
               <span v-for="c in startsAt(i + 1)" :key="c.id" class="block">מתחיל: {{ c.label }}</span>
               <span v-for="c in endsAt(i + 1)" :key="c.id" class="block text-n600">עד כאן: {{ c.label }}</span>
             </td>
+            <td class="py-1">{{ s.who }}</td>
           </tr>
         </tbody>
       </table>
