@@ -80,6 +80,23 @@ for (const { file, url, lesson, video } of pages) {
   }
 }
 
+// A spreadsheet formula written in prose loses its "*" when the paragraph has two of them:
+// Markdown reads them as italics, and the learner copies a wrong formula ("=400*3%" became "=4003%").
+// A formula goes in a JS string ({"=400*3%"}) or in code (`=400*3%`).
+for (const { file, url } of pages) {
+  const prose = readFileSync(url, "utf8")
+    .replace(/^---[\s\S]*?---/, "")
+    .replace(/^(import|export) [\s\S]*?^$/gm, "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`\n]*`/g, "")
+    .replace(/\{[^{}\n]*\}/g, "");
+  for (const line of prose.split("\n")) {
+    // Two "*" in one paragraph are what Markdown turns into italics.
+    if (/(^|[\s(>])=[A-Z0-9(][^\s<]*\*/.test(line) && (line.match(/\*/g) ?? []).length >= 2)
+      fail(file, `two "*" in a paragraph with a spreadsheet formula — Markdown makes them italics; wrap the formula as {"=…"}: ${line.trim().slice(0, 90)}`);
+  }
+}
+
 if (failures) {
   console.error(`\n${failures} term problem(s).`);
   process.exit(1);

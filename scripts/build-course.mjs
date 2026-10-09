@@ -20,7 +20,11 @@ for (const line of md.split("\n")) {
   if (row) {
     const [, id, cell, prereq] = row;
     const title = (cell.match(/\*\*(.+?)\*\*/)?.[1] ?? cell).replace(/[.:]$/, "").replace(/\s*★.*$/, "").trim();
-    const prereqs = prereq === "—" || prereq === "הכול" ? [] : [...prereq.matchAll(/\d\.\d+/g)].map((m) => m[0]);
+    // "1.2–1.4" is a range within one stage: 1.2, 1.3, 1.4.
+    const expanded = prereq.replace(/(\d+)\.(\d+)\s*[–-]\s*\1\.(\d+)/g, (_, st, a, b) =>
+      Array.from({ length: Number(b) - Number(a) + 1 }, (_, i) => `${st}.${Number(a) + i}`).join(", "),
+    );
+    const prereqs = prereq === "—" || prereq === "הכול" ? [] : [...expanded.matchAll(/\d+\.\d+/g)].map((m) => m[0]);
     stage.lessons.push({ id, title, prereqs });
   }
 }
