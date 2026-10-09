@@ -1,0 +1,451 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "2.1"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RateLayers from "../../components/RateLayers.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("2.1");
+export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
+export const pct = (id) => `${f.plain(id)}%`;
+export const sgn = (id) => f.plain(id).replace("-", "−");
+export const fmtDate = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+export const heDate = (id) => fmtDate(f.raw(id));
+export const asOf = heDate("data.date");
+export const half = f.rows("half.table");
+export const predictionOptions = [
+  "לא זזה: היא נקבעה ביום החתימה",
+  `יורדת ב־${f.plain("cut.size")} נקודת אחוז`,
+  `יורדת ב־${f.plain("spread.below")} נקודת אחוז`,
+  `יורדת ב־${f.plain("pred.both")} נקודות אחוז`,
+];
+
+בשיעור 0.10 הכרנו את <Term t="ריבית בנק ישראל" lesson="2.1">ריבית בנק ישראל</Term>, שמשפיעה על <Term t="עלות הכסף" lesson="2.1">עלות הכסף</Term> של הבנקים. בשיעור 1.4 ראינו ש<Term t="משכנתא" lesson="2.1">משכנתא</Term> בנויה מכמה <Term t="מסלול" lesson="2.1">מסלולים</Term>, ולכל אחד מנגנון ריבית משלו.
+בשיעור הזה נראה איך נבנית ריבית של מסלול שזזה יחד עם ריבית בנק ישראל: שלוש שכבות, זו על גבי זו. בדרך נכיר את <Term t="פריים" lesson="2.1">הפריים</Term>, ונבין מה פירוש ״פריים פחות {f.plain("spread.below")}״.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="2.1"
+  question={`במסלול שלכם הריבית היא ״פריים פחות ${f.plain("spread.below")}״. ריבית בנק ישראל יורדת ב־${f.plain("cut.size")} נקודת אחוז. מה קורה לריבית במסלול שלכם?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלוש שכבות של ריבית
+
+</Section>
+
+<LessonVideo lesson="2-1" />
+
+<Section kind="ההסבר">
+
+## שכבה ראשונה: ריבית בנק ישראל
+
+</Section>
+
+השכבה התחתונה היא הריבית שבנק ישראל קובע. את ההחלטה מקבלת <Term t="ועדה מוניטרית" lesson="2.1">הוועדה המוניטרית</Term>, במועדים שנקבעים מראש (שיעור 0.10).
+
+נכון ל־{asOf}: ריבית בנק ישראל היא **{pct("boi.rate")}**. ההחלטה פורסמה ב־{heDate("boi.announced")}, ונכנסה לתוקף ב־{heDate("boi.effective")}. ההחלטה הבאה נקבעה ל־{heDate("boi.next")}. (לא אומת — ראו מקורות.)
+
+אף אחד מאיתנו לא לווה בריבית הזו ישירות. היא הבסיס שעליו נבנות השכבות הבאות.
+
+<Section kind="ההסבר">
+
+## שכבה שנייה: הפריים
+
+</Section>
+
+**הפריים** היא ריבית שהבנקים בישראל משתמשים בה כבסיס להלוואות רבות. היא שווה לריבית בנק ישראל ועוד תוספת.
+נכון ל־{asOf}, התוספת היא {f.plain("prime.addition")} <Term t="נקודת אחוז" lesson="2.1">נקודות אחוז</Term> (לא אומת). ולכן:
+
+<M>{f.plain("boi.rate")} + {f.plain("prime.addition")} = {f.plain("prime.current")}</M>. הפריים היא {pct("prime.current")}.
+
+**הפריים זזה יחד עם ריבית בנק ישראל.** אם ריבית בנק ישראל יורדת ב־{f.plain("cut.size")} נקודת אחוז, ל־{pct("boi.after_cut")}, הפריים יורדת באותו מספר נקודות: <M>{f.plain("boi.after_cut")} + {f.plain("prime.addition")} = {f.plain("prime.after_cut")}</M>. התוספת לא זזה.
+
+<Callout title="מה כאן עוד לא נבדק מול המקור">
+<p>אתר בנק ישראל חסום בסביבה שבה נכתב השיעור. הריבית והתאריכים נלקחו מתקצירים של הודעות בנק ישראל במנוע חיפוש, ומבדיקה שהצוות תיעד ב־Brain. לכן הם מסומנים ״לא אומת״, ונכונים ל־{asOf}.</p>
+<p><strong>מקור התוספת של {f.plain("prime.addition")} נקודות — שאלה פתוחה, כמו בשיעור 0.10.</strong> דף הסבר לצרכן באתר בנק ישראל מתאר אותן כתוספת לריבית בנק ישראל, עם דוגמה: כשריבית בנק ישראל {pct("src.example_boi")}, הפריים {pct("src.example_prime")}. דף ב־Brain מייחס אותן להוראה רגולטורית. לא הכרענו, ולכן בקורס זה כלל שנכון ל־{asOf}, לא כלל לתמיד.</p>
+<p>גם הערך {pct("prime.current")} הוא חשבון שלנו: לא מצאנו דף של בנק ישראל שכתוב בו המספר הזה.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## שכבה שלישית: המרווח
+
+</Section>
+
+בשיעור 0.9 ראינו <Term t="מרווח" lesson="2.1">מרווח</Term>: ההפרש בין הריבית שהבנק גובה לבין עלות הכסף שלו. כאן נשתמש באותה מילה לדבר קרוב, אבל שונה:
+
+**המרווח בחוזה** הוא המרחק בין הריבית במסלול לבין ריבית שמתפרסמת, למשל הפריים. הוא נכתב בהצעה ובחוזה של המסלול, בנקודות אחוז. **הוא יכול להיות חיובי או שלילי.**
+
+״פריים פחות {f.plain("spread.below")}״ פירושו: מרווח של <span class="ltr">{sgn("spread.example")}</span> נקודות אחוז. נכון ל־{asOf}:
+
+<M>{f.plain("prime.current")} − {f.plain("spread.below")} = {f.plain("track.example")}</M>. הריבית במסלול היא {pct("track.example")}.
+
+**איך זה נכתב.** בקיצור כותבים לפעמים ״P−{f.plain("spread.below")}״. שימו לב: ה־P כאן הוא **פריים**, לא <Term t="קרן" lesson="2.1">הקרן</Term> P מהנוסחאות של הקורס (שיעור 0.2). בנוסחאות שלנו לא נכתוב P לפריים.
+
+**שני מרווחים, שתי שאלות.** כששתי המשמעויות מופיעות יחד, נקרא להן בשמות נפרדים:
+- **המרווח של הבנק** (שיעור 0.9): הריבית שהבנק גובה פחות עלות הכסף שלו. הוא עונה על השאלה ״כמה נשאר לבנק?״.
+- **המרווח בחוזה** (השיעור הזה): הריבית במסלול פחות הריבית שמתפרסמת. הוא עונה על השאלה ״כמה רחוק אתם מהפריים?״.
+
+באפליקציית היועץ של Mogi, בכל חלק של ההלוואה שהריבית בו נקבעת לפי הפריים, יש שדה ״מרווח מהפריים״: מספר עם סימן, למשל <span class="ltr">{sgn("spread.example")}</span>.
+
+<Section kind="ההסבר">
+
+## עוגן: השם הכללי לשכבה שמתחת
+
+</Section>
+
+הפריים היא דוגמה אחת למשהו כללי יותר. ריבית שמתפרסמת, ושלפיה נקבעת הריבית של מסלול, נקראת <Term t="עוגן" lesson="2.1">עוגן</Term>. הכלל:
+
+<div class="my-4 rounded-lg border border-n200 bg-n0 p-4 text-center text-body-l text-navy">הריבית במסלול = העוגן + המרווח בחוזה</div>
+
+**יש גם עוגנים אחרים.** במסלולים שהריבית בהם מתעדכנת פעם בכמה שנים, העוגן הוא בדרך כלל <Term t="תשואה" lesson="2.1">תשואה</Term> של <Term t="אג״ח ממשלתי" lesson="2.1">אג״ח ממשלתית</Term> (שיעור 0.11). יש גם מסלולים שהעוגן שלהם הוא <Term t="מק״מ" lesson="2.1">מק״מ</Term>. (לא אומת; פרטים בשיעור 2.7.)
+למשל, עם עוגן של {pct("anchor.other")} ומרווח של <span class="ltr">+{f.plain("spread.other")}</span>: <M>{f.plain("anchor.other")} + {f.plain("spread.other")} = {f.plain("rate.other")}</M>. (מספרים להמחשה.)
+
+**מתי העוגן מזיז את הריבית?** כשהעוגן הוא הפריים, הריבית במסלול זזה בכל פעם שהפריים זזה. כשהעוגן הוא תשואה של אג״ח, הריבית זזה רק במועדים שהחוזה קובע, לפי העוגן באותו יום (שיעור 2.7). בשני המקרים **המרווח לא זז**: הוא נשאר כפי שנכתב בחוזה.
+
+<Section kind="ההסבר">
+
+## למה ״פריים פחות״?
+
+</Section>
+
+״פחות״ נשמע כמו הנחה. אבל זכרו שהפריים עצמה גבוהה מריבית בנק ישראל ב־{f.plain("prime.addition")} נקודות אחוז. לכן מסלול של ״פריים פחות {f.plain("spread.below")}״ עדיין מעל ריבית בנק ישראל:
+
+<M>{f.plain("track.example")} − {f.plain("boi.rate")} = {f.plain("track.over_boi")}</M> נקודות אחוז מעליה.
+
+בשיעור 0.10 ראינו שריבית בנק ישראל משפיעה על עלות הכסף של הבנקים. **בפישוט**: אילו עלות הכסף של הבנק הייתה בדיוק ריבית בנק ישראל, המרווח של הבנק (שיעור 0.9) במסלול הזה היה {f.plain("track.over_boi")} נקודות אחוז. בפועל עלות הכסף של בנק תלויה בעוד דברים (שיעור 0.9), אז זה רק כיוון: ״פחות״ ביחס לפריים אינו ״פחות״ ביחס לעלות הכסף.
+
+**מה משתנה מהצעה להצעה?** ריבית בנק ישראל והתוספת זהות לכל הבנקים באותו יום. **המרווח הוא החלק שנקבע בהצעה עצמה**, ולכן בו כדאי להשוות בין הצעות למסלולים שהעוגן שלהם הוא הפריים.
+
+<Callout title="איך Mogi שומרת את שלושת המספרים">
+<p>לפי החלטה של Mogi (אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08), המנוע ישמור בנפרד את ריבית בנק ישראל, את הפריים ואת המרווח של הלקוח, כל אחד עם התאריך שלו. הריבית הכוללת במסלול תוצג קודם, והעוגן והמרווח בפירוט. המימוש עוד לא הושלם.</p>
+<p>באותה החלטה יש אזהרה: ריבית שנקבעה בעבר, פחות העוגן של היום, לא מחזירה את המרווח שנכתב בחוזה. את המרווח לוקחים מהחוזה עצמו. תרגיל 5 מראה למה.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## שלוש השכבות
+
+</Section>
+
+המחוון הראשון קובע את ריבית בנק ישראל, והשני את המרווח בחוזה. התוספת של הפריים קבועה: {f.plain("prime.addition")} נקודות אחוז, נכון ל־{asOf}. הפסים מראים את שלוש השכבות, זו על גבי זו.
+
+<RateLayers
+  client:visible
+  policy={Number(f.raw("boi.rate"))}
+  spread={Number(f.raw("spread.example"))}
+  addition={f.raw("prime.addition")}
+  note={`התוספת וריבית בנק ישראל ההתחלתית (${pct("boi.rate")}): לא אומת, לפי תקציר של מקור רשמי ולפי תיעוד של הצוות ב־Brain. נכון ל־${asOf}.`}
+/>
+
+נסו את שלושת אלה:
+1. השאירו את ריבית בנק ישראל על {pct("boi.rate")}, וקבעו מרווח של <span class="ltr">{sgn("slider.spread")}</span>. מה הריבית במסלול?
+2. עכשיו הורידו את ריבית בנק ישראל ל־{pct("slider.boi_two_cuts")}, בלי לגעת במרווח. מה זז, ובכמה?
+3. החזירו את ריבית בנק ישראל ל־{pct("boi.rate")}. איזה מרווח שם את הריבית במסלול בדיוק בגובה של ריבית בנק ישראל?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{pct("slider.rate")}: הפריים {pct("prime.current")}, פחות {f.plain("slider.spread").replace("-", "")} נקודות.</li>
+    <li>ריבית בנק ישראל ירדה ב־{f.plain("slider.boi_drop")} נקודת אחוז. הפריים ירדה ל־{pct("slider.prime_two_cuts")}, והריבית במסלול ל־{pct("slider.rate_two_cuts")}: אותן נקודות בדיוק. המרווח לא זז.</li>
+    <li>מרווח של <span class="ltr">{sgn("slider.at_boi_spread")}</span>: הוא מבטל בדיוק את התוספת של הפריים.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — הפריים.** ריבית בנק ישראל ועוד התוספת: <M>{f.plain("boi.rate")} + {f.plain("prime.addition")} = {f.plain("prime.current")}</M>.
+
+**צעד 2 — הריבית במסלול.** העוגן ועוד המרווח. כאן העוגן הוא הפריים, והמרווח שלילי: <M>{f.plain("prime.current")} + ({sgn("spread.example")}) = {f.plain("track.example")}</M>.
+
+**צעד 3 — לחודש.** כמו בשיעור 0.4, ריבית שנתית בחוזה מחלקים ב־12: <M>{f.plain("track.example")} ÷ 12 = {f.plain("worked.monthly_rate")}</M>, בערך.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">r = A + s</p>
+  <p class="text-h3 mt-2 text-navy">ואם העוגן הוא הפריים: A = ריבית בנק ישראל + התוספת</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית השנתית במסלול, כמספר עשרוני: 4% הם 0.04</dd>
+    <dt class="ltr font-semibold text-n900">A</dt><dd>העוגן (A כמו anchor), לשנה, כמספר עשרוני: 5% הם 0.05</dd>
+    <dt class="ltr font-semibold text-n900">s</dt><dd>המרווח בחוזה, כמו בשיעור 0.9: כותבים כמספר עשרוני, ואומרים בנקודות אחוז. מרווח שלילי כותבים עם מינוס: מינוס חצי נקודת אחוז הוא <span class="ltr">−0.005</span></dd>
+    <dt class="font-semibold text-n900">התוספת</dt><dd>{f.plain("prime.addition")} נקודות אחוז, נכון ל־{asOf} (לא אומת)</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?**
+1. רק במסלול שהחוזה שלו קובע ״עוגן ועוד מרווח״. במסלול שהריבית בו נקבעת לכל התקופה (<Later lesson="2.2">ריבית קבועה</Later>) אין עוגן שמזיז אותה.
+2. A הוא ערך העוגן במועד שהחוזה קובע. כשהעוגן הוא הפריים — בכל פעם שהיא זזה. בעוגנים אחרים — רק במועדי העדכון (שיעור 2.7).
+3. s הוא המרווח כפי שנכתב בחוזה. לא מחשבים אותו מחדש מהעוגן של היום.
+
+<Callout title="איך מחשבים">
+<p><strong>ביד:</strong> חיבור וחיסור של אחוזים. שימו לב לסימן: ״פחות {f.plain("spread.below")}״ הוא חיבור של <span class="ltr">{sgn("spread.example")}</span>.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם ריבית בנק ישראל בתא A1 (למשל 3.25) והמרווח בתא B1 (למשל <span class="ltr">-0.8</span>), הפריים היא <span class="ltr">{"=A1+1.5"}</span> והריבית במסלול <span class="ltr">{"=A1+1.5+B1"}</span>. אם התוספת תשתנה, שנו את ה־1.5.</p>
+<p><strong>אין כאן עיגול:</strong> בחיבור וחיסור של אחוזים עם שתי ספרות אחרי הנקודה, התוצאה מדויקת.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="2.1"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "זה נכון לריבית שנקבעת לכל התקופה. כאן הריבית בנויה מהפריים ועוד מרווח, והפריים זזה עם ריבית בנק ישראל.",
+    "",
+    `${f.plain("spread.below")} הוא המרווח בחוזה. הוא לא זז כשריבית בנק ישראל זזה.`,
+    `חיברתם את השינוי ואת המרווח. המרווח כבר היה שם לפני השינוי; זז רק השינוי עצמו, ${f.plain("cut.size")} נקודת אחוז.`,
+  ]}
+>
+  ריבית בנק ישראל ירדה ב־{f.plain("cut.size")} נקודת אחוז, ולכן גם הפריים: מ־{pct("prime.current")} ל־{pct("prime.after_cut")}. המרווח, <span class="ltr">{sgn("spread.example")}</span>, לא זז. הריבית במסלול ירדה מ־{pct("track.example")} ל־{pct("track.after_cut")}: <M>{f.plain("track.after_cut")} − {f.plain("track.example")} = {sgn("track.cut_change")}</M>.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## ״פריים פחות״, במרחק מריבית בנק ישראל
+
+</Section>
+
+״פריים פחות X״ הוא ריבית בנק ישראל ועוד (התוספת פחות X). עם התוספת של {f.plain("prime.addition")} ומרווח של <span class="ltr">{sgn("spread.example")}</span>: ריבית בנק ישראל ועוד {f.plain("track.over_boi")}.
+זה חשבון מדויק, כל עוד הפריים היא ריבית בנק ישראל ועוד {f.plain("prime.addition")} — כלומר, נכון ל־{asOf}.
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: מסלול שהעוגן שלו הוא הפריים
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נועם ושירה בדויים, והמרווח בדוגמה בדוי.</p>
+</Callout>
+
+נועם ושירה (תיק א׳) מקבלים הצעה: אחד המסלולים ב<Term t="תמהיל" lesson="2.1">תמהיל</Term> שלהם הוא {f.shekels("worked.amount")} ב״פריים פחות {f.plain("spread.below")}״. מה הריבית, וכמה ריבית ישלמו בחודש הראשון?
+
+**צעד 1 — הפריים.** נכון ל־{asOf}: <M>{f.plain("boi.rate")} + {f.plain("prime.addition")} = {f.plain("prime.current")}</M> (לא אומת).
+
+**צעד 2 — הריבית במסלול.** <M>{f.plain("prime.current")} − {f.plain("spread.below")} = {f.plain("track.example")}</M>, כלומר {pct("track.example")} לשנה.
+
+**צעד 3 — סכום הריבית בחודש הראשון.** אחוז הריבית לחודש הוא <M>{f.plain("track.example")} ÷ 12</M>, בערך {pct("worked.monthly_rate")}. על כל הסכום: <M>{n("worked.amount")} × {f.plain("track.example")}% ÷ 12 = {f.shekels("worked.month_interest")}</M>. זו רק הריבית: בתשלום של כל חודש יש גם החזר של חלק מהקרן — נחשב אותו בשלב 3.
+
+**צעד 4 — תרגיל מחשבה, לא תחזית.** נניח שבהחלטה של {heDate("boi.next")} ריבית בנק ישראל יורדת ב־{f.plain("cut.size")} נקודת אחוז, ל־{pct("boi.after_cut")}. הפריים יורדת ל־{pct("prime.after_cut")}, והריבית במסלול ל־{pct("track.after_cut")}. סכום הריבית לחודש: <M>{n("worked.amount")} × {f.plain("track.after_cut")}% ÷ 12 = {f.shekels("worked.month_interest_cut")}</M>, כלומר {f.shekels("worked.month_saving")} פחות בחודש. אף אחד לא יודע מה הוועדה תחליט; החשבון רק מראה מה זז ובכמה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+ארבעה מצבים בדויים (מספרים להמחשה, לא תחזית). התוספת: {f.plain("prime.addition")} נקודות אחוז. השורה הראשונה מלאה. כתבו את האחוזים בלי הסימן %, ומרווח שלילי עם מינוס, למשל <span class="ltr">-0.8</span>.
+
+<FillTable
+  client:visible
+  id="2.1-half"
+  rows={half}
+  columns={[
+    { key: "policy", label: "בנק ישראל", format: "percent" },
+    { key: "prime", label: "פריים", format: "percent" },
+    { key: "spread", label: "מרווח", format: "points" },
+    { key: "rate", label: "במסלול", format: "percent" },
+  ]}
+  blanks={["2.prime", "2.rate", "3.prime", "3.rate", "4.prime", "4.spread"]}
+  success="בכל שורה: פריים = ריבית בנק ישראל ועוד התוספת, והריבית במסלול = הפריים ועוד המרווח. בשורה האחרונה הלכתם הפוך: מהריבית במסלול אל המרווח."
+  hint="קודם הפריים: ריבית בנק ישראל ועוד 1.5. אחר כך המרווח: הריבית במסלול פחות הפריים (מרווח מתחת לפריים יוצא במינוס)."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. כתבו אחוזים ונקודות אחוז בלי הסימן %. ריבית בנק ישראל של {pct("boi.rate")} והפריים של {pct("prime.current")} נכונות ל־{asOf} (לא אומת). **המרווחים, השינויים והסכומים הם מספרים להמחשה, לא נתוני שוק.**
+
+<ChoiceExercise
+  client:visible
+  id="2.1-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ריבית שכל בנק קובע לעצמו, לפי הלקוח", feedback: "החלק שנקבע לכל לקוח הוא המרווח. הפריים עצמה זהה לכל הבנקים באותו יום." },
+    { text: "ריבית בנק ישראל ועוד תוספת קבועה; היא זזה יחד עם ריבית בנק ישראל", correct: true, feedback: `נכון. נכון ל־${asOf}, התוספת היא ${f.plain("prime.addition")} נקודות אחוז (לא אומת).` },
+    { text: "הריבית הנמוכה ביותר שבנק רשאי לתת", feedback: `לא. יש מסלולים בריבית נמוכה מהפריים, למשל ״פריים פחות ${f.plain("spread.below")}״.` },
+    { text: "ריבית שנקבעת ביום החתימה ולא משתנה", feedback: "הפריים זזה בכל פעם שריבית בנק ישראל זזה. ריבית שלא משתנה היא נושא השיעור הבא." },
+  ]}
+>
+  מה זה <Term t="פריים" lesson="2.1">פריים</Term>?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="2.1-2"
+  n={2}
+  level="קל"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.added"), message: `הוספתם ${f.plain("ex2.spread").replace("-", "")}. ״פריים פחות״ פירושו שהמרווח שלילי: מחסרים אותו מהפריים.` },
+    { value: f.raw("ex2.on_boi"), message: `חיסרתם מריבית בנק ישראל. העוגן כאן הוא הפריים, ${pct("prime.current")}.` },
+    { value: f.raw("prime.current"), message: "זו הפריים עצמה. עכשיו הורידו ממנה את המרווח." },
+  ]}
+>
+  נכון ל־{asOf}, הפריים היא {pct("prime.current")} (לא אומת). קיבלתם הצעה למסלול ב״פריים פחות {f.plain("ex2.spread").replace("-", "")}״. מה אחוז הריבית במסלול?
+</NumericExercise>
+
+<Solution for="2.1-2">
+<M>{f.plain("prime.current")} − {f.plain("ex2.spread").replace("-", "")} = {f.plain("ex2.answer")}</M>, כלומר {pct("ex2.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.1-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex2.answer"), message: "זו הריבית לפני השינוי. כשריבית בנק ישראל עולה, הפריים עולה איתה — וגם המסלול." },
+    { value: f.raw("ex3.prime"), message: "זו הפריים החדשה. הורידו ממנה את המרווח, שלא זז." },
+    { value: f.raw("ex3.down"), message: "הורדתם את השינוי. בתרגיל ריבית בנק ישראל עולה, ולכן מוסיפים." },
+  ]}
+>
+  <strong>תרגיל מחשבה, לא תחזית:</strong> אתם במסלול ״פריים פחות {f.plain("ex2.spread").replace("-", "")}״, וריבית בנק ישראל עולה מ־{pct("boi.rate")} ל־{pct("ex3.boi")}. מה אחוז הריבית החדש במסלול?
+</NumericExercise>
+
+<Solution for="2.1-3">
+הפריים החדשה: <M>{f.plain("ex3.boi")} + {f.plain("prime.addition")} = {f.plain("ex3.prime")}</M>. הריבית במסלול: <M>{f.plain("ex3.prime")} − {f.plain("ex2.spread").replace("-", "")} = {f.plain("ex3.answer")}</M>, כלומר {pct("ex3.answer")}. הריבית עלתה באותו מספר נקודות כמו ריבית בנק ישראל.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.1-4"
+  n={4}
+  level="בינוני"
+  unit="נקודות אחוז"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.signed"), message: `הכיוון נכון: המרווח בחוזה הוא ${sgn("ex4.signed")}. כאן השאלה כבר אומרת ״מתחת״, אז כותבים את הגודל: ${f.plain("ex4.answer")}.` },
+    { value: f.raw("ex4.vs_boi"), message: `זה המרחק מריבית בנק ישראל. השאלה היא על המרחק מהפריים, ${pct("prime.current")}.` },
+  ]}
+>
+  כשהפריים הייתה {pct("prime.current")}, הוצע לכם מסלול שהעוגן שלו הוא הפריים, בריבית של {pct("ex4.rate")}. בכמה נקודות אחוז הריבית הזו מתחת לפריים?
+</NumericExercise>
+
+<Solution for="2.1-4">
+<M>{f.plain("prime.current")} − {f.plain("ex4.rate")} = {f.plain("ex4.answer")}</M> נקודות אחוז. כלומר ״פריים פחות {f.plain("ex4.answer")}״: מרווח של <span class="ltr">{sgn("ex4.signed")}</span>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.1-5"
+  n={5}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.001}
+  near={0}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.rate_then"), message: `זו הריבית ביום החתימה, או החשבון של החבר: הוא חישב ״מרווח״ של ${eq(`${f.plain("ex5.rate_then")} − ${f.plain("prime.current")} = ${f.plain("ex5.wrong_spread")}`)}, וזה מחזיר אותו לאותה ריבית. המרווח בחוזה הוא ${sgn("ex5.spread")}, והוא חל על הפריים של היום.` },
+    { value: f.raw("prime.current"), message: "זו הפריים של היום. הורידו ממנה את המרווח מהחוזה." },
+    { value: f.raw("ex5.on_boi"), message: "חיסרתם את המרווח מריבית בנק ישראל. העוגן הוא הפריים." },
+  ]}
+>
+  חוזה נחתם כשריבית בנק ישראל הייתה {pct("ex5.boi_then")} (מספר בדוי). כתוב בו ״פריים פחות {f.plain("ex5.spread").replace("-", "")}״, ולכן הריבית ביום החתימה הייתה {pct("ex5.rate_then")}. חבר אומר: ״הריבית שלי הייתה {pct("ex5.rate_then")}, והפריים היום {pct("prime.current")}, אז המרווח שלי הוא <span class="ltr">+{f.plain("ex5.wrong_spread")}</span>״. נכון ל־{asOf}, מה אחוז הריבית במסלול?
+</NumericExercise>
+
+<Solution for="2.1-5">
+המרווח לקוח מהחוזה, לא מחושב מהעוגן של היום: <span class="ltr">{sgn("ex5.spread")}</span>. הפריים היום: {pct("prime.current")}. הריבית: <M>{f.plain("prime.current")} − {f.plain("ex5.spread").replace("-", "")} = {f.plain("ex5.answer")}</M>, כלומר {pct("ex5.answer")}. החבר חיסר את הפריים של היום מריבית של אז, וקיבל ״מרווח״ שלא קיים בשום חוזה. זו בדיוק האזהרה בהחלטה של Mogi.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.1-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.year"), message: "זה השינוי לשנה שלמה. השאלה היא על חודש: מחלקים ב־12 (שיעור 0.4)." },
+    { value: f.raw("ex6.spread_mix"), message: `חישבתם עם המרווח, ${f.plain("spread.below")}. המרווח לא זז; מה שזז הוא השינוי בריבית.` },
+  ]}
+>
+  <strong>תרגיל מחשבה, לא תחזית:</strong> במסלול שהעוגן שלו הוא הפריים נשאר חוב של {f.shekels("ex6.balance")}. ריבית בנק ישראל עולה ב־{f.plain("cut.size")} נקודת אחוז. בכמה שקלים יגדל סכום הריבית בחודש הבא?
+</NumericExercise>
+
+<Solution for="2.1-6">
+הפריים, ואיתה הריבית במסלול, עולות ב־{f.plain("cut.size")} נקודת אחוז. לחודש: <M>{n("ex6.balance")} × {f.plain("cut.size")}% ÷ 12 = {f.shekels("ex6.answer")}</M>. לא צריך לדעת את הריבית עצמה: מספיק לדעת בכמה היא זזה.
+</Solution>
+
+<Callout title="חמש שאלות על פריים, עוגן ומרווח">
+<p><strong>מה זה?</strong> שלוש שכבות של ריבית: ריבית בנק ישראל; הפריים, שהיא ריבית בנק ישראל ועוד {f.plain("prime.addition")} נקודות (נכון ל־{asOf}, לא אומת); והמרווח שבחוזה. העוגן הוא השם הכללי לריבית שמתפרסמת ושהמסלול נקבע לפיה, והפריים היא עוגן אחד.</p>
+<p><strong>למה זה קיים?</strong> עוגן נותן לבנק ולכם כלל אחד, שקוף, לשינוי הריבית לאורך השנים: הריבית זזה עם ריבית שמתפרסמת, והחלק שנקבע בהצעה עצמה הוא רק המרווח.</p>
+<p><strong>איך זה עובד?</strong> הריבית במסלול = העוגן + המרווח. כשהעוגן זז (בפריים — בכל פעם שריבית בנק ישראל זזה; בעוגנים אחרים — במועדים שבחוזה), הריבית זזה איתו באותן נקודות. המרווח נשאר כפי שנכתב.</p>
+<p><strong>איך זה משפיע עליכם?</strong> במסלול כזה סכום הריבית שלכם זז עם החלטות שאף אחד לא יודע מראש. כל רבע נקודה בריבית בנק ישראל מזיז את סכום הריבית בכל חודש, על כל החוב שנשאר.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים הצעות לפי המרווח, כי העוגן זהה לכולם באותו יום. רושמים את המרווח מהחוזה, ולא מחשבים אותו מהעוגן של היום. ובודקים כמה התשלום יזוז אם העוגן יזוז, כי אף אחד לא יודע מה העוגן יעשה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שלוש שכבות:** ריבית בנק ישראל; הפריים = ריבית בנק ישראל ועוד {f.plain("prime.addition")} נקודות אחוז; והמרווח בחוזה.
+- **נכון ל־{asOf} (לא אומת):** ריבית בנק ישראל {pct("boi.rate")}, הפריים {pct("prime.current")}. מקור התוספת — שאלה פתוחה.
+- **עוגן** = ריבית שמתפרסמת, שהמסלול נקבע לפיה. הריבית במסלול = העוגן + המרווח. הפריים היא עוגן אחד; תשואת אג״ח ממשלתית היא עוגן אחר.
+- **המרווח בחוזה יכול להיות שלילי:** ״פריים פחות {f.plain("spread.below")}״ = <span class="ltr">{sgn("spread.example")}</span>, ועדיין {f.plain("track.over_boi")} נקודות מעל ריבית בנק ישראל. אל תבלבלו אותו עם המרווח של הבנק משיעור 0.9.
+- **כשהעוגן זז, הריבית זזה באותן נקודות. המרווח לא זז.** לכן משווים הצעות לפי המרווח, ולוקחים אותו מהחוזה.
+
+**בשיעור הבא — 2.2, <Later lesson="2.2" quiet>קבועה מול משתנה, ו״ריבית קבועה מול תשלום קבוע״</Later>:** מה ההבדל בין <Later lesson="2.2" quiet>ריבית קבועה</Later> ל<Later lesson="2.2" quiet>ריבית משתנה</Later>, ולמה ריבית שלא זזה עדיין לא אומרת שהתשלום לא זז.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "ריבית בנק ישראל 3.25%: הוועדה המוניטרית הודיעה ב־2026-09-01 על הורדה של 0.25 נקודת אחוז; בתוקף מ־2026-09-03. ההחלטה הבאה: 2026-10-21. לפי תקציר של מקור רשמי; ממתין לבדיקה.", href: "https://www.boi.org.il/en/communication-and-publications/press-releases/01-9-26-en/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "הריבית 3.25% והמועד הבא 2026-10-21, לפי תעתיק בצוות ב־Brain (דף 67469313, 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "הפריים = ריבית בנק ישראל ועוד 1.5 נקודות אחוז; דף ההסבר לצרכן באתר בנק ישראל נותן דוגמה: כשריבית בנק ישראל 1%, הפריים 2.5%. לפי תקציר של מקור רשמי; ממתין לבדיקה. סתירה פתוחה: דף ב־Brain (7831553) מייחס את ה־1.5 להוראה רגולטורית ולא לבנקים. הערך 4.75% הוא חשבון, לא נתון שפורסם. הקשר נכתב בשיעור כנכון ל־2026-10-09, לא ככלל קבוע.", href: "https://www.boi.org.il/information/bank-paymnts/financial-education/competition-in-mortgages/", date: "2026-10-09" },
+    { kind: "לא אומת", text: "עוגן: ריבית שמתפרסמת, שלפיה נקבעת ריבית של מסלול משתנה — הפריים או תשואה של אג״ח ממשלתית — והבנק מוסיף מרווח. לפי תעתיק בצוות ב־Brain של ההוראה של בנק ישראל על נהלים במתן הלוואות לדיור (מספר 451), נספח 4 (דף 7733250, אוגוסט 2026), ממתין לבדיקה מול המקור. במסלולים שמתעדכנים פעם בכמה שנים העוגן הוא בדרך כלל אג״ח ממשלתית: לפי תקציר של דף ההסבר של בנק ישראל; ממתין לבדיקה. עוגן של מק״מ: לפי סקירה של הצוות ממקורות ציבוריים (Brain, דף 67436545, נספח, 2026-10-07), ממתין לבדיקה." },
+    { kind: "החלטה של Mogi", text: "שומרים בנפרד את ריבית בנק ישראל, את הפריים ואת המרווח בחוזה של הלקוח, כל אחד עם ערכו ותאריכו; מציגים קודם את הריבית הכוללת במסלול; ״ריבית שנקבעה בעבר פחות העוגן של היום לא מחזירה את המרווח המקורי״. אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08 (Brain, דף 67436545, תשובות 5 ו־15). המימוש לא הושלם." },
+    { kind: "החלטה של Mogi", text: "באפליקציית היועץ, בחלק של ההלוואה שהעוגן שלו הוא הפריים, נשמר השדה ״מרווח מהפריים״ כמספר עם סימן (רישום השדות v1 של Mogi)." },
+    { kind: "ידע כלכלי כללי", text: "הקיצור ״P−0.8״ לפריים פחות 0.8 נקודות אחוז; ושהמרווח בחוזה הוא החלק שנקבע בהצעה עצמה, בעוד העוגן זהה לכולם באותו יום. לא נבדק מול מקור כתוב." },
+    { kind: "הנחת חישוב", text: "המרווחים (−0.8, −0.6, −0.5, +1), השינויים בריבית בנק ישראל (−0.25, +0.5), העוגן של 3.5% ו־4.5% כריבית בנק ישראל בעבר — מספרים להמחשה, לא נתוני שוק ולא תחזית. נועם ושירה (תיק א׳) בדויים: דוגמה לימודית; נתוני הלקוח והריביות להמחשה בלבד, ואינם הצעת בנק או נתוני שוק עדכניים. ריבית חודשית = ריבית שנתית חלקי 12 (שיעור 0.4; Brain ENG-223)." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/tracks.ts via scripts/lessons/lesson-2-1.ts and data/lessons/2-1.json, rechecked by checks/kinds/tracks.py. Illustration: src/components/RateLayers.vue. Video: video/2-1.html. Official data: research/notes/official-sources.md §6; Brain 67469313, 7831553, 7733250, 67436545. Field knowledge used: none (Mogi decisions DEC-3 E44, E51). */}

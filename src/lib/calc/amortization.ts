@@ -1,0 +1,274 @@
+/**
+ * Amortization — how a loan track is repaid month by month. The arithmetic
+ * behind lessons 2.5–2.7 (fixed, prime and variable tracks) and 2.9 (the
+ * level payment against equal principal), and later stage 3.
+ *
+ * Conventions, the same everywhere in the course:
+ *  - Rates are a contract's nominal annual rate, in percent, as strings
+ *    ("4.75" means 4.75% a year). The monthly rate is the annual rate ÷ 12
+ *    (lesson 0.4; checked against two banks' schedules, Brain ENG-223).
+ *  - Payments are monthly, at the end of each month.
+ *  - The level payment (שפיצר) is the payment that brings the balance to
+ *    exactly zero after the last month: P × m ÷ (1 − (1 + m)^−n).
+ *  - When a track's rate changes (prime, a variable track's reset), the
+ *    payment is recalculated on the balance left, over the months left; the
+ *    term stays. That is the course's calculation assumption; a contract may
+ *    say otherwise.
+ *  - An index-linked track (צמוד) moves its balance by the index each month
+ *    before the payment; the payment is the scheduled one times the index
+ *    ratio (lesson 0.8: amount × M₁ ÷ M₀).
+ *
+ * Every function returns exact Decimals; money is rounded to the agora only
+ * when shown (money.ts), except in the *Statement functions, which follow a
+ * bank statement: each month's figures rounded to the agora so every row adds
+ * up. Recomputed independently in checks/kinds/amortization.py.
+ *
+ * Exports are stable: other lessons import them. Add, don't rename.
+ */
+import Decimal from "decimal.js";
+
+export type Numeric = Decimal.Value;
+
+/** A private Decimal with room for long powers and roots; results mix freely with the default Decimal. */
+const D = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_UP });
+const ONE = new D(1);
+const HUNDRED = new D(100);
+const TWELVE = new D(12);
+
+function assertMonths(months: number): void {
+  if (!Number.isInteger(months) || months < 1) throw new RangeError(`months must be a whole number of at least 1, got ${months}`);
+}
+
+function agorot(value: Numeric): Decimal {
+  return new D(value).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+}
+
+/** The monthly rate in percent, from a nominal annual rate: annual ÷ 12. "6" → 0.5. */
+export function monthlyRate(annualPercent: Numeric): Decimal {
+  return new D(annualPercent).div(TWELVE);
+}
+
+/** One month's interest on a balance at a nominal annual rate: balance × annual ÷ 12 ÷ 100. Exact. */
+export function monthInterest(balance: Numeric, annualPercent: Numeric): Decimal {
+  return new D(balance).mul(annualPercent).div(TWELVE).div(HUNDRED);
+}
+
+/**
+ * The level monthly payment (שפיצר) that repays `principal` in `months`
+ * payments at a nominal annual rate: P × m ÷ (1 − (1 + m)^−n), m = annual ÷ 12.
+ * At a rate of zero, principal ÷ months. Exact, unrounded.
+ */
+export function annuityPayment(principal: Numeric, annualPercent: Numeric, months: number): Decimal {
+  assertMonths(months);
+  const m = monthlyRate(annualPercent).div(HUNDRED);
+  const p = new D(principal);
+  if (m.isZero()) return p.div(months);
+  return p.mul(m).div(ONE.minus(ONE.plus(m).pow(-months)));
+}
+
+/**
+ * The balance left after `paid` level payments: P × (1 + m)^k − C × ((1 + m)^k − 1) ÷ m.
+ * `paid` from 0 (the principal) to `months` (zero). Exact, unrounded.
+ */
+export function annuityBalance(principal: Numeric, annualPercent: Numeric, months: number, paid: number): Decimal {
+  assertMonths(months);
+  if (!Number.isInteger(paid) || paid < 0 || paid > months) throw new RangeError(`paid must be a whole number from 0 to ${months}, got ${paid}`);
+  const p = new D(principal);
+  const c = annuityPayment(principal, annualPercent, months);
+  const m = monthlyRate(annualPercent).div(HUNDRED);
+  if (m.isZero()) return p.minus(c.mul(paid));
+  const g = ONE.plus(m).pow(paid);
+  return p.mul(g).minus(c.mul(g.minus(ONE)).div(m));
+}
+
+/** One month of a schedule. */
+export interface AmortizationRow {
+  /** 1-based month. */
+  month: number;
+  /** The balance at the start of the month (after indexation, on a linked track). */
+  opening: Decimal;
+  payment: Decimal;
+  /** This month's interest: opening × monthly rate. */
+  interest: Decimal;
+  /** The part of the payment that lowers the balance: payment − interest. */
+  principalPaid: Decimal;
+  /** The balance after this month's payment. */
+  closing: Decimal;
+}
+
+/** Month-by-month schedule of the level payment, exact (round only for display). */
+export function annuitySchedule(principal: Numeric, annualPercent: Numeric, months: number): AmortizationRow[] {
+  assertMonths(months);
+  return pathSchedule(principal, Array.from({ length: months }, () => annualPercent));
+}
+
+/** Month-by-month schedule with an equal part of the principal each month (קרן שווה), exact. */
+export function equalPrincipalSchedule(principal: Numeric, annualPercent: Numeric, months: number): AmortizationRow[] {
+  assertMonths(months);
+  const part = new D(principal).div(months);
+  const rows: AmortizationRow[] = [];
+  let balance = new D(principal);
+  for (let month = 1; month <= months; month++) {
+    const interest = monthInterest(balance, annualPercent);
+    const principalPaid = month === months ? balance : part;
+    rows.push({ month, opening: balance, payment: principalPaid.plus(interest), interest, principalPaid, closing: balance.minus(principalPaid) });
+    balance = balance.minus(principalPaid);
+  }
+  return rows;
+}
+
+/**
+ * The level-payment schedule the way a bank statement shows it: the payment
+ * rounded to the agora; each month's interest rounded to the agora; the rest
+ * of the payment lowers the balance. The last payment is whatever clears the
+ * balance, so it can differ from the others by a few agorot.
+ */
+export function annuityStatement(principal: Numeric, annualPercent: Numeric, months: number): AmortizationRow[] {
+  assertMonths(months);
+  const payment = agorot(annuityPayment(principal, annualPercent, months));
+  const rows: AmortizationRow[] = [];
+  let balance = agorot(principal);
+  for (let month = 1; month <= months; month++) {
+    const interest = agorot(monthInterest(balance, annualPercent));
+    const principalPaid = month === months ? balance : payment.minus(interest);
+    rows.push({ month, opening: balance, payment: principalPaid.plus(interest), interest, principalPaid, closing: balance.minus(principalPaid) });
+    balance = balance.minus(principalPaid);
+  }
+  return rows;
+}
+
+/**
+ * The equal-principal schedule the way a statement shows it: the principal
+ * part rounded to the agora (the last month takes what is left), each month's
+ * interest rounded to the agora.
+ */
+export function equalPrincipalStatement(principal: Numeric, annualPercent: Numeric, months: number): AmortizationRow[] {
+  assertMonths(months);
+  const part = agorot(new D(principal).div(months));
+  const rows: AmortizationRow[] = [];
+  let balance = agorot(principal);
+  for (let month = 1; month <= months; month++) {
+    const interest = agorot(monthInterest(balance, annualPercent));
+    const principalPaid = month === months ? balance : part;
+    rows.push({ month, opening: balance, payment: principalPaid.plus(interest), interest, principalPaid, closing: balance.minus(principalPaid) });
+    balance = balance.minus(principalPaid);
+  }
+  return rows;
+}
+
+/** One month of a track whose rate or index can move. */
+export interface PathRow extends AmortizationRow {
+  /** The nominal annual rate in force this month, in percent. */
+  rate: Decimal;
+  /** How much the index moved during this month (1 = not at all; 1.002 = up 0.2%). */
+  indexFactor: Decimal;
+}
+
+/**
+ * A level-payment track whose rate (and, on a linked track, index) can change
+ * month by month: prime, a variable track at its reset, a fixed linked track.
+ *
+ * `rates[t]` is the annual rate in month t + 1; the term is rates.length
+ * months. `indexFactors[t]` (default 1) is how much the index moved during
+ * month t + 1; the balance is indexed by it before that month's payment.
+ *
+ * Each month: index the balance; if the rate changed (or it is the first
+ * month), recalculate the level payment on that balance over the months left;
+ * otherwise keep last month's payment, indexed. Exact, unrounded.
+ */
+export function pathSchedule(principal: Numeric, rates: Numeric[], indexFactors?: Numeric[]): PathRow[] {
+  const months = rates.length;
+  assertMonths(months);
+  if (indexFactors && indexFactors.length !== months) throw new RangeError("indexFactors must have one entry per month");
+  const rows: PathRow[] = [];
+  let balance = new D(principal);
+  let payment = new D(0);
+  let rate = new D(rates[0]);
+  for (let t = 0; t < months; t++) {
+    const factor = new D(indexFactors ? indexFactors[t] : 1);
+    const opening = balance.mul(factor);
+    const thisRate = new D(rates[t]);
+    if (t === 0 || !thisRate.eq(rate)) payment = annuityPayment(opening, thisRate, months - t);
+    else payment = payment.mul(factor);
+    rate = thisRate;
+    const interest = monthInterest(opening, thisRate);
+    const principalPaid = payment.minus(interest);
+    const closing = t === months - 1 ? new D(0) : opening.minus(principalPaid);
+    rows.push({ month: t + 1, opening, payment, interest, principalPaid, closing, rate: thisRate, indexFactor: factor });
+    balance = closing;
+  }
+  return rows;
+}
+
+/**
+ * A month-by-month path from values held for blocks of months: block 1 for
+ * months 1…blockMonths, block 2 for the next blockMonths, and so on. The last
+ * value carries on to the end. Used for a prime path (one prime level per
+ * block), a variable track's anchor between resets, or yearly inflation.
+ */
+export function blockPath(values: Numeric[], blockMonths: number, months: number): Decimal[] {
+  assertMonths(months);
+  assertMonths(blockMonths);
+  if (values.length === 0) throw new RangeError("a path needs at least one value");
+  return Array.from({ length: months }, (_, t) => new D(values[Math.min(Math.floor(t / blockMonths), values.length - 1)]));
+}
+
+/**
+ * How much the index moves in one month when it rises by `annualPercent` over
+ * a year at an even pace: (1 + π)^(1/12), a twelfth root (lesson 0.4). Twelve
+ * such months make exactly 1 + π.
+ */
+export function monthlyIndexFactor(annualPercent: Numeric): Decimal {
+  const base = ONE.plus(new D(annualPercent).div(HUNDRED));
+  if (base.lte(0)) throw new RangeError("an index cannot fall by 100% or more");
+  return base.pow(ONE.div(TWELVE));
+}
+
+/** Monthly index factors from a yearly inflation per block: blockPath, then monthlyIndexFactor. */
+export function indexPath(inflationPercents: Numeric[], blockMonths: number, months: number): Decimal[] {
+  const perBlock = inflationPercents.map((p) => monthlyIndexFactor(p));
+  return blockPath(perBlock, blockMonths, months);
+}
+
+/** One year of a schedule: the payment in its last month, and the balance at its end. */
+export interface YearPoint {
+  year: number;
+  payment: Decimal;
+  balance: Decimal;
+}
+
+/** Year by year: for each whole year of the schedule, its last month's payment and closing balance. */
+export function yearlySummary(rows: AmortizationRow[]): YearPoint[] {
+  const years: YearPoint[] = [];
+  for (let k = 12; k <= rows.length; k += 12) years.push({ year: k / 12, payment: rows[k - 1].payment, balance: rows[k - 1].closing });
+  return years;
+}
+
+/** A prime track's rate: the prime plus its margin from prime (signed, "-0.5" for P−0.5). */
+export function primeTrackRate(primePercent: Numeric, marginPercent: Numeric): Decimal {
+  return new D(primePercent).plus(marginPercent);
+}
+
+/**
+ * When a variable track's rate is reset: every `intervalMonths` from the start,
+ * strictly before the term ends (no reset on the last day). 240 months every
+ * 60 → [60, 120, 180].
+ */
+export function updateMonths(termMonths: number, intervalMonths: number): number[] {
+  assertMonths(termMonths);
+  assertMonths(intervalMonths);
+  const points: number[] = [];
+  for (let k = intervalMonths; k < termMonths; k += intervalMonths) points.push(k);
+  return points;
+}
+
+/** The first reset strictly after month `now` (0 = the day the loan starts), or null when none is left. */
+export function nextUpdateMonth(termMonths: number, intervalMonths: number, now: number): number | null {
+  return updateMonths(termMonths, intervalMonths).find((k) => k > now) ?? null;
+}
+
+/** Months from `now` to the next reset, or null when none is left. */
+export function monthsToNextUpdate(termMonths: number, intervalMonths: number, now: number): number | null {
+  const next = nextUpdateMonth(termMonths, intervalMonths, now);
+  return next === null ? null : next - now;
+}

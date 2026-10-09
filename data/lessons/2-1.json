@@ -1,0 +1,515 @@
+{
+  "lesson": "2.1",
+  "title": "ריבית בנק ישראל, פריים, עוגן ומרווח",
+  "note": "The Bank of Israel rate and dates are search-index summaries and the team's Brain record (official-sources.md §6; Brain 67469313), as of 2026-10-09, not read from the releases. Prime = rate + 1.5 is arithmetic. Spreads, cuts and amounts are invented teaching numbers.",
+  "facts": [
+    {
+      "id": "boi.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.25"
+    },
+    {
+      "id": "boi.announced",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-01"
+    },
+    {
+      "id": "boi.effective",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-03"
+    },
+    {
+      "id": "boi.next",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-21"
+    },
+    {
+      "id": "data.date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-09"
+    },
+    {
+      "id": "prime.addition",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.5"
+    },
+    {
+      "id": "prime.current",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5"
+      },
+      "value": "4.75"
+    },
+    {
+      "id": "src.example_boi",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "src.example_prime",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "1",
+        "addition": "1.5"
+      },
+      "value": "2.5"
+    },
+    {
+      "id": "spread.example",
+      "kind": "given",
+      "inputs": {},
+      "value": "-0.8"
+    },
+    {
+      "id": "spread.below",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.8"
+    },
+    {
+      "id": "track.example",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5",
+        "spread": "-0.8"
+      },
+      "value": "3.95"
+    },
+    {
+      "id": "track.over_boi",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "3.95",
+        "anchor": "3.25"
+      },
+      "value": "0.7"
+    },
+    {
+      "id": "cut.size",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "pred.both",
+      "kind": "trk_points_sum",
+      "inputs": {
+        "a": "0.25",
+        "b": "0.8"
+      },
+      "value": "1.05"
+    },
+    {
+      "id": "boi.after_cut",
+      "kind": "trk_rate",
+      "inputs": {
+        "anchor": "3.25",
+        "spread": "-0.25"
+      },
+      "value": "3"
+    },
+    {
+      "id": "prime.after_cut",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "3",
+        "addition": "1.5"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "track.after_cut",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3",
+        "addition": "1.5",
+        "spread": "-0.8"
+      },
+      "value": "3.7"
+    },
+    {
+      "id": "track.cut_change",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "3.7",
+        "anchor": "3.95"
+      },
+      "value": "-0.25"
+    },
+    {
+      "id": "anchor.other",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.5"
+    },
+    {
+      "id": "spread.other",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "rate.other",
+      "kind": "trk_rate",
+      "inputs": {
+        "anchor": "3.5",
+        "spread": "1"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "slider.spread",
+      "kind": "given",
+      "inputs": {},
+      "value": "-0.5"
+    },
+    {
+      "id": "slider.rate",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5",
+        "spread": "-0.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "slider.boi_two_cuts",
+      "kind": "given",
+      "inputs": {},
+      "value": "2.75"
+    },
+    {
+      "id": "slider.boi_drop",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "3.25",
+        "anchor": "2.75"
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "slider.prime_two_cuts",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "2.75",
+        "addition": "1.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "slider.rate_two_cuts",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "2.75",
+        "addition": "1.5",
+        "spread": "-0.5"
+      },
+      "value": "3.75"
+    },
+    {
+      "id": "slider.at_boi_spread",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "3.25",
+        "anchor": "4.75"
+      },
+      "value": "-1.5"
+    },
+    {
+      "id": "worked.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000"
+    },
+    {
+      "id": "worked.monthly_rate",
+      "kind": "trk_monthly",
+      "inputs": {
+        "annual": "3.95",
+        "decimals": 4
+      },
+      "value": "0.3292"
+    },
+    {
+      "id": "worked.month_interest",
+      "kind": "trk_month_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate": "3.95"
+      },
+      "value": "1975.00"
+    },
+    {
+      "id": "worked.month_interest_cut",
+      "kind": "trk_month_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate": "3.7"
+      },
+      "value": "1850.00"
+    },
+    {
+      "id": "worked.month_saving",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.month_interest",
+        "subtrahend": "worked.month_interest_cut"
+      },
+      "value": "125.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "trk_layers_table",
+      "inputs": {
+        "addition": "1.5",
+        "policy_1": "3.25",
+        "spread_1": "-0.8",
+        "policy_2": "2.75",
+        "spread_2": "-0.8",
+        "policy_3": "4",
+        "spread_3": "-0.5",
+        "policy_4": "3.5",
+        "spread_4": "-0.7"
+      },
+      "value": [
+        {
+          "period": 1,
+          "policy": "3.25",
+          "prime": "4.75",
+          "spread": "-0.8",
+          "rate": "3.95"
+        },
+        {
+          "period": 2,
+          "policy": "2.75",
+          "prime": "4.25",
+          "spread": "-0.8",
+          "rate": "3.45"
+        },
+        {
+          "period": 3,
+          "policy": "4",
+          "prime": "5.5",
+          "spread": "-0.5",
+          "rate": "5"
+        },
+        {
+          "period": 4,
+          "policy": "3.5",
+          "prime": "5",
+          "spread": "-0.7",
+          "rate": "4.3"
+        }
+      ]
+    },
+    {
+      "id": "ex2.spread",
+      "kind": "given",
+      "inputs": {},
+      "value": "-0.6"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5",
+        "spread": "-0.6"
+      },
+      "value": "4.15"
+    },
+    {
+      "id": "ex2.added",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5",
+        "spread": "0.6"
+      },
+      "value": "5.35"
+    },
+    {
+      "id": "ex2.on_boi",
+      "kind": "trk_rate",
+      "inputs": {
+        "anchor": "3.25",
+        "spread": "-0.6"
+      },
+      "value": "2.65"
+    },
+    {
+      "id": "ex3.boi",
+      "kind": "trk_rate",
+      "inputs": {
+        "anchor": "3.25",
+        "spread": "0.5"
+      },
+      "value": "3.75"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.75",
+        "addition": "1.5",
+        "spread": "-0.6"
+      },
+      "value": "4.65"
+    },
+    {
+      "id": "ex3.prime",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "3.75",
+        "addition": "1.5"
+      },
+      "value": "5.25"
+    },
+    {
+      "id": "ex3.down",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "2.75",
+        "addition": "1.5",
+        "spread": "-0.6"
+      },
+      "value": "3.65"
+    },
+    {
+      "id": "ex4.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "4.75",
+        "anchor": "4.2"
+      },
+      "value": "0.55"
+    },
+    {
+      "id": "ex4.signed",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "4.2",
+        "anchor": "4.75"
+      },
+      "value": "-0.55"
+    },
+    {
+      "id": "ex4.vs_boi",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "4.2",
+        "anchor": "3.25"
+      },
+      "value": "0.95"
+    },
+    {
+      "id": "ex5.boi_then",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "ex5.spread",
+      "kind": "given",
+      "inputs": {},
+      "value": "-0.5"
+    },
+    {
+      "id": "ex5.prime_then",
+      "kind": "trk_prime",
+      "inputs": {
+        "policy": "4.5",
+        "addition": "1.5"
+      },
+      "value": "6"
+    },
+    {
+      "id": "ex5.rate_then",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "4.5",
+        "addition": "1.5",
+        "spread": "-0.5"
+      },
+      "value": "5.5"
+    },
+    {
+      "id": "ex5.wrong_spread",
+      "kind": "trk_spread",
+      "inputs": {
+        "rate": "5.5",
+        "anchor": "4.75"
+      },
+      "value": "0.75"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "trk_prime_track",
+      "inputs": {
+        "policy": "3.25",
+        "addition": "1.5",
+        "spread": "-0.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "ex5.on_boi",
+      "kind": "trk_rate",
+      "inputs": {
+        "anchor": "3.25",
+        "spread": "-0.5"
+      },
+      "value": "2.75"
+    },
+    {
+      "id": "ex6.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "480000"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "trk_month_interest",
+      "inputs": {
+        "balance": "480000",
+        "rate": "0.25"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "ex6.year",
+      "kind": "trk_year_interest",
+      "inputs": {
+        "balance": "480000",
+        "rate": "0.25"
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "ex6.spread_mix",
+      "kind": "trk_month_interest",
+      "inputs": {
+        "balance": "480000",
+        "rate": "0.8"
+      },
+      "value": "320.00"
+    }
+  ]
+}

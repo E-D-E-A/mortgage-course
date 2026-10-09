@@ -1,0 +1,410 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "2.10"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RepaymentPaths from "../../components/RepaymentPaths.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("2.10");
+export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
+export const nv = (v) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(v));
+export const none = f.rows("explain.none");
+export const partial = f.rows("explain.partial");
+export const full = f.rows("explain.full");
+export const bp = f.rows("bullet.partial");
+export const bf = f.rows("bullet.full");
+export const half = f.rows("half.full").slice(0, 3);
+export const predictionOptions = [
+  "אותו סכום: אותה הלוואה ואותו אחוז ריבית, רק מאוחר יותר",
+  "פחות: שנה שלמה בלי תשלומים",
+  "יותר: הריבית שלא שולמה מצטרפת לחוב, ומשלמים ריבית גם עליה",
+  "אי אפשר לדעת; זה תלוי בבנק",
+];
+
+בשיעור הקודם ראינו שתי שיטות החזר: <Term t="שפיצר" lesson="2.10">שפיצר</Term> ו<Term t="קרן שווה" lesson="2.10">קרן שווה</Term>. בשתיהן מתחילים להחזיר את <Term t="קרן" lesson="2.10">הקרן</Term> כבר בחודש הראשון.
+לפעמים רוצים לדחות: לשלם מעט בהתחלה, או כלום, ולהחזיר אחר כך. בשיעור הזה נראה איך עושים את זה, ומה זה עולה. כבר בשיעור 0.3, ב<Term t="ריבית דריבית" lesson="2.10">ריבית דריבית</Term>, ראינו את הכלל: ריבית שלא שולמה לא מחכה. היא מצטרפת לחוב.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="2.10"
+  question="לקחתם 600,000 ₪ ב־4.8% לשנה, ל־20 שנה בשפיצר. סיכמתם שב־12 החודשים הראשונים לא משלמים כלום, והריבית מצטרפת לחוב. בהשוואה להלוואה שמשלמים בה מהחודש הראשון, כמה תשלמו בסך הכול?"
+  options={predictionOptions}
+/>
+
+<Section kind="ההסבר">
+
+## גרייס: חודשים בלי להחזיר קרן
+
+</Section>
+
+**גרייס** (מאנגלית: grace, ״ארכה״) הוא תקופה בתחילת ההלוואה שבה לא מחזירים קרן. יש שני סוגים:
+- <Term t="גרייס חלקי" lesson="2.10">גרייס חלקי</Term>: משלמים רק את הריבית של כל חודש. <Term t="יתרה" lesson="2.10">היתרה</Term> נשארת כמו שהייתה.
+- <Term t="גרייס מלא" lesson="2.10">גרייס מלא</Term>: לא משלמים כלום. הריבית מצטרפת לחוב.
+
+אחרי הגרייס מתחילים להחזיר את הקרן; בשיעור הזה — בשפיצר. החלטה של Mogi: כברירת מחדל **הגרייס נמצא בתוך התקופה**. בהלוואה ל־12 חודשים עם 3 חודשי גרייס, את הקרן מחזירים רק בחודשים שאחרי הגרייס, עד החודש ה־12. (בהצעה אמיתית קובעים התנאים שבה.)
+
+נראה את שלוש הדרכים על הלוואה קטנה: {f.shekels("explain.principal")}, ב־6% לשנה (<M>6% ÷ 12 = {f.plain("explain.monthly")}%</M> לחודש), ל־12 חודשים, מתוכם 3 חודשי גרייס.
+
+**בלי גרייס.** שפיצר על 12 חודשים: {nv(none[0].payment)} ₪ בכל חודש.
+
+**גרייס חלקי.** בכל אחד משלושת החודשים הראשונים: <M>{f.plain("explain.monthly")}% × {n("explain.principal")} = {nv(partial[0].payment)}</M> ₪, רק ריבית. היתרה נשארת {f.shekels("explain.principal")}. מהחודש הרביעי ועד ה־12: שפיצר על {f.shekels("explain.principal")} — {nv(partial[3].payment)} ₪ בחודש. יותר מבלי גרייס, כי את אותה קרן מחזירים בפחות חודשים.
+
+**גרייס מלא.** שלושה חודשים בלי תשלום. הריבית מצטרפת לחוב, חודש אחר חודש:
+- חודש 1: <M>{f.plain("explain.monthly")}% × {nv(full[0].opening)} = {nv(full[0].interest)}</M>. החוב: {nv(full[0].closing)} ₪.
+- חודש 2: <M>{f.plain("explain.monthly")}% × {nv(full[1].opening)} = {n("explain.full_int_2")}</M>. החוב: {nv(full[1].closing)} ₪. כבר יש כאן ריבית על ריבית (שיעור 0.3).
+- חודש 3: הריבית {nv(full[2].interest)} ₪, והחוב: {f.shekels("explain.full_close_3")}.
+
+אחרי שלושה חודשים אתם חייבים {f.shekels("explain.full_added")} יותר ממה שלקחתם. מהחודש הרביעי ועד ה־12: שפיצר על כל החוב הזה — {nv(full[3].payment)} ₪ בחודש.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">חודש</th>
+        <th class="py-2 text-start font-semibold">בלי גרייס</th>
+        <th class="py-2 text-start font-semibold">גרייס חלקי</th>
+        <th class="py-2 text-start font-semibold">גרייס מלא</th>
+      </tr>
+    </thead>
+    <tbody>
+      {none.map((r, i) => (
+        <tr class="border-b border-n100">
+          <td class="py-1.5 text-n700">{r.period}</td>
+          <td class="py-1.5"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-1.5"><span class="ltr">{formatShekels(partial[i].payment)}</span></td>
+          <td class="py-1.5"><span class="ltr">{formatShekels(full[i].payment)}</span></td>
+        </tr>
+      ))}
+      <tr class="font-semibold text-n900">
+        <td class="py-2">שולם בסך הכול</td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.none_paid")}</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.partial_paid")}</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.full_paid")}</span></td>
+      </tr>
+      <tr class="text-n800">
+        <td class="py-2">מזה ריבית</td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.none_interest")}</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.partial_interest")}</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("explain.full_interest")}</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+(התשלום האחרון בכל עמודה שונה באגורות, כי הוא סוגר את מה שהעיגול השאיר — כמו בשיעור 2.9.)
+
+<Section kind="ההסבר">
+
+## דחיית תשלום אינה הקטנת עלות
+
+</Section>
+
+תסתכלו על שורת ״שולם בסך הכול״:
+- **גרייס חלקי:** <M>{n("explain.partial_paid")} − {n("explain.none_paid")} = {n("explain.partial_extra")}</M> ₪ יותר מבלי גרייס.
+- **גרייס מלא:** <M>{n("explain.full_paid")} − {n("explain.none_paid")} = {n("explain.full_extra")}</M> ₪ יותר מבלי גרייס.
+
+למה? אותו אחוז ריבית, אותה הלוואה, אותו חודש אחרון. ההבדל הוא **כמה זמן הקרן נשארת אצלכם**:
+- בגרייס חלקי הקרן לא קטנה בשלושת החודשים הראשונים, ולכן הריבית מחושבת על {f.shekels("explain.principal")} מלאים זמן רב יותר. זה אותו הסבר כמו שפיצר מול קרן שווה בשיעור 2.9: יתרה שיורדת לאט — יותר ריבית.
+- בגרייס מלא גם הריבית לא שולמה. היא מצטרפת לחוב, ומשלמים ריבית גם עליה.
+
+**הכלל:** גרייס לא מוריד את העלות. הוא מזיז תשלומים קדימה, ועל כל שקל שנדחה משלמים ריבית, באחוז של ההלוואה, כל עוד הוא לא הוחזר. בתמורה מקבלים תשלום נמוך עכשיו — וזה יכול להיות שווה את זה, למשל כשעוד משלמים שכר דירה. אבל זו קנייה של זמן, לא הנחה.
+
+<Section kind="ההסבר">
+
+## בלון ובוליט: כל הקרן בסוף
+
+</Section>
+
+גרייס דוחה את הקרן לכמה חודשים. יש הלוואות שדוחות אותה **עד הסוף**: כל הקרן חוזרת בבת אחת, בתשלום האחרון.
+לפי תקציר של הוראה של בנק ישראל (לא אומת), שני השמות, <Term t="בלון" lesson="2.10">בלון</Term> ו<Term t="בוליט" lesson="2.10">בוליט</Term>, מוגדרים שם יחד: הלוואה שהקרן שלה חוזרת במלואה בסוף התקופה. בהוראה כתוב ״בולט״; באפליקציית היועץ של Mogi, באפשרויות של ״צורת תשלום״, כתוב ״בוליט״. ויש שני סוגים, בדיוק כמו בגרייס:
+- **חלקי:** בכל חודש משלמים את הריבית. בסוף — כל הקרן, ועוד הריבית של החודש האחרון.
+- **מלא:** לא משלמים כלום עד הסוף. הריבית מצטרפת לחוב, ובסוף משלמים הכול.
+
+על אותה הלוואה של {f.shekels("explain.principal")} ב־6% לשנה, ל־12 חודשים:
+- **חלקי:** {nv(bp[0].payment)} ₪ בכל חודש, ובחודש ה־12: <M>{n("explain.principal")} + {nv(bp[0].payment)} = {n("bullet.partial_last")}</M> ₪. סכום הריבית: {f.shekels("bullet.partial_interest")}.
+- **מלא:** אפס בכל חודש, ובחודש ה־12 תשלום אחד של {f.shekels("bullet.full_last")}. סכום הריבית: {f.shekels("bullet.full_interest")}.
+- **ההפרש:** <M>{n("bullet.full_interest")} − {n("bullet.partial_interest")} = {n("bullet.gap")}</M> ₪ — ריבית על ריבית, שוב.
+
+**איפה פוגשים את זה.** הלוואה כזו מתאימה כשיודעים שכסף גדול יגיע בתאריך מסוים, למשל ממכירה של דירה קודמת. התשלום החודשי נמוך, אבל בסוף צריך את כל הקרן, בבת אחת. אם הכסף לא מגיע — יש בעיה.
+בנק ישראל מגביל חלק מההלוואות האלה: לפי תקציר של חוזר מ־2025, הלוואות בולט ובלון בעסקאות שבהן הקבלן מסבסד את הריבית לא יעלו על {f.plain("rule.bullet_share_limit")}% מההלוואות לדיור שבנק נותן בחודש, עד סוף 2026. הסיבה שהתקציר מביא: הלוואות כאלה עלולות לעודד קנייה של מי שלא בטוח שיוכל להשלים את העסקה. (לא אומת; נכון ל־9 באוקטובר 2026.)
+ומהשטח: טובי זמיר, בנקאי מחוץ לצוות, סיפר שסניפים ״דוחפים הלוואות בלון״ (שיחה מ־2026-08-05; מקור יחיד; ידע מהשטח, ממתין לאישור אילון). אם מציעים לכם כזו, שאלו מאיפה יגיעו הכסף לסוף ההלוואה.
+
+<Callout title="איזה תשלום נכנס לחישוב של הבנק">
+<p>כשהבנק בודק כמה מההכנסה הולך לתשלום (<Later lesson="4.3">יחס החזר</Later>), הוא לא לוקח את התשלום הנמוך של הגרייס. לפי ההחלטה של Mogi (Brain, דף 67436545, 2026-10-07), שנשענת על כלל של בנק ישראל: בהלוואה עם גרייס — התשלום <strong>אחרי</strong> הגרייס; בבוליט ובבלון — הריבית החודשית, גם כשבפועל היא נדחית לסוף. (הכלל של בנק ישראל: לא אומת, לפי תעתיק בצוות ב־Brain.) כלומר, גרייס לא ״מגדיל״ את ההלוואה שאפשר לקבל.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## גרייס מלא מול גרייס חלקי
+
+</Section>
+
+ההמחשה מציגה אותה הלוואה בשלוש דרכים: בלי גרייס, עם גרייס חלקי ועם גרייס מלא — אותו אחוז ריבית, ואותה תקופה, שהגרייס בתוכה. הזיזו את מספר חודשי הגרייס. בגרף היתרה, שימו לב למה שקורה בחודשים הראשונים.
+
+<RepaymentPaths client:visible mode="grace" principal={600000} rate={4.8} years={20} grace={12} />
+
+נסו את שלושת אלה:
+1. בהגדרות של ההתחלה (600,000 ₪, 4.8%, 20 שנה, 12 חודשי גרייס): כמה משלמים בחודש בזמן הגרייס החלקי? וכמה בכל דרך אחרי הגרייס?
+2. כמה ריבית משלמים בסך הכול בכל דרך? כמה יותר עולה הגרייס המלא מבלי גרייס?
+3. הזיזו את הגרייס ל־36 חודשים. מה קרה ליתרה בגרייס המלא בזמן הגרייס, ומה קרה לסכום הריבית?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>בגרייס חלקי: {f.shekels("slider.grace_pay")} בחודש — רק ריבית. בגרייס מלא: אפס. אחרי הגרייס: {f.shekels("slider.partial_after")} אחרי גרייס חלקי, ו־{f.shekels("slider.full_after")} אחרי גרייס מלא, כי החוב גדל ל־{f.shekels("slider.full_balance")}. בלי גרייס: {f.shekels("slider.none_pay")} מהחודש הראשון.</li>
+    <li>ריבית: {f.shekels("slider.none_interest")} בלי גרייס, {f.shekels("slider.partial_interest")} בגרייס חלקי, {f.shekels("slider.full_interest")} בגרייס מלא. הגרייס המלא עולה {f.shekels("ex5.answer")} יותר, והחלקי {f.shekels("slider.partial_extra")} יותר.</li>
+    <li>בגרייס המלא היתרה <strong>עולה</strong> בזמן הגרייס, מעל הסכום שלקחתם. הריבית בסך הכול מגיעה ל־{f.shekels("slider.full_interest_36")} — {f.shekels("slider.full_extra_36")} יותר מבלי גרייס.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="2.10"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `לא אותו סכום. בזמן הדחייה הריבית ממשיכה לרוץ ומצטרפת לחוב. בדוגמה: ${f.shekels("ex5.answer")} יותר ריבית.`,
+    "שנה בלי תשלומים היא לא שנה בלי ריבית. הריבית של השנה הזו מצטרפת לחוב, ומחזירים אותה אחר כך — עם ריבית עליה.",
+    "",
+    "כשהאחוז, הסכום, התקופה והגרייס ידועים, החשבון קובע את התשובה. הוא לא תלוי בבנק.",
+  ]}
+>
+  בלי גרייס: {f.shekels("slider.none_paid")}. עם 12 חודשי גרייס מלא: {f.shekels("slider.full_paid")}. הריבית שלא שולמה מצטרפת לחוב, והחוב הגדול יותר מוחזר בפחות חודשים.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## כמה עולה חודש של גרייס חלקי
+
+</Section>
+
+בגרייס חלקי התשלום בזמן הגרייס הוא הריבית החודשית על כל הקרן: הקרן כפול אחוז הריבית לשנה, חלקי 12. ב־600,000 ₪ וב־4.8%: <M>600,000 × 4.8% ÷ 12 = {n("slider.grace_pay")}</M> ₪.
+זה גם התשלום בבוליט חלקי, בכל חודש עד האחרון. וזה גם מה שהבנק לוקח כתשלום החודשי של בוליט ובלון כשהוא בודק את ההכנסה (לפי התיבה למעלה).
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: שנה של שכר דירה
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נועם ושירה בדויים, וההחלטות כאן הן דוגמה, לא המלצה.</p>
+</Callout>
+
+נועם ושירה מתיק א׳ לוקחים משכנתא של {f.shekels("case.loan")}. בשיעור 1.3 הם אמרו: ״בשנה הראשונה חשוב לנו לשלם מעט, כי נמשיך לשלם שכר דירה עד שנעבור.״ נניח שאחד המסלולים בתמהיל שלהם הוא 500,000 ₪, ב־4.8% לשנה, ל־25 שנה בשפיצר. כמה יחסוך להם גרייס של 12 חודשים בשנה הראשונה, ומה הוא יעלה?
+
+**צעד 1 — בלי גרייס.** <M>25 × 12 = {f.plain("worked.months")}</M> חודשים בשפיצר: {f.shekels("worked.none_pay")} בחודש (מהמחשבון או מההמחשה).
+
+**צעד 2 — בזמן גרייס חלקי.** רק ריבית: <M>{f.plain("worked.monthly")}% × 500,000 = {n("worked.grace_pay")}</M> ₪ בחודש. ההקלה בכל חודש בשנה הראשונה: <M>{n("worked.none_pay")} − {n("worked.grace_pay")} = {n("worked.relief")}</M> ₪.
+
+**צעד 3 — אחרי הגרייס.** הגרייס בתוך התקופה, ולכן את 500,000 ₪ מחזירים מהחודש ה־13 ועד ה־{f.plain("worked.months")}: {f.shekels("worked.after_pay")} בחודש — <M>{n("worked.after_pay")} − {n("worked.none_pay")} = {n("worked.after_gap")}</M> ₪ יותר מבלי גרייס, בכל חודש עד הסוף.
+
+**צעד 4 — המחיר.** סכום הריבית בלי גרייס: {f.shekels("worked.none_interest")}. עם גרייס חלקי: {f.shekels("worked.partial_interest")}. ההפרש: <M>{n("worked.partial_interest")} − {n("worked.none_interest")} = {n("worked.partial_extra")}</M> ₪.
+
+**צעד 5 — ואם גרייס מלא?** בשנה הראשונה לא משלמים כלום, אבל החוב גדל ל־{f.shekels("worked.full_balance")}. אחר כך: {f.shekels("worked.full_after_pay")} בחודש. סכום הריבית: {f.shekels("worked.full_interest")} — <M>{n("worked.full_interest")} − {n("worked.none_interest")} = {n("worked.full_extra")}</M> ₪ יותר מבלי גרייס.
+
+**מה לקחת מזה.** הגרייס קונה לנועם ושירה {f.shekels("worked.relief")} פחות בכל חודש בשנה של שכר הדירה. המחיר הוא {f.shekels("worked.partial_extra")} ריבית לאורך ההלוואה בגרייס חלקי, ו־{f.shekels("worked.full_extra")} בגרייס מלא. שווה או לא — זו החלטה שלהם; המספרים רק מראים מה קונים ובכמה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו: גרייס מלא, חודש אחר חודש
+
+</Section>
+
+לקחתם 50,000 ₪ ב־6% לשנה (0.5% לחודש), עם גרייס מלא. בשלושת החודשים הראשונים לא משלמים כלום. החודש הראשון כבר מלא. השלימו את החוב בחודשים 2 ו־3.
+
+<FillTable
+  client:visible
+  id="2.10-half"
+  periodLabel="חודש"
+  columns={[
+    { key: "opening", label: "החוב בתחילת החודש" },
+    { key: "interest", label: "ריבית החודש" },
+    { key: "closing", label: "החוב בסוף החודש" },
+  ]}
+  rows={half}
+  blanks={["2.opening", "2.interest", "2.closing", "3.opening", "3.interest", "3.closing"]}
+  success="ככה גדל חוב בגרייס מלא: כל חודש הריבית מחושבת על החוב כולו, כולל הריבית שכבר הצטרפה."
+  hint="בדקו: האם חישבתם את הריבית על החוב של תחילת החודש, ולא על 50,000 ₪? ועיגלתם כל ריבית לאגורה?"
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים ואחוזי הריבית בתרגילים הם מספרים להמחשה, לא נתוני שוק.
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. כדאי מחשבון, ובתרגיל 5 — ההמחשה.
+
+<ChoiceExercise
+  client:visible
+  id="2.10-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "רק את הריבית של כל חודש", correct: true, feedback: "נכון. בגרייס חלקי משלמים את הריבית, והקרן לא קטנה." },
+    { text: "כלום", feedback: "זה גרייס מלא. בגרייס חלקי משלמים את הריבית." },
+    { text: "רק חלק מהקרן, בלי ריבית", feedback: "הפוך. בגרייס דוחים את הקרן, לא את הריבית (בגרייס חלקי)." },
+    { text: "תשלום רגיל, אבל בחודשים מאוחרים יותר", feedback: "בזמן הגרייס משלמים פחות מתשלום רגיל: רק ריבית, בלי קרן." },
+  ]}
+>
+  יש לכם 6 חודשי גרייס חלקי בתחילת ההלוואה. מה משלמים בכל אחד מהם?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="2.10-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_year"), message: `זו הריבית של שנה שלמה: ${eq("4.8% × 300,000")}. בכל חודש משלמים חלק אחד מ־12 ממנה.` },
+    { value: f.raw("ex2.zero"), message: "אפס משלמים בגרייס מלא. בגרייס חלקי משלמים את הריבית." },
+  ]}
+>
+  לקחתם 300,000 ₪ ב־4.8% לשנה, עם 12 חודשי גרייס חלקי. כמה תשלמו בכל חודש בזמן הגרייס?
+</NumericExercise>
+
+<Solution for="2.10-2">
+הריבית החודשית: <M>4.8% ÷ 12 = {f.plain("worked.monthly")}%</M>. בזמן הגרייס משלמים רק אותה: <M>{f.plain("worked.monthly")}% × 300,000 = {n("ex2.answer")}</M>, כלומר {f.shekels("ex2.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.10-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_simple"), message: "חישבתם בשני החודשים ריבית על 200,000 ₪. בחודש השני הריבית מחושבת על החוב שכבר גדל, כולל הריבית של החודש הראשון." },
+    { value: f.raw("ex3.one_month"), message: "זה החוב אחרי חודש אחד. המשיכו לחודש השני." },
+  ]}
+>
+  לקחתם 200,000 ₪ ב־6% לשנה, עם גרייס מלא. כמה תהיו חייבים אחרי חודשיים?
+</NumericExercise>
+
+<Solution for="2.10-3">
+הריבית החודשית: <M>6% ÷ 12 = {f.plain("explain.monthly")}%</M>. חודש 1: <M>200,000 + {f.plain("explain.monthly")}% × 200,000 = {n("ex3.one_month")}</M>. חודש 2: <M>{n("ex3.one_month")} + {f.plain("explain.monthly")}% × {n("ex3.one_month")} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.10-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.monthly"), message: "זה התשלום בכל חודש עד האחרון: רק ריבית. בחודש האחרון מצטרפת אליו כל הקרן." },
+    { value: f.raw("ex4.principal"), message: "זו הקרן לבדה. בחודש האחרון משלמים גם את הריבית של החודש." },
+  ]}
+>
+  לקחתם 250,000 ₪ ב־4.8% לשנה, ל־5 שנים, בבוליט חלקי: בכל חודש רק ריבית, ואת כל הקרן בסוף. כמה תשלמו בחודש האחרון?
+</NumericExercise>
+
+<Solution for="2.10-4">
+הריבית של כל חודש: <M>{f.plain("worked.monthly")}% × 250,000 = {n("ex4.monthly")}</M>. בחודש האחרון: <M>{n("ex4.principal")} + {n("ex4.monthly")} = {n("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.10-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("slider.partial_extra"), message: "זה ההפרש של גרייס חלקי. השאלה היא על גרייס מלא." },
+    { value: f.raw("slider.full_interest"), message: "זו כל הריבית בגרייס מלא. השאלה היא כמה זה יותר מבלי גרייס." },
+  ]}
+>
+  השתמשו בהמחשה, בהגדרות של ההתחלה: 600,000 ₪, 4.8% לשנה, 20 שנה ו־12 חודשי גרייס. בכמה שקלים סכום הריבית בגרייס מלא גבוה מסכום הריבית בלי גרייס?
+</NumericExercise>
+
+<Solution for="2.10-5">
+בכרטיסים של ההמחשה: בגרייס מלא {f.shekels("slider.full_interest")} ריבית, ובלי גרייס {f.shekels("slider.none_interest")}. ההפרש: <M>{n("slider.full_interest")} − {n("slider.none_interest")} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="2.10-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("bullet.gap")}
+  errors={[
+    { value: f.raw("bullet.full_interest"), message: "זו כל הריבית בבוליט מלא. השאלה היא על ההפרש בינו לבין בוליט חלקי." },
+    { value: f.raw("bullet.partial_interest"), message: "זו כל הריבית בבוליט חלקי. השאלה היא על ההפרש." },
+  ]}
+>
+  לקחתם {f.shekels("explain.principal")} ב־6% לשנה, ל־12 חודשים. בבוליט חלקי משלמים כל חודש את הריבית, ואת הקרן בסוף. בבוליט מלא לא משלמים כלום עד הסוף, והריבית מצטרפת לחוב בכל חודש (מעוגלת לאגורה). בכמה שקלים הריבית בבוליט מלא גדולה יותר? (רמז: זה מה ששיעור 0.3 קרא לו ריבית על ריבית.)
+</NumericExercise>
+
+<Solution for="2.10-6">
+בוליט חלקי: 12 חודשים של <M>{f.plain("explain.monthly")}% × {n("explain.principal")} = {nv(bp[0].payment)}</M> ₪, יחד {f.shekels("bullet.partial_interest")}. בוליט מלא: החוב גדל כל חודש ב־{f.plain("explain.monthly")}%, עד {f.shekels("bullet.full_last")} בסוף. (בנוסחה של שיעור 0.3, בלי לעגל כל חודש: <M>100,000 × 1.005<sup>12</sup> = {n("bullet.formula")}</M> — אגורה פחות, בגלל העיגול.) הריבית: {f.shekels("bullet.full_interest")}. ההפרש: <M>{n("bullet.full_interest")} − {n("bullet.partial_interest")} = {n("bullet.gap")}</M>, כלומר {f.shekels("bullet.gap")}.
+</Solution>
+
+<Callout title="חמש שאלות על גרייס, בלון ובוליט">
+<p><strong>מה זה?</strong> דרכים לדחות את החזר הקרן: גרייס — לכמה חודשים בהתחלה; בלון ובוליט — עד סוף ההלוואה. בגרסה החלקית משלמים בינתיים ריבית; בגרסה המלאה גם הריבית נדחית ומצטרפת לחוב.</p>
+<p><strong>למה זה קיים?</strong> לפעמים יש תקופה שבה קשה לשלם — עוד משלמים שכר דירה, או מחכים לכסף ממכירה. הדחייה מתאימה את התשלומים לזמן שבו יש כסף. המלווה מסכים, כי על הזמן הזה הוא מקבל ריבית.</p>
+<p><strong>איך זה עובד?</strong> בזמן הדחייה הקרן לא קטנה (ובגרסה המלאה החוב גדל). אחר כך מחזירים את כל מה שנשאר, בפחות זמן — ולכן התשלומים שאחרי גבוהים יותר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> תשלום נמוך עכשיו, תשלום גבוה יותר אחר כך, ויותר ריבית בסך הכול. בבלון ובבוליט צריך בסוף את כל הקרן בבת אחת.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים: כמה ההקלה עכשיו שווה לנו, וכמה היא עולה עד הסוף? משווים לוחות סילוקין עם גרייס ובלי. בבוליט ובבלון שואלים גם מאיפה יגיע הכסף לתשלום האחרון. וזוכרים: דחיית תשלום אינה הקטנת עלות.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **גרייס חלקי** = בחודשים הראשונים משלמים רק ריבית; הקרן לא קטנה.
+- **גרייס מלא** = בחודשים הראשונים לא משלמים כלום; הריבית מצטרפת לחוב, ומשלמים ריבית גם עליה.
+- **בלון ובוליט** = כל הקרן חוזרת בסוף. בחלקי משלמים ריבית לאורך הדרך; במלא — גם הריבית בסוף.
+- **אחרי דחייה התשלום גבוה יותר**, כי את אותו חוב (או חוב גדול יותר) מחזירים בפחות זמן.
+- **דחיית תשלום אינה הקטנת עלות:** כל שקל שנדחה ממשיך לשאת ריבית באחוז של ההלוואה. מה שקונים הוא זמן.
+- **בבדיקת ההכנסה** לוקחים את התשלום שאחרי הגרייס, ובבוליט ובלון את הריבית החודשית (לא אומת).
+
+**בשיעור הבא — 2.11, אותה <Later lesson="2.11" quiet>יתרת חוב</Later>: ריבית מול הצמדה, כל אחד בנפרד:** שני כוחות שפועלים על אותו חוב — הריבית והמדד — ואיך מפרידים ביניהם במספרים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "גרייס חלקי: משלמים ריבית ודוחים קרן. גרייס מלא: דוחים קרן וריבית, והריבית מצטרפת לחוב לפי תנאי ההלוואה. כברירת מחדל הגרייס בתוך התקופה; בהצעה אמיתית קובעים התנאים שבה. בוליט חלקי ומלא באותו אופן. Brain, דף 67436545 (החלטה שאילון אישר ב־2026-10-07 ועדן קיבל ב־2026-10-08; המימוש לא הושלם).", date: "2026-10-08" },
+    { kind: "לא אומת", text: "ההגדרה של בנק ישראל: הלוואת בולט/בלון היא הלוואה שהקרן שלה מוחזרת במלואה בסוף התקופה, בשני סוגים — חלקי (הריבית משולמת לאורך הדרך) ומלא (גם הריבית לא משולמת עד הסוף). לפי תקציר חיפוש של הוראות ניהול בנקאי תקין 451 ו־329 באתר בנק ישראל, נקרא ב־2026-10-09; ממתין לבדיקה מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "חוזר מ־2025 (תוספת להוראת בנק ישראל על הלוואות לדיור): הלוואות בולט ובלון בעסקאות שבהן הקבלן מסבסד את הריבית — עד 10% מהביצועים החודשיים של הלוואות לדיור; הוראת שעה עד 31 בדצמבר 2026. הסיבה, לפי התקציר: הלוואות כאלה עלולות לעודד קנייה של מי שלא בטוח ביכולתו להשלים את העסקה. לפי תקצירי חיפוש של החוזר ושל הודעה לעיתונות מ־2025-03-23, נקרא ב־2026-10-09; ממתין לבדיקה מול המקור.", date: "2026-10-09" },
+    { kind: "החלטה של Mogi", text: "התשלום שנכנס לבדיקת ההכנסה: בהלוואה רגילה — התשלום הראשון על כל הסכום; עם גרייס — התשלום אחרי הגרייס; בבוליט ובלון — הריבית החודשית, גם כשהיא נדחית. Brain, דף 67436545 (2026-10-07/08), שנשען על נספח א׳ של הוראת בנק ישראל על הלוואות לדיור — הכלל הרשמי לא אומת, לפי תעתיק בצוות ב־Brain.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "״הסניפים דוחפים הלוואות בלון״ — טובי זמיר, בנקאי מחוץ לצוות, בשיחה מ־2026-08-05 (FK-H-053). מקור יחיד; לא נבדק מול מקור רשמי; ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "החלטה של Mogi", text: "באפליקציית היועץ, אפשרויות ״צורת תשלום״: שפיצר, קרן שווה ובוליט; ושדה ״גרייס״ בחודשים, מ־0 עד 36. מתוך הרישום packages/schemas/registry/v1.yaml בריפו edea-mortgage, כפי שנקרא ב־2026-10-09.", date: "2026-10-09" },
+    { kind: "ידע מתמטי כללי", text: "ריבית שלא שולמה ומצטרפת לחוב מייצרת ריבית דריבית (שיעור 0.3). החזר של אותה קרן בפחות חודשים מעלה את התשלום." },
+    { kind: "הנחת חישוב", text: "ריבית חודשית = אחוז הריבית לשנה חלקי 12. הריבית של כל חודש מעוגלת לאגורה; בגרייס מלא ובבוליט מלא היא מצטרפת לחוב בכל חודש. אחרי הגרייס — שפיצר על החוב שנשאר, בחודשים שנשארו. החודש האחרון סוגר את מה שהעיגול השאיר. כל הסכומים והריביות להמחשה, ותיק א׳ בדוי." },
+    { kind: "בדיקת חישוב", text: "מודול החישוב משחזר את הדוגמה שב־Brain: מיליון ₪ ב־4.5% ל־25 שנה, 12 חודשי גרייס חלקי — 3,750 ₪ בזמן הגרייס ו־5,684.25 ₪ אחריו. כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/repayment.ts via scripts/lessons/lesson-2-10.ts and data/lessons/2-10.json, rechecked by checks/kinds/repayment.py. Illustration: src/components/RepaymentPaths.vue (mode "grace"). The map lists no video for this lesson. */}

@@ -1,0 +1,1233 @@
+{
+  "lesson": "2.6",
+  "title": "מסלול הפריים",
+  "note": "The Bank of Israel rate, its 2026 decisions and prime = rate + 1.5 points are from search-index summaries (official-sources.md §6, 2026-10-09), not verified. Loans, margins and prime paths are invented teaching numbers. Level payments from amortization.ts; on a rate change the payment is recalculated on the balance left over the months left.",
+  "facts": [
+    {
+      "id": "boi.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.25"
+    },
+    {
+      "id": "boi.decided",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-01"
+    },
+    {
+      "id": "boi.effective",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-09-03"
+    },
+    {
+      "id": "boi.next",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-21"
+    },
+    {
+      "id": "boi.as_of",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-09"
+    },
+    {
+      "id": "boi.addition",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.5"
+    },
+    {
+      "id": "boi.prime",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.25",
+        "addition": "1.5"
+      },
+      "value": "4.75"
+    },
+    {
+      "id": "case.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "explain.rate",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.75",
+        "margin": "-0.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "explain.small_prime",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.5",
+        "addition": "1.5"
+      },
+      "value": "5"
+    },
+    {
+      "id": "explain.small_rate",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5",
+        "margin": "-0.5"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "explain.small_change",
+      "kind": "lend_rate_change",
+      "inputs": {
+        "before": "4.25",
+        "after": "4.5"
+      },
+      "value": "0.25"
+    },
+    {
+      "id": "explain.first_interest",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "4.25"
+      },
+      "value": "2125.00"
+    },
+    {
+      "id": "explain.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.25",
+        "months": 240
+      },
+      "value": "3715.41"
+    },
+    {
+      "id": "explain.left_60",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.25",
+        "months": 240,
+        "paid": 60
+      },
+      "value": "493887.20"
+    },
+    {
+      "id": "explain.prime_up",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.75"
+    },
+    {
+      "id": "explain.rate_up",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.75",
+        "margin": "-0.5"
+      },
+      "value": "5.25"
+    },
+    {
+      "id": "explain.new_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "493887.20",
+        "rate_percent": "5.25",
+        "months": 180
+      },
+      "value": "3970.25"
+    },
+    {
+      "id": "explain.payment_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.new_payment",
+        "subtrahend": "explain.payment"
+      },
+      "value": "254.84"
+    },
+    {
+      "id": "explain.interest_before",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "493887.20",
+        "rate_percent": "4.25"
+      },
+      "value": "1749.18"
+    },
+    {
+      "id": "explain.interest_after",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "493887.20",
+        "rate_percent": "5.25"
+      },
+      "value": "2160.76"
+    },
+    {
+      "id": "explain.interest_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.interest_after",
+        "subtrahend": "explain.interest_before"
+      },
+      "value": "411.58"
+    },
+    {
+      "id": "rule.per_100k",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "100000",
+        "rate_percent": "1"
+      },
+      "value": "83.33"
+    },
+    {
+      "id": "explain.path_month_61",
+      "kind": "amort_path_payment",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "4.25",
+        "rate_2": "5.25",
+        "month": 61
+      },
+      "value": "3970.25"
+    },
+    {
+      "id": "explain.path_up",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "4.25",
+        "rate_2": "5.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3715.41",
+          "balance": "580538.94"
+        },
+        {
+          "year": 2,
+          "payment": "3715.41",
+          "balance": "560234.48"
+        },
+        {
+          "year": 3,
+          "payment": "3715.41",
+          "balance": "539050.06"
+        },
+        {
+          "year": 4,
+          "payment": "3715.41",
+          "balance": "516947.57"
+        },
+        {
+          "year": 5,
+          "payment": "3715.41",
+          "balance": "493887.20"
+        },
+        {
+          "year": 6,
+          "payment": "3970.25",
+          "balance": "471643.11"
+        },
+        {
+          "year": 7,
+          "payment": "3970.25",
+          "balance": "448202.68"
+        },
+        {
+          "year": 8,
+          "payment": "3970.25",
+          "balance": "423501.58"
+        },
+        {
+          "year": 9,
+          "payment": "3970.25",
+          "balance": "397472.01"
+        },
+        {
+          "year": 10,
+          "payment": "3970.25",
+          "balance": "370042.52"
+        },
+        {
+          "year": 11,
+          "payment": "3970.25",
+          "balance": "341137.82"
+        },
+        {
+          "year": 12,
+          "payment": "3970.25",
+          "balance": "310678.58"
+        },
+        {
+          "year": 13,
+          "payment": "3970.25",
+          "balance": "278581.17"
+        },
+        {
+          "year": 14,
+          "payment": "3970.25",
+          "balance": "244757.51"
+        },
+        {
+          "year": 15,
+          "payment": "3970.25",
+          "balance": "209114.75"
+        },
+        {
+          "year": 16,
+          "payment": "3970.25",
+          "balance": "171555.05"
+        },
+        {
+          "year": 17,
+          "payment": "3970.25",
+          "balance": "131975.32"
+        },
+        {
+          "year": 18,
+          "payment": "3970.25",
+          "balance": "90266.92"
+        },
+        {
+          "year": 19,
+          "payment": "3970.25",
+          "balance": "46315.36"
+        },
+        {
+          "year": 20,
+          "payment": "3970.25",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "explain.path_flat",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "4.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3715.41",
+          "balance": "580538.94"
+        },
+        {
+          "year": 2,
+          "payment": "3715.41",
+          "balance": "560234.48"
+        },
+        {
+          "year": 3,
+          "payment": "3715.41",
+          "balance": "539050.06"
+        },
+        {
+          "year": 4,
+          "payment": "3715.41",
+          "balance": "516947.57"
+        },
+        {
+          "year": 5,
+          "payment": "3715.41",
+          "balance": "493887.20"
+        },
+        {
+          "year": 6,
+          "payment": "3715.41",
+          "balance": "469827.45"
+        },
+        {
+          "year": 7,
+          "payment": "3715.41",
+          "balance": "444725.01"
+        },
+        {
+          "year": 8,
+          "payment": "3715.41",
+          "balance": "418534.68"
+        },
+        {
+          "year": 9,
+          "payment": "3715.41",
+          "balance": "391209.33"
+        },
+        {
+          "year": 10,
+          "payment": "3715.41",
+          "balance": "362699.75"
+        },
+        {
+          "year": 11,
+          "payment": "3715.41",
+          "balance": "332954.64"
+        },
+        {
+          "year": 12,
+          "payment": "3715.41",
+          "balance": "301920.44"
+        },
+        {
+          "year": 13,
+          "payment": "3715.41",
+          "balance": "269541.29"
+        },
+        {
+          "year": 14,
+          "payment": "3715.41",
+          "balance": "235758.90"
+        },
+        {
+          "year": 15,
+          "payment": "3715.41",
+          "balance": "200512.46"
+        },
+        {
+          "year": 16,
+          "payment": "3715.41",
+          "balance": "163738.52"
+        },
+        {
+          "year": 17,
+          "payment": "3715.41",
+          "balance": "125370.88"
+        },
+        {
+          "year": 18,
+          "payment": "3715.41",
+          "balance": "85340.47"
+        },
+        {
+          "year": 19,
+          "payment": "3715.41",
+          "balance": "43575.24"
+        },
+        {
+          "year": 20,
+          "payment": "3715.41",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.base",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "4.25",
+        "rate_2": "4.25",
+        "rate_3": "4.25",
+        "rate_4": "4.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3715.41",
+          "balance": "580538.94"
+        },
+        {
+          "year": 2,
+          "payment": "3715.41",
+          "balance": "560234.48"
+        },
+        {
+          "year": 3,
+          "payment": "3715.41",
+          "balance": "539050.06"
+        },
+        {
+          "year": 4,
+          "payment": "3715.41",
+          "balance": "516947.57"
+        },
+        {
+          "year": 5,
+          "payment": "3715.41",
+          "balance": "493887.20"
+        },
+        {
+          "year": 6,
+          "payment": "3715.41",
+          "balance": "469827.45"
+        },
+        {
+          "year": 7,
+          "payment": "3715.41",
+          "balance": "444725.01"
+        },
+        {
+          "year": 8,
+          "payment": "3715.41",
+          "balance": "418534.68"
+        },
+        {
+          "year": 9,
+          "payment": "3715.41",
+          "balance": "391209.33"
+        },
+        {
+          "year": 10,
+          "payment": "3715.41",
+          "balance": "362699.75"
+        },
+        {
+          "year": 11,
+          "payment": "3715.41",
+          "balance": "332954.64"
+        },
+        {
+          "year": 12,
+          "payment": "3715.41",
+          "balance": "301920.44"
+        },
+        {
+          "year": 13,
+          "payment": "3715.41",
+          "balance": "269541.29"
+        },
+        {
+          "year": 14,
+          "payment": "3715.41",
+          "balance": "235758.90"
+        },
+        {
+          "year": 15,
+          "payment": "3715.41",
+          "balance": "200512.46"
+        },
+        {
+          "year": 16,
+          "payment": "3715.41",
+          "balance": "163738.52"
+        },
+        {
+          "year": 17,
+          "payment": "3715.41",
+          "balance": "125370.88"
+        },
+        {
+          "year": 18,
+          "payment": "3715.41",
+          "balance": "85340.47"
+        },
+        {
+          "year": 19,
+          "payment": "3715.41",
+          "balance": "43575.24"
+        },
+        {
+          "year": 20,
+          "payment": "3715.41",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.first_up",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "5.25",
+        "rate_2": "4.25",
+        "rate_3": "4.25",
+        "rate_4": "4.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "4043.06",
+          "balance": "582567.72"
+        },
+        {
+          "year": 2,
+          "payment": "4043.06",
+          "balance": "564197.91"
+        },
+        {
+          "year": 3,
+          "payment": "4043.06",
+          "balance": "544840.12"
+        },
+        {
+          "year": 4,
+          "payment": "4043.06",
+          "balance": "524441.25"
+        },
+        {
+          "year": 5,
+          "payment": "4043.06",
+          "balance": "502945.28"
+        },
+        {
+          "year": 6,
+          "payment": "3783.55",
+          "balance": "478444.26"
+        },
+        {
+          "year": 7,
+          "payment": "3783.55",
+          "balance": "452881.43"
+        },
+        {
+          "year": 8,
+          "payment": "3783.55",
+          "balance": "426210.76"
+        },
+        {
+          "year": 9,
+          "payment": "3783.55",
+          "balance": "398384.25"
+        },
+        {
+          "year": 10,
+          "payment": "3783.55",
+          "balance": "369351.80"
+        },
+        {
+          "year": 11,
+          "payment": "3783.55",
+          "balance": "339061.15"
+        },
+        {
+          "year": 12,
+          "payment": "3783.55",
+          "balance": "307457.77"
+        },
+        {
+          "year": 13,
+          "payment": "3783.55",
+          "balance": "274484.78"
+        },
+        {
+          "year": 14,
+          "payment": "3783.55",
+          "balance": "240082.81"
+        },
+        {
+          "year": 15,
+          "payment": "3783.55",
+          "balance": "204189.93"
+        },
+        {
+          "year": 16,
+          "payment": "3783.55",
+          "balance": "166741.54"
+        },
+        {
+          "year": 17,
+          "payment": "3783.55",
+          "balance": "127670.23"
+        },
+        {
+          "year": 18,
+          "payment": "3783.55",
+          "balance": "86905.65"
+        },
+        {
+          "year": 19,
+          "payment": "3783.55",
+          "balance": "44374.43"
+        },
+        {
+          "year": 20,
+          "payment": "3783.55",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.third_up",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "4.25",
+        "rate_2": "4.25",
+        "rate_3": "5.25",
+        "rate_4": "4.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3715.41",
+          "balance": "580538.94"
+        },
+        {
+          "year": 2,
+          "payment": "3715.41",
+          "balance": "560234.48"
+        },
+        {
+          "year": 3,
+          "payment": "3715.41",
+          "balance": "539050.06"
+        },
+        {
+          "year": 4,
+          "payment": "3715.41",
+          "balance": "516947.57"
+        },
+        {
+          "year": 5,
+          "payment": "3715.41",
+          "balance": "493887.20"
+        },
+        {
+          "year": 6,
+          "payment": "3715.41",
+          "balance": "469827.45"
+        },
+        {
+          "year": 7,
+          "payment": "3715.41",
+          "balance": "444725.01"
+        },
+        {
+          "year": 8,
+          "payment": "3715.41",
+          "balance": "418534.68"
+        },
+        {
+          "year": 9,
+          "payment": "3715.41",
+          "balance": "391209.33"
+        },
+        {
+          "year": 10,
+          "payment": "3715.41",
+          "balance": "362699.75"
+        },
+        {
+          "year": 11,
+          "payment": "3891.47",
+          "balance": "334368.61"
+        },
+        {
+          "year": 12,
+          "payment": "3891.47",
+          "balance": "304513.77"
+        },
+        {
+          "year": 13,
+          "payment": "3891.47",
+          "balance": "273053.27"
+        },
+        {
+          "year": 14,
+          "payment": "3891.47",
+          "balance": "239900.78"
+        },
+        {
+          "year": 15,
+          "payment": "3891.47",
+          "balance": "204965.27"
+        },
+        {
+          "year": 16,
+          "payment": "3797.92",
+          "balance": "167374.69"
+        },
+        {
+          "year": 17,
+          "payment": "3797.92",
+          "balance": "128155.01"
+        },
+        {
+          "year": 18,
+          "payment": "3797.92",
+          "balance": "87235.64"
+        },
+        {
+          "year": 19,
+          "payment": "3797.92",
+          "balance": "44542.92"
+        },
+        {
+          "year": 20,
+          "payment": "3797.92",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.lower",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "3.25",
+        "rate_2": "3.25",
+        "rate_3": "3.25",
+        "rate_4": "3.25"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3403.17",
+          "balance": "578341.17"
+        },
+        {
+          "year": 2,
+          "payment": "3403.17",
+          "balance": "555967.85"
+        },
+        {
+          "year": 3,
+          "payment": "3403.17",
+          "balance": "532856.46"
+        },
+        {
+          "year": 4,
+          "payment": "3403.17",
+          "balance": "508982.66"
+        },
+        {
+          "year": 5,
+          "payment": "3403.17",
+          "balance": "484321.31"
+        },
+        {
+          "year": 6,
+          "payment": "3403.17",
+          "balance": "458846.41"
+        },
+        {
+          "year": 7,
+          "payment": "3403.17",
+          "balance": "432531.13"
+        },
+        {
+          "year": 8,
+          "payment": "3403.17",
+          "balance": "405347.75"
+        },
+        {
+          "year": 9,
+          "payment": "3403.17",
+          "balance": "377267.63"
+        },
+        {
+          "year": 10,
+          "payment": "3403.17",
+          "balance": "348261.19"
+        },
+        {
+          "year": 11,
+          "payment": "3403.17",
+          "balance": "318297.87"
+        },
+        {
+          "year": 12,
+          "payment": "3403.17",
+          "balance": "287346.11"
+        },
+        {
+          "year": 13,
+          "payment": "3403.17",
+          "balance": "255373.29"
+        },
+        {
+          "year": 14,
+          "payment": "3403.17",
+          "balance": "222345.74"
+        },
+        {
+          "year": 15,
+          "payment": "3403.17",
+          "balance": "188228.66"
+        },
+        {
+          "year": 16,
+          "payment": "3403.17",
+          "balance": "152986.10"
+        },
+        {
+          "year": 17,
+          "payment": "3403.17",
+          "balance": "116580.95"
+        },
+        {
+          "year": 18,
+          "payment": "3403.17",
+          "balance": "78974.84"
+        },
+        {
+          "year": 19,
+          "payment": "3403.17",
+          "balance": "40128.17"
+        },
+        {
+          "year": 20,
+          "payment": "3403.17",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "worked.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "worked.rate",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.75",
+        "margin": "-0.6"
+      },
+      "value": "4.15"
+    },
+    {
+      "id": "worked.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "4.15",
+        "months": 300
+      },
+      "value": "2680.77"
+    },
+    {
+      "id": "worked.left_12",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "4.15",
+        "months": 300,
+        "paid": 12
+      },
+      "value": "488361.02"
+    },
+    {
+      "id": "worked.prime_up",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.75",
+        "addition": "1.5"
+      },
+      "value": "5.25"
+    },
+    {
+      "id": "worked.rate_up",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.25",
+        "margin": "-0.6"
+      },
+      "value": "4.65"
+    },
+    {
+      "id": "worked.payment_up",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "488361.02",
+        "rate_percent": "4.65",
+        "months": 288
+      },
+      "value": "2817.31"
+    },
+    {
+      "id": "worked.payment_stay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "488361.02",
+        "rate_percent": "4.15",
+        "months": 288
+      },
+      "value": "2680.77"
+    },
+    {
+      "id": "worked.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.payment_up",
+        "subtrahend": "worked.payment_stay"
+      },
+      "value": "136.54"
+    },
+    {
+      "id": "worked.prime_down",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "2.75",
+        "addition": "1.5"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "worked.rate_down",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.25",
+        "margin": "-0.6"
+      },
+      "value": "3.65"
+    },
+    {
+      "id": "worked.payment_down",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "488361.02",
+        "rate_percent": "3.65",
+        "months": 288
+      },
+      "value": "2547.91"
+    },
+    {
+      "id": "worked.fall",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.payment_stay",
+        "subtrahend": "worked.payment_down"
+      },
+      "value": "132.86"
+    },
+    {
+      "id": "half.table",
+      "kind": "amort_prime_table",
+      "inputs": {
+        "addition": "1.5",
+        "margin": "-0.5",
+        "date_1": "2026-01-05",
+        "policy_1": "4",
+        "date_2": "2026-05-25",
+        "policy_2": "3.75",
+        "date_3": "2026-07-06",
+        "policy_3": "3.5",
+        "date_4": "2026-09-01",
+        "policy_4": "3.25"
+      },
+      "value": [
+        {
+          "period": 1,
+          "date": "2026-01-05",
+          "policy": "4",
+          "prime": "5.5",
+          "track": "5"
+        },
+        {
+          "period": 2,
+          "date": "2026-05-25",
+          "policy": "3.75",
+          "prime": "5.25",
+          "track": "4.75"
+        },
+        {
+          "period": 3,
+          "date": "2026-07-06",
+          "policy": "3.5",
+          "prime": "5",
+          "track": "4.5"
+        },
+        {
+          "period": 4,
+          "date": "2026-09-01",
+          "policy": "3.25",
+          "prime": "4.75",
+          "track": "4.25"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.75",
+        "margin": "-0.6"
+      },
+      "value": "4.15"
+    },
+    {
+      "id": "ex2.added",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.75",
+        "margin": "0.6"
+      },
+      "value": "5.35"
+    },
+    {
+      "id": "ex3.prime",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.75",
+        "addition": "1.5"
+      },
+      "value": "5.25"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.25",
+        "margin": "0.4"
+      },
+      "value": "5.65"
+    },
+    {
+      "id": "ex3.no_addition",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "3.75",
+        "margin": "0.4"
+      },
+      "value": "4.15"
+    },
+    {
+      "id": "ex3.old_prime",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.75",
+        "margin": "0.4"
+      },
+      "value": "5.15"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "0.25"
+      },
+      "value": "104.17"
+    },
+    {
+      "id": "ex4.year",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "500000",
+        "rate_percent": "0.25"
+      },
+      "value": "1250.00"
+    },
+    {
+      "id": "ex4.no_hundred",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "25"
+      },
+      "value": "10416.67"
+    },
+    {
+      "id": "ex5.prime_after",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.25",
+        "margin": "-0.75"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.5",
+        "margin": "-0.7"
+      },
+      "value": "3.8"
+    },
+    {
+      "id": "ex5.one_cut",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5",
+        "margin": "-0.7"
+      },
+      "value": "4.3"
+    },
+    {
+      "id": "ex5.no_cut",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.25",
+        "margin": "-0.7"
+      },
+      "value": "4.55"
+    },
+    {
+      "id": "ex6.long_before",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "4.25",
+        "months": 240
+      },
+      "value": "2476.94"
+    },
+    {
+      "id": "ex6.long_after",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.25",
+        "months": 240
+      },
+      "value": "2695.38"
+    },
+    {
+      "id": "ex6.long_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.long_after",
+        "subtrahend": "ex6.long_before"
+      },
+      "value": "218.44"
+    },
+    {
+      "id": "ex6.short_before",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "4.25",
+        "months": 60
+      },
+      "value": "7411.82"
+    },
+    {
+      "id": "ex6.short_after",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.25",
+        "months": 60
+      },
+      "value": "7594.39"
+    },
+    {
+      "id": "ex6.short_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.short_after",
+        "subtrahend": "ex6.short_before"
+      },
+      "value": "182.57"
+    }
+  ]
+}

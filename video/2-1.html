@@ -1,0 +1,269 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.1 — "שלוש שכבות של ריבית".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-1.json. The Bank of Israel rate and the
+  1.5-point addition are official data read through search summaries and the
+  team's Brain record, not from the source itself, so the scene marks them
+  "לא אומת" with the date. The spread (−0.8) and the 0.25-point cut are teaching
+  numbers, and the cut is marked as an example, not a forecast. The subtitle cues
+  (window.cues) carry the explanatory sentences — the script for narration, if it
+  is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.1 · ריבית בנק ישראל, פריים, עוגן ומרווח</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const minus = (s) => String(s).replace("-", "−");
+      const iso = fact("data.date");
+      const asOf = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+
+      const V = {
+        boi: fact("boi.rate"), add: fact("prime.addition"), prime: fact("prime.current"),
+        spread: fact("spread.example"), below: fact("spread.below"), track: fact("track.example"),
+        over: fact("track.over_boi"), cut: fact("cut.size"),
+        boi2: fact("boi.after_cut"), prime2: fact("prime.after_cut"), track2: fact("track.after_cut"),
+        anchorOther: fact("anchor.other"), spreadOther: fact("spread.other"), rateOther: fact("rate.other"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], boi: [12, 40], prime: [40, 78], spread: [78, 124], move: [124, 162], anchor: [162, 190], end: [190, 206] };
+      window.duration = 206;
+      window.cues = [
+        [1, 6, "יש ריביות שזזות יחד עם ריבית בנק ישראל."],
+        [6, 11.5, "איך הן נבנות? משלוש שכבות, זו על גבי זו."],
+        [13, 20, "השכבה הראשונה: ריבית בנק ישראל."],
+        [20, 29, `נכון ל־${asOf}: ${V.boi}%. לא אומת.`],
+        [29, 39, "אותה קובעת הוועדה המוניטרית. אף אחד לא לווה בה ישירות."],
+        [41, 50, `השכבה השנייה: תוספת של ${V.add} נקודות אחוז.`],
+        [50, 59, `יחד הן הפריים: ${V.prime}%.`],
+        [59, 68, "הפריים זזה יחד עם ריבית בנק ישראל. התוספת לא זזה."],
+        [68, 77, "מקור התוספת עוד לא נבדק; ראו בשיעור."],
+        [79, 88, "השכבה השלישית: המרווח, שכתוב בחוזה של המסלול."],
+        [88, 98, `כאן הוא שלילי: ״פריים פחות ${V.below}״.`],
+        [98, 108, `הריבית במסלול: ${V.track}%.`],
+        [108, 116, `זה עדיין ${V.over} נקודות מעל ריבית בנק ישראל.`],
+        [116, 123, "המרווח הוא החלק שנקבע בהצעה עצמה."],
+        [125, 133, "ומה קורה כשריבית בנק ישראל זזה?"],
+        [133, 142, `נניח הורדה של ${V.cut} נקודת אחוז. דוגמה, לא תחזית.`],
+        [142, 151, `הפריים יורדת ל־${V.prime2}%, והמסלול ל־${V.track2}%.`],
+        [151, 161, "כל השכבות זזו באותן נקודות. המרווח נשאר."],
+        [163, 171, "השכבה שמתחת למרווח נקראת עוגן."],
+        [171, 180, "הפריים היא עוגן אחד. יש מסלולים עם עוגן אחר."],
+        [180, 189, "ובכל מסלול כזה: הריבית = העוגן + המרווח."],
+        [191, 198, "שני מספרים זהים לכולם באותו יום."],
+        [198, 205, "רק המרווח נקבע בהצעה שלכם."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // The stack: a vertical column of layers on a percent scale. Base at y = BASE; 1% = UNIT px.
+      // The column stands at the start (right) side; its labels sit beside it, and the
+      // equations go to the end (left) side.
+      const BASE = 520, UNIT = 62, COL = 860, HALF = 90;
+      const yOf = (p) => BASE - p * UNIT;
+      function layer(from, to, fill, o, dashed = false) {
+        const h = (to - from) * UNIT;
+        if (h <= 0.5) return;
+        const attrs = { x: COL - HALF, y: yOf(to), width: HALF * 2, height: h, rx: 6, opacity: o };
+        if (dashed) el("rect", { ...attrs, fill: "none", stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7" });
+        else el("rect", { ...attrs, fill });
+      }
+      // A label at the level `p`: a tick, the name, and the value under it.
+      // side "end": left of the column (text runs leftward from its right edge);
+      // side "start": right of the column (text starts at its left edge).
+      function level(p, name, value, o, side = "end", dash = false) {
+        const y = yOf(p);
+        if (side === "end") {
+          el("line", { x1: COL - HALF - 40, x2: COL - HALF, y1: y, y2: y, stroke: C.navy, "stroke-width": 2, opacity: o, "stroke-dasharray": dash ? "6 5" : "0" });
+          txt(COL - HALF - 50, y - 4, name, 24, { anchor: "start", fill: C.n700, o });
+          txt(COL - HALF - 50, y + 30, value, 32, { anchor: "end", w: 700, o, ltr: true });
+        } else {
+          el("line", { x1: COL + HALF, x2: COL + HALF + 40, y1: y, y2: y, stroke: C.navy, "stroke-width": 2, opacity: o, "stroke-dasharray": dash ? "6 5" : "0" });
+          txt(COL + HALF + 50, y - 4, name, 24, { anchor: "end", fill: C.n700, o });
+          txt(COL + HALF + 50, y + 30, value, 32, { anchor: "start", w: 700, o, ltr: true });
+        }
+      }
+      // A side note beside a layer, inside the column's own height: "+1.5", "−0.8".
+      function tag(p, s, o) {
+        txt(COL, yOf(p) + 11, s, 30, { w: 700, o, ltr: true, fill: C.navy });
+      }
+      function axis(o) {
+        el("line", { x1: COL - HALF - 30, x2: COL + HALF + 30, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+        txt(COL + HALF + 40, BASE + 8, "0%", 22, { anchor: "start", fill: C.n600, o, ltr: true });
+      }
+      function equation(s, o, y = 330) {
+        el("rect", { x: 110, y: y - 44, width: 470, height: 68, rx: 12, fill: C.mint, opacity: o * 0.6 });
+        txt(345, y, s, 34, { w: 700, o, ltr: true });
+      }
+
+      const boi = Number(V.boi), add = Number(V.add), prime = Number(V.prime), track = Number(V.track), below = Number(V.below);
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שלוש שכבות של ריבית", 80, { w: 700, o });
+          txt(640, 360, "איך נבנית ריבית שזזה יחד עם בנק ישראל", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 6, o, 0.8);
+          [C.teal, C.tq2, C.n300].forEach((c, i) => el("rect", { x: 580, y: 470 - i * 34, width: 120, height: 28, rx: 6, fill: c, opacity: o2 }));
+        }
+        // Scene 2 — the Bank of Israel rate
+        if (inScene(t, S.boi)) {
+          const o = vis(t, S.boi);
+          txt(640, 110, "שכבה 1: ריבית בנק ישראל", 40, { w: 700, o });
+          axis(o);
+          layer(0, boi * ease((t - S.boi[0] - 2) / 5), C.teal, o);
+          level(boi, "ריבית בנק ישראל", `${V.boi}%`, after(t, S.boi, 8, o));
+          const o3 = after(t, S.boi, 17, o);
+          txt(580, 330, "קובעת: הוועדה המוניטרית", 30, { anchor: "start", fill: C.n700, o: o3 });
+          txt(580, 375, "לא לווים בה ישירות", 26, { anchor: "start", fill: C.n600, o: after(t, S.boi, 20, o) });
+          txt(640, 565, `לא אומת: לפי תקציר של מקור רשמי ותיעוד בצוות. נכון ל־${asOf}.`, 18, { fill: C.n500, o: after(t, S.boi, 8, o) });
+        }
+        // Scene 3 — prime: the rate plus the addition
+        if (inScene(t, S.prime)) {
+          const o = vis(t, S.prime);
+          txt(640, 110, "שכבה 2: הפריים", 40, { w: 700, o });
+          axis(o);
+          layer(0, boi, C.teal, o);
+          const grow = ease((t - S.prime[0] - 1) / 4);
+          layer(boi, boi + add * grow, C.tq2, o);
+          level(boi, "ריבית בנק ישראל", `${V.boi}%`, o * 0.6, "start");
+          tag(boi + add / 2, `+${V.add}`, after(t, S.prime, 3, o));
+          level(prime, "פריים", `${V.prime}%`, after(t, S.prime, 10, o));
+          equation(`${V.boi} + ${V.add} = ${V.prime}`, after(t, S.prime, 12, o));
+          txt(345, 420, "הפריים זזה יחד עם בנק ישראל", 26, { fill: C.n700, o: after(t, S.prime, 19, o) });
+          txt(640, 565, `התוספת ומקורה: לא אומת. נכון ל־${asOf}.`, 18, { fill: C.n500, o: after(t, S.prime, 28, o) });
+        }
+        // Scene 4 — the spread written in the contract
+        if (inScene(t, S.spread)) {
+          const o = vis(t, S.spread);
+          txt(640, 110, "שכבה 3: המרווח בחוזה", 40, { w: 700, o });
+          axis(o);
+          const cut = ease((t - S.spread[0] - 9) / 4);
+          layer(0, boi, C.teal, o);
+          layer(boi, prime - below * cut, C.tq2, o);
+          layer(prime - below * cut, prime, null, o * cut, true);
+          level(prime, "פריים", `${V.prime}%`, o * (1 - 0.4 * cut), "start", true);
+          tag(prime - below / 2, minus(V.spread), after(t, S.spread, 11, o));
+          level(track, "הריבית במסלול", `${V.track}%`, after(t, S.spread, 20, o));
+          equation(`${V.prime} − ${V.below} = ${V.track}`, after(t, S.spread, 20, o));
+          const o5 = after(t, S.spread, 30, o);
+          txt(345, 420, `מעל ריבית בנק ישראל ב־${V.over} נקודות`, 26, { fill: C.n700, o: o5 });
+          txt(345, 465, "המרווח נקבע בהצעה עצמה", 26, { fill: C.n700, o: after(t, S.spread, 38, o) });
+        }
+        // Scene 5 — the Bank of Israel rate moves; every layer above it moves with it
+        if (inScene(t, S.move)) {
+          const o = vis(t, S.move);
+          txt(640, 110, "כשריבית בנק ישראל זזה", 40, { w: 700, o });
+          axis(o);
+          const k = ease((t - S.move[0] - 11) / 5);
+          const shift = Number(V.cut) * k;
+          layer(0, boi - shift, C.teal, o);
+          layer(boi - shift, track - shift, C.tq2, o);
+          // The old level of the track, as a dashed reference.
+          const o2 = after(t, S.move, 11, o);
+          el("line", { x1: COL - HALF - 10, x2: COL + HALF + 10, y1: yOf(track), y2: yOf(track), stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: o2 * 0.7 });
+          const done = after(t, S.move, 17, o) > 0.5;
+          level(boi - shift, "ריבית בנק ישראל", `${done ? V.boi2 : V.boi}%`, o * 0.75, "start");
+          level(track - shift, "הריבית במסלול", `${done ? V.track2 : V.track}%`, o);
+          const o3 = after(t, S.move, 18, o);
+          el("rect", { x: 100, y: 230, width: 420, height: 190, rx: 14, fill: C.n0, stroke: C.n200, opacity: o3 });
+          txt(495, 280, `ריבית בנק ישראל: ${V.boi} ← ${V.boi2}`, 28, { anchor: "start", o: o3 });
+          txt(495, 330, `פריים: ${V.prime} ← ${V.prime2}`, 28, { anchor: "start", o: o3 });
+          txt(495, 380, `המסלול: ${V.track} ← ${V.track2}`, 28, { anchor: "start", o: o3 });
+          txt(640, 565, "דוגמה לחשבון בלבד. אף אחד לא יודע מה הוועדה תחליט.", 20, { fill: C.n600, o: after(t, S.move, 9, o) });
+        }
+        // Scene 6 — the general name: anchor
+        if (inScene(t, S.anchor)) {
+          const o = vis(t, S.anchor);
+          txt(640, 130, "עוגן + מרווח", 48, { w: 700, o });
+          const o2 = after(t, S.anchor, 2, o);
+          el("rect", { x: 370, y: 180, width: 540, height: 80, rx: 14, fill: C.mint, opacity: o2 * 0.6 });
+          txt(640, 233, "הריבית במסלול = העוגן + המרווח", 34, { w: 700, o: o2 });
+          const cards = [
+            { x: 860, title: "העוגן: הפריים", line: `${V.prime} − ${V.below} = ${V.track}` },
+            { x: 420, title: "עוגן אחר (מספרים להמחשה)", line: `${V.anchorOther} + ${V.spreadOther} = ${V.rateOther}` },
+          ];
+          cards.forEach((c, i) => {
+            const oc = after(t, S.anchor, 8 + i * 9, o);
+            el("rect", { x: c.x - 200, y: 310, width: 400, height: 150, rx: 14, fill: C.n0, stroke: C.n200, opacity: oc });
+            txt(c.x, 360, c.title, 28, { w: 600, o: oc });
+            txt(c.x, 420, c.line, 34, { w: 700, o: oc, ltr: true });
+          });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 140, "מי קובע כל שכבה", 44, { w: 700, o });
+          const rows = [
+            { c: C.teal, name: "ריבית בנק ישראל", who: "הוועדה המוניטרית" },
+            { c: C.tq2, name: "התוספת של הפריים", who: "זהה לכולם באותו יום" },
+            { c: C.n300, name: "המרווח", who: "ההצעה והחוזה שלכם" },
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, S.end, 1 + i * 2, o);
+            const y = 220 + i * 95;
+            el("rect", { x: 930, y, width: 70, height: 56, rx: 8, fill: r.c, opacity: oi });
+            txt(900, y + 38, r.name, 30, { anchor: "start", w: 600, o: oi });
+            txt(540, y + 38, r.who, 28, { anchor: "start", fill: C.n700, o: oi });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,620 @@
+{
+  "lesson": "2.7",
+  "title": "משתנה צמודה ולא צמודה",
+  "note": "Invented teaching numbers: loans, anchors, spreads and anchor paths are illustrations, not market data or a forecast. February 2026 averages (Brain 67469313) and the exit-point charge and notice (Brain 7798786) are not verified. Level payments from amortization.ts; at an update the payment is recalculated on the balance left over the months left.",
+  "facts": [
+    {
+      "id": "explain.anchor",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.5"
+    },
+    {
+      "id": "explain.spread",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.2"
+    },
+    {
+      "id": "explain.rate",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "3.5",
+        "b": "1.2"
+      },
+      "value": "4.7"
+    },
+    {
+      "id": "case.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "explain.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "4.7",
+        "months": 240
+      },
+      "value": "3217.48"
+    },
+    {
+      "id": "explain.points",
+      "kind": "amort_update_points",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": [
+        60,
+        120,
+        180
+      ]
+    },
+    {
+      "id": "explain.count",
+      "kind": "amort_update_count",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain.intervals",
+      "kind": "amort_update_count_with_end",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": "4"
+    },
+    {
+      "id": "explain.point_years",
+      "kind": "amort_update_years",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": [
+        "5",
+        "10",
+        "15"
+      ]
+    },
+    {
+      "id": "explain.left_60",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "4.7",
+        "months": 240,
+        "paid": 60
+      },
+      "value": "415022.58"
+    },
+    {
+      "id": "explain.anchor_up",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "explain.rate_up",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "4.5",
+        "b": "1.2"
+      },
+      "value": "5.7"
+    },
+    {
+      "id": "explain.payment_up",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "415022.58",
+        "rate_percent": "5.7",
+        "months": 180
+      },
+      "value": "3435.29"
+    },
+    {
+      "id": "explain.payment_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.payment_up",
+        "subtrahend": "explain.payment"
+      },
+      "value": "217.81"
+    },
+    {
+      "id": "explain.interest_before",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "415022.58",
+        "rate_percent": "4.7"
+      },
+      "value": "1625.51"
+    },
+    {
+      "id": "explain.interest_after",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "415022.58",
+        "rate_percent": "5.7"
+      },
+      "value": "1971.36"
+    },
+    {
+      "id": "market.month",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-02"
+    },
+    {
+      "id": "market.anchor",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.81"
+    },
+    {
+      "id": "market.spread",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.45"
+    },
+    {
+      "id": "market.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.26"
+    },
+    {
+      "id": "linked.rate",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "1.8",
+        "b": "1.45"
+      },
+      "value": "3.25"
+    },
+    {
+      "id": "linked.rate_up",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "2.3",
+        "b": "1.45"
+      },
+      "value": "3.75"
+    },
+    {
+      "id": "linked.payment_1",
+      "kind": "amort_path_payment",
+      "inputs": {
+        "principal": "500000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "3.25",
+        "rate_2": "3.75",
+        "inflation_1": "2",
+        "inflation_block_months": 240,
+        "month": 1
+      },
+      "value": "2840.66"
+    },
+    {
+      "id": "linked.payment_12",
+      "kind": "amort_path_payment",
+      "inputs": {
+        "principal": "500000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "3.25",
+        "rate_2": "3.75",
+        "inflation_1": "2",
+        "inflation_block_months": 240,
+        "month": 12
+      },
+      "value": "2892.70"
+    },
+    {
+      "id": "linked.payment_60",
+      "kind": "amort_path_payment",
+      "inputs": {
+        "principal": "500000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "3.25",
+        "rate_2": "3.75",
+        "inflation_1": "2",
+        "inflation_block_months": 240,
+        "month": 60
+      },
+      "value": "3131.15"
+    },
+    {
+      "id": "linked.payment_61",
+      "kind": "amort_path_payment",
+      "inputs": {
+        "principal": "500000",
+        "months": 240,
+        "block_months": 60,
+        "rate_1": "3.25",
+        "rate_2": "3.75",
+        "inflation_1": "2",
+        "inflation_block_months": 240,
+        "month": 61
+      },
+      "value": "3245.92"
+    },
+    {
+      "id": "survey.date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-07"
+    },
+    {
+      "id": "survey.linked",
+      "kind": "given",
+      "inputs": {},
+      "value": [
+        "1",
+        "2",
+        "2.5",
+        "3",
+        "5",
+        "6",
+        "7",
+        "10"
+      ]
+    },
+    {
+      "id": "survey.unlinked",
+      "kind": "given",
+      "inputs": {},
+      "value": [
+        "1",
+        "2",
+        "3",
+        "5",
+        "7",
+        "10"
+      ]
+    },
+    {
+      "id": "survey.single",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "survey.assumed",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "exit.max",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "exit.notice_min",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "exit.notice_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "45"
+    },
+    {
+      "id": "slider.points_20_5",
+      "kind": "amort_update_points",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": [
+        60,
+        120,
+        180
+      ]
+    },
+    {
+      "id": "slider.count_20_5",
+      "kind": "amort_update_count",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60
+      },
+      "value": "3"
+    },
+    {
+      "id": "slider.count_20_2_5",
+      "kind": "amort_update_count",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 30
+      },
+      "value": "7"
+    },
+    {
+      "id": "slider.years_20_2_5",
+      "kind": "amort_update_years",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 30
+      },
+      "value": [
+        "2.5",
+        "5",
+        "7.5",
+        "10",
+        "12.5",
+        "15",
+        "17.5"
+      ]
+    },
+    {
+      "id": "slider.next_38",
+      "kind": "amort_months_to_update",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60,
+        "now": 38
+      },
+      "value": "22"
+    },
+    {
+      "id": "slider.count_25_5",
+      "kind": "amort_update_count",
+      "inputs": {
+        "term_months": 300,
+        "interval_months": 60
+      },
+      "value": "4"
+    },
+    {
+      "id": "worked.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "worked.rate",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "3.5",
+        "b": "1.2"
+      },
+      "value": "4.7"
+    },
+    {
+      "id": "worked.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "4.7",
+        "months": 300
+      },
+      "value": "2268.98"
+    },
+    {
+      "id": "worked.point_years",
+      "kind": "amort_update_years",
+      "inputs": {
+        "term_months": 300,
+        "interval_months": 60
+      },
+      "value": [
+        "5",
+        "10",
+        "15",
+        "20"
+      ]
+    },
+    {
+      "id": "worked.left_60",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "4.7",
+        "months": 300,
+        "paid": 60
+      },
+      "value": "352602.15"
+    },
+    {
+      "id": "worked.rate_up",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "4.5",
+        "b": "1.2"
+      },
+      "value": "5.7"
+    },
+    {
+      "id": "worked.payment_up",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "352602.15",
+        "rate_percent": "5.7",
+        "months": 240
+      },
+      "value": "2465.51"
+    },
+    {
+      "id": "worked.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.payment_up",
+        "subtrahend": "worked.payment"
+      },
+      "value": "196.53"
+    },
+    {
+      "id": "worked.rate_down",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "2.5",
+        "b": "1.2"
+      },
+      "value": "3.7"
+    },
+    {
+      "id": "worked.payment_down",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "352602.15",
+        "rate_percent": "3.7",
+        "months": 240
+      },
+      "value": "2081.37"
+    },
+    {
+      "id": "worked.fall",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.payment",
+        "subtrahend": "worked.payment_down"
+      },
+      "value": "187.61"
+    },
+    {
+      "id": "half.table",
+      "kind": "amort_anchor_table",
+      "inputs": {
+        "spread": "1.45",
+        "year_1": 0,
+        "anchor_1": "1.8",
+        "year_2": 5,
+        "anchor_2": "2.3",
+        "year_3": 10,
+        "anchor_3": "1.6",
+        "year_4": 15,
+        "anchor_4": "2.05"
+      },
+      "value": [
+        {
+          "period": 0,
+          "anchor": "1.8",
+          "rate": "3.25"
+        },
+        {
+          "period": 5,
+          "anchor": "2.3",
+          "rate": "3.75"
+        },
+        {
+          "period": 10,
+          "anchor": "1.6",
+          "rate": "3.05"
+        },
+        {
+          "period": 15,
+          "anchor": "2.05",
+          "rate": "3.5"
+        }
+      ]
+    },
+    {
+      "id": "ex2.subtracted",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "3.9",
+        "b": "-0.95"
+      },
+      "value": "2.95"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "3.9",
+        "b": "0.95"
+      },
+      "value": "4.85"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "amort_update_count",
+      "inputs": {
+        "term_months": 300,
+        "interval_months": 60
+      },
+      "value": "4"
+    },
+    {
+      "id": "ex3.with_end",
+      "kind": "amort_update_count_with_end",
+      "inputs": {
+        "term_months": 300,
+        "interval_months": 60
+      },
+      "value": "5"
+    },
+    {
+      "id": "ex3.with_ends",
+      "kind": "amort_update_count_with_ends",
+      "inputs": {
+        "term_months": 300,
+        "interval_months": 60
+      },
+      "value": "6"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "amort_months_to_update",
+      "inputs": {
+        "term_months": 360,
+        "interval_months": 30,
+        "now": 40
+      },
+      "value": "20"
+    },
+    {
+      "id": "ex4.next",
+      "kind": "amort_next_update",
+      "inputs": {
+        "term_months": 360,
+        "interval_months": 30,
+        "now": 40
+      },
+      "value": "60"
+    },
+    {
+      "id": "ex4.since_last",
+      "kind": "amort_months_since_update",
+      "inputs": {
+        "term_months": 360,
+        "interval_months": 30,
+        "now": 40
+      },
+      "value": "10"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "4.25",
+        "b": "1.2"
+      },
+      "value": "5.45"
+    },
+    {
+      "id": "ex5.old",
+      "kind": "lend_rate_sum",
+      "inputs": {
+        "a": "3.5",
+        "b": "1.2"
+      },
+      "value": "4.7"
+    }
+  ]
+}

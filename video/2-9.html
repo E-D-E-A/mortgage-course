@@ -1,0 +1,263 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.9 — "שני שבילים לאפס".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/2-9.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+  No formula appears: the Spitzer payment's formula is lesson 3.1.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.9 · שפיצר וקרן שווה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-9.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const sp = fact("video.spitzer");
+      const eq = fact("video.equal");
+      const V = {
+        monthly: fact("slider.monthly"),
+        int1: shek(fact("slider.int_1")),
+        part: shek(fact("slider.equal_part")),
+        eqFirst: shek(fact("slider.equal_first")),
+        eqLast: shek(fact("slider.equal_last")),
+        spFirst: shek(fact("slider.spitzer_first")),
+        spPrin1: shek(fact("slider.spitzer_prin_1")),
+        eqHalf: shek(fact("slider.equal_half")),
+        spHalf: shek(fact("slider.spitzer_half")),
+        spInt: shek(fact("slider.spitzer_interest")),
+        eqInt: shek(fact("slider.equal_interest")),
+        gap: shek(fact("slider.interest_gap")),
+        months: fact("slider.months"),
+      };
+      const P = Number(sp[0].opening);
+      V.p = shek(P);
+      const pPlain = nf2.format(P).replace(".00", "");
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], month1: [12, 36], equal: [36, 70], spitzer: [70, 104], paths: [104, 136], totals: [136, 158], end: [158, 172] };
+      window.duration = 172;
+      window.cues = [
+        [1, 6, "שתי דרכים להחזיר את אותה הלוואה."],
+        [6, 11.5, `${V.p}, ‏4.8% לשנה, ל־20 שנה.`],
+        [13, 21, `ריבית חודשית: 4.8% חלקי 12, כלומר ${V.monthly}%.`],
+        [21, 28, `בחודש הראשון: ${V.monthly}% מ־${V.p} הם ${V.int1}.`],
+        [28, 35, "בשתי השיטות — אותה יתרה, ולכן אותה ריבית."],
+        [37, 46, `קרן שווה: מחזירים בכל חודש ${V.part} מהקרן.`],
+        [46, 55, `התשלום הראשון: ${V.part} ועוד ${V.int1} — ${V.eqFirst}.`],
+        [55, 62, "היתרה יורדת, הריבית יורדת, והתשלום יורד איתה."],
+        [62, 69, `התשלום האחרון: ${V.eqLast} בלבד.`],
+        [71, 80, `שפיצר: אותו תשלום בכל חודש — ${V.spFirst}.`],
+        [80, 89, `בחודש הראשון: ${V.int1} ריבית, ורק ${V.spPrin1} קרן.`],
+        [89, 96, "בכל חודש הריבית קטנה, והחלק של הקרן גדל."],
+        [96, 103, "בהתחלה הקרן חוזרת לאט יותר."],
+        [105, 113, "שני שבילים לאפס: היתרה בכל שיטה."],
+        [113, 123, `באמצע הדרך: בקרן שווה נשארו ${V.eqHalf}.`],
+        [123, 135, `בשפיצר עוד ${V.spHalf}. יותר חוב, יותר ריבית.`],
+        [137, 146, `ריבית בסך הכול: ${V.spInt} בשפיצר.`],
+        [146, 157, `בקרן שווה: ${V.eqInt}. ההפרש: ${V.gap}.`],
+        [159, 165, "אותו אחוז ריבית. שני שבילים, ומחיר שונה."],
+        [165, 171, "תשלום נמוך בהתחלה אינו עלות נמוכה."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // Payment bars: the first payment of each year, split into principal (grey) and interest (colour).
+      // Year 1 at the right; time runs leftward, as Hebrew is read.
+      const left = 160, right = 1120, base = 520, scale = 300 / 5000;
+      const years = V.months / 12;
+      const band = (right - left) / years;
+      function payBars(rows, colour, shown, o, highlightFirst) {
+        for (let y = 0; y < Math.min(shown, years); y++) {
+          const r = rows[y * 12];
+          const pay = Number(r.payment), int = Number(r.interest), prin = pay - int;
+          const x = right - (y + 1) * band + 4, w = band - 8;
+          const hp = prin * scale, hi = int * scale;
+          el("rect", { x, y: base - hp, width: w, height: hp, fill: C.n300, rx: 3, opacity: o });
+          el("rect", { x, y: base - hp - hi - 2, width: w, height: Math.max(0, hi - 2), fill: colour, rx: 3, opacity: o, stroke: highlightFirst && y === 0 ? C.navy : "none", "stroke-width": 2 });
+          if (y % 5 === 0 || y === years - 1) txt(x + w / 2, base + 26, String(y + 1), 16, { fill: C.n600, o });
+        }
+        txt(right, base + 46, "שנה (התשלום בחודש הראשון של כל שנה)", 16, { anchor: "start", fill: C.n600, o });
+      }
+      function legend(colour, o) {
+        el("rect", { x: 1096, y: 152, width: 18, height: 18, rx: 3, fill: C.n300, opacity: o });
+        txt(1086, 167, "קרן", 18, { anchor: "start", fill: C.n700, o });
+        el("rect", { x: 1016, y: 152, width: 18, height: 18, rx: 3, fill: colour, opacity: o });
+        txt(1006, 167, "ריבית", 18, { anchor: "start", fill: C.n700, o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שני שבילים לאפס", 80, { w: 700, o });
+          txt(640, 356, "שפיצר וקרן שווה", 34, { fill: C.n600, o });
+          const o2 = after(t, S.title, 5.5, o);
+          el("rect", { x: 420, y: 420, width: 440, height: 96, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(640, 462, V.p, 36, { w: 700, o: o2, ltr: true });
+          txt(640, 498, "ב־4.8% לשנה, ל־20 שנה", 22, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the first month: the same interest in both
+        if (inScene(t, S.month1)) {
+          const o = vis(t, S.month1);
+          txt(640, 150, "החודש הראשון", 42, { w: 700, o });
+          const o2 = after(t, S.month1, 1.5, o);
+          txt(640, 250, `4.8% ÷ 12 = ${V.monthly}%`, 40, { w: 600, o: o2, ltr: true });
+          txt(640, 290, "ריבית לחודש", 22, { fill: C.n600, o: o2 });
+          const o3 = after(t, S.month1, 9, o);
+          el("rect", { x: 390, y: 330, width: 500, height: 96, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(640, 374, `${V.monthly}% × ${pPlain} = ${V.int1}`, 34, { w: 700, o: o3, ltr: true });
+          txt(640, 410, "ריבית בחודש הראשון", 20, { fill: C.n700, o: o3 });
+          const o4 = after(t, S.month1, 16, o);
+          txt(640, 490, "בשתי השיטות: אותה יתרה, אותה ריבית", 28, { w: 600, fill: C.n700, o: o4 });
+        }
+        // Scene 3 — equal principal
+        if (inScene(t, S.equal)) {
+          const o = vis(t, S.equal);
+          txt(640, 130, "קרן שווה", 42, { w: 700, o });
+          legend(C.tq2, o);
+          const shown = 1 + Math.floor(prog(t, S.equal, 8, 12) * (years - 1) + 0.0001);
+          payBars(eq, C.tq2, shown, o, true);
+          const o2 = after(t, S.equal, 4, o);
+          const firstTop = base - Number(eq[0].payment) * scale - 2;
+          txt(right - band / 2, firstTop - 14, V.eqFirst, 22, { w: 700, o: o2, ltr: true });
+          const o3 = after(t, S.equal, 26, o);
+          el("rect", { x: 170, y: 150, width: 400, height: 90, rx: 14, fill: C.n0, stroke: C.n200, opacity: o3 });
+          txt(370, 190, V.eqLast, 28, { w: 700, o: o3, ltr: true });
+          txt(370, 224, "התשלום בחודש האחרון", 18, { fill: C.n600, o: o3 });
+        }
+        // Scene 4 — Spitzer
+        if (inScene(t, S.spitzer)) {
+          const o = vis(t, S.spitzer);
+          txt(640, 130, "שפיצר", 42, { w: 700, o });
+          legend(C.teal, o);
+          const shown = 1 + Math.floor(prog(t, S.spitzer, 6, 12) * (years - 1) + 0.0001);
+          payBars(sp, C.teal, shown, o, true);
+          const o2 = after(t, S.spitzer, 3, o);
+          const top = base - Number(sp[0].payment) * scale - 2;
+          txt(640, top - 22, `${V.spFirst} בכל חודש`, 24, { w: 700, o: o2 });
+          el("line", { x1: left, x2: right, y1: top, y2: top, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: o2 });
+          const o3 = after(t, S.spitzer, 11, o);
+          el("rect", { x: 170, y: 150, width: 430, height: 90, rx: 14, fill: C.n0, stroke: C.n200, opacity: o3 });
+          txt(385, 186, `ריבית ${V.int1} · קרן ${V.spPrin1}`, 24, { w: 600, o: o3 });
+          txt(385, 222, "החודש הראשון", 18, { fill: C.n600, o: o3 });
+        }
+        // Scene 5 — two paths to zero: the balance
+        if (inScene(t, S.paths)) {
+          const o = vis(t, S.paths);
+          txt(640, 130, "היתרה: שני שבילים לאפס", 42, { w: 700, o });
+          const top = 190, bScale = (base - top) / P;
+          const xAt = (k) => right - (k / V.months) * (right - left);
+          const yAt = (v) => base - Number(v) * bScale;
+          el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
+          const g = prog(t, S.paths, 1.5, 9);
+          const upto = Math.max(1, Math.floor(g * V.months));
+          const line = (rows) => [`${xAt(0)},${yAt(rows[0].opening)}`, ...rows.slice(0, upto).map((r, i) => `${xAt(i + 1)},${yAt(r.closing)}`)].join(" ");
+          el("polyline", { points: line(eq), fill: "none", stroke: C.tq2, "stroke-width": 5, "stroke-dasharray": "12 7", opacity: o });
+          el("polyline", { points: line(sp), fill: "none", stroke: C.teal, "stroke-width": 5, opacity: o });
+          txt(right, base + 30, "היום", 18, { anchor: "start", fill: C.n600, o });
+          txt(left, base + 30, "20 שנה", 18, { anchor: "end", fill: C.n600, o });
+          // legend
+          el("line", { x1: 330, x2: 380, y1: 210, y2: 210, stroke: C.teal, "stroke-width": 5, opacity: o });
+          txt(320, 217, "שפיצר", 20, { anchor: "start", fill: C.n700, o });
+          el("line", { x1: 330, x2: 380, y1: 244, y2: 244, stroke: C.tq2, "stroke-width": 5, "stroke-dasharray": "12 7", opacity: o });
+          txt(320, 251, "קרן שווה", 20, { anchor: "start", fill: C.n700, o });
+          // halfway
+          const o2 = after(t, S.paths, 9, o);
+          const xm = xAt(V.months / 2);
+          el("line", { x1: xm, x2: xm, y1: top - 10, y2: base, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "6 6", opacity: o2 });
+          el("circle", { cx: xm, cy: yAt(eq[V.months / 2 - 1].closing), r: 8, fill: C.tq2, opacity: o2 });
+          txt(xm + 16, yAt(eq[V.months / 2 - 1].closing) + 36, V.eqHalf, 24, { anchor: "start", w: 700, o: o2, ltr: true });
+          const o3 = after(t, S.paths, 19, o);
+          el("circle", { cx: xm, cy: yAt(sp[V.months / 2 - 1].closing), r: 8, fill: C.teal, opacity: o3 });
+          txt(xm - 16, yAt(sp[V.months / 2 - 1].closing) - 20, V.spHalf, 24, { anchor: "end", w: 700, o: o3, ltr: true });
+          txt(xm, top - 18, "אמצע הדרך", 18, { fill: C.n600, o: o2 });
+        }
+        // Scene 6 — the interest, in total
+        if (inScene(t, S.totals)) {
+          const o = vis(t, S.totals);
+          txt(640, 140, "ריבית בסך הכול", 42, { w: 700, o });
+          const maxW = 620, unit = maxW / Number(fact("slider.spitzer_interest"));
+          const g = prog(t, S.totals, 1, 3);
+          const rows = [
+            { y: 230, name: "שפיצר", v: fact("slider.spitzer_interest"), c: C.teal, from: 0 },
+            { y: 330, name: "קרן שווה", v: fact("slider.equal_interest"), c: C.tq2, from: 9 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.totals, r.from, o);
+            txt(1100, r.y + 40, r.name, 26, { anchor: "start", w: 600, o: or });
+            const w = Number(r.v) * unit * (r.from ? ease((t - S.totals[0] - r.from) / 3) : g);
+            el("rect", { x: 940 - w, y: r.y, width: w, height: 64, rx: 8, fill: r.c, opacity: or });
+            txt(940 - w - 16, r.y + 42, shek(r.v), 28, { anchor: "end", w: 700, o: or, ltr: true });
+          }
+          const o3 = after(t, S.totals, 12, o);
+          el("rect", { x: 430, y: 430, width: 420, height: 86, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(640, 470, V.gap, 34, { w: 700, o: o3, ltr: true });
+          txt(640, 502, "ההפרש — אותו אחוז ריבית", 20, { fill: C.n700, o: o3 });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "אותו אחוז ריבית.", 48, { w: 700, o });
+          txt(640, 340, "שני שבילים לאפס — ומחיר שונה.", 48, { w: 700, o });
+          const o2 = after(t, S.end, 6, o);
+          txt(640, 430, "תשלום נמוך בהתחלה אינו עלות נמוכה.", 30, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

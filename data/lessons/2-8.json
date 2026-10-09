@@ -1,0 +1,535 @@
+{
+  "lesson": "2.8",
+  "title": "מסלולי זכאות ומסלולים מיוחדים",
+  "note": "Official figures are given facts from search summaries (לא אומת, 2026-10-09). Rates, prices and exchange rates in examples are teaching numbers.",
+  "facts": [
+    {
+      "id": "rule.below_points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.5"
+    },
+    {
+      "id": "rule.cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "rule.min_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "rule.max_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "rule.base_low_2023",
+      "kind": "given",
+      "inputs": {},
+      "value": "54240.00"
+    },
+    {
+      "id": "rule.base_high_2023",
+      "kind": "given",
+      "inputs": {},
+      "value": "161665.00"
+    },
+    {
+      "id": "rule.ltv_cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "target.percent",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "target.cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "explain.rate_low",
+      "kind": "rep_capped_rate",
+      "inputs": {
+        "average_percent": "3.2",
+        "below_points": "0.5",
+        "cap_percent": "3"
+      },
+      "value": "2.7"
+    },
+    {
+      "id": "explain.rate_high",
+      "kind": "rep_capped_rate",
+      "inputs": {
+        "average_percent": "4",
+        "below_points": "0.5",
+        "cap_percent": "3"
+      },
+      "value": "3"
+    },
+    {
+      "id": "explain.minus_high",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.5"
+    },
+    {
+      "id": "target.a.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "target.a.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1200000",
+        "rate_percent": "20"
+      },
+      "value": "240000.00"
+    },
+    {
+      "id": "target.a.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "1200000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "240000.00"
+    },
+    {
+      "id": "target.a.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "target.a.price",
+        "subtrahend": "target.a.discount"
+      },
+      "value": "960000.00"
+    },
+    {
+      "id": "target.b.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000.00"
+    },
+    {
+      "id": "target.b.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2000000",
+        "rate_percent": "20"
+      },
+      "value": "400000.00"
+    },
+    {
+      "id": "target.b.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "2000000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "target.b.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "target.b.price",
+        "subtrahend": "target.b.discount"
+      },
+      "value": "1700000.00"
+    },
+    {
+      "id": "fx.units",
+      "kind": "rep_fx_units",
+      "inputs": {
+        "amount": "375000",
+        "rate": "3.75"
+      },
+      "value": "100000.00"
+    },
+    {
+      "id": "fx.up",
+      "kind": "rep_fx_balance",
+      "inputs": {
+        "amount": "375000",
+        "rate_at_start": "3.75",
+        "rate_now": "3.9"
+      },
+      "value": "390000.00"
+    },
+    {
+      "id": "fx.down",
+      "kind": "rep_fx_balance",
+      "inputs": {
+        "amount": "375000",
+        "rate_at_start": "3.75",
+        "rate_now": "3.6"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "fx.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "375000.00"
+    },
+    {
+      "id": "fx.up_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "fx.up",
+        "subtrahend": "fx.amount"
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "worked.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1600000.00"
+    },
+    {
+      "id": "worked.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "worked.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.price",
+        "subtrahend": "worked.equity"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "worked.ltv",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "1200000.00",
+        "loan": "1600000"
+      },
+      "value": "75"
+    },
+    {
+      "id": "worked.eligibility",
+      "kind": "given",
+      "inputs": {},
+      "value": "120000.00"
+    },
+    {
+      "id": "worked.rest",
+      "kind": "mix_remainder",
+      "inputs": {
+        "loan": "1200000.00",
+        "amount_1": "120000"
+      },
+      "value": "1080000.00"
+    },
+    {
+      "id": "worked.share",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "120000",
+        "loan": "1200000.00"
+      },
+      "value": "10"
+    },
+    {
+      "id": "worked.rate",
+      "kind": "rep_capped_rate",
+      "inputs": {
+        "average_percent": "3.2",
+        "below_points": "0.5",
+        "cap_percent": "3"
+      },
+      "value": "2.7"
+    },
+    {
+      "id": "worked.err_on_top",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "worked.loan|worked.eligibility"
+      },
+      "value": "1320000.00"
+    },
+    {
+      "id": "worked.err_ltv",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "1320000.00",
+        "loan": "1600000"
+      },
+      "value": "82.5"
+    },
+    {
+      "id": "half.r1.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "half.r1.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1000000",
+        "rate_percent": "20"
+      },
+      "value": "200000.00"
+    },
+    {
+      "id": "half.r1.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "1000000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "200000.00"
+    },
+    {
+      "id": "half.r1.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.r1.price",
+        "subtrahend": "half.r1.discount"
+      },
+      "value": "800000.00"
+    },
+    {
+      "id": "half.r2.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "half.r2.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1500000",
+        "rate_percent": "20"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "half.r2.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "1500000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "half.r2.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.r2.price",
+        "subtrahend": "half.r2.discount"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "half.r3.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "half.r3.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1800000",
+        "rate_percent": "20"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "half.r3.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "1800000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "half.r3.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.r3.price",
+        "subtrahend": "half.r3.discount"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "rep_capped_rate",
+      "inputs": {
+        "average_percent": "3.4",
+        "below_points": "0.5",
+        "cap_percent": "3"
+      },
+      "value": "2.9"
+    },
+    {
+      "id": "ex2.err_plus",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.9"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "rep_capped_rate",
+      "inputs": {
+        "average_percent": "3.8",
+        "below_points": "0.5",
+        "cap_percent": "3"
+      },
+      "value": "3"
+    },
+    {
+      "id": "ex3.err_uncapped",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.3"
+    },
+    {
+      "id": "ex4.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1350000.00"
+    },
+    {
+      "id": "ex4.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1350000",
+        "rate_percent": "20"
+      },
+      "value": "270000.00"
+    },
+    {
+      "id": "ex4.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "1350000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "270000.00"
+    },
+    {
+      "id": "ex4.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.price",
+        "subtrahend": "ex4.discount"
+      },
+      "value": "1080000.00"
+    },
+    {
+      "id": "ex5.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "ex5.pct",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2200000",
+        "rate_percent": "20"
+      },
+      "value": "440000.00"
+    },
+    {
+      "id": "ex5.discount",
+      "kind": "rep_capped_discount",
+      "inputs": {
+        "price": "2200000",
+        "percent": "20",
+        "cap": "300000"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "ex5.after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.price",
+        "subtrahend": "ex5.discount"
+      },
+      "value": "1900000.00"
+    },
+    {
+      "id": "ex6.units",
+      "kind": "rep_fx_units",
+      "inputs": {
+        "amount": "480000",
+        "rate": "4"
+      },
+      "value": "120000.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "rep_fx_balance",
+      "inputs": {
+        "amount": "480000",
+        "rate_at_start": "4",
+        "rate_now": "3.7"
+      },
+      "value": "444000.00"
+    },
+    {
+      "id": "ex6.err_inverse",
+      "kind": "rep_fx_balance",
+      "inputs": {
+        "amount": "480000",
+        "rate_at_start": "3.7",
+        "rate_now": "4"
+      },
+      "value": "518918.92"
+    },
+    {
+      "id": "ex6.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "480000.00"
+    },
+    {
+      "id": "ex5.err_no_cap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.price",
+        "subtrahend": "ex5.pct"
+      },
+      "value": "1760000.00"
+    },
+    {
+      "id": "ex4.err_cap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.price",
+        "subtrahend": "target.cap"
+      },
+      "value": "1050000.00"
+    }
+  ]
+}

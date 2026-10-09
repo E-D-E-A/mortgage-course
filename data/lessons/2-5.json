@@ -1,0 +1,788 @@
+{
+  "lesson": "2.5",
+  "title": "מסלולים קבועים",
+  "note": "Invented teaching numbers: loans, rates and inflation are illustrations, not market data or a forecast. The February 2026 averages are Bank of Israel data as recorded in the Brain (67469313), not verified. Level payments from amortization.ts (annual rate ÷ 12); the index rises evenly within a year.",
+  "facts": [
+    {
+      "id": "case.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "case.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "case.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "240"
+    },
+    {
+      "id": "rate.unlinked",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "rate.linked",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "infl.base",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "explain.unlinked_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "5",
+        "months": 240
+      },
+      "value": "3959.73"
+    },
+    {
+      "id": "explain.unlinked_interest",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "5"
+      },
+      "value": "2500.00"
+    },
+    {
+      "id": "explain.unlinked_down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.unlinked_payment",
+        "subtrahend": "explain.unlinked_interest"
+      },
+      "value": "1459.73"
+    },
+    {
+      "id": "explain.unlinked_balance_12",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "5",
+        "months": 240,
+        "paid": 12
+      },
+      "value": "582076.13"
+    },
+    {
+      "id": "explain.linked_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "3",
+        "months": 240
+      },
+      "value": "3327.59"
+    },
+    {
+      "id": "explain.linked_interest",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "600000",
+        "rate_percent": "3"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "explain.linked_down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.linked_payment",
+        "subtrahend": "explain.linked_interest"
+      },
+      "value": "1827.59"
+    },
+    {
+      "id": "explain.linked_year1",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "3327.59",
+        "base_index": "100",
+        "new_index": "102"
+      },
+      "value": "3394.14"
+    },
+    {
+      "id": "explain.linked_balance_12",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "3",
+        "months": 240,
+        "paid": 12
+      },
+      "value": "577764.89"
+    },
+    {
+      "id": "explain.linked_balance_12_indexed",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "577764.89",
+        "base_index": "100",
+        "new_index": "102"
+      },
+      "value": "589320.19"
+    },
+    {
+      "id": "explain.linked_year10",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "3327.59",
+        "inflation_percent": "2",
+        "years": 10
+      },
+      "value": "4056.31"
+    },
+    {
+      "id": "explain.unlinked_real10",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "3959.73",
+        "inflation_percent": "2",
+        "years": 10
+      },
+      "value": "3248.36"
+    },
+    {
+      "id": "market.month",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-02"
+    },
+    {
+      "id": "market.unlinked",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.74"
+    },
+    {
+      "id": "market.linked",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.25"
+    },
+    {
+      "id": "slider.unlinked",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "5"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3959.73",
+          "balance": "582076.13"
+        },
+        {
+          "year": 2,
+          "payment": "3959.73",
+          "balance": "563235.24"
+        },
+        {
+          "year": 3,
+          "payment": "3959.73",
+          "balance": "543430.42"
+        },
+        {
+          "year": 4,
+          "payment": "3959.73",
+          "balance": "522612.35"
+        },
+        {
+          "year": 5,
+          "payment": "3959.73",
+          "balance": "500729.18"
+        },
+        {
+          "year": 6,
+          "payment": "3959.73",
+          "balance": "477726.43"
+        },
+        {
+          "year": 7,
+          "payment": "3959.73",
+          "balance": "453546.81"
+        },
+        {
+          "year": 8,
+          "payment": "3959.73",
+          "balance": "428130.12"
+        },
+        {
+          "year": 9,
+          "payment": "3959.73",
+          "balance": "401413.06"
+        },
+        {
+          "year": 10,
+          "payment": "3959.73",
+          "balance": "373329.11"
+        },
+        {
+          "year": 11,
+          "payment": "3959.73",
+          "balance": "343808.33"
+        },
+        {
+          "year": 12,
+          "payment": "3959.73",
+          "balance": "312777.21"
+        },
+        {
+          "year": 13,
+          "payment": "3959.73",
+          "balance": "280158.48"
+        },
+        {
+          "year": 14,
+          "payment": "3959.73",
+          "balance": "245870.91"
+        },
+        {
+          "year": 15,
+          "payment": "3959.73",
+          "balance": "209829.12"
+        },
+        {
+          "year": 16,
+          "payment": "3959.73",
+          "balance": "171943.37"
+        },
+        {
+          "year": 17,
+          "payment": "3959.73",
+          "balance": "132119.32"
+        },
+        {
+          "year": 18,
+          "payment": "3959.73",
+          "balance": "90257.78"
+        },
+        {
+          "year": 19,
+          "payment": "3959.73",
+          "balance": "46254.54"
+        },
+        {
+          "year": 20,
+          "payment": "3959.73",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.linked_2",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "3",
+        "inflation_1": "2"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3394.14",
+          "balance": "589320.19"
+        },
+        {
+          "year": 2,
+          "payment": "3462.02",
+          "balance": "577269.57"
+        },
+        {
+          "year": 3,
+          "payment": "3531.26",
+          "balance": "563761.66"
+        },
+        {
+          "year": 4,
+          "payment": "3601.89",
+          "balance": "548705.27"
+        },
+        {
+          "year": 5,
+          "payment": "3673.92",
+          "balance": "532004.21"
+        },
+        {
+          "year": 6,
+          "payment": "3747.40",
+          "balance": "513557.01"
+        },
+        {
+          "year": 7,
+          "payment": "3822.35",
+          "balance": "493256.71"
+        },
+        {
+          "year": 8,
+          "payment": "3898.80",
+          "balance": "470990.52"
+        },
+        {
+          "year": 9,
+          "payment": "3976.77",
+          "balance": "446639.53"
+        },
+        {
+          "year": 10,
+          "payment": "4056.31",
+          "balance": "420078.39"
+        },
+        {
+          "year": 11,
+          "payment": "4137.43",
+          "balance": "391174.98"
+        },
+        {
+          "year": 12,
+          "payment": "4220.18",
+          "balance": "359790.04"
+        },
+        {
+          "year": 13,
+          "payment": "4304.59",
+          "balance": "325776.81"
+        },
+        {
+          "year": 14,
+          "payment": "4390.68",
+          "balance": "288980.66"
+        },
+        {
+          "year": 15,
+          "payment": "4478.49",
+          "balance": "249238.64"
+        },
+        {
+          "year": 16,
+          "payment": "4568.06",
+          "balance": "206379.07"
+        },
+        {
+          "year": 17,
+          "payment": "4659.42",
+          "balance": "160221.09"
+        },
+        {
+          "year": 18,
+          "payment": "4752.61",
+          "balance": "110574.17"
+        },
+        {
+          "year": 19,
+          "payment": "4847.66",
+          "balance": "57237.60"
+        },
+        {
+          "year": 20,
+          "payment": "4944.62",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.linked_0",
+      "kind": "amort_path_series",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "3",
+        "inflation_1": "0"
+      },
+      "value": [
+        {
+          "year": 1,
+          "payment": "3327.59",
+          "balance": "577764.89"
+        },
+        {
+          "year": 2,
+          "payment": "3327.59",
+          "balance": "554853.49"
+        },
+        {
+          "year": 3,
+          "payment": "3327.59",
+          "balance": "531245.21"
+        },
+        {
+          "year": 4,
+          "payment": "3327.59",
+          "balance": "506918.86"
+        },
+        {
+          "year": 5,
+          "payment": "3327.59",
+          "balance": "481852.60"
+        },
+        {
+          "year": 6,
+          "payment": "3327.59",
+          "balance": "456023.93"
+        },
+        {
+          "year": 7,
+          "payment": "3327.59",
+          "balance": "429409.65"
+        },
+        {
+          "year": 8,
+          "payment": "3327.59",
+          "balance": "401985.88"
+        },
+        {
+          "year": 9,
+          "payment": "3327.59",
+          "balance": "373727.98"
+        },
+        {
+          "year": 10,
+          "payment": "3327.59",
+          "balance": "344610.60"
+        },
+        {
+          "year": 11,
+          "payment": "3327.59",
+          "balance": "314607.58"
+        },
+        {
+          "year": 12,
+          "payment": "3327.59",
+          "balance": "283691.99"
+        },
+        {
+          "year": 13,
+          "payment": "3327.59",
+          "balance": "251836.07"
+        },
+        {
+          "year": 14,
+          "payment": "3327.59",
+          "balance": "219011.23"
+        },
+        {
+          "year": 15,
+          "payment": "3327.59",
+          "balance": "185187.98"
+        },
+        {
+          "year": 16,
+          "payment": "3327.59",
+          "balance": "150335.97"
+        },
+        {
+          "year": 17,
+          "payment": "3327.59",
+          "balance": "114423.91"
+        },
+        {
+          "year": 18,
+          "payment": "3327.59",
+          "balance": "77419.54"
+        },
+        {
+          "year": 19,
+          "payment": "3327.59",
+          "balance": "39289.65"
+        },
+        {
+          "year": 20,
+          "payment": "3327.59",
+          "balance": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "slider.linked_5_after5",
+      "kind": "amort_path_balance",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "3",
+        "inflation_1": "5",
+        "month": 60
+      },
+      "value": "614979.59"
+    },
+    {
+      "id": "worked.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "worked.unlinked_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "4.8",
+        "months": 300
+      },
+      "value": "2864.98"
+    },
+    {
+      "id": "worked.unlinked_interest",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "500000",
+        "rate_percent": "4.8"
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "worked.unlinked_down",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.unlinked_payment",
+        "subtrahend": "worked.unlinked_interest"
+      },
+      "value": "864.98"
+    },
+    {
+      "id": "worked.linked_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "3.2",
+        "months": 300
+      },
+      "value": "2423.39"
+    },
+    {
+      "id": "worked.index_5",
+      "kind": "infl_chain_index",
+      "inputs": {
+        "base": "100",
+        "inflation_1": "2.5",
+        "inflation_2": "2.5",
+        "inflation_3": "2.5",
+        "inflation_4": "2.5",
+        "inflation_5": "2.5"
+      },
+      "value": "113.14"
+    },
+    {
+      "id": "worked.linked_after5",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "2423.39",
+        "inflation_percent": "2.5",
+        "years": 5
+      },
+      "value": "2741.84"
+    },
+    {
+      "id": "worked.unlinked_real5",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "2864.98",
+        "inflation_percent": "2.5",
+        "years": 5
+      },
+      "value": "2532.22"
+    },
+    {
+      "id": "half.table",
+      "kind": "amort_linked_payment_table",
+      "inputs": {
+        "payment": "3327.59",
+        "inflation_percent": "2",
+        "years": 4,
+        "base_index": "100"
+      },
+      "value": [
+        {
+          "period": 1,
+          "index": "102",
+          "payment": "3394.14"
+        },
+        {
+          "period": 2,
+          "index": "104.04",
+          "payment": "3462.02"
+        },
+        {
+          "period": 3,
+          "index": "106.12",
+          "payment": "3531.26"
+        },
+        {
+          "period": 4,
+          "index": "108.24",
+          "payment": "3601.89"
+        }
+      ]
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "2800",
+        "base_index": "102.4",
+        "new_index": "107.52"
+      },
+      "value": "2940.00"
+    },
+    {
+      "id": "ex3.base_100",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "2800",
+        "base_index": "100",
+        "new_index": "107.52"
+      },
+      "value": "3010.56"
+    },
+    {
+      "id": "ex3.points",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "2800",
+        "base_index": "100",
+        "new_index": "105.12"
+      },
+      "value": "2943.36"
+    },
+    {
+      "id": "ex3.points_value",
+      "kind": "infl_index_points",
+      "inputs": {
+        "old": "102.4",
+        "new": "107.52"
+      },
+      "value": "5.12"
+    },
+    {
+      "id": "ex3.change",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "102.4",
+        "new": "107.52"
+      },
+      "value": "5"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "450000",
+        "rate_percent": "4.4"
+      },
+      "value": "1650.00"
+    },
+    {
+      "id": "ex4.year",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "450000",
+        "rate_percent": "4.4"
+      },
+      "value": "19800.00"
+    },
+    {
+      "id": "ex4.tenfold",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "450000",
+        "rate_percent": "44"
+      },
+      "value": "16500.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "infl_real_value",
+      "inputs": {
+        "amount": "4000",
+        "inflation_percent": "3",
+        "years": 8
+      },
+      "value": "3157.64"
+    },
+    {
+      "id": "ex5.indexed",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "4000",
+        "inflation_percent": "3",
+        "years": 8
+      },
+      "value": "5067.08"
+    },
+    {
+      "id": "ex5.simple",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "4000",
+        "inflation_percent": "-24",
+        "years": 1
+      },
+      "value": "3040.00"
+    },
+    {
+      "id": "ex6.plain_balance",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "3",
+        "months": 240,
+        "paid": 60
+      },
+      "value": "481852.60"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "481852.60",
+        "inflation_percent": "5",
+        "years": 5
+      },
+      "value": "614979.59"
+    },
+    {
+      "id": "ex6.simple",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "481852.60",
+        "inflation_percent": "25",
+        "years": 1
+      },
+      "value": "602315.75"
+    },
+    {
+      "id": "ex6.exact",
+      "kind": "amort_path_balance",
+      "inputs": {
+        "principal": "600000",
+        "months": 240,
+        "block_months": 240,
+        "rate_1": "3",
+        "inflation_1": "5",
+        "month": 60
+      },
+      "value": "614979.59"
+    }
+  ]
+}

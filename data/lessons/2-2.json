@@ -1,0 +1,777 @@
+{
+  "lesson": "2.2",
+  "title": "קבועה מול משתנה, ו״ריבית קבועה מול תשלום קבוע״",
+  "note": "Invented teaching numbers. Yearly examples for head arithmetic; monthly ones by annual ÷ 12. Equal-payment tables round each period's interest to the agora; the payment is re-set when the rate changes.",
+  "facts": [
+    {
+      "id": "ex.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "42000"
+    },
+    {
+      "id": "ex.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "ex.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "ex.rate_up",
+      "kind": "given",
+      "inputs": {},
+      "value": "7"
+    },
+    {
+      "id": "ex.inflation",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "a.table",
+      "kind": "trk_ep_year_table",
+      "inputs": {
+        "loan": "42000",
+        "years": 3,
+        "rate": "5"
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "42000.00",
+          "interest": "2100.00",
+          "principal": "14000.00",
+          "payment": "16100.00"
+        },
+        {
+          "period": 2,
+          "opening": "28000.00",
+          "interest": "1400.00",
+          "principal": "14000.00",
+          "payment": "15400.00"
+        },
+        {
+          "period": 3,
+          "opening": "14000.00",
+          "interest": "700.00",
+          "principal": "14000.00",
+          "payment": "14700.00"
+        }
+      ]
+    },
+    {
+      "id": "b.factor_1",
+      "kind": "trk_discount",
+      "inputs": {
+        "rate": "5",
+        "period": 1,
+        "decimals": 6
+      },
+      "value": "0.952381"
+    },
+    {
+      "id": "b.factor_2",
+      "kind": "trk_discount",
+      "inputs": {
+        "rate": "5",
+        "period": 2,
+        "decimals": 6
+      },
+      "value": "0.907029"
+    },
+    {
+      "id": "b.factor_3",
+      "kind": "trk_discount",
+      "inputs": {
+        "rate": "5",
+        "period": 3,
+        "decimals": 6
+      },
+      "value": "0.863838"
+    },
+    {
+      "id": "b.factor_sum",
+      "kind": "trk_annuity_factor",
+      "inputs": {
+        "rate": "5",
+        "periods": 3,
+        "decimals": 6
+      },
+      "value": "2.723248"
+    },
+    {
+      "id": "b.payment",
+      "kind": "trk_equal_payment",
+      "inputs": {
+        "loan": "42000",
+        "rate": "5",
+        "periods": 3
+      },
+      "value": "15422.76"
+    },
+    {
+      "id": "b.table",
+      "kind": "trk_payment_path",
+      "inputs": {
+        "loan": "42000",
+        "rate_1": "5",
+        "rate_2": "5",
+        "rate_3": "5"
+      },
+      "value": [
+        {
+          "period": 1,
+          "rate": "5",
+          "opening": "42000.00",
+          "interest": "2100.00",
+          "principal": "13322.76",
+          "payment": "15422.76",
+          "closing": "28677.24"
+        },
+        {
+          "period": 2,
+          "rate": "5",
+          "opening": "28677.24",
+          "interest": "1433.86",
+          "principal": "13988.90",
+          "payment": "15422.76",
+          "closing": "14688.34"
+        },
+        {
+          "period": 3,
+          "rate": "5",
+          "opening": "14688.34",
+          "interest": "734.42",
+          "principal": "14688.34",
+          "payment": "15422.76",
+          "closing": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "c.table",
+      "kind": "trk_payment_path",
+      "inputs": {
+        "loan": "42000",
+        "rate_1": "5",
+        "rate_2": "7",
+        "rate_3": "7"
+      },
+      "value": [
+        {
+          "period": 1,
+          "rate": "5",
+          "opening": "42000.00",
+          "interest": "2100.00",
+          "principal": "13322.76",
+          "payment": "15422.76",
+          "closing": "28677.24"
+        },
+        {
+          "period": 2,
+          "rate": "7",
+          "opening": "28677.24",
+          "interest": "2007.41",
+          "principal": "13853.74",
+          "payment": "15861.15",
+          "closing": "14823.50"
+        },
+        {
+          "period": 3,
+          "rate": "7",
+          "opening": "14823.50",
+          "interest": "1037.65",
+          "principal": "14823.50",
+          "payment": "15861.15",
+          "closing": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "c.payment_2",
+      "kind": "trk_equal_payment",
+      "inputs": {
+        "loan": "28677.24",
+        "rate": "7",
+        "periods": 2
+      },
+      "value": "15861.15"
+    },
+    {
+      "id": "c.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.payment_2",
+        "subtrahend": "b.payment"
+      },
+      "value": "438.39"
+    },
+    {
+      "id": "d.payment_1",
+      "kind": "trk_indexed_payment",
+      "inputs": {
+        "payment": "15422.76",
+        "inflation": "2",
+        "years": 1
+      },
+      "value": "15731.22"
+    },
+    {
+      "id": "d.payment_2",
+      "kind": "trk_indexed_payment",
+      "inputs": {
+        "payment": "15422.76",
+        "inflation": "2",
+        "years": 2
+      },
+      "value": "16045.84"
+    },
+    {
+      "id": "d.payment_3",
+      "kind": "trk_indexed_payment",
+      "inputs": {
+        "payment": "15422.76",
+        "inflation": "2",
+        "years": 3
+      },
+      "value": "16366.76"
+    },
+    {
+      "id": "worked.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "360000"
+    },
+    {
+      "id": "worked.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "worked.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.8"
+    },
+    {
+      "id": "worked.rate_up",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "worked.monthly_rate",
+      "kind": "trk_monthly",
+      "inputs": {
+        "annual": "4.8",
+        "decimals": 4
+      },
+      "value": "0.4"
+    },
+    {
+      "id": "worked.monthly_rate_up",
+      "kind": "trk_monthly",
+      "inputs": {
+        "annual": "6",
+        "decimals": 4
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "worked.principal",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 1,
+        "part": "principal"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "worked.m1_interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 1,
+        "part": "interest"
+      },
+      "value": "1440.00"
+    },
+    {
+      "id": "worked.m1_payment",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 1,
+        "part": "payment"
+      },
+      "value": "2440.00"
+    },
+    {
+      "id": "worked.m2_balance",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 2,
+        "part": "balance"
+      },
+      "value": "359000.00"
+    },
+    {
+      "id": "worked.m2_interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 2,
+        "part": "interest"
+      },
+      "value": "1436.00"
+    },
+    {
+      "id": "worked.m2_payment",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 2,
+        "part": "payment"
+      },
+      "value": "2436.00"
+    },
+    {
+      "id": "worked.m121_balance",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 121,
+        "part": "balance"
+      },
+      "value": "240000.00"
+    },
+    {
+      "id": "worked.m121_interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 121,
+        "part": "interest"
+      },
+      "value": "960.00"
+    },
+    {
+      "id": "worked.m121_payment",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 121,
+        "part": "payment"
+      },
+      "value": "1960.00"
+    },
+    {
+      "id": "worked.m360_balance",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 360,
+        "part": "balance"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "worked.m360_interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 360,
+        "part": "interest"
+      },
+      "value": "4.00"
+    },
+    {
+      "id": "worked.m360_payment",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 360,
+        "part": "payment"
+      },
+      "value": "1004.00"
+    },
+    {
+      "id": "worked.m61_balance",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 61,
+        "part": "balance"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "worked.m61_interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 61,
+        "part": "interest"
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "worked.m61_payment",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "4.8",
+        "month": 61,
+        "part": "payment"
+      },
+      "value": "2200.00"
+    },
+    {
+      "id": "worked.m61_interest_up",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "6",
+        "month": 61,
+        "part": "interest"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "worked.m61_payment_up",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "360000",
+        "months": 360,
+        "rate": "6",
+        "month": 61,
+        "part": "payment"
+      },
+      "value": "2500.00"
+    },
+    {
+      "id": "worked.m61_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.m61_payment_up",
+        "subtrahend": "worked.m61_payment"
+      },
+      "value": "300.00"
+    },
+    {
+      "id": "half.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "240000"
+    },
+    {
+      "id": "half.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "240"
+    },
+    {
+      "id": "half.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "half.monthly_rate",
+      "kind": "trk_monthly",
+      "inputs": {
+        "annual": "6",
+        "decimals": 4
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "half.table",
+      "kind": "trk_ep_month_table",
+      "inputs": {
+        "loan": "240000",
+        "months": 240,
+        "rate": "6",
+        "month_1": 1,
+        "month_2": 2,
+        "month_3": 13,
+        "month_4": 121
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "240000.00",
+          "interest": "1200.00",
+          "payment": "2200.00"
+        },
+        {
+          "period": 2,
+          "opening": "239000.00",
+          "interest": "1195.00",
+          "payment": "2195.00"
+        },
+        {
+          "period": 13,
+          "opening": "228000.00",
+          "interest": "1140.00",
+          "payment": "2140.00"
+        },
+        {
+          "period": 121,
+          "opening": "120000.00",
+          "interest": "600.00",
+          "payment": "1600.00"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "60000",
+        "years": 4,
+        "rate": "6",
+        "year": 2,
+        "part": "payment"
+      },
+      "value": "17700.00"
+    },
+    {
+      "id": "ex2.year1",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "60000",
+        "years": 4,
+        "rate": "6",
+        "year": 1,
+        "part": "payment"
+      },
+      "value": "18600.00"
+    },
+    {
+      "id": "ex2.principal",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "60000",
+        "years": 4,
+        "rate": "6",
+        "year": 2,
+        "part": "principal"
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "ex2.interest",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "60000",
+        "years": 4,
+        "rate": "6",
+        "year": 2,
+        "part": "interest"
+      },
+      "value": "2700.00"
+    },
+    {
+      "id": "ex2.balance",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "60000",
+        "years": 4,
+        "rate": "6",
+        "year": 2,
+        "part": "balance"
+      },
+      "value": "45000.00"
+    },
+    {
+      "id": "ex4.before",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "180000",
+        "months": 180,
+        "rate": "5.4",
+        "month": 1,
+        "part": "payment"
+      },
+      "value": "1810.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "180000",
+        "months": 180,
+        "rate": "6",
+        "month": 1,
+        "part": "payment"
+      },
+      "value": "1900.00"
+    },
+    {
+      "id": "ex4.interest",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "180000",
+        "months": 180,
+        "rate": "6",
+        "month": 1,
+        "part": "interest"
+      },
+      "value": "900.00"
+    },
+    {
+      "id": "ex4.principal",
+      "kind": "trk_ep_month",
+      "inputs": {
+        "loan": "180000",
+        "months": 180,
+        "rate": "6",
+        "month": 1,
+        "part": "principal"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "trk_equal_payment",
+      "inputs": {
+        "loan": "20000",
+        "rate": "6",
+        "periods": 2
+      },
+      "value": "10908.74"
+    },
+    {
+      "id": "ex5.ep_year1",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "20000",
+        "years": 2,
+        "rate": "6",
+        "year": 1,
+        "part": "payment"
+      },
+      "value": "11200.00"
+    },
+    {
+      "id": "ex5.no_interest",
+      "kind": "trk_ep_year",
+      "inputs": {
+        "loan": "20000",
+        "years": 2,
+        "rate": "6",
+        "year": 1,
+        "part": "principal"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "ex5.half_plus",
+      "kind": "trk_plain_owed",
+      "inputs": {
+        "amount": "10000",
+        "rate": "6"
+      },
+      "value": "10600.00"
+    },
+    {
+      "id": "ex5.factor_1",
+      "kind": "trk_discount",
+      "inputs": {
+        "rate": "6",
+        "period": 1,
+        "decimals": 6
+      },
+      "value": "0.943396"
+    },
+    {
+      "id": "ex5.factor_2",
+      "kind": "trk_discount",
+      "inputs": {
+        "rate": "6",
+        "period": 2,
+        "decimals": 6
+      },
+      "value": "0.889996"
+    },
+    {
+      "id": "ex5.factor_sum",
+      "kind": "trk_annuity_factor",
+      "inputs": {
+        "rate": "6",
+        "periods": 2,
+        "decimals": 6
+      },
+      "value": "1.833393"
+    },
+    {
+      "id": "ex6.path",
+      "kind": "trk_payment_path",
+      "inputs": {
+        "loan": "20000",
+        "rate_1": "6",
+        "rate_2": "8"
+      },
+      "value": [
+        {
+          "period": 1,
+          "rate": "6",
+          "opening": "20000.00",
+          "interest": "1200.00",
+          "principal": "9708.74",
+          "payment": "10908.74",
+          "closing": "10291.26"
+        },
+        {
+          "period": 2,
+          "rate": "8",
+          "opening": "10291.26",
+          "interest": "823.30",
+          "principal": "10291.26",
+          "payment": "11114.56",
+          "closing": "0.00"
+        }
+      ]
+    }
+  ]
+}
