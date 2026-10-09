@@ -8,7 +8,7 @@
  * (who publishes the index and when) are sentences with their sources, not numbers
  * computed here.
  */
-import { basketCost, chainIndex, changePercent, indexedAmount, indexPoints, indexValue, plainNumber } from "../../src/lib/calc/indexation.ts";
+import { basketCost, chainIndex, changeOnNew, changePercent, deflatedAmount, dropPercent, indexedAmount, indexPoints, indexValue, plainNumber } from "../../src/lib/calc/indexation.ts";
 import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -104,6 +104,27 @@ const pointsAsShekels = (id: string, amount: string, old: string, next: string):
   value: moneyString(new Decimal(amount).plus(indexPoints(old, next))),
 });
 
+const onNew = (id: string, old: string, next: string): Fact => ({
+  id,
+  kind: "infl_change_on_new",
+  inputs: { old, new: next },
+  value: plainNumber(changeOnNew(old, next)),
+});
+
+const drop = (id: string, old: string, next: string): Fact => ({
+  id,
+  kind: "infl_drop_percent",
+  inputs: { old, new: next },
+  value: plainNumber(dropPercent(old, next)),
+});
+
+const deflated = (id: string, amount: string, baseIndex: string, newIndex: string): Fact => ({
+  id,
+  kind: "infl_deflated_amount",
+  inputs: { amount, base_index: baseIndex, new_index: newIndex },
+  value: moneyString(deflatedAmount(amount, baseIndex, newIndex)),
+});
+
 const given = (id: string, value: string): Fact => ({ id, kind: "given", inputs: {}, value });
 
 // The teaching basket: bread, milk, vegetables, bus rides. Quantity × price per month.
@@ -152,6 +173,7 @@ export default function lesson07(): LessonData {
     given("cbs.groups", "10"),
     given("cbs.house_prices_out", "1999"),
     given("cbs.base_year", "2024"),
+    given("cbs.data_date", "2026-10-09"),
 
     // Prediction: an index from 120 to 126.
     points("prediction.points", "120", "126"),
@@ -163,6 +185,7 @@ export default function lesson07(): LessonData {
     ...BASE.map(([q, p], n) => cost(`explain.base_line_${n + 1}`, [[q, p]])),
     ...NOW.map(([q, p], n) => cost(`explain.now_line_${n + 1}`, [[q, p]])),
     ...BASE.map(([, p], n) => change(`explain.item_change_${n + 1}`, p, NOW[n][1])),
+    drop("explain.item_drop_3", BASE[2][1], NOW[2][1]),
     baseTotal,
     nowTotal,
     difference("explain.diff", nowTotal, baseTotal),
@@ -201,23 +224,27 @@ export default function lesson07(): LessonData {
     factor("ex2.factor", "800", "824"),
     difference("ex2.diff", ex2new, ex2old),
     index("ex2.index", "824", "800"),
+    onNew("ex2.on_new", "800", "824"),
 
     // Exercise 3: index 110 → 113.3.
     change("ex3.answer", "110", "113.3"),
     factor("ex3.factor", "110", "113.3"),
     points("ex3.points", "110", "113.3"),
     points("ex3.from_100", "100", "113.3"),
+    onNew("ex3.on_new", "110", "113.3"),
 
     // Exercise 5: index 100 → 103.5, a basket of 2,000.
     indexed("ex5.answer", "2000", "100", "103.5"),
     given("ex5.old", "2000.00"),
     pointsAsShekels("ex5.points_as_shekels", "2000", "100", "103.5"),
+    points("ex5.points", "100", "103.5"),
+    deflated("ex5.divided", "2000", "100", "103.5"),
 
-    // Exercise 6: two years, 4% and then 5%.
-    chain("ex6.answer", "100", ["4", "5"]),
-    chain("ex6.after_1", "100", ["4"]),
-    added("ex6.added", "100", ["4", "5"]),
-    change("ex6.total_change", "100", plainNumber(chainIndex("100", ["4", "5"]))),
+    // Exercise 6: two years, 3% and then 6% (not the half-worked table's 4% and 5%).
+    chain("ex6.answer", "100", ["3", "6"]),
+    chain("ex6.after_1", "100", ["3"]),
+    added("ex6.added", "100", ["3", "6"]),
+    change("ex6.total_change", "100", plainNumber(chainIndex("100", ["3", "6"]))),
   ];
 
   const byId = (id: string) => facts.find((f) => f.id === id)!;

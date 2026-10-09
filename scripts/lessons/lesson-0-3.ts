@@ -10,6 +10,8 @@
 import { compoundBalance, compoundTable, exactPeriodsToDouble, periodsToDouble, ruleOf72, simpleBalance } from "../../src/lib/calc/compound.ts";
 import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
+import { afterChanges, percentAsDecimal, percentOf, percentString } from "../../src/lib/calc/percent.ts";
+import { simpleInterest } from "../../src/lib/calc/simple.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
 const compound = (id: string, principal: string, rate: string, periods: number): Fact => ({
@@ -144,6 +146,46 @@ export default function lesson03(): LessonData {
   ];
 
   const byId = (id: string) => facts.find((f) => f.id === id)!;
+
+  // Added after the beginner-reader review (2026-10-09): numbers the page showed without a fact.
+  const part = (id: string, amount: string, rate: string): Fact => ({
+    id,
+    kind: "percent_of",
+    inputs: { amount, rate_percent: rate },
+    value: moneyString(percentOf(amount, rate)),
+  });
+  const given = (id: string, amount: string): Fact => ({ id, kind: "given", inputs: {}, value: moneyString(amount) });
+  const y1 = part("explain.interest_y1", "10000", "5");
+  const y2 = part("explain.interest_y2", moneyString(compoundBalance("10000", "5", 1)), "5");
+  const ex1principal = given("ex1.principal", "1000");
+  const hundred = given("ex4.hundred_percent", "100");
+  const sixPercent = given("ex4.rate", "6");
+  facts.push(
+    y1,
+    y2,
+    difference("explain.y2_extra", y2, y1),
+    // Distractors for the prediction: the money doubled, the money tripled
+    { id: "prediction.double", kind: "after_percent_change", inputs: { amount: "10000", changes_percent: "100" }, value: moneyString(afterChanges("10000", ["100"])) },
+    { id: "prediction.triple", kind: "after_percent_change", inputs: { amount: "10000", changes_percent: "200" }, value: moneyString(afterChanges("10000", ["200"])) },
+    ex1principal,
+    difference("ex1.err_interest", byId("ex1.answer"), ex1principal),
+    hundred,
+    sixPercent,
+    {
+      id: "ex4.simple_years",
+      kind: "percent_quotient",
+      inputs: { dividend: hundred.id, divisor: sixPercent.id },
+      value: percentString(new Decimal(hundred.value as string).div(sixPercent.value as string)),
+    },
+    { id: "ex4.year_before", kind: "periods_below_double", inputs: { rate_percent: "6" }, value: periodsToDouble("6") - 1 },
+    {
+      id: "ex5.err_simple",
+      kind: "simple_interest",
+      inputs: { principal: "100000", rate_percent: "1", periods: 30 },
+      value: moneyString(simpleInterest("100000", "1", 30)),
+    },
+    { id: "rule72.decimal", kind: "percent_decimal", inputs: { rate_percent: "6" }, value: percentAsDecimal("6").toFixed() },
+  );
   facts.push(
     difference("explain.interest_after_2", byId("explain.after_2"), byId("explain.principal")),
     difference("slider.gap_30_6", byId("slider.compound_30_6"), byId("slider.simple_30_6")),

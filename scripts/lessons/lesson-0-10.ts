@@ -12,7 +12,7 @@
  * The prime is arithmetic: the rate plus 1.5 percentage points (BoI explainer,
  * also from a search summary).
  */
-import { PRIME_ADDITION, primeFromPolicy, rateAfterCuts, ratePath, relativeDrop } from "../../src/lib/calc/lending.ts";
+import { PRIME_ADDITION, primeFromPolicy, rateAfterCuts, rateChange, ratePath, relativeDrop, relativeDropOnNew } from "../../src/lib/calc/lending.ts";
 import { plainNumber } from "../../src/lib/calc/indexation.ts";
 import Decimal from "decimal.js";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -36,6 +36,20 @@ const relDrop = (id: string, before: string, after: string): Fact => ({
   kind: "lend_relative_drop",
   inputs: { before, after },
   value: plainNumber(relativeDrop(before, after)),
+});
+
+const relDropOnNew = (id: string, before: string, after: string): Fact => ({
+  id,
+  kind: "lend_relative_drop_on_new",
+  inputs: { before, after },
+  value: plainNumber(relativeDropOnNew(before, after)),
+});
+
+const change = (id: string, before: string, after: string): Fact => ({
+  id,
+  kind: "lend_rate_change",
+  inputs: { before, after },
+  value: plainNumber(rateChange(before, after)),
 });
 
 const given = (id: string, value: unknown): Fact => ({ id, kind: "given", inputs: {}, value });
@@ -81,21 +95,25 @@ export default function lesson010(): LessonData {
     given("decision.schedule_date", "2026-08-31"),
     given("decision.upcoming", ["2026-10-21", "2026-11-23"]),
     given("decision.count", "8"),
+    given("decision.data_date", "2026-10-09"),
     given("prime.addition", PRIME_ADDITION),
     given("target.low", "1"),
     given("target.high", "3"),
     path("timeline.path", START, DECISIONS),
     prime("prime.current", current),
-    prime("prime.start", START),
     drop("year.drop", START, current),
+    change("year.change", START, current),
     relDrop("year.relative_drop", START, current),
-    prime("explain.prime_example", "1"),
 
     // Exercises.
     drop("ex2.wrong_subtract", current, PRIME_ADDITION),
     drop("ex4.answer", "4", "3.5"),
+    change("ex4.signed", "4", "3.5"),
     relDrop("ex4.relative", "4", "3.5"),
-    drop("ex5.prime_drop", plainNumber(primeFromPolicy(START)), plainNumber(primeFromPolicy(current))),
+    // Exercise 5: invented rates, 4.5% to 3.6% (not the 2026 numbers the lesson already shows).
+    relDrop("ex5.answer", "4.5", "3.6"),
+    drop("ex5.points", "4.5", "3.6"),
+    relDropOnNew("ex5.on_new", "4.5", "3.6"),
     {
       id: "ex6.rate",
       kind: "lend_rate_after_cuts",

@@ -14,8 +14,10 @@ import {
   addedPercents,
   afterChanges,
   combinedFactor,
+  percentAsDecimal,
   percentagePoints,
   percentOf,
+  product,
   percentString,
   relativeChangePercent,
   sharePercent,
@@ -74,6 +76,28 @@ const added = (id: string, changes: string): Fact => ({
   value: percentString(addedPercents(changes.split("|"))),
 });
 
+const decimal = (id: string, rate: string): Fact => ({
+  id,
+  kind: "percent_decimal",
+  inputs: { rate_percent: rate },
+  value: percentAsDecimal(rate).toFixed(),
+});
+
+const times = (id: string, a: string, b: string): Fact => ({
+  id,
+  kind: "plain_product",
+  inputs: { a, b },
+  value: percentString(product(a, b)),
+});
+
+/** dividend ÷ divisor, both facts, as a plain number to two decimals. */
+const ratio = (id: string, dividend: Fact, divisor: Fact): Fact => ({
+  id,
+  kind: "percent_quotient",
+  inputs: { dividend: dividend.id, divisor: divisor.id },
+  value: percentString(new Decimal(dividend.value as string).div(divisor.value as string)),
+});
+
 const difference = (id: string, minuend: Fact, subtrahend: Fact): Fact => ({
   id,
   kind: "difference",
@@ -108,6 +132,7 @@ export default function lesson01(): LessonData {
   const priceOld = given("explain.price_old", "200");
   const priceNew = given("explain.price_new", "230");
   const priceRise = difference("explain.price_rise", priceNew, priceOld);
+  const explainPart30 = given("explain.part_30", "30");
 
   // Percentage points: 4% → 5%, on 10,000 ₪.
   const at4 = part("pp.at_4", "10000", "4");
@@ -165,6 +190,14 @@ export default function lesson01(): LessonData {
     part("explain.three_of_5000", "5000", "3"),
     part("explain.half_of_200", "200", "50"),
     share("explain.share_30_of_200", "30", "200"),
+    // 30 out of 200, one step at a time: 30 ÷ 200 = 0.15, then × 100
+    explainPart30,
+    ratio("explain.fraction_30_of_200", explainPart30, priceOld),
+    // Percent as a decimal: divide by 100
+    decimal("explain.decimal_10", "10"),
+    decimal("explain.decimal_5", "5"),
+    decimal("explain.decimal_3", "3"),
+    decimal("explain.decimal_2_5", "2.5"),
 
     // Change in percent
     priceOld,
@@ -184,6 +217,8 @@ export default function lesson01(): LessonData {
     share("pp.gap_of_10000", v(ppGap), "10000"),
     // 5% → 4%: one point out of 5 (and the mistake in exercise 2: measuring 4 → 5 from 5)
     share("pp.one_of_five", "1", "5"),
+    // "1% of 4%" — the tiny change the ambiguous sentence could mean
+    after("pp.one_percent_of_4", "4", "1"),
 
     // Tools for the head: 3,600 ₪
     part("head.ten", "3600", "10"),
@@ -215,6 +250,7 @@ export default function lesson01(): LessonData {
     part("ex1.one", "400", "1"),
     part("ex1.err_thirty", "400", "30"),
     after("ex1.err_total", "400", "3"),
+    times("ex1.err_no_hundred", "400", "3"),
 
 
     // Exercise 3: 250 → 300
@@ -224,6 +260,7 @@ export default function lesson01(): LessonData {
     change("ex3.answer", "250", "300"),
     share("ex3.err_new_base", v(ex3diff), "300"),
     share("ex3.err_ratio", "300", "250"),
+    share("ex3.err_upside_down", "250", "300"),
 
     // Exercise 4: 3% → 4% of 8,000
     ex4old,
@@ -237,6 +274,7 @@ export default function lesson01(): LessonData {
     share("ex5.answer", v(ex5points), "8"),
     share("ex5.err_new_base", v(ex5points), "6"),
     change("ex5.signed", "8", "6"),
+    share("ex5.err_remaining", "6", "8"),
 
     // Exercise 6: back up from 400 to 500
     ex6high,
@@ -245,6 +283,7 @@ export default function lesson01(): LessonData {
     share("ex6.fall", v(ex6diff), "500"),
     change("ex6.answer", "400", "500"),
     share("ex6.err_ratio", "500", "400"),
+    share("ex6.err_remaining", "400", "500"),
 
     // Exercise 7: two discounts
     ex7price,

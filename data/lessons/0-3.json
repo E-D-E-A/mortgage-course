@@ -757,6 +757,113 @@
       "value": "142154.88"
     },
     {
+      "id": "explain.interest_y1",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "5"
+      },
+      "value": "500.00"
+    },
+    {
+      "id": "explain.interest_y2",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10500.00",
+        "rate_percent": "5"
+      },
+      "value": "525.00"
+    },
+    {
+      "id": "explain.y2_extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.interest_y2",
+        "subtrahend": "explain.interest_y1"
+      },
+      "value": "25.00"
+    },
+    {
+      "id": "prediction.double",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "10000",
+        "changes_percent": "100"
+      },
+      "value": "20000.00"
+    },
+    {
+      "id": "prediction.triple",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "10000",
+        "changes_percent": "200"
+      },
+      "value": "30000.00"
+    },
+    {
+      "id": "ex1.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "ex1.err_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex1.answer",
+        "subtrahend": "ex1.principal"
+      },
+      "value": "210.00"
+    },
+    {
+      "id": "ex4.hundred_percent",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "ex4.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "6.00"
+    },
+    {
+      "id": "ex4.simple_years",
+      "kind": "percent_quotient",
+      "inputs": {
+        "dividend": "ex4.hundred_percent",
+        "divisor": "ex4.rate"
+      },
+      "value": "16.67"
+    },
+    {
+      "id": "ex4.year_before",
+      "kind": "periods_below_double",
+      "inputs": {
+        "rate_percent": "6"
+      },
+      "value": 11
+    },
+    {
+      "id": "ex5.err_simple",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "1",
+        "periods": 30
+      },
+      "value": "30000.00"
+    },
+    {
+      "id": "rule72.decimal",
+      "kind": "percent_decimal",
+      "inputs": {
+        "rate_percent": "6"
+      },
+      "value": "0.06"
+    },
+    {
       "id": "explain.interest_after_2",
       "kind": "difference",
       "inputs": {

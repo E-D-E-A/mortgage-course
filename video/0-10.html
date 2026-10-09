@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Video scene for lesson 0.10 — "הכפתור של הכלכלה".
+  Video scene for lesson 0.10 — "הריבית ומה שהיא מזיזה".
   Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
   for each time t (seconds) and photographs the page. render(t) depends only on t.
   Every number comes from data/lessons/0-10.json. The 2026 decisions are from
@@ -44,32 +44,32 @@
       const path = fact("timeline.path");
       const V = {
         start: fact("decision.start"), now: fact("decision.current"), eff: fact("decision.effective_date"),
-        next: fact("decision.upcoming")[0], count: fact("decision.count"), add: fact("prime.addition"),
-        p0: fact("prime.start"), p1: fact("prime.current"), drop: fact("year.drop"),
+        next: fact("decision.upcoming")[0], count: fact("decision.count"), asOf: heDate(fact("decision.data_date")),
+        drop: fact("year.drop"),
         lo: fact("target.low"), hi: fact("target.high"),
       };
 
       const S = { title: [0, 10], bank: [10, 36], knob: [36, 80], committee: [80, 100], year: [100, 140], end: [140, 154] };
       window.duration = 154;
       window.cues = [
-        [1, 5, "בנק ישראל: הכפתור של הכלכלה."],
+        [1, 5, "בנק ישראל והריבית שלו."],
         [5, 9.5, "מה הוא עושה, ולמה."],
         [11, 19, "בנק ישראל הוא הבנק המרכזי. הוא עובד מול הבנקים."],
         [19, 27, "אחד מתפקידיו: שהמחירים יעלו לאט ובאופן צפוי."],
-        [27, 35, `היעד: אינפלציה של ${V.lo}% עד ${V.hi}% בשנה.`],
+        [27, 35, `נכון ל־${V.asOf}: יעד של ${V.lo}% עד ${V.hi}% בשנה.`],
         [37, 45, "הכלי העיקרי שלו: ריבית בנק ישראל."],
         [45, 53, "כשהיא עולה, הכסף עולה לבנקים יותר."],
         [53, 61, "הבנקים מעלים את הריבית על הלוואות חדשות."],
         [61, 70, "אנשים ועסקים לווים וקונים פחות."],
         [70, 79, "והמחירים עולים לאט יותר. זה לוקח חודשים."],
         [81, 90, "את הריבית קובעת הוועדה המוניטרית."],
-        [90, 99, `${V.count} החלטות בשנה, במועדים שנקבעים מראש.`],
+        [90, 99, `ב־2026 נקבעו מראש ${V.count} החלטות.`],
         [101, 110, `ב־2026 הריבית ירדה: מ־${V.start}% ל־${V.now}%.`],
-        [110, 120, `ירידה של ${V.drop} נקודת אחוז, בכמה החלטות.`],
-        [120, 130, `הקו הבהיר: הריבית ועוד ${V.add} נקודות אחוז.`],
-        [130, 139, `הוא ירד מ־${V.p0}% ל־${V.p1}% — באותו קצב.`],
-        [141, 147, `היום: ${V.now}%, מ־${heDate(V.eff)}.`],
-        [147, 153, `ההחלטה הבאה: ${heDate(V.next)}.`],
+        [110, 120, `ירידה של ${V.drop === "1" ? "נקודת אחוז אחת" : `${V.drop} נקודות אחוז`}, בכמה החלטות.`],
+        [120, 130, "בחלק מההחלטות הריבית לא השתנתה."],
+        [130, 139, "כל נקודה בגרף היא החלטה אחת של הוועדה."],
+        [141, 147, `נכון ל־${V.asOf}: ${V.now}%.`],
+        [147, 153, `ההחלטה הבאה נקבעה ל־${heDate(V.next)}.`],
       ];
 
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -99,8 +99,10 @@
       // 2026 from the right edge (January) to the left (December).
       const L = 190, R = 1090, y0 = 2026;
       const xOf = (iso) => R - ((when(iso) - Date.UTC(y0, 0, 1)) / (Date.UTC(y0 + 1, 0, 1) - Date.UTC(y0, 0, 1))) * (R - L);
-      const base = 520, top = 190, max = Number(V.p0) + 0.5;
-      const yOf = (v) => base - (Number(v) / max) * (base - top);
+      // The vertical axis spans whole percents around the year's rates, so a quarter point shows.
+      const rates = [V.start, ...path.map((r) => r.rate)].map(Number);
+      const base = 520, top = 230, yLo = Math.floor(Math.min(...rates) - 0.5), yHi = Math.ceil(Math.max(...rates));
+      const yOf = (v) => base - ((Number(v) - yLo) / (yHi - yLo)) * (base - top);
       function steps(key, first, upto) {
         let d = `M ${R} ${yOf(first)}`;
         for (const r of path) {
@@ -116,7 +118,7 @@
         if (inScene(t, S.title)) {
           const o = vis(t, S.title);
           txt(640, 290, "בנק ישראל", 84, { w: 700, o });
-          txt(640, 360, "הכפתור של הכלכלה", 34, { fill: C.n600, o });
+          txt(640, 360, "הריבית ומה שהיא מזיזה", 34, { fill: C.n600, o });
         }
         if (inScene(t, S.bank)) {
           const o = vis(t, S.bank);
@@ -155,7 +157,7 @@
             el("circle", { cx, cy: 300, r: 30, fill: C.n0, stroke: C.teal, "stroke-width": 3, opacity: o2 });
             txt(cx, 310, String(i + 1), 26, { w: 700, o: o2, ltr: true });
           }
-          txt(640, 400, `${V.count} החלטות בשנה, במועדים קבועים מראש`, 30, { fill: C.n700, o: o2 });
+          txt(640, 400, `ב־2026 נקבעו מראש ${V.count} החלטות`, 30, { fill: C.n700, o: o2 });
           note(o2);
         }
         if (inScene(t, S.year)) {
@@ -167,8 +169,10 @@
             const x = xOf(`2026-${String(m + 1).padStart(2, "0")}-15`);
             txt(x, base + 26, monthFmt.format(when(`2026-${String(m + 1).padStart(2, "0")}-15`)), 16, { fill: C.n600, o });
           }
-          const oP = after(t, S.year, 20, o);
-          el("path", { d: steps("prime", V.p0, reveal), fill: "none", stroke: C.tq2, "stroke-width": 4, opacity: oP });
+          for (let g = yLo; g <= yHi; g++) {
+            el("line", { x1: L, x2: R, y1: yOf(g), y2: yOf(g), stroke: C.n200, opacity: o });
+            txt(L - 10, yOf(g) + 6, `${g}%`, 18, { anchor: "end", fill: C.n600, o, ltr: true });
+          }
           el("path", { d: steps("rate", V.start, reveal), fill: "none", stroke: C.teal, "stroke-width": 4, opacity: o });
           for (const r of path) {
             if (xOf(r.date) < reveal) continue;
@@ -178,18 +182,17 @@
             el("circle", { cx: xOf(d), cy: base - 12, r: 6, fill: C.n0, stroke: C.n500, "stroke-width": 2, opacity: after(t, S.year, 12, o) });
           }
           txt(R + 10, yOf(V.start) + 8, `${V.start}%`, 22, { anchor: "start", w: 700, fill: C.teal, o, ltr: true });
-          txt(R + 10, yOf(V.p0) + 8, `${V.p0}%`, 22, { anchor: "start", w: 700, fill: C.n700, o: oP, ltr: true });
           const oEnd = after(t, S.year, 13, o);
           const xl = xOf(path[path.length - 1].date);
           txt(xl - 14, yOf(V.now) + 34, `${V.now}%`, 24, { anchor: "middle", w: 700, fill: C.teal, o: oEnd, ltr: true });
-          txt(xl - 14, yOf(V.p1) - 16, `${V.p1}%`, 24, { anchor: "middle", w: 700, fill: C.n700, o: Math.min(oEnd, oP), ltr: true });
           note(o, 172);
         }
         if (inScene(t, S.end)) {
           const o = vis(t, S.end);
-          txt(640, 260, `היום: ${V.now}%`, 64, { w: 700, o });
-          txt(640, 320, `בתוקף מ־${heDate(V.eff)}`, 28, { fill: C.n700, o });
-          txt(640, 400, `ההחלטה הבאה: ${heDate(V.next)}`, 32, { w: 600, o: after(t, S.end, 6, o) });
+          txt(640, 200, `נכון ל־${V.asOf}`, 30, { fill: C.n700, o });
+          txt(640, 275, `ריבית בנק ישראל: ${V.now}%`, 56, { w: 700, o });
+          txt(640, 330, `בתוקף מ־${heDate(V.eff)}`, 28, { fill: C.n700, o });
+          txt(640, 410, `ההחלטה הבאה נקבעה ל־${heDate(V.next)}`, 32, { w: 600, o: after(t, S.end, 6, o) });
           note(o);
         }
       };

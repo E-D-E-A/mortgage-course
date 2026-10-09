@@ -56,7 +56,7 @@
         base: fact("explain.base_total"), now: fact("explain.now_total"),
         i0: fact("explain.base_index"), i1: fact("explain.now_index"), infl: fact("explain.now_change"),
         y2cost: fact("explain.y2_cost"), i2: fact("explain.y2_index"), pts: fact("explain.y2_points"), infl2: fact("explain.y2_change"),
-        day: fact("cbs.day"), time: fact("cbs.time"), out: fact("cbs.house_prices_out"),
+        day: fact("cbs.day"), asOf: fact("cbs.data_date"), time: fact("cbs.time"), out: fact("cbs.house_prices_out"),
       };
 
       const S = { title: [0, 12], basket: [12, 44], year1: [44, 78], year2: [78, 110], who: [110, 140], end: [140, 154] };
@@ -185,7 +185,7 @@
             el("rect", { x: 300, y: 250 + i * 80, width: 680, height: 62, rx: 12, fill: C.n0, stroke: C.n200, opacity: oi });
             txt(940, 290 + i * 80, s, 28, { anchor: "start", o: oi });
           });
-          txt(640, 530, "לא אומת: לפי תקציר של אתר הלמ״ס; ממתין לבדיקה", 20, { fill: C.n500, o });
+          txt(640, 530, `לא אומת: לפי תקציר של אתר הלמ״ס; ממתין לבדיקה. נכון ל־${V.asOf}.`, 20, { fill: C.n500, o });
         }
         if (inScene(t, S.end)) {
           const o = vis(t, S.end);

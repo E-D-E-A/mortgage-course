@@ -105,7 +105,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
           תשואה: <span class="ltr">{{ yieldPercent }}%</span>
         </p>
       </div>
-      <p class="mt-1 text-center text-caption text-n600">הנדנדה מאוזנת כשהתשואה שווה לתשלום השנתי באחוזים. תשואה גבוהה יותר מורידה את המחיר.</p>
+      <p class="mt-1 text-center text-caption text-n600">הנדנדה מאוזנת כשהתשואה שווה לתשלום השנתי כאחוז מהקרן. תשואה גבוהה יותר מורידה את המחיר.</p>
     </div>
 
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">

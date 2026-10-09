@@ -35,12 +35,12 @@ const showValues = computed(() => years.value <= 5);
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <div class="grid gap-4 sm:grid-cols-3">
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">הקרן — הסכום שמשאילים</span>
+        <span class="text-caption font-semibold text-n600">הקרן — הסכום שמלווים</span>
         <input v-model.number="principal" type="range" min="100" max="20000" step="100" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekelsText(principal) }}</span></span>
       </label>
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">ריבית לשנה</span>
+        <span class="text-caption font-semibold text-n600">אחוז הריבית לשנה</span>
         <input v-model.number="rate" type="range" min="1" max="12" step="0.5" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ rate }}%</span></span>
       </label>
@@ -53,11 +53,11 @@ const showValues = computed(() => years.value <= 5);
 
     <div class="mt-5 grid gap-3 sm:grid-cols-3">
       <div class="rounded-md bg-n50 p-3">
-        <p class="text-caption text-n600">הריבית בכל שנה</p>
+        <p class="text-caption text-n600">סכום הריבית בכל שנה</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ formatShekelsText(yearly) }}</span></p>
       </div>
       <div class="rounded-md bg-n50 p-3">
-        <p class="text-caption text-n600">כל הריבית, ב־{{ years === 1 ? "שנה אחת" : `${years} שנים` }}</p>
+        <p class="text-caption text-n600">כל סכום הריבית, ב־{{ years === 1 ? "שנה אחת" : `${years} שנים` }}</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ formatShekelsText(totalInterest) }}</span></p>
       </div>
       <div class="rounded-md bg-n50 p-3">
@@ -68,7 +68,7 @@ const showValues = computed(() => years.value <= 5);
 
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-n300)"></span>קרן: עוברת מהמלווה ללווה היום, וחוזרת בסוף</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>ריבית: הלווה משלם למלווה בסוף כל שנה</li>
+      <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>סכום הריבית: הלווה משלם למלווה בסוף כל שנה</li>
     </ul>
 
     <div class="relative mt-3" role="img" :aria-label="`ציר זמן: היום ניתנת קרן של ${formatShekelsText(principal)}; בסוף כל אחת מ־${years} השנים משולמת ריבית של ${formatShekelsText(yearly)}; בסוף חוזרת הקרן`">
@@ -99,7 +99,7 @@ const showValues = computed(() => years.value <= 5);
           </span>
         </span>
       </div>
-      <p class="mt-1 text-center text-caption text-n600">שנים (מימין לשמאל). הקרן לא מצוירת בקנה מידה — היא גדולה בהרבה מהריבית של שנה.</p>
+      <p class="mt-1 text-center text-caption text-n600">שנים (מימין לשמאל). הקרן לא מצוירת בקנה מידה — היא גדולה בהרבה מסכום הריבית של שנה.</p>
       <div
         v-if="hover !== null"
         class="pointer-events-none absolute top-0 start-0 z-tooltip rounded-md border border-n200 bg-n0 p-3 text-caption text-n800 shadow-md"
@@ -111,8 +111,8 @@ const showValues = computed(() => years.value <= 5);
         </template>
         <template v-else>
           <p class="font-semibold text-n900">סוף שנה {{ hover }}</p>
-          <p>ריבית השנה: <span class="ltr">{{ formatShekelsText(rows[hover - 1].interest) }}</span></p>
-          <p>כל הריבית עד עכשיו: <span class="ltr">{{ formatShekelsText(rows[hover - 1].totalInterest) }}</span></p>
+          <p>סכום הריבית השנה: <span class="ltr">{{ formatShekelsText(rows[hover - 1].interest) }}</span></p>
+          <p>סכום הריבית עד עכשיו: <span class="ltr">{{ formatShekelsText(rows[hover - 1].totalInterest) }}</span></p>
           <p v-if="hover === years">ועוד החזר הקרן: <span class="ltr">{{ formatShekelsText(principal) }}</span></p>
         </template>
       </div>
@@ -126,8 +126,8 @@ const showValues = computed(() => years.value <= 5);
         <thead class="sticky top-0 bg-n0">
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-2 text-start">מתי</th>
-            <th class="py-2 text-start">ריבית</th>
-            <th class="py-2 text-start">כל הריבית עד עכשיו</th>
+            <th class="py-2 text-start">סכום הריבית</th>
+            <th class="py-2 text-start">סכום הריבית עד עכשיו</th>
             <th class="py-2 text-start">קרן</th>
           </tr>
         </thead>

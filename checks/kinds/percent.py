@@ -109,3 +109,26 @@ def added_percents(i, _facts=None):
 
 KINDS["combined_factor"] = combined_factor
 KINDS["added_percents"] = added_percents
+
+
+def percent_decimal(i, _facts=None):
+    s = format(Decimal(i["rate_percent"]).scaleb(-2), "f")
+    return s.rstrip("0").rstrip(".") if "." in s else s
+
+
+def plain_product(i, _facts=None):
+    return plain(Decimal(i["a"]) * Decimal(i["b"]))
+
+
+def periods_below_double(i, _facts=None):
+    # The last whole number of periods after which a compounding balance is still below double.
+    g = 1 + Decimal(i["rate_percent"]) / 100
+    n = 0
+    while g ** (n + 1) < 2:
+        n += 1
+    return n
+
+
+KINDS["percent_decimal"] = percent_decimal
+KINDS["plain_product"] = plain_product
+KINDS["periods_below_double"] = periods_below_double

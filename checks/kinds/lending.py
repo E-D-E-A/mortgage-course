@@ -86,7 +86,29 @@ def rate_path(i, _facts=None):
     return rows
 
 
+def relative_drop_on_new(i, _facts=None):
+    after = Decimal(i["after"])
+    return plain((Decimal(i["before"]) - after) / after * HUNDRED)
+
+
+def income_fraction(i, _facts=None):
+    return plain(Decimal(i["income"]) / Decimal(i["amount"]))
+
+
+def rate_for_income_no_percent(i, _facts=None):
+    # The mistake: adding the fraction to the cost of funds without × 100.
+    return plain(Decimal(i["income"]) / Decimal(i["amount"]) + Decimal(i["cost_rate"]))
+
+
+def rate_change(i, _facts=None):
+    return plain(Decimal(i["after"]) - Decimal(i["before"]))
+
+
 KINDS = {
+    "lend_rate_change": rate_change,
+    "lend_relative_drop_on_new": relative_drop_on_new,
+    "lend_income_fraction": income_fraction,
+    "lend_rate_for_income_no_percent": rate_for_income_no_percent,
     "lend_spread": spread,
     "lend_rate_sum": rate_sum,
     "lend_year_interest": year_interest,

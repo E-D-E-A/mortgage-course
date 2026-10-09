@@ -4,6 +4,8 @@ import {
   addedPercents,
   afterChanges,
   combinedFactor,
+  percentAsDecimal,
+  product,
   changeFactor,
   onePercent,
   percentagePoints,
@@ -116,5 +118,17 @@ describe("combinedFactor and addedPercents", () => {
 
   it("adds the percentages, the way the common mistake does", () => {
     expect(addedPercents(["30", "20"]).toString()).toBe("50");
+  });
+});
+
+describe("percentAsDecimal and product", () => {
+  it("moves the point two places", () => {
+    expect(percentAsDecimal("10").toString()).toBe("0.1");
+    expect(percentAsDecimal("5").toString()).toBe("0.05");
+    expect(percentAsDecimal("2.5").toString()).toBe("0.025");
+  });
+
+  it("multiplies", () => {
+    expect(product(400, 3).toString()).toBe("1200");
   });
 });

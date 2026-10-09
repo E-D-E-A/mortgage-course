@@ -2,7 +2,7 @@
 // Lesson 0.8's illustration, "השפעת אינפלציה ומדד" (required by the brief).
 // The learner sets a yearly inflation, a number of years and an amount, and
 // sees a debt with no interest and no payments, once indexed and once not.
-// A switch shows the same two debts in today's shekels (real), not only in
+// A switch shows the same two debts in today's purchasing power (real), not only in
 // the shekels written on paper (nominal). Every number comes from indexation.ts.
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
@@ -85,7 +85,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
         :aria-pressed="real"
         @click="real = true"
       >
-        בשקלים של היום (ריאלי)
+        בכוח קנייה של היום (ריאלי)
       </button>
     </div>
 
@@ -100,7 +100,7 @@ const tickEvery = computed(() => (rows.value.length <= 12 ? 1 : rows.value.lengt
       </div>
     </div>
     <p class="mt-2 text-caption text-n600">
-      {{ real ? "בשקלים של היום: כמה הסכום שווה בכוח קנייה, במחירים של היום." : "בשקלים שעל הנייר: כמה שקלים תחזירו בפועל." }} המחוון מעגל לשקל שלם.
+      {{ real ? "בכוח קנייה של היום: כמה הסכום שווה, במחירים של היום." : "בשקלים שעל הנייר: כמה שקלים תחזירו בפועל." }} המחוון מעגל לשקל שלם.
     </p>
 
     <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">

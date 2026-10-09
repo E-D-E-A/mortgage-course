@@ -10,6 +10,7 @@
 import Decimal from "decimal.js";
 import {
   bondPrice,
+  decimalString,
   deflatedAmount,
   indexedAmount,
   percentOff,
@@ -199,7 +200,28 @@ export default function lesson011(): LessonData {
     difference("ex7.drop_2", ex7at5, ex7two),
   ];
   const byId = (id: string) => facts.find((x) => x.id === id)!;
-  facts.push(difference("ex2.gain", byId("ex2.payment"), byId("ex2.price")));
+  const ratio = (id: string, payment: string, priceAmount: string): Fact => ({
+    id,
+    kind: "bond_single_yield_decimal",
+    inputs: { payment, price: priceAmount, years: 1 },
+    value: decimalString(singlePaymentYield(payment, priceAmount, 1).div(100)),
+  });
+  const ex6coupon2 = pv("ex6.pv_coupon_2", "3", "5", 2);
+  const ex5payment = given("ex5.payment", "103");
+  facts.push(
+    difference("ex2.gain", byId("ex2.payment"), byId("ex2.price")),
+    // The yield as a decimal before it becomes a percentage: 10 ÷ 100, 5 ÷ 105.
+    ratio("one.ratio_100", "110", "100"),
+    ratio("one.ratio_105", "110", "105"),
+    // Exercise errors the review asked for.
+    ex6coupon2,
+    difference("ex6.err_forgot_coupon_2", byId("ex6.answer"), ex6coupon2),
+    ex5payment,
+    difference("ex5.err_increase", byId("ex5.answer"), ex5payment),
+    // Price ticks on the video's price-by-yield chart.
+    given("video.tick_90", "90"),
+    given("video.tick_110", "110"),
+  );
 
   return {
     lesson: "0.11",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { primeFromPolicy, rateAfterCuts, rateChange, rateForSpreadIncome, ratePath, relativeDrop, spread, yearInterest } from "./lending.ts";
+import { incomeFraction, primeFromPolicy, rateAfterCuts, relativeDropOnNew, rateChange, rateForSpreadIncome, ratePath, relativeDrop, spread, yearInterest } from "./lending.ts";
 
 describe("spread and a year's interest", () => {
   it("subtracts rates in percentage points", () => {
@@ -49,5 +49,14 @@ describe("rateAfterCuts", () => {
     // 3.25 − 2 × 0.25 = 2.75.
     expect(rateAfterCuts("3.25", "0.25", 2).toString()).toBe("2.75");
     expect(() => rateAfterCuts("3", "0.25", 1.5)).toThrow(RangeError);
+  });
+});
+
+describe("the named mistakes", () => {
+  it("measures a drop against the wrong base, and forgets × 100", () => {
+    // 0.9 ÷ 3.6 = 0.25.
+    expect(relativeDropOnNew("4.5", "3.6").toString()).toBe("25");
+    // 6,000 ÷ 300,000 = 0.02.
+    expect(incomeFraction(300000, 6000).toString()).toBe("0.02");
   });
 });

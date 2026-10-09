@@ -54,6 +54,20 @@ export function relativeDrop(beforePercent: Numeric, afterPercent: Numeric): Dec
   return before.minus(afterPercent).div(before).mul(HUNDRED);
 }
 
+/** The mistake: the drop measured against the rate AFTER it, (before − after) ÷ after × 100. */
+export function relativeDropOnNew(beforePercent: Numeric, afterPercent: Numeric): Decimal {
+  const after = new Decimal(afterPercent);
+  if (after.lte(0)) throw new RangeError("the new rate must be more than zero");
+  return new Decimal(beforePercent).minus(after).div(after).mul(HUNDRED);
+}
+
+/** Income as a fraction of the amount, not yet in percent: income ÷ amount. */
+export function incomeFraction(amount: Numeric, income: Numeric): Decimal {
+  const a = new Decimal(amount);
+  if (a.lte(0)) throw new RangeError("the amount must be more than zero");
+  return new Decimal(income).div(a);
+}
+
 /** The rate after `count` equal cuts of `cut` percentage points each. */
 export function rateAfterCuts(startPercent: Numeric, cutPoints: Numeric, count: number): Decimal {
   if (!Number.isInteger(count) || count < 0) throw new RangeError(`count must be a whole number of at least 0, got ${count}`);

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   approxRealRate,
+  changeOnNew,
+  deflatedAmount,
+  dropPercent,
+  realRateOverNominal,
   basketCost,
   chainIndex,
   changePercent,
@@ -122,5 +126,19 @@ describe("indexationTable", () => {
       ["51000.00", "1020.00", "52020.00"],
       ["52020.00", "1040.40", "53060.40"],
     ]);
+  });
+});
+
+describe("the named mistakes", () => {
+  it("computes each wrong route exactly", () => {
+    // 24 ÷ 824 = 0.029126…; 3.3 ÷ 113.3 = 0.029126…
+    expect(plainNumber(changeOnNew(800, 824))).toBe("2.91");
+    expect(plainNumber(changeOnNew(110, "113.3"))).toBe("2.91");
+    // 10 → 9.1 is a 9% drop.
+    expect(dropPercent(10, "9.1").toString()).toBe("9");
+    // 2,000 ÷ 1.035 = 1,932.367…
+    expect(moneyString(deflatedAmount(2000, 100, "103.5"))).toBe("1932.37");
+    // 1 − 1.04 ÷ 1.06 = 0.018867…
+    expect(plainNumber(realRateOverNominal("6", "4"))).toBe("1.89");
   });
 });

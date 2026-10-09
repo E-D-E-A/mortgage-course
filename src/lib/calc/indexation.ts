@@ -122,6 +122,34 @@ export function indexationTable(amount: Numeric, inflationPercent: Numeric, year
   return rows;
 }
 
+// The common mistakes the exercises name, computed so their feedback can quote them.
+
+/** Change measured against the NEW value — the mistake: (new − old) ÷ new × 100. */
+export function changeOnNew(oldValue: Numeric, newValue: Numeric): Decimal {
+  const next = new Decimal(newValue);
+  if (next.lte(0)) throw new RangeError("the new value must be more than zero");
+  return next.minus(oldValue).div(next).mul(HUNDRED);
+}
+
+/** How much a price fell, as a positive percent: (old − new) ÷ old × 100. */
+export function dropPercent(oldValue: Numeric, newValue: Numeric): Decimal {
+  return changePercent(oldValue, newValue).neg();
+}
+
+/** Dividing by the index ratio instead of multiplying — the mistake: amount × base index ÷ new index. */
+export function deflatedAmount(amount: Numeric, baseIndex: Numeric, newIndex: Numeric): Decimal {
+  const next = new Decimal(newIndex);
+  if (next.lte(0)) throw new RangeError("the new index must be more than zero");
+  return new Decimal(amount).mul(baseIndex).div(next);
+}
+
+/** Dividing the gap by the nominal growth — the mistake: (1 − (1 + inflation) ÷ (1 + nominal)) × 100. */
+export function realRateOverNominal(nominalPercent: Numeric, inflationPercent: Numeric): Decimal {
+  const n = ONE.plus(new Decimal(nominalPercent).div(HUNDRED));
+  const i = ONE.plus(new Decimal(inflationPercent).div(HUNDRED));
+  return ONE.minus(i.div(n)).mul(HUNDRED);
+}
+
 /** A percentage or index value for display: at most two decimals, no trailing zeros ("3", "2.94", "109.2"). */
 export function plainNumber(value: Numeric): string {
   return new Decimal(value).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString();

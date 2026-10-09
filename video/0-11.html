@@ -65,8 +65,8 @@
         [1, 6, "אג״ח היא הלוואה עם תשלומים ידועים מראש."],
         [6, 11.5, "ואפשר למכור אותה למישהו אחר לפני הסוף."],
         [13, 19, `אג״ח עם תשלום אחד: ${shek(V.pay1)} בעוד שנה.`],
-        [20, 27.5, `קונים ב־${shek(V.p100)}: רווח של ${shek(V.g100)}. תשואה: ${pc(V.y100)}.`],
-        [28.5, 37.5, `קונים ב־${shek(V.p105)}: רווח של ${shek(V.g105)}. תשואה: ${pc(V.y105)}.`],
+        [20, 27.5, `קונים ב־${shek(V.p100)}: רווח ${shek(V.g100)} מתוך ${shek(V.p100)} — ${pc(V.y100)}.`],
+        [28.5, 37.5, `קונים ב־${shek(V.p105)}: רווח ${shek(V.g105)} מתוך ${shek(V.p105)} — ${pc(V.y105)}.`],
         [38.5, 45, `קונים ב־${shek(V.p110)}: אין רווח. תשואה: ${pc(V.y110)}.`],
         [45.5, 51, "המחיר עלה — התשואה ירדה."],
         [53, 61, `אג״ח של 3 שנים: ${shek(coupon)} בכל שנה, ובסוף גם ${shek(face)}.`],
@@ -78,7 +78,7 @@
         [111, 122, "ככל שהתשואה גבוהה יותר — המחיר נמוך יותר."],
         [122, 133, "התשלומים קבועים. רק המחיר זז."],
         [135, 142, "מחיר ותשואה הם שני צדדים של נדנדה אחת."],
-        [142, 151, "בשיעור: ומה קורה כשהתשלומים צמודים למדד."],
+        [142, 151, "בהמשך השיעור: מה קורה כשהתשלומים צמודים למדד."],
       ];
 
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -215,6 +215,12 @@
           // The face, dashed: where the seesaw is level.
           el("line", { x1: left, x2: right, y1: yOf(face), y2: yOf(face), stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: o * 0.7 });
           txt(left - 12, yOf(face) + 7, shek(face), 20, { anchor: "end", fill: C.n700, o, ltr: true });
+          // Two more price ticks, so the vertical axis reads as price.
+          for (const tick of [fact("video.tick_90"), fact("video.tick_110")]) {
+            el("line", { x1: left, x2: right, y1: yOf(tick), y2: yOf(tick), stroke: C.n200, "stroke-width": 1, opacity: o });
+            txt(left - 12, yOf(tick) + 7, shek(tick), 20, { anchor: "end", fill: C.n600, o, ltr: true });
+          }
+          txt(left - 12, top - 14, "מחיר", 20, { anchor: "end", w: 600, fill: C.n700, o, ltr: true });
           const shown = clamp((t - 102) / 8);
           const n = Math.max(1, Math.round(shown * (s.length - 1)));
           const d = s.slice(0, n + 1).map((r, i) => `${i ? "L" : "M"}${xOf(i)},${yOf(r.price)}`).join(" ");

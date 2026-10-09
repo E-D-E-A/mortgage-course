@@ -10,6 +10,9 @@ import Decimal from "decimal.js";
 import {
   bondPrice,
   curvePrice,
+  decimalString,
+  growthFactor,
+  singlePaymentYield,
   curveShape,
   impliedRate,
   inflationGap,
@@ -161,6 +164,55 @@ export default function lesson012(): LessonData {
   facts.push(
     { id: "ex4.answer_whole", kind: "bond_round_whole", inputs: { of: "ex4.answer" }, value: new Decimal(byId("ex4.answer").value as string).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toString() },
     difference("ex5.simple", byId("ex5.nominal"), byId("ex5.real")),
+  );
+
+  const workedRows = pricedPayments("100", "5", 3, ["3", "4", "5"]);
+  const segment = (short: string, shortYears: number, long: string, longYears: number) => ({
+    short_percent: short,
+    short_years: shortYears,
+    long_percent: long,
+    long_years: longYears,
+  });
+  const ratioOf = (short: string, shortYears: number, long: string, longYears: number) =>
+    growthFactor(long, longYears).div(growthFactor(short, shortYears));
+  const yieldDecimal = (id: string, payment: string, priceAmount: string): Fact => ({
+    id,
+    kind: "bond_single_yield_decimal",
+    inputs: { payment, price: priceAmount, years: 1 },
+    value: decimalString(singlePaymentYield(payment, priceAmount, 1).div(100)),
+  });
+  const singleYield = (id: string, payment: string, priceAmount: string): Fact => ({
+    id,
+    kind: "bond_single_yield",
+    inputs: { payment, price: priceAmount, years: 1 },
+    value: percentString(singlePaymentYield(payment, priceAmount, 1)),
+  });
+  facts.push(
+    // The worked example's own total: each row rounded to the agora, then added.
+    {
+      id: "worked.table_total",
+      kind: "bond_table_total",
+      inputs: { face: "100", payment_percent: "5", years: 3, yields: "3,4,5" },
+      value: moneyString(workedRows.reduce((s, r) => s.plus(moneyString(r.presentValue)), new Decimal(0))),
+    },
+    // 5.16 ÷ 103 as a decimal: (108.16 ÷ 103) − 1.
+    yieldDecimal("two.ratio", twoLong.value as string, twoShort.value as string),
+    // The long segment, 5 to 10 years on the rising curve, step by step.
+    { id: "long.f10", kind: "bond_factor", inputs: { rate_percent: "4.25", years: 10 }, value: decimalString(growthFactor("4.25", 10)) },
+    { id: "long.f5", kind: "bond_factor", inputs: { rate_percent: "3.75", years: 5 }, value: decimalString(growthFactor("3.75", 5)) },
+    { id: "long.ratio", kind: "bond_factor_ratio", inputs: segment("3.75", 5, "4.25", 10), value: decimalString(ratioOf("3.75", 5, "4.25", 10)) },
+    { id: "long.root", kind: "bond_implied_factor", inputs: segment("3.75", 5, "4.25", 10), value: decimalString(impliedRate("3.75", 5, "4.25", 10).div(100).plus(1)) },
+    implied("long.rate", "3.75", 5, "4.25", 10),
+    // Exercise 8: the stretch from 2 to 5 years.
+    implied("ex8.answer", "3", 2, "4", 5),
+    { id: "ex8.err_no_root", kind: "bond_ratio_gain_percent", inputs: segment("3", 2, "4", 5), value: percentString(ratioOf("3", 2, "4", 5).minus(1).mul(100)) },
+    { id: "ex8.err_decimal", kind: "bond_implied_decimal", inputs: segment("3", 2, "4", 5), value: decimalString(impliedRate("3", 2, "4", 5).div(100)) },
+    // Errors the review asked for.
+    { id: "ex4.err_decimal", kind: "bond_implied_decimal", inputs: segment("2", 1, "3", 2), value: decimalString(impliedRate("2", 1, "3", 2).div(100)) },
+    singleYield("ex4.err_no_square", "103", "102"),
+    yieldDecimal("ex5.err_decimal", "104", "101.5"),
+    singleYield("ex5.err_wrong_way", "101.5", "104"),
+    compound("ex3.err_times", "100", "4", 2),
   );
 
   return {

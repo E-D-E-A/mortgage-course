@@ -133,7 +133,27 @@ def points_as_shekels(i, _facts=None):
     return str(agorot(Decimal(i["amount"]) + Decimal(i["new_index"]) - Decimal(i["old_index"])))
 
 
+def change_on_new(i, _facts=None):
+    return plain((Decimal(i["new"]) - Decimal(i["old"])) / Decimal(i["new"]) * HUNDRED)
+
+
+def drop_percent(i, _facts=None):
+    return plain((Decimal(i["old"]) - Decimal(i["new"])) / Decimal(i["old"]) * HUNDRED)
+
+
+def deflated_amount(i, _facts=None):
+    return str(agorot(Decimal(i["amount"]) * Decimal(i["base_index"]) / Decimal(i["new_index"])))
+
+
+def real_rate_over_nominal(i, _facts=None):
+    return plain((1 - factor(i["inflation_percent"]) / factor(i["nominal_percent"])) * HUNDRED)
+
+
 KINDS = {
+    "infl_change_on_new": change_on_new,
+    "infl_drop_percent": drop_percent,
+    "infl_deflated_amount": deflated_amount,
+    "infl_real_rate_over_nominal": real_rate_over_nominal,
     "infl_growth_factor": growth_factor,
     "infl_points_as_shekels": points_as_shekels,
     "infl_index_table": index_table,

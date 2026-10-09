@@ -4,7 +4,9 @@ import {
   bondPrice,
   curvePrice,
   curveShape,
+  decimalString,
   deflatedAmount,
+  growthFactor,
   impliedRate,
   indexedAmount,
   inflationGap,
@@ -188,5 +190,19 @@ describe("curveShape", () => {
 
   it("ignores steps within the tolerance", () => {
     expect(curveShape(pts("4", "4.02", "4", "4.01", "4"))).toBe("flat");
+  });
+});
+
+describe("growthFactor and decimalString", () => {
+  it("shows the factors of the long-segment example to four places", () => {
+    // 1.0425^10 = 1.516209..., 1.0375^5 = 1.202104..., their ratio 1.261296...
+    expect(decimalString(growthFactor("4.25", 10))).toBe("1.5162");
+    expect(decimalString(growthFactor("3.75", 5))).toBe("1.2021");
+    expect(decimalString(growthFactor("4.25", 10).div(growthFactor("3.75", 5)))).toBe("1.2613");
+  });
+
+  it("shows a yield as a decimal", () => {
+    // 5 ÷ 105 = 0.047619...
+    expect(decimalString(singlePaymentYield(110, 105, 1).div(100))).toBe("0.0476");
   });
 });

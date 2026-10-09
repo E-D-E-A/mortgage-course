@@ -77,7 +77,10 @@ const squares = Array.from({ length: 100 }, (_, i) => i);
       </div>
       <div v-if="comparing" class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">מ־<span class="ltr">{{ percent }}%</span> ל־<span class="ltr">{{ second }}%</span></p>
-        <p class="text-body-l font-semibold text-n900"><span class="ltr">{{ signed(percentString(gapPoints)) }}</span> נקודות אחוז</p>
+        <p class="text-body-l font-semibold text-n900">
+          <template v-if="gapPoints.abs().eq(1)">{{ gapPoints.isNegative() ? "ירידה של" : "עלייה של" }} נקודת אחוז אחת</template>
+          <template v-else><span class="ltr">{{ signed(percentString(gapPoints)) }}</span> נקודות אחוז</template>
+        </p>
         <p class="text-body-m text-n700">
           <template v-if="relative !== null">שינוי יחסי: <span class="ltr">{{ signed(percentString(relative)) }}%</span></template>
           <template v-else>שינוי יחסי: אין — אי אפשר למדוד שינוי יחסי מ־0%</template>

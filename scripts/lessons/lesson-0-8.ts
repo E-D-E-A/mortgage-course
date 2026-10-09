@@ -16,6 +16,7 @@ import {
   nominalRate,
   plainNumber,
   realRate,
+  realRateOverNominal,
   realValue,
 } from "../../src/lib/calc/indexation.ts";
 import { compoundBalance, simpleBalance } from "../../src/lib/calc/compound.ts";
@@ -189,11 +190,21 @@ export default function lesson08(): LessonData {
     points("ex3.points", "105", "108.15"),
     realR("ex4.answer", "6", "4"),
     realApprox("ex4.approx", "6", "4"),
+    given("ex4.nominal", "6"),
+    {
+      id: "ex4.over_nominal",
+      kind: "infl_real_rate_over_nominal",
+      inputs: { nominal_percent: "6", inflation_percent: "4" },
+      value: plainNumber(realRateOverNominal("6", "4")),
+    },
     real("ex5.answer", "100000", "2", 5),
     simple("ex5.simple", "100000", "-2", 5),
+    given("ex5.amount", "100000.00"),
     balance("ex5.indexed", "100000", "2", 5),
     nominalR("ex6.answer", "3", "2"),
     nominalApprox("ex6.approx", "3", "2"),
+    // The mistake: dividing the growth factors instead of multiplying them.
+    realR("ex6.divided", "3", "2"),
   ];
 
   return {

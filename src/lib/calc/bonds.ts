@@ -29,6 +29,17 @@ export function percentString(ratePercent: Numeric): string {
   return new Decimal(ratePercent).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2);
 }
 
+/** A rate or factor shown as a plain decimal with a fixed number of places: "0.0476", "1.2613". */
+export function decimalString(value: Numeric, places = 4): string {
+  return new Decimal(value).toDecimalPlaces(places, Decimal.ROUND_HALF_UP).toFixed(places);
+}
+
+/** How many times an amount grows in `years` years at `ratePercent` a year: (1 + r)^years. */
+export function growthFactor(ratePercent: Numeric, years: number): Decimal {
+  assertYears(years);
+  return ONE.plus(fraction(ratePercent)).pow(years);
+}
+
 /** What an amount paid after `years` years is worth today, discounted at `ratePercent` a year: amount ÷ (1 + r)^years. */
 export function presentValue(amount: Numeric, ratePercent: Numeric, years: number): Decimal {
   assertYears(years);

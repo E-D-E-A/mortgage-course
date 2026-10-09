@@ -66,3 +66,13 @@ export function combinedFactor(ratesPercent: Numeric[]): Decimal {
 export function addedPercents(ratesPercent: Numeric[]): Decimal {
   return ratesPercent.reduce<Decimal>((sum, rate) => sum.plus(rate), new Decimal(0));
 }
+
+/** A percent written as a decimal: divide by 100. "10" → 0.1, "2.5" → 0.025. */
+export function percentAsDecimal(ratePercent: Numeric): Decimal {
+  return new Decimal(ratePercent).div(100);
+}
+
+/** A plain product a × b — used only to name a mistake (400 × 3 without dividing by 100). */
+export function product(a: Numeric, b: Numeric): Decimal {
+  return new Decimal(a).mul(b);
+}

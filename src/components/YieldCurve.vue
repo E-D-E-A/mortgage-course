@@ -53,8 +53,8 @@ const ticks = computed(() => {
   return out;
 });
 const curvePath = computed(() => points.value.map((p, i) => `${i ? "L" : "M"}${xOf(p.years)},${yOf(Number(p.yieldPercent))}`).join(" "));
-const LENGTH_LABEL: Record<number, string> = { 1: "שנה", 2: "שנתיים" };
-const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `${y} שנים`;
+const LENGTH_LABEL: Record<number, string> = { 1: "לשנה אחת", 2: "לשנתיים" };
+const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `ל־${y} שנים`;
 </script>
 
 <template>
@@ -74,12 +74,12 @@ const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `${y} שנים`;
 
     <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-5">
       <label v-for="(y, i) in LENGTHS" :key="y" class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">תשואה ל{{ lengthLabel(y) }}</span>
+        <span class="text-caption font-semibold text-n600">תשואה {{ lengthLabel(y) }}</span>
         <input v-model.number="yields[i]" type="range" min="0" max="8" step="0.25" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ yields[i] }}%</span></span>
       </label>
     </div>
-    <p class="mt-2 text-caption text-n600">מספרים להמחשה; אינם נתוני שוק.</p>
+    <p class="mt-2 text-caption text-n600">תשואות בשנה. מספרים להמחשה, לא נתוני שוק. המספרים המדויקים — ב״הצגה כטבלה״.</p>
 
     <div class="mt-5 rounded-md bg-n50 p-3" aria-live="polite">
       <p class="text-body-l font-semibold text-navy">{{ SHAPE_TEXT[shape].title }}</p>

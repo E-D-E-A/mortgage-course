@@ -10,7 +10,7 @@
  */
 import { simpleBalance } from "../../src/lib/calc/compound.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
-import { percentOf, percentString, sharePercent } from "../../src/lib/calc/percent.ts";
+import { percentAsDecimal, percentOf, percentString, sharePercent } from "../../src/lib/calc/percent.ts";
 import { quotient, simpleInterest, simpleInterestTable } from "../../src/lib/calc/simple.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -67,10 +67,19 @@ const ratio = (id: string, dividend: Fact, divisor: Fact): Fact => ({
 
 const v = (f: Fact) => f.value as string;
 
+const decimal = (id: string, rate: string): Fact => ({
+  id,
+  kind: "percent_decimal",
+  inputs: { rate_percent: rate },
+  value: percentAsDecimal(rate).toFixed(),
+});
+
 export default function lesson02(): LessonData {
   const ex6yearly = yearly("ex6.yearly", "8000", "6");
   const ex7yearly = yearly("ex7.yearly", "20000", "5");
   const ex7target = given("ex7.target", "5000");
+  const storyPrincipal = given("story.principal", "100");
+  const bigPrincipal = given("big.principal", "10000");
 
   const facts: Fact[] = [
     // Prediction: lending 1,000 ₪ for 3 years at 5% a year
@@ -81,7 +90,7 @@ export default function lesson02(): LessonData {
     total("pred.one_year", "1000", "5", 1),
 
     // The story (explanation and video): "I lend you 100 ₪"
-    given("story.principal", "100"),
+    storyPrincipal,
     yearly("story.one", "100", "1"),
     yearly("story.yearly", "100", "5"),
     table("story.table", "100", "5", 3),
@@ -92,6 +101,12 @@ export default function lesson02(): LessonData {
 
     // A bigger amount (explanation, slider and video)
     yearly("big.yearly", "10000", "5"),
+    // The principal alone: 100 times the principal, same rate and years
+    bigPrincipal,
+    ratio("big.times", bigPrincipal, storyPrincipal),
+    interest("big.interest_3_years", "10000", "5", 3),
+    // Percent as a decimal (formula section)
+    decimal("formula.r_5", "5"),
     table("big.table", "10000", "5", 10),
     interest("big.interest", "10000", "5", 10),
     total("big.total", "10000", "5", 10),
@@ -121,6 +136,8 @@ export default function lesson02(): LessonData {
     yearly("ex3.yearly", "12000", "3"),
     interest("ex3.answer", "12000", "3", 4),
     total("ex3.err_total", "12000", "3", 4),
+    interest("ex3.err_thirty", "12000", "30", 4),
+    decimal("ex3.r", "3"),
 
     // Exercise 4: everything received, 5,000 ₪, 3 years, 6%
     yearly("ex4.yearly", "5000", "6"),
@@ -141,6 +158,8 @@ export default function lesson02(): LessonData {
     ex6yearly,
     share("ex6.answer", v(ex6yearly), "8000"),
     share("ex6.err_total", moneyString(simpleInterest("8000", "6", 2)), "8000"),
+    decimal("ex6.err_decimal", "6"),
+    decimal("ex6.err_decimal_total", "12"),
 
     // Exercise 7: find the years
     given("ex7.principal", "20000"),

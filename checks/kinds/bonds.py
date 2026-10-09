@@ -126,7 +126,52 @@ def bond_curve(i, _facts=None):
     }
 
 
+FOUR = Decimal("0.0001")
+
+
+def dec4(x):
+    return str(Decimal(x).quantize(FOUR, rounding=ROUND_HALF_UP))
+
+
+def bond_single_yield_decimal(i, _facts=None):
+    ratio = Decimal(i["payment"]) / Decimal(i["price"])
+    n = int(i["years"])
+    growth = ratio if n == 1 else (ratio.ln() / n).exp()
+    return dec4(growth - 1)
+
+
+def bond_factor(i, _facts=None):
+    return dec4(g(i["rate_percent"]) ** int(i["years"]))
+
+
+def _ratio(i):
+    return g(i["long_percent"]) ** int(i["long_years"]) / g(i["short_percent"]) ** int(i["short_years"])
+
+
+def bond_factor_ratio(i, _facts=None):
+    return dec4(_ratio(i))
+
+
+def bond_ratio_gain_percent(i, _facts=None):
+    return pct((_ratio(i) - 1) * 100)
+
+
+def bond_implied_factor(i, _facts=None):
+    span = int(i["long_years"]) - int(i["short_years"])
+    return dec4((_ratio(i).ln() / span).exp())
+
+
+def bond_implied_decimal(i, _facts=None):
+    return dec4(_implied(i["short_percent"], int(i["short_years"]), i["long_percent"], int(i["long_years"])) / 100)
+
+
 KINDS = {
+    "bond_single_yield_decimal": bond_single_yield_decimal,
+    "bond_factor": bond_factor,
+    "bond_factor_ratio": bond_factor_ratio,
+    "bond_ratio_gain_percent": bond_ratio_gain_percent,
+    "bond_implied_factor": bond_implied_factor,
+    "bond_implied_decimal": bond_implied_decimal,
     "bond_present_value": bond_present_value,
     "bond_simple_discount": bond_simple_discount,
     "bond_percent_off": bond_percent_off,

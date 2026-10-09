@@ -6,7 +6,7 @@
  * All rates and amounts are invented round teaching numbers for a made-up
  * "בנק א׳". They are not any real bank's rates, costs or spreads.
  */
-import { rateForSpreadIncome, spread, yearInterest } from "../../src/lib/calc/lending.ts";
+import { incomeFraction, rateForSpreadIncome, spread, yearInterest } from "../../src/lib/calc/lending.ts";
 import { plainNumber } from "../../src/lib/calc/indexation.ts";
 import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
@@ -99,6 +99,8 @@ export default function lesson09(): LessonData {
     // Exercise 2: 6% and 3.5%.
     spreadFact("ex2.answer", "6", "3.5"),
     sum("ex2.sum", "6", "3.5"),
+    { id: "ex2.loan", kind: "given", inputs: {}, value: "6" },
+    { id: "ex2.cost", kind: "given", inputs: {}, value: "3.5" },
 
     // Exercise 3: 200,000 at 5%, cost 3%.
     interest("ex3.received", "200000", "5"),
@@ -112,6 +114,20 @@ export default function lesson09(): LessonData {
       kind: "lend_rate_for_income",
       inputs: { amount: "300000", income: "6000", cost_rate: "2.5" },
       value: plainNumber(rateForSpreadIncome("300000", "6000", "2.5")),
+    },
+    { id: "ex5.cost", kind: "given", inputs: {}, value: "2.5" },
+    {
+      id: "ex5.fraction",
+      kind: "lend_income_fraction",
+      inputs: { amount: "300000", income: "6000" },
+      value: plainNumber(incomeFraction("300000", "6000")),
+    },
+    {
+      id: "ex5.no_percent",
+      kind: "lend_rate_for_income_no_percent",
+      inputs: { amount: "300000", income: "6000", cost_rate: "2.5" },
+      // The mistake: the fraction added to the cost of funds without × 100.
+      value: plainNumber(incomeFraction("300000", "6000").plus("2.5")),
     },
     spreadFact("ex5.spread_only", plainNumber(rateForSpreadIncome("300000", "6000", "2.5")), "2.5"),
   ];
