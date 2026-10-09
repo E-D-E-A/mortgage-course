@@ -192,7 +192,7 @@ function toggleInList(id: string) {
             <button
               :ref="setListButton(n.id)"
               type="button"
-              class="flex min-h-11 w-full scroll-mt-4 items-center justify-between gap-2 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
+              class="flex min-h-11 w-full scroll-mt-24 items-center justify-between gap-2 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
               :class="nodeClass(n)"
               :aria-expanded="n.id === selected"
               @click="toggleInList(n.id)"

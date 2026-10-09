@@ -98,7 +98,7 @@ const shown = (n: NumberRow) => (!n.blank || solved[n.key] ? formatShekels(n.val
 </script>
 
 <template>
-  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5" :data-diy-print="printing ? 'active' : null">
+  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5" data-diy-block :data-diy-print="printing ? 'active' : null">
     <p class="text-body-l font-semibold text-n900">{{ title }}</p>
     <div class="diy-no-print mt-2 flex flex-wrap gap-x-4 gap-y-1">
       <button type="button" class="min-h-11 min-w-11 text-body-m text-navy underline" :aria-pressed="printView" @click="printView = !printView">

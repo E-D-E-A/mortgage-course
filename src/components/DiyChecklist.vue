@@ -131,7 +131,7 @@ function endPrint() {
 </script>
 
 <template>
-  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5" :data-diy-print="printing ? 'active' : null">
+  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5" data-diy-block :data-diy-print="printing ? 'active' : null">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
       <p class="text-body-l font-semibold text-n900">{{ title }}</p>
       <p class="text-caption text-n600" aria-live="polite">סימנתם {{ done }} מתוך {{ total }}</p>

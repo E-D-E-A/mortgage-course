@@ -78,7 +78,7 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
       <tbody>
         <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
           <td v-if="periodLabel" class="py-2 text-n700">{{ nameOf(row, i) }}</td>
-          <td v-for="c in columns" :key="c.key" class="py-2 pe-2">
+          <td v-for="c in columns" :key="c.key" class="py-2 pe-1 sm:pe-2">
             <template v-if="isBlank(row, i, c.key) && !revealed">
               <input
                 v-model="entered[keyOf(row, i, c.key)]"
@@ -95,7 +95,7 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
                 "
               />
             </template>
-            <span v-else :class="[c.format === 'date' ? '' : 'ltr', isBlank(row, i, c.key) ? 'font-semibold' : '', 'text-n900']">{{
+            <span v-else :class="[c.format === 'date' ? '' : 'ltr whitespace-nowrap', isBlank(row, i, c.key) ? 'font-semibold' : '', 'text-n900']">{{
               show(row[c.key], c.format)
             }}</span>
           </td>
