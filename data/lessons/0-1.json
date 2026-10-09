@@ -1,0 +1,745 @@
+{
+  "lesson": "0.1",
+  "title": "אחוז: חלק ממאה",
+  "note": "Teaching assumptions, not real prices. Money rounded to the agora at the end of each calculation; percentages to two decimals.",
+  "facts": [
+    {
+      "id": "pred.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "200.00"
+    },
+    {
+      "id": "pred.up",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "200",
+        "changes_percent": "10"
+      },
+      "value": "220.00"
+    },
+    {
+      "id": "pred.after",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "200",
+        "changes_percent": "10|-10"
+      },
+      "value": "198.00"
+    },
+    {
+      "id": "pred.lost",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pred.start",
+        "subtrahend": "pred.after"
+      },
+      "value": "2.00"
+    },
+    {
+      "id": "pred.down_then_up",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "200",
+        "changes_percent": "-10|10"
+      },
+      "value": "198.00"
+    },
+    {
+      "id": "pred.down",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "200",
+        "changes_percent": "-10"
+      },
+      "value": "180.00"
+    },
+    {
+      "id": "pred.down_rise",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "180.00",
+        "rate_percent": "10"
+      },
+      "value": "18.00"
+    },
+    {
+      "id": "pred.rise",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "200",
+        "rate_percent": "10"
+      },
+      "value": "20.00"
+    },
+    {
+      "id": "pred.drop",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "220.00",
+        "rate_percent": "10"
+      },
+      "value": "22.00"
+    },
+    {
+      "id": "pred.total_fall",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "2.00",
+        "whole": "200"
+      },
+      "value": "1"
+    },
+    {
+      "id": "pred.factor",
+      "kind": "combined_factor",
+      "inputs": {
+        "changes_percent": "10|-10"
+      },
+      "value": "0.99"
+    },
+    {
+      "id": "explain.one_of_100",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "1"
+      },
+      "value": "1.00"
+    },
+    {
+      "id": "explain.one_of_200",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "200",
+        "rate_percent": "1"
+      },
+      "value": "2.00"
+    },
+    {
+      "id": "explain.three_of_200",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "200",
+        "rate_percent": "3"
+      },
+      "value": "6.00"
+    },
+    {
+      "id": "explain.one_of_5000",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "1"
+      },
+      "value": "50.00"
+    },
+    {
+      "id": "explain.three_of_5000",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "3"
+      },
+      "value": "150.00"
+    },
+    {
+      "id": "explain.half_of_200",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "200",
+        "rate_percent": "50"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "explain.share_30_of_200",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "30",
+        "whole": "200"
+      },
+      "value": "15"
+    },
+    {
+      "id": "explain.price_old",
+      "kind": "given",
+      "inputs": {},
+      "value": "200.00"
+    },
+    {
+      "id": "explain.price_new",
+      "kind": "given",
+      "inputs": {},
+      "value": "230.00"
+    },
+    {
+      "id": "explain.price_rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.price_new",
+        "subtrahend": "explain.price_old"
+      },
+      "value": "30.00"
+    },
+    {
+      "id": "explain.price_change",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "200",
+        "to": "230"
+      },
+      "value": "15"
+    },
+    {
+      "id": "explain.factor_up_10",
+      "kind": "combined_factor",
+      "inputs": {
+        "changes_percent": "10"
+      },
+      "value": "1.1"
+    },
+    {
+      "id": "explain.factor_down_10",
+      "kind": "combined_factor",
+      "inputs": {
+        "changes_percent": "-10"
+      },
+      "value": "0.9"
+    },
+    {
+      "id": "pp.points",
+      "kind": "percentage_point_change",
+      "inputs": {
+        "from_percent": "4",
+        "to_percent": "5"
+      },
+      "value": "1"
+    },
+    {
+      "id": "pp.relative",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "4",
+        "to": "5"
+      },
+      "value": "25"
+    },
+    {
+      "id": "pp.at_4",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "4"
+      },
+      "value": "400.00"
+    },
+    {
+      "id": "pp.at_5",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "5"
+      },
+      "value": "500.00"
+    },
+    {
+      "id": "pp.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pp.at_5",
+        "subtrahend": "pp.at_4"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "pp.gap_of_400",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "100.00",
+        "whole": "400.00"
+      },
+      "value": "25"
+    },
+    {
+      "id": "pp.gap_of_10000",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "100.00",
+        "whole": "10000"
+      },
+      "value": "1"
+    },
+    {
+      "id": "pp.one_of_five",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "1",
+        "whole": "5"
+      },
+      "value": "20"
+    },
+    {
+      "id": "head.ten",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "3600",
+        "rate_percent": "10"
+      },
+      "value": "360.00"
+    },
+    {
+      "id": "head.one",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "3600",
+        "rate_percent": "1"
+      },
+      "value": "36.00"
+    },
+    {
+      "id": "head.five",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "3600",
+        "rate_percent": "5"
+      },
+      "value": "180.00"
+    },
+    {
+      "id": "head.fifty",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "3600",
+        "rate_percent": "50"
+      },
+      "value": "1800.00"
+    },
+    {
+      "id": "head.twenty_five",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "3600",
+        "rate_percent": "25"
+      },
+      "value": "900.00"
+    },
+    {
+      "id": "video.square_220",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "220.00",
+        "rate_percent": "1"
+      },
+      "value": "2.20"
+    },
+    {
+      "id": "worked.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "600.00"
+    },
+    {
+      "id": "worked.first_off",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "600",
+        "rate_percent": "25"
+      },
+      "value": "150.00"
+    },
+    {
+      "id": "worked.after_first",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "600",
+        "changes_percent": "-25"
+      },
+      "value": "450.00"
+    },
+    {
+      "id": "worked.second_off",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "450.00",
+        "rate_percent": "10"
+      },
+      "value": "45.00"
+    },
+    {
+      "id": "worked.final",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "600",
+        "changes_percent": "-25|-10"
+      },
+      "value": "405.00"
+    },
+    {
+      "id": "worked.saved",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.price",
+        "subtrahend": "worked.final"
+      },
+      "value": "195.00"
+    },
+    {
+      "id": "worked.saved_share",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "195.00",
+        "whole": "600"
+      },
+      "value": "32.5"
+    },
+    {
+      "id": "worked.added",
+      "kind": "added_percents",
+      "inputs": {
+        "changes_percent": "25|10"
+      },
+      "value": "35"
+    },
+    {
+      "id": "worked.factor_first",
+      "kind": "combined_factor",
+      "inputs": {
+        "changes_percent": "-25"
+      },
+      "value": "0.75"
+    },
+    {
+      "id": "worked.factor",
+      "kind": "combined_factor",
+      "inputs": {
+        "changes_percent": "-25|-10"
+      },
+      "value": "0.675"
+    },
+    {
+      "id": "half.table",
+      "kind": "percent_rows",
+      "inputs": {
+        "amounts": "5000|800|12000|64",
+        "rates_percent": "3|15|2.5|25"
+      },
+      "value": [
+        {
+          "amount": "5000.00",
+          "rate_percent": "3",
+          "one_percent": "50.00",
+          "result": "150.00"
+        },
+        {
+          "amount": "800.00",
+          "rate_percent": "15",
+          "one_percent": "8.00",
+          "result": "120.00"
+        },
+        {
+          "amount": "12000.00",
+          "rate_percent": "2.5",
+          "one_percent": "120.00",
+          "result": "300.00"
+        },
+        {
+          "amount": "64.00",
+          "rate_percent": "25",
+          "one_percent": "0.64",
+          "result": "16.00"
+        }
+      ]
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "400",
+        "rate_percent": "3"
+      },
+      "value": "12.00"
+    },
+    {
+      "id": "ex1.one",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "400",
+        "rate_percent": "1"
+      },
+      "value": "4.00"
+    },
+    {
+      "id": "ex1.err_thirty",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "400",
+        "rate_percent": "30"
+      },
+      "value": "120.00"
+    },
+    {
+      "id": "ex1.err_total",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "400",
+        "changes_percent": "3"
+      },
+      "value": "412.00"
+    },
+    {
+      "id": "ex3.old",
+      "kind": "given",
+      "inputs": {},
+      "value": "250.00"
+    },
+    {
+      "id": "ex3.new",
+      "kind": "given",
+      "inputs": {},
+      "value": "300.00"
+    },
+    {
+      "id": "ex3.diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.new",
+        "subtrahend": "ex3.old"
+      },
+      "value": "50.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "250",
+        "to": "300"
+      },
+      "value": "20"
+    },
+    {
+      "id": "ex3.err_new_base",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "50.00",
+        "whole": "300"
+      },
+      "value": "16.67"
+    },
+    {
+      "id": "ex3.err_ratio",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "300",
+        "whole": "250"
+      },
+      "value": "120"
+    },
+    {
+      "id": "ex4.at_3",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "8000",
+        "rate_percent": "3"
+      },
+      "value": "240.00"
+    },
+    {
+      "id": "ex4.at_4",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "8000",
+        "rate_percent": "4"
+      },
+      "value": "320.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.at_4",
+        "subtrahend": "ex4.at_3"
+      },
+      "value": "80.00"
+    },
+    {
+      "id": "ex4.points",
+      "kind": "percentage_point_change",
+      "inputs": {
+        "from_percent": "3",
+        "to_percent": "4"
+      },
+      "value": "1"
+    },
+    {
+      "id": "ex4.relative",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "3",
+        "to": "4"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "ex5.points_between",
+      "kind": "percentage_point_change",
+      "inputs": {
+        "from_percent": "6",
+        "to_percent": "8"
+      },
+      "value": "2"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "2",
+        "whole": "8"
+      },
+      "value": "25"
+    },
+    {
+      "id": "ex5.err_new_base",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "2",
+        "whole": "6"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "ex5.signed",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "8",
+        "to": "6"
+      },
+      "value": "-25"
+    },
+    {
+      "id": "ex6.high",
+      "kind": "given",
+      "inputs": {},
+      "value": "500.00"
+    },
+    {
+      "id": "ex6.low",
+      "kind": "given",
+      "inputs": {},
+      "value": "400.00"
+    },
+    {
+      "id": "ex6.diff",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.high",
+        "subtrahend": "ex6.low"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "ex6.fall",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "100.00",
+        "whole": "500"
+      },
+      "value": "20"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "relative_change_percent",
+      "inputs": {
+        "from": "400",
+        "to": "500"
+      },
+      "value": "25"
+    },
+    {
+      "id": "ex6.err_ratio",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "500",
+        "whole": "400"
+      },
+      "value": "125"
+    },
+    {
+      "id": "ex7.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "ex7.first_off",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "30"
+      },
+      "value": "300.00"
+    },
+    {
+      "id": "ex7.after_first",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "1000",
+        "changes_percent": "-30"
+      },
+      "value": "700.00"
+    },
+    {
+      "id": "ex7.second_off",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "700.00",
+        "rate_percent": "20"
+      },
+      "value": "140.00"
+    },
+    {
+      "id": "ex7.final",
+      "kind": "after_percent_change",
+      "inputs": {
+        "amount": "1000",
+        "changes_percent": "-30|-20"
+      },
+      "value": "560.00"
+    },
+    {
+      "id": "ex7.saved",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex7.price",
+        "subtrahend": "ex7.final"
+      },
+      "value": "440.00"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "440.00",
+        "whole": "1000"
+      },
+      "value": "44"
+    },
+    {
+      "id": "ex7.err_added",
+      "kind": "added_percents",
+      "inputs": {
+        "changes_percent": "30|20"
+      },
+      "value": "50"
+    },
+    {
+      "id": "ex7.err_price_share",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "560.00",
+        "whole": "1000"
+      },
+      "value": "56"
+    }
+  ]
+}

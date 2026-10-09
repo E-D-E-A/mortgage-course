@@ -1,0 +1,477 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.1"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import PercentGrid from "../../components/PercentGrid.vue";
+import FillRows from "../../components/FillRows.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.1");
+export const P = (id) => `${f.plain(id)}%`;
+export const predictionOptions = [
+  `בדיוק ${f.shekels("pred.start")} — המחיר חזר למה שהיה`,
+  `${f.shekels("pred.after")}`,
+  `יותר מ־${f.shekels("pred.start")}`,
+  "תלוי בסדר: אם קודם יורד ואחר כך עולה, יוצא מחיר אחר",
+];
+
+ברוכים הבאים לקורס המשכנתאות של Mogi. הקורס מתחיל מאפס, ולא מניח שום ידע קודם בכלכלה או במימון.
+שלב 0 עוסק ביסודות הכסף: אחוזים, <Later lesson="0.2">ריבית</Later>, זמן ו<Later lesson="0.7">אינפלציה</Later>. כל חישוב של <Later lesson="1.1">משכנתא</Later> בנוי מהם, ולכן נלמד אותם קודם.
+השיעור הראשון הוא על המושג שכל השאר נשען עליו: <Term t="אחוז" lesson="0.1">אחוז</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.1"
+  question="מוצר עלה 200 ₪. המחיר שלו עלה ב־10%, ואחרי חודש ירד ב־10%. כמה עולה המוצר עכשיו?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מאה ריבועים
+
+</Section>
+
+<LessonVideo lesson="0-1" />
+
+<Section kind="ההסבר">
+
+## חלק אחד ממאה
+
+</Section>
+
+### אחוז מסכום
+
+**אחוז הוא חלק אחד מתוך מאה.** דמיינו סכום כלשהו שמחולק ל־100 חלקים שווים — 100 ריבועים קטנים. כל ריבוע הוא אחוז אחד, וכותבים אותו 1%. הסימן % פירושו ״מתוך מאה״.
+
+**נתחיל מ־100 ₪.** מחלקים 100 ₪ ל־100 ריבועים, וכל ריבוע שווה {f.shekels("explain.one_of_100")}. כלומר, 1% מ־100 ₪ הם {f.shekels("explain.one_of_100")}.
+
+**עכשיו 200 ₪.** שוב 100 ריבועים, אבל הסכום כפול, ולכן כל ריבוע שווה יותר: <M>200 ÷ 100 = {f.shekels("explain.one_of_200")}</M>.
+3% הם שלושה ריבועים: <M>3 × {f.shekels("explain.one_of_200")} = {f.shekels("explain.three_of_200")}</M>.
+
+**ואם הסכום הוא 5,000 ₪?** כל ריבוע: <M>5,000 ÷ 100 = {f.shekels("explain.one_of_5000")}</M>. ו־3% הם <M>3 × {f.shekels("explain.one_of_5000")} = {f.shekels("explain.three_of_5000")}</M>.
+
+אותם 3%, ושני סכומים שונים לגמרי: {f.shekels("explain.three_of_200")} ו־{f.shekels("explain.three_of_5000")}. אחוז לבדו לא אומר כמה כסף זה. תמיד צריך לשאול: **אחוז ממה?**
+
+**הכלל:** כדי לחשב אחוז מסכום, מחלקים את הסכום ב־100 — זה ערך של ריבוע אחד — ומכפילים במספר האחוזים.
+
+**100% הם הכול** — כל מאת הריבועים. 50% הם חצי: 50% מ־200 ₪ הם {f.shekels("explain.half_of_200")}.
+
+**ובכיוון ההפוך: כמה אחוזים זה?** מתוך 200 ₪, כמה אחוזים הם 30 ₪? כל ריבוע שווה {f.shekels("explain.one_of_200")}, ו־30 ₪ ממלאים {f.plain("explain.share_30_of_200")} ריבועים — כלומר {P("explain.share_30_of_200")}.
+בלי ריבועים: מחלקים את החלק בסכום כולו, ומכפילים ב־100: <M>30 ÷ 200 × 100 = {f.plain("explain.share_30_of_200")}</M>.
+
+### שינוי באחוזים
+
+מחיר עלה מ־200 ₪ ל־230 ₪. בכמה אחוזים הוא עלה?
+
+**צעד 1 — בכמה שקלים?** <M>230 − 200 = {f.shekels("explain.price_rise")}</M>.
+
+**צעד 2 — כמה אחוזים זה מהמחיר שהיה קודם?** {f.shekels("explain.price_rise")} מתוך 200 ₪ — כבר חישבנו: {P("explain.price_change")}.
+
+**שינוי באחוזים נמדד תמיד ממה שהיה לפני השינוי.** זה הכלל החשוב ביותר בשיעור.
+
+**להוסיף 10% זה להכפיל ב־1.1.** 10% הם 10 חלקי 100, כלומר 0.1. מחיר של 200 ₪ שעולה ב־10%:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>200 + 10% × 200</M>
+  <M>= 200 + {f.shekels("pred.rise")} = {f.shekels("pred.up")}</M>
+  <M>= 200 × {f.plain("explain.factor_up_10")}</M>
+</div>
+
+המספר {f.plain("explain.factor_up_10")} הוא 1 (כל המחיר, 100%) ועוד 0.1 (התוספת, 10%).
+באותו אופן, **להוריד 10% זה להכפיל ב־{f.plain("explain.factor_down_10")}**: מכל המחיר (1) מורידים את ה־0.1.
+
+**ועכשיו לשאלת החיזוי: עלייה של 10% ואחר כך ירידה של 10%.**
+
+1. המחיר עולה ב־10%: <M>200 × {f.plain("explain.factor_up_10")} = {f.shekels("pred.up")}</M>.
+2. המחיר יורד ב־10%. 10% ממה? מהמחיר שהיה רגע לפני הירידה — {f.shekels("pred.up")}. 10% מ־{f.shekels("pred.up")} הם {f.shekels("pred.drop")}.
+3. <M>{f.shekels("pred.up")} − {f.shekels("pred.drop")} = {f.shekels("pred.after")}</M>.
+
+העלייה הייתה {f.shekels("pred.rise")}, והירידה {f.shekels("pred.drop")}. אותו אחוז, אבל הירידה נמדדה מסכום גדול יותר — ולכן היא גדולה יותר בשקלים.
+
+### נקודת אחוז מול אחוז
+
+כשמשהו נמדד באחוזים — שיעור מס, שיעור הנחה, או <Later lesson="0.2">ריבית</Later> שנכיר בשיעור הבא — והוא משתנה, יש שתי דרכים לתאר את השינוי.
+
+נניח ששיעור מסוים עלה מ־4% ל־5%.
+
+- **בנקודות אחוז:** <M>5 − 4 = {f.plain("pp.points")}</M>. השיעור עלה ב<Term t="נקודת אחוז" lesson="0.1">נקודת אחוז</Term> אחת. בריבועים: היו 4, עכשיו 5 — נוסף ריבוע אחד.
+- **באחוזים, ביחס למה שהיה:** נוסף ריבוע אחד על 4 שהיו. <M>{f.plain("pp.points")} ÷ 4 × 100 = {f.plain("pp.relative")}</M> — עלייה של {P("pp.relative")}.
+
+שני המשפטים נכונים, ומתארים אותו שינוי. המשפט ״השיעור עלה ב־1%״ מבלבל: לא ברור אם הכוונה לנקודת אחוז אחת, או ל־1% מ־4%, שזה שינוי זעיר. לכן, כשמשהו שנמדד באחוזים משתנה, אומרים **נקודות אחוז**.
+
+**כמה זה בשקלים?** נניח שהשיעור נגבה מ־10,000 ₪.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[20rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">השיעור</th>
+        <th class="py-2 text-start font-semibold">מ־10,000 ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2"><span class="ltr">4%</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("pp.at_4")}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2"><span class="ltr">5%</span></td>
+        <td class="py-2"><span class="ltr">{f.shekelsExact("pp.at_5")}</span></td>
+      </tr>
+      <tr>
+        <td class="py-2 font-semibold text-n900">ההפרש</td>
+        <td class="py-2 font-semibold text-n900"><span class="ltr">{f.shekelsExact("pp.gap")}</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+ההפרש, {f.shekels("pp.gap")}, הוא {P("pp.gap_of_10000")} מ־10,000 ₪ — זו נקודת האחוז. והוא גם {P("pp.gap_of_400")} מ־{f.shekels("pp.at_4")} — זו העלייה היחסית.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מאה ריבועים בידיים
+
+</Section>
+
+הסכום כולו הוא 100 ריבועים. הזיזו את המחוונים, ושימו לב כמה שווה ריבוע אחד.
+
+<PercentGrid client:visible amount={200} percent={3} compareTo={5} />
+
+נסו את שלושת אלה:
+1. השאירו 3%, והזיזו את הסכום ל־200 ₪ ואחר כך ל־5,000 ₪. כמה שווה ריבוע אחד בכל פעם, וכמה שווים 3%?
+2. סמנו ״השוואה בין שני אחוזים״. קבעו סכום של 10,000 ₪, אחוז ראשון 4% ואחוז שני 5%. מה השינוי בנקודות אחוז, ומה השינוי היחסי?
+3. הפכו את הסדר: אחוז ראשון 5%, אחוז שני 4%. למה השינוי היחסי לא אותו מספר כמו בסעיף 2?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ב־200 ₪ ריבוע שווה {f.shekels("explain.one_of_200")}, ו־3% הם {f.shekels("explain.three_of_200")}. ב־5,000 ₪ ריבוע שווה {f.shekels("explain.one_of_5000")}, ו־3% הם {f.shekels("explain.three_of_5000")}.</li>
+    <li>עלייה של נקודת אחוז אחת, ושינוי יחסי של {P("pp.relative")}. בטבלה: {f.shekels("pp.at_4")} הופכים ל־{f.shekels("pp.at_5")}.</li>
+    <li>שוב נקודת אחוז אחת, אבל עכשיו ירידה יחסית של {P("pp.one_of_five")}: ריבוע אחד מתוך 5 שהיו, לא מתוך 4. השינוי היחסי נמדד תמיד ממה שהיה קודם.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחאות
+
+</Section>
+
+כל מה שעשינו עם ריבועים אפשר לכתוב בשלוש נוסחאות קצרות.
+
+**צעד 1 — אחוז מסכום.** מחלקים ב־100 ומכפילים במספר האחוזים. 3% מ־200: <M>200 × 3 ÷ 100 = {f.shekels("explain.three_of_200")}</M>.
+
+**צעד 2 — שינוי באחוזים.** ההפרש, חלקי מה שהיה קודם, כפול 100. מ־200 ל־230: <M>{f.shekels("explain.price_rise")} ÷ 200 ₪ × 100 = {f.plain("explain.price_change")}</M>.
+
+**צעד 3 — הסכום אחרי שינוי.** מכפילים ב־1 ועוד האחוז כמספר עשרוני: <M>200 × {f.plain("explain.factor_up_10")} = {f.shekels("pred.up")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">X = A × p ÷ 100</p>
+  <p class="ltr mt-2 text-h3 text-navy">c = (B − A) ÷ A × 100</p>
+  <p class="ltr mt-2 text-h3 text-navy">B = A × (1 + p ÷ 100)</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">A</dt><dd>הסכום שממנו מתחילים — מה שהיה לפני השינוי, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">p</dt><dd>מספר האחוזים, כמספר רגיל: ל־3% כותבים 3. בירידה כותבים אותו עם מינוס: ירידה של 10% היא <span class="ltr">−10</span></dd>
+    <dt class="ltr font-semibold text-n900">X</dt><dd>החלק: כמה שקלים הם p אחוזים מ־A</dd>
+    <dt class="ltr font-semibold text-n900">B</dt><dd>הסכום אחרי השינוי, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">c</dt><dd>השינוי באחוזים, ביחס ל־A. עם מינוס — ירידה</dd>
+  </dl>
+</div>
+
+**מתי הנוסחאות נכונות?**
+1. A הוא תמיד הסכום שלפני השינוי. אם מחליפים אותו בסכום שאחרי, מקבלים מספר אחר ושגוי.
+2. כמה שינויים ברצף: כל אחד נמדד מהסכום שהיה רגע לפניו. לכן מכפילים — לא מחברים את האחוזים.
+3. שינוי של משהו שנמדד בעצמו באחוזים: אומרים במפורש אם מתכוונים לנקודות אחוז (<span class="ltr">5 − 4</span>) או לשינוי יחסי (הנוסחה של c).
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> 3% מ־400 — מקישים <span class="ltr">400 × 3 ÷ 100</span>. אפשר בלי כפתור ה־%.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): כותבים בתא <span class="ltr">=400*3%</span> או <span class="ltr">=400*3/100</span>. התוצאה זהה.</p>
+<p><strong>ביד:</strong> לחלק ב־100 זה להזיז את הנקודה העשרונית שני מקומות שמאלה: 400 הופך ל־4. ואז מכפילים במספר האחוזים.</p>
+</Callout>
+
+<Callout title="עיגול">
+<p>לפעמים אחוז לא יוצא מספר שלם. בקורס מעגלים אחוזים לשתי ספרות אחרי הנקודה, וכסף — לאגורה. התרגילים מקבלים תשובה מעוגלת כך.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.1"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `המחיר לא חוזר. הירידה נמדדת מ־${f.shekels("pred.up")}, לא מ־${f.shekels("pred.start")}: 10% מ־${f.shekels("pred.up")} הם ${f.shekels("pred.drop")} — יותר מ־${f.shekels("pred.rise")} של העלייה.`,
+    "",
+    `העלייה והירידה הן אותו אחוז, אבל הירידה נמדדת מסכום גדול יותר, ולכן היא גדולה יותר בשקלים. המחיר נגמר מתחת ל־${f.shekels("pred.start")}.`,
+    `הסדר לא משנה. ירידה קודם: ${f.shekels("pred.down")}, ואז עלייה של 10% — ${f.shekels("pred.down_rise")} — נותנת שוב ${f.shekels("pred.down_then_up")}. בשני הסדרים מכפילים ב־${f.plain("explain.factor_up_10")} וב־${f.plain("explain.factor_down_10")}.`,
+  ]}
+>
+  <M>200 × {f.plain("explain.factor_up_10")} = {f.shekels("pred.up")}</M>, ואז <M>{f.shekels("pred.up")} × {f.plain("explain.factor_down_10")} = {f.shekels("pred.after")}</M>. המחיר ירד ב־{f.shekels("pred.lost")} מתחת להתחלה — {P("pred.total_fall")} ממנה.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## קיצורי דרך לאחוזים נפוצים
+
+</Section>
+
+כמה אחוזים אפשר לחשב בראש. דוגמה: 3,600 ₪.
+
+- **10%** — מחלקים ב־10: {f.shekels("head.ten")}.
+- **1%** — מחלקים ב־100: {f.shekels("head.one")}.
+- **5%** — חצי מ־10%: {f.shekels("head.five")}.
+- **50%** — חצי מהסכום: {f.shekels("head.fifty")}.
+- **25%** — רבע מהסכום: {f.shekels("head.twenty_five")}.
+
+אלה לא קירובים: הם מדויקים. הם שימושיים כדי לבדוק במהירות אם תוצאה מהמחשבון נשמעת הגיונית.
+
+<Section kind="דוגמה פתורה">
+
+## שתי הנחות
+
+</Section>
+
+מעיל עולה {f.shekels("worked.price")}. בחנות יש הנחה של 25%, ובקופה מקבלים עוד 10% הנחה על המחיר שאחרי ההנחה הראשונה.
+האם זו הנחה של {P("worked.added")}? כמה תשלמו?
+
+**צעד 1 — ההנחה הראשונה.** 25% מ־{f.shekels("worked.price")} הם {f.shekels("worked.first_off")}. המחיר: <M>{f.shekels("worked.price")} − {f.shekels("worked.first_off")} = {f.shekels("worked.after_first")}</M>.
+
+**צעד 2 — ההנחה השנייה.** 10% ממה? מהמחיר שאחרי ההנחה הראשונה: 10% מ־{f.shekels("worked.after_first")} הם {f.shekels("worked.second_off")}. המחיר: <M>{f.shekels("worked.after_first")} − {f.shekels("worked.second_off")} = {f.shekels("worked.final")}</M>.
+
+**צעד 3 — כמה חסכתם בשקלים?** <M>{f.shekels("worked.price")} − {f.shekels("worked.final")} = {f.shekels("worked.saved")}</M>.
+
+**צעד 4 — וכמה אחוזים זה?** <M>{f.shekels("worked.saved")} ÷ {f.shekels("worked.price")} × 100 = {f.plain("worked.saved_share")}</M>. ההנחה הכוללת היא {P("worked.saved_share")}, לא {P("worked.added")}.
+
+**צעד 5 — בדיקה בקיצור.** להוריד 25% זה להכפיל ב־{f.plain("worked.factor_first")}, ולהוריד 10% זה להכפיל ב־{f.plain("explain.factor_down_10")}. יחד: <M>{f.plain("worked.factor_first")} × {f.plain("explain.factor_down_10")} = {f.plain("worked.factor")}</M>, ו־<M>600 × {f.plain("worked.factor")} = {f.shekels("worked.final")}</M>. אותה תוצאה.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>אחוזים ברצף לא מחברים. כל אחוז נמדד מהסכום שהיה רגע לפניו, ולכן שתי הנחות נותנות פחות מסכום האחוזים שלהן, ושתי עליות נותנות יותר מסכום האחוזים שלהן.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+בכל שורה: מה שווה ריבוע אחד (1%), ומה שווה האחוז שבשורה. השורה הראשונה כבר מלאה.
+
+<FillRows
+  client:visible
+  id="0.1-half"
+  columns={[
+    { key: "amount", label: "הסכום כולו", format: "shekels" },
+    { key: "rate_percent", label: "האחוז", format: "percent" },
+    { key: "one_percent", label: "ריבוע אחד (1%)", format: "shekels" },
+    { key: "result", label: "התוצאה", format: "shekels" },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.one_percent", "2.result", "3.one_percent", "3.result", "4.one_percent", "4.result"]}
+  done="ככה בדיוק מחשבים אחוז: קודם ריבוע אחד — הסכום חלקי 100 — ואז כמה ריבועים."
+  hint="בדקו: האם חילקתם את הסכום ב־100 (ולא ב־10)? ואחר כך — האם הכפלתם במספר האחוזים שבשורה?"
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. כשהתשובה היא באחוזים, כתבו רק את המספר.
+אפשר לפתור את כולם בראש או במחשבון פשוט.
+
+<NumericExercise
+  client:visible
+  id="0.1-1"
+  n={1}
+  level="קל"
+  answer={f.raw("ex1.answer")}
+  errors={[
+    { value: f.raw("ex1.err_thirty"), message: "חילקתם ב־10 במקום ב־100. ריבוע אחד הוא חלק אחד מתוך 100: ‏400 חלקי 100." },
+    { value: f.raw("ex1.err_total"), message: "זה המחיר אחרי שמוסיפים 3%. השאלה שואלת כמה הם ה־3% עצמם." },
+    { value: f.raw("ex1.one"), message: "זה ערך של ריבוע אחד — 1%. השאלה היא על 3%: שלושה ריבועים." },
+  ]}
+>
+  ביקשו מכם לשלם תוספת של 3% על חשבון של 400 ₪. כמה שקלים היא התוספת?
+</NumericExercise>
+
+<Solution for="0.1-1">
+ריבוע אחד: <M>400 ÷ 100 = {f.shekels("ex1.one")}</M>. שלושה ריבועים: <M>3 × {f.shekels("ex1.one")} = {f.shekels("ex1.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.1-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "השיעור עלה ב־1%", feedback: "המשפט הזה מבלבל: 1% מ־4% הוא שינוי זעיר. כדאי לומר ״נקודת אחוז אחת״." },
+    { text: `השיעור עלה בנקודת אחוז אחת, שהיא עלייה של ${P("pp.relative")} ביחס ל־4%`, correct: true, feedback: `בדיוק. ${eq(`5 − 4 = ${f.plain("pp.points")}`)} נקודת אחוז, וביחס למה שהיה: ריבוע אחד על 4 — ${P("pp.relative")}.` },
+    { text: `השיעור עלה ב־${f.plain("pp.relative")} נקודות אחוז`, feedback: `${f.plain("pp.relative")} הוא השינוי היחסי, באחוזים. בנקודות אחוז השינוי הוא ${eq("5 − 4")}: נקודה אחת.` },
+    { text: `השיעור עלה ב־${P("pp.one_of_five")} ביחס ל־4%`, feedback: `${P("pp.one_of_five")} הם נקודה אחת מתוך 5 — מדדתם מהשיעור החדש. שינוי נמדד ממה שהיה קודם: נקודה אחת מתוך 4.` },
+  ]}
+>
+  שיעור המס על מוצר עלה מ־4% ל־5%. איזה משפט מתאר את השינוי בדיוק?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.1-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.diff"), message: `${f.shekels("ex3.diff")} זה השינוי בשקלים. השאלה היא כמה אחוזים הוא מהמחיר הקודם.` },
+    { value: f.raw("ex3.err_new_base"), tolerance: 0.1, message: "חילקתם במחיר החדש. שינוי נמדד ממה שהיה לפני השינוי — מ־250 ₪." },
+    { value: f.raw("ex3.err_ratio"), message: `${P("ex3.err_ratio")} זה המחיר החדש כאחוז מהישן — כולל המחיר הישן עצמו (100%). השאלה היא רק על התוספת.` },
+  ]}
+>
+  המחיר של מנוי חודשי עלה מ־250 ₪ ל־300 ₪. בכמה אחוזים הוא עלה?
+</NumericExercise>
+
+<Solution for="0.1-3">
+בשקלים: <M>300 − 250 = {f.shekels("ex3.diff")}</M>. ביחס למחיר הקודם: <M>{f.shekels("ex3.diff")} ÷ 250 ₪ × 100 = {f.plain("ex3.answer")}</M>. המחיר עלה ב־{P("ex3.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.1-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.points"), tolerance: 0, message: "זה השינוי בנקודות אחוז. השאלה היא בכמה שקלים גדל התשלום." },
+    { value: f.raw("ex4.relative"), tolerance: 0.1, message: "זה השינוי היחסי, באחוזים. השאלה היא בשקלים: כמה יותר תשלמו." },
+    { value: f.raw("ex4.at_4"), message: "זה כל התשלום בשיעור החדש. השאלה היא רק על התוספת." },
+    { value: f.raw("ex4.at_3"), message: "זה התשלום בשיעור הישן. השאלה היא בכמה הוא גדל." },
+  ]}
+>
+  אתם משלמים דמי שירות של 3% על סכום של 8,000 ₪. השיעור עלה ל־4%. בכמה שקלים גדל התשלום שלכם?
+</NumericExercise>
+
+<Solution for="0.1-4">
+בשיעור הישן: 3% מ־8,000 ₪ הם {f.shekels("ex4.at_3")}. בשיעור החדש: 4% הם {f.shekels("ex4.at_4")}. ההפרש: <M>{f.shekels("ex4.at_4")} − {f.shekels("ex4.at_3")} = {f.shekels("ex4.answer")}</M> — זו נקודת אחוז אחת מ־8,000 ₪. ביחס לתשלום הקודם זו עלייה של {P("ex4.relative")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.1-5"
+  n={5}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.points_between"), tolerance: 0, message: "זה השינוי בנקודות אחוז. השאלה היא על השינוי היחסי — ביחס ל־8%." },
+    { value: f.raw("ex5.err_new_base"), tolerance: 0.1, message: "מדדתם מהשיעור החדש, 6%. שינוי נמדד ממה שהיה קודם — מ־8%." },
+    { value: f.raw("ex5.signed"), message: `נכון שהשינוי הוא ${P("ex5.signed")}. השאלה שואלת בכמה ירד, אז כתבו את המספר בלי מינוס.` },
+  ]}
+>
+  שיעור ההנחה בחנות ירד מ־8% ל־6%. בכמה אחוזים ירד השיעור, ביחס למה שהיה?
+</NumericExercise>
+
+<Solution for="0.1-5">
+בנקודות אחוז: <M>8 − 6 = {f.plain("ex5.points_between")}</M>. ביחס למה שהיה: <M>{f.plain("ex5.points_between")} ÷ 8 × 100 = {f.plain("ex5.answer")}</M>. השיעור ירד ב־{f.plain("ex5.points_between")} נקודות אחוז, שהן ירידה של {P("ex5.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.1-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.fall"), tolerance: 0, message: `${P("ex6.fall")} היא הירידה, שנמדדה מ־500 ₪. העלייה נמדדת מ־400 ₪ — סכום קטן יותר, ולכן צריך אחוז גדול יותר.` },
+    { value: f.raw("ex6.diff"), tolerance: 0, message: `${f.shekels("ex6.diff")} זה ההפרש בשקלים. השאלה היא כמה אחוזים הוא מ־400 ₪.` },
+    { value: f.raw("ex6.err_ratio"), message: "זה 500 כאחוז מ־400 — כולל ה־400 עצמם (100%). השאלה היא רק על התוספת." },
+  ]}
+>
+  מחיר של כיסא ירד מ־500 ₪ ל־400 ₪ — ירידה של {P("ex6.fall")}. בכמה אחוזים צריך להעלות את המחיר החדש כדי שיחזור ל־500 ₪?
+</NumericExercise>
+
+<Solution for="0.1-6">
+צריך להוסיף {f.shekels("ex6.diff")} ל־400 ₪. ביחס ל־400 ₪: <M>{f.shekels("ex6.diff")} ÷ 400 ₪ × 100 = {f.plain("ex6.answer")}</M>. ירידה של {P("ex6.fall")} מתוקנת רק בעלייה של {P("ex6.answer")}, כי העלייה נמדדת מסכום קטן יותר.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.1-7"
+  n={7}
+  level="מאתגר"
+  unit="%"
+  answer={f.raw("ex7.answer")}
+  errors={[
+    { value: f.raw("ex7.err_added"), tolerance: 0, message: "חיברתם את שתי ההנחות. ההנחה השנייה נמדדת מהמחיר שאחרי הראשונה — מסכום קטן יותר — ולכן ההנחה הכוללת קטנה מהסכום שלהן." },
+    { value: f.raw("ex7.saved"), tolerance: 0, message: `${f.shekels("ex7.saved")} זה החיסכון בשקלים. השאלה היא כמה אחוזים הוא מהמחיר המקורי.` },
+    { value: f.raw("ex7.err_price_share"), tolerance: 0, message: "זה המחיר הסופי כאחוז מהמקורי. ההנחה היא מה שירד — השאר." },
+  ]}
+>
+  מכונת כביסה עולה 1,000 ₪. בחנות יש הנחה של 30%, ובקופה עוד 20% הנחה על המחיר שאחרי ההנחה הראשונה. בכמה אחוזים ירד המחיר בסך הכול?
+</NumericExercise>
+
+<Solution for="0.1-7">
+אחרי ההנחה הראשונה: <M>1,000 − {f.shekels("ex7.first_off")} = {f.shekels("ex7.after_first")}</M>. ההנחה השנייה: 20% מ־{f.shekels("ex7.after_first")} הם {f.shekels("ex7.second_off")}, והמחיר: {f.shekels("ex7.final")}. חסכתם {f.shekels("ex7.saved")} — <M>{f.shekels("ex7.saved")} ÷ 1,000 ₪ × 100 = {f.plain("ex7.answer")}</M>. ההנחה הכוללת: {P("ex7.answer")}, לא {P("ex7.err_added")}.
+</Solution>
+
+<Callout title="חמש שאלות על אחוזים">
+<p><strong>מה זה?</strong> אחוז הוא חלק אחד מתוך מאה. 3% מסכום הם 3 חלקים מתוך 100 החלקים שלו.</p>
+<p><strong>למה זה קיים?</strong> כדי להשוות חלקים של סכומים בגדלים שונים באותה שפה. {f.shekels("explain.three_of_200")} מתוך 200 ₪ ו־{f.shekels("explain.three_of_5000")} מתוך 5,000 ₪ הם סכומים שונים מאוד, אבל שניהם 3%.</p>
+<p><strong>איך זה עובד?</strong> מחלקים את הסכום ב־100 ומכפילים במספר האחוזים. שינוי באחוזים נמדד תמיד ממה שהיה לפני השינוי.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מחירים, הנחות, העלאות שכר, מסים — וגם <Later lesson="0.2">ריבית</Later>, שנכיר בשיעור הבא — מתוארים באחוזים. שינוי של נקודת אחוז אחת יכול להישמע קטן, ובכל זאת להיות שינוי יחסי גדול.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשאומרים לכם אחוז, שאלו ״אחוז ממה?״. כשאומרים לכם שאחוז השתנה, שאלו ״בנקודות אחוז, או ביחס למה שהיה?״. ותמיד תרגמו גם לשקלים: זה המספר שיוצא מהכיס.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **אחוז** = חלק אחד מתוך מאה. 3% מסכום = הסכום חלקי 100, כפול 3.
+- **אחוז ממה?** אותו אחוז מסכומים שונים הוא סכומים שונים בשקלים.
+- **שינוי באחוזים** = ההפרש חלקי מה שהיה **לפני** השינוי, כפול 100.
+- **להוסיף 10% זה להכפיל ב־{f.plain("explain.factor_up_10")}; להוריד 10% זה להכפיל ב־{f.plain("explain.factor_down_10")}.** עלייה וירידה באותו אחוז לא מבטלות זו את זו: מ־200 ₪ מגיעים ל־{f.shekels("pred.after")}.
+- **אחוזים ברצף לא מחברים** — מכפילים.
+- **נקודת אחוז מול אחוז:** מ־4% ל־5% זו עלייה של נקודת אחוז אחת, שהיא {P("pp.relative")} ביחס למה שהיה.
+
+**בשיעור הבא — 0.2, <Later lesson="0.2">ריבית</Later>: המחיר של כסף:** מה משלמים למי שנותן לכם כסף לזמן מה, ואיך מחשבים את זה באחוזים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ההגדרה של אחוז, החישוב של שינוי באחוזים וההבחנה בין נקודת אחוז לשינוי יחסי הן מתמטיקה בסיסית.", code: ["X = A × p ÷ 100", "c = (B − A) ÷ A × 100"] },
+    { kind: "הנחת חישוב", text: "כל המחירים, הסכומים והשיעורים בשיעור הם מספרים עגולים להמחשה. הם לא מחירים אמיתיים ולא שיעורי מס אמיתיים." },
+    { kind: "הנחת חישוב", text: "עיגול: כסף לאגורה, ואחוזים לשתי ספרות אחרי הנקודה — פעם אחת, בסוף החישוב." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/percent.ts via data/lessons/0-1.json (scripts/lessons/lesson-0-1.ts), rechecked by checks/independent_check.py (checks/kinds/percent.py). */}

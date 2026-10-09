@@ -1,0 +1,454 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "0.2"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import LoanTimeline from "../../components/LoanTimeline.vue";
+import FillRows from "../../components/FillRows.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("0.2");
+export const P = (id) => `${f.plain(id)}%`;
+export const story = f.rows("story.table");
+export const worked = f.rows("worked.table");
+export const predictionOptions = [
+  `${f.shekels("pred.one_year")}`,
+  `${f.shekels("pred.total")}`,
+  `${f.shekels("pred.interest")}`,
+  `${f.shekels("pred.principal")} — מחזירים רק את מה שלקחו`,
+];
+
+בשיעור הקודם למדנו מהו <Term t="אחוז" lesson="0.2">אחוז</Term> — חלק אחד מתוך מאה — ואיך מחשבים אחוז מסכום.
+בשיעור הזה נשתמש בזה כדי להבין את המושג המרכזי בעולם הכסף: <Term t="ריבית" lesson="0.2">ריבית</Term>, המחיר שמשלמים על שימוש בכסף של מישהו אחר.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="0.2"
+  question="השאלתם לחבר 1,000 ₪ לשלוש שנים. סיכמתם שבסוף כל שנה הוא ישלם לכם 5% מ־1,000 ₪, ובסוף השנה השלישית יחזיר לכם גם את ה־1,000 ₪. כמה כסף תקבלו ממנו בסך הכול?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## ״אני משאיל לך 100 ₪״
+
+</Section>
+
+<LessonVideo lesson="0-2" />
+
+<Section kind="ההסבר">
+
+## הלוואה והמחיר שלה
+
+</Section>
+
+### מי נותן ומי מקבל
+
+חבר צריך 100 ₪ עכשיו, ויוכל להחזיר אותם רק בעוד שלוש שנים. אתם נותנים לו את הכסף, והוא מתחייב להחזיר.
+זו <Term t="הלוואה" lesson="0.2">הלוואה</Term>: כסף שמקבלים עכשיו ומתחייבים להחזיר בהמשך.
+
+בכל הלוואה יש שני צדדים:
+- מי שנותן את הכסף הוא <Term t="מלווה" lesson="0.2">המלווה</Term> — כאן, אתם.
+- מי שמקבל את הכסף ומתחייב להחזיר אותו הוא <Term t="לווה" lesson="0.2">הלווה</Term> — כאן, החבר.
+
+הסכום שעבר מהמלווה ללווה — {f.shekels("story.principal")} — נקרא <Term t="קרן" lesson="0.2">הקרן</Term>.
+
+### למה לבקש יותר ממה שנתתם
+
+בשלוש השנים האלה הכסף לא אצלכם. אי אפשר לקנות בו דבר, ואי אפשר להשתמש בו לשום מטרה אחרת. וגם אם אתם סומכים על החבר, תמיד יש סיכוי שהכסף לא יחזור במלואו.
+לכן המלווה מבקש תשלום על הזמן שבו הכסף נמצא אצל הלווה. התשלום הזה הוא **ריבית**: המחיר של שימוש בכסף, לזמן מה.
+יש לכך גם סיבה נוספת — מחירים שעולים עם הזמן — שנכיר בשיעור על <Later lesson="0.7">אינפלציה</Later>.
+
+**אותו דבר בחיסכון.** כשאתם מפקידים כסף בתוכנית חיסכון בבנק, אתם המלווים, והבנק הוא הלווה: הוא משתמש בכסף שלכם, ומשלם לכם ריבית.
+מי שמשתמש בכסף של מישהו אחר משלם ריבית. מי שנותן את הכסף מקבל אותה.
+
+**ריבית נאמרת באחוזים, ובדרך כלל לשנה.** ״5% לשנה״ פירושו: בכל שנה הלווה משלם 5% מהקרן.
+
+### שנה אחר שנה
+
+נחזור לחבר. הקרן היא {f.shekels("story.principal")}, והריבית היא 5% לשנה. החבר משלם את הריבית בסוף כל שנה, ומחזיר את הקרן בסוף השנה השלישית.
+
+**השנה הראשונה.** 5% מ־{f.shekels("story.principal")}: כל אחוז שווה {f.shekels("story.one")}, וחמישה אחוזים הם {f.shekels("story.yearly")}. בסוף השנה החבר משלם לכם {f.shekels("story.yearly")}.
+
+**השנה השנייה.** שוב 5% מהקרן — מאותם {f.shekels("story.principal")} — כלומר שוב {f.shekels("story.yearly")}.
+
+**השנה השלישית.** עוד {f.shekels("story.yearly")}, ועכשיו החבר מחזיר גם את הקרן.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[24rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">ריבית השנה</th>
+        <th class="py-2 text-start font-semibold">כל הריבית עד סוף השנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {story.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.total_interest)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+בסך הכול קיבלתם {f.shekels("story.interest")} ריבית, ועוד הקרן: <M>{f.shekels("story.principal")} + {f.shekels("story.interest")} = {f.shekels("story.total")}</M>.
+
+**שימו לב לעמודה השנייה: הריבית זהה בכל שנה.** היא מחושבת רק על הקרן, והריבית ששולמה לא מצטרפת לקרן. לזה קוראים <Term t="ריבית פשוטה" lesson="0.2">ריבית פשוטה</Term>.
+
+### מה מגדיל את הריבית
+
+בריבית פשוטה, שלושה דברים קובעים כמה ריבית תשולם בסך הכול: הקרן, הריבית לשנה, ומספר השנים.
+- **פי שניים זמן — פי שניים ריבית.** אותם {f.shekels("story.principal")} ב־5% לשנה, אבל לשש שנים: {f.shekels("story.interest_6_years")} ריבית.
+- **פי שניים ריבית לשנה — פי שניים ריבית.** שלוש שנים, אבל ב־10% לשנה: גם {f.shekels("story.interest_at_10")}.
+- **קרן גדולה יותר — ריבית גדולה יותר באותו יחס.** 10,000 ₪ ב־5% לשנה: {f.shekels("big.yearly")} בכל שנה, ובעשר שנים {f.shekels("big.interest")}.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הלוואה על ציר הזמן
+
+</Section>
+
+כל עמודה היא הריבית שהלווה משלם בסוף שנה. הקרן עוברת מהמלווה ללווה ״היום״, וחוזרת בסוף. הזיזו את שלושת המחוונים.
+
+<LoanTimeline client:visible principal={100} rate={5} years={3} />
+
+נסו את שלושת אלה:
+1. השאירו את ההתחלה: {f.shekels("story.principal")}, 5%, שלוש שנים. מה קורה לגובה העמודות משנה לשנה?
+2. העלו את מספר השנים לשש. אחר כך החזירו לשלוש, והעלו את הריבית ל־10%. כמה ריבית יש בסך הכול בכל אחד מהמקרים?
+3. קבעו קרן של 10,000 ₪, ריבית של 5% ועשר שנים. כמה ריבית בכל שנה, וכמה הלווה משלם בסך הכול?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>כל העמודות באותו גובה: {f.shekels("story.yearly")} בכל שנה. בריבית פשוטה הריבית לא משתנה משנה לשנה.</li>
+    <li>בשני המקרים {f.shekels("story.interest_6_years")} — פי שניים מ־{f.shekels("story.interest")}. להכפיל את הזמן או להכפיל את הריבית לשנה עושה כאן אותו דבר.</li>
+    <li>{f.shekels("big.yearly")} בכל שנה, {f.shekels("big.interest")} ריבית בסך הכול, והלווה משלם {f.shekels("big.total")} — הקרן ועוד הריבית.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — הריבית של שנה אחת.** 5% הם 5 חלקי 100, כלומר 0.05. לכן הריבית של שנה היא הקרן כפול 0.05:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>5% × 100</M>
+  <M>= 0.05 × 100 = {f.shekels("story.yearly")}</M>
+</div>
+
+**צעד 2 — כמה שנים.** הריבית זהה בכל שנה, אז מכפילים במספר השנים: <M>100 × 0.05 × 3 = {f.shekels("story.interest")}</M>.
+
+**צעד 3 — הסכום הכולל.** מוסיפים את הקרן: <M>100 + {f.shekels("story.interest")} = {f.shekels("story.total")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h2 text-navy">I = P × r × n</p>
+  <p class="ltr mt-2 text-h3 text-navy">B = P + I</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">I</dt><dd>כל הריבית, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">P</dt><dd>הקרן — הסכום שעבר מהמלווה ללווה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית לשנה, כמספר עשרוני: 5% הם 5 חלקי 100, כלומר 0.05</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר השנים</dd>
+    <dt class="ltr font-semibold text-n900">B</dt><dd>הסכום הכולל: הקרן ועוד כל הריבית, בשקלים</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** רק כשארבעה תנאים מתקיימים:
+1. הריבית מחושבת כל שנה רק על הקרן. ריבית שכבר נוספה לא מרוויחה ריבית בעצמה.
+2. הריבית לשנה זהה בכל השנים.
+3. הקרן לא משתנה באמצע: לא מחזירים חלק ממנה לפני הסוף, ולא מוסיפים לה.
+4. r נאמרת לשנה, ו־n נספר בשנים. אם הריבית נאמרת לחודש, גם הזמן צריך להיות בחודשים.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> 10,000 ₪ ב־5% לשנה, ל־10 שנים — מקישים <span class="ltr">10000 × 0.05 × 10</span>.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): כותבים בתא <span class="ltr">=10000*5%*10</span>.</p>
+<p><strong>ביד:</strong> קודם 1% מהקרן (מחלקים ב־100), אחר כך כפול מספר האחוזים — זו הריבית של שנה — ואז כפול מספר השנים.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="0.2"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `${f.shekels("pred.one_year")} זו הקרן ועוד ריבית של שנה אחת בלבד. הריבית נאמרת לשנה — ובשלוש שנים משלמים אותה שלוש פעמים.`,
+    "",
+    `${f.shekels("pred.interest")} הם כל הריבית. אבל החבר גם מחזיר לכם את הקרן — ${f.shekels("pred.principal")}.`,
+    "בין חברים זה קורה, אבל כאן סיכמתם על 5% לשנה. בלי ריבית, החבר משתמש בכסף שלכם שלוש שנים בחינם.",
+  ]}
+>
+  בכל שנה: <M>1,000 × 0.05 = {f.shekels("pred.yearly")}</M>. בשלוש שנים: <M>3 × {f.shekels("pred.yearly")} = {f.shekels("pred.interest")}</M>. ועוד הקרן: <M>1,000 + {f.shekels("pred.interest")} = {f.shekels("pred.total")}</M>.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הלוואה לשלוש שנים
+
+</Section>
+
+לקחתם הלוואה של {f.shekels("worked.principal")} לשלוש שנים, בריבית פשוטה של 4% לשנה. בסוף כל שנה משלמים את הריבית של אותה שנה, ובסוף השנה השלישית מחזירים גם את הקרן.
+כמה תשלמו בסך הכול? וכמה אחוזים מהקרן היא כל הריבית?
+
+**צעד 1 — הריבית של שנה.** 1% מ־{f.shekels("worked.principal")} הוא {f.shekels("worked.one")}. 4% הם <M>4 × {f.shekels("worked.one")} = {f.shekels("worked.yearly")}</M>.
+
+**צעד 2 — שנה אחר שנה.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[24rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנה</th>
+        <th class="py-2 text-start font-semibold">ריבית השנה (4%)</th>
+        <th class="py-2 text-start font-semibold">כל הריבית עד סוף השנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {worked.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.period}</td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.total_interest)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 3 — בדיקה בנוסחה.** <M>30,000 × 0.04 × 3 = {f.shekels("worked.interest")}</M>. אותה תוצאה.
+
+**צעד 4 — כמה תשלמו בסך הכול?** <M>{f.shekels("worked.principal")} + {f.shekels("worked.interest")} = {f.shekels("worked.total")}</M>.
+
+**צעד 5 — כמה אחוזים מהקרן היא כל הריבית?** <M>{f.shekels("worked.interest")} ÷ {f.shekels("worked.principal")} × 100 = {f.plain("worked.interest_share")}</M>. כלומר {P("worked.interest_share")} מהקרן, על פני שלוש שנים — 4% בכל שנה.
+
+<Callout title="מה לקחת מזה" tone="warning">
+<p>אחוז ריבית לבדו לא אומר כמה תשלמו. צריך לדעת גם לכמה זמן הוא נאמר ועל איזה סכום. כאן 4% לשנה ו־{P("worked.interest_share")} על כל ההלוואה מתארים את אותו מחיר.</p>
+<p>בדוגמה הזו הקרן חוזרת בבת אחת, בסוף. יש הלוואות שבהן מחזירים את הקרן בחלקים לאורך הדרך; שם החשבון שונה, ונגיע אליו בהמשך הקורס.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+לקחתם הלוואה של 4,000 ₪ לארבע שנים, בריבית פשוטה של 6% לשנה. השנה הראשונה כבר מלאה. השלימו את השאר.
+
+<FillRows
+  client:visible
+  id="0.2-half"
+  columns={[
+    { key: "period", label: "שנה", format: "plain" },
+    { key: "interest", label: "ריבית השנה", format: "shekels" },
+    { key: "total_interest", label: "כל הריבית עד סוף השנה", format: "shekels" },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.interest", "2.total_interest", "3.interest", "3.total_interest", "4.interest", "4.total_interest"]}
+  done="בריבית פשוטה הריבית של כל שנה זהה, ולכן כל הריבית גדלה באותו סכום משנה לשנה."
+  hint="בדקו: האם חישבתם 6% מהקרן — 4,000 ₪ — בכל שנה? בעמודה השלישית מוסיפים את ריבית השנה למה שהיה בשורה הקודמת."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. בכל ההלוואות כאן הריבית פשוטה, והקרן חוזרת בסוף.
+אפשר לפתור את כולם במחשבון פשוט.
+
+<NumericExercise
+  client:visible
+  id="0.2-1"
+  n={1}
+  level="קל"
+  answer={f.raw("ex1.answer")}
+  errors={[
+    { value: f.raw("ex1.err_total"), message: "זו הקרן ועוד הריבית. השאלה שואלת רק על הריבית." },
+    { value: f.raw("ex1.err_tenth"), message: "חילקתם ב־10 במקום ב־100. אחוז הוא חלק מתוך 100: 1% מ־2,000 ₪ הוא 2,000 חלקי 100." },
+    { value: f.raw("ex1.one"), message: "זה 1% מהקרן. הריבית היא 4%." },
+  ]}
+>
+  השאלתם לחברה 2,000 ₪ לשנה אחת, בריבית של 4% לשנה. כמה ריבית תקבלו ממנה?
+</NumericExercise>
+
+<Solution for="0.2-1">
+1% מ־2,000 ₪: <M>2,000 ÷ 100 = {f.shekels("ex1.one")}</M>. 4%: <M>4 × {f.shekels("ex1.one")} = {f.shekels("ex1.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.2-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "הבנק הוא המלווה, ודנה היא הלווה", feedback: "המלווה הוא מי שנותן את הכסף עכשיו. כאן דנה נתנה את הכסף לבנק." },
+    { text: "דנה היא המלווה, והבנק הוא הלווה", correct: true, feedback: "בדיוק. דנה נתנה את הכסף, והבנק משתמש בו ומשלם לה ריבית — המחיר על השימוש בכסף שלה." },
+    { text: "אין כאן הלוואה — זה חיסכון", feedback: "חיסכון בבנק הוא הלוואה מכם לבנק: נותנים כסף עכשיו, ומקבלים אותו בחזרה בהמשך, עם ריבית." },
+    { text: "שניהם מלווים", feedback: "בכל הלוואה צד אחד נותן את הכסף — המלווה — וצד אחד מקבל אותו ומתחייב להחזיר — הלווה." },
+  ]}
+>
+  דנה הפקידה {f.shekels("ex2.deposit")} בתוכנית חיסכון בבנק, והבנק משלם לה ריבית. מי המלווה ומי הלווה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.2-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.yearly"), message: "זו הריבית של שנה אחת. ההלוואה היא לארבע שנים, ובכל שנה משלמים אותה ריבית." },
+    { value: f.raw("ex3.err_total"), message: "זו הקרן ועוד כל הריבית. השאלה שואלת רק על הריבית." },
+  ]}
+>
+  לקחתם הלוואה של 12,000 ₪ לארבע שנים, בריבית פשוטה של 3% לשנה. כמה ריבית תשלמו בסך הכול?
+</NumericExercise>
+
+<Solution for="0.2-3">
+ריבית של שנה: 3% מ־12,000 ₪ הם {f.shekels("ex3.yearly")}. ארבע שנים: <M>12,000 × 0.03 × 4 = {f.shekels("ex3.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.2-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.interest"), message: "זו כל הריבית. השאלה שואלת כמה תקבלו בסך הכול — גם הקרן חוזרת אליכם." },
+    { value: f.raw("ex4.err_one_year"), message: "זו הקרן ועוד ריבית של שנה אחת. ההלוואה היא לשלוש שנים." },
+    { value: f.raw("ex4.yearly"), message: "זו הריבית של שנה אחת בלבד. השאלה היא על כל מה שתקבלו." },
+  ]}
+>
+  השאלתם 5,000 ₪ לשלוש שנים, בריבית פשוטה של 6% לשנה. כמה כסף תקבלו בחזרה בסך הכול — הריבית וגם הקרן?
+</NumericExercise>
+
+<Solution for="0.2-4">
+ריבית של שנה: 6% מ־5,000 ₪ הם {f.shekels("ex4.yearly")}. שלוש שנים: <M>3 × {f.shekels("ex4.yearly")} = {f.shekels("ex4.interest")}</M>. ועוד הקרן: <M>5,000 + {f.shekels("ex4.interest")} = {f.shekels("ex4.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="0.2-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "בהצעה א׳, כי היא ארוכה יותר", feedback: `היא ארוכה יותר, אבל הריבית שלה לשנה נמוכה יותר. חשבו: ${f.shekels("ex5.yearly_a")} בשנה, כפול 5 שנים.` },
+    { text: "בהצעה ב׳, כי הריבית שלה לשנה גבוהה יותר", feedback: `הריבית לשנה גבוהה יותר, אבל ההלוואה קצרה יותר. חשבו: ${f.shekels("ex5.yearly_b")} בשנה, כפול 4 שנים.` },
+    { text: "בשתיהן אותה ריבית", correct: true, feedback: `בדיוק. בהצעה א׳: ${f.shekels("ex5.yearly_a")} בשנה, חמש שנים — ${f.shekels("ex5.a")}. בהצעה ב׳: ${f.shekels("ex5.yearly_b")} בשנה, ארבע שנים — ${f.shekels("ex5.b")}.` },
+    { text: "אי אפשר לדעת בלי לדעת את מטרת הכסף", feedback: "הריבית תלויה בקרן, בריבית לשנה ובמספר השנים — לא במה שעושים בכסף. יש כאן את כל השלושה." },
+  ]}
+>
+  אתם צריכים {f.shekels("ex5.principal")}. הצעה א׳: ריבית של 4% לשנה, לחמש שנים. הצעה ב׳: ריבית של 5% לשנה, לארבע שנים. בשתיהן הריבית פשוטה. באיזו הצעה תשלמו יותר ריבית בסך הכול?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="0.2-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0.01}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_total"), tolerance: 0.01, message: "זה כל הריבית כאחוז מהקרן — על שנתיים. הריבית נאמרת לשנה: חלקו קודם את הריבית בין השנים." },
+    { value: f.raw("ex6.yearly"), message: "זו הריבית של שנה אחת, בשקלים. כמה אחוזים היא מהקרן?" },
+    { value: f.raw("ex6.interest"), message: "זו כל הריבית בשקלים. השאלה היא על הריבית לשנה, באחוזים." },
+  ]}
+>
+  לקחתם הלוואה של {f.shekels("ex6.principal")} לשנתיים, בריבית פשוטה. בסך הכול שילמתם {f.shekels("ex6.interest")} ריבית. מה הייתה הריבית לשנה, באחוזים?
+</NumericExercise>
+
+<Solution for="0.2-6">
+הריבית זהה בכל שנה, אז בכל אחת משתי השנים שילמתם {f.shekels("ex6.yearly")}. כמה אחוזים זה מהקרן: <M>{f.shekels("ex6.yearly")} ÷ {f.shekels("ex6.principal")} × 100 = {f.plain("ex6.answer")}</M>. הריבית: {P("ex6.answer")} לשנה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="0.2-7"
+  n={7}
+  level="מאתגר"
+  unit="שנים"
+  tolerance={0}
+  near={0}
+  answer={f.raw("ex7.answer")}
+  errors={[
+    { value: f.raw("ex7.err_share"), message: "זה כל הריבית כאחוז מהקרן. השאלה היא כמה שנים עוברות עד שהיא מצטברת." },
+    { value: f.raw("ex7.yearly"), message: "זו הריבית של שנה אחת, בשקלים. כמה שנים כאלה צריך?" },
+  ]}
+>
+  השאלתם {f.shekels("ex7.principal")} בריבית פשוטה של 5% לשנה. אחרי כמה שנים תקבלו בסך הכול {f.shekels("ex7.target")} ריבית?
+</NumericExercise>
+
+<Solution for="0.2-7">
+ריבית של שנה: 5% מ־{f.shekels("ex7.principal")} הם {f.shekels("ex7.yearly")}. כמה שנים כאלה עד {f.shekels("ex7.target")}: <M>{f.shekels("ex7.target")} ÷ {f.shekels("ex7.yearly")} = {f.plain("ex7.answer")}</M> שנים.
+</Solution>
+
+<Callout title="חמש שאלות על ריבית">
+<p><strong>מה זה?</strong> המחיר שמשלם מי שמשתמש בכסף של מישהו אחר, לזמן מה. היא נאמרת באחוזים מהקרן, בדרך כלל לשנה.</p>
+<p><strong>למה זה קיים?</strong> מי שנותן כסף מוותר על השימוש בו כל עוד הוא אצל הלווה, ולוקח סיכון שהכסף לא יחזור במלואו. הריבית היא התשלום על שני אלה.</p>
+<p><strong>איך זה עובד?</strong> בריבית פשוטה מחשבים בכל שנה את האחוז מהקרן. זה אותו סכום בכל שנה, וכל הריבית היא <span class="ltr">P × r × n</span>.</p>
+<p><strong>איך זה משפיע עליכם?</strong> כשאתם לווים — מחזירים יותר ממה שקיבלתם. כשאתם מלווים או חוסכים — מקבלים יותר ממה שנתתם. ריבית גבוהה יותר או זמן ארוך יותר מגדילים את הסכום.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים הלוואות לפי הריבית בשקלים לאורך כל ההלוואה, ולא רק לפי האחוז. ובודקים לכמה זמן האחוז נאמר: 4% לשנה ו־4% לכל ההלוואה הם מחירים שונים מאוד.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הלוואה** = כסף שמקבלים עכשיו ומחזירים בהמשך. **המלווה** נותן, **הלווה** מקבל ומתחייב להחזיר. **הקרן** היא הסכום שעבר ביניהם.
+- **ריבית** = המחיר של שימוש בכסף לזמן מה. נאמרת באחוזים מהקרן, בדרך כלל לשנה.
+- **ריבית פשוטה** = בכל שנה מחשבים ריבית רק על הקרן, ולכן היא אותו סכום בכל שנה.
+- **הנוסחה:** <M>I = P × r × n</M>, והסכום הכולל <M>B = P + I</M>. היא נכונה כשהריבית מחושבת רק על הקרן, הריבית לשנה לא משתנה, והקרן לא משתנה באמצע.
+- **פי שניים זמן, או פי שניים ריבית לשנה — פי שניים ריבית** בסך הכול.
+- **אחוז ריבית לבדו לא מספיק:** שואלים לכמה זמן הוא נאמר ועל איזה סכום, ומתרגמים לשקלים.
+
+**בשיעור הבא — 0.3, <Later lesson="0.3">ריבית דריבית</Later>:** מה קורה כשהריבית לא יוצאת מהחשבון אלא מצטרפת לקרן — ומהשנה הבאה מרוויחה ריבית בעצמה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ההגדרות של הלוואה, מלווה, לווה, קרן, ריבית וריבית פשוטה, והנוסחה של ריבית פשוטה, הן מתמטיקה פיננסית בסיסית.", code: ["I = P × r × n", "B = P + I"] },
+    { kind: "ידע מתמטי כללי", text: "ההסבר למה יש ריבית (ויתור על השימוש בכסף, וסיכון שלא יחזור), ושהפקדה בתוכנית חיסכון היא הלוואה מהחוסך לבנק, הם ידע כלכלי בסיסי." },
+    { kind: "הנחת חישוב", text: "כל הסכומים והריביות בשיעור הם מספרים עגולים להמחשה. הם לא ריביות שוק ולא הצעה של בנק." },
+    { kind: "הנחת חישוב", text: "בכל הדוגמאות הריבית משולמת בסוף כל שנה, והקרן חוזרת בבת אחת בסוף." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-09" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/simple.ts, percent.ts and compound.ts (simpleBalance) via data/lessons/0-2.json (scripts/lessons/lesson-0-2.ts), rechecked by checks/independent_check.py (checks/kinds/percent.py, compound.py). */}

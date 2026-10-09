@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.2 — "אני משאיל לך 100 ₪".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-2.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.2 · ריבית</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const V = {
+        p: fact("story.principal"), yearly: fact("story.yearly"), interest: fact("story.interest"), total: fact("story.total"),
+        bigYearly: fact("big.yearly"), bigInterest: fact("big.interest"), bigTotal: fact("big.total"),
+      };
+      const bigTable = fact("big.table");
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], lend: [12, 36], why: [36, 58], line: [58, 104], total: [104, 124], big: [124, 150], end: [150, 162] };
+      window.duration = 162;
+      window.cues = [
+        [1, 6, "ריבית: המחיר של כסף."],
+        [6, 11.5, `נתחיל מסיפור קטן: ״אני משאיל לך ${shek(V.p)}״.`],
+        [13, 19, `אתם משאילים לחבר ${shek(V.p)} לשלוש שנים.`],
+        [19, 26, "מי שנותן את הכסף הוא המלווה. מי שמקבל — הלווה."],
+        [26, 35, `ה־${shek(V.p)} האלה הם הקרן: הסכום שעבר ביניכם.`],
+        [37, 44, "בשלוש השנים האלה הכסף לא אצלכם."],
+        [44, 50, "ויש סיכוי שהוא לא יחזור במלואו."],
+        [50, 57, "לכן החבר משלם מחיר על הזמן: ריבית. כאן — 5% לשנה."],
+        [59, 65, `5% מ־${shek(V.p)} הם ${shek(V.yearly)}.`],
+        [65, 72, `סוף שנה 1: החבר משלם לכם ${shek(V.yearly)}.`],
+        [72, 79, `סוף שנה 2: שוב ${shek(V.yearly)} — אותו סכום.`],
+        [79, 87, `סוף שנה 3: עוד ${shek(V.yearly)}, והוא מחזיר את ${shek(V.p)}.`],
+        [87, 95, "בכל שנה אותה ריבית, כי מחשבים אותה רק על הקרן."],
+        [95, 103, "לזה קוראים ריבית פשוטה."],
+        [105, 113, `בסך הכול: ${shek(V.interest)} ריבית, בשלוש שנים.`],
+        [113, 123, `ועם הקרן, החבר מחזיר לכם ${shek(V.total)}.`],
+        [125, 132, "אותו חשבון בסכום גדול: 10,000 ₪, 5% לשנה, 10 שנים."],
+        [132, 140, `${shek(V.bigYearly)} בכל שנה — כל העמודות באותו גובה.`],
+        [140, 149, `אחרי 10 שנים: ${shek(V.bigInterest)} ריבית, ${shek(V.bigTotal)} בסך הכול.`],
+        [151, 156, "ריבית היא המחיר של שימוש בכסף, לאורך זמן."],
+        [156, 161.5, "ובשיעור הבא: מה קורה כשהריבית מצטרפת לקרן."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - s) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (cx, cy, w, h, o, fill = C.n0) => el("rect", { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      // A person: a circle with a label under it.
+      const person = (cx, cy, name, o, oRole) => {
+        el("circle", { cx, cy, r: 62, fill: C.n0, stroke: C.navy, "stroke-width": 3, opacity: o });
+        txt(cx, cy + 12, name, 32, { w: 700, o });
+        txt(cx, cy + 108, cx > 640 ? "המלווה — נותן" : "הלווה — מקבל", 28, { fill: C.teal, w: 600, o: oRole });
+      };
+      const note = (cx, cy, label, o, fill = C.n300) => {
+        el("rect", { x: cx - 80, y: cy - 34, width: 160, height: 68, rx: 10, fill, opacity: o });
+        txt(cx, cy + 11, label, 30, { w: 700, o, ltr: true });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ריבית", 96, { w: 700, o });
+          txt(640, 362, "המחיר של כסף", 36, { fill: C.n600, o });
+          const o2 = after(t, S.title, 6, o, 0.8);
+          card(640, 470, 420, 84, o2);
+          txt(640, 482, `״אני משאיל לך ${shek(V.p)}״`, 32, { w: 600, o: o2 });
+        }
+        // Scene 2 — lender, borrower, principal
+        if (inScene(t, S.lend)) {
+          const o = vis(t, S.lend);
+          person(1000, 280, "אתם", o, after(t, S.lend, 7, o));
+          person(280, 280, "החבר", o, after(t, S.lend, 7, o));
+          const g = ease((t - S.lend[0] - 3) / 3);
+          note(1000 - 560 * g, 280, shek(V.p), o);
+          const o3 = after(t, S.lend, 14, o);
+          txt(640, 470, "הקרן: הסכום שעבר מהמלווה ללווה", 30, { w: 600, fill: C.n700, o: o3 });
+        }
+        // Scene 3 — why ask for more
+        if (inScene(t, S.why)) {
+          const o = vis(t, S.why);
+          txt(640, 150, "למה לבקש יותר?", 44, { w: 700, o });
+          card(640, 250, 640, 76, after(t, S.why, 1, o));
+          txt(640, 262, "שלוש שנים — הכסף לא אצלכם", 30, { o: after(t, S.why, 1, o) });
+          card(640, 350, 640, 76, after(t, S.why, 8, o));
+          txt(640, 362, "יש סיכוי שלא יחזור במלואו", 30, { o: after(t, S.why, 8, o) });
+          card(640, 460, 640, 92, after(t, S.why, 14, o), C.mint);
+          txt(640, 456, "המחיר על הזמן: ריבית", 34, { w: 700, o: after(t, S.why, 14, o) });
+          txt(640, 492, "5% מהקרן בכל שנה", 24, { fill: C.n700, o: after(t, S.why, 14, o) });
+        }
+        // Scene 4 — the time line
+        if (inScene(t, S.line)) {
+          const o = vis(t, S.line);
+          const axisY = 430, xs = [1080, 820, 560, 300];
+          el("line", { x1: 1110, x2: 170, y1: axisY, y2: axisY, stroke: C.n300, "stroke-width": 3, opacity: o });
+          ["היום", "שנה 1", "שנה 2", "שנה 3"].forEach((label, i) => {
+            el("circle", { cx: xs[i], cy: axisY, r: 7, fill: C.navy, opacity: o });
+            txt(xs[i], axisY + 40, label, 24, { fill: C.n700, o });
+          });
+          // Today: the principal goes to the borrower.
+          note(xs[0], 340, shek(V.p), o);
+          txt(xs[0], 285, "קרן: עוברת לחבר", 22, { fill: C.n700, o });
+          const k = t - S.line[0];
+          txt(640, 150, `בכל שנה: 5% מהקרן — ${shek(V.yearly)}`, 36, { w: 600, fill: C.teal, o: after(t, S.line, 1, o) });
+          [6, 14, 22].forEach((s, i) => {
+            const oi = after(t, S.line, s, o);
+            const h = 150 * ease((k - s) / 0.8);
+            el("rect", { x: xs[i + 1] - 36, y: axisY - 8 - h, width: 72, height: h, rx: 4, fill: C.teal, opacity: oi });
+            txt(xs[i + 1], axisY - 22 - h, shek(V.yearly), 26, { w: 700, o: oi, ltr: true });
+          });
+          const oBack = after(t, S.line, 28, o);
+          note(xs[3] - 140, 340, shek(V.p), oBack);
+          txt(xs[3] - 140, 285, "הקרן חוזרת", 22, { fill: C.n700, o: oBack });
+          const oSame = after(t, S.line, 30, o);
+          txt(640, 210, "אותו סכום בכל שנה: ריבית פשוטה", 30, { w: 700, o: oSame });
+        }
+        // Scene 5 — the total
+        if (inScene(t, S.total)) {
+          const o = vis(t, S.total);
+          card(640, 230, 560, 120, o);
+          txt(640, 210, "כל הריבית", 24, { fill: C.n600, o });
+          txt(640, 258, `3 × ${shek(V.yearly)} = ${shek(V.interest)}`, 40, { w: 700, fill: C.teal, o, ltr: true });
+          const o2 = after(t, S.total, 9, o);
+          card(640, 400, 560, 120, o2, C.mint);
+          txt(640, 380, "מה שחוזר אליכם בסך הכול", 24, { fill: C.n700, o: o2 });
+          txt(640, 428, `${shek(V.p)} + ${shek(V.interest)} = ${shek(V.total)}`, 40, { w: 700, o: o2, ltr: true });
+        }
+        // Scene 6 — a bigger loan, ten equal bars
+        if (inScene(t, S.big)) {
+          const o = vis(t, S.big);
+          txt(640, 140, "10,000 ₪ · 5% לשנה · 10 שנים", 34, { w: 700, o });
+          const baseY = 470, left = 200, right = 1080, band = (right - left) / bigTable.length;
+          const shown = Math.min(bigTable.length, Math.floor((t - S.big[0] - 1) / 0.7) + 1);
+          el("line", { x1: left - 10, x2: right + 10, y1: baseY, y2: baseY, stroke: C.n300, "stroke-width": 2, opacity: o });
+          bigTable.forEach((row, i) => {
+            const x = right - (i + 1) * band + 8; // year 1 at the right, time runs leftward
+            const oi = i < shown ? o : 0;
+            el("rect", { x, y: baseY - 140, width: band - 16, height: 138, rx: 4, fill: C.teal, opacity: oi });
+            txt(x + (band - 16) / 2, baseY + 30, String(row.period), 20, { fill: C.n600, o: oi });
+          });
+          txt(right - band / 2, baseY - 156, shek(V.bigYearly), 22, { w: 700, o: after(t, S.big, 2, o), ltr: true });
+          const o2 = after(t, S.big, 16, o);
+          card(640, 250, 520, 80, o2, C.mint);
+          txt(640, 262, `ריבית: ${shek(V.bigInterest)} · בסך הכול: ${shek(V.bigTotal)}`, 28, { w: 700, o: o2 });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 290, "ריבית = המחיר של כסף, לאורך זמן.", 50, { w: 700, o });
+          const o2 = after(t, S.end, 5, o, 0.8);
+          txt(640, 380, "בשיעור הבא: ריבית שמצטרפת לקרן.", 34, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

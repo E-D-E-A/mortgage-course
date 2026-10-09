@@ -1,0 +1,579 @@
+{
+  "lesson": "0.2",
+  "title": "ריבית: המחיר של כסף",
+  "note": "Teaching assumptions, not market rates. Interest is paid at the end of every year; the principal is returned at the end.",
+  "facts": [
+    {
+      "id": "pred.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "pred.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "5"
+      },
+      "value": "50.00"
+    },
+    {
+      "id": "pred.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "150.00"
+    },
+    {
+      "id": "pred.total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "1150.00"
+    },
+    {
+      "id": "pred.one_year",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "5",
+        "periods": 1
+      },
+      "value": "1050.00"
+    },
+    {
+      "id": "story.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "100.00"
+    },
+    {
+      "id": "story.one",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "1"
+      },
+      "value": "1.00"
+    },
+    {
+      "id": "story.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "100",
+        "rate_percent": "5"
+      },
+      "value": "5.00"
+    },
+    {
+      "id": "story.table",
+      "kind": "simple_interest_table",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "interest": "5.00",
+          "total_interest": "5.00"
+        },
+        {
+          "period": 2,
+          "interest": "5.00",
+          "total_interest": "10.00"
+        },
+        {
+          "period": 3,
+          "interest": "5.00",
+          "total_interest": "15.00"
+        }
+      ]
+    },
+    {
+      "id": "story.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "15.00"
+    },
+    {
+      "id": "story.total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "115.00"
+    },
+    {
+      "id": "story.interest_6_years",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "5",
+        "periods": 6
+      },
+      "value": "30.00"
+    },
+    {
+      "id": "story.interest_at_10",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "100",
+        "rate_percent": "10",
+        "periods": 3
+      },
+      "value": "30.00"
+    },
+    {
+      "id": "big.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "5"
+      },
+      "value": "500.00"
+    },
+    {
+      "id": "big.table",
+      "kind": "simple_interest_table",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": [
+        {
+          "period": 1,
+          "interest": "500.00",
+          "total_interest": "500.00"
+        },
+        {
+          "period": 2,
+          "interest": "500.00",
+          "total_interest": "1000.00"
+        },
+        {
+          "period": 3,
+          "interest": "500.00",
+          "total_interest": "1500.00"
+        },
+        {
+          "period": 4,
+          "interest": "500.00",
+          "total_interest": "2000.00"
+        },
+        {
+          "period": 5,
+          "interest": "500.00",
+          "total_interest": "2500.00"
+        },
+        {
+          "period": 6,
+          "interest": "500.00",
+          "total_interest": "3000.00"
+        },
+        {
+          "period": 7,
+          "interest": "500.00",
+          "total_interest": "3500.00"
+        },
+        {
+          "period": 8,
+          "interest": "500.00",
+          "total_interest": "4000.00"
+        },
+        {
+          "period": 9,
+          "interest": "500.00",
+          "total_interest": "4500.00"
+        },
+        {
+          "period": 10,
+          "interest": "500.00",
+          "total_interest": "5000.00"
+        }
+      ]
+    },
+    {
+      "id": "big.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "big.total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "worked.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000.00"
+    },
+    {
+      "id": "worked.one",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "30000",
+        "rate_percent": "1"
+      },
+      "value": "300.00"
+    },
+    {
+      "id": "worked.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "30000",
+        "rate_percent": "4"
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "worked.table",
+      "kind": "simple_interest_table",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "interest": "1200.00",
+          "total_interest": "1200.00"
+        },
+        {
+          "period": 2,
+          "interest": "1200.00",
+          "total_interest": "2400.00"
+        },
+        {
+          "period": 3,
+          "interest": "1200.00",
+          "total_interest": "3600.00"
+        }
+      ]
+    },
+    {
+      "id": "worked.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "3600.00"
+    },
+    {
+      "id": "worked.total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": "33600.00"
+    },
+    {
+      "id": "worked.interest_share",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "3600.00",
+        "whole": "30000"
+      },
+      "value": "12"
+    },
+    {
+      "id": "half.table",
+      "kind": "simple_interest_table",
+      "inputs": {
+        "principal": "4000",
+        "rate_percent": "6",
+        "periods": 4
+      },
+      "value": [
+        {
+          "period": 1,
+          "interest": "240.00",
+          "total_interest": "240.00"
+        },
+        {
+          "period": 2,
+          "interest": "240.00",
+          "total_interest": "480.00"
+        },
+        {
+          "period": 3,
+          "interest": "240.00",
+          "total_interest": "720.00"
+        },
+        {
+          "period": 4,
+          "interest": "240.00",
+          "total_interest": "960.00"
+        }
+      ]
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "4"
+      },
+      "value": "80.00"
+    },
+    {
+      "id": "ex1.err_total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "4",
+        "periods": 1
+      },
+      "value": "2080.00"
+    },
+    {
+      "id": "ex1.err_tenth",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "40"
+      },
+      "value": "800.00"
+    },
+    {
+      "id": "ex1.one",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "1"
+      },
+      "value": "20.00"
+    },
+    {
+      "id": "ex2.deposit",
+      "kind": "given",
+      "inputs": {},
+      "value": "5000.00"
+    },
+    {
+      "id": "ex3.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "12000",
+        "rate_percent": "3"
+      },
+      "value": "360.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "3",
+        "periods": 4
+      },
+      "value": "1440.00"
+    },
+    {
+      "id": "ex3.err_total",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "3",
+        "periods": 4
+      },
+      "value": "13440.00"
+    },
+    {
+      "id": "ex4.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "6"
+      },
+      "value": "300.00"
+    },
+    {
+      "id": "ex4.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "5000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "900.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "5000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "5900.00"
+    },
+    {
+      "id": "ex4.err_one_year",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "5000",
+        "rate_percent": "6",
+        "periods": 1
+      },
+      "value": "5300.00"
+    },
+    {
+      "id": "ex5.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "ex5.yearly_a",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "4"
+      },
+      "value": "400.00"
+    },
+    {
+      "id": "ex5.yearly_b",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "5"
+      },
+      "value": "500.00"
+    },
+    {
+      "id": "ex5.a",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "4",
+        "periods": 5
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "ex5.b",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 4
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "ex6.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "8000.00"
+    },
+    {
+      "id": "ex6.interest",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "8000",
+        "rate_percent": "6",
+        "periods": 2
+      },
+      "value": "960.00"
+    },
+    {
+      "id": "ex6.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "8000",
+        "rate_percent": "6"
+      },
+      "value": "480.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "480.00",
+        "whole": "8000"
+      },
+      "value": "6"
+    },
+    {
+      "id": "ex6.err_total",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "960.00",
+        "whole": "8000"
+      },
+      "value": "12"
+    },
+    {
+      "id": "ex7.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "ex7.yearly",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "20000",
+        "rate_percent": "5"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "ex7.target",
+      "kind": "given",
+      "inputs": {},
+      "value": "5000.00"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "percent_quotient",
+      "inputs": {
+        "dividend": "ex7.target",
+        "divisor": "ex7.yearly"
+      },
+      "value": "5"
+    },
+    {
+      "id": "ex7.err_share",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "5000.00",
+        "whole": "20000"
+      },
+      "value": "25"
+    }
+  ]
+}
