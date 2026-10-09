@@ -190,8 +190,8 @@ export default function lesson04(): LessonData {
   const root6 = fromEffective("rate.root_6", "6", 4);
   const tableAfter12 = tableClosing("explain.table_after_12", "10000", "0.5", 12);
   const tableInterest = difference("explain.table_interest", tableAfter12, principal);
-  const ex3 = effective("ex3.answer", "12", 2);
-  const ex3Factor = factor("ex3.factor", "1", 12, 6);
+  const ex3 = effective("ex3.answer", "18", 2);
+  const ex3Factor = factor("ex3.factor", "1.5", 12, 6);
   const ex5 = fromEffective("ex5.answer", "5", 4);
   const ex5Root = rootFactor("ex5.root_factor", "5", 6);
 
@@ -201,7 +201,7 @@ export default function lesson04(): LessonData {
     monthly6,
     factor("base.monthly_6", "0.5", 1, 6),
     factor("base.worked_a", "0.4", 1, 6),
-    factor("base.ex3", "1", 1, 6),
+    factor("base.ex3", "1.5", 1, 6),
     factor("base.ex4", "0.3", 1, 6),
     factor("base.ex6", "0.45", 1, 6),
     table("explain.table", "10000", "0.5", 12),
@@ -240,7 +240,7 @@ export default function lesson04(): LessonData {
     fromEffective("worked.monthly_b", "4.9", 4),
 
     // Half-worked example.
-    conversionTable("half.table", ["3", "6", "9", "12"], 2),
+    conversionTable("half.table", ["3", "7.2", "9", "12"], 2),
 
     // Exercises.
     ex1,
@@ -250,7 +250,7 @@ export default function lesson04(): LessonData {
     ex3Factor,
     asFraction("ex3.err_fraction", ex3),
     asPercent("ex3.err_factor_percent", ex3Factor),
-    byDivision("ex3.err_monthly", "12", 4),
+    byDivision("ex3.err_monthly", "18", 4),
     ex4,
     ex4Principal,
     difference("ex4.interest", ex4, ex4Principal),

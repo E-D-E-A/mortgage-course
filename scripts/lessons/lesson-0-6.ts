@@ -101,10 +101,10 @@ export default function lesson06(): LessonData {
   const p2 = given("explain.pay_2", "1210.00");
   const v1 = today("explain.today_1", "1100", "10", 1);
   const v2 = today("explain.today_2", "1210", "10", 2);
-  // Exercise 2: 2,200 after a year and 2,420 after two, at 10%.
-  const ex2p1 = given("ex2.pay_1", "2200.00");
+  // Exercise 2: 3,300 after a year and 2,420 after two, at 10%.
+  const ex2p1 = given("ex2.pay_1", "3300.00");
   const ex2p2 = given("ex2.pay_2", "2420.00");
-  const ex2v1 = today("ex2.today_1", "2200", "10", 1);
+  const ex2v1 = today("ex2.today_1", "3300", "10", 1);
   const ex2v2 = today("ex2.today_2", "2420", "10", 2);
   const ex2v2Once = today("ex2.err_once", "2420", "10", 1);
 
@@ -167,8 +167,8 @@ export default function lesson06(): LessonData {
     difference("worked.nominal_gap", workedTotal, workedNow),
 
     // Half-worked example.
-    todayTable("half.table", "2000", "5", 3, 6),
-    stream("half.total", "2000", "5", 3),
+    todayTable("half.table", "3000", "6", 3, 6),
+    stream("half.total", "3000", "6", 3),
 
     // Exercises (exercise 2's answer is explain.sum_today).
     ex2p1,
