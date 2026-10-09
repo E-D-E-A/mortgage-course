@@ -92,7 +92,8 @@ const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `${y} שנים`;
     </ul>
 
     <div class="relative mt-3">
-      <svg :viewBox="`0 0 ${W} ${H}`" class="w-full" role="img" aria-label="גרף: עקום התשואות והריבית שהוא מגלם לכל קטע">
+      <div class="relative">
+      <svg :viewBox="`0 0 ${W} ${H}`" class="block w-full" role="img" aria-label="גרף: עקום התשואות והריבית שהוא מגלם לכל קטע">
         <line v-for="t in ticks" :key="t" :x1="PAD.end" :x2="W - PAD.start" :y1="yOf(t)" :y2="yOf(t)" stroke="var(--mogi-n200)" stroke-width="1" />
         <line
           v-for="s in segments"
@@ -115,6 +116,7 @@ const lengthLabel = (y: number) => LENGTH_LABEL[y] ?? `${y} שנים`;
         :style="{ top: `${(yOf(t) / H) * 100}%` }"
         ><span class="ltr">{{ t }}%</span></span
       >
+      </div>
       <div class="relative mt-1 h-5 text-caption text-n600" aria-hidden="true">
         <span v-for="y in LENGTHS" :key="y" class="absolute -translate-x-1/2" :style="{ left: `${(xOf(y) / W) * 100}%` }">{{ y }}</span>
       </div>
