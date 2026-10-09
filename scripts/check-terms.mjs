@@ -6,10 +6,11 @@
 //  2. A term this lesson introduces must appear at least once as <Term t="…">,
 //     so it gets its definition and popover where it is first used.
 //  3. Every <Term t="…"> must name a glossary term with a written definition.
+// The lesson's video subtitles (public/video/<lesson>.he.vtt) are checked with its text.
 //
 // Hebrew attaches prefixes (ה, ב, ל, ו, מ, ש, כ and their combinations), so a
 // term matches with any of them. Run: pnpm check:terms
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 
 const glossary = JSON.parse(readFileSync(new URL("../src/data/glossary.json", import.meta.url), "utf8"));
 const dir = new URL("../src/pages/lessons/", import.meta.url);
@@ -39,7 +40,9 @@ const fail = (file, msg) => {
 
 for (const file of readdirSync(dir).filter((f) => /^\d+-\d+\.mdx$/.test(f))) {
   const lesson = file.replace(".mdx", "").replace("-", ".");
-  const raw = readFileSync(new URL(file, dir), "utf8");
+  // The video's subtitles are lesson text too.
+  const vttPath = new URL(`../public/video/${file.replace(".mdx", "")}.he.vtt`, import.meta.url);
+  const raw = readFileSync(new URL(file, dir), "utf8") + (existsSync(vttPath) ? `\n${readFileSync(vttPath, "utf8")}` : "");
   // Frontmatter, imports and code are not prose. <Later> blocks are allowed forward references.
   const prose = raw
     .replace(/^---[\s\S]*?---/, "")

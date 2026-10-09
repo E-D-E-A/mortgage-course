@@ -1,0 +1,204 @@
+<!doctype html>
+<!--
+  Video scene for lesson 0.3 — "כדור שלג של כסף".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/0-3.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      .num { direction: ltr; unicode-bidi: isolate; }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 0.3 · ריבית דריבית</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/0-3.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const nf0 = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+      const shek0 = (v) => `${nf0.format(Math.round(Number(v)))} ₪`;
+
+      const table = fact("explain.table");
+      const s10 = fact("explain.series_10");
+      const s30 = fact("video.series_30");
+      const V = {
+        p: "10,000 ₪",
+        y1: table[0], y2: table[1],
+        c10: fact("prediction.compound"), s10: fact("prediction.simple"),
+        c30: fact("video.compound_30"), s30: fact("video.simple_30"), gap30: fact("video.gap_30"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 14], y1: [14, 38], y2: [38, 66], ten: [66, 100], thirty: [100, 134], end: [134, 152] };
+      window.duration = 152;
+      window.cues = [
+        [1, 7, "ריבית דריבית: כשהריבית לא נשארת בצד, אלא מצטרפת לסכום."],
+        [7, 13.5, `נתחיל בהפקדה של ${V.p}, בריבית של 5% לשנה.`],
+        [15, 24, `בשנה הראשונה הריבית היא 5% מ־${V.p}: ${shek(V.y1.interest)}.`],
+        [24, 36, `בסוף השנה יש ${shek(V.y1.closing)}. עד כאן — כמו בריבית פשוטה.`],
+        [39, 50, `בשנה השנייה מחשבים 5% מכל היתרה, ${shek(V.y2.opening)}: ${shek(V.y2.interest)}.`],
+        [50, 65, `${shek(V.y2.interest_on_interest)} מתוכם הם 5% מהריבית של השנה הראשונה. הריבית הרוויחה ריבית.`],
+        [67, 80, "כך זה ממשיך, שנה אחר שנה. החלק הטורקיז — הריבית על הריבית — גדל בכל שנה."],
+        [80, 99, `אחרי 10 שנים: ${shek(V.c10)}. בריבית פשוטה היו ${shek(V.s10)}.`],
+        [101, 116, "עכשיו נמתח את הזמן ל־30 שנה."],
+        [116, 133, `אחרי 30 שנה: ${shek(V.c30)}, לעומת ${shek(V.s30)} בריבית פשוטה. ההפרש, ${shek(V.gap30)}, כולו ריבית על ריבית.`],
+        [135, 151, "ככל שהזמן ארוך יותר, ההבדל גדל מהר יותר. זה נכון בחיסכון — וגם בחוב."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", tq: "var(--mogi-turquoise)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // Stacked bar: principal / simple-interest part / interest-on-interest, bottom at baseY.
+      function bar(x, w, baseY, scale, p, si, ioi, o = 1, glow = false) {
+        const hp = p * scale, hs = si * scale, hi = ioi * scale;
+        el("rect", { x, y: baseY - hp, width: w, height: hp, fill: C.n300, rx: 3, opacity: o });
+        if (hs > 0.5) el("rect", { x, y: baseY - hp - hs - 1, width: w, height: Math.max(0, hs - 1), fill: C.teal, rx: 3, opacity: o });
+        if (hi > 0.5) el("rect", { x, y: baseY - hp - hs - hi - 2, width: w, height: Math.max(0, hi - 1), fill: C.tq2, rx: 3, opacity: o, stroke: glow ? C.navy : "none", "stroke-width": glow ? 2 : 0 });
+        return baseY - hp - hs - hi;
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 300, "ריבית דריבית", 84, { w: 700, o });
+          txt(640, 370, "כדור שלג של כסף", 34, { fill: C.n600, o });
+          const o2 = Math.min(o, clamp((t - 6.5) / 0.8));
+          el("rect", { x: 470, y: 440, width: 340, height: 92, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(640, 482, V.p, 36, { w: 700, o: o2, ltr: true });
+          txt(640, 516, "בריבית של 5% לשנה", 22, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — year one
+        if (inScene(t, S.y1)) {
+          const o = vis(t, S.y1);
+          const base = 600, scale = 0.034, x = 760, w = 150;
+          txt(640, 140, "השנה הראשונה", 40, { w: 700, o });
+          const g = prog(t, S.y1, 2, 3);
+          bar(x, w, base, scale, 10000, 500 * g, 0, o);
+          txt(x + w / 2, base + 34, V.p, 22, { fill: C.n600, o, ltr: true });
+          const o3 = Math.min(o, clamp((t - S.y1[0] - 4) / 0.6));
+          txt(500, 300, `5% × 10,000 = ${shek(V.y1.interest)}`, 34, { w: 600, fill: C.teal, o: o3, ltr: true });
+          const o4 = Math.min(o, clamp((t - S.y1[0] - 10) / 0.6));
+          txt(500, 380, `יתרה: ${shek(V.y1.closing)}`, 34, { w: 700, o: o4 });
+        }
+        // Scene 3 — year two, the first interest on interest
+        if (inScene(t, S.y2)) {
+          const o = vis(t, S.y2);
+          const base = 600, scale = 0.034, w = 150;
+          txt(640, 140, "השנה השנייה", 40, { w: 700, o });
+          bar(900, w, base, scale, 10000, 500, 0, o * 0.55);
+          txt(975, base + 34, "שנה 1", 20, { fill: C.n600, o });
+          const g = prog(t, S.y2, 2, 3);
+          const top = bar(680, w, base, scale, 10000, 1000 * g, 25 * g * 8, o, g > 0.9);
+          txt(755, base + 34, "שנה 2", 20, { fill: C.n600, o });
+          const o3 = Math.min(o, clamp((t - S.y2[0] - 5) / 0.6));
+          txt(330, 300, `5% × ${nf2.format(Number(V.y2.opening)).replace(".00", "")} = ${shek(V.y2.interest)}`, 32, { w: 600, fill: C.teal, o: o3, ltr: true });
+          const o4 = Math.min(o, clamp((t - S.y2[0] - 12) / 0.6));
+          el("rect", { x: 130, y: 350, width: 400, height: 96, rx: 14, fill: C.mint, opacity: o4 * 0.6 });
+          txt(330, 392, `${shek(V.y2.interest_on_interest)}`, 36, { w: 700, o: o4, ltr: true });
+          txt(330, 428, "ריבית על הריבית של השנה הראשונה", 22, { fill: C.n700, o: o4 });
+          el("line", { x1: 530, y1: 398, x2: 676, y2: top + 6, stroke: C.navy, "stroke-width": 2, opacity: o4, "stroke-dasharray": "6 6" });
+          // (the turquoise sliver is drawn 8× taller than scale so it can be seen; the label carries the true value)
+          txt(330, 470, "(החלק הטורקיז מוגדל כדי שיהיה אפשר לראות אותו)", 16, { fill: C.n500, o: o4 });
+        }
+        // Scene 4 — ten years
+        if (inScene(t, S.ten)) {
+          const o = vis(t, S.ten);
+          drawSeries(t, s10, S.ten, o, 10, V.c10, V.s10, 0.017);
+        }
+        // Scene 5 — thirty years
+        if (inScene(t, S.thirty)) {
+          const o = vis(t, S.thirty);
+          drawSeries(t, s30, S.thirty, o, 30, V.c30, V.s30, 0.0105, V.gap30);
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "הריבית מצטרפת לסכום —", 46, { w: 700, o });
+          txt(640, 336, "ומהשנה הבאה מרוויחה ריבית בעצמה.", 46, { w: 700, o });
+          const o2 = Math.min(o, clamp((t - S.end[0] - 4) / 0.8));
+          el("rect", { x: 420, y: 400, width: 440, height: 90, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(640, 458, "B = P × (1 + r)ⁿ", 40, { w: 700, o: o2, ltr: true });
+        }
+      };
+
+      function drawSeries(t, series, sc, o, years, compound, simple, scale, gap) {
+        const base = 610, left = 160, right = 1120;
+        const band = (right - left) / series.length, w = band - 4;
+        txt(640, 130, years === 10 ? "עשר שנים" : "שלושים שנה", 40, { w: 700, o });
+        const shown = 1 + Math.floor(prog(t, sc, 1.5, years === 10 ? 12 : 10) * (series.length - 1) + 0.0001);
+        for (let i = 0; i < Math.min(shown, series.length); i++) {
+          const row = series[i];
+          const x = right - (i + 1) * band + 2; // year 0 at the right, time runs leftward
+          const c = Number(row.compound), s = Number(row.simple);
+          bar(x, w, base, scale, 10000, s - 10000, c - s, o);
+          if (years === 10 || i % 5 === 0) txt(x + w / 2, base + 26, String(row.period), 16, { fill: C.n600, o });
+        }
+        // simple-interest level at the end, dashed
+        const done = shown >= series.length;
+        const o2 = done ? Math.min(o, clamp((t - sc[0] - (years === 10 ? 14 : 12)) / 0.8)) : 0;
+        const ySimple = base - Number(simple) * scale;
+        const yComp = base - Number(compound) * scale;
+        el("line", { x1: left, x2: right, y1: ySimple, y2: ySimple, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: o2 });
+        // In an RTL text run "start" is the right edge, so the label grows leftward from x.
+        txt(right - 4, ySimple - 10, `בריבית פשוטה: ${shek(simple)}`, 20, { anchor: "start", fill: C.n700, o: o2 });
+        txt(left + 4, yComp - 14, `${shek(compound)}`, 26, { anchor: "start", w: 700, o: o2, ltr: true });
+        if (gap) {
+          const o3 = Math.min(o, clamp((t - sc[0] - 18) / 0.8));
+          el("rect", { x: 330, y: 170, width: 420, height: 86, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(540, 210, `${shek(gap)}`, 34, { w: 700, o: o3, ltr: true });
+          txt(540, 242, "ההפרש — כולו ריבית על ריבית", 20, { fill: C.n700, o: o3 });
+        }
+      }
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
