@@ -1,0 +1,724 @@
+{
+  "lesson": "0.3",
+  "title": "ריבית דריבית",
+  "note": "Teaching assumptions, not market rates. Money rounded to the agora only at the end of each calculation.",
+  "facts": [
+    {
+      "id": "prediction.compound",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "16288.95"
+    },
+    {
+      "id": "prediction.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": "15000.00"
+    },
+    {
+      "id": "prediction.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "prediction.compound",
+        "subtrahend": "prediction.simple"
+      },
+      "value": "1288.95"
+    },
+    {
+      "id": "explain.table",
+      "kind": "compound_table",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 5
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "10000.00",
+          "interest": "500.00",
+          "interest_on_principal": "500.00",
+          "interest_on_interest": "0.00",
+          "closing": "10500.00"
+        },
+        {
+          "period": 2,
+          "opening": "10500.00",
+          "interest": "525.00",
+          "interest_on_principal": "500.00",
+          "interest_on_interest": "25.00",
+          "closing": "11025.00"
+        },
+        {
+          "period": 3,
+          "opening": "11025.00",
+          "interest": "551.25",
+          "interest_on_principal": "500.00",
+          "interest_on_interest": "51.25",
+          "closing": "11576.25"
+        },
+        {
+          "period": 4,
+          "opening": "11576.25",
+          "interest": "578.81",
+          "interest_on_principal": "500.00",
+          "interest_on_interest": "78.81",
+          "closing": "12155.06"
+        },
+        {
+          "period": 5,
+          "opening": "12155.06",
+          "interest": "607.75",
+          "interest_on_principal": "500.00",
+          "interest_on_interest": "107.75",
+          "closing": "12762.81"
+        }
+      ]
+    },
+    {
+      "id": "explain.formula_5",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 5
+      },
+      "value": "12762.82"
+    },
+    {
+      "id": "explain.series_10",
+      "kind": "growth_series",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 10
+      },
+      "value": [
+        {
+          "period": 0,
+          "compound": "10000.00",
+          "simple": "10000.00"
+        },
+        {
+          "period": 1,
+          "compound": "10500.00",
+          "simple": "10500.00"
+        },
+        {
+          "period": 2,
+          "compound": "11025.00",
+          "simple": "11000.00"
+        },
+        {
+          "period": 3,
+          "compound": "11576.25",
+          "simple": "11500.00"
+        },
+        {
+          "period": 4,
+          "compound": "12155.06",
+          "simple": "12000.00"
+        },
+        {
+          "period": 5,
+          "compound": "12762.82",
+          "simple": "12500.00"
+        },
+        {
+          "period": 6,
+          "compound": "13400.96",
+          "simple": "13000.00"
+        },
+        {
+          "period": 7,
+          "compound": "14071.00",
+          "simple": "13500.00"
+        },
+        {
+          "period": 8,
+          "compound": "14774.55",
+          "simple": "14000.00"
+        },
+        {
+          "period": 9,
+          "compound": "15513.28",
+          "simple": "14500.00"
+        },
+        {
+          "period": 10,
+          "compound": "16288.95",
+          "simple": "15000.00"
+        }
+      ]
+    },
+    {
+      "id": "video.series_30",
+      "kind": "growth_series",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": [
+        {
+          "period": 0,
+          "compound": "10000.00",
+          "simple": "10000.00"
+        },
+        {
+          "period": 1,
+          "compound": "10500.00",
+          "simple": "10500.00"
+        },
+        {
+          "period": 2,
+          "compound": "11025.00",
+          "simple": "11000.00"
+        },
+        {
+          "period": 3,
+          "compound": "11576.25",
+          "simple": "11500.00"
+        },
+        {
+          "period": 4,
+          "compound": "12155.06",
+          "simple": "12000.00"
+        },
+        {
+          "period": 5,
+          "compound": "12762.82",
+          "simple": "12500.00"
+        },
+        {
+          "period": 6,
+          "compound": "13400.96",
+          "simple": "13000.00"
+        },
+        {
+          "period": 7,
+          "compound": "14071.00",
+          "simple": "13500.00"
+        },
+        {
+          "period": 8,
+          "compound": "14774.55",
+          "simple": "14000.00"
+        },
+        {
+          "period": 9,
+          "compound": "15513.28",
+          "simple": "14500.00"
+        },
+        {
+          "period": 10,
+          "compound": "16288.95",
+          "simple": "15000.00"
+        },
+        {
+          "period": 11,
+          "compound": "17103.39",
+          "simple": "15500.00"
+        },
+        {
+          "period": 12,
+          "compound": "17958.56",
+          "simple": "16000.00"
+        },
+        {
+          "period": 13,
+          "compound": "18856.49",
+          "simple": "16500.00"
+        },
+        {
+          "period": 14,
+          "compound": "19799.32",
+          "simple": "17000.00"
+        },
+        {
+          "period": 15,
+          "compound": "20789.28",
+          "simple": "17500.00"
+        },
+        {
+          "period": 16,
+          "compound": "21828.75",
+          "simple": "18000.00"
+        },
+        {
+          "period": 17,
+          "compound": "22920.18",
+          "simple": "18500.00"
+        },
+        {
+          "period": 18,
+          "compound": "24066.19",
+          "simple": "19000.00"
+        },
+        {
+          "period": 19,
+          "compound": "25269.50",
+          "simple": "19500.00"
+        },
+        {
+          "period": 20,
+          "compound": "26532.98",
+          "simple": "20000.00"
+        },
+        {
+          "period": 21,
+          "compound": "27859.63",
+          "simple": "20500.00"
+        },
+        {
+          "period": 22,
+          "compound": "29252.61",
+          "simple": "21000.00"
+        },
+        {
+          "period": 23,
+          "compound": "30715.24",
+          "simple": "21500.00"
+        },
+        {
+          "period": 24,
+          "compound": "32251.00",
+          "simple": "22000.00"
+        },
+        {
+          "period": 25,
+          "compound": "33863.55",
+          "simple": "22500.00"
+        },
+        {
+          "period": 26,
+          "compound": "35556.73",
+          "simple": "23000.00"
+        },
+        {
+          "period": 27,
+          "compound": "37334.56",
+          "simple": "23500.00"
+        },
+        {
+          "period": 28,
+          "compound": "39201.29",
+          "simple": "24000.00"
+        },
+        {
+          "period": 29,
+          "compound": "41161.36",
+          "simple": "24500.00"
+        },
+        {
+          "period": 30,
+          "compound": "43219.42",
+          "simple": "25000.00"
+        }
+      ]
+    },
+    {
+      "id": "video.compound_30",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "43219.42"
+    },
+    {
+      "id": "video.simple_30",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "video.gap_30",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "video.compound_30",
+        "subtrahend": "video.simple_30"
+      },
+      "value": "18219.42"
+    },
+    {
+      "id": "rule72.approx",
+      "kind": "rule_of_72",
+      "inputs": {
+        "rate_percent": "6"
+      },
+      "value": "12"
+    },
+    {
+      "id": "rule72.exact",
+      "kind": "exact_doubling",
+      "inputs": {
+        "rate_percent": "6"
+      },
+      "value": "11.90"
+    },
+    {
+      "id": "worked.table",
+      "kind": "compound_table",
+      "inputs": {
+        "principal": "50000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "50000.00",
+          "interest": "3000.00",
+          "interest_on_principal": "3000.00",
+          "interest_on_interest": "0.00",
+          "closing": "53000.00"
+        },
+        {
+          "period": 2,
+          "opening": "53000.00",
+          "interest": "3180.00",
+          "interest_on_principal": "3000.00",
+          "interest_on_interest": "180.00",
+          "closing": "56180.00"
+        },
+        {
+          "period": 3,
+          "opening": "56180.00",
+          "interest": "3370.80",
+          "interest_on_principal": "3000.00",
+          "interest_on_interest": "370.80",
+          "closing": "59550.80"
+        }
+      ]
+    },
+    {
+      "id": "worked.final",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "50000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "59550.80"
+    },
+    {
+      "id": "worked.simple_final",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "50000",
+        "rate_percent": "6",
+        "periods": 3
+      },
+      "value": "59000.00"
+    },
+    {
+      "id": "worked.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "50000.00"
+    },
+    {
+      "id": "worked.interest_total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.final",
+        "subtrahend": "worked.principal"
+      },
+      "value": "9550.80"
+    },
+    {
+      "id": "worked.interest_on_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.final",
+        "subtrahend": "worked.simple_final"
+      },
+      "value": "550.80"
+    },
+    {
+      "id": "worked.simple_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.simple_final",
+        "subtrahend": "worked.principal"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "compound_table",
+      "inputs": {
+        "principal": "8000",
+        "rate_percent": "4",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "8000.00",
+          "interest": "320.00",
+          "interest_on_principal": "320.00",
+          "interest_on_interest": "0.00",
+          "closing": "8320.00"
+        },
+        {
+          "period": 2,
+          "opening": "8320.00",
+          "interest": "332.80",
+          "interest_on_principal": "320.00",
+          "interest_on_interest": "12.80",
+          "closing": "8652.80"
+        },
+        {
+          "period": 3,
+          "opening": "8652.80",
+          "interest": "346.11",
+          "interest_on_principal": "320.00",
+          "interest_on_interest": "26.11",
+          "closing": "8998.91"
+        }
+      ]
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "1210.00"
+    },
+    {
+      "id": "ex1.table",
+      "kind": "compound_table",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "1000.00",
+          "interest": "100.00",
+          "interest_on_principal": "100.00",
+          "interest_on_interest": "0.00",
+          "closing": "1100.00"
+        },
+        {
+          "period": 2,
+          "opening": "1100.00",
+          "interest": "110.00",
+          "interest_on_principal": "100.00",
+          "interest_on_interest": "10.00",
+          "closing": "1210.00"
+        }
+      ]
+    },
+    {
+      "id": "ex1.err_simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "1000",
+        "rate_percent": "10",
+        "periods": 2
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "ex2.table",
+      "kind": "compound_table",
+      "inputs": {
+        "principal": "20000",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "20000.00",
+          "interest": "1000.00",
+          "interest_on_principal": "1000.00",
+          "interest_on_interest": "0.00",
+          "closing": "21000.00"
+        },
+        {
+          "period": 2,
+          "opening": "21000.00",
+          "interest": "1050.00",
+          "interest_on_principal": "1000.00",
+          "interest_on_interest": "50.00",
+          "closing": "22050.00"
+        },
+        {
+          "period": 3,
+          "opening": "22050.00",
+          "interest": "1102.50",
+          "interest_on_principal": "1000.00",
+          "interest_on_interest": "102.50",
+          "closing": "23152.50"
+        }
+      ]
+    },
+    {
+      "id": "ex2.balance_after_2",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "20000",
+        "rate_percent": "5",
+        "periods": 2
+      },
+      "value": "22050.00"
+    },
+    {
+      "id": "ex2.balance_after_3",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "20000",
+        "rate_percent": "5",
+        "periods": 3
+      },
+      "value": "23152.50"
+    },
+    {
+      "id": "ex2.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "ex2.total_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.balance_after_3",
+        "subtrahend": "ex2.principal"
+      },
+      "value": "3152.50"
+    },
+    {
+      "id": "ex3.compound",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4",
+        "periods": 10
+      },
+      "value": "44407.33"
+    },
+    {
+      "id": "ex3.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4",
+        "periods": 10
+      },
+      "value": "42000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.compound",
+        "subtrahend": "ex3.simple"
+      },
+      "value": "2407.33"
+    },
+    {
+      "id": "ex3.principal",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000.00"
+    },
+    {
+      "id": "ex3.compound_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.compound",
+        "subtrahend": "ex3.principal"
+      },
+      "value": "14407.33"
+    },
+    {
+      "id": "ex3.simple_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.simple",
+        "subtrahend": "ex3.principal"
+      },
+      "value": "12000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "periods_to_double",
+      "inputs": {
+        "rate_percent": "6"
+      },
+      "value": 12
+    },
+    {
+      "id": "ex4.factor_11",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1",
+        "rate_percent": "6",
+        "periods": 11
+      },
+      "value": "1.90"
+    },
+    {
+      "id": "ex4.factor_12",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "1",
+        "rate_percent": "6",
+        "periods": 12
+      },
+      "value": "2.01"
+    },
+    {
+      "id": "ex5.at_5",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "5",
+        "periods": 30
+      },
+      "value": "432194.24"
+    },
+    {
+      "id": "ex5.at_6",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "6",
+        "periods": 30
+      },
+      "value": "574349.12"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.at_6",
+        "subtrahend": "ex5.at_5"
+      },
+      "value": "142154.88"
+    }
+  ]
+}

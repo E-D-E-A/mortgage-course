@@ -1,0 +1,35 @@
+{
+  "name": "mogi-course",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "pnpm data && astro build",
+    "preview": "astro preview",
+    "data": "node scripts/build-course.mjs && node scripts/build-glossary.mjs && node --experimental-strip-types --no-warnings scripts/build-data.ts",
+    "test": "vitest run",
+    "check:python": "python3 -I checks/independent_check.py",
+    "check:terms": "node scripts/check-terms.mjs",
+    "screens": "node scripts/screenshots.mjs"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "8.0.2",
+    "@astrojs/vue": "7.0.3",
+    "@fontsource/heebo": "5.3.0",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.5",
+    "decimal.js": "10.6.0",
+    "tailwindcss": "4.3.3",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "vitest": "5.0.1",
+    "playwright-core": "1.63.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

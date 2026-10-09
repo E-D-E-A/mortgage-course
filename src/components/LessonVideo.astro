@@ -1,0 +1,25 @@
+---
+// The lesson's short video. No narration in v1: text on screen, plus Hebrew
+// subtitles as a WebVTT track (shown by default) so narration can be added later
+// without re-producing. The script sits under the player.
+interface Props {
+  src: string;
+  captions: string;
+  poster?: string;
+  minutes: string;
+}
+const { src, captions, poster, minutes } = Astro.props;
+---
+
+<figure class="my-6">
+  <video class="w-full rounded-lg border border-n200 bg-navy shadow-sm" controls preload="metadata" playsinline poster={poster}>
+    <source src={src} type="video/mp4" />
+    <track kind="subtitles" srclang="he" label="עברית" src={captions} default />
+    הדפדפן לא מציג וידאו. התסריט המלא נמצא מתחת.
+  </video>
+  <figcaption class="mt-2 text-caption text-n600">סרטון, כ־{minutes} דקות. בלי קול: הטקסט על המסך, וכתוביות בעברית.</figcaption>
+  <details class="mt-2 rounded-md border border-n200 bg-n0 p-3 text-body-m text-n700">
+    <summary class="cursor-pointer text-n900">התסריט המלא</summary>
+    <div class="mt-2 [&>p]:my-2"><slot /></div>
+  </details>
+</figure>

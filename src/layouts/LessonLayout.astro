@@ -1,0 +1,88 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { isBuilt, lessonById, lessonHref, neighbours, stageOf } from "../lib/course.ts";
+
+const { frontmatter, headings = [] } = Astro.props;
+const { lesson, minutes } = frontmatter;
+const ref = lessonById(lesson);
+if (!ref) throw new Error(`lesson ${lesson} is not in course/course-map.md`);
+const stage = stageOf(lesson);
+const { prev, next } = neighbours(lesson);
+const sections = headings.filter((h: { depth: number }) => h.depth === 2);
+---
+
+<BaseLayout title={`${lesson} ${ref.title}`}>
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-8 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <aside class="hidden lg:block" aria-label="מבנה השיעור">
+      <nav class="sticky top-24 space-y-1 text-body-m">
+        <p class="mb-3 text-caption text-n500">בשיעור הזה</p>
+        {
+          sections.map((h: { slug: string; text: string }) => (
+            <a href={`#${h.slug}`} class="block rounded-sm px-2 py-1 text-n600 hover:bg-n100 hover:text-navy">
+              {h.text}
+            </a>
+          ))
+        }
+      </nav>
+    </aside>
+
+    <article class="min-w-0 max-w-3xl">
+      <nav class="mb-4 text-caption text-n500" aria-label="פירורי לחם">
+        <a href="/" class="hover:text-navy">שלב {stage.id} · {stage.title}</a>
+        <span aria-hidden="true"> › </span>
+        <span>שיעור {lesson}</span>
+      </nav>
+      <h1 class="text-h1 text-navy">{ref.title}</h1>
+      <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-body-m text-n600">
+        <span>כ־{minutes} דקות, כולל תרגול</span>
+        {
+          ref.prereqs.length > 0 && (
+            <span class="flex flex-wrap items-center gap-2">
+              <span>לפני השיעור הזה:</span>
+              {ref.prereqs.map((p) => {
+                const pr = lessonById(p);
+                return isBuilt(p) ? (
+                  <a href={lessonHref(p)} class="rounded-pill bg-n100 px-3 py-0.5 text-caption text-n700 hover:bg-n200">
+                    {p} {pr?.title}
+                  </a>
+                ) : (
+                  <span class="rounded-pill bg-n100 px-3 py-0.5 text-caption text-n700">
+                    {p} {pr?.title}
+                  </span>
+                );
+              })}
+            </span>
+          )
+        }
+      </div>
+
+      <div class="prose-lesson mt-8">
+        <slot />
+      </div>
+
+      <nav class="mt-16 flex flex-wrap justify-between gap-4 border-t border-n200 pt-6" aria-label="שיעור קודם והבא">
+        {
+          prev ? (
+            <a href={isBuilt(prev.id) ? lessonHref(prev.id) : "/"} class="text-body-m text-n600 hover:text-navy">
+              <span class="block text-caption text-n500">הקודם</span>
+              {prev.id} {prev.title}
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a
+              href={isBuilt(next.id) ? lessonHref(next.id) : "/"}
+              class="rounded-md bg-turquoise px-5 py-3 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"
+            >
+              <span class="block text-caption">השיעור הבא{isBuilt(next.id) ? "" : " (בכתיבה)"}</span>
+              {next.id} {next.title}
+            </a>
+          )
+        }
+      </nav>
+    </article>
+  </div>
+</BaseLayout>

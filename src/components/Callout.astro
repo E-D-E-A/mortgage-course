@@ -1,0 +1,19 @@
+---
+// A boxed aside inside a lesson. `tone` picks the semantic colour:
+// info = an explanation on the side; warning = a common trap.
+interface Props {
+  title: string;
+  tone?: "info" | "warning";
+}
+const { title, tone = "info" } = Astro.props;
+---
+
+<aside
+  class:list={[
+    "my-6 rounded-md border-s-4 p-5",
+    tone === "info" ? "border-info bg-info-bg" : "border-warning bg-warning-bg",
+  ]}
+>
+  <p class="!mt-0 text-body-l font-semibold text-n900">{title}</p>
+  <div class="text-body-m text-n700 [&>p]:my-2"><slot /></div>
+</aside>

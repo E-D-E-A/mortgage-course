@@ -1,0 +1,32 @@
+---
+// The worked solution to one exercise. Hidden until that exercise unlocks it
+// (two wrong tries, or a correct answer) — the exercise announces that with a
+// `mogi:solution` event carrying its id.
+interface Props {
+  for: string;
+}
+const { for: exerciseId } = Astro.props;
+---
+
+<details data-solution-for={exerciseId} hidden class="-mt-4 mb-6 rounded-b-lg border border-t-0 border-n200 bg-n50 px-5 py-3 text-body-m text-n800">
+  <summary class="cursor-pointer font-semibold text-navy">הפתרון המלא</summary>
+  <div class="mt-2 [&>p]:my-1"><slot /></div>
+</details>
+
+<script>
+  // A solution already unlocked in an earlier visit opens straight away.
+  document.querySelectorAll<HTMLDetailsElement>("details[data-solution-for]").forEach((d) => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(`mogi-course:exercise:${d.dataset.solutionFor}`) ?? "null");
+      if (saved?.correct) d.hidden = false;
+    } catch {
+      /* storage unavailable: the exercise unlocks it again */
+    }
+  });
+  document.addEventListener("mogi:solution", (e) => {
+    const id = (e as CustomEvent<string>).detail;
+    document.querySelectorAll<HTMLDetailsElement>(`details[data-solution-for="${CSS.escape(id)}"]`).forEach((d) => {
+      d.hidden = false;
+    });
+  });
+</script>

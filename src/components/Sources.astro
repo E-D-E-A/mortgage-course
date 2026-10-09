@@ -1,0 +1,36 @@
+---
+// The lesson's sources. Every claim in the course is one of the brief's six kinds,
+// and the kind is always named next to the source.
+interface Source {
+  kind: "עובדה מאומתת" | "החלטה של Mogi" | "ידע מהשטח" | "מחקר / הצעה" | "הנחת חישוב" | "לא אומת" | "ידע מתמטי כללי";
+  text: string;
+  /** Code, file paths or formulas, shown left to right after the text. */
+  code?: string[];
+  date?: string;
+  href?: string;
+}
+const { items } = Astro.props as { items: Source[] };
+---
+
+<ul class="!list-none !ps-0">
+  {
+    items.map((s) => (
+      <li class="my-3 flex flex-wrap items-baseline gap-2 text-body-m text-n700">
+        <span class="rounded-pill bg-n100 px-3 py-0.5 text-caption font-semibold text-n700">{s.kind}</span>
+        {s.href ? (
+          <a href={s.href} class="text-navy underline">
+            {s.text}
+          </a>
+        ) : (
+          <span>{s.text}</span>
+        )}
+        {s.code?.map((c) => (
+          <code dir="ltr" class="ltr rounded-sm bg-n100 px-1.5 text-caption text-n800">
+            {c}
+          </code>
+        ))}
+        {s.date && <span class="text-caption text-n500">{s.date}</span>}
+      </li>
+    ))
+  }
+</ul>

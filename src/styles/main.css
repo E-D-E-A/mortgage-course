@@ -1,0 +1,205 @@
+@import "tailwindcss";
+@import "./tokens.css";
+/* Heebo, self-hosted from @fontsource/heebo 5.3.0 (OFL-1.1), as the advisor app does.
+   No request to Google Fonts. */
+@import "@fontsource/heebo/400.css";
+@import "@fontsource/heebo/500.css";
+@import "@fontsource/heebo/600.css";
+@import "@fontsource/heebo/700.css";
+
+/*
+ * Mogi's tokens as Tailwind utilities — the same names the advisor app uses
+ * (E-D-E-A/edea-mortgage apps/advisor-web/src/assets/main.css @ 6156bf8),
+ * so a class like `text-n500` means the same thing in both.
+ * tokens.css is the only source of a value; this block only names them.
+ */
+@theme inline {
+  --color-navy: var(--mogi-navy);
+  --color-turquoise: var(--mogi-turquoise);
+  --color-turquoise-2: var(--mogi-turquoise-2);
+  --color-turquoise-hover: var(--mogi-turquoise-hover);
+  --color-mint: var(--mogi-mint);
+  --color-teal-deep: var(--mogi-teal-deep);
+
+  --color-n0: var(--mogi-n0);
+  --color-n50: var(--mogi-n50);
+  --color-n100: var(--mogi-n100);
+  --color-n200: var(--mogi-n200);
+  --color-n300: var(--mogi-n300);
+  --color-n400: var(--mogi-n400);
+  --color-n500: var(--mogi-n500);
+  --color-n600: var(--mogi-n600);
+  --color-n700: var(--mogi-n700);
+  --color-n800: var(--mogi-n800);
+  --color-n900: var(--mogi-n900);
+
+  --color-success: var(--mogi-success);
+  --color-success-bg: var(--mogi-success-bg);
+  --color-warning: var(--mogi-warning);
+  --color-warning-bg: var(--mogi-warning-bg);
+  --color-danger: var(--mogi-danger);
+  --color-danger-bg: var(--mogi-danger-bg);
+  --color-info: var(--mogi-info);
+  --color-info-bg: var(--mogi-info-bg);
+
+  --text-h1: var(--mogi-text-h1-size);
+  --text-h1--line-height: var(--mogi-text-h1-line);
+  --text-h1--font-weight: var(--mogi-text-h1-weight);
+  --text-h2: var(--mogi-text-h2-size);
+  --text-h2--line-height: var(--mogi-text-h2-line);
+  --text-h2--font-weight: var(--mogi-text-h2-weight);
+  --text-h3: var(--mogi-text-h3-size);
+  --text-h3--line-height: var(--mogi-text-h3-line);
+  --text-h3--font-weight: var(--mogi-text-h3-weight);
+  --text-body-l: var(--mogi-text-body-l-size);
+  --text-body-l--line-height: var(--mogi-text-body-l-line);
+  --text-body-l--font-weight: var(--mogi-text-body-l-weight);
+  --text-body-m: var(--mogi-text-body-m-size);
+  --text-body-m--line-height: var(--mogi-text-body-m-line);
+  --text-body-m--font-weight: var(--mogi-text-body-m-weight);
+  --text-caption: var(--mogi-text-caption-size);
+  --text-caption--line-height: var(--mogi-text-caption-line);
+  --text-caption--font-weight: var(--mogi-text-caption-weight);
+  /* Ours, as in the app: 11px with caption's line height (asterisk, small labels). */
+  --text-micro: 11px;
+  --text-micro--line-height: var(--mogi-text-caption-line);
+
+  --font-sans: var(--mogi-font-family);
+
+  --radius-sm: var(--mogi-radius-sm);
+  --radius-md: var(--mogi-radius-md);
+  --radius-lg: var(--mogi-radius-lg);
+  --radius-pill: var(--mogi-radius-pill);
+
+  --shadow-sm: var(--mogi-shadow-sm);
+  --shadow-md: var(--mogi-shadow-md);
+  --shadow-lg: var(--mogi-shadow-lg);
+  /* Ours, the handoff boards' focus rings, as in the app. */
+  --shadow-ring-button: 0 0 0 3px rgba(3, 7, 30, 0.15);
+  --shadow-ring-input: 0 0 0 3px rgba(0, 206, 203, 0.18);
+  --shadow-ring-error: 0 0 0 3px rgba(220, 38, 38, 0.12);
+
+  --ease-out: var(--mogi-ease-out);
+  --ease-in-out: var(--mogi-ease-in-out);
+
+  --z-index-dropdown: var(--mogi-z-dropdown);
+  --z-index-sticky: var(--mogi-z-sticky);
+  --z-index-overlay: var(--mogi-z-overlay);
+  --z-index-modal: var(--mogi-z-modal);
+  --z-index-toast: var(--mogi-z-toast);
+  --z-index-tooltip: var(--mogi-z-tooltip);
+}
+
+@utility duration-fast {
+  transition-duration: var(--mogi-duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--mogi-duration-base);
+}
+@utility duration-slow {
+  transition-duration: var(--mogi-duration-slow);
+}
+
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+  body {
+    background: var(--mogi-n50);
+    color: var(--mogi-n900);
+    font-family: var(--mogi-font-family);
+    font-size: var(--mogi-text-body-l-size);
+    line-height: var(--mogi-text-body-l-line);
+  }
+  /* Numbers and formulas read left to right inside Hebrew text. */
+  .ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(3, 7, 30, 0.15);
+    border-radius: var(--mogi-radius-sm);
+  }
+}
+
+/* Lesson prose: long-form Hebrew reading, tokens only. */
+.prose-lesson {
+  font-size: var(--mogi-text-body-l-size);
+  line-height: 1.75;
+  color: var(--mogi-n800);
+}
+.prose-lesson p {
+  margin-block: var(--mogi-space-4);
+}
+.prose-lesson h2 {
+  font-size: var(--mogi-text-h2-size);
+  line-height: var(--mogi-text-h2-line);
+  font-weight: var(--mogi-text-h2-weight);
+  color: var(--mogi-n900);
+  margin-block: var(--mogi-space-10) var(--mogi-space-4);
+}
+.prose-lesson h3 {
+  font-size: var(--mogi-text-h3-size);
+  line-height: var(--mogi-text-h3-line);
+  font-weight: var(--mogi-text-h3-weight);
+  color: var(--mogi-n900);
+  margin-block: var(--mogi-space-8) var(--mogi-space-3);
+}
+.prose-lesson ul,
+.prose-lesson ol {
+  padding-inline-start: var(--mogi-space-6);
+  margin-block: var(--mogi-space-4);
+}
+.prose-lesson ul {
+  list-style: disc;
+}
+.prose-lesson ol {
+  list-style: decimal;
+}
+.prose-lesson li {
+  margin-block: var(--mogi-space-2);
+}
+.prose-lesson strong {
+  font-weight: 600;
+  color: var(--mogi-n900);
+}
+
+/* Range sliders: a neutral track and a teal thumb, no native fill. In RTL the
+   browser draws the fill from the wrong end, so the course draws none. */
+input[type="range"] {
+  appearance: none;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--mogi-radius-pill);
+  background: var(--mogi-n200);
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: var(--mogi-radius-pill);
+  background: var(--mogi-n200);
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  margin-top: -7px;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--mogi-radius-pill);
+  background: var(--mogi-teal-deep);
+  border: 3px solid var(--mogi-n0);
+  box-shadow: var(--mogi-shadow-sm);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--mogi-radius-pill);
+  background: var(--mogi-teal-deep);
+  border: 3px solid var(--mogi-n0);
+}
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(0, 206, 203, 0.18);
+}

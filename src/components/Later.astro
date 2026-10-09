@@ -1,0 +1,10 @@
+---
+// A word the learner meets before its lesson. Says where it will be explained,
+// and is the only place scripts/check-terms.mjs lets a future term appear.
+interface Props {
+  lesson: string;
+}
+const { lesson } = Astro.props;
+---
+
+<span><slot /><span class="text-caption text-n500"> (נגיע לזה בשיעור {lesson})</span></span>
