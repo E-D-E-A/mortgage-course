@@ -1,0 +1,255 @@
+---
+layout: ../../layouts/CheckLayout.astro
+stage: 0
+---
+import StageCheck from "../../components/StageCheck.vue";
+import Callout from "../../components/Callout.astro";
+import { facts } from "../../lib/facts.ts";
+import { isBuilt, lessonHref } from "../../lib/course.ts";
+
+export const f = facts("check-0");
+export const questions = [
+  {
+    id: "c0.q1",
+    lesson: "0.1",
+    type: "numeric",
+    prompt: "מוצר עלה 240 ₪, והמחיר שלו עלה ב־15%. בכמה שקלים עלה המחיר?",
+    answer: f.raw("q1.answer"),
+    errors: [
+      { value: f.raw("q1.new_price"), message: `${f.shekels("q1.new_price")} הוא המחיר החדש. השאלה שואלת בכמה עלה המחיר — רק התוספת.` },
+      { value: "15", message: "15 הוא מספר האחוזים. צריך 15 חלקים מתוך 100 של 240 ₪." },
+    ],
+    explanation: `אחוז אחד הוא חלק ממאה: 240 ₪ חלקי 100 הם ${f.shekels("q1.one_percent")}. חמישה עשר אחוזים הם פי 15: ${f.shekels("q1.answer")}. המחיר החדש: ${f.shekels("q1.new_price")}.`,
+  },
+  {
+    id: "c0.q2",
+    lesson: "0.1",
+    type: "choice",
+    prompt: "שיעור ההנחה בחנות עלה מ־4% ל־6%. איזה משפט נכון?",
+    options: [
+      { text: `הוא עלה ב־${f.plain("q2.points")} נקודות אחוז, שהן עלייה של ${f.plain("q2.relative")}%.`, correct: true },
+      { text: `הוא עלה ב־${f.plain("q2.points")}%.` },
+      { text: `הוא עלה ב־${f.plain("q2.relative")} נקודות אחוז.` },
+      { text: `הוא עלה ב־${f.plain("q2.points")} נקודות אחוז, שהן עלייה של ${f.plain("q2.points")}%.` },
+    ],
+    explanation: `ההפרש בין שני אחוזים נמדד בנקודות אחוז: מ־4% ל־6% הן ${f.plain("q2.points")} נקודות אחוז. ביחס לנקודת ההתחלה זו עלייה של ${f.plain("q2.relative")}%, כי ${f.plain("q2.points")} הן חצי מ־4.`,
+  },
+  {
+    id: "c0.q3",
+    lesson: "0.2",
+    type: "numeric",
+    prompt: "הלוויתם לחבר 5,000 ₪ בריבית פשוטה של 4% לשנה, לשלוש שנים. כמה ריבית תקבלו בסך הכול?",
+    answer: f.raw("q3.answer"),
+    errors: [
+      { value: f.raw("q3.one_year"), message: `${f.shekels("q3.one_year")} היא הריבית של שנה אחת. ההלוואה נמשכת שלוש שנים.` },
+      { value: f.raw("q3.balance"), message: `${f.shekels("q3.balance")} הם הקרן והריבית יחד. השאלה שואלת רק על הריבית.` },
+      { value: f.raw("q3.compound_interest"), message: "חישבתם ריבית דריבית. בריבית פשוטה הריבית של כל שנה מחושבת רק על הקרן, ולכן היא זהה בכל שנה." },
+    ],
+    explanation: `בריבית פשוטה מקבלים בכל שנה 4% מהקרן: ${f.shekels("q3.one_year")}. בשלוש שנים: ${f.shekels("q3.answer")}.`,
+  },
+  {
+    id: "c0.q4",
+    lesson: "0.3",
+    type: "numeric",
+    prompt: "הפקדתם 20,000 ₪ בריבית דריבית של 5% לשנה, ולא משכתם כלום. כמה יהיה בחשבון אחרי ארבע שנים? (צריך מחשבון.)",
+    answer: f.raw("q4.answer"),
+    errors: [
+      { value: f.raw("q4.simple"), message: `${f.shekels("q4.simple")} הוא החשבון בריבית פשוטה. בריבית דריבית הריבית של כל שנה מצטרפת ליתרה ומרוויחה ריבית בעצמה.` },
+    ],
+    explanation: `${"⁦"}20,000 × 1.05 × 1.05 × 1.05 × 1.05${"⁩"}, או בקיצור 1.05 בחזקת 4: ${f.shekels("q4.answer")}. בריבית פשוטה היו רק ${f.shekels("q4.simple")}.`,
+  },
+  {
+    id: "c0.q5",
+    lesson: "0.3",
+    type: "choice",
+    prompt: "בריבית דריבית של 6% לשנה, בערך אחרי כמה שנים הסכום יוכפל?",
+    options: [
+      { text: `בערך ${f.plain("q5.rule72")} שנים`, correct: true },
+      { text: "בערך 6 שנים" },
+      { text: "בערך 72 שנים" },
+      { text: "אף פעם: ריבית של 6% לא מכפילה סכום" },
+    ],
+    explanation: `לפי כלל ה־72: 72 חלקי 6 הם בערך ${f.plain("q5.rule72")} שנים. זה קירוב, לא חישוב מדויק.`,
+  },
+  {
+    id: "c0.q6",
+    lesson: "0.4",
+    type: "numeric",
+    unit: "%",
+    tolerance: 0.001,
+    near: 0,
+    prompt: "בחוזה הלוואה כתובה ריבית שנתית של 4.8%, והריבית מחושבת כל חודש לפי חלוקה ב־12. מה הריבית החודשית, באחוזים?",
+    answer: f.raw("q6.answer"),
+    errors: [
+      { value: "4.8", message: "4.8% היא הריבית לשנה. כדי לקבל ריבית לחודש מחלקים אותה ב־12.", tolerance: 0.001 },
+    ],
+    explanation: `${"⁦"}4.8% ÷ 12 = ${f.plain("q6.answer")}%${"⁩"} לחודש.`,
+  },
+  {
+    id: "c0.q7",
+    lesson: "0.4",
+    type: "choice",
+    prompt: `ריבית שנתית של 12% מחושבת כל חודש: ${f.plain("q7.monthly")}% בכל חודש, וכל ריבית מצטרפת ליתרה. כמה גדל הסכום בשנה, באחוזים?`,
+    options: [
+      { text: `קצת יותר מ־12%: בערך ${f.plain("q7.effective")}%`, correct: true },
+      { text: "בדיוק 12%" },
+      { text: "קצת פחות מ־12%" },
+      { text: `${f.plain("q7.monthly")}% בלבד, כמו בחודש אחד` },
+    ],
+    explanation: `כל חודש מרוויח ריבית גם על הריבית של החודשים הקודמים, ולכן הריבית האפקטיבית לשנה גבוהה מ־12%: ${f.plain("q7.effective")}%.`,
+  },
+  {
+    id: "c0.q8",
+    lesson: "0.5",
+    type: "numeric",
+    prompt: "הבטיחו לכם 10,816 ₪ בעוד שנתיים. אילו הייתם מפקידים כסף היום, הייתם מקבלים 4% לשנה בריבית דריבית. כמה שווה ההבטחה הזו היום? (צריך מחשבון.)",
+    answer: f.raw("q8.answer"),
+    errors: [
+      { value: "10816", message: "זה הסכום של עוד שנתיים. שקל של עוד שנתיים שווה היום פחות משקל." },
+      { value: f.raw("q8.percent_off"), message: "הורדתם 4% על כל שנה. כדי לחזור אחורה בזמן מחלקים ב־1.04 פעם לכל שנה, ולא מורידים אחוזים." },
+    ],
+    explanation: `${"⁦"}10,816 ÷ 1.04 ÷ 1.04${"⁩"} = ${f.shekels("q8.answer")}. בדיקה: ${f.shekels("q8.answer")} שגדלים ב־4% לשנה במשך שנתיים הופכים ל־10,816 ₪.`,
+  },
+  {
+    id: "c0.q9",
+    lesson: "0.6",
+    type: "numeric",
+    prompt: "תקבלו 1,000 ₪ בסוף כל שנה, במשך שלוש שנים. לפי ריבית של 5% לשנה, מה הערך הנוכחי של שלושת התשלומים יחד? (צריך מחשבון.)",
+    answer: f.raw("q9.answer"),
+    errors: [
+      { value: "3000", message: "חיברתם את התשלומים כמו שהם. כל תשלום מגיע בזמן אחר, ולכן קודם מהוונים כל אחד להיום, ורק אז מחברים." },
+      { value: f.raw("q9.one"), message: `${f.shekels("q9.one")} הוא הערך הנוכחי של התשלום האחרון בלבד. צריך להוון את שלושתם ולחבר.` },
+    ],
+    explanation: `${"⁦"}1,000 ÷ 1.05 + 1,000 ÷ 1.05² + 1,000 ÷ 1.05³${"⁩"} = ${f.shekels("q9.answer")}. פחות מ־3,000 ₪, כי כל תשלום מגיע בעתיד.`,
+  },
+  {
+    id: "c0.q10",
+    lesson: "0.7",
+    type: "numeric",
+    unit: "%",
+    tolerance: 0.01,
+    near: 0,
+    prompt: "מדד המחירים לצרכן עלה מ־104 נקודות ל־106.6 נקודות. מה שיעור האינפלציה בתקופה הזו, באחוזים?",
+    answer: f.raw("q10.answer"),
+    errors: [
+      { value: f.raw("q10.points"), message: `${f.plain("q10.points")} הן נקודות המדד שנוספו. האינפלציה היא השינוי באחוזים: חלקי 104, כפול 100.`, tolerance: 0.01 },
+    ],
+    explanation: `המדד עלה ב־${f.plain("q10.points")} נקודות. ${"⁦"}${f.plain("q10.points")} ÷ 104 × 100 = ${f.plain("q10.answer")}%${"⁩"}.`,
+  },
+  {
+    id: "c0.q11",
+    lesson: "0.8",
+    type: "numeric",
+    prompt: "חוב של 200,000 ₪ מוצמד למדד. בשנה האחרונה המדד עלה ב־3%, ולא שילמתם כלום. כמה החוב אחרי ההצמדה?",
+    answer: f.raw("q11.answer"),
+    errors: [
+      { value: "200000", message: "בחוב שמוצמד למדד, הסכום גדל יחד עם המדד." },
+      { value: f.raw("q11.added"), message: "זו התוספת בלבד. השאלה שואלת כמה החוב כולו." },
+    ],
+    explanation: `${"⁦"}200,000 × 1.03 = ${f.shekels("q11.answer")}${"⁩"}.`,
+  },
+  {
+    id: "c0.q12",
+    lesson: "0.8",
+    type: "choice",
+    prompt: "פיקדון נותן 5% לשנה, והאינפלציה באותה שנה היא 2%. כמה גדל כוח הקנייה שלכם?",
+    options: [
+      { text: `בערך ${f.plain("q12.real")}% — קצת פחות מ־3%`, correct: true },
+      { text: `בדיוק ${f.plain("q12.approx")}%` },
+      { text: "5%, כי זו הריבית" },
+      { text: `${f.plain("q12.sum")}%` },
+    ],
+    explanation: `הריבית הריאלית: ${"⁦"}1.05 ÷ 1.02 − 1${"⁩"}, בערך ${f.plain("q12.real")}%. החיסור, ${f.plain("q12.approx")}%, קרוב, אבל לא מדויק.`,
+  },
+  {
+    id: "c0.q13",
+    lesson: "0.9",
+    type: "numeric",
+    unit: "נקודות אחוז",
+    tolerance: 0.001,
+    near: 0,
+    prompt: "בנק א׳ משלם 2.5% לשנה על הפיקדונות שהוא מקבל, ומלווה את הכסף ב־6% לשנה. מה המרווח שלו, בנקודות אחוז?",
+    answer: f.raw("q13.answer"),
+    errors: [{ value: f.raw("q13.sum"), message: "חיברתם. המרווח הוא ההפרש: הריבית על ההלוואה פחות עלות הכסף.", tolerance: 0.001 }],
+    explanation: `${"⁦"}6 − 2.5 = ${f.plain("q13.answer")}${"⁩"} נקודות אחוז. מהמרווח הבנק מכסה הוצאות והפסדים, ומה שנשאר הוא הרווח.`,
+  },
+  {
+    id: "c0.q14",
+    lesson: "0.10",
+    type: "numeric",
+    unit: "%",
+    tolerance: 0.001,
+    near: 0,
+    prompt: `נניח שריבית בנק ישראל היא 2.5%. הבנקים משתמשים בריבית שהיא ריבית בנק ישראל ועוד ${f.plain("q14.addition")} נקודות אחוז. כמה היא?`,
+    answer: f.raw("q14.answer"),
+    errors: [{ value: "2.5", message: `זו ריבית בנק ישראל עצמה. צריך להוסיף לה ${f.plain("q14.addition")} נקודות אחוז.`, tolerance: 0.001 }],
+    explanation: `${"⁦"}2.5 + ${f.plain("q14.addition")} = ${f.plain("q14.answer")}%${"⁩"}.`,
+  },
+  {
+    id: "c0.q15",
+    lesson: "0.10",
+    type: "choice",
+    prompt: "מי מחליט על ריבית בנק ישראל, ובאיזו תדירות?",
+    options: [
+      { text: "הוועדה המוניטרית של בנק ישראל, שמונה פעמים בשנה במועדים קבועים", correct: true },
+      { text: "הממשלה, פעם בשנה עם התקציב" },
+      { text: "כל בנק לעצמו, לפי הלקוחות שלו" },
+      { text: "הלמ״ס, בכל פעם שמתפרסם מדד" },
+    ],
+    explanation: "הוועדה המוניטרית מחליטה במועדים שנקבעים מראש, שמונה פעמים בשנה. (לפי מה שנלמד בשיעור 0.10; עדיין לא אומת מול המקור.)",
+  },
+  {
+    id: "c0.q16",
+    lesson: "0.11",
+    type: "choice",
+    prompt: "קניתם אג״ח שהתשלומים שלו קבועים. אחר כך התשואה שהשוק דורש מאג״ח כזה עלתה. מה קרה למחיר שלו?",
+    options: [
+      { text: "המחיר ירד", correct: true },
+      { text: "המחיר עלה" },
+      { text: "המחיר לא השתנה, כי התשלומים קבועים" },
+      { text: "אי אפשר לדעת" },
+    ],
+    explanation: "המחיר הוא הערך הנוכחי של התשלומים. כשמהוונים את אותם תשלומים בתשואה גבוהה יותר, הערך הנוכחי קטן. מחיר ותשואה זזים הפוך, כמו נדנדה.",
+  },
+  {
+    id: "c0.q17",
+    lesson: "0.11",
+    type: "numeric",
+    tolerance: 0.02,
+    near: 0.5,
+    prompt: "אג״ח משלם תשלום אחד של 100 ₪ בעוד שנה, והתשואה עליו היא 4%. מה המחיר שלו היום, עד האגורה?",
+    answer: f.raw("q17.answer"),
+    errors: [
+      { value: f.raw("q17.percent_off"), message: "הורדתם 4% מ־100. המחיר הוא הערך הנוכחי: מחלקים ב־1.04.", tolerance: 0.02 },
+      { value: "100", message: "100 ₪ מגיעים רק בעוד שנה, ולכן שווים היום פחות." },
+    ],
+    explanation: `${"⁦"}100 ÷ 1.04 = ${f.shekels("q17.answer")}${"⁩"}. מי שקונה במחיר הזה ומקבל 100 ₪ בעוד שנה, מרוויח 4%.`,
+  },
+  {
+    id: "c0.q18",
+    lesson: "0.12",
+    type: "choice",
+    prompt: "עקום התשואות עולה: התשואה לעשר שנים גבוהה מהתשואה לשנה. מה זה מספר?",
+    options: [
+      { text: "המחירים בשוק מגלמים ריביות גבוהות יותר בעתיד, ויש בהם גם תוספת על זמן. זו לא הבטחה.", correct: true },
+      { text: "הריבית תעלה בוודאות" },
+      { text: "הריבית תרד בוודאות" },
+      { text: "שום דבר, הצורה מקרית" },
+    ],
+    explanation: "עקום עולה פירושו שהמחירים מגלמים ריביות גבוהות יותר בעתיד. אבל העקום אינו הבטחה: יש בו ציפיות, ויש בו גם תוספת על זמן.",
+  },
+];
+
+זו הבדיקה של כל שלב 0: {questions.length} שאלות, מאחוז ועד עקום התשואות. עונים על כולן, ואז לוחצים ״סיימתי — לבדיקה״.
+
+- כדי לעבור צריך לפחות 80% תשובות נכונות. מי שעובר פותח את שלב 1.
+- אחרי הבדיקה, ליד כל שאלה מופיעים התשובה הנכונה, ההסבר והשיעור שכדאי לחזור אליו. אפשר לנסות שוב כמה פעמים שרוצים.
+- בחלק מהשאלות צריך מחשבון. בתשובה מספרית כותבים רק ספרות, עם פסיקים או בלעדיהם.
+
+<Callout tone="info" title="דוגמה לימודית">
+  כל המספרים בבדיקה להמחשה בלבד. אינם הצעת בנק או נתוני שוק עדכניים.
+</Callout>
+
+<StageCheck client:load stage={0} questions={questions} nextHref={isBuilt("1.1") ? lessonHref("1.1") : "/"} nextLabel={isBuilt("1.1") ? "לשלב 1" : "למפת הקורס (שלב 1 בכתיבה)"} />
+
+{/* Internal note: numbers come from scripts/lessons/check-0.ts → data/lessons/check-0.json, rechecked by checks/independent_check.py with the stage-0 lessons' kinds. The scoring and the pass record are src/components/StageCheck.vue; the lock on stage 1 is src/components/StageLock.astro. */}
