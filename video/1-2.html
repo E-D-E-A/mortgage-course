@@ -121,7 +121,8 @@
       function legendRow(x, y, color, label, value, o) {
         el("rect", { x: x - 26, y: y - 20, width: 26, height: 26, rx: 5, fill: color, opacity: o });
         txt(x - 40, y, label, 28, { anchor: "start", fill: C.n700, o });
-        txt(x - 40, y + 40, value, 34, { anchor: "start", w: 700, o });
+        // An LTR run: "end" puts its right edge at x, under the label.
+        txt(x - 40, y + 40, value, 34, { anchor: "end", w: 700, o, ltr: true });
       }
       // The buyer's part of the cake, as a fraction of the price — geometry only, from the data's own amounts.
       const share = (row) => Number(row.min_equity) / Number(V.price);
@@ -184,8 +185,8 @@
             txt(x, 470, `הלוואה עד ${shek(k.row.max_loan)}`, 22, { fill: C.n700, o: oi });
             txt(x, 502, `משלכם לפחות ${shek(k.row.min_equity)}`, 22, { w: 600, o: oi });
           });
-          // RTL "start" is the right edge, so the note grows leftward from x.
-          txt(640, 552, "לא אומת: לפי תעתיק של הצוות ב־Brain (2026-10-08), ממתין לבדיקה מול המקור. נכון ל־2026-10-09.", 18, { fill: C.n500, o: after(t, S.limits, 35, o) });
+          // No Latin word next to the dates, so the line keeps its order right to left.
+          txt(640, 552, "לא אומת: לפי תעתיק של הצוות מ־2026-10-08; ממתין לבדיקה מול המקור. נכון ל־2026-10-09.", 18, { fill: C.n500, o: after(t, S.limits, 33, o) });
         }
         // Scene 5 — takeaway: a lower ceiling needs more equity
         if (inScene(t, S.end)) {
@@ -199,7 +200,7 @@
             el("rect", { x: right - full, y, width: full, height: 56, rx: 6, fill: C.n300, opacity: oi * 0.4 });
             el("rect", { x: right - w, y, width: w, height: 56, rx: 6, fill: C.tq2, opacity: oi });
             txt(right + 20, y + 37, `עד ${k.row.ceiling}%`, 26, { anchor: "end", w: 700, o: oi });
-            txt(right - 16, y + 38, shek(k.row.min_equity), 26, { anchor: "start", w: 700, o: oi, ltr: false });
+            txt(right - 16, y + 38, shek(k.row.min_equity), 26, { anchor: "end", w: 700, o: oi, ltr: true });
           });
           const o2 = after(t, S.end, 10, o, 0.8);
           txt(640, 540, "ככל שהתקרה נמוכה יותר — צריך יותר הון עצמי.", 32, { w: 700, o: o2 });

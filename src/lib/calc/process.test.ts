@@ -6,6 +6,7 @@ import {
   businessDaysBetween,
   calendarDaysBetween,
   calendarFrom,
+  dayList,
   daysLeft,
   isBusinessDay,
   skippedDays,
@@ -86,6 +87,16 @@ describe("banking business days", () => {
   it("reads a calendar from fact inputs", () => {
     expect(calendarFrom("2026-09-20,2026-09-21", "no")).toEqual({ closed: ["2026-09-20", "2026-09-21"], fridayCounts: false });
     expect(calendarFrom("", "yes")).toEqual({ closed: [], fridayCounts: true });
+  });
+});
+
+describe("a list of days for a picture", () => {
+  it("marks each day after the start as a business day or not", () => {
+    // After Sunday 11 Oct: Mon–Fri business, Sat 17 not, Sun 18 business.
+    expect(dayList("2026-10-11", 7, CALENDAR_2026).map((d) => d.business)).toEqual([true, true, true, true, true, false, true]);
+    expect(dayList("2026-10-11", 2, CALENDAR_2026)[1]).toEqual({ n: 2, date: "2026-10-13", business: true, count: 2 });
+    // Saturday 17 Oct adds nothing to the count; Sunday 18 is the 6th business day.
+    expect(dayList("2026-10-11", 7, CALENDAR_2026).map((d) => d.count)).toEqual([1, 2, 3, 4, 5, 5, 6]);
   });
 });
 

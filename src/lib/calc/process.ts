@@ -114,6 +114,21 @@ export function skippedDays(from: string, to: string, calendar: BankCalendar): s
   return out;
 }
 
+/**
+ * The `days` calendar days after `iso`, for drawing a count: each day's number
+ * (1, 2, …), whether it is a business day, and how many business days have
+ * passed by its end.
+ */
+export function dayList(iso: string, days: number, calendar: BankCalendar): { n: number; date: string; business: boolean; count: number }[] {
+  let count = 0;
+  return Array.from({ length: days }, (_, k) => {
+    const date = addCalendarDays(iso, k + 1);
+    const business = isBusinessDay(date, calendar);
+    if (business) count++;
+    return { n: k + 1, date, business, count };
+  });
+}
+
 /** Days left in a window of `windowDays` after `used` days have passed (negative once it has closed). */
 export function daysLeft(windowDays: number, used: number): number {
   return windowDays - used;

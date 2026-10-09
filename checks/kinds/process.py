@@ -50,6 +50,18 @@ def business_days_between(i, _facts=None):
     return sum(1 for k in range(1, (end - start).days + 1) if _business(start + timedelta(days=k), friday, closed))
 
 
+def day_list(i, _facts=None):
+    friday, closed = _calendar(i)
+    start = _d(i["start"])
+    out, count = [], 0
+    for k in range(1, int(i["days"]) + 1):
+        day = start + timedelta(days=k)
+        business = _business(day, friday, closed)
+        count += 1 if business else 0
+        out.append({"n": k, "date": day.isoformat(), "business": business, "count": count})
+    return out
+
+
 def days_left(i, _facts=None):
     return int(i["window"]) - int(i["used"])
 
@@ -71,5 +83,6 @@ KINDS = {
     "proc_calendar_days_between": calendar_days_between,
     "proc_business_days_between": business_days_between,
     "proc_days_left": days_left,
+    "proc_day_list": day_list,
     "proc_window_table": window_table,
 }

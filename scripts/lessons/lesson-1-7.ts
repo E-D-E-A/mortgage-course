@@ -20,6 +20,7 @@ import {
   addCalendarDays,
   businessDaysBetween,
   calendarDaysBetween,
+  dayList,
   daysLeft,
   type BankCalendar,
 } from "../../src/lib/calc/process.ts";
@@ -129,6 +130,10 @@ export default function lesson17(): LessonData {
     given("worked.signing", signing),
     between("worked.used", approved, signing),
     left("worked.left", WINDOW, used),
+
+    // For the video: the days after the request and after the approval, marked business or not.
+    { id: "video.week", kind: "proc_day_list", inputs: { start: sent, days: 7, ...inputsOf(CALENDAR_2026) }, value: dayList(sent, 7, CALENDAR_2026) },
+    { id: "video.window", kind: "proc_day_list", inputs: { start: approved, days: WINDOW, ...inputsOf(CALENDAR_2026) }, value: dayList(approved, WINDOW, CALENDAR_2026) },
 
     windowTable("half.table", approved, WINDOW, [
       ["האישור הגיע", approved],

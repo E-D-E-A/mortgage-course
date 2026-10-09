@@ -1,0 +1,281 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.7 — "מהשיחה הראשונה ועד הכסף".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number and date comes from data/lessons/1-7.json (the clocks, the step
+  count, the example dates, and the day lists with their counts). The scene does
+  no arithmetic; it only lays out and formats. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.7 · התהליך מקצה לקצה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-7.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const at = (iso) => new Date(`${iso}T12:00:00Z`);
+      const dayMonth = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(at(iso));
+      const longDate = (iso) => new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" }).format(at(iso));
+      const fullDate = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(at(iso));
+      const weekdayShort = (iso) => new Intl.DateTimeFormat("he-IL", { weekday: "short" }).format(at(iso));
+      const dayNum = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "numeric" }).format(at(iso));
+      const isSaturday = (iso) => at(iso).getUTCDay() === 6;
+
+      const V = {
+        steps: fact("steps.count"),
+        answer: fact("clock.answer"),
+        answer7: fact("clock.answer_extended"),
+        window: fact("clock.window"),
+        window12: fact("clock.window_no_lien"),
+        appraisal: fact("clock.appraisal"),
+        sent: fact("worked.sent"),
+        answerBy: fact("worked.answer_by"),
+        approved: fact("worked.approved"),
+        windowEnd: fact("worked.window_end"),
+        appraisalDate: fact("worked.appraisal"),
+        appraisalEnd: fact("worked.appraisal_end"),
+        week: fact("video.week"),
+        windowDays: fact("video.window"),
+      };
+
+      // The twelve steps, short titles (the lesson's step list, shortened to fit a box).
+      const STEPS = [
+        ["1", "שיחה ראשונה"], ["2", "מסמכים"], ["3", "בקשה לאישור עקרוני"], ["4", "האישורים מגיעים"],
+        ["5", "בניית תמהיל"], ["6", "הצעות ומשא ומתן"], ["7", "פתיחת תיק"], ["8", "שמאות"],
+        ["9", "חיתום"], ["10", "ביטוחים"], ["11", "חתימה"], ["12", "העמדת ההלוואה"],
+      ];
+      // When each step appears in the steps scene (seconds), following the cues.
+      const APPEAR = [13.5, 15.5, 22, 25.5, 31, 33.5, 39, 40.5, 42, 43.5, 49, 51.5];
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], steps: [12, 60], c1: [60, 92], c2: [92, 124], c3: [124, 142], end: [142, 160] };
+      window.duration = 160;
+      window.cues = [
+        [1, 6, "מהשיחה הראשונה ועד שהכסף עובר."],
+        [6, 11.5, `${V.steps} צעדים, ושלושה שעונים בדרך.`],
+        [13, 21, "קודם היועץ מברר מה אתם צריכים, ואוסף מסמכים."],
+        [21, 30, "אחר כך הוא מבקש אישור עקרוני מכמה בנקים."],
+        [30, 38, "עם האישורים בונים תמהיל, ומבקשים הצעות."],
+        [38, 48, "בוחרים בנק: פתיחת תיק, שמאות, חיתום, ביטוחים."],
+        [48, 59, "ובסוף חתימה, ואז הבנק מעביר את הכסף."],
+        [61, 70, `שעון 1: הבנק עונה תוך ${V.answer} ימי עסקים.`],
+        [70, 78, `${V.answer7} ימי עסקים: רק לסוגי הלוואות שהבנק הגדיר מראש.`],
+        [78, 85, "שבת וחגים לא נספרים. שישי נספר, לפי הנחת הקורס."],
+        [85, 91, `בקשה ב־${dayMonth(V.sent)}: תשובה עד ${dayMonth(V.answerBy)}.`],
+        [93, 102, `שעון 2: התנאים שבאישור נשמרים לפחות ${V.window} יום.`],
+        [102, 110, "כאן סופרים כל יום, גם שבת וחג."],
+        [110, 117, `בלי שעבוד חדש: ${V.window12} יום בלבד.`],
+        [117, 123, "כל מה שעד החתימה רץ מול השעון הזה."],
+        [125, 133, "שעון 3: שמאות שנעשתה בשביל בנק אחד."],
+        [133, 141, `בנק אחר לא יסרב לה בלי סיבה סבירה, עד ${V.appraisal} יום.`],
+        [143, 150, "לשאר הצעדים לא מצאנו שעון כתוב."],
+        [150, 159, "המספרים לפי תעתיק של הצוות. הם עוד לא אומתו."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, start, d = 0.5) => clamp((t - start) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, dates) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      // The steps grid: three rows of four, step 1 at the top right, read right to left.
+      const BOX = { w: 250, h: 60, gap: 18, right: 1166, top: 120, row: 78 };
+      const boxAt = (i) => {
+        const col = i % 4, row = Math.floor(i / 4);
+        const x = BOX.right - (col + 1) * BOX.w - col * BOX.gap;
+        return { x, y: BOX.top + row * BOX.row };
+      };
+      function drawSteps(t, o, opts = {}) {
+        STEPS.forEach(([num, title], i) => {
+          const a = opts.appear ? Math.min(o, after(t, APPEAR[i])) : o;
+          if (a <= 0) return;
+          const { x, y } = boxAt(i);
+          const hl = opts.highlight?.(num);
+          el("rect", {
+            x, y, width: BOX.w, height: BOX.h, rx: 12,
+            fill: hl ? hl.fill : C.n0,
+            stroke: hl ? hl.stroke : C.n300,
+            "stroke-width": hl ? 3 : 1.5,
+            "stroke-dasharray": hl?.dashed ? "8 6" : "none",
+            opacity: hl === null && opts.dim ? a * 0.45 : a,
+          });
+          const dim = opts.dim && !hl ? 0.45 : 1;
+          el("circle", { cx: x + BOX.w - 26, cy: y + BOX.h / 2, r: 15, fill: C.navy, opacity: a * dim });
+          txt(x + BOX.w - 26, y + BOX.h / 2 + 6, num, 16, { w: 700, fill: C.n0, o: a * dim, ltr: true });
+          txt(x + BOX.w - 52, y + BOX.h / 2 + 7, title, 20, { anchor: "start", w: 600, fill: C.navy, o: a * dim });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "התהליך מקצה לקצה", 76, { w: 700, o });
+          txt(640, 355, "מהשיחה הראשונה ועד הכסף", 34, { fill: C.n600, o });
+          const o2 = Math.min(o, after(t, 6.5, 0.8));
+          el("rect", { x: 440, y: 410, width: 400, height: 92, rx: 14, fill: C.n0, stroke: C.n200, opacity: o2 });
+          txt(640, 452, `${V.steps} צעדים`, 34, { w: 700, o: o2 });
+          txt(640, 487, "ושלושה שעונים", 22, { fill: C.n600, o: o2 });
+        }
+
+        // Scene 2 — the twelve steps appear in order
+        if (inScene(t, S.steps)) {
+          const o = vis(t, S.steps);
+          txt(640, 88, `${V.steps} צעדים`, 34, { w: 700, o });
+          drawSteps(t, o, { appear: true });
+          // The four parts, under the grid.
+          const parts = [
+            [13.5, "לפני הבנק: 1–2"], [22, "השאלה לבנקים: 3–4"], [31, "ההצעה: 5–6"], [39, "מהבחירה לכסף: 7–12"],
+          ];
+          parts.forEach(([start, label], k) => {
+            const a = Math.min(o, after(t, start, 0.8));
+            const x = 1100 - k * 270;
+            el("rect", { x: x - 250, y: 400, width: 250, height: 48, rx: 24, fill: C.n100, opacity: a });
+            txt(x - 125, 431, label, 20, { w: 600, fill: C.n700, o: a });
+          });
+          const o3 = Math.min(o, after(t, 52, 0.8));
+          txt(640, 510, "אישור עקרוני — לפני הבדיקה.  העמדת ההלוואה — כשהכסף עובר.", 22, { fill: C.n700, o: o3 });
+        }
+
+        // Scene 3 — clock 1: business days to answer
+        if (inScene(t, S.c1)) {
+          const o = vis(t, S.c1);
+          txt(640, 88, `שעון 1: ${V.answer} ימי עסקים לתשובה`, 34, { w: 700, o });
+          drawSteps(t, o, { dim: true, highlight: (n) => (["3", "4"].includes(n) ? { fill: C.n0, stroke: C.teal } : null) });
+          // The week after the request: day 0, then each day, with the running count of business days.
+          const cells = [{ date: V.sent, zero: true }, ...V.week];
+          const W = 118, G = 14, right = 1170, y = 400;
+          cells.forEach((c, k) => {
+            const a = Math.min(o, after(t, 63 + k * 1.2));
+            if (a <= 0) return;
+            const x = right - (k + 1) * W - k * G;
+            const last = !c.zero && c.business && c.count === V.answer;
+            const off = !c.zero && !c.business;
+            el("rect", { x, y, width: W, height: 92, rx: 12, fill: last ? C.mint : off ? C.n100 : C.n0, stroke: last ? C.teal : C.n300, "stroke-width": last ? 3 : 1.5, opacity: a });
+            txt(x + W / 2, y + 30, weekdayShort(c.date), 20, { w: 600, fill: off ? C.n500 : C.navy, o: a });
+            txt(x + W / 2, y + 60, dayNum(c.date), 20, { fill: off ? C.n500 : C.n700, o: a, ltr: true });
+            const under = c.zero ? "נשלחה" : c.business ? String(c.count) : "לא נספר";
+            txt(x + W / 2, y + 124, under, c.business && !c.zero ? 26 : 18, { w: 700, fill: c.zero ? C.n700 : off ? C.n500 : C.teal, o: a, ltr: !c.zero && c.business });
+            if (off) el("line", { x1: x + 12, y1: y + 80, x2: x + W - 12, y2: y + 12, stroke: C.n300, "stroke-width": 2, opacity: a });
+          });
+          const o2 = Math.min(o, after(t, 85, 0.6));
+          txt(640, 562, `היום האחרון: ${longDate(V.answerBy)}`, 24, { w: 700, fill: C.navy, o: o2 });
+        }
+
+        // Scene 4 — clock 2: calendar days the terms hold
+        if (inScene(t, S.c2)) {
+          const o = vis(t, S.c2);
+          txt(640, 88, `שעון 2: לפחות ${V.window} יום לתנאים`, 34, { w: 700, o });
+          drawSteps(t, o, { dim: true, highlight: (n) => (["4", "5", "6", "7", "8", "9", "10", "11"].includes(n) ? { fill: C.n0, stroke: C.tq2 } : null) });
+          const W = 38, G = 4, right = 1160, y = 430;
+          txt(right, y - 22, `האישור: ${dayMonth(V.approved)}`, 20, { anchor: "start", w: 600, fill: C.n700, o });
+          V.windowDays.forEach((c, k) => {
+            const a = Math.min(o, after(t, 94 + k * 0.25, 0.4));
+            if (a <= 0) return;
+            const x = right - (k + 1) * W - k * G;
+            const sat = isSaturday(c.date);
+            el("rect", { x, y, width: W, height: 52, rx: 6, fill: C.tq2, opacity: a * (sat ? 0.55 : 1) });
+            txt(x + W / 2, y + 33, String(c.n), 16, { w: 600, fill: C.navy, o: a, ltr: true });
+            if (sat) txt(x + W / 2, y + 78, "שבת", 14, { fill: C.n600, o: a });
+            if (c.n === V.window12) {
+              const o3 = Math.min(o, after(t, 110, 0.6));
+              el("line", { x1: x - G / 2, x2: x - G / 2, y1: y - 12, y2: y + 64, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "6 4", opacity: o3 });
+              txt(x - 8, y + 104, `בלי שעבוד חדש: ${V.window12}`, 18, { anchor: "start", w: 600, fill: C.navy, o: o3 });
+            }
+          });
+          const o2 = Math.min(o, after(t, 102, 0.6));
+          txt(640, 566, `לפחות עד ${longDate(V.windowEnd)}`, 24, { w: 700, fill: C.navy, o: o2 });
+        }
+
+        // Scene 5 — clock 3: an appraisal moves to another bank
+        if (inScene(t, S.c3)) {
+          const o = vis(t, S.c3);
+          txt(640, 88, `שעון 3: ${V.appraisal} יום לשמאות`, 34, { w: 700, o });
+          drawSteps(t, o, { dim: true, highlight: (n) => (n === "8" ? { fill: C.n0, stroke: C.navy, dashed: true } : null) });
+          const o2 = Math.min(o, after(t, 126, 0.6));
+          el("rect", { x: 760, y: 400, width: 360, height: 110, rx: 14, fill: C.n0, stroke: C.n300, opacity: o2 });
+          txt(1100, 440, "בנק א׳: שמאות", 22, { anchor: "start", w: 700, o: o2 });
+          txt(1100, 478, fullDate(V.appraisalDate), 22, { anchor: "start", fill: C.n700, o: o2 });
+          const o3 = Math.min(o, after(t, 133, 0.6));
+          el("line", { x1: 750, x2: 540, y1: 455, y2: 455, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o3 });
+          el("polygon", { points: "540,455 556,446 556,464", fill: C.navy, opacity: o3 });
+          txt(645, 440, `${V.appraisal} יום`, 22, { w: 700, fill: C.navy, o: o3 });
+          el("rect", { x: 160, y: 400, width: 370, height: 110, rx: 14, fill: C.mint, opacity: o3 * 0.7 });
+          txt(510, 440, "בנק ב׳: לא יסרב בלי סיבה סבירה", 22, { anchor: "start", w: 700, o: o3 });
+          txt(510, 478, `עד ${fullDate(V.appraisalEnd)}`, 22, { anchor: "start", fill: C.n700, o: o3 });
+          txt(640, 552, "בתנאי שהשמאי נמצא גם ברשימה של בנק ב׳", 20, { fill: C.n700, o: o3 });
+        }
+
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 120, "שלושה שעונים", 44, { w: 700, o });
+          const cards = [
+            [`${V.answer} ימי עסקים`, "לתשובה לבקשה", "סופרים ימי עסקים", C.teal],
+            [`${V.window} יום`, `(${V.window12} בלי שעבוד חדש)`, "סופרים את כל הימים", C.tq2],
+            [`${V.appraisal} יום`, "לשמאות שעוברת לבנק אחר", "סופרים את כל הימים", C.navy],
+          ];
+          cards.forEach(([big, small, how, colour], k) => {
+            const a = Math.min(o, after(t, 143 + k * 1.2, 0.6));
+            const x = 1080 - k * 380;
+            el("rect", { x: x - 300, y: 180, width: 300, height: 200, rx: 16, fill: C.n0, stroke: colour, "stroke-width": 3, opacity: a });
+            txt(x - 150, 255, big, 40, { w: 700, o: a });
+            txt(x - 150, 300, small, 20, { fill: C.n700, o: a });
+            txt(x - 150, 345, how, 18, { fill: C.n600, o: a });
+          });
+          const o2 = Math.min(o, after(t, 150, 0.8));
+          txt(640, 460, "לפי תעתיק של הצוות מהוראה של בנק ישראל. לא אומת מול המקור.", 22, { fill: C.n700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
