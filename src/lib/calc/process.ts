@@ -31,6 +31,7 @@ export interface BankCalendar {
  * (Rosh Hashana's first day, Sukkot, Shemini Atzeret) change nothing and are
  * left out. 2026-04-08 (the seventh day of Passover) is in the transcribed
  * definition but not in the Brain's table; its date is from the Hebrew calendar.
+ * 2026-10-27 is the Knesset election day (news reports, not verified).
  */
 export const CLOSED_2026 = [
   "2026-03-03",
@@ -42,6 +43,9 @@ export const CLOSED_2026 = [
   "2026-09-13",
   "2026-09-20",
   "2026-09-21",
+  // Knesset election day, a statutory day of rest. Not verified: per news reports (Globes, i24,
+  // Israel Hayom, 2026-07 to 2026-10), the election is set for Tuesday 27 October 2026.
+  "2026-10-27",
 ];
 
 export const CALENDAR_2026: BankCalendar = { fridayCounts: true, closed: CLOSED_2026 };
