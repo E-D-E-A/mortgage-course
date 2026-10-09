@@ -95,7 +95,7 @@ A lesson that needs a **new interactive illustration**: write it as `src/compone
 
 ## Sources and reliability (brief §9)
 
-`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `בדיקת חישוב`.
+`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב`.
 
 - **The official sites are blocked in this environment** (Bank of Israel, CBS, gov.il, Knesset). Nothing official may be marked `עובדה מאומתת` until someone opens the primary document. Facts that come from the team's transcription in the Brain: kind `לא אומת`, text "לפי תעתיק בצוות ב־Brain (דף N, תאריך), ממתין לבדיקה מול המקור". From search summaries only: `לא אומת`, "לפי תקציר של מקור רשמי; ממתין לבדיקה". Always date the data (for example "ריבית בנק ישראל 3.25%, מ־2026-09-03").
 - Field knowledge (`research/field-knowledge.md`): kind `ידע מהשטח`, text names who said it and when, plus "ממתין לאישור אילון". Never the do-not-teach items.

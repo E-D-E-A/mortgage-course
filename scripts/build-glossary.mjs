@@ -22,6 +22,11 @@ const terms = {};
 for (const line of section.split("\n")) {
   if (!line.startsWith("**שלב")) continue;
   const body = line.slice(line.indexOf(":**") + 3);
+  // A bracket after a term is either another name for it (קל״צ, IRR, נסח טאבו),
+  // which becomes a form, or a note (מבוא, של בנק ישראל, חשיפה לשינויי ריבית ומדד),
+  // which does not. Another name is at most two words and not a "של…" phrase.
+  const isAlias = (p) =>
+    !!p && !/^[\d.]+$/.test(p) && !/^(מבוא|מלא|חזרה)$/.test(p) && !p.startsWith("של ") && p.trim().split(/\s+/).length <= 2;
   for (const group of body.split("·")) {
     const m = group.trim().match(/^(.*)\((\d\.\d+)\)\s*$/);
     if (!m) continue;
@@ -34,7 +39,7 @@ for (const line of section.split("\n")) {
       terms[term] = {
         lesson,
         definition: d.definition ?? null,
-        forms: [...(d.forms ?? []), ...(parenthetical && !/^[\d.]+$/.test(parenthetical) && !/^(מבוא|מלא|חזרה)$/.test(parenthetical) ? [parenthetical] : [])],
+        forms: [...(d.forms ?? []), ...(isAlias(parenthetical) ? [parenthetical] : [])],
       };
     }
   }
