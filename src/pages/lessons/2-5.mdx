@@ -110,23 +110,24 @@ export const predictionOptions = [
 
 </Section>
 
-<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-4">
+  <table class="w-full border-collapse text-caption sm:text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">השאלה</th>
-        <th class="py-2 text-start font-semibold">קבועה לא צמודה (קל״צ)</th>
+        <th class="py-2 pe-2 text-start font-semibold">השאלה</th>
+        <th class="py-2 pe-2 text-start font-semibold">קל״צ</th>
         <th class="py-2 text-start font-semibold">קבועה צמודה</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100"><td class="py-2 text-n700">אחוז הריבית</td><td class="py-2">קבוע לכל התקופה</td><td class="py-2">קבוע לכל התקופה</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 text-n700">החוב בשקלים</td><td class="py-2">רק יורד, בכל תשלום</td><td class="py-2">זז עם המדד; כשהמדד עולה מהר, הוא יכול אפילו לעלות</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 text-n700">התשלום בשקלים</td><td class="py-2">קבוע (בתשלומים שווים)</td><td class="py-2">זז עם המדד</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 text-n700">התשלום בכוח קנייה של היום</td><td class="py-2">יורד כשהמחירים עולים</td><td class="py-2">קבוע (בתשלומים שווים)</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 text-n700">מתי משהו זז</td><td class="py-2">אף פעם, לפי החוזה</td><td class="py-2">בכל חודש, עם המדד</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-2 text-n700">אחוז הריבית</td><td class="py-2 pe-2">קבוע לכל התקופה</td><td class="py-2">קבוע לכל התקופה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-2 text-n700">החוב בשקלים</td><td class="py-2 pe-2">רק יורד</td><td class="py-2">זז עם המדד; יכול גם לעלות</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-2 text-n700">התשלום בשקלים</td><td class="py-2 pe-2">קבוע*</td><td class="py-2">זז עם המדד</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-2 text-n700">התשלום בכוח קנייה</td><td class="py-2 pe-2">יורד כשהמחירים עולים</td><td class="py-2">קבוע*</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-2 text-n700">מתי משהו זז</td><td class="py-2 pe-2">אף פעם, לפי החוזה</td><td class="py-2">בכל חודש, עם המדד</td></tr>
     </tbody>
   </table>
+  <p class="mt-2 text-caption text-n600">* בשיטה של תשלומים שווים. ״בכוח קנייה״ — של היום.</p>
 </div>
 
 **ריבית קבועה אינה תשלום קבוע.** זו ההבחנה משיעור 2.2. בקבועה צמודה אחוז הריבית קבוע, והתשלום בשקלים לא. וגם בקל״צ, התשלום קבוע רק בשיטה של תשלומים שווים; בשיטות אחרות הוא משתנה (שיעור 2.9).
@@ -428,7 +429,7 @@ export const predictionOptions = [
   items={[
     { kind: "לא אומת", text: "הגדרות המסלולים: קבועה לא צמודה (קל״צ) וקבועה צמודה. לפי תקציר של דף ההסבר של בנק ישראל על הרפורמה במשכנתאות (נמצא בחיפוש ב־2026-10-09); ממתין לבדיקה מול הדף עצמו.", date: "2026-10-09" },
     { kind: "החלטה של Mogi", text: "שמות המסלולים כפי שהם באפליקציית היועץ: ״קבועה לא צמודה״ ו״קבועה צמודה״ (רישום השדות v1.yaml של Mogi, כפי שנקרא ב־research/notes/repo-domain.md)." },
-    { kind: "החלטה של Mogi", text: "בכללי החישוב של Mogi ההצמדה למדד היא חודשית, ותשלום צמוד יכול לזוז גם כשאחוז הריבית לא זז. דף ההחלטה ב־Brain (67436545), שאילון אישר ב־2026-10-07 ועדן קיבל ב־2026-10-08. כטענה על השוק: לא אומת מול מקור רשמי.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "בכללי החישוב של Mogi ההצמדה למדד היא חודשית, ותשלום צמוד יכול לזוז גם כשאחוז הריבית לא זז. החלטה של Mogi על בסיס ידע מהשטח של אילון: דף ההחלטה ב־Brain (67436545), שאילון אישר ב־2026-10-07 ועדן קיבל ב־2026-10-08. כטענה על השוק: לא אומת מול מקור רשמי.", date: "2026-10-08" },
     { kind: "לא אומת", text: "ממוצע אחוזי הריבית על הלוואות חדשות בפברואר 2026: 4.74% בקל״צ ו־3.25% בקבועה צמודה. מנתוני בנק ישראל (סדרות BIR_MRTG_99) כפי שתועדו ב־Brain (דף 67469313, 2026-10-08); ממתין לבדיקה מול המקור.", date: "2026-10-08" },
     { kind: "לא אומת", text: "פירעון מוקדם של מסלול קבוע: יכול לעלות סכום גדול כשהריבית במשק ירדה; אין במסלול קבוע מועד שבו הסכום הזה נעלם; ובמסלול צמוד יש תוספת על פירעון בין ה־1 ל־15 בחודש. לפי תעתיק בצוות של צו הבנקאות (פירעון מוקדם של הלוואה לדיור), התשס״ב-2002, ב־Brain (דף 7798786, 2026-08-17); ממתין לבדיקה מול המקור.", date: "2026-08-17" },
     { kind: "לא אומת", text: "כלל של בנק ישראל (נלמד בשיעור 4.4): לפחות שליש מהלוואה לדיור באחוז ריבית שנקבע לכל התקופה. לפי תעתיק בצוות ב־Brain (דף 7503881, 2026-10-08); ממתין לבדיקה מול המקור. נכון ל־2026-10-09.", date: "2026-10-08" },
