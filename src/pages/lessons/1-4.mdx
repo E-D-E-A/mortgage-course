@@ -160,7 +160,14 @@ export const predictionOptions = [
 
 **צעד 4 — המסלול האחרון לוקח את מה שנשאר.** <M>{n("case.loan")} − {money(thirds[0].amount)} − {money(thirds[1].amount)} = {money(thirds[2].amount)}</M> ₪.
 
-**צעד 5 — בדיקה.** <M>{money(thirds[0].amount)} + {money(thirds[1].amount)} + {money(thirds[2].amount)} = {money(f.raw("worked.sum"))}</M> ₪. בדיוק ההלוואה.
+**צעד 5 — בדיקה.** מחברים את שלושת המסלולים, אחד מתחת לשני:
+
+<M>{money(thirds[0].amount)}</M><br />
+<M>+ {money(thirds[1].amount)}</M><br />
+<M>+ {money(thirds[2].amount)}</M><br />
+<M>= {money(f.raw("worked.sum"))} ₪</M>
+
+בדיוק ההלוואה.
 
 **צעד 6 — איזה חלק יכול לזוז.** שני מסלולים מתוך שלושה שווים: <M>2 ÷ 3 × 100 = {f.plain("worked.moving_share")}</M> (בעיגול). כלומר שני שלישים מההלוואה, ושליש באחוז שנקבע לכל התקופה. התמהיל הזה עומד בדיוק על הגבול של הכלל מההסבר: לפחות שליש באחוז שנקבע לכל התקופה (לא אומת).
 

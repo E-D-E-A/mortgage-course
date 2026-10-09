@@ -31,6 +31,10 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM ?? 
 const problems = [];
 for (const [name, viewport] of Object.entries(viewports)) {
   const page = await browser.newPage({ viewport, locale: "he-IL" });
+  // QA photographs the content, so every stage is opened as if its previous check were passed.
+  await page.addInitScript(() => {
+    for (let stage = 0; stage < 10; stage++) localStorage.setItem(`mogi-course:check:${stage}`, JSON.stringify({ passed: true }));
+  });
   page.on("pageerror", (e) => problems.push(`${name}: page error: ${e.message}`));
   page.on("console", (m) => m.type() === "error" && problems.push(`${name}: console: ${m.text()}`));
   for (const p of pages) {
