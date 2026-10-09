@@ -1,0 +1,282 @@
+---
+layout: ../../layouts/CheckLayout.astro
+stage: 1
+---
+import StageCheck from "../../components/StageCheck.vue";
+import Callout from "../../components/Callout.astro";
+import { facts } from "../../lib/facts.ts";
+import { isBuilt, lessonHref } from "../../lib/course.ts";
+
+export const f = facts("check-1");
+export const clocks = facts("1.7");
+export const questions = [
+  // Stage 0, repeated (brief: every stage check includes earlier stages).
+  {
+    id: "c1.r1",
+    lesson: "0.1",
+    type: "numeric",
+    unit: "נקודות אחוז",
+    tolerance: 0.001,
+    near: 0,
+    prompt: "תקרה אחת של שיעור מימון היא 75%, ותקרה אחרת היא 70%. בכמה נקודות אחוז נמוכה השנייה מהראשונה?",
+    answer: f.raw("r1.points"),
+    errors: [{ value: f.raw("r1.relative"), tolerance: 0.01, message: `חישבתם שינוי באחוזים: ${f.plain("r1.points")} מתוך 75. השאלה שואלת על ההפרש בין שני אחוזים — בנקודות אחוז.` }],
+    explanation: `ההפרש בין שני אחוזים נמדד בנקודות אחוז: 75 פחות 70 הם ${f.plain("r1.points")} נקודות אחוז. ביחס ל־75 זו ירידה של ${f.plain("r1.relative")}% — מספר אחר, שעונה על שאלה אחרת.`,
+  },
+  {
+    id: "c1.r2",
+    lesson: "0.3",
+    type: "numeric",
+    prompt: "הפקדתם 10,000 ₪ בריבית דריבית של 4% לשנה, ולא משכתם כלום. כמה יהיה בחשבון אחרי שלוש שנים? (צריך מחשבון.)",
+    answer: f.raw("r2.answer"),
+    errors: [{ value: f.raw("r2.simple"), message: "חישבתם ריבית פשוטה. בריבית דריבית הריבית של כל שנה מצטרפת ליתרה ומרוויחה ריבית בעצמה." }],
+    explanation: `10,000 כפול 1.04, שלוש פעמים: ${f.shekels("r2.answer")}. בריבית פשוטה היו ${f.shekels("r2.simple")}.`,
+  },
+  {
+    id: "c1.r3",
+    lesson: "0.8",
+    type: "numeric",
+    prompt: "חוב של 300,000 ₪ מוצמד למדד. בשנה האחרונה המדד עלה ב־2%, ולא שילמתם כלום. כמה החוב אחרי ההצמדה?",
+    answer: f.raw("r3.answer"),
+    errors: [
+      { value: "300000", message: "בחוב שמוצמד למדד, הסכום גדל יחד עם המדד." },
+      { value: f.raw("r3.added"), message: "זו התוספת בלבד. השאלה שואלת כמה החוב כולו." },
+    ],
+    explanation: `300,000 ₪ ועוד 2% מהם: ${f.shekels("r3.answer")}.`,
+  },
+
+  // Stage 1.
+  {
+    id: "c1.q1",
+    lesson: "1.1",
+    type: "choice",
+    prompt: "מה זה שעבוד?",
+    options: [
+      { text: "הזכות של המלווה על נכס: למכור אותו אם לא משלמים, ולקבל את החוב ראשון מהמכירה", correct: true },
+      { text: "העברת הבעלות על הדירה לבנק, עד שמסיימים לשלם" },
+      { text: "ביטוח שהלווים קונים למקרה שלא יוכלו לשלם" },
+      { text: "הלוואה בלי שום נכס מאחוריה" },
+    ],
+    explanation: "שעבוד הוא זכות של המלווה על הבטוחה. הדירה נשארת של הלווים; אם הם לא משלמים, המלווה רשאי לממש אותה ולהיפרע קודם.",
+  },
+  {
+    id: "c1.q2",
+    lesson: "1.1",
+    type: "numeric",
+    prompt: `דירה משועבדת נמכרה ב־1,200,000 ₪, והחוב למלווה הוא 900,000 ₪. כמה כסף נשאר ללווים אחרי שהחוב נפרע?`,
+    answer: f.raw("q2.borrower"),
+    errors: [
+      { value: f.raw("q2.lender"), message: `${f.shekels("q2.lender")} הם החלק שהולך למלווה. השאלה שואלת מה נשאר ללווים.` },
+      { value: "1200000", message: "המחיר כולו לא נשאר ללווים: קודם נפרע החוב." },
+    ],
+    explanation: `מהמכירה נפרע קודם החוב, ${f.shekels("q2.lender")}. השאר, ${f.shekels("q2.borrower")}, נשאר ללווים.`,
+  },
+  {
+    id: "c1.q3",
+    lesson: "1.1",
+    type: "numeric",
+    prompt: "דירה משועבדת נמכרה ב־800,000 ₪, והחוב למלווה הוא 900,000 ₪. כמה חוב נשאר על הלווים אחרי המכירה?",
+    answer: f.raw("q3.owed"),
+    errors: [{ value: "0", tolerance: 0.5, message: "מכירת הדירה לא מוחקת את החוב. מה שהמכירה לא כיסתה נשאר חוב." }],
+    explanation: `המכירה כיסתה 800,000 ₪ מתוך 900,000 ₪. ${f.shekels("q3.owed")} נשארים חוב של הלווים.`,
+  },
+  {
+    id: "c1.q4",
+    lesson: "1.2",
+    type: "numeric",
+    unit: "%",
+    tolerance: 0.01,
+    near: 0,
+    prompt: "דירה עולה 1,800,000 ₪, וזה גם השווי שלה. הלווים לוקחים הלוואה של 1,260,000 ₪. מה שיעור המימון?",
+    answer: f.raw("q4.answer"),
+    errors: [{ value: f.raw("q4.equity_share"), tolerance: 0.01, message: `${f.plain("q4.equity_share")}% הוא החלק של ההון העצמי. שיעור המימון מדבר על ההלוואה: ההלוואה חלקי השווי.` }],
+    explanation: `ההלוואה חלקי השווי, כפול 100: ${f.plain("q4.answer")}%. ההון העצמי, ${f.shekels("q4.equity")}, הוא ${f.plain("q4.equity_share")}% הנותרים.`,
+  },
+  {
+    id: "c1.q5",
+    lesson: "1.2",
+    type: "numeric",
+    prompt: "נניח שהתקרה לשיעור המימון היא 75%. מה ההלוואה הגדולה ביותר לדירה ששווה 2,000,000 ₪?",
+    answer: f.raw("q5.max_loan"),
+    errors: [{ value: f.raw("q5.min_equity"), message: `${f.shekels("q5.min_equity")} הם ההון העצמי המינימלי. ההלוואה היא 75% מהשווי.` }],
+    explanation: `75% מ־2,000,000 ₪ הם ${f.shekels("q5.max_loan")}. את השאר, ${f.shekels("q5.min_equity")}, מביאים מהכסף שלכם.`,
+  },
+  {
+    id: "c1.q6",
+    lesson: "1.2",
+    type: "numeric",
+    prompt: "דירה עולה 2,000,000 ₪, אבל השווי שלה נקבע ל־1,900,000 ₪. נניח שהתקרה היא 75%. כמה הון עצמי צריך לפחות?",
+    answer: f.raw("q6.answer"),
+    errors: [
+      { value: f.raw("q5.min_equity"), message: "חישבתם לפי המחיר. שיעור המימון נמדד מול השווי, ולכן ההלוואה קטנה יותר — וצריך יותר הון עצמי." },
+      { value: f.raw("q6.max_loan"), message: `${f.shekels("q6.max_loan")} היא ההלוואה המרבית. ההון העצמי הוא המחיר פחות ההלוואה.` },
+    ],
+    explanation: `ההלוואה המרבית: 75% מהשווי, ${f.shekels("q6.max_loan")}. ההון העצמי: המחיר פחות ההלוואה, ${f.shekels("q6.answer")}.`,
+  },
+  {
+    id: "c1.q7",
+    lesson: "1.3",
+    type: "choice",
+    prompt: "״האם אחוז הריבית יכול לזוז במשך ההלוואה, ולפי מה?״ — לאיזו מהשאלות הנפרדות זה שייך?",
+    options: [
+      { text: "מנגנון הריבית", correct: true },
+      { text: "מטרת ההלוואה" },
+      { text: "שיטת ההחזר" },
+      { text: "שיעור המימון" },
+    ],
+    explanation: "מנגנון הריבית אומר איך נקבע אחוז הריבית לאורך ההלוואה. מטרת ההלוואה היא בשביל מה הכסף; שיטת ההחזר היא באיזה קצב הקרן חוזרת.",
+  },
+  {
+    id: "c1.q8",
+    lesson: "1.4",
+    type: "numeric",
+    prompt: "הלוואה של 1,500,000 ₪ מחולקת לשלושה מסלולים: 40% במסלול הראשון, 35% בשני, והשאר בשלישי. כמה שקלים במסלול השלישי?",
+    answer: f.raw("q8.third"),
+    errors: [
+      { value: f.raw("q8.first"), message: "זה המסלול הראשון. השלישי לוקח את מה שנשאר." },
+      { value: f.raw("q8.second"), message: "זה המסלול השני. השלישי לוקח את מה שנשאר." },
+    ],
+    explanation: `המסלולים מסתכמים בדיוק להלוואה: ${f.shekels("q8.first")} ועוד ${f.shekels("q8.second")}, והשאר — ${f.shekels("q8.third")} — במסלול השלישי.`,
+  },
+  {
+    id: "c1.q9",
+    lesson: "1.4",
+    type: "choice",
+    prompt: "מה זה תמהיל?",
+    options: [
+      { text: "ההרכב של המסלולים במשכנתא: אילו מסלולים, וכמה כסף בכל אחד", correct: true },
+      { text: "הריבית הממוצעת של כל הבנקים" },
+      { text: "המסמכים שמביאים לבנק" },
+      { text: "החלק של ההון העצמי במחיר הדירה" },
+    ],
+    explanation: "משכנתא היא בדרך כלל כמה הלוואות יחד — מסלולים. התמהיל הוא ההרכב שלהם.",
+  },
+  {
+    id: "c1.q10",
+    lesson: "1.5",
+    type: "choice",
+    prompt: "לדנה יש דירה, והיא קונה עוד דירה ומתכוונת להשאיר את הראשונה. איך נקראת הדירה החדשה?",
+    options: [
+      { text: "דירה נוספת", correct: true },
+      { text: "דירה חליפית" },
+      { text: "דירה יחידה" },
+      { text: "מחזור חיצוני" },
+    ],
+    explanation: "דירה נוספת — יש לכם דירה ותשאירו אותה. דירה חליפית — יש לכם דירה ותמכרו אותה בתוך תקופה שהבנק קובע. הקובע הוא בעלות, לא איפה גרים.",
+  },
+  {
+    id: "c1.q11",
+    lesson: "1.5",
+    type: "choice",
+    prompt: "יואב מעביר את המשכנתא הקיימת שלו לבנק אחר, בתנאים חדשים. איך זה נקרא?",
+    options: [
+      { text: "מחזור חיצוני", correct: true },
+      { text: "מחזור פנימי" },
+      { text: "הלוואה לכל מטרה" },
+      { text: "בנייה עצמית" },
+    ],
+    explanation: "מחזור — מחליפים משכנתא קיימת. פנימי באותו בנק, חיצוני בבנק אחר.",
+  },
+  {
+    id: "c1.q12",
+    lesson: "1.6",
+    type: "choice",
+    prompt: "מי מבין אלה עובד בשביל הלווים?",
+    options: [
+      { text: "יועץ המשכנתאות ועורך הדין שלהם", correct: true },
+      { text: "השמאי" },
+      { text: "הבנק" },
+      { text: "בנק ישראל" },
+    ],
+    explanation: "היועץ ועורך הדין עובדים בשביל הלווים; היועץ פונה לבנק בשמם לפי כתב הרשאה. השמאי נבחר מהרשימה של הבנק והדוח שלו הולך לבנק. בנק ישראל אינו צד בעסקה.",
+  },
+  {
+    id: "c1.q13",
+    lesson: "1.7",
+    type: "choice",
+    prompt: "באיזה סדר הדברים האלה קורים?",
+    options: [
+      { text: "אישור עקרוני ← חיתום ← העמדת ההלוואה", correct: true },
+      { text: "חיתום ← אישור עקרוני ← העמדת ההלוואה" },
+      { text: "אישור עקרוני ← העמדת ההלוואה ← חיתום" },
+      { text: "העמדת ההלוואה ← אישור עקרוני ← חיתום" },
+    ],
+    explanation: "אישור עקרוני הוא תשובה לפי מה שנמסר לבנק. החיתום בא אחריו: הבנק בודק לראשונה את המסמכים. העמדת ההלוואה, כשהכסף עובר, היא הסוף.",
+  },
+  {
+    id: "c1.q14",
+    lesson: "1.7",
+    type: "choice",
+    prompt: "לפי מה שלמדנו (תעתיק של הצוות, לא אומת), תוך כמה זמן בנק צריך לענות על בקשה לאישור עקרוני?",
+    options: [
+      { text: `${clocks.plain("clock.answer")} ימי עסקים בנקאיים (${clocks.plain("clock.answer_extended")} בתנאים מסוימים)`, correct: true },
+      { text: `${clocks.plain("clock.window")} יום, כולל שבתות וחגים` },
+      { text: `${clocks.plain("clock.appraisal")} יום` },
+      { text: "אין שום מגבלת זמן" },
+    ],
+    explanation: `השעון הראשון: ${clocks.plain("clock.answer")} ימי עסקים בנקאיים לתשובה. ה־${clocks.plain("clock.window")} יום הם שעון אחר — כמה זמן התנאים מחזיקים.`,
+  },
+  {
+    id: "c1.q15",
+    lesson: "1.8",
+    type: "choice",
+    prompt: "קיבלתם אישור עקרוני. בחיתום התברר שההכנסה נמוכה ממה שנמסר. מה קורה לתנאים שבאישור?",
+    options: [
+      { text: "הבנק כבר לא מחויב להם: האישור ניתן לפי נתונים שהתבררו כלא נכונים", correct: true },
+      { text: "הבנק חייב לתת את ההלוואה בדיוק בתנאים שבאישור" },
+      { text: "התנאים נשארים, רק התוקף מתקצר" },
+      { text: "הכסף כבר הועבר, ולכן אין שינוי" },
+    ],
+    explanation: "אישור עקרוני הוא מחיר על נתונים שעוד לא נבדקו. כשהבדיקה מוצאת פער, ההתחייבות לתנאים נופלת.",
+  },
+  {
+    id: "c1.q16",
+    lesson: "1.8",
+    type: "choice",
+    prompt: "לפי מה שלמדנו (לא אומת), לכמה זמן לפחות הבנק מחזיק בתנאים שבאישור העקרוני, ואיך סופרים?",
+    options: [
+      { text: `${clocks.plain("clock.window")} יום (${clocks.plain("clock.window_no_lien")} בלי שעבוד חדש), וסופרים את כל הימים`, correct: true },
+      { text: `${clocks.plain("clock.window")} ימי עסקים בלבד` },
+      { text: "שלושה חודשים" },
+      { text: `${clocks.plain("clock.answer")} ימי עסקים` },
+    ],
+    explanation: `לפי התעתיק: לפחות ${clocks.plain("clock.window")} יום, ${clocks.plain("clock.window_no_lien")} כשאין שעבוד חדש, וכל הימים נספרים. ״שלושה חודשים״ — לא נמצא לזה מקור.`,
+  },
+  {
+    id: "c1.q17",
+    lesson: "1.9",
+    type: "numeric",
+    prompt: "לחשבון של נועם נכנסים 12,400 ₪ בחודש, ולחשבון של שירה 9,300 ₪. יש להם הלוואת רכב של 1,450 ₪ בחודש. מה ההכנסה הפנויה שלהם, לפני המחיה?",
+    answer: f.raw("q12.answer"),
+    errors: [{ value: f.raw("q12.incomes"), message: "זה סך ההכנסות. ההכנסה הפנויה היא אחרי שמורידים את התשלומים הקבועים — כאן, הלוואת הרכב." }],
+    explanation: `סך ההכנסות, ${f.shekels("q12.incomes")}, פחות התשלום הקבוע: ${f.shekels("q12.answer")}.`,
+  },
+  {
+    id: "c1.q18",
+    lesson: "1.9",
+    type: "choice",
+    prompt: "מה מהבאים הכי נזיל?",
+    options: [
+      { text: "כסף בחשבון העו״ש", correct: true },
+      { text: "דירה להשקעה" },
+      { text: "חיסכון שנעול עד מועד מסוים, ושבירה שלו עולה כסף" },
+      { text: "רכב" },
+    ],
+    explanation: "נזילות היא כמה מהר אפשר להפוך כסף או נכס למזומן, בלי להפסיד מערכו. כסף בעו״ש כבר מזומן; את השאר צריך למכור או לשבור, וזה לוקח זמן או עולה כסף.",
+  },
+];
+
+זו הבדיקה של שלב 1: {questions.length} שאלות. רובן על שלב 1, ושלוש חוזרות לשלב 0 — כי מה שלמדנו שם ממשיך לשמש אותנו.
+
+- כדי לעבור צריך לפחות 80% תשובות נכונות. מי שעובר פותח את שלב 2.
+- אחרי הבדיקה, ליד כל שאלה מופיעים התשובה, ההסבר והשיעור שכדאי לחזור אליו. אפשר לנסות שוב כמה פעמים שרוצים.
+- בחלק מהשאלות צריך מחשבון. בתשובה מספרית כותבים רק ספרות, עם פסיקים או בלעדיהם.
+- הכללים הרשמיים שבשאלות (שעונים ותקרות) הם לפי תעתיק של הצוות, ועוד לא אומתו מול המקור.
+
+<Callout tone="info" title="דוגמה לימודית">
+  נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.
+</Callout>
+
+<StageCheck client:load stage={1} questions={questions} nextHref={isBuilt("2.1") ? lessonHref("2.1") : "/"} nextLabel={isBuilt("2.1") ? "לשלב 2" : "למפת הקורס (שלב 2 בכתיבה)"} />
+
+{/* Internal note: numbers come from scripts/lessons/check-1.ts → data/lessons/check-1.json (rechecked by checks/independent_check.py), and the clocks from lesson 1.7's data. The three r-questions repeat stage 0, as the brief requires of every stage check. */}
