@@ -160,3 +160,30 @@ What works:
 - Extremes (2,000,000 ₪ at 8%; 5 years with 36 grace months) render without overflow, clipping or errors.
 - No horizontal page scroll, nothing under 12px, no console messages from the component. (`/video/2-9.mp4` is missing from `dist/video/`.)
 
+## BalanceForces (2.11)
+
+Bugs:
+- **חשוב — when the index falls, or the payment is 0, the sentence under the cards says something impossible.**
+  - Steps: indexed track, 3%, "הריבית זזה" −2, index −2%, payment 30,000.
+  - What happened: "מתוך 30,000 ₪ ששילמתם, רק 35,100 ₪ הורידו את היתרה. השאר כיסה את הריבית ואת ההצמדה." Also with payment 0: "מתוך 0 ₪ ששילמתם, רק 10,000 ₪ הורידו את היתרה", and with balance 100,000 / payment 100,000 / index −2%: "מתוך 100,000 ₪…, רק 102,000 ₪". The "principal paid" is payment − interest − indexation, which is larger than the payment when interest plus indexation is negative, and the sentence assumes it never is. The waterfall label also stays "הצמדה · היתרה עצמה גדלה עם המדד" next to −10,000 ₪.
+  - Expected: a branch for interest plus indexation below zero (for example "המדד ירד, ולכן היתרה ירדה ב־35,100 ₪ — יותר מהתשלום"), and an indexation note that says "קטנה" when the index falls. Or a minimum of 0% on the index slider.
+  - Screenshot: `qa/components/stage-2/BalanceForces-desktop-12-deflation-change-2.png`, `qa/components/stage-2/BalanceForces-phone-05-deflation-change-2.png`.
+- **קטן — the rate change in the waterfall row's note reads backwards.** The note "· −2 נקודות אחוז, על היתרה בתחילת השנה" is not in an `.ltr` span, so in RTL the minus sign is drawn to the right of the digit ("2−"; measured: minus at x=764, digit at x=757). The same happens with "+1". The slider's own output above is in `.ltr` and reads "−2" correctly.
+  - Steps: set "הריבית זזה" to −2 (or +1) and read the new "ריבית מהשינוי בריבית" row.
+  - Expected: `<span class="ltr">` around the signed number, as everywhere else.
+  - Screenshot: `qa/components/stage-2/BalanceForces-desktop-12-deflation-change-2.png`.
+- **קטן — two small wording and format slips in the outputs.**
+  - The index output uses a hyphen ("-2%"), while the rate change uses a real minus ("−2"). Screenshot: `qa/components/stage-2/BalanceForces-desktop-12b-negative-outputs.png`.
+  - One point is written "+1 נקודות אחוז" (slider output and row note). RateLayers writes "בנקודת אחוז אחת" and "0.5 נקודת אחוז" for the same thing. Screenshot: `qa/components/stage-2/BalanceForces-phone-03-unlinked-5-change+1.png`.
+
+What works:
+- The defaults match `data/lessons/2-11.json`: indexation +10,000 (`i.indexation`), interest +15,000 (`i.interest_base`), interest on indexation +300 (`i.interest_on_indexation`), payment −30,000; closing 495,300 (`i.after`), change −4,700, "רק 4,700 ₪ הורידו את היתרה" (`i.principal_paid`). The moment card says 510,000 instead of 500,000 (`i.indexed_balance`).
+- Task 1 (non-indexed, 5%, set with eight ArrowLeft presses): interest 25,000, closing 495,000, "רק 5,000 ₪" (`u.interest_5`, `u.after_5`, `u.principal_paid_5`).
+- Task 2 (+1 point): a new row of +5,000 (`u.change_extra`); the "rate moved" moment card says the balance is still 500,000; closing 500,000 (`u.after_6`), "התשלום כיסה בדיוק את הריבית".
+- Task 3 (indexed, 3%, index 6%): closing 515,900 (`slider.idx6_after`), "היתרה גדלה ב־15,900 ₪, למרות ששילמתם", and the total bar crosses to the "adds" side.
+- The rows always add up: opening + rows = closing in every state I tried, and the table repeats the same rows with the opening and closing balances.
+- The waterfall is consistent: each bar starts where the one above ended; additions go left and the payment right, as the caption says; the dashed zero line is at the same place in every row.
+- Limits hold: with a 1% rate the change slider's minimum becomes −1 and the value is clamped from −2; with a 100,000 balance the payment's maximum becomes 100,000 and the value is clamped from 120,000.
+- Keyboard: Tab goes track toggle (two buttons), the five sliders, the table button, each with a ring; the toggles take Enter, report `aria-pressed` and keep focus; the table opens with Enter.
+- No horizontal scroll, nothing under 12px, nothing clipped, no console messages from the component. (`/video/2-11.mp4` is missing from `dist/video/`.)
+

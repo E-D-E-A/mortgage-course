@@ -58,6 +58,8 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - **"בשקלים של היום"** means a value today found by discounting at an interest rate (0.5–0.6). A sum adjusted for inflation is **"בכוח קנייה של היום"** (0.8). Never mix the two.
 - **The "בשיעור הבא" line uses the next lesson's exact title** from the map. A stage's last lesson leads to the stage check (`/checks/<stage>/`); the layout's button does this.
 - **Tables:** a fill-in table must fit 340px (FillTable does). A wide reading table may scroll; the layout adds a "יש עוד עמודות משמאל" hint on its own. Still, keep the column the text talks about early (on the right).
+- **The three cases follow the map's timeline.** Case A (נועם ושירה) gets its mix in stage 5 and its bank offers in stage 6; before that it appears only with the numbers already given (price, equity, loan, incomes). A lesson that needs a track, an offer or a mix before then uses other invented people, or says plainly "תרגיל נפרד, לא התיק של נועם ושירה".
+- **Mogi decisions** (DEC-1…DEC-4 in `research/field-knowledge.md`) are marked `החלטה של Mogi`, with who and when; they do not wait for Eylon. Field claims (FK-H-…) do.
 - **Live official data** (a rate, a date) is written with its date in the text: "נכון ל־9 באוקטובר 2026, … (לא אומת)". Never "היום", never "תמיד".
 - Exercise wording always has the actor and the verb: "הפקדתם 30,000 ₪ ל־10 שנים…", not "30,000 ₪ ל־10 שנים".
 - Keep the brief's distinctions exact. 5% → 6% is **one percentage point** (נקודת אחוז), not "one percent". Name two near-identical terms apart when both appear (ריבית דריבית is the method; ריבית על ריבית is the extra amount).
