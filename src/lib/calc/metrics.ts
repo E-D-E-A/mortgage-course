@@ -11,9 +11,15 @@
  *    string; the monthly rate is the annual rate ÷ 12 (lesson 0.4).
  *  - Payments are monthly, at the end of each month. A payment list starts
  *    with month 1.
- *  - Schedules here are exact: nothing is rounded on the way; money is rounded
- *    to the agora once, when shown (money.ts). A bank statement rounds every
- *    month, so its totals can differ from these by agorot.
+ *  - Two rounding conventions, chosen per track (`rounding`, from schedule.ts):
+ *    "exact" (the default here, for the API's sake): nothing is rounded on the
+ *    way; money is rounded to the agora once, when shown (money.ts).
+ *    "statement": what the lessons show (course/AUTHORING.md): the balance in
+ *    agorot, each month's interest rounded to the agora, the payment rounded
+ *    once when it is set, the last payment clearing the balance — the same
+ *    rows as amortization.ts's annuityStatement / equalPrincipalStatement on a
+ *    flat unlinked track, so 2.9, 3.9 and 3.12 agree on the same loan. Present
+ *    values and IRRs are then computed on those payments, unrounded.
  *  - The schedules themselves come from schedule.ts (lessons 3.5–3.7), which
  *    builds on amortization.ts: the level payment, a rate that changes at
  *    resets (recalculated on the balance left, over the months left), equal
@@ -35,7 +41,9 @@
  */
 import Decimal from "decimal.js";
 import { monthlyIndexFactor, pathSchedule } from "./amortization.ts";
-import { scheduleFromPaths } from "./schedule.ts";
+import { type Rounding, scheduleFromPaths } from "./schedule.ts";
+
+export type { Rounding };
 
 export type Numeric = Decimal.Value;
 
@@ -65,6 +73,8 @@ export interface Track {
   inflationPercent?: Numeric;
   /** Grace methods: months of grace at the start, inside the term. */
   graceMonths?: number;
+  /** "exact" (default) or "statement" (every row in agorot; what the lessons show). */
+  rounding?: Rounding;
 }
 
 /** One month of a track. */
@@ -96,30 +106,38 @@ export function ratePath(track: Track): Decimal[] {
   return Array.from({ length: track.months }, (_, t) => new D(track.rates[Math.min(Math.floor(t / block), track.rates.length - 1)]));
 }
 
-/** A grace period at the start, then the level payment on what is owed, over the months left. Exact. */
+const agorot = (d: Decimal) => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+
+/**
+ * A grace period at the start, then the level payment on what is owed, over
+ * the months left. "statement": each grace month's interest in agorot, then
+ * the statement level payment.
+ */
 function graceRows(track: Track, kind: "partial" | "full"): MetricRow[] {
   const grace = track.graceMonths ?? 0;
   assertWhole("graceMonths", grace, 0);
   if (grace >= track.months) throw new RangeError("the grace must be shorter than the loan");
+  const statement = track.rounding === "statement";
   const rate = new D(track.rates[0]);
   const m = rate.div(TWELVE).div(HUNDRED);
   const rows: MetricRow[] = [];
-  let balance = new D(track.principal);
+  let balance = statement ? agorot(new D(track.principal)) : new D(track.principal);
   for (let k = 1; k <= grace; k++) {
-    const interest = balance.mul(m);
+    const interest = statement ? agorot(balance.mul(m)) : balance.mul(m);
     const payment = kind === "partial" ? interest : ZERO;
     const closing = balance.plus(interest).minus(payment);
     rows.push({ month: k, opening: balance, indexation: ZERO, interest, payment, principalPaid: payment.minus(interest), closing, rate });
     balance = closing;
   }
-  const after = pathSchedule(balance, Array.from({ length: track.months - grace }, () => rate));
+  const left = Array.from({ length: track.months - grace }, () => rate);
+  const after = statement ? scheduleFromPaths(balance, left, undefined, "spitzer", "statement") : pathSchedule(balance, left);
   for (const r of after) {
     rows.push({ month: r.month + grace, opening: r.opening, indexation: ZERO, interest: r.interest, payment: r.payment, principalPaid: r.principalPaid, closing: r.closing, rate });
   }
   return rows;
 }
 
-/** Every month of a track, exact (round only for display). */
+/** Every month of a track, by its rounding convention (default exact: round only for display). */
 export function trackRows(track: Track): MetricRow[] {
   const method = track.method ?? "spitzer";
   const inflation = new D(track.inflationPercent ?? 0);
@@ -129,7 +147,7 @@ export function trackRows(track: Track): MetricRow[] {
   if (method === "grace_partial") return graceRows(track, "partial");
   if (method === "grace_full") return graceRows(track, "full");
   const factors = inflation.isZero() ? undefined : Array.from({ length: track.months }, () => monthlyIndexFactor(inflation));
-  return scheduleFromPaths(track.principal, ratePath(track), factors, method).map((r) => ({
+  return scheduleFromPaths(track.principal, ratePath(track), factors, method, track.rounding ?? "exact").map((r) => ({
     month: r.month,
     opening: r.opening,
     indexation: r.indexation,

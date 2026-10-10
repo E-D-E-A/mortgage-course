@@ -37,15 +37,24 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import { roundedString } from "../../src/lib/calc/rates.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
-/** The schedule as the Python check reads it: one track per ";", fields "|"-separated. */
+/**
+ * Teaching numbers follow the statement convention (course/AUTHORING.md): every
+ * schedule a fact is built from is rounded the way a statement is, unless the
+ * track says otherwise. So the same loan gives the same totals in 2.9, 3.9 and
+ * 3.12. Present values and IRRs are computed on those payments.
+ */
+export const st = (t: Track): Track => ({ ...t, rounding: t.rounding ?? "statement" });
+
+/** The schedule as the Python check reads it: one track per ";", fields "|"-separated; the last is the rounding. */
 export const enc = (tracks: Track[]) =>
   tracks
+    .map(st)
     .map((t) =>
-      [t.method ?? "spitzer", t.principal, t.rates.join(","), t.blockMonths ?? t.months, t.months, t.inflationPercent ?? 0, t.graceMonths ?? 0].join("|"),
+      [t.method ?? "spitzer", t.principal, t.rates.join(","), t.blockMonths ?? t.months, t.months, t.inflationPercent ?? 0, t.graceMonths ?? 0, t.rounding].join("|"),
     )
     .join(";");
 
-const pays = (tracks: Track[]) => (tracks.length === 1 ? trackPayments(tracks[0]) : mixPayments(tracks));
+const pays = (tracks: Track[]) => (tracks.length === 1 ? trackPayments(st(tracks[0])) : mixPayments(tracks.map(st)));
 
 export const given = (id: string, value: string): Fact => ({ id, kind: "given", inputs: {}, value });
 
@@ -122,7 +131,7 @@ export const balanceAfter = (id: string, track: Track, month: number): Fact => (
   id,
   kind: "met_balance",
   inputs: { tracks: enc([track]), month },
-  value: moneyString(trackRows(track)[month - 1].closing),
+  value: moneyString(trackRows(st(track))[month - 1].closing),
 });
 
 export const total = (id: string, tracks: Track[]): Fact => ({
@@ -136,14 +145,14 @@ export const interest = (id: string, track: Track): Fact => ({
   id,
   kind: "met_total_interest",
   inputs: { tracks: enc([track]) },
-  value: moneyString(breakdown(track).interest),
+  value: moneyString(breakdown(st(track)).interest),
 });
 
 export const indexation = (id: string, track: Track): Fact => ({
   id,
   kind: "met_total_indexation",
   inputs: { tracks: enc([track]) },
-  value: moneyString(breakdown(track).indexation),
+  value: moneyString(breakdown(st(track)).indexation),
 });
 
 /** The value today of a schedule at a rate: "annual" (÷ 12) or "monthly". */
@@ -152,6 +161,14 @@ export const pv = (id: string, tracks: Track[], rate: string, basis: "annual" | 
   kind: "met_pv",
   inputs: { tracks: enc(tracks), rate_percent: rate, basis },
   value: moneyString(basis === "annual" ? presentValueAtAnnual(pays(tracks), rate) : presentValue(pays(tracks), rate)),
+});
+
+/** The value today of the same rounded payment `months` times, at an annual rate (monthly = annual ÷ 12): a spreadsheet's =PV. */
+export const pvLevel = (id: string, payment: Fact, months: number, rate: string): Fact => ({
+  id,
+  kind: "met_pv_level",
+  inputs: { payment: payment.id, months, rate_percent: rate },
+  value: moneyString(presentValueAtAnnual(Array.from({ length: months }, () => payment.value as string), rate)),
 });
 
 /** The value today of a plain list of monthly payments, at a monthly rate. */
@@ -226,7 +243,7 @@ export const bisection = (id: string, tracks: Track[], received: string, low: st
 
 /** One row per block of months: each track's rate and payment in the block's first month, and the mix's total. */
 export const blocks = (id: string, tracks: Track[], blockMonths: number): Fact => {
-  const each = tracks.map(trackPayments);
+  const each = tracks.map((t) => trackPayments(st(t)));
   const paths = tracks.map(ratePath);
   const n = Math.max(...each.map((p) => p.length));
   const rows: Record<string, string | number>[] = [];
@@ -308,9 +325,11 @@ export default function lesson38(): LessonData {
   const x5Var: Track = { principal: "350000", rates: ["4.5", "5", "5.5", "6"], blockMonths: 60, months: 240 };
   const x5Max = highest("ex5.answer", [x5Fixed, x5Var]);
   const x5FixedPay = first("ex5.fixed_pay", [x5Fixed]);
-  const x5VarMax = highest("ex5.var_max", [x5Var]);
+  // The variable track's payment in years 16-20 (month 181), as the table shows it. (Its very last
+  // payment, which clears the balance, is a few agorot more: the statement convention.)
+  const x5VarMax = payment("ex5.var_max", [x5Var], 181);
   // 6: Mogi's highlight — the forecast maximum against today's payment.
-  const x6: Track = { principal: "500000", rates: ["4.2", "5.2", "5.8", "5.8"], blockMonths: 60, months: 240 };
+  const x6: Track = { principal: "500000", rates: ["4.2", "5.2", "5.8", "5.5"], blockMonths: 60, months: 240 };
   const x6First = first("ex6.first", [x6]);
   const x6Max = highest("ex6.max", [x6]);
   const x6Gap = difference("ex6.gap", x6Max, x6First);
@@ -318,6 +337,17 @@ export default function lesson38(): LessonData {
   // ── Half-worked: a fixed track for 10 years beside a variable one for 20. ──
   const hFixed: Track = { principal: "200000", rates: ["4.9"], months: 120 };
   const hVar: Track = { principal: "400000", rates: ["4.4", "5.4", "6", "5.6"], blockMonths: 60, months: 240 };
+
+  // ── When the first payment and the payment under today's terms differ. ──
+  // (a) A prime track taken three years ago at 4.5%; prime has since risen one point: 5.5% from month 37.
+  const prime: Track = { principal: "400000", rates: ["4.5", "5.5"], blockMonths: 36, months: 240 };
+  const dFirst = first("diff.prime_first", [prime]);
+  const dNow = payment("diff.prime_now", [prime], 37);
+  // (b) A fixed linked track, 3% a year, the index rising 2% a year (a teaching assumption):
+  // the payment under today's terms has no index move; the first payment already has one month of it.
+  const dLinked: Track = { principal: "600000", rates: ["3"], months: 240, inflationPercent: "2" };
+  const dLinkedNow = first("diff.linked_now", [{ ...dLinked, inflationPercent: "0" }]);
+  const dLinkedFirst = first("diff.linked_first", [dLinked]);
 
   // ── The illustration's defaults (ForecastPaths.vue): the explanation's track. ──
   const sHigh: Track = { ...forecast, rates: ["4.6", "5.1", "6.5", "5.3"] };
@@ -344,6 +374,16 @@ export default function lesson38(): LessonData {
     above("explain.above", fMax, fFirst, 1),
     threshold("explain.highlight_at", fFirst, "10"),
 
+    // When the first payment and the payment under today's terms differ.
+    given("diff.prime_loan", "400000.00"),
+    dFirst,
+    dNow,
+    difference("diff.prime_gap", dNow, dFirst),
+    given("diff.linked_loan", "600000.00"),
+    dLinkedNow,
+    dLinkedFirst,
+    difference("diff.linked_gap", dLinkedFirst, dLinkedNow),
+
     // The illustration's guided tasks.
     highest("slider.high_max", [sHigh]),
     highestMonth("slider.high_max_month", [sHigh]),
@@ -356,6 +396,8 @@ export default function lesson38(): LessonData {
     wFirst,
     blocks("worked.blocks", W, 60),
     wVarMax,
+    difference("worked.var_gap", wVarMax, wVarFirst),
+    above("worked.var_above", wVarMax, wVarFirst, 1),
     wMax,
     highestMonth("worked.max_month", W),
     difference("worked.max_gap", wMax, wFirst),
@@ -365,9 +407,12 @@ export default function lesson38(): LessonData {
     difference("worked.high_gap", wHighMax, wMax),
 
     // Half-worked.
+    given("half.fixed_amount", "200000.00"),
+    given("half.var_amount", "400000.00"),
     blocks("half.blocks", [hFixed, hVar], 60),
     highest("half.max", [hFixed, hVar]),
     highestMonth("half.max_month", [hFixed, hVar]),
+    highestMonth("ex6.max_month", [x6]),
     highest("half.var_max", [hVar]),
     first("half.fixed_pay", [hFixed]),
 
@@ -376,6 +421,7 @@ export default function lesson38(): LessonData {
     x2Answer,
     difference("ex2.err_tenth", x2Answer, x2Base),
     // Exercise 3: the payment after the reset.
+    given("ex3.loan", "400000.00"),
     first("ex3.first", [x3]),
     x3Balance,
     payment("ex3.answer", [x3], 61),
@@ -386,13 +432,13 @@ export default function lesson38(): LessonData {
     x5FixedPay,
     first("ex5.var_first", [x5Var]),
     x5VarMax,
-    highestMonth("ex5.var_max_month", [x5Var]),
     blocks("ex5.blocks", [x5Fixed, x5Var], 60),
     x5Max,
     highestMonth("ex5.answer_month", [x5Fixed, x5Var]),
     sumOf("ex5.err_sum", [x5FixedPay, x5VarMax]),
     first("ex5.mix_first", [x5Fixed, x5Var]),
     // Exercise 6.
+    given("ex6.loan", "500000.00"),
     x6First,
     blocks("ex6.blocks", [x6], 60),
     x6Max,
@@ -405,7 +451,7 @@ export default function lesson38(): LessonData {
   return {
     lesson: "3.8",
     title: "החזר ראשון, החזר בתנאים הנוכחיים, החזר מרבי חזוי",
-    note: "Teaching numbers, not market rates. The variable tracks' later rates are invented paths for teaching, not the Bank of Israel's forecast. Monthly rate = annual ÷ 12; the payment is recalculated on the balance left at each reset; exact schedules, rounded to the agora only when shown.",
+    note: "Teaching numbers, not market rates. The variable tracks' later rates are invented paths for teaching, not the Bank of Israel's forecast. Monthly rate = annual ÷ 12; the payment is recalculated on the balance left at each reset; schedules follow the statement convention (balance and each month's interest in agorot, the payment rounded when set, the last payment clearing the balance).",
     facts,
   };
 }

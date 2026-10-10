@@ -10,15 +10,18 @@
  * The index series (100 → 100.3 → 100.5 → 100.4 …) and the inflation paths are
  * teaching scenarios, not forecasts. The schedule engine is src/lib/calc/schedule.ts:
  * the balance is indexed every month before the payment (Mogi decision DEC-3), so
- * already payment 1 carries one month of index — the same as amortization.ts's
- * pathSchedule.
+ * already payment 1 carries one month of index. Every table and worked row uses its
+ * statement rounding (course/AUTHORING.md): balance, interest and payment in agorot
+ * each month, the payment the printed C × M_k ÷ M_0 rounded, so every equality the
+ * page prints holds on the printed numbers. LinkedSchedule.vue uses the same.
  *
  * The fact builders at the top are exported for lessons 3.6 and 3.7.
  */
 import Decimal from "decimal.js";
 import { annuityBalance, annuityPayment, monthInterest } from "../../src/lib/calc/amortization.ts";
-import { indexedAmount } from "../../src/lib/calc/indexation.ts";
+import { changePercent, indexedAmount, plainNumber } from "../../src/lib/calc/indexation.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
+import { periodicRateByDivision, periodicRateFromEffective, roundedString } from "../../src/lib/calc/rates.ts";
 import {
   interimInterest,
   type PathInputs,
@@ -138,11 +141,14 @@ export default function lesson35(): LessonData {
   const N = 240;
   const R = "3";
   const INDEX = ["100", "100.3", "100.5", "100.4"];
-  const linked = pathInputs({ principal: P, months: N, rate: R, index: INDEX });
-  const once = pathInputs({ principal: P, months: N, rate: R, index: ["100", "100.3"] });
-  const unlinked = pathInputs({ principal: P, months: N, rate: R });
+  const S = "statement" as const; // every teaching row in agorot, as a statement shows it
+  const linked = pathInputs({ principal: P, months: N, rate: R, index: INDEX, rounding: S });
+  const once = pathInputs({ principal: P, months: N, rate: R, index: ["100", "100.3"], rounding: S });
+  const unlinked = pathInputs({ principal: P, months: N, rate: R, rounding: S });
   const c = payment("explain.c", P, R, N);
-  const onceExtra = schTotal("once.payment_extra_total", once, "payment_indexation");
+  const oncePaid = schTotal("once.paid_total", once, "payment");
+  const unlinkedPaid = schTotal("unlinked.paid_total", unlinked, "payment");
+  const onceExtra = difference("once.payment_extra_total", oncePaid, unlinkedPaid);
   const onceIndexation = schTotal("once.indexation_total", once, "indexation");
 
   const m1Index = schRow("m1.indexation", linked, 1, "indexation");
@@ -152,7 +158,7 @@ export default function lesson35(): LessonData {
   const m1Principal = schRow("m1.principal", linked, 1, "principal_paid");
   const m1Closing = schRow("m1.closing", linked, 1, "closing");
   const u1Interest = interest("u1.interest", P, R);
-  const u1Closing = balance("u1.closing", P, R, N, 1);
+  const u1Closing = schRow("u1.closing", unlinked, 1, "closing");
 
   const m2Index = schRow("m2.indexation", linked, 2, "indexation");
   const m2Opening = schRow("m2.opening", linked, 2, "opening");
@@ -169,20 +175,20 @@ export default function lesson35(): LessonData {
   const m3Closing = schRow("m3.closing", linked, 3, "closing");
 
   // The illustration: 2% a year, evenly; the same track unlinked at the same 3%.
-  const two = pathInputs({ principal: P, months: N, rate: R, inflation: ["2"] });
-  const four = pathInputs({ principal: P, months: N, rate: R, inflation: ["4"] });
+  const two = pathInputs({ principal: P, months: N, rate: R, inflation: ["2"], rounding: S });
+  const four = pathInputs({ principal: P, months: N, rate: R, inflation: ["4"], rounding: S });
 
   // Worked example: Yael, a linked track of 250,000 ₪ for 25 years at 3.2%, paid out on 18 December 2026.
   const W = "250000";
   const WN = 300;
   const WR = "3.2";
-  const worked = pathInputs({ principal: W, months: WN, rate: WR, index: ["100", "100.4"] });
+  const worked = pathInputs({ principal: W, months: WN, rate: WR, index: ["100", "100.4"], rounding: S });
   const wStart = scheduleStart("2026-12-18");
   const wc = payment("worked.c", W, WR, WN);
   const wPay = schRow("worked.payment", worked, 1, "payment");
 
   // Exercises.
-  const ex4 = pathInputs({ principal: "320000", months: 240, rate: "3.5", index: ["100", "100.4"] });
+  const ex4 = pathInputs({ principal: "320000", months: 240, rate: "3.5", index: ["100", "100.4"], rounding: S });
   const ex5c = payment("ex5.c", "320000", "3.5", 240);
 
   const facts: Fact[] = [
@@ -190,6 +196,7 @@ export default function lesson35(): LessonData {
     given("case.rate", R),
     given("case.months", String(N)),
     ...INDEX.map((m, k) => given(`index.${k}`, m)),
+    { id: "index.rise1", kind: "infl_change_percent", inputs: { old: "100", new: "100.3" }, value: plainNumber(changePercent("100", "100.3")) },
 
     // Prediction: the first payment when the index rose 0.3% in month 1.
     c,
@@ -212,6 +219,8 @@ export default function lesson35(): LessonData {
     difference("u1.principal", c, u1Interest),
     u1Closing,
     difference("m1.gap", m1Closing, u1Closing),
+    // The check: the unlinked balance after month 1, × 100.3 ÷ 100, is the linked balance.
+    indexed("check.m1", v(u1Closing), "100", "100.3"),
     m2Index,
     m2Opening,
     m2Interest,
@@ -226,6 +235,8 @@ export default function lesson35(): LessonData {
     m3Closing,
     difference("m3.payment_fall", m2Payment, m3Payment),
     // The 1,200 ₪ is not paid at once: if the index stays at 100.3, all the payments' indexation parts add up to more.
+    oncePaid,
+    unlinkedPaid,
     onceExtra,
     onceIndexation,
     difference("once.interest_on", onceExtra, onceIndexation),
@@ -236,7 +247,10 @@ export default function lesson35(): LessonData {
     schRow("slider.m1_indexation", two, 1, "indexation"),
     schRow("slider.m120_payment", two, 120, "payment"),
     schRow("slider.m120_balance", two, 120, "closing"),
-    balance("slider.u120_balance", P, R, N, 120),
+    schRow("slider.u120_balance", unlinked, 120, "closing"),
+    // The illustration's monthly index step: the twelfth root of 1.02 (lesson 0.4), not 2% ÷ 12.
+    { id: "slider.monthly_root", kind: "monthly_rate_from_effective", inputs: { effective_percent: "2", periods_per_year: 12, decimals: 3 }, value: roundedString(periodicRateFromEffective("2", 12), 3) },
+    { id: "slider.monthly_div", kind: "monthly_rate_by_division", inputs: { annual_percent: "2", periods_per_year: 12, decimals: 3 }, value: roundedString(periodicRateByDivision("2", 12), 3) },
     schTotal("slider.indexation_120", two, "indexation", 120),
     schRow("slider.four_m60_balance", four, 60, "closing"),
     schRow("slider.four_m12_balance", four, 12, "closing"),
@@ -244,6 +258,7 @@ export default function lesson35(): LessonData {
     // Worked example.
     given("worked.amount", "250000.00"),
     ...startFacts("worked", "2026-12-18"),
+    { id: "worked.rise", kind: "infl_change_percent", inputs: { old: "100", new: "100.4" }, value: plainNumber(changePercent("100", "100.4")) },
     interim("worked.interim", W, WR, wStart.interimDays),
     wc,
     schRow("worked.indexation", worked, 1, "indexation"),
@@ -292,7 +307,7 @@ export default function lesson35(): LessonData {
   return {
     lesson: "3.5",
     title: "הצמדה לאורך ציר הזמן",
-    note: "Teaching numbers: loans, rates, the index series and the inflation paths are illustrations, not forecasts. Schedules from src/lib/calc/schedule.ts (balance indexed every month before the payment, DEC-3). The §17 start rule and the interim period follow the team's transcription of Directive 451 in the Brain, not verified; interim interest by the day uses ÷ 365, the course's assumption.",
+    note: "Teaching numbers: loans, rates, the index series and the inflation paths are illustrations, not forecasts. Schedules from src/lib/calc/schedule.ts (balance indexed every month before the payment, DEC-3), in statement rounding (every row in agorot). The §17 start rule and the interim period follow the team's transcription of Directive 451 in the Brain, not verified; interim interest by the day uses ÷ 365, the course's assumption.",
     facts,
   };
 }

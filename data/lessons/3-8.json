@@ -1,7 +1,7 @@
 {
   "lesson": "3.8",
   "title": "החזר ראשון, החזר בתנאים הנוכחיים, החזר מרבי חזוי",
-  "note": "Teaching numbers, not market rates. The variable tracks' later rates are invented paths for teaching, not the Bank of Israel's forecast. Monthly rate = annual ÷ 12; the payment is recalculated on the balance left at each reset; exact schedules, rounded to the agora only when shown.",
+  "note": "Teaching numbers, not market rates. The variable tracks' later rates are invented paths for teaching, not the Bank of Israel's forecast. Monthly rate = annual ÷ 12; the payment is recalculated on the balance left at each reset; schedules follow the statement convention (balance and each month's interest in agorot, the payment rounded when set, the last payment clearing the balance).",
   "facts": [
     {
       "id": "explain.loan",
@@ -21,7 +21,7 @@
       "id": "explain.fixed_pay",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6|240|240|0|0"
+        "tracks": "spitzer|600000|4.6|240|240|0|0|statement"
       },
       "value": "3828.36"
     },
@@ -29,7 +29,7 @@
       "id": "explain.first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "3828.36"
     },
@@ -37,7 +37,7 @@
       "id": "explain.pay_61",
       "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement",
         "month": 61
       },
       "value": "3957.11"
@@ -46,7 +46,7 @@
       "id": "explain.pay_121",
       "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement",
         "month": 121
       },
       "value": "4030.31"
@@ -55,16 +55,16 @@
       "id": "explain.pay_181",
       "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement",
         "month": 181
       },
-      "value": "4010.87"
+      "value": "4010.86"
     },
     {
       "id": "explain.max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "4030.31"
     },
@@ -72,7 +72,7 @@
       "id": "explain.max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": 121
     },
@@ -89,7 +89,7 @@
       "id": "explain.blocks",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,5.1,5.5,5.3|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -126,8 +126,8 @@
           "to_month": 240,
           "years": "16–20",
           "rate_1": "5.3",
-          "payment_1": "4010.87",
-          "total": "4010.87"
+          "payment_1": "4010.86",
+          "total": "4010.86"
         }
       ]
     },
@@ -135,7 +135,7 @@
       "id": "explain.blocks_high",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -172,8 +172,8 @@
           "to_month": 240,
           "years": "16–20",
           "rate_1": "6.5",
-          "payment_1": "4335.12",
-          "total": "4335.12"
+          "payment_1": "4335.11",
+          "total": "4335.11"
         }
       ]
     },
@@ -181,7 +181,7 @@
       "id": "explain.blocks_low",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0",
+        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -227,7 +227,7 @@
       "id": "explain.high_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0|statement"
       },
       "value": "4387.20"
     },
@@ -235,7 +235,7 @@
       "id": "explain.high_max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,6,7,6.5|60|240|0|0|statement"
       },
       "value": 121
     },
@@ -243,7 +243,7 @@
       "id": "explain.low_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0|statement"
       },
       "value": "3828.36"
     },
@@ -251,7 +251,7 @@
       "id": "explain.low_max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,4,3.5,3.5|60|240|0|0|statement"
       },
       "value": 1
     },
@@ -284,10 +284,73 @@
       "value": "4211.20"
     },
     {
+      "id": "diff.prime_loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "diff.prime_first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|400000|4.5,5.5|36|240|0|0|statement"
+      },
+      "value": "2530.60"
+    },
+    {
+      "id": "diff.prime_now",
+      "kind": "met_payment",
+      "inputs": {
+        "tracks": "spitzer|400000|4.5,5.5|36|240|0|0|statement",
+        "month": 37
+      },
+      "value": "2722.89"
+    },
+    {
+      "id": "diff.prime_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "diff.prime_now",
+        "subtrahend": "diff.prime_first"
+      },
+      "value": "192.29"
+    },
+    {
+      "id": "diff.linked_loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "diff.linked_now",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|0|0|statement"
+      },
+      "value": "3327.59"
+    },
+    {
+      "id": "diff.linked_first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0|statement"
+      },
+      "value": "3333.09"
+    },
+    {
+      "id": "diff.linked_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "diff.linked_first",
+        "subtrahend": "diff.linked_now"
+      },
+      "value": "5.50"
+    },
+    {
       "id": "slider.high_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,6.5,5.3|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,5.1,6.5,5.3|60|240|0|0|statement"
       },
       "value": "4216.80"
     },
@@ -295,7 +358,7 @@
       "id": "slider.high_max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|600000|4.6,5.1,6.5,5.3|60|240|0|0"
+        "tracks": "spitzer|600000|4.6,5.1,6.5,5.3|60|240|0|0|statement"
       },
       "value": 121
     },
@@ -315,7 +378,7 @@
       "id": "worked.fixed_pay",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0"
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement"
       },
       "value": "2013.16"
     },
@@ -323,7 +386,7 @@
       "id": "worked.var_first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "1914.18"
     },
@@ -331,7 +394,7 @@
       "id": "worked.first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "3927.34"
     },
@@ -339,7 +402,7 @@
       "id": "worked.blocks",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0",
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -363,7 +426,7 @@
           "payment_1": "2013.16",
           "rate_2": "5.1",
           "payment_2": "1978.55",
-          "total": "3991.72"
+          "total": "3991.71"
         },
         {
           "block": 3,
@@ -384,8 +447,8 @@
           "rate_1": "5.2",
           "payment_1": "2013.16",
           "rate_2": "5.3",
-          "payment_2": "2005.43",
-          "total": "4018.59"
+          "payment_2": "2005.44",
+          "total": "4018.60"
         }
       ]
     },
@@ -393,15 +456,34 @@
       "id": "worked.var_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "2015.16"
+    },
+    {
+      "id": "worked.var_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.var_max",
+        "subtrahend": "worked.var_first"
+      },
+      "value": "100.98"
+    },
+    {
+      "id": "worked.var_above",
+      "kind": "met_percent_above",
+      "inputs": {
+        "value": "worked.var_max",
+        "base": "worked.var_first",
+        "decimals": 1
+      },
+      "value": "5.3"
     },
     {
       "id": "worked.max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": "4028.32"
     },
@@ -409,7 +491,7 @@
       "id": "worked.max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0"
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement;spitzer|300000|4.6,5.1,5.5,5.3|60|240|0|0|statement"
       },
       "value": 121
     },
@@ -445,7 +527,7 @@
       "id": "worked.high_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|300000|5.2|240|240|0|0;spitzer|300000|4.6,6,7,6.5|60|240|0|0"
+        "tracks": "spitzer|300000|5.2|240|240|0|0|statement;spitzer|300000|4.6,6,7,6.5|60|240|0|0|statement"
       },
       "value": "4206.76"
     },
@@ -459,10 +541,22 @@
       "value": "178.44"
     },
     {
+      "id": "half.fixed_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000.00"
+    },
+    {
+      "id": "half.var_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
       "id": "half.blocks",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|200000|4.9|120|120|0|0;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0",
+        "tracks": "spitzer|200000|4.9|120|120|0|0|statement;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -475,7 +569,7 @@
           "payment_1": "2111.55",
           "rate_2": "4.4",
           "payment_2": "2509.06",
-          "total": "4620.60"
+          "total": "4620.61"
         },
         {
           "block": 2,
@@ -516,7 +610,7 @@
       "id": "half.max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|200000|4.9|120|120|0|0;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0"
+        "tracks": "spitzer|200000|4.9|120|120|0|0|statement;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0|statement"
       },
       "value": "4791.95"
     },
@@ -524,15 +618,23 @@
       "id": "half.max_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|200000|4.9|120|120|0|0;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0"
+        "tracks": "spitzer|200000|4.9|120|120|0|0|statement;spitzer|400000|4.4,5.4,6,5.6|60|240|0|0|statement"
       },
       "value": 61
+    },
+    {
+      "id": "ex6.max_month",
+      "kind": "met_highest_month",
+      "inputs": {
+        "tracks": "spitzer|500000|4.2,5.2,5.8,5.5|60|240|0|0|statement"
+      },
+      "value": 121
     },
     {
       "id": "half.var_max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|400000|4.4,5.4,6,5.6|60|240|0|0"
+        "tracks": "spitzer|400000|4.4,5.4,6,5.6|60|240|0|0|statement"
       },
       "value": "2754.57"
     },
@@ -540,7 +642,7 @@
       "id": "half.fixed_pay",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|200000|4.9|120|120|0|0"
+        "tracks": "spitzer|200000|4.9|120|120|0|0|statement"
       },
       "value": "2111.55"
     },
@@ -548,7 +650,7 @@
       "id": "ex2.base",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|450000|4.8|300|300|0|0"
+        "tracks": "spitzer|450000|4.8|300|300|0|0|statement"
       },
       "value": "2578.49"
     },
@@ -571,10 +673,16 @@
       "value": "257.85"
     },
     {
+      "id": "ex3.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
       "id": "ex3.first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|400000|4,5|60|300|0|0"
+        "tracks": "spitzer|400000|4,5|60|300|0|0|statement"
       },
       "value": "2111.35"
     },
@@ -582,16 +690,16 @@
       "id": "ex3.balance_60",
       "kind": "met_balance",
       "inputs": {
-        "tracks": "spitzer|400000|4,5|60|300|0|0",
+        "tracks": "spitzer|400000|4,5|60|300|0|0|statement",
         "month": 60
       },
-      "value": "348418.46"
+      "value": "348418.33"
     },
     {
       "id": "ex3.answer",
       "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|400000|4,5|60|300|0|0",
+        "tracks": "spitzer|400000|4,5|60|300|0|0|statement",
         "month": 61
       },
       "value": "2299.41"
@@ -600,7 +708,7 @@
       "id": "ex3.err_flat",
       "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|400000|4|60|300|0|0",
+        "tracks": "spitzer|400000|4|60|300|0|0|statement",
         "month": 61
       },
       "value": "2111.35"
@@ -609,7 +717,7 @@
       "id": "ex3.err_full_amount",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|400000|5|300|300|0|0"
+        "tracks": "spitzer|400000|5|300|300|0|0|statement"
       },
       "value": "2338.36"
     },
@@ -617,7 +725,7 @@
       "id": "ex3.err_all_months",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|348418.46|5|300|300|0|0"
+        "tracks": "spitzer|348418.33|5|300|300|0|0|statement"
       },
       "value": "2036.82"
     },
@@ -625,7 +733,7 @@
       "id": "ex5.fixed_pay",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|250000|5|180|180|0|0"
+        "tracks": "spitzer|250000|5|180|180|0|0|statement"
       },
       "value": "1976.98"
     },
@@ -633,31 +741,24 @@
       "id": "ex5.var_first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|350000|4.5,5,5.5,6|60|240|0|0"
+        "tracks": "spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement"
       },
       "value": "2214.27"
     },
     {
       "id": "ex5.var_max",
-      "kind": "met_highest_payment",
+      "kind": "met_payment",
       "inputs": {
-        "tracks": "spitzer|350000|4.5,5,5.5,6|60|240|0|0"
+        "tracks": "spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement",
+        "month": 181
       },
       "value": "2370.46"
-    },
-    {
-      "id": "ex5.var_max_month",
-      "kind": "met_highest_month",
-      "inputs": {
-        "tracks": "spitzer|350000|4.5,5,5.5,6|60|240|0|0"
-      },
-      "value": 181
     },
     {
       "id": "ex5.blocks",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|250000|5|180|180|0|0;spitzer|350000|4.5,5,5.5,6|60|240|0|0",
+        "tracks": "spitzer|250000|5|180|180|0|0|statement;spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -670,7 +771,7 @@
           "payment_1": "1976.98",
           "rate_2": "4.5",
           "payment_2": "2214.27",
-          "total": "4191.26"
+          "total": "4191.25"
         },
         {
           "block": 2,
@@ -681,7 +782,7 @@
           "payment_1": "1976.98",
           "rate_2": "5",
           "payment_2": "2288.95",
-          "total": "4265.94"
+          "total": "4265.93"
         },
         {
           "block": 3,
@@ -711,17 +812,17 @@
       "id": "ex5.answer",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|250000|5|180|180|0|0;spitzer|350000|4.5,5,5.5,6|60|240|0|0"
+        "tracks": "spitzer|250000|5|180|180|0|0|statement;spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement"
       },
-      "value": "4319.04"
+      "value": "4320.22"
     },
     {
       "id": "ex5.answer_month",
       "kind": "met_highest_month",
       "inputs": {
-        "tracks": "spitzer|250000|5|180|180|0|0;spitzer|350000|4.5,5,5.5,6|60|240|0|0"
+        "tracks": "spitzer|250000|5|180|180|0|0|statement;spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement"
       },
-      "value": 121
+      "value": 180
     },
     {
       "id": "ex5.err_sum",
@@ -735,15 +836,21 @@
       "id": "ex5.mix_first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|250000|5|180|180|0|0;spitzer|350000|4.5,5,5.5,6|60|240|0|0"
+        "tracks": "spitzer|250000|5|180|180|0|0|statement;spitzer|350000|4.5,5,5.5,6|60|240|0|0|statement"
       },
-      "value": "4191.26"
+      "value": "4191.25"
+    },
+    {
+      "id": "ex6.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
     },
     {
       "id": "ex6.first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|500000|4.2,5.2,5.8,5.8|60|240|0|0"
+        "tracks": "spitzer|500000|4.2,5.2,5.8,5.5|60|240|0|0|statement"
       },
       "value": "3082.85"
     },
@@ -751,7 +858,7 @@
       "id": "ex6.blocks",
       "kind": "met_block_table",
       "inputs": {
-        "tracks": "spitzer|500000|4.2,5.2,5.8,5.8|60|240|0|0",
+        "tracks": "spitzer|500000|4.2,5.2,5.8,5.5|60|240|0|0|statement",
         "block_months": 60
       },
       "value": [
@@ -787,9 +894,9 @@
           "from_month": 181,
           "to_month": 240,
           "years": "16–20",
-          "rate_1": "5.8",
-          "payment_1": "3386.12",
-          "total": "3386.12"
+          "rate_1": "5.5",
+          "payment_1": "3361.70",
+          "total": "3361.70"
         }
       ]
     },
@@ -797,7 +904,7 @@
       "id": "ex6.max",
       "kind": "met_highest_payment",
       "inputs": {
-        "tracks": "spitzer|500000|4.2,5.2,5.8,5.8|60|240|0|0"
+        "tracks": "spitzer|500000|4.2,5.2,5.8,5.5|60|240|0|0|statement"
       },
       "value": "3386.12"
     },

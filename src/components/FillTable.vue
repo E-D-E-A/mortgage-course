@@ -5,6 +5,7 @@
 // rows and one from the formula both count), percent or points to 0.005,
 // a date shown only. The first rows are usually given; the learner fills the rest.
 import { reactive, ref } from "vue";
+import { numberPieces } from "../lib/bidi.ts";
 import { formatShekels } from "../lib/calc/money.ts";
 import { parseAnswer, save } from "../lib/progress.ts";
 
@@ -40,6 +41,8 @@ const revealed = ref(false);
 const nameOf = (row: Row, i: number) => String(row[props.rowKey] ?? i + 1);
 const keyOf = (row: Row, i: number, col: string) => `${nameOf(row, i)}.${col}`;
 const isBlank = (row: Row, i: number, col: string) => props.blanks.includes(keyOf(row, i, col));
+// A row name may hold a range ("6–10") or a signed number; each is drawn left to right (bidi.ts).
+const namePieces = (row: Row, i: number) => numberPieces(nameOf(row, i));
 
 const dateFormat = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
 const percentFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4, useGrouping: false });
@@ -57,7 +60,7 @@ function check() {
     for (const c of props.columns) {
       if (!isBlank(row, i, c.key)) continue;
       const k = keyOf(row, i, c.key);
-      const v = parseAnswer((entered[k] ?? "").replace("−", "-"));
+      const v = parseAnswer(entered[k] ?? "");
       result[k] = v !== null && Math.abs(v - Number(row[c.key])) <= tolerance(c.format) ? "ok" : "bad";
     }
   });
@@ -71,14 +74,16 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
     <table class="w-full border-collapse text-caption sm:text-body-m">
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
-          <th v-if="periodLabel" class="py-2 pe-1 text-start font-semibold sm:pe-3">{{ periodLabel }}</th>
-          <th v-for="c in columns" :key="c.key" class="py-2 pe-1 text-start font-semibold sm:pe-2">{{ c.label }}</th>
+          <th v-if="periodLabel" class="py-2 pe-3 text-start align-bottom font-semibold last:pe-0">{{ periodLabel }}</th>
+          <th v-for="c in columns" :key="c.key" class="py-2 pe-3 text-start align-bottom font-semibold last:pe-0">{{ c.label }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
-          <td v-if="periodLabel" class="py-2 pe-1 text-n700 sm:pe-3">{{ nameOf(row, i) }}</td>
-          <td v-for="c in columns" :key="c.key" class="py-2 pe-1 sm:pe-2">
+          <td v-if="periodLabel" class="py-2 pe-3 text-n700 last:pe-0">
+            <template v-for="(p, j) in namePieces(row, i)" :key="j"><span v-if="p.ltr" class="ltr whitespace-nowrap">{{ p.text }}</span><template v-else>{{ p.text }}</template></template>
+          </td>
+          <td v-for="c in columns" :key="c.key" class="py-2 pe-3 last:pe-0">
             <template v-if="isBlank(row, i, c.key) && !revealed">
               <input
                 v-model="entered[keyOf(row, i, c.key)]"

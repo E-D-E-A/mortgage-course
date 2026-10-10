@@ -98,7 +98,7 @@ function persist() {
 const key = (k: number, f: Field) => `${k}.${f}`;
 // Exact to the agora: 55.136 is not 55.14 — not rounding is one of the mistakes.
 const same = (a: number, b: string | number) => Math.abs(a - Number(b)) < 0.0005;
-const num = (k: number, f: Field) => parseAnswer((entered[key(k, f)] ?? "").replace("−", "-"));
+const num = (k: number, f: Field) => parseAnswer(entered[key(k, f)] ?? "");
 const opening = (k: number) => (isGiven(k, "opening") ? Number(rightValue(k, "opening")) : num(k, "opening"));
 
 function judge(k: number, f: Field): { tone: "ok" | "bad"; text: string } {
@@ -130,9 +130,22 @@ function check(k: number) {
     feedback[key(k, f.key)] = result;
     if (result.tone !== "ok") ok = false;
   }
-  if (ok) solved[k] = true;
-  else tries[k] = (tries[k] ?? 0) + 1;
+  if (ok) {
+    solved[k] = true;
+    moveOn(k);
+  } else tries[k] = (tries[k] ?? 0) + 1;
   persist();
+}
+/**
+ * A solved or revealed month loses its fields and buttons, the one that had focus among them. Focus goes
+ * to the month that just opened (its first field), or after the last month to the closing line.
+ */
+function moveOn(k: number) {
+  nextTick(() => {
+    const next = k < props.months ? document.getElementById(`sbh-${props.id}-${k + 1}-${fieldsOf(k + 1)[0].key}`) : null;
+    const target = next ?? document.getElementById(`sbh-${props.id}-done`) ?? document.getElementById(`sbh-${props.id}-${k}-title`);
+    target?.focus();
+  });
 }
 function reveal(k: number) {
   for (const f of fieldsOf(k)) {
@@ -141,6 +154,7 @@ function reveal(k: number) {
   }
   revealed[k] = true;
   solved[k] = true;
+  moveOn(k);
   persist();
 }
 function onInput(k: number, f: Field, value: string) {
@@ -246,56 +260,58 @@ const lastRow = computed(() => props.rows[props.rows.length - 1]);
       <ol class="list-reset mt-4 grid gap-3">
         <li v-for="k in monthList" :key="k" class="rounded-md border p-3" :class="isOpen(k) ? 'border-n200' : 'border-n100 bg-n50'">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <p class="text-body-l font-semibold text-n900">חודש {{ k }}</p>
+            <p :id="`sbh-${id}-${k}-title`" tabindex="-1" class="text-body-l font-semibold text-n900">חודש {{ k }}</p>
             <p v-if="solved[k]" class="text-caption text-n700">{{ revealed[k] ? "הפתרון הוצג" : "נכון ✓" }}</p>
             <p v-else-if="!isOpen(k)" class="text-caption text-n600">ייפתח כשחודש {{ k - 1 }} יהיה נכון</p>
           </div>
-          <div v-if="isOpen(k)" class="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
-            <div v-for="f in FIELDS" :key="f.key" class="min-w-0">
-              <label :for="`sbh-${id}-${k}-${f.key}`" class="block text-caption text-n700">{{ f.label }}</label>
-              <p v-if="isGiven(k, f.key)" :id="`sbh-${id}-${k}-${f.key}`" class="flex h-11 items-center text-body-m font-semibold text-n900">
-                <span class="ltr">{{ formatShekels(rightValue(k, f.key)) }}</span>
-              </p>
-              <p v-else-if="solved[k]" class="flex h-11 items-center text-body-m font-semibold text-n900">
-                <span class="ltr">{{ formatShekels(rightValue(k, f.key)) }}</span>
-              </p>
-              <input
-                v-else
-                :id="`sbh-${id}-${k}-${f.key}`"
-                :value="entered[key(k, f.key)] ?? ''"
-                inputmode="decimal"
-                autocomplete="off"
-                dir="ltr"
-                class="h-11 w-full rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
-                :class="feedback[key(k, f.key)]?.tone === 'bad' ? 'border-danger shadow-ring-error' : feedback[key(k, f.key)]?.tone === 'ok' ? 'border-success' : 'border-n200'"
-                :aria-describedby="feedback[key(k, f.key)] ? `sbh-${id}-${k}-${f.key}-fb` : undefined"
-                @input="onInput(k, f.key, ($event.target as HTMLInputElement).value)"
-              />
-              <p
-                v-if="!solved[k] && feedback[key(k, f.key)]"
-                :id="`sbh-${id}-${k}-${f.key}-fb`"
-                class="mt-1 text-caption"
-                :class="feedback[key(k, f.key)]?.tone === 'ok' ? 'text-n700' : 'text-n800'"
-                aria-live="polite"
-              >
-                {{ feedback[key(k, f.key)]?.text }}
-              </p>
+          <!-- A form, so Enter in any field checks the month. -->
+          <form v-if="isOpen(k)" novalidate @submit.prevent="check(k)">
+            <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+              <div v-for="f in FIELDS" :key="f.key" class="min-w-0">
+                <label :for="`sbh-${id}-${k}-${f.key}`" class="block text-caption text-n700">{{ f.label }}</label>
+                <p v-if="isGiven(k, f.key)" :id="`sbh-${id}-${k}-${f.key}`" class="flex h-11 items-center text-body-m font-semibold text-n900">
+                  <span class="ltr">{{ formatShekels(rightValue(k, f.key)) }}</span>
+                </p>
+                <p v-else-if="solved[k]" class="flex h-11 items-center text-body-m font-semibold text-n900">
+                  <span class="ltr">{{ formatShekels(rightValue(k, f.key)) }}</span>
+                </p>
+                <input
+                  v-else
+                  :id="`sbh-${id}-${k}-${f.key}`"
+                  :value="entered[key(k, f.key)] ?? ''"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  dir="ltr"
+                  class="h-11 w-full rounded-md border bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
+                  :class="feedback[key(k, f.key)]?.tone === 'bad' ? 'border-danger shadow-ring-error' : feedback[key(k, f.key)]?.tone === 'ok' ? 'border-success' : 'border-n200'"
+                  :aria-describedby="feedback[key(k, f.key)] ? `sbh-${id}-${k}-${f.key}-fb` : undefined"
+                  @input="onInput(k, f.key, ($event.target as HTMLInputElement).value)"
+                />
+                <p
+                  v-if="!solved[k] && feedback[key(k, f.key)]"
+                  :id="`sbh-${id}-${k}-${f.key}-fb`"
+                  class="mt-1 text-caption"
+                  :class="feedback[key(k, f.key)]?.tone === 'ok' ? 'text-n700' : 'text-n800'"
+                  aria-live="polite"
+                >
+                  {{ feedback[key(k, f.key)]?.text }}
+                </p>
+              </div>
             </div>
-          </div>
-          <div v-if="isOpen(k) && !solved[k]" class="mt-3 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              class="h-11 rounded-md bg-turquoise px-5 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"
-              @click="check(k)"
-            >
-              בדיקת חודש {{ k }}
-            </button>
-            <button v-if="(tries[k] ?? 0) >= 2" type="button" class="min-h-11 text-body-m text-navy underline" @click="reveal(k)">הצגת הפתרון לחודש {{ k }}</button>
-          </div>
+            <div v-if="!solved[k]" class="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                class="h-11 rounded-md bg-turquoise px-5 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"
+              >
+                בדיקת חודש {{ k }}
+              </button>
+              <button v-if="(tries[k] ?? 0) >= 2" type="button" class="min-h-11 text-body-m text-navy underline" @click="reveal(k)">הצגת הפתרון לחודש {{ k }}</button>
+            </div>
+          </form>
         </li>
       </ol>
 
-      <p v-if="allSolved" class="mt-3 rounded-md bg-success-bg p-3 text-body-m text-n800" aria-live="polite">
+      <p v-if="allSolved" :id="`sbh-${id}-done`" tabindex="-1" class="mt-3 rounded-md bg-success-bg p-3 text-body-m text-n800" aria-live="polite">
         <strong class="text-n900">{{ months }} חודשים, עד האגורה.</strong> אלה בדיוק השורות הראשונות בלוח של המחשבון של הקורס. ככה ממשיכים עד החודש האחרון — וזה מה שהגיליון יעשה בשבילכם.
       </p>
 

@@ -11,7 +11,7 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import { afterChange } from "../../src/lib/calc/percent.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given, percentOfFact, repCell, repMonths, repPayment, repSchedule, repSum, repTotalInterest, repTotalPaid, slice } from "./lesson-2-9.ts";
-import { monthlyFact, overtakeFact, paymentsTotal, stepsFact } from "./lesson-3-1.ts";
+import { baseFact, halfRateFact, monthlyFact, overtakeFact, paymentsTotal, stepsFact } from "./lesson-3-1.ts";
 
 /** amount × (1 + p%), to the agora (lesson 0.1's kind). */
 const grown = (id: string, amount: string, percent: string): Fact => ({
@@ -36,7 +36,10 @@ export default function lesson32(): LessonData {
   const lPaid = repTotalPaid("long.paid", "spitzer", ...L);
   const lInterest = repTotalInterest("long.interest", "spitzer", ...L);
 
-  // ── Worked example: דנה's track, 350,000 ₪ at 4.2% for 25 years; month 37. ──
+  // ── When is the first payment mostly interest? The same loan at 3% a year. ──
+  const LOW = ["600000", "3", 240] as const;
+
+  // ── Worked example: הילה's track, 350,000 ₪ at 4.2% for 25 years; month 37. ──
   const W = ["350000", "4.2", 300] as const;
   const wOpen = repCell("worked.open_37", "spitzer", ...W, 37, "opening");
   const wInt = repCell("worked.int_37", "spitzer", ...W, 37, "interest");
@@ -53,6 +56,7 @@ export default function lesson32(): LessonData {
   const xPaid = repTotalPaid("ex6.paid", "spitzer", ...X);
   const xNC = paymentsTotal("ex6.n_times_c", xPay.value as string, 300);
   const xLoan = given("ex6.loan", "250000.00");
+  const xAfterWhole = difference("ex4.after_whole", xLoan, xPay);
 
   const facts: Fact[] = [
     // Prediction.
@@ -93,6 +97,18 @@ export default function lesson32(): LessonData {
     lInterest,
     difference("long.principal_sum", lPaid, lInterest),
     stepsFact("long.steps", ...L),
+    baseFact("long.base", "4.8"),
+    percentOfFact("long.prin_1_rate", lPrin1.value as string, "0.4"),
+    // The first payment is mostly interest only above a rate that depends on the term.
+    halfRateFact("half_rate.180", 180),
+    halfRateFact("half_rate.240", 240),
+    halfRateFact("half_rate.300", 300),
+    halfRateFact("half_rate.360", 360),
+    monthlyFact("low.monthly", "3", 2),
+    repPayment("low.pay", ...LOW),
+    repCell("low.int_1", "spitzer", ...LOW, 1, "interest"),
+    repCell("low.prin_1", "spitzer", ...LOW, 1, "principal"),
+    slice("low.part", "600000", "1", "240"),
     // A rule of thumb: the principal part grows by the monthly rate, so it doubles in about 72 ÷ annual % years.
     { id: "head.rule72", kind: "rule_of_72", inputs: { rate_percent: "4.8" }, value: ruleOf72("4.8").toString() },
     { id: "head.months_to_double", kind: "periods_to_double", inputs: { rate_percent: "0.4" }, value: periodsToDouble("0.4") },
@@ -123,6 +139,9 @@ export default function lesson32(): LessonData {
     slice("ex3.err_equal", "250000", "1", "300"),
     repCell("ex4.answer", "spitzer", ...X, 2, "interest"),
     repCell("ex4.open", "spitzer", ...X, 2, "opening"),
+    xAfterWhole,
+    percentOfFact("ex4.err_whole", xAfterWhole.value as string, "0.4"),
+    repMonths("ex.months", 25),
     xOpen121,
     xInt121,
     repCell("ex5.answer", "spitzer", ...X, 121, "principal"),

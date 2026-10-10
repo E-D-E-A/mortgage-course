@@ -18,11 +18,26 @@ const props = defineProps<{
   links: MapLink[];
   /** The lesson the map is shown in: its own nodes are marked as new. */
   lesson: string;
+  /**
+   * A stage's summary lesson adds no node of its own: with newFrom ("3.1") every node added from that
+   * lesson up to this one is marked new, and the legend says "in this stage".
+   */
+  newFrom?: string;
   /** The node whose card is open at first. */
   initial?: string;
 }>();
 
-const selected = ref<string>(props.initial ?? props.nodes.find((n) => n.lesson === props.lesson)?.id ?? props.nodes[0]?.id ?? "");
+// a ≤ b by lesson number ("3.10" after "3.9"); the same rule as big-picture/index.ts, kept here so the
+// component does not import every stage's data.
+const num = (id: string) => id.split(".").map(Number);
+const notAfter = (a: string, b: string) => {
+  const [as, al] = num(a);
+  const [bs, bl] = num(b);
+  return as < bs || (as === bs && al <= bl);
+};
+const isNew = (n: MapNode) => (props.newFrom ? notAfter(props.newFrom, n.lesson) && notAfter(n.lesson, props.lesson) : n.lesson === props.lesson);
+const anyNew = computed(() => props.nodes.some(isNew));
+const selected = ref<string>(props.initial ?? props.nodes.find(isNew)?.id ?? props.nodes[0]?.id ?? "");
 const asList = ref(false);
 
 const byId = computed(() => new Map(props.nodes.map((n) => [n.id, n])));
@@ -41,7 +56,7 @@ const current = computed(() => byId.value.get(selected.value));
 function nodeClass(n: MapNode) {
   if (n.id === selected.value) return "border-navy bg-navy text-n0";
   if (linked.value.has(n.id)) return "border-teal-deep bg-mint text-n900";
-  if (n.lesson === props.lesson) return "border-teal-deep bg-n0 text-n900 font-semibold";
+  if (isNew(n)) return "border-teal-deep bg-n0 text-n900 font-semibold";
   return "border-n300 bg-n50 text-n700";
 }
 
@@ -121,8 +136,9 @@ function toggleInList(id: string) {
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <ul class="list-reset flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
-      <li class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm border-2 border-teal-deep bg-n0"></span>חדש בשיעור הזה</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm border border-n300 bg-n50"></span>משיעורים קודמים</li>
+      <!-- The "new" swatch only when something is marked new; otherwise every node is "earlier". -->
+      <li v-if="anyNew" class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm border-2 border-teal-deep bg-n0"></span>{{ newFrom ? "חדש בשלב הזה" : "חדש בשיעור הזה" }}</li>
+      <li class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm border border-n300 bg-n50"></span>{{ newFrom ? "משלבים קודמים" : "משיעורים קודמים" }}</li>
       <li class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm bg-navy"></span>הצומת שבחרתם</li>
       <li class="flex items-center gap-2"><span class="inline-block h-4 w-5 rounded-sm border border-teal-deep bg-mint"></span>קשור אליו</li>
     </ul>

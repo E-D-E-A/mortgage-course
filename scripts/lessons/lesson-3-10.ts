@@ -11,7 +11,7 @@
  */
 import type { Track } from "../../src/lib/calc/metrics.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { bisection, difference, effective, first, given, irr, irrEffective, irrX12, pv, pvRows, share, total, x12 } from "./lesson-3-8.ts";
+import { bisection, difference, effective, first, given, irr, irrEffective, irrX12, payment, pv, pvRows, share, total, x12 } from "./lesson-3-8.ts";
 
 export default function lesson310(): LessonData {
   // ── The explanation: 30,000 ₪ at 6% a year (0.5% a month), three months. ──
@@ -49,6 +49,7 @@ export default function lesson310(): LessonData {
     difference("explain.received", smallLoan, smallFee),
     share("explain.fee_share", smallFee, smallLoan, 2),
     first("explain.payment", [small]),
+    payment("explain.last", [small], 3),
     smallTotal,
     difference("explain.total_interest", smallTotal, smallLoan),
     pvRows("explain.rows_05", [small], "0.5", 6),
@@ -128,7 +129,7 @@ export default function lesson310(): LessonData {
   return {
     lesson: "3.10",
     title: "ערך נוכחי ושיעור תשואה פנימי (IRR)",
-    note: "Teaching numbers, not market rates or a bank's fees. Monthly rate = annual ÷ 12; exact schedules. The IRR is found by bisection to 10⁻¹² percentage points a month (TypeScript) and by Newton's method (Python), then rounded for display.",
+    note: "Teaching numbers, not market rates or a bank's fees. Monthly rate = annual ÷ 12; schedules follow the statement convention (each month's interest in agorot, the last payment clearing the balance); present values and IRRs are computed on those payments, unrounded. The IRR is found by bisection to 10⁻¹² percentage points a month (TypeScript) and by Newton's method (Python), then rounded for display.",
     facts,
   };
 }

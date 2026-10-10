@@ -373,3 +373,59 @@ KINDS.update({
     "amort_principal_overtakes": principal_overtakes,
     "amort_formula_steps": formula_steps,
 })
+
+
+# ── Stage 3 fix round (2026-10-10): the helpers behind numbers the pages print. ──
+
+def growth_base(i, _facts=None):
+    """1 + the rate per period, as a decimal, without trailing zeros: "1.004"."""
+    b = 1 + Decimal(i["rate_percent"]) / HUNDRED / int(i["periods_per_year"])
+    s = format(b.normalize(), "f")
+    return s
+
+
+def interpolation_step(i, _facts=None):
+    """(high − low) × what low leaves ÷ (what low leaves + what high overpays), to the agora."""
+    base = {"principal": i["principal"], "rate_percent": i["rate_percent"], "months": i["months"]}
+    left = Decimal(trial_rows({**base, "payment": i["low"]})[-1]["closing"])
+    over = -Decimal(trial_rows({**base, "payment": i["high"]})[-1]["closing"])
+    return str(agorot((Decimal(str(i["high"])) - Decimal(str(i["low"]))) * left / (left + over)))
+
+
+def flat_interest_trial(i, _facts=None):
+    """The slip: each month's interest on the whole loan. Month by month, not by the closed form."""
+    p = agorot(i["principal"])
+    interest = agorot(p * Decimal(i["rate_percent"]) / TWELVE / HUNDRED)
+    b = p
+    for _ in range(int(i["months"])):
+        b = b + interest - Decimal(str(i["payment"]))
+    return str(agorot(b))
+
+
+def shown_sum(i, _facts=None):
+    """S the calculator way: 1 − (1 + m)^−n kept to `decimals`, divided by m, kept to `decimals`."""
+    d = int(i["decimals"])
+    m = monthly(i["rate_percent"])
+    one_minus = Decimal(fixed(1 - 1 / (1 + m) ** int(i["months"]), d))
+    return fixed(one_minus / m, d)
+
+
+def half_interest_rate(i, _facts=None):
+    """The annual rate whose first-month interest is half the level payment, found by halving search."""
+    n = int(i["months"])
+    lo, hi = Decimal(0), Decimal(100)
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        m = mid / TWELVE / HUNDRED
+        share = 1 - 1 / (1 + m) ** n  # interest ÷ payment in month 1
+        lo, hi = (mid, hi) if share < Decimal("0.5") else (lo, mid)
+    return plain(lo)
+
+
+KINDS.update({
+    "amort_growth_base": growth_base,
+    "amort_interpolation_step": interpolation_step,
+    "amort_flat_interest_trial": flat_interest_trial,
+    "amort_shown_sum": shown_sum,
+    "amort_half_interest_rate": half_interest_rate,
+})

@@ -1,7 +1,7 @@
 {
   "lesson": "3.10",
   "title": "ערך נוכחי ושיעור תשואה פנימי (IRR)",
-  "note": "Teaching numbers, not market rates or a bank's fees. Monthly rate = annual ÷ 12; exact schedules. The IRR is found by bisection to 10⁻¹² percentage points a month (TypeScript) and by Newton's method (Python), then rounded for display.",
+  "note": "Teaching numbers, not market rates or a bank's fees. Monthly rate = annual ÷ 12; schedules follow the statement convention (each month's interest in agorot, the last payment clearing the balance); present values and IRRs are computed on those payments, unrounded. The IRR is found by bisection to 10⁻¹² percentage points a month (TypeScript) and by Newton's method (Python), then rounded for display.",
   "facts": [
     {
       "id": "explain.loan",
@@ -38,15 +38,24 @@
       "id": "explain.payment",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0"
+        "tracks": "spitzer|30000|6|3|3|0|0|statement"
       },
       "value": "10100.17"
+    },
+    {
+      "id": "explain.last",
+      "kind": "met_payment",
+      "inputs": {
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
+        "month": 3
+      },
+      "value": "10100.16"
     },
     {
       "id": "explain.total",
       "kind": "met_total_paid",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0"
+        "tracks": "spitzer|30000|6|3|3|0|0|statement"
       },
       "value": "30300.50"
     },
@@ -63,7 +72,7 @@
       "id": "explain.rows_05",
       "kind": "met_pv_rows",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "monthly_percent": "0.5",
         "decimals": 6
       },
@@ -82,9 +91,9 @@
         },
         {
           "month": 3,
-          "payment": "10100.17",
+          "payment": "10100.16",
           "growth": "1.015075",
-          "value_today": "9950.17"
+          "value_today": "9950.16"
         }
       ]
     },
@@ -92,7 +101,7 @@
       "id": "explain.pv_05",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "rate_percent": "0.5",
         "basis": "monthly"
       },
@@ -102,7 +111,7 @@
       "id": "explain.pv_04",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "rate_percent": "0.4",
         "basis": "monthly"
       },
@@ -112,7 +121,7 @@
       "id": "explain.pv_06",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "rate_percent": "0.6",
         "basis": "monthly"
       },
@@ -122,7 +131,7 @@
       "id": "explain.search",
       "kind": "met_bisection_table",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "received": "29700",
         "low": "0.5",
         "high": "2",
@@ -184,7 +193,7 @@
       "id": "explain.irr",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "received": "29700",
         "decimals": 4
       },
@@ -194,17 +203,17 @@
       "id": "explain.irr_6",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "received": "29700",
         "decimals": 6
       },
-      "value": "1.007574"
+      "value": "1.007576"
     },
     {
       "id": "explain.irr_x12",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "received": "29700",
         "decimals": 2
       },
@@ -214,7 +223,7 @@
       "id": "explain.irr_eff",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "received": "29700",
         "decimals": 2
       },
@@ -224,11 +233,11 @@
       "id": "explain.pv_check",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|30000|6|3|3|0|0",
+        "tracks": "spitzer|30000|6|3|3|0|0|statement",
         "rate_percent": "1.0076",
         "basis": "monthly"
       },
-      "value": "29699.98"
+      "value": "29699.99"
     },
     {
       "id": "explain.x12_04",
@@ -252,7 +261,7 @@
       "id": "explain.big_irr",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 4
       },
@@ -262,7 +271,7 @@
       "id": "explain.big_eff",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 3
       },
@@ -272,7 +281,7 @@
       "id": "slider.x12_fee0",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 2
       },
@@ -282,7 +291,7 @@
       "id": "slider.eff_fee0",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 2
       },
@@ -314,7 +323,7 @@
       "id": "slider.x12_fee6000",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "594000",
         "decimals": 2
       },
@@ -324,7 +333,7 @@
       "id": "slider.eff_fee6000",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "594000",
         "decimals": 2
       },
@@ -334,7 +343,7 @@
       "id": "slider.x12_ep",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "equal_principal|600000|4.8|240|240|0|0",
+        "tracks": "equal_principal|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 2
       },
@@ -344,7 +353,7 @@
       "id": "slider.ep_first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "equal_principal|600000|4.8|240|240|0|0"
+        "tracks": "equal_principal|600000|4.8|240|240|0|0|statement"
       },
       "value": "4900.00"
     },
@@ -352,7 +361,7 @@
       "id": "slider.sp_first",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0"
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement"
       },
       "value": "3893.74"
     },
@@ -381,7 +390,7 @@
       "id": "worked.payment",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0"
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement"
       },
       "value": "3893.74"
     },
@@ -389,7 +398,7 @@
       "id": "worked.pv_own",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "rate_percent": "4.8",
         "basis": "annual"
       },
@@ -399,7 +408,7 @@
       "id": "worked.irr",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "599640",
         "decimals": 6
       },
@@ -409,7 +418,7 @@
       "id": "worked.irr_x12",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "599640",
         "decimals": 4
       },
@@ -419,7 +428,7 @@
       "id": "worked.irr_eff",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "599640",
         "decimals": 4
       },
@@ -429,7 +438,7 @@
       "id": "worked.eff_no_fee",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 4
       },
@@ -439,7 +448,7 @@
       "id": "worked.x12_no_fee",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "600000",
         "decimals": 4
       },
@@ -470,7 +479,7 @@
       "id": "half.payment",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|9000|12|3|3|0|0"
+        "tracks": "spitzer|9000|12|3|3|0|0|statement"
       },
       "value": "3060.20"
     },
@@ -478,7 +487,7 @@
       "id": "half.rows",
       "kind": "met_pv_rows",
       "inputs": {
-        "tracks": "spitzer|9000|12|3|3|0|0",
+        "tracks": "spitzer|9000|12|3|3|0|0|statement",
         "monthly_percent": "1.5",
         "decimals": 6
       },
@@ -487,7 +496,7 @@
           "month": 1,
           "payment": "3060.20",
           "growth": "1.015",
-          "value_today": "3014.97"
+          "value_today": "3014.98"
         },
         {
           "month": 2,
@@ -507,17 +516,17 @@
       "id": "half.pv",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|9000|12|3|3|0|0",
+        "tracks": "spitzer|9000|12|3|3|0|0|statement",
         "rate_percent": "1.5",
         "basis": "monthly"
       },
-      "value": "8911.91"
+      "value": "8911.92"
     },
     {
       "id": "half.irr",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|9000|12|3|3|0|0",
+        "tracks": "spitzer|9000|12|3|3|0|0|statement",
         "received": "8910",
         "decimals": 2
       },
@@ -533,7 +542,7 @@
       "id": "ex2.payment",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|18000|4.8|6|6|0|0"
+        "tracks": "spitzer|18000|4.8|6|6|0|0|statement"
       },
       "value": "3042.14"
     },
@@ -541,7 +550,7 @@
       "id": "ex2.answer",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|18000|4.8|6|6|0|0",
+        "tracks": "spitzer|18000|4.8|6|6|0|0|statement",
         "rate_percent": "0.4",
         "basis": "monthly"
       },
@@ -551,7 +560,7 @@
       "id": "ex2.err_total",
       "kind": "met_total_paid",
       "inputs": {
-        "tracks": "spitzer|18000|4.8|6|6|0|0"
+        "tracks": "spitzer|18000|4.8|6|6|0|0|statement"
       },
       "value": "18252.84"
     },
@@ -598,7 +607,7 @@
       "id": "ex4.pv_05",
       "kind": "met_pv",
       "inputs": {
-        "tracks": "spitzer|50000|6|24|24|0|0",
+        "tracks": "spitzer|50000|6|24|24|0|0|statement",
         "rate_percent": "0.5",
         "basis": "monthly"
       },
@@ -639,7 +648,7 @@
       "id": "ex5.payment",
       "kind": "met_first_payment",
       "inputs": {
-        "tracks": "spitzer|12000|6|12|12|0|0"
+        "tracks": "spitzer|12000|6|12|12|0|0|statement"
       },
       "value": "1032.80"
     },
@@ -647,7 +656,7 @@
       "id": "ex5.answer",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|12000|6|12|12|0|0",
+        "tracks": "spitzer|12000|6|12|12|0|0|statement",
         "received": "11880",
         "decimals": 2
       },
@@ -657,7 +666,7 @@
       "id": "ex5.err_effective",
       "kind": "met_irr_effective",
       "inputs": {
-        "tracks": "spitzer|12000|6|12|12|0|0",
+        "tracks": "spitzer|12000|6|12|12|0|0|statement",
         "received": "11880",
         "decimals": 2
       },
@@ -667,7 +676,7 @@
       "id": "ex5.err_monthly",
       "kind": "met_irr_monthly",
       "inputs": {
-        "tracks": "spitzer|12000|6|12|12|0|0",
+        "tracks": "spitzer|12000|6|12|12|0|0|statement",
         "received": "11880",
         "decimals": 2
       },
@@ -677,7 +686,7 @@
       "id": "ex6.long",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|600000|4.8|240|240|0|0",
+        "tracks": "spitzer|600000|4.8|240|240|0|0|statement",
         "received": "599640",
         "decimals": 4
       },
@@ -687,7 +696,7 @@
       "id": "ex6.short",
       "kind": "met_irr_x12",
       "inputs": {
-        "tracks": "spitzer|30000|4.8|3|3|0|0",
+        "tracks": "spitzer|30000|4.8|3|3|0|0|statement",
         "received": "29640",
         "decimals": 2
       },

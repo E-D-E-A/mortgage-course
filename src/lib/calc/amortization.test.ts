@@ -9,6 +9,11 @@ import {
   blockPath,
   discountSum,
   firstMonthBelow,
+  flatInterestTrialLeft,
+  growthBase,
+  halfInterestRate,
+  interpolationStep,
+  shownDiscountSum,
   equalPrincipalSchedule,
   equalPrincipalStatement,
   indexPath,
@@ -285,5 +290,35 @@ describe("stage 3: when the balance falls below a level", () => {
     expect(rows[(k as number) - 2].closing.gte(300000)).toBe(true);
     expect(k).toBeGreaterThan(120);
     expect(firstMonthBelow("600000", "4.8", 240, "0")).toBeNull();
+  });
+});
+
+describe("stage 3 fix round: helpers behind printed numbers", () => {
+  it("the growth base is 1 + the rate per period", () => {
+    expect(growthBase("4.8").toString()).toBe("1.004");
+    expect(growthBase("4.8", 1).toString()).toBe("1.048");
+    expect(growthBase("4.5").toString()).toBe("1.00375");
+  });
+  it("the third try: 1,000 leaves 30.20, 1,020 overpays 10, so the step is 20 × 30.20 ÷ 40.20", () => {
+    // By hand: 20 × 30.20 ÷ 40.20 = 15.0248756…, and 1,000 + 15.02 is the payment to the agora.
+    expect(interpolationStep("2000", "12", 2, "1000", "1020").toDecimalPlaces(2).toString()).toBe("15.02");
+    expect(moneyString(new Decimal(1000).plus(interpolationStep("2000", "12", 2, "1000", "1020")))).toBe(moneyString(annuityPayment("2000", "12", 2)));
+    expect(() => interpolationStep("2000", "12", 2, "1020", "1030")).toThrow(RangeError);
+  });
+  it("interest charged on the whole loan every month: 2,000 + 20 + 20 − 2 × 1,010 = 20", () => {
+    expect(flatInterestTrialLeft("2000", "12", "1010", 2).toFixed(2)).toBe("20.00");
+  });
+  it("S as a calculator gets it: 0.51254818 ÷ 0.004 = 128.137045", () => {
+    expect(shownDiscountSum("4.8", 180).toFixed(8)).toBe("128.13704500");
+    expect(shownDiscountSum("4.5", 156).toFixed(8)).toBe("117.94246667");
+    // and the formula's S differs only in the last places
+    close(shownDiscountSum("4.8", 180), discountSum("4.8", 180), 5);
+  });
+  it("the rate at which the first payment is half interest: (1 + m)^n = 2", () => {
+    expect(halfInterestRate(240).toDecimalPlaces(2).toString()).toBe("3.47");
+    expect(halfInterestRate(360).toDecimalPlaces(2).toString()).toBe("2.31");
+    // at that rate, month 1's interest is half the exact payment
+    const r = halfInterestRate(240);
+    close(monthInterest("600000", r).mul(2), annuityPayment("600000", r, 240), 8);
   });
 });

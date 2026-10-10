@@ -394,3 +394,62 @@ export function firstMonthBelow(principal: Numeric, annualPercent: Numeric, mont
   const k = annuityStatement(principal, annualPercent, months).findIndex((r) => r.closing.lt(threshold));
   return k < 0 ? null : k + 1;
 }
+
+// ── Stage 3 fix round (2026-10-10): small helpers so every number a lesson prints is a fact. ──
+
+/** 1 + the rate per period, as a decimal: 1 + annual ÷ (100 × periodsPerYear). (4.8, 12) → 1.004; (4.8, 1) → 1.048. Exact. */
+export function growthBase(annualPercent: Numeric, periodsPerYear = 12): Decimal {
+  if (!Number.isInteger(periodsPerYear) || periodsPerYear < 1) throw new RangeError(`periodsPerYear must be a whole number of at least 1, got ${periodsPerYear}`);
+  return ONE.plus(new D(annualPercent).div(HUNDRED).div(periodsPerYear));
+}
+
+/**
+ * Lesson 3.1's third try, between two trials: a payment `low` that leaves a
+ * debt and a payment `high` that overpays. What is left at the end moves (up to
+ * the rounding) by the same amount for each shekel of payment, so the step from
+ * `low` is (high − low) × left ÷ (left + over), where left is what `low` leaves
+ * and over what `high` overpays. Returns that step, exact.
+ */
+export function interpolationStep(principal: Numeric, annualPercent: Numeric, months: number, low: Numeric, high: Numeric): Decimal {
+  const left = paymentTrial(principal, annualPercent, low, months)[months - 1].closing;
+  const over = paymentTrial(principal, annualPercent, high, months)[months - 1].closing.neg();
+  if (left.lte(0) || over.lte(0)) throw new RangeError("low must leave a debt and high must overpay");
+  return new D(high).minus(low).mul(left).div(left.plus(over));
+}
+
+/**
+ * The classic slip in a trial (lesson 3.1, exercise 2): charging every month's
+ * interest on the original principal instead of on the balance. What is left
+ * after `months` payments of `payment`: P + months × (P × m, to the agora) − months × payment.
+ */
+export function flatInterestTrialLeft(principal: Numeric, annualPercent: Numeric, payment: Numeric, months: number): Decimal {
+  assertMonths(months);
+  const interest = agorot(monthInterest(principal, annualPercent));
+  return agorot(principal).plus(interest.mul(months)).minus(new D(payment).mul(months));
+}
+
+/**
+ * S the way a learner with a calculator gets it (lesson 3.3): 1 − (1 + m)^−n
+ * kept to `decimals` places, then divided by m, kept to `decimals` places.
+ * It can differ from discountSum in the last places; the lessons print this one
+ * beside the division that produces it.
+ */
+export function shownDiscountSum(annualPercent: Numeric, months: number, decimals = 8): Decimal {
+  assertMonths(months);
+  const m = monthlyRate(annualPercent).div(HUNDRED);
+  if (m.isZero()) throw new RangeError("the shown sum needs a rate above zero");
+  const oneMinus = ONE.minus(ONE.plus(m).pow(-months)).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP);
+  return oneMinus.div(m).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP);
+}
+
+/**
+ * The annual rate (percent, nominal, ÷ 12 monthly) at which the first month's
+ * interest is exactly half of the level payment over `months` months (lesson 3.2).
+ * The interest share of the first payment is 1 − (1 + m)^−n, so it is half
+ * when (1 + m)^n = 2: m = 2^(1/n) − 1. Above this rate the first payment is
+ * mostly interest; below it, mostly principal. Exact.
+ */
+export function halfInterestRate(months: number): Decimal {
+  assertMonths(months);
+  return new D(2).pow(ONE.div(months)).minus(ONE).mul(TWELVE).mul(HUNDRED);
+}

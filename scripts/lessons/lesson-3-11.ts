@@ -12,7 +12,7 @@
  */
 import type { Track } from "../../src/lib/calc/metrics.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { difference, first, given, interest, irrEffective, irrX12, payment, pv, pvCurve, series, total } from "./lesson-3-8.ts";
+import { difference, first, given, interest, irrEffective, irrX12, payment, pv, pvCurve, pvLevel, series, total } from "./lesson-3-8.ts";
 
 export default function lesson311(): LessonData {
   // ── The explanation (and the video): 400,000 ₪ at 6% (0.5% a month), 15 years, two ways. ──
@@ -21,7 +21,10 @@ export default function lesson311(): LessonData {
   const G: Track = { ...S, method: "grace_full", graceMonths: 12 };
   const sTotal = total("explain.s_total", [S]);
   const gTotal = total("explain.g_total", [G]);
-  const x3Loan = given("ex3.loan", "400000.00");
+  // Exercise 3: another loan with full grace — at its own rate it is worth the loan (to the agora).
+  const x3: Track = { principal: "300000", rates: ["5"], months: 240, method: "grace_full", graceMonths: 6 };
+  const x3Loan = given("ex3.loan", "300000.00");
+  const x3Total = total("ex3.total", [x3]);
   const eTotal = total("explain.e_total", [E]);
   const sPv3 = pv("explain.s_pv_3", [S], "3");
   const ePv3 = pv("explain.e_pv_3", [E], "3");
@@ -46,11 +49,15 @@ export default function lesson311(): LessonData {
   const hA: Track = { principal: "3000", rates: ["24"], months: 3 };
   const hB: Track = { ...hA, method: "equal_principal" };
 
+  // Exercise 5: offer B's payment, as a spreadsheet's =PV sees it (the same rounded payment 360 times).
+  const x5Pay = first("ex5.payment", [B]);
+
   const rates = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   const facts: Fact[] = [
     // The explanation.
     given("explain.loan", "400000.00"),
+    payment("explain.s_last", [S], 180),
     first("explain.s_first", [S]),
     first("explain.e_first", [E]),
     sTotal,
@@ -106,6 +113,7 @@ export default function lesson311(): LessonData {
     // Half-worked.
     given("half.loan", "3000.00"),
     first("half.a_pay", [hA]),
+    payment("half.a_last", [hA], 3),
     total("half.a_total", [hA]),
     total("half.b_total", [hB]),
     pv("half.a_pv_1", [hA], "1", "monthly"),
@@ -118,17 +126,21 @@ export default function lesson311(): LessonData {
 
     // Exercises.
     x3Loan,
-    difference("ex3.err_interest", gTotal, x3Loan),
-    pv("ex5.answer", [B], "6"),
-    first("ex5.payment", [B]),
+    x3Total,
+    pv("ex3.answer", [x3], "5"),
+    difference("ex3.err_interest", x3Total, x3Loan),
+    pv("ex3.err_3", [x3], "3"),
+    x5Pay,
+    pvLevel("ex5.answer", x5Pay, 360, "3.5"),
     total("ex5.err_total", [B]),
-    pv("ex5.err_own", [B], "4.6"),
+    pvLevel("ex5.err_own", x5Pay, 360, "4.6"),
+    pvLevel("ex5.err_6", x5Pay, 360, "6"),
   ];
 
   return {
     lesson: "3.11",
     title: "למה סך תשלומים, ערך נוכחי ו־IRR הם שלושה מדדים שונים",
-    note: "Teaching numbers, not market rates or offers. Monthly rate = annual ÷ 12; exact schedules, rounded to the agora only when shown. The rate the money could earn meanwhile is a teaching input.",
+    note: "Teaching numbers, not market rates or offers. Monthly rate = annual ÷ 12; schedules follow the statement convention (each month's interest in agorot, the last payment clearing the balance), and present values and IRRs are computed on those payments, unrounded. The rate the money could earn meanwhile is a teaching input.",
     facts,
   };
 }

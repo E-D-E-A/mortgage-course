@@ -24,10 +24,19 @@ export function save(key: string, value: unknown): void {
   }
 }
 
-/** Parses what a learner typed as a number: "1,210", "1210 ₪", "1210.5". */
+/**
+ * Parses what a learner typed as a number: "1,210", "1210 ₪", "1210.5", "5.4%", "−1" (a Unicode minus).
+ * Thousands commas, ₪ and % signs, a trailing ש״ח, spaces and invisible direction marks are dropped; what
+ * is left must be a plain decimal number with an optional leading sign, or the answer is not a number (null).
+ * So "12abc", "1e1", "1.2.3" and "5-" are refused rather than read as some other number.
+ */
 export function parseAnswer(text: string): number | null {
-  const cleaned = text.replace(/[₪,\s%]/g, "").replace(/[^\d.-]/g, "");
-  if (cleaned === "" || cleaned === "-" || cleaned === ".") return null;
+  const cleaned = text
+    .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, "")
+    .replace(/[\u2212\u2012\u2013]/g, "-")
+    .replace(/\s*(?:ש["״׳']?ח|שקלים|שקל)\s*$/u, "")
+    .replace(/[₪,%\s]/g, "");
+  if (!/^[-+]?(?:\d+\.?\d*|\.\d+)$/.test(cleaned)) return null;
   const n = Number(cleaned);
   return Number.isFinite(n) ? n : null;
 }

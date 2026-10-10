@@ -11,6 +11,14 @@ rate change the payment is recalculated on the balance left over the months left
 variable track resets every `reset` months from the start, and its new rate is the start
 rate plus the anchor's shift in the month after the reset; prime's rate is the start rate
 plus the prime shift of that month. Each track has its own term; a mix is their sum.
+
+Rounding "statement" (inputs `rounding`, or `t{k}_rounding` / `rounding` on a mix): the
+balance in agorot; an indexed opening balance rounded to the agora; each month's interest
+rounded; the payment (Spitzer) or the principal part (equal principal) set in agorot in
+month 1 and, for Spitzer, at a rate change (on the balance before that month's index
+move, over the months left); on a linked track each month's payment is the set one times
+the index move since it was set (M_k ÷ M at setting), rounded; the last month pays what is
+left. Written here from that rule, step by step, not from the TypeScript.
 """
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
@@ -40,8 +48,10 @@ def level_payment(balance, annual, months):
     return Decimal(balance) * m / (1 - (1 + m) ** (-months))
 
 
-def run(principal, rates, factors, method):
+def run(principal, rates, factors, method, rounding="exact"):
     """Rows of (opening, indexation, interest, payment, principal_paid, closing, index_ratio)."""
+    if rounding == "statement":
+        return run_statement(principal, rates, factors, method)
     months = len(rates)
     balance = Decimal(principal)
     ratio = Decimal(1)
@@ -69,6 +79,37 @@ def run(principal, rates, factors, method):
     return rows
 
 
+def run_statement(principal, rates, factors, method):
+    months = len(rates)
+    balance = agorot(Decimal(str(principal)))
+    index_now = Decimal(1)  # the index relative to the base, M_k / M_0
+    index_at_set = Decimal(1)
+    fixed = None
+    rows = []
+    for t in range(months):
+        f = factors[t] if factors else Decimal(1)
+        rate = rates[t]
+        if t == 0 or (method == "spitzer" and rate != rates[t - 1]):
+            fixed = agorot(level_payment(balance, rate, months - t) if method == "spitzer" else balance / (months - t))
+            index_at_set = index_now
+        index_now = index_now * f
+        opening = balance if f == 1 else agorot(balance * f)
+        interest = agorot(opening * rate / TWELVE / HUNDRED)
+        due = fixed if index_now == index_at_set else agorot(fixed * index_now / index_at_set)
+        if t == months - 1:
+            principal_paid = opening
+        else:
+            principal_paid = due - interest if method == "spitzer" else due
+        payment = principal_paid + interest
+        rows.append({
+            "opening": opening, "indexation": opening - balance, "interest": interest, "payment": payment,
+            "principal_paid": principal_paid, "closing": opening - principal_paid, "index_ratio": index_now,
+            "payment_indexation": agorot(payment - payment / index_now),
+        })
+        balance = opening - principal_paid
+    return rows
+
+
 def path_from_inputs(i):
     months = int(i["months"])
     changes, k = [], 1
@@ -91,7 +132,7 @@ def path_from_inputs(i):
     elif inflation:
         block = int(i.get("inflation_block_months", 12))
         factors = [(1 + block_value(inflation, block, t) / HUNDRED) ** (Decimal(1) / TWELVE) for t in range(months)]
-    return run(i["principal"], rates, factors, i.get("method", "spitzer"))
+    return run(i["principal"], rates, factors, i.get("method", "spitzer"), i.get("rounding", "exact"))
 
 
 def money(x):
@@ -156,7 +197,8 @@ def mix_from_inputs(i):
         factors = None
         if kind in ("fixed_linked", "variable_linked"):
             factors = [(1 + block_value(infl, block, t) / HUNDRED) ** (Decimal(1) / TWELVE) for t in range(months)]
-        tracks.append({"kind": kind, "amount": Decimal(str(i[p + "amount"])), "rows": run(i[p + "amount"], rates, factors, i[p + "method"])})
+        rounding = i.get(p + "rounding", i.get("rounding", "exact"))
+        tracks.append({"kind": kind, "amount": Decimal(str(i[p + "amount"])), "rows": run(i[p + "amount"], rates, factors, i[p + "method"], rounding)})
     return tracks
 
 

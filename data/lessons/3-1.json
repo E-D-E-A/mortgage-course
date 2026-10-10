@@ -148,30 +148,64 @@
       "value": "10.00"
     },
     {
-      "id": "explain.try_1015",
-      "kind": "amort_trial_table",
+      "id": "explain.left_1000",
+      "kind": "amort_trial_last",
       "inputs": {
         "principal": "2000",
         "rate_percent": "12",
-        "payment": "1015.00",
+        "payment": "1000.00",
         "months": 2
       },
-      "value": [
-        {
-          "period": 1,
-          "opening": "2000.00",
-          "interest": "20.00",
-          "payment": "1015.00",
-          "closing": "1005.00"
-        },
-        {
-          "period": 2,
-          "opening": "1005.00",
-          "interest": "10.05",
-          "payment": "1015.00",
-          "closing": "0.05"
-        }
-      ]
+      "value": "30.20"
+    },
+    {
+      "id": "explain.low",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "explain.high",
+      "kind": "given",
+      "inputs": {},
+      "value": "1020.00"
+    },
+    {
+      "id": "explain.span",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.high",
+        "subtrahend": "explain.low"
+      },
+      "value": "20.00"
+    },
+    {
+      "id": "explain.swing",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "explain.left_1000|explain.over_1020"
+      },
+      "value": "40.20"
+    },
+    {
+      "id": "explain.step",
+      "kind": "amort_interpolation_step",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "months": 2,
+        "low": "1000.00",
+        "high": "1020.00"
+      },
+      "value": "15.02"
+    },
+    {
+      "id": "explain.try3",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "explain.low|explain.step"
+      },
+      "value": "1015.02"
     },
     {
       "id": "explain.try_pay",
@@ -249,6 +283,24 @@
       "value": "1015.03"
     },
     {
+      "id": "explain.last_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.last_pay",
+        "subtrahend": "explain.pay"
+      },
+      "value": "0.01"
+    },
+    {
+      "id": "explain.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "12",
+        "periods_per_year": 12
+      },
+      "value": "1.01"
+    },
+    {
       "id": "explain.f1",
       "kind": "amort_discount_factor",
       "inputs": {
@@ -315,6 +367,15 @@
         "decimals": 2
       },
       "value": "0.5"
+    },
+    {
+      "id": "three.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "6",
+        "periods_per_year": 12
+      },
+      "value": "1.005"
     },
     {
       "id": "three.f1",
@@ -416,6 +477,24 @@
         "field": "payment"
       },
       "value": "3895.68"
+    },
+    {
+      "id": "long.last_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "long.last_pay",
+        "subtrahend": "long.pay"
+      },
+      "value": "1.94"
+    },
+    {
+      "id": "long.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 12
+      },
+      "value": "1.004"
     },
     {
       "id": "long.try_3500",
@@ -601,6 +680,15 @@
       "value": "0.425"
     },
     {
+      "id": "worked.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "5.1",
+        "periods_per_year": 12
+      },
+      "value": "1.00425"
+    },
+    {
       "id": "worked.months",
       "kind": "rep_months_in_years",
       "inputs": {
@@ -617,6 +705,15 @@
         "months": 3
       },
       "value": "10080.11"
+    },
+    {
+      "id": "half.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 12
+      },
+      "value": "1.004"
     },
     {
       "id": "half.factor_1",
@@ -757,6 +854,17 @@
       "value": "0.00"
     },
     {
+      "id": "ex2.err_flat",
+      "kind": "amort_flat_interest_trial",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1010.00",
+        "months": 2
+      },
+      "value": "20.00"
+    },
+    {
       "id": "ex3.answer",
       "kind": "amort_payment",
       "inputs": {
@@ -803,6 +911,15 @@
         "decimals": 2
       },
       "value": "0.5"
+    },
+    {
+      "id": "ex3.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "6",
+        "periods_per_year": 12
+      },
+      "value": "1.005"
     },
     {
       "id": "ex3.f1",
@@ -927,6 +1044,15 @@
       "value": "0.35"
     },
     {
+      "id": "ex4.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.2",
+        "periods_per_year": 12
+      },
+      "value": "1.0035"
+    },
+    {
       "id": "ex5.steps",
       "kind": "amort_formula_steps",
       "inputs": {
@@ -985,6 +1111,15 @@
       "value": "0.45"
     },
     {
+      "id": "ex5.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "5.4",
+        "periods_per_year": 12
+      },
+      "value": "1.0045"
+    },
+    {
       "id": "ex5.months",
       "kind": "rep_months_in_years",
       "inputs": {
@@ -1040,6 +1175,25 @@
         "decimals": 3
       },
       "value": "0.375"
+    },
+    {
+      "id": "ex6.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.5",
+        "periods_per_year": 12
+      },
+      "value": "1.00375"
+    },
+    {
+      "id": "ex6.err_years",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "4000.00",
+        "rate_percent": "4.5",
+        "months": 25
+      },
+      "value": "95285.30"
     },
     {
       "id": "ex6.months",

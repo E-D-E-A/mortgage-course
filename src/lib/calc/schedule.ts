@@ -36,10 +36,12 @@
  *    (course/AUTHORING.md), so every row adds up on the printed numbers: the
  *    balance in agorot; on a linked track the opening balance is indexed and
  *    rounded to the agora each month; each month's interest rounded to the
- *    agora; the payment rounded to the agora when it is set (month 1, a rate
- *    change, an index move) and kept otherwise; the last payment clears the
- *    balance. On a flat unlinked track this is amortization.ts's
- *    annuityStatement / equalPrincipalStatement, row for row.
+ *    agora; the payment rounded to the agora when it is set (month 1, and a
+ *    rate change: Spitzer on the balance left over the months left), and on a
+ *    linked track carried with the index and rounded again (the set payment ×
+ *    M_k ÷ M at setting, lesson 2.5); the last payment clears the balance. On a
+ *    flat unlinked track this is amortization.ts's annuityStatement /
+ *    equalPrincipalStatement, row for row.
  * Recomputed independently in checks/kinds/schedule.py (fact kinds with the
  * prefix sch_).
  *
@@ -260,34 +262,37 @@ export function scheduleFromPaths(principal: Numeric, rates: Numeric[], factors?
 }
 
 /**
- * The statement convention, month by month: index the balance and round it to
- * the agora; round the interest to the agora; set the payment (Spitzer: the
- * level payment on the opening balance over the months left; equal principal:
- * the opening balance ÷ the months left) in agorot in month 1 and whenever the
- * rate changed (Spitzer) or the index moved, and keep it otherwise; the last
- * month pays what is left.
+ * The statement convention, month by month. The balance is in agorot; on a
+ * linked track it is indexed and rounded to the agora before the payment. The
+ * interest is rounded to the agora. The payment (Spitzer) or the principal part
+ * (equal principal) is set in agorot at the start and, for Spitzer, again at
+ * every rate change — on the balance left before this month's index move, over
+ * the months left — and is then carried with the index: this month's payment is
+ * the set one × the index's move since it was set, rounded to the agora. That
+ * is lesson 2.5's C × M_k ÷ M_0 on the printed C, so the page's equalities hold
+ * on its printed numbers. The last month pays what is left.
  */
 function statementPath(principal: Numeric, rates: Numeric[], factors: Numeric[] | undefined, method: ScheduleMethod): PathRow[] {
   const months = rates.length;
   const rows: PathRow[] = [];
   let balance = agorot(principal);
-  let set = ZERO; // Spitzer: the payment; equal principal: the principal part
-  let lastRate = new D(rates[0]);
+  let set = ZERO; // Spitzer: the payment, as set; equal principal: the principal part, as set
+  let ratio = ONE; // the index's move since the start
+  let setRatio = ONE; // the index's move up to the month before the payment was set
   for (let t = 0; t < months; t++) {
     const factor = new D(factors ? factors[t] : 1);
-    const moved = !factor.eq(1);
-    const opening = moved ? agorot(balance.mul(factor)) : balance;
     const rate = new D(rates[t]);
     const left = months - t;
-    const interest = agorot(monthInterest(opening, rate));
-    if (method === "spitzer") {
-      if (t === 0 || moved || !rate.eq(lastRate)) set = agorot(annuityPayment(opening, rate, left));
-    } else if (t === 0 || moved) {
-      set = agorot(opening.div(left));
+    if (t === 0 || (method === "spitzer" && !rate.eq(rates[t - 1]))) {
+      set = agorot(method === "spitzer" ? annuityPayment(balance, rate, left) : balance.div(left));
+      setRatio = ratio;
     }
-    lastRate = rate;
+    ratio = ratio.mul(factor);
+    const opening = factor.eq(1) ? balance : agorot(balance.mul(factor));
+    const interest = agorot(monthInterest(opening, rate));
+    const current = ratio.eq(setRatio) ? set : agorot(set.mul(ratio).div(setRatio));
     const last = t === months - 1;
-    const principalPaid = last ? opening : method === "spitzer" ? set.minus(interest) : set;
+    const principalPaid = last ? opening : method === "spitzer" ? current.minus(interest) : current;
     const closing = opening.minus(principalPaid);
     rows.push({ month: t + 1, opening, payment: principalPaid.plus(interest), interest, principalPaid, closing, rate, indexFactor: factor });
     balance = closing;

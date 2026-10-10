@@ -1,7 +1,7 @@
 {
   "lesson": "3.5",
   "title": "הצמדה לאורך ציר הזמן",
-  "note": "Teaching numbers: loans, rates, the index series and the inflation paths are illustrations, not forecasts. Schedules from src/lib/calc/schedule.ts (balance indexed every month before the payment, DEC-3). The §17 start rule and the interim period follow the team's transcription of Directive 451 in the Brain, not verified; interim interest by the day uses ÷ 365, the course's assumption.",
+  "note": "Teaching numbers: loans, rates, the index series and the inflation paths are illustrations, not forecasts. Schedules from src/lib/calc/schedule.ts (balance indexed every month before the payment, DEC-3), in statement rounding (every row in agorot). The §17 start rule and the interim period follow the team's transcription of Directive 451 in the Brain, not verified; interim interest by the day uses ÷ 365, the course's assumption.",
   "facts": [
     {
       "id": "case.amount",
@@ -46,6 +46,15 @@
       "value": "100.4"
     },
     {
+      "id": "index.rise1",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "100",
+        "new": "100.3"
+      },
+      "value": "0.3"
+    },
+    {
       "id": "explain.c",
       "kind": "amort_payment",
       "inputs": {
@@ -63,6 +72,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -80,6 +90,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -177,6 +188,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -194,6 +206,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -211,6 +224,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -228,6 +242,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -266,12 +281,15 @@
     },
     {
       "id": "u1.closing",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "400000",
-        "rate_percent": "3",
         "months": 240,
-        "paid": 1
+        "method": "spitzer",
+        "rate": "3",
+        "rounding": "statement",
+        "month": 1,
+        "field": "closing"
       },
       "value": "398781.61"
     },
@@ -285,6 +303,16 @@
       "value": "1196.34"
     },
     {
+      "id": "check.m1",
+      "kind": "infl_indexed_amount",
+      "inputs": {
+        "amount": "398781.61",
+        "base_index": "100",
+        "new_index": "100.3"
+      },
+      "value": "399977.95"
+    },
+    {
       "id": "m2.indexation",
       "kind": "sch_row",
       "inputs": {
@@ -292,6 +320,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -309,6 +338,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -316,7 +346,7 @@
         "month": 2,
         "field": "opening"
       },
-      "value": "400775.52"
+      "value": "400775.51"
     },
     {
       "id": "m2.interest",
@@ -326,6 +356,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -343,6 +374,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -360,6 +392,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -377,6 +410,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -394,6 +428,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -411,6 +446,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -428,6 +464,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -445,6 +482,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -462,6 +500,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -469,7 +508,7 @@
         "month": 3,
         "field": "principal_paid"
       },
-      "value": "1229.39"
+      "value": "1229.38"
     },
     {
       "id": "m3.closing",
@@ -479,6 +518,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "index_2": "100.5",
@@ -498,18 +538,41 @@
       "value": "2.22"
     },
     {
-      "id": "once.payment_extra_total",
+      "id": "once.paid_total",
       "kind": "sch_total",
       "inputs": {
         "principal": "400000",
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
-        "field": "payment_indexation"
+        "field": "payment"
       },
-      "value": "1597.24"
+      "value": "534010.48"
+    },
+    {
+      "id": "unlinked.paid_total",
+      "kind": "sch_total",
+      "inputs": {
+        "principal": "400000",
+        "months": 240,
+        "method": "spitzer",
+        "rate": "3",
+        "rounding": "statement",
+        "field": "payment"
+      },
+      "value": "532413.82"
+    },
+    {
+      "id": "once.payment_extra_total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "once.paid_total",
+        "subtrahend": "unlinked.paid_total"
+      },
+      "value": "1596.66"
     },
     {
       "id": "once.indexation_total",
@@ -519,6 +582,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "field": "indexation"
@@ -532,7 +596,7 @@
         "minuend": "once.payment_extra_total",
         "subtrahend": "once.indexation_total"
       },
-      "value": "397.24"
+      "value": "396.66"
     },
     {
       "id": "once.principal_total",
@@ -542,6 +606,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.3",
         "field": "principal_paid"
@@ -556,6 +621,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "2",
         "inflation_block_months": 12,
         "month": 1,
@@ -571,6 +637,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "2",
         "inflation_block_months": 12,
         "month": 1,
@@ -586,6 +653,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "2",
         "inflation_block_months": 12,
         "month": 120,
@@ -601,23 +669,47 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "2",
         "inflation_block_months": 12,
         "month": 120,
         "field": "closing"
       },
-      "value": "280052.26"
+      "value": "280052.19"
     },
     {
       "id": "slider.u120_balance",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "400000",
-        "rate_percent": "3",
         "months": 240,
-        "paid": 120
+        "method": "spitzer",
+        "rate": "3",
+        "rounding": "statement",
+        "month": 120,
+        "field": "closing"
       },
-      "value": "229740.40"
+      "value": "229740.49"
+    },
+    {
+      "id": "slider.monthly_root",
+      "kind": "monthly_rate_from_effective",
+      "inputs": {
+        "effective_percent": "2",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.165"
+    },
+    {
+      "id": "slider.monthly_div",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "2",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.167"
     },
     {
       "id": "slider.indexation_120",
@@ -627,12 +719,13 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "2",
         "inflation_block_months": 12,
         "field": "indexation",
         "through": 120
       },
-      "value": "69425.93"
+      "value": "69425.91"
     },
     {
       "id": "slider.four_m60_balance",
@@ -642,12 +735,13 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "4",
         "inflation_block_months": 12,
         "month": 60,
         "field": "closing"
       },
-      "value": "390831.58"
+      "value": "390831.61"
     },
     {
       "id": "slider.four_m12_balance",
@@ -657,6 +751,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3",
+        "rounding": "statement",
         "inflation_1": "4",
         "inflation_block_months": 12,
         "month": 12,
@@ -701,6 +796,15 @@
       "value": "14"
     },
     {
+      "id": "worked.rise",
+      "kind": "infl_change_percent",
+      "inputs": {
+        "old": "100",
+        "new": "100.4"
+      },
+      "value": "0.4"
+    },
+    {
       "id": "worked.interim",
       "kind": "sch_interim_interest",
       "inputs": {
@@ -728,6 +832,7 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -743,6 +848,7 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -758,6 +864,7 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -773,12 +880,13 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
         "field": "payment"
       },
-      "value": "1216.54"
+      "value": "1216.55"
     },
     {
       "id": "worked.payment_extra",
@@ -787,7 +895,7 @@
         "minuend": "worked.payment",
         "subtrahend": "worked.c"
       },
-      "value": "4.84"
+      "value": "4.85"
     },
     {
       "id": "worked.principal",
@@ -797,12 +905,13 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
         "field": "principal_paid"
       },
-      "value": "547.21"
+      "value": "547.22"
     },
     {
       "id": "worked.closing",
@@ -812,12 +921,13 @@
         "months": 300,
         "method": "spitzer",
         "rate": "3.2",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
         "field": "closing"
       },
-      "value": "250452.79"
+      "value": "250452.78"
     },
     {
       "id": "half.table",
@@ -945,6 +1055,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -960,6 +1071,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -985,6 +1097,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -1075,6 +1188,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -1090,6 +1204,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
@@ -1105,12 +1220,13 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
         "field": "principal_paid"
       },
-      "value": "926.23"
+      "value": "926.22"
     },
     {
       "id": "ex7.answer",
@@ -1120,12 +1236,13 @@
         "months": 240,
         "method": "spitzer",
         "rate": "3.5",
+        "rounding": "statement",
         "index_0": "100",
         "index_1": "100.4",
         "month": 1,
         "field": "closing"
       },
-      "value": "320353.77"
+      "value": "320353.78"
     },
     {
       "id": "ex7.unlinked",

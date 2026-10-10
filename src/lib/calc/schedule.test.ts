@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
-import { annuityPayment, equalPrincipalSchedule, indexPath, pathSchedule } from "./amortization.ts";
+import { annuityPayment, annuityStatement, equalPrincipalSchedule, equalPrincipalStatement, indexPath, pathSchedule } from "./amortization.ts";
 import { moneyString } from "./money.ts";
 import {
   exposure,
@@ -84,6 +84,72 @@ describe("one track, month by month", () => {
     const rows = scheduleFromPaths("600000", rateChangesPath("4.25", 240, [{ month: 61, rate: "5.25" }]));
     close(rows[60].payment, recalculatedPayment(rows[59].closing, "5.25", 180));
     expect(rows[239].closing.toString()).toBe("0");
+  });
+});
+
+describe("statement rounding (teaching tables)", () => {
+  const same = (ours: { opening: Decimal; payment: Decimal; interest: Decimal; principalPaid: Decimal; closing: Decimal }[], theirs: typeof ours) => {
+    expect(ours).toHaveLength(theirs.length);
+    ours.forEach((r, k) => {
+      for (const f of ["opening", "payment", "interest", "principalPaid", "closing"] as const) expect(r[f].toString(), `month ${k + 1} ${f}`).toBe(theirs[k][f].toString());
+    });
+  };
+
+  it("is annuityStatement row for row on a flat unlinked Spitzer path", () => {
+    same(scheduleFromPaths("600000", rateChangesPath("4.8", 240), undefined, "spitzer", "statement"), annuityStatement("600000", "4.8", 240));
+    same(scheduleFromPaths("400000", rateChangesPath("3", 240), undefined, "spitzer", "statement"), annuityStatement("400000", "3", 240));
+    same(scheduleFromPaths("12000", rateChangesPath("6", 12), undefined, "spitzer", "statement"), annuityStatement("12000", "6", 12));
+  });
+
+  it("is equalPrincipalStatement row for row on a flat unlinked equal-principal path", () => {
+    same(scheduleFromPaths("500000", rateChangesPath("4.8", 240), undefined, "equal_principal", "statement"), equalPrincipalStatement("500000", "4.8", 240));
+    same(scheduleFromPaths("100", rateChangesPath("12", 3), undefined, "equal_principal", "statement"), equalPrincipalStatement("100", "12", 3));
+  });
+
+  it("keeps every row in agorot and every row adds up, on a linked track with a rate change", () => {
+    const rows = scheduleFromPaths("400000", rateChangesPath("3", 240, [{ month: 61, rate: "4" }]), indexPath(["2"], 12, 240), "spitzer", "statement");
+    let previous = new Decimal("400000");
+    for (const r of rows) {
+      for (const v of [r.opening, r.payment, r.interest, r.principalPaid, r.closing]) expect(v.decimalPlaces()).toBeLessThanOrEqual(2);
+      expect(r.payment.minus(r.interest).toString()).toBe(r.principalPaid.toString());
+      expect(r.opening.minus(r.principalPaid).toString()).toBe(r.closing.toString());
+      expect(r.opening.minus(previous).toString()).toBe(r.indexation.toString());
+      previous = r.closing;
+    }
+    expect(rows[239].closing.toString()).toBe("0");
+  });
+
+  it("indexes and rounds the balance, and pays the printed C × M_k ÷ M_0 rounded, on a linked track (checked by hand)", () => {
+    // 1,000 at 12% a year over 2 months; the index goes 100 → 101.
+    const rows = scheduleFromPaths("1000", ["12", "12"], indexFactorsFromIndex(["100", "101"], 2), "spitzer", "statement");
+    // Month 1: 1,010.00; interest 10.10; C = 507.51 (507.5124…), × 101 ÷ 100 = 512.5851 → 512.59.
+    expect([rows[0].opening, rows[0].interest, rows[0].payment, rows[0].closing].map(moneyString)).toEqual(["1010.00", "10.10", "512.59", "507.51"]);
+    // Month 2: the index did not move, interest 5.08 (5.0751), the last payment clears 507.51.
+    expect([rows[1].interest, rows[1].payment, rows[1].closing].map(moneyString)).toEqual(["5.08", "512.59", "0.00"]);
+  });
+
+  it("keeps lesson 2.5's rule on the printed payment: 1,211.70 × 100.4 ÷ 100 = 1,216.55 (lesson 3.5's worked example)", () => {
+    const rows = scheduleFromPaths("250000", rateChangesPath("3.2", 300), indexFactorsFromIndex(["100", "100.4"], 300), "spitzer", "statement");
+    expect(moneyString(annuityPayment("250000", "3.2", 300))).toBe("1211.70");
+    expect([rows[0].opening, rows[0].interest, rows[0].payment, rows[0].principalPaid, rows[0].closing].map(moneyString)).toEqual(["251000.00", "669.33", "1216.55", "547.22", "250452.78"]);
+  });
+
+  it("recalculates on the balance left at a rate change, over the months left", () => {
+    const rows = scheduleFromPaths("500000", rateChangesPath("4.8", 240, [{ month: 37, rate: "6" }]), undefined, "spitzer", "statement");
+    expect(moneyString(rows[36].payment)).toBe(moneyString(recalculatedPayment(rows[35].closing, "6", 204)));
+    expect(rows[239].closing.toString()).toBe("0");
+  });
+
+  it("threads through a track, a mix and flat inputs, and stays exact by default", () => {
+    const track: TrackSpec = { kind: "fixed_unlinked", amount: "600000", rate: "4.8", months: 240 };
+    const st = annuityStatement("600000", "4.8", 240);
+    expect(trackSchedule({ ...track, rounding: "statement" })[239].payment.toString()).toBe(st[239].payment.toString());
+    expect(mixCashFlow([track], { rounding: "statement" })[239].payment.toString()).toBe(st[239].payment.toString());
+    expect(scheduleFromInputs(pathInputs({ principal: "600000", months: 240, rate: "4.8", rounding: "statement" }))[239].payment.toString()).toBe(st[239].payment.toString());
+    expect(trackSchedule(track)[0].payment.toString()).toBe(annuityPayment("600000", "4.8", 240).toString());
+    const back = mixFromInputs(mixInputs([{ ...track, rounding: "statement" }], { rounding: "statement" }));
+    expect(back.tracks[0].rounding).toBe("statement");
+    expect(back.scenario.rounding).toBe("statement");
   });
 });
 

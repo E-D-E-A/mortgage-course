@@ -92,8 +92,10 @@ const variants = computed(() => {
   return { exact: of("exact"), payment_unrounded: of("payment_unrounded"), no_last_adjust: of("no_last_adjust") };
 });
 
-const value = (f: Figure) => parseAnswer((entered[f] ?? "").replace("−", "-"));
+const value = (f: Figure) => parseAnswer(entered[f] ?? "");
 const filled = computed(() => FIGURES.filter((f) => value(f.key) !== null));
+/** Typed, but not a number ("abc", "12abc"): named, never silently skipped. */
+const unreadable = computed(() => FIGURES.filter((f) => (entered[f.key] ?? "").trim() !== "" && value(f.key) === null));
 // A sheet shows two decimals: equal to the agora means within half an agora.
 const agoraEqual = (a: number, b: Decimal.Value) => Math.abs(a - new Decimal(b).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toNumber()) < 0.005;
 const diffOf = (f: Figure) => {
@@ -102,7 +104,15 @@ const diffOf = (f: Figure) => {
   return v === null || !c ? null : new Decimal(v).minus(c[f].toDecimalPlaces(2, Decimal.ROUND_HALF_UP));
 };
 
-const VARIANT_TEXT: Record<"exact" | "payment_unrounded" | "no_last_adjust", string> = {
+type Variant = "exact" | "payment_unrounded" | "no_last_adjust";
+/** Short names, as in the lesson's callout of four sheets. */
+const VARIANT_NAME: Record<Variant | "course", string> = {
+  course: "כמו המחשבון של הקורס",
+  exact: "בלי ROUND בכלל",
+  payment_unrounded: "ROUND על הריבית, לא על ההחזר",
+  no_last_adjust: "גם החודש האחרון משלם את ההחזר הרגיל",
+};
+const VARIANT_TEXT: Record<Variant, string> = {
   exact:
     "הגיליון שלכם בלי ROUND בכלל: ההחזר הוא התוצאה המדויקת של PMT, והריבית לא מעוגלת. כל המספרים נכונים — לפי מוסכמה אחרת. המחשבון של הקורס מעגל את ההחזר ואת הריבית של כל חודש לאגורה, ולכן הסכומים נבדלים באגורות. להתאמה: ⁦ROUND(…,2)⁩ על ההחזר ועל הריבית, והחודש האחרון סוגר את היתרה.",
   payment_unrounded:
@@ -111,17 +121,34 @@ const VARIANT_TEXT: Record<"exact" | "payment_unrounded" | "no_last_adjust", str
     "בגיליון שלכם גם החודש האחרון משלם את ההחזר הרגיל. העיגולים של כל החודשים מצטברים, ולכן היתרה בסוף לא יוצאת אפס בדיוק — נשארות כמה אגורות, או שמשלמים יותר מדי. במחשבון של הקורס החודש האחרון משלם את מה שנשאר ועוד הריבית: בעמודת ההחזר, בשורה האחרונה, היתרה בתחילת החודש ועוד הריבית.",
 };
 
+const join = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ו${xs[xs.length - 1]}`);
 const verdict = computed(() => {
   const c = course.value;
   if (!c || filled.value.length === 0) return null;
-  if (filled.value.every((f) => agoraEqual(value(f.key) as number, c[f.key]))) return { tone: "ok" as const, text: "" };
+  const fits = (figs: Record<Figure, Decimal.Value>) => filled.value.every((f) => agoraEqual(value(f.key) as number, figs[f.key]));
   const v = variants.value;
-  if (v) {
-    for (const name of ["exact", "payment_unrounded", "no_last_adjust"] as const) {
-      const figs = v[name];
-      if (filled.value.every((f) => agoraEqual(value(f.key) as number, figs[f.key]))) return { tone: "rounding" as const, text: VARIANT_TEXT[name] };
-    }
+  // Every convention the figures typed so far fit. With some figures missing, several can fit at once
+  // (in the workshop's loan the regular payment is the same under all four), and naming the first
+  // would be a confident wrong diagnosis.
+  const matches: (Variant | "course")[] = [
+    ...(fits(c) ? (["course"] as const) : []),
+    ...(v ? (["exact", "payment_unrounded", "no_last_adjust"] as const).filter((name) => fits(v[name])) : []),
+  ];
+  const partial = filled.value.length < FIGURES.length;
+  if (matches.length > 1 && partial) {
+    const left = FIGURES.filter((f) => !filled.value.includes(f)).map((f) => f.label);
+    return {
+      tone: "unsure" as const,
+      text: `המספרים שמילאתם מתאימים ליותר ממוסכמה אחת: ${join(matches.map((m) => `״${VARIANT_NAME[m]}״`))}. מלאו גם את ${join(left)}, ואז אפשר יהיה לדעת איזו מהן בגיליון שלכם.`,
+    };
   }
+  if (matches[0] === "course") return { tone: "ok" as const, text: "" };
+  if (matches.length > 1)
+    return {
+      tone: "unsure" as const,
+      text: `בהלוואה הזו כמה מוסכמות נותנות את אותם ארבעה מספרים: ${join(matches.map((m) => `״${VARIANT_NAME[m]}״`))}. אפשר להבחין ביניהן בהלוואה אחרת, גדולה וארוכה יותר.`,
+    };
+  if (matches.length === 1) return { tone: "rounding" as const, text: VARIANT_TEXT[matches[0] as Variant] };
   const small = filled.value.every((f) => (diffOf(f.key) as Decimal).abs().lte(5));
   if (small)
     return {
@@ -138,6 +165,12 @@ function check() {
   checked.value = true;
   persist();
 }
+/** The loan as the sheet holds it, formatted like every other amount when it reads as numbers. */
+const loanShown = computed(() => {
+  const x = parsed.value;
+  if ("error" in x) return { principal: `${loan.principal} ₪`, rate: `${loan.rate}%`, months: loan.months };
+  return { principal: formatShekels(x.p), rate: `${x.r}%`, months: String(x.n) };
+});
 function onEntered(f: Figure, text: string) {
   entered[f] = text;
   persist();
@@ -192,12 +225,13 @@ function gapText(f: Figure): string {
     <div v-if="printView" class="mt-4 text-body-m text-n800">
       <p v-if="printNote" class="rounded-md border border-n200 p-3 text-caption text-n700">{{ printNote }}</p>
       <p class="mt-3">
-        ההלוואה בגיליון: <span class="ltr font-semibold">{{ loan.principal }}</span> ₪, <span class="ltr font-semibold">{{ loan.rate }}%</span> לשנה,
-        <span class="ltr font-semibold">{{ loan.months }}</span> חודשים.
+        ההלוואה בגיליון: <span class="ltr font-semibold">{{ loanShown.principal }}</span>, <span class="ltr font-semibold">{{ loanShown.rate }}</span> לשנה,
+        <span class="ltr font-semibold">{{ loanShown.months }}</span> חודשים.
       </p>
     </div>
 
-    <div v-else class="mt-4">
+    <!-- A form, so Enter in any field compares. -->
+    <form v-else class="mt-4" novalidate @submit.prevent="check">
       <p class="text-body-m font-semibold text-n900">ההלוואה שבגיליון</p>
       <div class="mt-2 grid grid-cols-3 gap-2">
         <div class="min-w-0">
@@ -232,13 +266,18 @@ function gapText(f: Figure): string {
         </li>
       </ul>
       <button
-        type="button"
+        type="submit"
         class="diy-no-print mt-3 h-11 rounded-md bg-turquoise px-5 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0 active:scale-[0.98] active:bg-turquoise-hover"
-        @click="check"
       >
         השוואה למחשבון של הקורס
       </button>
-    </div>
+      <p v-if="checked && (unreadable.length || !filled.length)" class="mt-3 rounded-md bg-warning-bg p-3 text-body-m text-n800" aria-live="polite">
+        <template v-if="unreadable.length">
+          לא הצלחנו לקרוא מספר ב{{ join(unreadable.map((f) => `״${f.label}״`)) }}. כתבו רק ספרות, כמו שהן בגיליון, למשל 3247.15 או 3,247.15.
+        </template>
+        <template v-else>עוד לא כתבתם מספר. העתיקו מהגיליון לפחות את ההחזר בחודש 1, ולחצו שוב.</template>
+      </p>
+    </form>
 
     <template v-if="checked && course && filled.length">
       <div class="mt-4 overflow-x-auto">
@@ -264,6 +303,9 @@ function gapText(f: Figure): string {
       <p v-if="verdict?.tone === 'ok'" class="mt-3 rounded-md bg-success-bg p-3 text-body-m text-n800" aria-live="polite">
         <strong class="text-n900">תואם עד האגורה.</strong> הגיליון שלכם מחשב בדיוק כמו המחשבון של הקורס: אותה ריבית חודשית, אותו עיגול, ואותו חודש אחרון.
         <template v-if="filled.length < FIGURES.length"> (בדקנו {{ filled.length }} מתוך {{ FIGURES.length }} המספרים; מלאו את כולם לבדיקה מלאה.)</template>
+      </p>
+      <p v-else-if="verdict?.tone === 'unsure'" class="mt-3 rounded-md bg-info-bg p-3 text-body-m text-n800" aria-live="polite">
+        <strong class="text-n900">עוד אי אפשר לדעת.</strong> {{ verdict.text }}
       </p>
       <p v-else-if="verdict?.tone === 'rounding'" class="mt-3 rounded-md bg-info-bg p-3 text-body-m text-n800" aria-live="polite">
         <strong class="text-n900">ההפרש הוא עיגול.</strong> {{ verdict.text }}

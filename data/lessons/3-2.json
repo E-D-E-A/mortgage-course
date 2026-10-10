@@ -412,6 +412,112 @@
       }
     },
     {
+      "id": "long.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 12
+      },
+      "value": "1.004"
+    },
+    {
+      "id": "long.prin_1_rate",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1493.74",
+        "rate_percent": "0.4"
+      },
+      "value": "5.97"
+    },
+    {
+      "id": "half_rate.180",
+      "kind": "amort_half_interest_rate",
+      "inputs": {
+        "months": 180
+      },
+      "value": "4.63"
+    },
+    {
+      "id": "half_rate.240",
+      "kind": "amort_half_interest_rate",
+      "inputs": {
+        "months": 240
+      },
+      "value": "3.47"
+    },
+    {
+      "id": "half_rate.300",
+      "kind": "amort_half_interest_rate",
+      "inputs": {
+        "months": 300
+      },
+      "value": "2.78"
+    },
+    {
+      "id": "half_rate.360",
+      "kind": "amort_half_interest_rate",
+      "inputs": {
+        "months": 360
+      },
+      "value": "2.31"
+    },
+    {
+      "id": "low.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "3",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.25"
+    },
+    {
+      "id": "low.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "3",
+        "months": 240
+      },
+      "value": "3327.59"
+    },
+    {
+      "id": "low.int_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "3",
+        "months": 240,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "low.prin_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "3",
+        "months": 240,
+        "period": 1,
+        "field": "principal"
+      },
+      "value": "1827.59"
+    },
+    {
+      "id": "low.part",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "600000",
+        "weight": "1",
+        "total_weight": "240"
+      },
+      "value": "2500.00"
+    },
+    {
       "id": "head.rule72",
       "kind": "rule_of_72",
       "inputs": {
@@ -700,6 +806,32 @@
         "field": "opening"
       },
       "value": "249567.51"
+    },
+    {
+      "id": "ex4.after_whole",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.loan",
+        "subtrahend": "ex.pay"
+      },
+      "value": "248567.51"
+    },
+    {
+      "id": "ex4.err_whole",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "248567.51",
+        "rate_percent": "0.4"
+      },
+      "value": "994.27"
+    },
+    {
+      "id": "ex.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 25
+      },
+      "value": 300
     },
     {
       "id": "ex5.open",

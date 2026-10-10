@@ -39,6 +39,8 @@ export default function lesson39(): LessonData {
   const linked: Track = { principal: "600000", rates: ["3"], months: 240, inflationPercent: "2" };
 
   const smallPay = first("small.payment", [small]);
+  const smallTotal = total("small.total", [small]);
+  const smallTimes = times("small.times", smallPay, 12);
   const bigPay = first("big.payment", [big]);
   const bigTotal = total("big.total", [big]);
   const bigInterest = interest("big.interest", big);
@@ -102,8 +104,10 @@ export default function lesson39(): LessonData {
     // The explanation: small numbers.
     given("small.loan", "12000.00"),
     smallPay,
-    total("small.total", [small]),
-    times("small.times", smallPay, 12),
+    smallTotal,
+    payment("small.last", [small], 12),
+    smallTimes,
+    difference("small.times_gap", smallTimes, smallTotal),
     interest("small.interest", small),
 
     // The explanation: 600,000 ₪, 20 years.
@@ -168,7 +172,7 @@ export default function lesson39(): LessonData {
     x3Loan,
     x5Int30,
     simpleInterest("ex3.err_simple", "600000", "4.8", 30),
-    total("ex3.exact_total", [big30]),
+    difference("ex3.round_gap", big30Total, x3Total),
     x4Total,
     x4Interest,
     x4Loan,
@@ -186,7 +190,7 @@ export default function lesson39(): LessonData {
   return {
     lesson: "3.9",
     title: "סך תשלומים, ריבית, הצמדה ועמלות",
-    note: "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; exact schedules, rounded to the agora only when shown. The linked track's index rises 2% a year (2.5% in exercise 4): a teaching assumption, not a forecast. Where the learner multiplies a rounded payment by the number of months, the fact does the same (met_times).",
+    note: "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; schedules follow the statement convention (each month's interest rounded to the agora, the payment rounded once, the last payment clearing the balance), so totals agree with 2.9 and 3.12. The linked track's index rises 2% a year (2.5% in exercise 4): a teaching assumption, not a forecast. Where the learner multiplies a rounded payment by the number of months, the fact does the same (met_times).",
     facts,
   };
 }

@@ -117,8 +117,8 @@ def build(kind, loan, rate, months):
         ws[c].font = font(bold=True, color=navy)
 
     header("A9", "חישוב")
-    label(10, "הריבית החודשית", "הריבית לשנה חלקי 12" if kind == "solution" else "כתבו כאן נוסחה (צעד 1)")
-    label(11, "ההחזר החודשי, מעוגל לאגורה", "מעוגל לאגורה" if kind == "solution" else "כתבו כאן נוסחה (צעד 2)")
+    label(10, "הריבית החודשית", "הריבית לשנה חלקי 12" if kind == "solution" else "את הנוסחה כותבים בתא B10 (צעד 1), לא בתא הזה")
+    label(11, "ההחזר החודשי, מעוגל לאגורה", "מעוגל לאגורה" if kind == "solution" else "את הנוסחה כותבים בתא B11 (צעד 2), לא בתא הזה")
     ws["B10"].number_format, ws["B11"].number_format = pct4, money
     if kind == "solution":
         ws["B10"] = "=B6/12"

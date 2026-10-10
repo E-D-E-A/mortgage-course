@@ -45,7 +45,7 @@
 
       const t1000 = fact("explain.try_1000");
       const t1020 = fact("explain.try_1020");
-      const t1015 = fact("explain.try_1015");
+      const tPay = fact("explain.try_pay");
       const st = fact("explain.steps");
       const lg = fact("long.steps");
       const V = {
@@ -53,7 +53,9 @@
         monthly: fact("explain.monthly"),
         left1000: shek(t1000[1].closing),
         over1020: shek(fact("explain.over_1020")),
-        left1015: shek(t1015[1].closing),
+        leftPay: shek(tPay[1].closing),
+        S6: dec(fact("explain.S6")),
+        lgBase: fact("long.base"),
         f1: dec(fact("explain.f1")),
         f2: dec(fact("explain.f2")),
         S: dec(fact("explain.S")),
@@ -77,8 +79,8 @@
         [5, 9.5, `נתחיל מהלוואה קטנה: ${V.loan}, ${V.monthly}% לחודש, חודשיים.`],
         [11, 17, "ננחש תשלום, ונבדוק מה נשאר אחרי החודש השני."],
         [17, 25, `1,000 ₪ בחודש: נשאר חוב של ${V.left1000}. קטן מדי.`],
-        [25, 33, `1,020 ₪ בחודש: שילמנו ${V.over1020} יותר מדי.`],
-        [33, 41, `1,015 ₪ בחודש: נשארו ${V.left1015}. כמעט.`],
+        [25, 33, `1,020 ₪ בחודש: שילמתם ${V.over1020} יותר מדי.`],
+        [33, 41, `לפי היחס בין השניים: ${V.pay}. נשארה אגורה.`],
         [41, 50, "בהלוואה של 240 חודשים, לנחש ככה זה ארוך מדי."],
         [53, 60, "בלי לנחש: ההלוואה שווה לערך הנוכחי של התשלומים."],
         [60, 68, "כל תשלום מהוונים לפי החודש שבו הוא מגיע."],
@@ -167,8 +169,8 @@
           txt(640, 184, "היתרה אחרי החודש השני", 22, { fill: C.n600, o });
           const rows = [
             { from: 6, pay: "1,000 ₪", rows: t1000, left: t1000[1].closing, note: "חוב נשאר", y: 230 },
-            { from: 14, pay: "1,020 ₪", rows: t1020, left: fact("explain.over_1020"), note: "שילמנו יותר מדי", y: 330 },
-            { from: 22, pay: "1,015 ₪", rows: t1015, left: t1015[1].closing, note: "חוב נשאר: כמעט אפס", y: 430 },
+            { from: 14, pay: "1,020 ₪", rows: t1020, left: fact("explain.over_1020"), note: "שילמתם יותר מדי", y: 330 },
+            { from: 22, pay: V.pay, rows: tPay, left: tPay[1].closing, note: "נשארה אגורה אחת", y: 430 },
           ];
           for (const r of rows) {
             const or = after(t, S.tries, r.from, o);
@@ -210,11 +212,13 @@
           el("line", { x1: 400, x2: 880, y1: 302, y2: 302, stroke: C.n300, "stroke-width": 2, opacity: o3 });
           eqn(640, 350, ["S × 1.01 − S = 1 − 1 ÷ ", ["1.01", "2"]], 34, { o: o3, fill: C.teal });
           const o4 = after(t, S.shortcut, 24, o);
-          eqn(640, 420, [`S × 0.01 = 1 − ${V.discount} = ${V.oneMinus}`], 28, { w: 400, fill: C.n700, o: o4 });
+          eqn(640, 400, [`S × 0.01 = 1 − ${V.discount} = ${V.oneMinus}`], 28, { w: 400, fill: C.n700, o: o4 });
+          const o4b = after(t, S.shortcut, 27, o);
+          eqn(640, 440, [`S = ${V.oneMinus} ÷ 0.01 = ${V.S6}`], 28, { w: 400, fill: C.n700, o: o4b });
           const o5 = after(t, S.shortcut, 32, o);
-          box(330, 450, 620, 96, o5 * 0.6, C.mint);
-          eqn(640, 508, ["S = (1 − 1 ÷ ", ["(1 + r)", "n"], ") ÷ r"], 38, { w: 700, o: o5 });
-          txt(640, 538, "r — הריבית לחודש · n — מספר התשלומים", 18, { fill: C.n700, o: o5 });
+          box(330, 462, 620, 96, o5 * 0.6, C.mint);
+          eqn(640, 518, ["S = (1 − 1 ÷ ", ["(1 + r)", "n"], ") ÷ r"], 38, { w: 700, o: o5 });
+          txt(640, 548, "r — הריבית לחודש · n — מספר התשלומים", 18, { fill: C.n700, o: o5 });
         }
         // Scene 5 — the formula, and a check on 240 payments
         if (inScene(t, S.formula)) {
@@ -226,10 +230,12 @@
           txt(640, 315, "P — סכום ההלוואה · r — הריבית לחודש · n — מספר החודשים", 20, { fill: C.n600, o: o1 });
           txt(640, 345, "המינוס בחזקה: ״אחד חלקי״", 20, { fill: C.n600, o: o1 });
           const o2 = after(t, S.formula, 9, o);
-          eqn(640, 410, [`r = ${V.lgM}`, "   ·   n = 240   ·   ", ["1 − 1.004", "−240"], ` = ${V.lgOneMinus}`], 24, { w: 400, fill: C.n700, o: o2 });
+          eqn(640, 382, [`r = ${V.lgM}`], 24, { w: 400, fill: C.n700, o: o2 });
+          eqn(640, 410, ["n = 240"], 24, { w: 400, fill: C.n700, o: o2 });
+          eqn(640, 438, [["1 − " + V.lgBase, "−240"], ` = ${V.lgOneMinus}`], 24, { w: 400, fill: C.n700, o: o2 });
           const o3 = after(t, S.formula, 12, o);
-          box(320, 440, 640, 90, o3 * 0.6, C.mint);
-          eqn(640, 498, [`600,000 × ${V.lgM} ÷ ${V.lgOneMinus} = ${num(fact("long.pay"))}`], 30, { w: 700, o: o3 });
+          box(320, 456, 640, 90, o3 * 0.6, C.mint);
+          eqn(640, 514, [`600,000 × ${V.lgM} ÷ ${V.lgOneMinus} = ${num(fact("long.pay"))}`], 30, { w: 700, o: o3 });
         }
         // Scene 6 — takeaway
         if (inScene(t, S.end)) {

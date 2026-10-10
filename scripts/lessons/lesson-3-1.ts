@@ -13,12 +13,17 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import {
   annuitySteps,
   discountSum,
+  flatInterestTrialLeft,
+  growthBase,
+  halfInterestRate,
+  interpolationStep,
   monthlyDiscountFactor,
   monthlyRate,
   paymentTrial,
   paymentsValueToday,
   principalOvertakesInterest,
   remainingBalance,
+  shownDiscountSum,
   statementBalance,
 } from "../../src/lib/calc/amortization.ts";
 import { valueToday } from "../../src/lib/calc/present-value.ts";
@@ -145,6 +150,46 @@ export const paymentsTotal = (id: string, payment: string, periods: number): Fac
   value: moneyString(new Decimal(payment).mul(periods)),
 });
 
+/** 1 + the rate per period, as a decimal: (4.8, 12) → "1.004"; (4.8, 1) → "1.048". */
+export const baseFact = (id: string, annual: string, periodsPerYear = 12): Fact => ({
+  id,
+  kind: "amort_growth_base",
+  inputs: { rate_percent: annual, periods_per_year: periodsPerYear },
+  value: growthBase(annual, periodsPerYear).toString(),
+});
+
+/** The step from a too-small trial payment toward a too-large one, by the ratio of what each leaves (lesson 3.1). */
+export const interpolationFact = (id: string, principal: string, annual: string, months: number, low: string, high: string): Fact => ({
+  id,
+  kind: "amort_interpolation_step",
+  inputs: { principal, rate_percent: annual, months, low, high },
+  value: moneyString(interpolationStep(principal, annual, months, low, high)),
+});
+
+/** What a trial leaves when every month's interest is charged on the whole loan (a slip). */
+export const flatTrialFact = (id: string, principal: string, annual: string, payment: string, months: number): Fact => ({
+  id,
+  kind: "amort_flat_interest_trial",
+  inputs: { principal, rate_percent: annual, payment, months },
+  value: moneyString(flatInterestTrialLeft(principal, annual, payment, months)),
+});
+
+/** S the calculator way: (1 − (1 + m)^−n, kept to `decimals`) ÷ m, kept to `decimals` (lesson 3.3). */
+export const shownSumFact = (id: string, annual: string, months: number, decimals = 8): Fact => ({
+  id,
+  kind: "amort_shown_sum",
+  inputs: { rate_percent: annual, months, decimals },
+  value: shownDiscountSum(annual, months, decimals).toFixed(decimals),
+});
+
+/** The annual rate at which the first month's interest is half the level payment over `months` (lesson 3.2). */
+export const halfRateFact = (id: string, months: number): Fact => ({
+  id,
+  kind: "amort_half_interest_rate",
+  inputs: { months },
+  value: halfInterestRate(months).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString(),
+});
+
 export default function lesson31(): LessonData {
   // ── The explanation: 2,000 ₪ for two months at 12% a year (1% a month). ──
   const E = ["2000", "12", 2] as const;
@@ -154,6 +199,12 @@ export default function lesson31(): LessonData {
   const long4000 = trialLast("long.try_4000", "600000", "4.8", "4000.00", 240);
   const pHalf = slice("pred.half", "2000", "1", "2");
   const pInt1 = percentOfFact("pred.int_half", "1000", "1");
+  // The third try, by the ratio of what the first two left.
+  const left1000 = trialLast("explain.left_1000", "2000", "12", "1000.00", 2);
+  const lowFact = given("explain.low", "1000.00");
+  const highFact = given("explain.high", "1020.00");
+  const over1020 = difference("explain.over_1020", zeroFact, last1020);
+  const stepFact = interpolationFact("explain.step", "2000", "12", 2, "1000.00", "1020.00");
   const pIntAll = percentOfFact("pred.int_all", "2000", "1");
 
   // ── Lesson 2.9's loan: 60,000 ₪ at 6% a year (0.5% a month), three months. ──
@@ -165,6 +216,9 @@ export default function lesson31(): LessonData {
   const lInt = percentOfFact("bound.interest", "600000", "0.4");
   const longTryPay = trialLast("long.try_pay", "600000", "4.8", "3893.74", 240);
   const longTryUp = trialLast("long.try_up", "600000", "4.8", "3893.75", 240);
+  const longPay = repPayment("long.pay", ...L);
+  const longLastPay = repCell("long.last_pay", "spitzer", ...L, 240, "payment");
+  const eLastPay = repCell("explain.last_pay", "spitzer", ...E, 2, "payment");
 
   // ── Worked example: 450,000 ₪ at 5.1% a year (0.425% a month), 25 years. ──
   const W = ["450000", "5.1", 300] as const;
@@ -215,12 +269,20 @@ export default function lesson31(): LessonData {
     trialTable("explain.try_1020", "2000", "12", "1020.00", 2),
     zeroFact,
     last1020,
-    difference("explain.over_1020", zeroFact, last1020),
-    trialTable("explain.try_1015", "2000", "12", "1015.00", 2),
+    over1020,
+    left1000,
+    lowFact,
+    highFact,
+    difference("explain.span", highFact, lowFact),
+    repSum("explain.swing", [left1000, over1020]),
+    stepFact,
+    repSum("explain.try3", [lowFact, stepFact]),
     trialTable("explain.try_pay", "2000", "12", ePay.value as string, 2),
     trialTable("explain.try_up", "2000", "12", "1015.03", 2),
     ePay,
-    repCell("explain.last_pay", "spitzer", ...E, 2, "payment"),
+    eLastPay,
+    difference("explain.last_gap", eLastPay, ePay),
+    baseFact("explain.base", "12"),
     // By present value.
     factorFact("explain.f1", "12", 1),
     factorFact("explain.f2", "12", 2),
@@ -229,6 +291,7 @@ export default function lesson31(): LessonData {
     stepsFact("explain.steps", ...E),
     // Lesson 2.9's three-month loan.
     repMonthly("three.monthly", "6"),
+    baseFact("three.base", "6"),
     factorFact("three.f1", "6", 1),
     factorFact("three.f2", "6", 2),
     factorFact("three.f3", "6", 3),
@@ -236,9 +299,11 @@ export default function lesson31(): LessonData {
     repPayment("three.pay", ...T),
     // 240 payments.
     sumFact("long.S", "4.8", 240),
-    repPayment("long.pay", ...L),
+    longPay,
     stepsFact("long.steps", ...L),
-    repCell("long.last_pay", "spitzer", ...L, 240, "payment"),
+    longLastPay,
+    difference("long.last_gap", longLastPay, longPay),
+    baseFact("long.base", "4.8"),
     trialLast("long.try_3500", "600000", "4.8", "3500.00", 240),
     longTryPay,
     longTryUp,
@@ -260,10 +325,12 @@ export default function lesson31(): LessonData {
     wPart,
     repSum("worked.upper", [wPart, wInt1]),
     monthlyFact("worked.monthly", "5.1"),
+    baseFact("worked.base", "5.1"),
     repMonths("worked.months", 25),
 
     // Half-worked.
     hPay,
+    baseFact("half.base", "4.8"),
     ...hFactors,
     ...hToday,
     hTotal,
@@ -273,12 +340,14 @@ export default function lesson31(): LessonData {
     x2Try,
     trialLast("ex2.answer", "2000", "12", "1010.00", 2),
     given("ex2.err_zero", "0.00"),
+    flatTrialFact("ex2.err_flat", "2000", "12", "1010.00", 2),
     // Exercise 3.
     x3Pay,
     x3Part,
     x3IntAll,
     x3IntPart,
     repMonthly("ex3.monthly", "6"),
+    baseFact("ex3.base", "6"),
     factorFact("ex3.f1", "6", 1),
     factorFact("ex3.f2", "6", 2),
     sumFact("ex3.S", "6", 2),
@@ -292,12 +361,14 @@ export default function lesson31(): LessonData {
     repMonths("ex4.months", 20),
     repPayment("ex4.err_percent", "300000", "420", 240),
     monthlyFact("ex4.monthly", "4.2"),
+    baseFact("ex4.base", "4.2"),
     // Exercise 5.
     x5,
     repPayment("ex5.answer", "400000", "5.4", 180),
     repPayment("ex5.err_years", "400000", "5.4", 15),
     repPayment("ex5.err_annual", "400000", "64.8", 180),
     monthlyFact("ex5.monthly", "5.4"),
+    baseFact("ex5.base", "5.4"),
     repMonths("ex5.months", 15),
     // Exercise 6.
     x6,
@@ -305,6 +376,8 @@ export default function lesson31(): LessonData {
     paymentsTotal("ex6.err_no_discount", "4000.00", 300),
     pvFact("ex6.err_annual", "4000.00", "54", 300),
     monthlyFact("ex6.monthly", "4.5"),
+    baseFact("ex6.base", "4.5"),
+    pvFact("ex6.err_years", "4000.00", "4.5", 25),
     repMonths("ex6.months", 25),
     stepsFact("ex6.steps", "4000", "4.5", 300),
   ];

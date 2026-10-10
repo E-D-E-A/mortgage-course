@@ -3,13 +3,15 @@
 Every fact kind here starts with met_. A schedule is described in the fact's
 inputs as a string, one track per ';', fields separated by '|':
 
-    method|principal|rates|block_months|months|inflation_percent|grace_months
+    method|principal|rates|block_months|months|inflation_percent|grace_months[|rounding]
 
 - method: spitzer, equal_principal, grace_partial or grace_full;
 - rates: nominal annual percents, comma-separated, one per block of
   block_months months (a variable track's teaching path); the last carries on;
 - inflation_percent: a linked track's yearly index rise, at an even monthly
-  pace (the twelfth root); 0 for an unlinked track.
+  pace (the twelfth root); 0 for an unlinked track;
+- rounding (optional, default exact): "statement" rebuilds the schedule the way
+  a statement shows it (see _statement_rows).
 
 This file rebuilds each schedule by its own route, with Python's Decimal only
 and no code from src/lib/calc: the monthly rate is the annual rate / 12; the
@@ -45,7 +47,9 @@ def _money(x):
 def _parse(tracks):
     out = []
     for part in str(tracks).split(";"):
-        method, principal, rates, block, months, inflation, grace = part.split("|")
+        fields = part.split("|")
+        method, principal, rates, block, months, inflation, grace = fields[:7]
+        rounding = fields[7] if len(fields) > 7 else "exact"
         out.append(
             {
                 "method": method,
@@ -55,6 +59,7 @@ def _parse(tracks):
                 "months": int(months),
                 "inflation": Decimal(inflation),
                 "grace": int(grace),
+                "rounding": rounding,
             }
         )
     return out
@@ -66,8 +71,59 @@ def _level(balance, monthly, months):
     return balance * monthly / (ONE - (ONE + monthly) ** (-months))
 
 
+def _statement_rows(t):
+    """The statement convention, rebuilt here on its own: every balance in agorot.
+
+    The payment is set in agorot in month 1 and again whenever (Spitzer) the rate
+    changes: the level payment on the balance left over the months left, or (equal
+    principal) the balance / the months, as the principal part. On a linked track
+    the set amount is then carried with the index: in a later month it is
+    set x (index now / index when it was set), rounded to the agora again. Each
+    month the balance is indexed and rounded to the agora (when the index moved),
+    the month's interest is rounded to the agora, and the last month pays
+    whatever is left. A grace month pays its rounded interest (partial) or adds
+    it to the debt (full); the level payment starts after it.
+    """
+    n = t["months"]
+    rates = [t["rates"][min(k // t["block"], len(t["rates"]) - 1)] for k in range(n)]
+    method = t["method"]
+    bal = agorot(t["principal"])
+    rows = []
+    start = 0
+    if method in ("grace_partial", "grace_full"):
+        for k in range(t["grace"]):
+            interest = agorot(bal * rates[0] / TWELVE / HUNDRED)
+            pay = interest if method == "grace_partial" else Decimal(0)
+            rows.append({"opening": bal, "indexation": Decimal(0), "interest": interest, "payment": pay, "closing": bal + interest - pay})
+            bal = bal + interest - pay
+        start = t["grace"]
+        method = "spitzer"
+    factor = (ONE + t["inflation"] / HUNDRED) ** (ONE / TWELVE)
+    index = ONE  # the index now / the index at the start
+    index_at_set = ONE
+    amount = None
+    for k in range(start, n):
+        rate = rates[k]
+        m = rate / TWELVE / HUNDRED
+        if amount is None or (method == "spitzer" and rate != rates[k - 1]):
+            amount = agorot(_level(bal, m, n - k) if method == "spitzer" else bal / (n - k))
+            index_at_set = index
+        index = index * factor
+        opening = bal if factor == ONE else agorot(bal * factor)
+        interest = agorot(opening * m)
+        now = amount if index == index_at_set else agorot(amount * index / index_at_set)
+        part = now - interest if method == "spitzer" else now
+        if k == n - 1:
+            part = opening
+        rows.append({"opening": opening, "indexation": opening - bal, "interest": interest, "payment": part + interest, "closing": opening - part})
+        bal = opening - part
+    return rows
+
+
 def _rows(t):
     """Each month: dict(opening, indexation, interest, payment, closing)."""
+    if t.get("rounding") == "statement":
+        return _statement_rows(t)
     n = t["months"]
     rates = [t["rates"][min(k // t["block"], len(t["rates"]) - 1)] for k in range(n)]
     rows = []
@@ -205,6 +261,16 @@ def pv_list(i, facts):
     return _money(_pv(payments, Decimal(i["monthly_percent"])))
 
 
+def pv_level(i, facts):
+    """The same payment (a fact) every month for `months` months, at an annual rate / 12: a closed-form annuity here."""
+    c = Decimal(facts[i["payment"]]["value"])
+    r = Decimal(i["rate_percent"]) / TWELVE / HUNDRED
+    n = int(i["months"])
+    if r == 0:
+        return _money(c * n)
+    return _money(c * (ONE - (ONE + r) ** (-n)) / r)
+
+
 def pv_rows(i, facts):
     payments = _payments(i["tracks"]) if "tracks" in i else [Decimal(x) for x in str(i["payments"]).split(",")]
     g = ONE + Decimal(i["monthly_percent"]) / HUNDRED
@@ -320,6 +386,7 @@ KINDS = {
     "met_total_indexation": total_indexation,
     "met_pv": pv,
     "met_pv_list": pv_list,
+    "met_pv_level": pv_level,
     "met_pv_rows": pv_rows,
     "met_irr_monthly": irr_monthly,
     "met_irr_x12": irr_x12,
