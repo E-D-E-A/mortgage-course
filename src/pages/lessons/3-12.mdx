@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import ScheduleByHand from "../../components/ScheduleByHand.vue";
 import SheetMatch from "../../components/SheetMatch.vue";
 import BigPictureMap from "../../components/BigPictureMap.vue";
@@ -109,6 +110,14 @@ export const F = {
 <li><strong>בגיליון — תמר ועידו:</strong> {f.shekels("sheet.loan")}, ב־5.4% לשנה, ל־15 שנה ({f.plain("sheet.months")} חודשים). זו ההלוואה מהדוגמה הפתורה של שיעור 2.9.</li>
 </ul>
 </Callout>
+
+<Section kind="סרטון">
+
+## ביד, בגיליון, ומול המחשבון
+
+</Section>
+
+<LessonVideo lesson="3-12" />
 
 <Section kind="הכללים">
 
@@ -457,4 +466,4 @@ export const F = {
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/amortization.ts (annuityStatement) and src/lib/calc/workshop.ts (handMistake, sheetFigures) via scripts/lessons/lesson-3-12.ts and data/lessons/3-12.json, rechecked by checks/kinds/workshop.py. Components: src/components/ScheduleByHand.vue (state key schedule-by-hand:3.12-hand), src/components/SheetMatch.vue (state key sheet-match:3.12-match; imports amortization.ts and workshop.ts for live inputs), BigPictureMap.vue with src/components/big-picture/stage-3.ts at mapUpTo("3.12"). The spreadsheets: scripts/build-sheets.py writes public/downloads/schedule-template.xlsx and schedule-solution.xlsx from data/lessons/3-12.json; `python3 scripts/build-sheets.py --verify` recalculates the solution in LibreOffice and compares it with the facts. Cell addresses in the page (B5–B17, rows 19–379) are the script's layout: change both together. No field knowledge used. No video (workshop). */}
+{/* Internal note: numbers come from src/lib/calc/amortization.ts (annuityStatement) and src/lib/calc/workshop.ts (handMistake, sheetFigures) via scripts/lessons/lesson-3-12.ts and data/lessons/3-12.json, rechecked by checks/kinds/workshop.py. Components: src/components/ScheduleByHand.vue (state key schedule-by-hand:3.12-hand), src/components/SheetMatch.vue (state key sheet-match:3.12-match; imports amortization.ts and workshop.ts for live inputs), BigPictureMap.vue with src/components/big-picture/stage-3.ts at mapUpTo("3.12"). The spreadsheets: scripts/build-sheets.py writes public/downloads/schedule-template.xlsx and schedule-solution.xlsx from data/lessons/3-12.json; `python3 scripts/build-sheets.py --verify` recalculates the solution in LibreOffice and compares it with the facts. Cell addresses in the page (B5–B17, rows 19–379) are the script's layout: change both together. No field knowledge used. Video: video/3-12.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

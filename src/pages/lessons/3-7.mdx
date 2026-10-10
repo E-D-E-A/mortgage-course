@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import MixBuilder from "../../components/MixBuilder.vue";
@@ -47,6 +48,14 @@ export const predictionOptions = [
   question={`תמהיל של 900,000 ₪ בשלושה מסלולים של 300,000 ₪: קבועה לא צמודה ל־30 שנה, פריים ל־12 שנה, וקבועה צמודה ל־20 שנה. בחודש הראשון משלמים על כל התמהיל ${f.shekels("flat.m1")}. נניח ששום דבר לא זז: לא הפריים ולא המדד. כמה תשלמו בחודש 145, אחרי 12 שנה?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## תקופה נפרדת לכל מסלול
+
+</Section>
+
+<LessonVideo lesson="3-7" />
 
 <Section kind="ההסבר">
 
@@ -449,4 +458,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/schedule.ts (mixCashFlow, mixSummary, exposure, oneFormulaPayment) via scripts/lessons/lesson-3-7.ts and data/lessons/3-7.json, rechecked by checks/kinds/schedule.py and amortization.py. Illustration: src/components/MixBuilder.vue (new) — the brief's required "בונה תמהיל", first version; stage 5 extends it through its props (tracks, scenario, labels). The map lists no video for this lesson. No field knowledge used. */}
+{/* Internal note: numbers come from src/lib/calc/schedule.ts (mixCashFlow, mixSummary, exposure, oneFormulaPayment) via scripts/lessons/lesson-3-7.ts and data/lessons/3-7.json, rechecked by checks/kinds/schedule.py and amortization.py. Illustration: src/components/MixBuilder.vue (new) — the brief's required "בונה תמהיל", first version; stage 5 extends it through its props (tracks, scenario, labels). No field knowledge used. Video: video/3-7.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

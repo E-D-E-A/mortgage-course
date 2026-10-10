@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import ScheduleBuilder from "../../components/ScheduleBuilder.vue";
@@ -58,6 +59,14 @@ export const predictionOptions = [
   question={`לקחתם 600,000 ₪ ב־4.8% לשנה, ל־20 שנה, בשפיצר. ההחזר החודשי: ${f.shekels("long.pay")}. בחודש הראשון ${f.shekels("long.int_1")} ממנו הם ריבית, והשאר מחזיר קרן. מאיזה חודש החלק שמחזיר קרן יהיה גדול מהחלק שהוא ריבית?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## כמה הולך לריבית, וכמה מחזיר קרן
+
+</Section>
+
+<LessonVideo lesson="3-2" />
 
 <Section kind="ההסבר">
 
@@ -454,4 +463,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/amortization.ts and repayment.ts (and halfInterestRate, growthBase) via scripts/lessons/lesson-3-2.ts and data/lessons/3-2.json, rechecked by checks/kinds/repayment.py, amortization.py, percent.py and compound.py. Illustration: src/components/ScheduleBuilder.vue (Spitzer only; lesson 3.4 adds the method picker). */}
+{/* Internal note: numbers come from src/lib/calc/amortization.ts and repayment.ts (and halfInterestRate, growthBase) via scripts/lessons/lesson-3-2.ts and data/lessons/3-2.json, rechecked by checks/kinds/repayment.py, amortization.py, percent.py and compound.py. Illustration: src/components/ScheduleBuilder.vue (Spitzer only; lesson 3.4 adds the method picker). Video: video/3-2.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

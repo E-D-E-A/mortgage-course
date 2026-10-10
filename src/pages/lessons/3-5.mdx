@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import LinkedSchedule from "../../components/LinkedSchedule.vue";
@@ -50,6 +51,14 @@ export const predictionOptions = [
   question={`יש לכם מסלול קבועה צמודה של 400,000 ₪. בלוח המקורי, בלי מדד, התשלום החודשי ${f.shekels("explain.c")}. מדד הבסיס 100, וביום התשלום הראשון המדד 100.3. ההצמדה הוסיפה לחוב ${f.shekels("m1.indexation")}. כמה תשלמו בתשלום הראשון?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## לוח צמוד, חודש אחרי חודש
+
+</Section>
+
+<LessonVideo lesson="3-5" />
 
 <Section kind="ההסבר">
 
@@ -495,4 +504,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/schedule.ts (built on amortization.ts) via scripts/lessons/lesson-3-5.ts and data/lessons/3-5.json, rechecked by checks/kinds/schedule.py, amortization.py and indexation.py. Illustration: src/components/LinkedSchedule.vue (new, "לוח צמוד מול לא צמוד"). §17 and §18 of Directive 451 from Brain J-170 (9895937). The map lists no video for this lesson. No field knowledge used. */}
+{/* Internal note: numbers come from src/lib/calc/schedule.ts (built on amortization.ts) via scripts/lessons/lesson-3-5.ts and data/lessons/3-5.json, rechecked by checks/kinds/schedule.py, amortization.py and indexation.py. Illustration: src/components/LinkedSchedule.vue (new, "לוח צמוד מול לא צמוד"). §17 and §18 of Directive 451 from Brain J-170 (9895937). No field knowledge used. Video: video/3-5.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

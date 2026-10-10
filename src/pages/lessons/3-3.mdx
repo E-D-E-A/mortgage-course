@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import ScheduleBuilder from "../../components/ScheduleBuilder.vue";
@@ -51,6 +52,14 @@ export const predictionOptions = [
   question={`לקחתם 900,000 ₪ ב־5.4% לשנה, ל־30 שנה, בשפיצר. ההחזר החודשי: ${f.shekels("pred.pay")}. עברו 15 שנה — חצי מהתקופה — ושילמתם 180 תשלומים. כמה אתם עוד חייבים?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## כמה עוד חייבים?
+
+</Section>
+
+<LessonVideo lesson="3-3" />
 
 <Section kind="ההסבר">
 
@@ -398,4 +407,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/amortization.ts (remainingBalance, paymentsValueToday, statementBalance, discountSum, shownDiscountSum, firstMonthBelow, growthBase) via scripts/lessons/lesson-3-3.ts and data/lessons/3-3.json, rechecked by checks/kinds/amortization.py. Illustration: src/components/ScheduleBuilder.vue (its row check). */}
+{/* Internal note: numbers come from src/lib/calc/amortization.ts (remainingBalance, paymentsValueToday, statementBalance, discountSum, shownDiscountSum, firstMonthBelow, growthBase) via scripts/lessons/lesson-3-3.ts and data/lessons/3-3.json, rechecked by checks/kinds/amortization.py. Illustration: src/components/ScheduleBuilder.vue (its row check). Video: video/3-3.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

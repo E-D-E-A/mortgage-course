@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import RateReset from "../../components/RateReset.vue";
@@ -47,6 +48,14 @@ export const predictionOptions = [
   question={`לקחתם מסלול פריים של 500,000 ₪ ל־20 שנה (240 תשלומים), ב־4.8%. התשלום ${f.shekels("explain.c0")}. אחרי 36 תשלומים הפריים עולה, ואחוז הריבית במסלול עולה ל־6%. נניח שסוף ההלוואה לא זז. מה יהיה התשלום מהחודש ה־37?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## התשלום מחושב מחדש, על מה שנשאר
+
+</Section>
+
+<LessonVideo lesson="3-6" />
 
 <Section kind="ההסבר">
 
@@ -440,4 +449,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/schedule.ts (built on amortization.ts) via scripts/lessons/lesson-3-6.ts and data/lessons/3-6.json, rechecked by checks/kinds/schedule.py and amortization.py. Illustration: src/components/RateReset.vue (new; "פריים זז באמצע הדרך", the second visit of the brief's "שינוי פריים ומדד לאורך זמן"). The map lists no video for this lesson. No field knowledge used. */}
+{/* Internal note: numbers come from src/lib/calc/schedule.ts (built on amortization.ts) via scripts/lessons/lesson-3-6.ts and data/lessons/3-6.json, rechecked by checks/kinds/schedule.py and amortization.py. Illustration: src/components/RateReset.vue (new; "פריים זז באמצע הדרך", the second visit of the brief's "שינוי פריים ומדד לאורך זמן"). No field knowledge used. Video: video/3-6.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}

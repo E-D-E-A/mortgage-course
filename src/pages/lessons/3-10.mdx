@@ -7,6 +7,7 @@ import Term from "../../components/Term.vue";
 import Later from "../../components/Later.astro";
 import Callout from "../../components/Callout.astro";
 import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import OneRateSearch from "../../components/OneRateSearch.vue";
@@ -53,6 +54,14 @@ export const predictionOptions = [
   question={`לקחתם ${f.shekels("explain.loan")} לשלושה חודשים, ב־6% לשנה (0.5% לחודש), בשפיצר. ביום שקיבלתם את הכסף נגבתה עמלה של ${f.shekels("explain.fee")}, ולכן הגיעו אליכם ${f.shekels("explain.received")}. התשלומים לא השתנו. איזה אחוז ריבית לשנה אתם משלמים בפועל, על הכסף שקיבלתם?`}
   options={predictionOptions}
 />
+
+<Section kind="סרטון">
+
+## מערך נוכחי לשיעור תשואה פנימי
+
+</Section>
+
+<LessonVideo lesson="3-10" />
 
 <Section kind="ההסבר">
 
@@ -439,4 +448,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/metrics.ts (irrMonthly, bisectionSteps, presentValue; schedules from schedule.ts) via scripts/lessons/lesson-3-10.ts and data/lessons/3-10.json, rechecked by checks/kinds/metrics.py (Newton's method). Illustration: src/components/OneRateSearch.vue. The map lists no video for this lesson. */}
+{/* Internal note: numbers come from src/lib/calc/metrics.ts (irrMonthly, bisectionSteps, presentValue; schedules from schedule.ts) via scripts/lessons/lesson-3-10.ts and data/lessons/3-10.json, rechecked by checks/kinds/metrics.py (Newton's method). Illustration: src/components/OneRateSearch.vue. Video: video/3-10.html (the map's video column names only standout ideas; every lesson has a video, Dvir 2026-10-10). */}
