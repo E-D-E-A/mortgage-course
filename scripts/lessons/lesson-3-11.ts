@@ -134,7 +134,6 @@ export default function lesson311(): LessonData {
     pvLevel("ex5.answer", x5Pay, 360, "3.5"),
     total("ex5.err_total", [B]),
     pvLevel("ex5.err_own", x5Pay, 360, "4.6"),
-    pvLevel("ex5.err_6", x5Pay, 360, "6"),
   ];
 
   return {

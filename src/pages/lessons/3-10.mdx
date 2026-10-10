@@ -375,11 +375,11 @@ export const predictionOptions = [
     { value: f.raw("ex5.err_monthly"), tolerance: 0.01, message: "זה ה־IRR לחודש. כפלו ב־12." },
   ]}
 >
-  לקחתם {f.shekels("ex5.loan")} לשנה, ב־6% לשנה, בשפיצר: {f.shekels("ex5.payment")} בכל חודש, 12 פעמים. נגבתה עמלה של {f.shekels("ex5.fee")}, ולכן קיבלתם {f.shekels("ex5.received")}. מה ה־IRR לשנה, כפול 12? (בגיליון; שתי ספרות אחרי הנקודה.)
+  לקחתם {f.shekels("ex5.loan")} לשנה, ב־6% לשנה, בשפיצר: {f.shekels("ex5.payment")} בכל חודש, 12 פעמים (והאחרון, שסוגר את העיגול, {f.shekels("ex5.last")}, כמו בשיעור 3.9). נגבתה עמלה של {f.shekels("ex5.fee")}, ולכן קיבלתם {f.shekels("ex5.received")}. מה ה־IRR לשנה, כפול 12? (בגיליון; שתי ספרות אחרי הנקודה.)
 </NumericExercise>
 
 <Solution for="3.10-5">
-בגיליון: בתא A1 <span class="ltr">-{n("ex5.received")}</span>, בתאים A2 עד A13 התשלום {n("ex5.payment")}, ואז <span class="ltr">=IRR(A1:A13)*12</span>. יוצא {f.plain("ex5.answer")}%, מול 6% בחוזה — עמלה של {f.plain("ex5.fee_share")}% מההלוואה, בהלוואה של שנה אחת. (בחזקת 12: {f.plain("ex5.err_effective")}%.)
+בגיליון: בתא A1 <span class="ltr">-{n("ex5.received")}</span>, בתאים A2 עד A12 התשלום {n("ex5.payment")}, בתא A13 התשלום האחרון {n("ex5.last")}, ואז <span class="ltr">=IRR(A1:A13)*12</span>. יוצא {f.plain("ex5.answer")}%, מול 6% בחוזה — עמלה של {f.plain("ex5.fee_share")}% מההלוואה, בהלוואה של שנה אחת. (בחזקת 12: {f.plain("ex5.err_effective")}%.)
 </Solution>
 
 <ChoiceExercise

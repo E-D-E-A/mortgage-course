@@ -118,6 +118,8 @@ export default function lesson310(): LessonData {
     difference("ex5.received", x5Loan, x5Fee),
     share("ex5.fee_share", x5Fee, x5Loan, 2),
     first("ex5.payment", [x5]),
+    // The twelfth payment closes the rounding (as in 3.9 and 3.12): the IRR is computed on these payments.
+    payment("ex5.last", [x5], 12),
     irrX12("ex5.answer", [x5], "11880", 2),
     irrEffective("ex5.err_effective", [x5], "11880", 2),
     irr("ex5.err_monthly", [x5], "11880", 2),

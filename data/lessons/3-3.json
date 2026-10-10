@@ -863,9 +863,37 @@
       "kind": "amort_months_left",
       "inputs": {
         "months": 300,
-        "paid": 120
+        "paid": 144
       },
-      "value": 180
+      "value": 156
+    },
+    {
+      "id": "ex5.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "250000",
+        "rate_percent": "4.8",
+        "months": 156,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00400000",
+        "growth": "1.86405704",
+        "discount": "0.53646427",
+        "one_minus": "0.46353573",
+        "top": "1000.00",
+        "payment": "2157.33"
+      }
+    },
+    {
+      "id": "ex5.S_156_shown",
+      "kind": "amort_shown_sum",
+      "inputs": {
+        "rate_percent": "4.8",
+        "months": 156,
+        "decimals": 8
+      },
+      "value": "115.88393250"
     },
     {
       "id": "ex5.balance",
@@ -873,9 +901,9 @@
       "inputs": {
         "payment": "1432.49",
         "rate_percent": "4.8",
-        "months": 180
+        "months": 156
       },
-      "value": "183555.04"
+      "value": "166002.57"
     },
     {
       "id": "ex5.answer",
@@ -884,10 +912,49 @@
         "minuend": "ex3.loan",
         "subtrahend": "ex5.balance"
       },
-      "value": "66444.96"
+      "value": "83997.43"
     },
     {
       "id": "ex5.table",
+      "kind": "amort_statement_balance",
+      "inputs": {
+        "principal": "250000",
+        "rate_percent": "4.8",
+        "months": 300,
+        "paid": 144
+      },
+      "value": "166003.41"
+    },
+    {
+      "id": "ex5.table_repaid",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.loan",
+        "subtrahend": "ex5.table"
+      },
+      "value": "83996.59"
+    },
+    {
+      "id": "ex5.err_paid",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1432.49",
+        "periods": 144
+      },
+      "value": "206278.56"
+    },
+    {
+      "id": "ex5.err_straight",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "250000",
+        "weight": "144",
+        "total_weight": "300"
+      },
+      "value": "120000.00"
+    },
+    {
+      "id": "ex5.table_120",
       "kind": "amort_statement_balance",
       "inputs": {
         "principal": "250000",
@@ -898,32 +965,13 @@
       "value": "183555.79"
     },
     {
-      "id": "ex5.table_repaid",
+      "id": "ex5.err_ten_years",
       "kind": "difference",
       "inputs": {
         "minuend": "ex3.loan",
-        "subtrahend": "ex5.table"
+        "subtrahend": "ex5.table_120"
       },
       "value": "66444.21"
-    },
-    {
-      "id": "ex5.err_paid",
-      "kind": "payments_total",
-      "inputs": {
-        "payment": "1432.49",
-        "periods": 120
-      },
-      "value": "171898.80"
-    },
-    {
-      "id": "ex5.err_straight",
-      "kind": "mix_slice",
-      "inputs": {
-        "loan": "250000",
-        "weight": "120",
-        "total_weight": "300"
-      },
-      "value": "100000.00"
     },
     {
       "id": "ex6.balance",

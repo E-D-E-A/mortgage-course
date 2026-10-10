@@ -31,6 +31,7 @@ import {
   scheduleStart,
 } from "../../src/lib/calc/schedule.ts";
 import type { Fact, LessonData } from "../build-data.ts";
+import { leftFact } from "./lesson-3-1.ts";
 
 // ---------------------------------------------------------------------------
 // Fact builders (shared with lessons 3.6 and 3.7)
@@ -150,6 +151,8 @@ export default function lesson35(): LessonData {
   const unlinkedPaid = schTotal("unlinked.paid_total", unlinked, "payment");
   const onceExtra = difference("once.payment_extra_total", oncePaid, unlinkedPaid);
   const onceIndexation = schTotal("once.indexation_total", once, "indexation");
+  const onceLast = schRow("once.last_payment", once, N, "payment");
+  const unlinkedLast = schRow("unlinked.last_payment", unlinked, N, "payment");
 
   const m1Index = schRow("m1.indexation", linked, 1, "indexation");
   const m1Opening = schRow("m1.opening", linked, 1, "opening");
@@ -241,6 +244,11 @@ export default function lesson35(): LessonData {
     onceIndexation,
     difference("once.interest_on", onceExtra, onceIndexation),
     schTotal("once.principal_total", once, "principal_paid"),
+    // Every payment but the last is 6.66 ₪ higher; the last closes the rounding, so it differs by its own amount.
+    leftFact("once.but_last", N, 1),
+    onceLast,
+    unlinkedLast,
+    difference("once.last_extra", onceLast, unlinkedLast),
 
     // The illustration's guided tasks (2% a year, evenly; then 4%).
     schRow("slider.m1_payment", two, 1, "payment"),
