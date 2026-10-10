@@ -71,13 +71,13 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
     <table class="w-full border-collapse text-caption sm:text-body-m">
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
-          <th v-if="periodLabel" class="py-2 text-start font-semibold">{{ periodLabel }}</th>
+          <th v-if="periodLabel" class="py-2 pe-1 text-start font-semibold sm:pe-3">{{ periodLabel }}</th>
           <th v-for="c in columns" :key="c.key" class="py-2 text-start font-semibold">{{ c.label }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
-          <td v-if="periodLabel" class="py-2 text-n700">{{ nameOf(row, i) }}</td>
+          <td v-if="periodLabel" class="py-2 pe-1 text-n700 sm:pe-3">{{ nameOf(row, i) }}</td>
           <td v-for="c in columns" :key="c.key" class="py-2 pe-1 sm:pe-2">
             <template v-if="isBlank(row, i, c.key) && !revealed">
               <input

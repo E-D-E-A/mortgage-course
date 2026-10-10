@@ -92,7 +92,7 @@ function restart() {
     <div v-else-if="current" class="mt-3">
       <p ref="cardEl" tabindex="-1" class="rounded-md border border-n300 bg-n50 p-4 text-body-l font-semibold text-n900">״{{ current.text }}״</p>
       <p class="mt-3 text-caption font-semibold text-n600">לאיזו ערימה הקלף הזה שייך?</p>
-      <div class="mt-2 grid gap-2 sm:grid-cols-3" role="group" aria-label="הערימות">
+      <div class="mt-2 grid gap-2" :class="bins.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'" role="group" aria-label="הערימות">
         <button
           v-for="(b, i) in bins"
           :key="b"
@@ -116,7 +116,7 @@ function restart() {
     </p>
 
     <!-- The piles: what has been sorted so far. This is also the table view. -->
-    <div class="mt-5 grid gap-3 sm:grid-cols-3">
+    <div class="mt-5 grid gap-3" :class="bins.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'">
       <section v-for="(b, i) in bins" :key="b" class="rounded-md border border-n200 p-3" :aria-label="`הערימה ${b}`">
         <p class="text-body-m font-semibold text-navy">{{ b }}</p>
         <p class="text-caption text-n600">{{ questions[i] }}</p>
