@@ -23,7 +23,7 @@ export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("3.3");
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
-{/* A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004". */}
+// A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004".
 export const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
 export const ls = f.raw("long.steps_180");
 export const ws = f.raw("worked.steps_156");

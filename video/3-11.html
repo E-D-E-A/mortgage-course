@@ -1,0 +1,264 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.11 — "שלוש שאלות, שלוש תשובות".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-11.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+  No formula appears: the lesson builds it after the video.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.11 · שלושה מדדים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-11.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf2.format(Number(v))} ₪`.replace(".00 ₪", " ₪");
+
+      const sYears = fact("video.s_years").map(Number);
+      const eYears = fact("video.e_years").map(Number);
+      const sCurve = fact("video.s_curve");
+      const eCurve = fact("video.e_curve");
+      const V = {
+        loan: shek(fact("explain.loan")),
+        sFirst: shek(fact("explain.s_first")),
+        eFirst: shek(fact("explain.e_first")),
+        sTotal: shek(fact("explain.s_total")),
+        eTotal: shek(fact("explain.e_total")),
+        totalGap: shek(fact("explain.total_gap")),
+        irr: `${fact("explain.s_irr")}%`,
+        pv6: shek(fact("explain.s_pv_6")),
+        sPv3: shek(fact("explain.s_pv_3")),
+        ePv3: shek(fact("explain.e_pv_3")),
+        pv3Gap: shek(fact("explain.pv3_gap")),
+        sPv9: shek(fact("explain.s_pv_9")),
+        ePv9: shek(fact("explain.e_pv_9")),
+        pv9Gap: shek(fact("explain.pv9_gap")),
+      };
+      const years = sYears.length;
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], setup: [10, 36], total: [36, 62], irr: [62, 88], pv: [88, 152], end: [152, 168] };
+      window.duration = 168;
+      window.cues = [
+        [1, 5, "שלוש שאלות, שלוש תשובות."],
+        [5, 9.5, "שני לוחות סילוקין לאותה הלוואה."],
+        [11, 17, `${V.loan}, ‏6% לשנה, ל־15 שנה.`],
+        [17, 23, `שפיצר: ${V.sFirst} בכל חודש.`],
+        [23, 29, `קרן שווה: מתחילה ב־${V.eFirst}, ויורדת.`],
+        [29, 35, "איזה לוח זול יותר? נשאל שלוש שאלות."],
+        [37, 43, "שאלה 1: כמה שקלים ייצאו מהחשבון?"],
+        [43, 50, `שפיצר: ${V.sTotal}. קרן שווה: ${V.eTotal}.`],
+        [50, 56, `קרן שווה זולה ב־${V.totalGap}.`],
+        [56, 61, "אבל השקלים האלה מגיעים בזמנים שונים."],
+        [63, 69, "שאלה 2: איזו ריבית אחת מסבירה את התשלומים?"],
+        [69, 75, `בשני הלוחות: ${V.irr} לשנה. אותו מחיר.`],
+        [75, 81, "כל שקל שאצלכם עולה אותו דבר, בכל חודש."],
+        [81, 87, "ההבדל: כמה שקלים נשארים אצלכם, וכמה זמן."],
+        [89, 95, "שאלה 3: כמה שווים התשלומים היום?"],
+        [95, 101, "זה תלוי בריבית שבה מהוונים."],
+        [101, 109, `בריבית של ההלוואה, 6%: שניהם ${V.pv6}.`],
+        [109, 116, "אבל מה הכסף שלכם היה מרוויח בינתיים?"],
+        [116, 124, `בפיקדון ב־3%: קרן שווה זולה ב־${V.pv3Gap}.`],
+        [124, 132, `מחזירים חוב של 9%: שפיצר זול ב־${V.pv9Gap}.`],
+        [132, 140, "וב־0%, בלי להוון — זה סך התשלומים."],
+        [140, 151, "הקו הנמוך יותר הוא הלוח הזול יותר, בריבית הזו."],
+        [153, 160, "שלוש שאלות, שלוש תשובות."],
+        [160, 167, "מה זול יותר — תלוי במה שהכסף מרוויח בינתיים."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const prog = (t, [a, b], from = 0, len) => ease((t - a - from) / (len ?? b - a - from));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      function legend(o, y = 150) {
+        el("rect", { x: 1096, y, width: 18, height: 18, rx: 3, fill: C.teal, opacity: o });
+        txt(1086, y + 15, "שפיצר", 20, { anchor: "start", fill: C.n700, o });
+        el("rect", { x: 966, y, width: 18, height: 18, rx: 3, fill: C.tq2, opacity: o });
+        txt(956, y + 15, "קרן שווה", 20, { anchor: "start", fill: C.n700, o });
+      }
+      // A question header with its number.
+      function question(no, q, o) {
+        el("circle", { cx: 1100, cy: 128, r: 26, fill: C.navy, opacity: o });
+        txt(1100, 138, String(no), 28, { w: 700, fill: C.n0, o, ltr: true });
+        txt(1060, 140, q, 38, { anchor: "start", w: 700, o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 300, "שלוש שאלות, שלוש תשובות", 72, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 370, "שני לוחות סילוקין לאותה הלוואה", 32, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the two schedules: the payment in the first month of each year
+        if (inScene(t, S.setup)) {
+          const o = vis(t, S.setup);
+          txt(640, 130, `${V.loan} · 6% לשנה · 15 שנה`, 38, { w: 700, o });
+          legend(o, 162);
+          const left = 200, right = 1080, base = 520, scale = 260 / 4400;
+          const band = (right - left) / years;
+          const shown = 1 + Math.floor(prog(t, S.setup, 2, 10) * (years - 1) + 0.0001);
+          for (let y = 0; y < shown; y++) {
+            const x = right - (y + 1) * band;
+            const w = band / 2 - 4;
+            el("rect", { x: x + band / 2, y: base - sYears[y] * scale, width: w, height: sYears[y] * scale, rx: 3, fill: C.teal, opacity: o });
+            el("rect", { x: x + 4, y: base - eYears[y] * scale, width: w, height: eYears[y] * scale, rx: 3, fill: C.tq2, opacity: o });
+            if (y % 2 === 0 || y === years - 1) txt(x + band / 2, base + 26, String(y + 1), 16, { fill: C.n600, o });
+          }
+          el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
+          txt(right, base + 50, "שנה (התשלום בחודש הראשון של כל שנה, מימין לשמאל)", 16, { anchor: "start", fill: C.n600, o });
+          const o2 = after(t, S.setup, 7, o);
+          txt(right - band / 2 + 8, base - sYears[0] * scale - 50, V.sFirst, 20, { anchor: "start", w: 700, o: o2, ltr: true, fill: C.teal });
+          const o3 = after(t, S.setup, 13, o);
+          txt(right - band / 2 - 20, base - eYears[0] * scale - 16, V.eFirst, 20, { anchor: "start", w: 700, o: o3, ltr: true });
+        }
+        // Scene 3 — question 1: the total paid
+        if (inScene(t, S.total)) {
+          const o = vis(t, S.total);
+          question(1, "כמה שקלים ייצאו מהחשבון?", o);
+          const maxW = 620, unit = maxW / Number(fact("explain.s_total"));
+          const rows = [
+            { y: 240, name: "שפיצר", v: fact("explain.s_total"), c: C.teal, from: 6 },
+            { y: 340, name: "קרן שווה", v: fact("explain.e_total"), c: C.tq2, from: 9 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.total, r.from, o);
+            txt(1100, r.y + 42, r.name, 26, { anchor: "start", w: 600, o: or });
+            const w = Number(r.v) * unit * ease((t - S.total[0] - r.from) / 3);
+            el("rect", { x: 940 - w, y: r.y, width: w, height: 64, rx: 8, fill: r.c, opacity: or });
+            txt(940 - w - 16, r.y + 42, shek(r.v), 28, { anchor: "end", w: 700, o: or, ltr: true });
+          }
+          const o3 = after(t, S.total, 14, o);
+          el("rect", { x: 400, y: 440, width: 480, height: 80, rx: 14, fill: C.mint, opacity: o3 * 0.6 });
+          txt(640, 492, `קרן שווה: ${V.totalGap} פחות`, 30, { w: 700, o: o3 });
+        }
+        // Scene 4 — question 2: the IRR
+        if (inScene(t, S.irr)) {
+          const o = vis(t, S.irr);
+          question(2, "איזו ריבית אחת מסבירה את התשלומים?", o);
+          const cards = [
+            { x: 760, name: "שפיצר", c: C.teal, from: 6 },
+            { x: 300, name: "קרן שווה", c: C.tq2, from: 8 },
+          ];
+          for (const k of cards) {
+            const ok = after(t, S.irr, k.from, o);
+            el("rect", { x: k.x, y: 210, width: 220, height: 170, rx: 16, fill: C.n0, stroke: k.c, "stroke-width": 4, opacity: ok });
+            txt(k.x + 110, 260, k.name, 26, { w: 600, o: ok, fill: C.n700 });
+            txt(k.x + 110, 340, V.irr, 56, { w: 700, o: ok, ltr: true });
+          }
+          const o3 = after(t, S.irr, 10, o);
+          txt(640, 315, "=", 72, { w: 700, o: o3, ltr: true });
+          const o4 = after(t, S.irr, 19, o);
+          txt(640, 450, "אותו מחיר לכל שקל, לכל חודש", 30, { fill: C.n700, o: o4 });
+          txt(640, 500, "ההבדל: כמה שקלים נשארים אצלכם, וכמה זמן", 26, { fill: C.n600, o: o4 });
+        }
+        // Scene 5 — question 3: the value today, at every rate from 0% to 10%
+        if (inScene(t, S.pv)) {
+          const o = vis(t, S.pv);
+          question(3, "כמה שווים התשלומים היום?", o);
+          const left = 220, right = 1060, top = 200, base = 530;
+          const all = [...sCurve, ...eCurve].map((p) => Number(p.value_today));
+          const vMax = Math.max(...all) * 1.02, vMin = Math.min(...all) * 0.94;
+          const xAt = (r) => right - (r / 10) * (right - left);
+          const yAt = (v) => base - ((v - vMin) / (vMax - vMin)) * (base - top);
+          const o1 = after(t, S.pv, 4, o);
+          el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o1 });
+          for (const r of [0, 2, 4, 6, 8, 10]) txt(xAt(r), base + 28, `${r}%`, 18, { fill: C.n600, o: o1, ltr: true });
+          txt(640, base + 54, "הריבית שבה מהוונים, לשנה (מימין לשמאל)", 18, { fill: C.n600, o: o1 });
+          const g = prog(t, S.pv, 5, 6);
+          const upto = Math.max(1, Math.floor(g * (sCurve.length - 1)) + 1);
+          const line = (curve) => curve.slice(0, upto).map((p) => `${xAt(Number(p.rate))},${yAt(Number(p.value_today))}`).join(" ");
+          el("polyline", { points: line(sCurve), fill: "none", stroke: C.teal, "stroke-width": 5, opacity: o1 });
+          el("polyline", { points: line(eCurve), fill: "none", stroke: C.tq2, "stroke-width": 5, "stroke-dasharray": "12 7", opacity: o1 });
+          legend(o1, 175);
+          const at = (r) => ({ s: Number(sCurve[r].value_today), e: Number(eCurve[r].value_today) });
+          // a marker at the rate being discussed
+          const marks = [
+            { from: 13, to: 21, r: 6, label: `6%: שניהם ${V.pv6}` },
+            { from: 28, to: 36, r: 3, label: `3%: קרן שווה ${V.ePv3}` },
+            { from: 36, to: 44, r: 9, label: `9%: שפיצר ${V.sPv9}` },
+            { from: 44, to: 64, r: 0, label: "0%: סך התשלומים" },
+          ];
+          for (const m of marks) {
+            if (t < S.pv[0] + m.from || t >= S.pv[0] + m.to) continue;
+            const om = Math.min(o, clamp((t - S.pv[0] - m.from) / 0.6), clamp((S.pv[0] + m.to - t) / 0.6));
+            const x = xAt(m.r);
+            el("line", { x1: x, x2: x, y1: top - 10, y2: base, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "6 6", opacity: om });
+            el("circle", { cx: x, cy: yAt(at(m.r).s), r: 8, fill: C.teal, opacity: om });
+            el("circle", { cx: x, cy: yAt(at(m.r).e), r: 8, fill: C.tq2, opacity: om });
+            // The label sits where the curves are not: top left for high rates, bottom right for low ones.
+            const box = m.r >= 5 ? { x: 140, y: 205 } : { x: 640, y: 440 };
+            el("rect", { x: box.x, y: box.y, width: 420, height: 60, rx: 12, fill: C.n0, stroke: C.n200, opacity: om });
+            txt(box.x + 210, box.y + 38, m.label, 24, { w: 700, o: om });
+          }
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "שלוש שאלות, שלוש תשובות", 54, { w: 700, o });
+          const rows = [
+            { y: 330, q: "כמה שקלים?", a: "קרן שווה", from: 1.5 },
+            { y: 380, q: "איזו ריבית אחת?", a: "שווים", from: 3 },
+            { y: 430, q: "כמה שווה היום?", a: "תלוי במה שהכסף מרוויח", from: 4.5 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.end, r.from, o);
+            txt(700, r.y, r.q, 28, { anchor: "start", fill: C.n700, o: or });
+            txt(560, r.y, r.a, 28, { anchor: "start", w: 700, o: or });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

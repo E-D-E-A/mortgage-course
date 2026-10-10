@@ -220,6 +220,13 @@ describe("stage 3: trying a payment", () => {
     expect(close2("1015.02")).toEqual(["1004.98", "0.01"]);
   });
 
+  it("charges no interest once the debt is cleared, so an overpayment is plain shekels", () => {
+    // 2,000 ₪ at 1% a month, 1,500 ₪ a month for three months: month 2 clears the debt with 540 ₪ to spare.
+    const rows = paymentTrial("2000", "12", "1500", 3);
+    expect(rows.map((r) => r.closing.toFixed(2))).toEqual(["520.00", "-974.80", "-2474.80"]);
+    expect(rows[2].interest.toFixed(2)).toBe("0.00");
+  });
+
   it("rounds each month's interest to the agora, like a statement", () => {
     const rows = paymentTrial("60000", "6", "20200.33", 3);
     expect(rows.map((r) => r.interest.toFixed(2))).toEqual(["300.00", "200.50", "100.50"]);

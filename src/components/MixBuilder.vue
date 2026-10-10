@@ -154,6 +154,7 @@ const result = computed(() => {
 const ok = computed(() => ("flow" in result.value ? result.value : null));
 
 const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString()}%`;
+const unit = (v: number) => (Math.abs(v) <= 1 ? "נקודת אחוז" : "נקודות אחוז");
 const points = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${new Decimal(Math.abs(v)).toString()}`;
 const shareOf = (i: number) => pct(new Decimal(amounts.value[i]).div(props.loan).mul(100));
 const whenText = (month: number) => `חודש ${month} (שנה ${Math.ceil(month / 12)})`;
@@ -316,11 +317,11 @@ const yearRows = computed(() => {
           <input v-model.number="scenario.inflation" type="range" min="-1" max="6" step="0.5" aria-label="כמה המדד עולה בשנה" />
         </label>
         <label class="flex flex-col">
-          <span class="text-body-m text-n800">הפריים זזה משנה {{ scenario.primeFromYear }}: <span class="ltr font-semibold">{{ points(scenario.primeShift) }}</span> נקודות אחוז</span>
+          <span class="text-body-m text-n800">הפריים זזה משנה {{ scenario.primeFromYear }}: <span class="ltr font-semibold">{{ points(scenario.primeShift) }}</span> {{ unit(scenario.primeShift) }}</span>
           <input v-model.number="scenario.primeShift" type="range" min="-3" max="4" step="0.25" aria-label="בכמה נקודות אחוז הפריים זזה" />
         </label>
         <label class="flex flex-col">
-          <span class="text-body-m text-n800">העוגן בכל נקודת עדכון: <span class="ltr font-semibold">{{ points(scenario.anchorShift) }}</span> נקודות אחוז מהיום</span>
+          <span class="text-body-m text-n800">העוגן בכל נקודת עדכון: <span class="ltr font-semibold">{{ points(scenario.anchorShift) }}</span> {{ unit(scenario.anchorShift) }} מהיום</span>
           <input v-model.number="scenario.anchorShift" type="range" min="-2" max="3" step="0.25" aria-label="בכמה נקודות אחוז העוגן שונה מהיום בכל נקודת עדכון" />
         </label>
       </div>

@@ -310,7 +310,7 @@ def trial_rows(i):
     rate = Decimal(i["rate_percent"])
     rows = []
     for k in range(1, int(i["months"]) + 1):
-        interest = agorot(b * rate / TWELVE / HUNDRED)
+        interest = agorot(b * rate / TWELVE / HUNDRED) if b > 0 else agorot(0)  # an overpaid balance earns nothing
         closing = b + interest - pay
         rows.append({"period": k, "opening": str(b), "interest": str(interest), "payment": str(pay), "closing": str(closing)})
         b = closing

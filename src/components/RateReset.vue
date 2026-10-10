@@ -35,13 +35,14 @@ const method = ref<ScheduleMethod>(props.method);
 const changeMonth = ref(props.changeMonth);
 const change = ref(props.change);
 const showTable = ref(false);
-// The rate cannot go below zero: the lowest change is minus the start rate.
-const minChange = Math.max(-2, -Math.floor(Number(props.rate) * 4) / 4);
+// The rate cannot go below zero: the lowest change is minus the start rate (on the slider's 0.1 grid).
+const minChange = Math.max(-2, -Math.floor(Number(props.rate) * 10) / 10);
 watch(change, (c) => {
   if (c < minChange) change.value = minChange;
 });
 
 const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString()}%`;
+const unit = (v: number) => (Math.abs(v) <= 1 ? "נקודת אחוז" : "נקודות אחוז");
 const points = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${new Decimal(Math.abs(v)).toString()}`;
 const colours = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)"];
 
@@ -52,7 +53,7 @@ const series = computed<ScheduleRow[][]>(() => {
   const moved = kind.value === "prime" ? { primeShift: shiftPath.value, blockMonths: 1 } : { anchorShift: shiftPath.value, blockMonths: 1 };
   return [trackSchedule(track.value, moved), trackSchedule(track.value)];
 });
-const names = computed(() => [`עם השינוי (${points(change.value)} נקודות אחוז מחודש ${changeMonth.value})`, `בלי שינוי, ${pct(props.rate)} כל הדרך`]);
+const names = computed(() => [`עם השינוי (${points(change.value)} ${unit(change.value)} מחודש ${changeMonth.value})`, `בלי שינוי, ${pct(props.rate)} כל הדרך`]);
 
 // The month the rate (and so the payment) first changes, or null when it never does.
 const resetAt = computed(() => {
@@ -79,14 +80,18 @@ const W = 640;
 const H = 170;
 const PAD = { top: 12, bottom: 8, side: 10 };
 const x = (m: number) => W - PAD.side - (m / months) * (W - 2 * PAD.side);
-function chart(value: (s: number, m: number) => Decimal, from: number) {
+// zeroBased: the axis starts at 0 (the balance). Otherwise (the payment) it starts a little under the
+// lowest payment, so a change of a few hundred shekels can be seen; the caption says so.
+function chart(value: (s: number, m: number) => Decimal, from: number, zeroBased: boolean) {
   const pts = [0, 1].map((s) => Array.from({ length: months - from + 1 }, (_, i) => value(s, i + from).toNumber()));
-  const max = Math.max(...pts.flat()) * 1.08 || 1;
-  const y = (v: number) => H - PAD.bottom - (Math.max(v, 0) / max) * (H - PAD.top - PAD.bottom);
-  return { lines: pts.map((p) => p.map((v, i) => `${i === 0 ? "M" : "L"}${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).join(" ")), base: y(0) };
+  const hi = Math.max(...pts.flat());
+  const lo = zeroBased ? 0 : Math.min(...pts.flat()) * 0.8;
+  const top = hi + (hi - lo) * 0.08 || 1;
+  const y = (v: number) => H - PAD.bottom - ((Math.max(v, lo) - lo) / (top - lo)) * (H - PAD.top - PAD.bottom);
+  return { lines: pts.map((p) => p.map((v, i) => `${i === 0 ? "M" : "L"}${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).join(" ")), base: y(lo) };
 }
-const paymentChart = computed(() => chart((s, m) => series.value[s][m - 1].payment, 1));
-const balanceChart = computed(() => chart((s, m) => (m === 0 ? new Decimal(props.amount) : series.value[s][m - 1].closing), 0));
+const paymentChart = computed(() => chart((s, m) => series.value[s][m - 1].payment, 1, false));
+const balanceChart = computed(() => chart((s, m) => (m === 0 ? new Decimal(props.amount) : series.value[s][m - 1].closing), 0, true));
 const markerChange = computed(() => x(changeMonth.value - 1));
 const markerReset = computed(() => (resetAt.value === null ? null : x(resetAt.value - 1)));
 const ticks = Array.from({ length: Math.floor(props.years / 5) + 1 }, (_, i) => i * 5);
@@ -131,8 +136,8 @@ const yearRows = computed(() =>
         <input v-model.number="changeMonth" type="range" min="2" :max="months - 1" step="1" :aria-label="kind === 'prime' ? 'מאיזה חודש הפריים זזה' : 'מאיזה חודש העוגן זז'" />
       </label>
       <label class="flex flex-col">
-        <span class="text-body-m font-semibold text-n900">בכמה: <span class="ltr">{{ points(change) }}</span> נקודות אחוז</span>
-        <input v-model.number="change" type="range" :min="minChange" max="3" step="0.25" aria-label="בכמה נקודות אחוז" />
+        <span class="text-body-m font-semibold text-n900">בכמה: <span class="ltr">{{ points(change) }}</span> {{ unit(change) }}</span>
+        <input v-model.number="change" type="range" :min="minChange" max="3" step="0.1" aria-label="בכמה נקודות אחוז" />
       </label>
     </div>
 
@@ -146,9 +151,9 @@ const yearRows = computed(() =>
 
     <div class="mt-3 grid gap-4 lg:grid-cols-2">
       <figure v-for="(c, ci) in [paymentChart, balanceChart]" :key="ci">
-        <figcaption class="text-caption font-semibold text-n600">{{ ci === 0 ? "התשלום בכל חודש" : "היתרה בסוף כל חודש" }}</figcaption>
+        <figcaption class="text-caption font-semibold text-n600">{{ ci === 0 ? "התשלום בכל חודש (הציר לא מתחיל באפס)" : "היתרה בסוף כל חודש" }}</figcaption>
         <svg :viewBox="`0 0 ${W} ${H}`" class="mt-1 w-full" role="img" :aria-label="ci === 0 ? `גרף: התשלום בכל חודש, לאורך ${years} שנה, עם השינוי ובלעדיו` : `גרף: היתרה לאורך ${years} שנה, עם השינוי ובלעדיו`">
-          <line :x1="PAD.side" :x2="W - PAD.side" :y1="c.base" :y2="c.base" stroke="var(--mogi-n300)" stroke-width="1" />
+          <line v-if="ci === 1" :x1="PAD.side" :x2="W - PAD.side" :y1="c.base" :y2="c.base" stroke="var(--mogi-n300)" stroke-width="1" />
           <path v-for="i in [1, 0]" :key="i" :d="c.lines[i]" fill="none" :stroke="colours[i]" :stroke-width="i === 0 ? 3 : 2" vector-effect="non-scaling-stroke" />
           <line :x1="markerChange" :x2="markerChange" :y1="PAD.top" :y2="H - PAD.bottom" stroke="var(--mogi-n500)" stroke-width="1.5" stroke-dasharray="2 4" />
           <line v-if="markerReset !== null" :x1="markerReset" :x2="markerReset" :y1="PAD.top" :y2="H - PAD.bottom" stroke="var(--mogi-navy)" stroke-width="1.5" stroke-dasharray="5 4" />

@@ -114,6 +114,7 @@ const interestPaid = (r: ScheduleRow) => Decimal.min(r.payment, r.interest).toNu
 const principalPaid = (r: ScheduleRow) => Decimal.max(0, r.payment.minus(r.interest)).toNumber();
 // A bullet's last payment carries the whole principal; it stays out of the scale and is named in text.
 const scaleRows = computed(() => (isBullet.value && n.value > 1 ? rows.value.slice(0, -1) : rows.value));
+const noPayments = computed(() => scaleRows.value.every((r) => r.payment.isZero()));
 const payMax = computed(() => Math.max(1, ...scaleRows.value.map((r) => r.payment.toNumber())) * 1.08);
 const yPay = (v: number) => PH - 2 - (Math.min(v, payMax.value) / payMax.value) * (PH - 8);
 function band(lower: (r: ScheduleRow) => number, upper: (r: ScheduleRow) => number) {
@@ -171,7 +172,7 @@ function checkRow() {
   const right = rows.value[k - 1][checkCol.value];
   const gap = new Decimal(v).minus(right).abs();
   const name = COLS.find((c) => c.key === checkCol.value)?.label ?? "";
-  if (gap.lte(0.02)) verdict.value = { tone: "ok", text: `תואם: ${name} בחודש ${k} הוא ${formatShekels(right)}.` };
+  if (gap.lte(0.02)) verdict.value = { tone: "ok", text: `תואם. בבונה, בחודש ${k}, ${name}: ${formatShekels(right)}.` };
   else if (gap.lte(5)) verdict.value = { tone: "near", text: `קרוב: ${formatShekels(right)} בבונה, הפרש של ${formatShekels(gap)}. הפרש של אגורות או שקלים בודדים בא בדרך כלל מעיגול: בבונה הריבית של כל חודש מעוגלת לאגורה, וגם התשלום.` };
   else verdict.value = { tone: "off", text: `לא תואם: בבונה ${formatShekels(right)}, הפרש של ${formatShekels(gap)}. בדקו את החודש הקודם, ואת הריבית החודשית (אחוז לשנה חלקי 12).` };
 }
@@ -250,7 +251,9 @@ watch([loan, method], () => {
       <polygon :points="interestBand" fill="var(--mogi-teal-deep)" />
     </svg>
     <p class="mt-1 text-caption text-n600">
-      גובה מלא: <span class="ltr">{{ formatWholeShekels(payMax) }}</span> בחודש. החודשים רצים מימין לשמאל.
+      <template v-if="noPayments">עד החודש האחרון אין תשלומים, ולכן הגרף ריק.</template>
+      <template v-else>גובה מלא: <span class="ltr">{{ formatWholeShekels(payMax) }}</span> בחודש.</template>
+      החודשים רצים מימין לשמאל.
       <template v-if="isBullet">התשלום בחודש האחרון, <span class="ltr">{{ formatShekels(lastRow.payment) }}</span>, גבוה מדי לגרף, ולכן הוא לא מצויר.</template>
     </p>
 
@@ -325,7 +328,7 @@ watch([loan, method], () => {
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-caption font-semibold text-n600">מה בדקתם</span>
-          <select v-model="checkCol" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900">
+          <select v-model="checkCol" aria-label="מה בדקתם" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900">
             <option v-for="c in COLS" :key="c.key" :value="c.key">{{ c.label }}</option>
           </select>
         </label>

@@ -12,7 +12,7 @@
  */
 import type { Track } from "../../src/lib/calc/metrics.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { difference, first, given, interest, irrEffective, irrX12, pv, pvCurve, series, total } from "./lesson-3-8.ts";
+import { difference, first, given, interest, irrEffective, irrX12, payment, pv, pvCurve, series, total } from "./lesson-3-8.ts";
 
 export default function lesson311(): LessonData {
   // ── The explanation (and the video): 400,000 ₪ at 6% (0.5% a month), 15 years, two ways. ──
@@ -31,6 +31,8 @@ export default function lesson311(): LessonData {
   // ── Worked example: two offers for 600,000 ₪. A: 5%, 20 years. B: 4.6%, 30 years. ──
   const A: Track = { principal: "600000", rates: ["5"], months: 240 };
   const B: Track = { principal: "600000", rates: ["4.6"], months: 360 };
+  const aPay = first("worked.a_pay", [A]);
+  const bPay = first("worked.b_pay", [B]);
   const aTotal = total("worked.a_total", [A]);
   const bTotal = total("worked.b_total", [B]);
   const aPv3 = pv("worked.a_pv_3", [A], "3");
@@ -80,8 +82,9 @@ export default function lesson311(): LessonData {
 
     // Worked example.
     given("worked.loan", "600000.00"),
-    first("worked.a_pay", [A]),
-    first("worked.b_pay", [B]),
+    aPay,
+    bPay,
+    difference("worked.pay_gap", aPay, bPay),
     aTotal,
     bTotal,
     difference("worked.total_gap", bTotal, aTotal),
@@ -110,6 +113,8 @@ export default function lesson311(): LessonData {
     pv("half.a_pv_3", [hA], "3", "monthly"),
     pv("half.b_pv_3", [hB], "3", "monthly"),
     first("half.b_first", [hB]),
+    payment("half.b_pay_2", [hB], 2),
+    payment("half.b_pay_3", [hB], 3),
 
     // Exercises.
     x3Loan,

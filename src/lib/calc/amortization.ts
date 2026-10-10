@@ -336,7 +336,9 @@ export function statementBalance(principal: Numeric, annualPercent: Numeric, mon
  * Statement convention: each month's interest rounded to the agora, the
  * payment taken off as it is. The balance is NOT forced to zero: what is left
  * after the last month is positive when the payment was too small, negative
- * when it was too large (overpaid).
+ * when it was too large (overpaid). Once the debt is cleared, a balance below
+ * zero earns no interest: what is left at the end is then simply the shekels
+ * paid beyond the debt.
  */
 export function paymentTrial(principal: Numeric, annualPercent: Numeric, payment: Numeric, months: number): AmortizationRow[] {
   assertMonths(months);
@@ -344,7 +346,7 @@ export function paymentTrial(principal: Numeric, annualPercent: Numeric, payment
   const rows: AmortizationRow[] = [];
   let balance = agorot(principal);
   for (let month = 1; month <= months; month++) {
-    const interest = agorot(monthInterest(balance, annualPercent));
+    const interest = balance.gt(0) ? agorot(monthInterest(balance, annualPercent)) : new D(0);
     const principalPaid = pay.minus(interest);
     rows.push({ month, opening: balance, payment: pay, interest, principalPaid, closing: balance.minus(principalPaid) });
     balance = balance.minus(principalPaid);
