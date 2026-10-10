@@ -1,0 +1,236 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.6 — "שתי שאלות לכל משתתף".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  The lesson computes no numbers; data/lessons/1-6.json holds only the data date,
+  which the scene reads for its "נכון ל־" line. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: around one mortgage stand many participants; for each, ask whom
+  they work for and who pays them):
+  1. Title. Because of the collateral, a mortgage is not only borrowers and a bank.
+  2. The map: the two sides (borrowers, bank); who works for the borrowers (adviser,
+     lawyer); around the apartment (seller, appraiser, the land registry); the
+     insurer; the Bank of Israel, which is no side but sets the banks' rules.
+  3. Two questions per participant. The appraiser: from the bank's list, ordered
+     and paid by the borrowers, report straight to the bank; you may ask for a copy.
+  4. The table: adviser, appraiser, insurer, Bank of Israel — where the answers
+     differ is where to pay attention. The appraiser is not against you; he writes
+     for the bank.
+  Claim labels, as in the lesson: the appraiser list, the copy and the insurance
+  rules are the team's transcription of a Bank of Israel directive (August 2026),
+  "לא אומת"; the report going straight to the bank is also Tobi Zamir's field
+  knowledge (August 2026), "ממתין לאישור אילון".
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.6 · המשתתפים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-6.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const asOf = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${fact("data_date")}T12:00:00Z`));
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], map: [12, 62], appraiser: [62, 110], table: [110, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "משכנתא היא לא עסק רק בין הלווים לבנק."],
+        [6, 11.5, "בגלל הבטוחה, יש סביב העסקה עוד הרבה משתתפים."],
+        [13, 21, "במרכז, שני הצדדים להלוואה: הלווים והבנק."],
+        [21, 30, "יועץ משכנתאות ועורך דין עובדים בשביל הלווים."],
+        [30, 38, "המוכר מקבל את המחיר: חלק מהקונים, וחלק ישר מהבנק."],
+        [38, 46, "שמאי מעריך כמה הדירה שווה. בטאבו רשום של מי היא."],
+        [46, 53, "המבטח מוכר את הביטוחים שהבנק דורש."],
+        [53, 61, "ובנק ישראל: לא צד בעסקה, אבל קובע לבנקים כללים."],
+        [63, 70, "לכל משתתף, שאלו שתי שאלות:"],
+        [70, 77, "בשביל מי הוא עובד? ומי משלם לו?"],
+        [77, 85, "השמאי נבחר מתוך רשימה שהבנק נותן."],
+        [85, 93, "הלווים, או היועץ, מזמינים אותו — והלווים משלמים."],
+        [93, 101, "אבל את הדוח הוא שולח ישירות לבנק."],
+        [101, 109, "מותר לכם לבקש מהבנק עותק."],
+        [111, 119, "המבטח: הלווים משלמים, והבנק מקבל את הכסף אם קורה משהו."],
+        [119, 127, "ומותר לקנות את הביטוח גם מחוץ לבנק."],
+        [127, 135, "בנק ישראל: אף אחד בעסקה לא משלם לו."],
+        [135, 142, "כשהתשובות לא זהות — שם שמים לב."],
+        [142, 149, "השמאי לא פועל נגדכם. הוא כותב את הדוח בשביל הבנק."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      // A participant: a pill with its name.
+      function node(x, y, name, o, opts = {}) {
+        const w = opts.w ?? 190, h = opts.h ?? 54;
+        box(x - w / 2, y - h / 2, w, h, o, { rx: h / 2, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n300, sw: opts.sw ?? 2 });
+        txt(x, y + 8, name, opts.size ?? 22, { w: 700, fill: opts.color ?? C.navy, o });
+      }
+      const line = (x1, y1, x2, y2, o, opts = {}) =>
+        el("line", { x1, y1, x2, y2, stroke: opts.stroke ?? C.n300, "stroke-width": opts.sw ?? 2.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+      // An arrow from (x1,y1) to (x2,y2) with a label above its middle.
+      function arrow(x1, y1, x2, y2, label, o, opts = {}) {
+        const c = opts.stroke ?? C.navy;
+        line(x1, y1, x2, y2, o, { stroke: c, sw: 3, dash: opts.dash });
+        const a = Math.atan2(y2 - y1, x2 - x1), L = 14;
+        el("polygon", { points: `${x2},${y2} ${x2 - L * Math.cos(a - 0.4)},${y2 - L * Math.sin(a - 0.4)} ${x2 - L * Math.cos(a + 0.4)},${y2 - L * Math.sin(a + 0.4)}`, fill: c, opacity: o });
+        if (label) txt((x1 + x2) / 2 + (opts.dx ?? 0), (y1 + y2) / 2 + (opts.dy ?? -12), label, 20, { w: 600, fill: c, o });
+      }
+
+      const P = {
+        borrowers: [930, 310], bank: [350, 310], adviser: [1110, 185], lawyer: [1110, 440],
+        seller: [640, 175], appraiser: [530, 450], registry: [760, 450], insurer: [170, 185], boi: [170, 440],
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "המשתתפים", 84, { w: 700, o });
+          txt(640, 360, "מי נמצא סביב עסקה אחת", 34, { fill: C.n600, o });
+        }
+
+        // Scene 2 — the map of participants
+        if (inScene(t, S.map)) {
+          const o = vis(t, S.map);
+          txt(640, 108, "מי נמצא סביב עסקה אחת", 34, { w: 700, o });
+          const oC = at(t, 13, o), oB = at(t, 21, o), oS = at(t, 30, o), oA = at(t, 38, o), oI = at(t, 46, o), oR = at(t, 53, o);
+          // Links first, so the pills sit on top of them.
+          line(...P.borrowers, ...P.bank, oC, { stroke: C.teal, sw: 4 });
+          txt(640, 296, "הלוואה", 22, { w: 700, fill: C.teal, o: oC });
+          line(...P.adviser, ...P.borrowers, oB);
+          line(...P.lawyer, ...P.borrowers, oB);
+          line(...P.adviser, ...P.bank, oB, { dash: "6 6" });
+          line(...P.seller, ...P.borrowers, oS);
+          line(...P.seller, ...P.bank, oS);
+          line(...P.appraiser, ...P.bank, oA);
+          line(...P.registry, ...P.bank, oA);
+          line(...P.registry, ...P.lawyer, oA);
+          line(...P.insurer, ...P.bank, oI);
+          line(...P.boi, ...P.bank, oR, { dash: "6 6" });
+          node(...P.borrowers, "הלווים", oC, { w: 210, h: 70, fill: C.navy, stroke: C.navy, color: C.n0, size: 28 });
+          node(...P.bank, "הבנק", oC, { w: 210, h: 70, fill: C.navy, stroke: C.navy, color: C.n0, size: 28 });
+          node(...P.adviser, "יועץ משכנתאות", oB, { w: 210, stroke: C.teal });
+          node(...P.lawyer, "עורך דין", oB, { stroke: C.teal });
+          txt(1110, 520, "עובדים בשביל הלווים", 20, { fill: C.teal, w: 600, o: oB });
+          node(...P.seller, "המוכר", oS);
+          node(...P.appraiser, "שמאי", oA);
+          node(...P.registry, "טאבו", oA);
+          node(...P.insurer, "מבטח", oI);
+          node(...P.boi, "בנק ישראל", oR, { stroke: C.n600, sw: 2.5 });
+          txt(170, 520, "קובע לבנקים כללים", 20, { fill: C.n700, w: 600, o: oR });
+        }
+
+        // Scene 3 — two questions, and the appraiser
+        if (inScene(t, S.appraiser)) {
+          const o = vis(t, S.appraiser);
+          const oQ = at(t, 63, o);
+          txt(640, 112, "שתי שאלות לכל משתתף", 40, { w: 700, o: oQ });
+          const oQ2 = at(t, 70, o);
+          box(700, 140, 330, 50, oQ2, { rx: 25, fill: C.mint, stroke: C.mint });
+          txt(865, 173, "בשביל מי הוא עובד?", 24, { w: 700, o: oQ2 });
+          box(250, 140, 330, 50, oQ2, { rx: 25, fill: C.mint, stroke: C.mint });
+          txt(415, 173, "מי משלם לו?", 24, { w: 700, o: oQ2 });
+          // The borrowers (right) and the bank (left) on top; the appraiser below, between them.
+          const oN = at(t, 77, o);
+          const B = [1030, 270], K = [250, 270], A = [640, 440];
+          node(...B, "הלווים", oN, { w: 200, h: 66, fill: C.navy, stroke: C.navy, color: C.n0, size: 26 });
+          node(...K, "הבנק", oN, { w: 200, h: 66, fill: C.navy, stroke: C.navy, color: C.n0, size: 26 });
+          node(...A, "שמאי", oN, { w: 200, h: 66, stroke: C.teal, sw: 3, size: 26 });
+          arrow(330, 306, 556, 412, "רשימת שמאים", oN, { stroke: C.n600, dx: 80, dy: -16 });
+          const oP = at(t, 85, o);
+          arrow(950, 306, 724, 412, "מזמינים ומשלמים", oP, { stroke: C.teal, dx: -90, dy: -16 });
+          const oR = at(t, 93, o);
+          arrow(538, 452, 236, 310, "הדוח — ישירות לבנק", oR, { stroke: C.navy, dx: -90, dy: 40 });
+          const oK = at(t, 101, o);
+          arrow(354, 270, 926, 270, "עותק, אם מבקשים", oK, { stroke: C.n600, dash: "8 6", dy: -14 });
+          const oF = at(t, 93, o);
+          txt(640, 532, "הרשימה והעותק: לפי תעתיק של הוראה של בנק ישראל (אוגוסט 2026); לא אומת.", 18, { fill: C.n600, o: oF });
+          txt(640, 556, "הדוח ישירות לבנק: גם ידע מהשטח, טובי זמיר (אוגוסט 2026); ממתין לאישור אילון.", 18, { fill: C.n600, o: oF });
+        }
+
+        // Scene 4 — the table: when the answers differ
+        if (inScene(t, S.table)) {
+          const o = vis(t, S.table);
+          txt(640, 112, "מי משלם, ובשביל מי", 40, { w: 700, o });
+          const cols = [1150, 790, 460];
+          txt(cols[0], 166, "המשתתף", 22, { anchor: "start", w: 600, fill: C.n600, o });
+          txt(cols[1], 166, "מי משלם לו", 22, { anchor: "start", w: 600, fill: C.n600, o });
+          txt(cols[2], 166, "בשביל מי הוא עובד", 22, { anchor: "start", w: 600, fill: C.n600, o });
+          const rows = [
+            ["יועץ המשכנתאות", "הלווים", "הלווים", 110, false],
+            ["השמאי", "הלווים", "הבנק", 110, true],
+            ["המבטח", "הלווים", "עצמו; הבנק מקבל את הכסף", 111, true],
+            ["בנק ישראל", "אף אחד בעסקה", "אף צד; קובע כללים", 127, false],
+          ];
+          rows.forEach(([who, pays, forWhom, start, differ], i) => {
+            const oi = at(t, start, o);
+            const y = 186 + i * 72;
+            const hl = differ && t >= 135;
+            box(120, y, 1050, 62, oi, { rx: 10, fill: hl ? C.mint : C.n0, stroke: hl ? C.mint : C.n200 });
+            txt(cols[0], y + 40, who, 24, { anchor: "start", w: 700, o: oi });
+            txt(cols[1], y + 40, pays, 24, { anchor: "start", o: oi });
+            txt(cols[2], y + 40, forWhom, 24, { anchor: "start", o: oi });
+          });
+          const oI = at(t, 119, o);
+          txt(640, 500, `מותר לבטח מחוץ לבנק: לפי תעתיק של הצוות (אוגוסט 2026); לא אומת. נכון ל־${asOf}.`, 18, { fill: C.n600, o: oI });
+          const oE = at(t, 142, o, 0.8);
+          txt(640, 546, "השמאי לא פועל נגדכם. הוא כותב את הדוח בשביל הבנק.", 26, { w: 700, o: oE });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

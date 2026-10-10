@@ -1,0 +1,258 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.3 — "שלוש שאלות על כל הלוואה".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/1-3.json: the explanation's loan, term and
+  rates, the year-1 and year-2 payments of both repayment ways, and the combination
+  counts (the "2 × 2 × 2" factors are that fact's own inputs). The scene does no
+  arithmetic; it only lays out and formats. The subtitle cues (window.cues) carry the
+  explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: purpose, interest mechanism and repayment method are three
+  separate questions):
+  1. Title. "Which mortgage did you take?" hides three questions.
+  2. The three questions and their names: the loan's purpose, the interest
+     mechanism (including linkage to the index), the repayment method.
+  3. Small numbers, paid once a year: way A returns an equal part of the principal,
+     way B pays interest only. In year 2 the rate rises 5% -> 6%. The 2 x 2 table:
+     along a row only the mechanism moves; down a column only the method. In way A
+     the rate did not move and the payment still fell.
+  4. The purpose is not in the table: the same table for buying and for renovating.
+     Two answers to each question: 8 combinations, not 2 — within the rules.
+  Claim labels: the Bank of Israel limit on the moving-rate share is the team's
+  Brain transcription (2026-10-08), marked "לא אומת", as in the lesson.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.3 · שלושה דברים נפרדים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-3.json")).json();
+      const F = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => F(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+      const num = (v) => nf.format(Number(v));
+
+      const V = {
+        loan: fact("explain.loan"), years: fact("explain.years"), rate: fact("explain.rate"), up: fact("explain.rate_up"),
+        aPrin: fact("explain.a_principal"), aInt1: fact("explain.a_interest_1"), aPay1: fact("explain.a_pay_1"),
+        bPay1: fact("explain.b_pay_1"),
+        aPay2: fact("explain.a_pay_2"), aPay2up: fact("explain.a_pay_2_up"), bPay2: fact("explain.b_pay_2"), bPay2up: fact("explain.b_pay_2_up"),
+        combos: fact("explain.combos"), tied: fact("explain.combos_if_tied"),
+      };
+      // The factors of "2 × 2 × 2" are the combination fact's own inputs.
+      const counts = F("explain.combos").inputs;
+      const factors = [counts.count_1, counts.count_2, counts.count_3];
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], three: [12, 46], grid: [46, 112], purpose: [112, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 6, "״איזו משכנתא לקחתם?״ — בתשובה מסתתרות שלוש שאלות."],
+        [6, 11.5, "בשביל מה הכסף, איך נקבעת הריבית, ואיך מחזירים."],
+        [13, 21, "שאלה ראשונה: בשביל מה הכסף? זו מטרת ההלוואה."],
+        [21, 29, "שנייה: איך נקבע אחוז הריבית לאורך הדרך?"],
+        [29, 37, "זה מנגנון הריבית — וגם השאלה אם החוב מוצמד למדד."],
+        [37, 45, "שלישית: באיזה קצב הקרן חוזרת? זו שיטת ההחזר."],
+        [47, 55, `הלוואה של ${shek(V.loan)} ל־${V.years} שנים, ב־${V.rate}% לשנה.`],
+        [55, 62, "כדי לחשב בראש, נניח שמשלמים פעם בשנה."],
+        [62, 70, `דרך א׳: בכל שנה ${shek(V.aPrin)} מהקרן, ועוד ריבית.`],
+        [70, 77, "דרך ב׳: בכל שנה רק ריבית, ואת כל הקרן בסוף."],
+        [78, 86, `בשנה 2, נניח שאחוז הריבית עלה ל־${V.up}%.`],
+        [86, 94, "לאורך שורה זז רק מנגנון הריבית. הקרן לא זזה."],
+        [94, 102, "לאורך עמודה זזה רק שיטת ההחזר."],
+        [102, 111, `בדרך א׳ האחוז לא זז, ובכל זאת התשלום ירד ל־${shek(V.aPay2)}.`],
+        [113, 121, "ומטרת ההלוואה? היא לא מופיעה בטבלה בכלל."],
+        [121, 129, "אותה טבלה בדיוק — לקניית דירה, וגם לשיפוץ."],
+        [129, 137, `שתי תשובות לכל שאלה: ${V.combos} צירופים, לא ${V.tied}.`],
+        [137, 143, "נפרדים — אבל בגבולות הכללים."],
+        [143, 149, "יש כללים שחוסמים חלק מהצירופים. נכיר אותם בהמשך."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      const QUESTIONS = [
+        { q: ["בשביל מה", "הכסף?"], name: "מטרת ההלוואה", ex: ["קנייה · בנייה · שיפוץ", "החלפת משכנתא"], start: 13 },
+        { q: ["איך נקבע אחוז", "הריבית לאורך הדרך?"], name: "מנגנון הריבית", ex: ["נקבע פעם אחת, או זז", "מוצמד למדד, או לא"], start: 21 },
+        { q: ["באיזה קצב", "הקרן חוזרת?"], name: "שיטת ההחזר", ex: ["חלק שווה בכל פעם", "רק ריבית, והקרן בסוף"], start: 37 },
+      ];
+      function questionCard(i, o, small = false) {
+        const k = QUESTIONS[i];
+        const w = 320, gap = 50, x = 1150 - (i + 1) * w - i * gap;
+        box(x, 150, w, 330, o);
+        el("circle", { cx: x + w / 2, cy: 196, r: 22, fill: C.navy, opacity: o });
+        txt(x + w / 2, 204, String(i + 1), 22, { w: 700, fill: C.n0, o, ltr: true });
+        txt(x + w / 2, 262, k.q[0], 26, { w: 600, o });
+        txt(x + w / 2, 298, k.q[1], 26, { w: 600, o });
+        box(x + 30, 326, w - 60, 54, o, { fill: C.mint, stroke: C.mint, rx: 27 });
+        txt(x + w / 2, 362, k.name, 26, { w: 700, o });
+        txt(x + w / 2, 420, k.ex[0], 20, { fill: C.n700, o });
+        txt(x + w / 2, 452, k.ex[1], 20, { fill: C.n700, o });
+      }
+
+      // The 2 × 2 table of year-2 payments.
+      const G = { labelRight: 1160, c1: 760, c2: 440, cw: 270, r1: 250, r2: 350, rh: 76 };
+      function grid(t, o, x0 = 0, s = 1, opts = {}) {
+        const X = (x) => x0 + x * s, Y = (y) => opts.y0 !== undefined ? opts.y0 + (y - 160) * s : y;
+        const size = (n) => n * s;
+        txt(X(G.c1), Y(210), `אחוז הריבית נשאר ${V.rate}%`, size(22), { w: 600, fill: C.n700, o });
+        txt(X(G.c2), Y(210), `אחוז הריבית עלה ל־${V.up}%`, size(22), { w: 600, fill: C.n700, o });
+        const rows = [["דרך א׳: חלק שווה מהקרן", V.aPay2, V.aPay2up], ["דרך ב׳: רק ריבית", V.bPay2, V.bPay2up]];
+        rows.forEach(([label, p1, p2], r) => {
+          const y = r === 0 ? G.r1 : G.r2;
+          txt(X(G.labelRight), Y(y + 47), label, size(22), { anchor: "start", w: 600, o });
+          [[G.c1, p1], [G.c2, p2]].forEach(([cx, p], c) => {
+            const hl = opts.hl?.(r, c);
+            box(X(cx - G.cw / 2), Y(y), size(G.cw), size(G.rh), o, { stroke: hl ?? C.n200, sw: hl ? 3.5 : 1.5 });
+            txt(X(cx), Y(y + 50), shek(p), size(32), { w: 700, o, ltr: true });
+          });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שלושה דברים נפרדים", 80, { w: 700, o });
+          const o2 = at(t, 6.5, o, 0.8);
+          txt(640, 370, "מטרת ההלוואה · מנגנון הריבית · שיטת ההחזר", 32, { fill: C.n600, o: o2 });
+        }
+
+        // Scene 2 — three questions, three names
+        if (inScene(t, S.three)) {
+          const o = vis(t, S.three);
+          txt(640, 112, "שלוש שאלות על כל הלוואה", 40, { w: 700, o });
+          QUESTIONS.forEach((k, i) => questionCard(i, at(t, k.start, o)));
+          const oL = at(t, 29, o);
+          txt(640, 540, "ההצמדה למדד: בקורס היא חלק ממנגנון הריבית (יש מקורות שמתארים אותה כשאלה נפרדת).", 20, { fill: C.n600, o: oL });
+        }
+
+        // Scene 3 — small numbers: the method and the mechanism move the payment separately
+        if (inScene(t, S.grid)) {
+          const o = vis(t, S.grid);
+          txt(640, 112, `הלוואה של ${shek(V.loan)} · ${V.years} שנים · ${V.rate}% לשנה`, 36, { w: 700, o });
+          if (t < 77.6) {
+            // Year 1: both ways, the same rate.
+            const o1 = Math.min(o, clamp((77.6 - t) / 0.6));
+            txt(640, 166, "התשלום בשנה 1, משלמים פעם בשנה", 24, { fill: C.n700, o: at(t, 49, o1) });
+            const oA = at(t, 62, o1), oB = at(t, 70, o1);
+            txt(G.labelRight, 272, "דרך א׳: חלק שווה מהקרן", 26, { anchor: "start", w: 600, o: oA });
+            box(380, 220, 400, 86, oA);
+            txt(580, 262, shek(V.aPay1), 34, { w: 700, o: oA, ltr: true });
+            txt(580, 292, `קרן ${num(V.aPrin)} ועוד ריבית ${num(V.aInt1)}`, 20, { fill: C.n700, o: oA });
+            txt(G.labelRight, 392, "דרך ב׳: רק ריבית", 26, { anchor: "start", w: 600, o: oB });
+            box(380, 340, 400, 86, oB);
+            txt(580, 382, shek(V.bPay1), 34, { w: 700, o: oB, ltr: true });
+            txt(580, 412, "רק ריבית; את הקרן — בסוף", 20, { fill: C.n700, o: oB });
+          } else {
+            const o2 = at(t, 78, o);
+            txt(640, 166, "התשלום בשנה 2", 26, { w: 600, fill: C.n700, o: o2 });
+            const rowHL = t >= 86 && t < 94, colHL = t >= 94 && t < 102, cellHL = t >= 102;
+            grid(t, o2, 0, 1, {
+              hl: (r, c) => (rowHL && r === 0 ? C.teal : colHL && c === 0 ? C.navy : cellHL && r === 0 && c === 0 ? C.teal : null),
+            });
+            if (rowHL) txt(G.c1 - (G.c1 - G.c2) / 2, 470, "שורה: רק מנגנון הריבית זז", 24, { w: 700, fill: C.teal, o: at(t, 86, o) });
+            if (colHL) txt(G.c1, 470, "עמודה: רק שיטת ההחזר זזה", 24, { w: 700, o: at(t, 94, o) });
+            if (cellHL) {
+              const oC = at(t, 102, o);
+              txt(G.c1, 470, `בשנה 1 באותה דרך: ${shek(V.aPay1)}`, 24, { w: 600, fill: C.n700, o: oC });
+              txt(G.c1, 510, "האחוז לא זז — והתשלום כן", 24, { w: 700, fill: C.teal, o: oC });
+            }
+          }
+        }
+
+        // Scene 4 — the purpose is not in the table; combinations multiply
+        if (inScene(t, S.purpose)) {
+          const o = vis(t, S.purpose);
+          if (t < 128.6) {
+            const o1 = Math.min(o, clamp((128.6 - t) / 0.6));
+            txt(640, 112, "ומטרת ההלוואה?", 40, { w: 700, o: o1 });
+            // Two identical small tables: one per purpose.
+            const oT = at(t, 121, o1);
+            [[650, "לקניית דירה"], [40, "לשיפוץ"]].forEach(([x0, label]) => {
+              txt(x0 + 366, 200, label, 28, { w: 700, o: oT });
+              grid(t, oT, x0, 0.5, { y0: 210 });
+            });
+            txt(640, 470, "אותם צירופים, באותם מספרים, בכל מטרה", 26, { w: 600, fill: C.n700, o: at(t, 123, o1) });
+          } else {
+            const o2 = at(t, 129, o);
+            txt(640, 112, "נפרדים, ולכן מכפילים", 40, { w: 700, o: o2 });
+            const cols = [["מטרה", ["קניית דירה", "שיפוץ"]], ["מנגנון ריבית", ["נקבע פעם אחת", "זז"]], ["שיטת החזר", ["חלק שווה", "רק ריבית"]]];
+            cols.forEach(([head, chips], i) => {
+              const cx = 1000 - i * 360;
+              txt(cx, 180, head, 26, { w: 700, o: o2 });
+              chips.forEach((c, j) => {
+                box(cx - 120, 205 + j * 66, 240, 50, o2, { rx: 25, fill: j === 0 ? C.mint : C.n0, stroke: j === 0 ? C.mint : C.n300 });
+                txt(cx, 238 + j * 66, c, 22, { w: 600, o: o2 });
+              });
+              if (i < 2) txt(cx - 180, 272, "×", 36, { w: 700, fill: C.n600, o: o2 });
+            });
+            const oE = at(t, 131, o);
+            txt(640, 400, `${factors.join(" × ")} = ${V.combos}`, 44, { w: 700, o: oE, ltr: true });
+            txt(640, 440, `צירופים. אילו המטרה הייתה קובעת את האחרות — רק ${V.tied}`, 22, { fill: C.n700, o: oE });
+            const oR = at(t, 137, o);
+            box(190, 474, 900, 76, oR, { fill: C.n100, stroke: C.n100 });
+            txt(640, 504, "בגבולות הכללים: למשל, כלל של בנק ישראל מגביל איזה חלק מהמשכנתא", 20, { fill: C.n700, o: oR });
+            txt(640, 534, "מותר לתת בריבית שיכולה לזוז (לא אומת; לפי תעתיק בצוות, 2026-10-08).", 20, { fill: C.n700, o: oR });
+          }
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.12 — "שתי שאלות, שישה מסלולים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-12.json: the lesson's worked example
+  (three tracks with the same 400,000 ₪ balance, one year in which the prime rose
+  one point and the index 3%, an illustration, not a forecast). The rates and the
+  index rise are the facts' own inputs. The tracks' behaviour and risks follow the
+  lesson's table (lessons 2.5–2.8); nothing new is taught.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — six tracks, sorted by two questions; interest works on every debt.
+  2. The two questions: can the rate move, and when? Does the index move the debt?
+  3. The four squares: fixed unlinked; fixed linked and the eligibility loan;
+     prime (at every change) and variable unlinked (at update points); variable
+     linked, the only one where both move.
+  4. One year, three tracks with 400,000 ₪ each: the prime rose a point, the index
+     3%. Fixed unlinked: nothing changed. Prime: the balance did not move, 4,000 ₪
+     more interest a year. Fixed linked: the debt itself grew 12,000 ₪, and 360 ₪
+     of interest on that.
+  5. The risk in one sentence, per track.
+  6. Takeaway — the table does not say which track is cheaper; offers decide that,
+     and the mix is built in stage 5.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.12 · סיכום: טבלת המסלולים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-12.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const pIn = get("worked.prime_extra").inputs, iIn = get("worked.interest_on_indexation").inputs;
+      const V = {
+        bal: fact("worked.balance"), primeExtra: fact("worked.prime_extra"), idx: fact("worked.indexation"),
+        idxInt: fact("worked.interest_on_indexation"), idxTotal: fact("worked.index_total"), idxBal: fact("worked.indexed_balance"),
+        r0: pIn.old_rate_percent, r1: pIn.new_rate_percent, pi: iIn.inflation_percent, rl: iIn.rate_percent,
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], q: [12, 40], grid: [40, 84], ex: [84, 130], risk: [130, 160], end: [160, 176] };
+      window.duration = 176;
+      window.cues = [
+        [1, 6, "שישה מסלולים. שתי שאלות מסדרות את כולם."],
+        [6, 11.5, "ריבית פועלת על כל חוב. מה עוד יכול להשתנות?"],
+        [13, 21, "שאלה ראשונה: האם אחוז הריבית יכול לזוז, ומתי?"],
+        [21, 30, "שאלה שנייה: האם המדד מזיז את החוב?"],
+        [30, 39, "שתי שאלות, ולכן ארבע משבצות."],
+        [41, 49, "הריבית לא זזה, ולא צמוד: קבועה לא צמודה."],
+        [49, 57, "הריבית לא זזה, וצמוד: קבועה צמודה, והלוואת זכאות."],
+        [57, 64, "הריבית זזה, ולא צמוד: מסלול פריים, ומשתנה לא צמודה."],
+        [64, 72, "בפריים — בכל שינוי; במשתנה — בנקודות העדכון."],
+        [72, 83, "הריבית זזה, וצמוד: משתנה צמודה. שני הדברים זזים בה."],
+        [85, 93, `שלושה מסלולים, ${shek(V.bal)} בכל אחד. שנה אחת.`],
+        [93, 101, `הפריים עלתה בנקודת אחוז, והמדד עלה ב־${V.pi}%. להמחשה.`],
+        [101, 109, "קבועה לא צמודה: השנה הזו לא שינתה בה כלום."],
+        [109, 117, `פריים: היתרה לא זזה, אבל עוד ${shek(V.primeExtra)} ריבית בשנה.`],
+        [117, 125, `קבועה צמודה: החוב עצמו גדל ב־${shek(V.idx)}.`],
+        [125, 130, `ועל התוספת, עוד ${shek(V.idxInt)} ריבית.`],
+        [131, 139, "קבועה לא צמודה: כשהשוק יורד, הריבית שלכם לא יורדת."],
+        [139, 146, "צמודות: אם המחירים יעלו מהר, החוב והתשלום יעלו."],
+        [146, 153, "פריים: בכל העלאה של בנק ישראל, התשלום עולה."],
+        [153, 159, "משתנות: בכל נקודת עדכון הריבית יכולה לקפוץ."],
+        [161, 168, "הטבלה לא אומרת איזה מסלול זול יותר."],
+        [168, 175, "את זה קובעות ההצעות. ואת התמהיל בונים בשלב 5."],
+      ];
+
+      // The four squares. Column headers above, row headers at the right.
+      const COLX = [760, 330], CW = 400, ROWY = [230, 370], CH = 120;
+      function grid(t, sc, o) {
+        const oh = after(t, sc, 0.5, o);
+        txt(COLX[0], 210, "לא צמוד: המדד לא מזיז את החוב", 22, { w: 700, o: oh });
+        txt(COLX[1], 210, "צמוד: המדד מזיז את החוב", 22, { w: 700, o: oh });
+        txt(1220, ROWY[0] + 55, "הריבית", 24, { anchor: "start", w: 700, o: oh });
+        txt(1220, ROWY[0] + 85, "לא זזה", 24, { anchor: "start", w: 700, o: oh });
+        txt(1220, ROWY[1] + 55, "הריבית", 24, { anchor: "start", w: 700, o: oh });
+        txt(1220, ROWY[1] + 85, "יכולה לזוז", 24, { anchor: "start", w: 700, o: oh });
+        const cells = [
+          { r: 0, c: 0, lines: ["קבועה לא צמודה"], at: 1 },
+          { r: 0, c: 1, lines: ["קבועה צמודה", "הלוואת זכאות"], at: 9 },
+          { r: 1, c: 0, lines: ["מסלול פריים (בכל שינוי)", "משתנה לא צמודה (בנקודות עדכון)"], at: 17 },
+          { r: 1, c: 1, lines: ["משתנה צמודה (בנקודות עדכון)"], at: 32, hot: true },
+        ];
+        for (const c of cells) {
+          const oc = after(t, sc, c.at, o);
+          const x = COLX[c.c] - CW / 2, y = ROWY[c.r];
+          el("rect", { x, y, width: CW, height: CH, rx: 12, fill: c.hot ? C.mint : C.n0, stroke: c.hot ? C.teal : C.n200, "stroke-width": c.hot ? 2 : 1, opacity: oc });
+          const y0 = y + CH / 2 + 9 - (c.lines.length - 1) * 18;
+          c.lines.forEach((l, k) => txt(COLX[c.c], y0 + k * 36, l, c.lines.length > 1 ? 22 : 26, { w: 700, o: oc }));
+        }
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "שתי שאלות, שישה מסלולים", 72, { w: 700, o });
+          txt(640, 350, "סיכום שלב 2: טבלת המסלולים", 32, { fill: C.n600, o });
+        }
+        // Scene 2 — the two questions
+        if (inScene(t, S.q)) {
+          const sc = S.q, o = vis(t, sc);
+          heading("ריבית פועלת על כל חוב. מה עוד יכול להשתנות?", null, o);
+          const qs = [
+            { x: 660, n: "1", title: "אחוז הריבית", lines: ["האם הוא יכול לזוז?", "ואם כן — מתי?"], at: 1 },
+            { x: 80, n: "2", title: "המדד", lines: ["האם הוא מזיז", "את החוב עצמו?"], at: 9 },
+          ];
+          for (const q of qs) {
+            const oq = after(t, sc, q.at, o, 0.8);
+            card(q.x, 190, 540, 260, oq);
+            el("circle", { cx: q.x + 485, cy: 245, r: 26, fill: C.mint, opacity: oq });
+            txt(q.x + 485, 255, q.n, 28, { w: 700, o: oq });
+            txt(q.x + 440, 257, q.title, 34, { anchor: "start", w: 700, o: oq });
+            q.lines.forEach((l, k) => txt(q.x + 500, 330 + k * 48, l, 28, { anchor: "start", fill: C.n700, o: oq }));
+          }
+          if (after(t, sc, 18, o) > 0) pill(640, 510, 340, "שתי שאלות, ארבע משבצות", after(t, sc, 18, o), 24);
+        }
+        // Scene 3 — the four squares
+        if (inScene(t, S.grid)) {
+          const sc = S.grid, o = vis(t, sc);
+          heading("ארבע משבצות", null, o);
+          grid(t, sc, o);
+        }
+        // Scene 4 — one year, three tracks
+        if (inScene(t, S.ex)) {
+          const sc = S.ex, o = vis(t, sc);
+          heading("שנה אחת, שלושה מסלולים", `הפריים עלתה מ־${V.r0}% ל־${V.r1}%, והמדד עלה ${V.pi}% · מספרים להמחשה, לא תחזית`, o);
+          const cols = [
+            { x: 1000, title: "קבועה לא צמודה", at: 1, show: 17, lines: [["היתרה:", shek(V.bal)], ["שינוי:", "אין"]] },
+            { x: 640, title: "מסלול פריים", at: 1, show: 25, lines: [["היתרה:", shek(V.bal)], ["ריבית נוספת:", iso(`+${money(V.primeExtra)} ₪`) + " בשנה"]] },
+            { x: 280, title: `קבועה צמודה, ${V.rl}%`, at: 1, show: 33, lines: [["היתרה:", shek(V.idxBal)], ["הצמדה:", iso(`+${money(V.idx)} ₪`)], ["ריבית עליה:", iso(`+${money(V.idxInt)} ₪`)]] },
+          ];
+          for (const c of cols) {
+            const oc = after(t, sc, c.at, o);
+            card(c.x - 170, 200, 340, 290, oc);
+            txt(c.x, 245, c.title, 26, { w: 700, o: oc });
+            txt(c.x, 285, `יתרה בהתחלה: ${shek(V.bal)}`, 18, { fill: C.n600, o: oc });
+            const os = after(t, sc, c.show, o);
+            el("line", { x1: c.x - 150, x2: c.x + 150, y1: 305, y2: 305, stroke: C.n200, "stroke-width": 2, opacity: os });
+            txt(c.x, 330, "בסוף השנה", 18, { fill: C.n600, w: 600, o: os });
+            c.lines.forEach(([k, v], i) => {
+              txt(c.x + 150, 375 + i * 40, k, 20, { anchor: "start", fill: C.n700, o: os });
+              txt(c.x - 150, 375 + i * 40, v, 22, { anchor: "end", w: 700, fill: i ? C.teal : C.navy, o: os });
+            });
+          }
+          const oP = after(t, sc, 41, o);
+          if (oP > 0) pill(640, 530, 640, "פריים: השתנה המחיר. צמודה: השתנה החוב עצמו.", oP, 22);
+        }
+        // Scene 5 — the risk in one sentence
+        if (inScene(t, S.risk)) {
+          const sc = S.risk, o = vis(t, sc);
+          heading("הסיכון, במשפט אחד", null, o);
+          const rows = [
+            ["קבועה לא צמודה", "אם הריביות בשוק יירדו, הריבית שלכם לא תרד", 1],
+            ["קבועה צמודה, זכאות", "אם המחירים יעלו מהר, החוב והתשלום בשקלים יעלו", 9],
+            ["מסלול פריים", "בכל העלאה של בנק ישראל התשלום עולה, בלי תקרה ידועה", 16],
+            ["משתנה לא צמודה", "בכל נקודת עדכון הריבית, ואיתה התשלום, יכולה לעלות", 23],
+            ["משתנה צמודה", "המדד מזיז את החוב כל הזמן, והריבית יכולה לקפוץ", 23],
+          ];
+          rows.forEach(([k, v, at], i) => {
+            const oi = after(t, sc, at, o);
+            const y = 175 + i * 72;
+            el("rect", { x: 70, y, width: 1140, height: 60, rx: 10, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(1190, y + 39, k, 24, { anchor: "start", w: 700, fill: C.teal, o: oi });
+            txt(930, y + 39, v, 23, { anchor: "start", fill: C.n700, o: oi });
+          });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 160, "מה הטבלה לא אומרת", 44, { w: 700, o });
+          const o1 = after(t, sc, 1, o);
+          card(190, 210, 900, 230, o1);
+          txt(1050, 275, "איזה מסלול זול יותר: את זה קובעות ההצעות,", 28, { anchor: "start", fill: C.n700, o: o1 });
+          txt(1050, 320, "והן משתנות מבנק לבנק ומיום ליום.", 28, { anchor: "start", fill: C.n700, o: o1 });
+          const o2 = after(t, sc, 8, o);
+          txt(1050, 390, "איך בונים תמהיל ומשווים הצעות — בשלב 5.", 28, { anchor: "start", w: 700, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

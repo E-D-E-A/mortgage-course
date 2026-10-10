@@ -1,0 +1,289 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.2 — "קבוע מה?".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-2.json: the lesson's own small loan
+  (42,000 ₪, 3 years, 5%, one payment a year) in its four situations, א׳–ד׳.
+  The 2% index rise and the rise to 7% are the lesson's teaching inputs, marked
+  as illustrations. No formula appears (the formula section comes later), and
+  the two repayment methods are described, not named (their names are lesson 2.9).
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — "ריבית קבועה" answers what happens to the rate, not to the payment.
+  2. The loan: 42,000 ₪, 3 years, 5% a year, one payment at the end of each year.
+  3. א׳ — an equal part of the principal each year, plus interest on what is left:
+     the rate does not move, the payment goes down.
+  4. ב׳ — equal payments: neither the rate nor the payment moves.
+  5. ג׳ — equal payments on a debt linked to the index (2% a year, an illustration):
+     the rate does not move, the payment goes up.
+  6. ד׳ — equal payments, a variable rate that rises to 7% in year 2 (an example,
+     not a forecast): the payment is recalculated and goes up with the rate.
+  7. Takeaway — the four situations side by side; the payment stays put only in ב׳.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.2 · קבועה מול משתנה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("15,422.76 ₪"); whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const shek = (v) => iso(`${nf2.format(Number(v)).replace(/\.00$/, "")} ₪`);
+
+      const A = fact("a.table"), B = fact("b.table"), Cv = fact("c.table");
+      const V = {
+        loan: fact("ex.loan"), years: fact("ex.years"), rate: fact("ex.rate"), rateUp: fact("ex.rate_up"), infl: fact("ex.inflation"),
+        pay: fact("b.payment"), cPay: fact("c.payment_2"), rise: fact("c.rise"),
+        d: [fact("d.payment_1"), fact("d.payment_2"), fact("d.payment_3")],
+      };
+      // The four situations, year by year: the rate and the payment.
+      const WAYS = {
+        a: A.map((r) => ({ rate: V.rate, pay: r.payment })),
+        b: B.map((r) => ({ rate: r.rate, pay: r.payment })),
+        c: V.d.map((p) => ({ rate: V.rate, pay: p })),
+        d: Cv.map((r) => ({ rate: r.rate, pay: r.payment })),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], loan: [12, 30], a: [30, 64], b: [64, 90], c: [90, 124], d: [124, 156], end: [156, 178] };
+      window.duration = 178;
+      window.cues = [
+        [1, 6, "״ריבית קבועה״. האם גם התשלום קבוע?"],
+        [6, 11.5, "נבדוק על הלוואה אחת, בארבעה מצבים."],
+        [13, 21, `הלוואה של ${shek(V.loan)}, ל־${V.years} שנים, ב־${V.rate}% לשנה.`],
+        [21, 29, "כדי לחשב בראש: משלמים פעם בשנה, בסוף השנה."],
+        [31, 39, `א׳: בכל שנה מחזירים חלק שווה מהקרן, ${shek(A[0].principal)}.`],
+        [39, 47, `ועוד ריבית על מה שנשאר. בשנה 1: ${shek(A[0].interest)}.`],
+        [47, 55, "החוב קטן, ולכן גם סכום הריבית. התשלום יורד."],
+        [55, 63, "אחוז הריבית לא זז, והתשלום יורד."],
+        [65, 72, "ב׳: הפעם משלמים בכל שנה אותו סכום."],
+        [72, 81, `${shek(V.pay)} בכל שנה, והחוב מגיע בדיוק לאפס.`],
+        [81, 89, "כאן גם אחוז הריבית וגם התשלום לא זזים."],
+        [91, 99, "ג׳: אותם תשלומים שווים, אבל החוב מוצמד למדד."],
+        [99, 107, `נניח שהמדד עולה ב־${V.infl}% בכל שנה. הנחה להמחשה.`],
+        [107, 115, `התשלום עולה: ${shek(V.d[0])}, ובשנה 3 ${shek(V.d[2])}.`],
+        [115, 123, `אחוז הריבית עדיין ${V.rate}%. החוב עצמו גדל עם המדד.`],
+        [125, 132, "ד׳: תשלומים שווים, וריבית משתנה."],
+        [132, 140, `בשנה 2 אחוז הריבית עולה ל־${V.rateUp}%. דוגמה, לא תחזית.`],
+        [140, 148, `התשלום מחושב מחדש: ${shek(V.cPay)}, עוד ${shek(V.rise)}.`],
+        [148, 155, "בריבית משתנה, התשלום זז כשאחוז הריבית זז."],
+        [157, 165, "רק במצב אחד התשלום לא זז: ב׳."],
+        [165, 172, "תשלומים שווים, וחוב שלא מוצמד, וריבית קבועה."],
+        [172, 177, "״ריבית קבועה״ מבטיחה רק שהאחוז לא יזוז."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+
+      // The year chart: three columns, year 1 at the right (time runs leftward, as Hebrew is read).
+      // A rate chip above each column, a payment bar from zero below it.
+      const COLS = [820, 620, 420], BW = 130, BASE = 470, K = 240 / 17000;
+      const LABEL_X = 1210;
+      function yearChart(t, sc, ways, o, opts = {}) {
+        txt(LABEL_X, 200, "אחוז הריבית", 24, { anchor: "start", fill: C.n700, w: 600, o });
+        txt(LABEL_X, BASE + 34, "התשלום", 24, { anchor: "start", fill: C.n700, w: 600, o });
+        el("line", { x1: COLS[2] - BW / 2 - 30, x2: COLS[0] + BW / 2 + 30, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+        // A dashed line at the first year's payment, so a rise or a fall shows against it.
+        const oRef = after(t, sc, (opts.at ?? 2) + 2 * (opts.step ?? 1.5) + 1.5, o);
+        const yRef = BASE - Number(ways[0].pay) * K;
+        el("line", { x1: COLS[2] - BW / 2 - 20, x2: COLS[0] + BW / 2 + 20, y1: yRef, y2: yRef, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: oRef * 0.7 });
+        if (oRef > 0) txt(COLS[0] + BW / 2 + 30, yRef + 7, "כמו בשנה 1", 18, { anchor: "end", fill: C.n600, o: oRef });
+        ways.forEach((w, i) => {
+          const oi = after(t, sc, (opts.at ?? 2) + i * (opts.step ?? 1.5), o);
+          const x = COLS[i];
+          const hot = opts.hot?.(i);
+          el("rect", { x: x - 55, y: 168, width: 110, height: 46, rx: 23, fill: hot ? C.mint : C.n0, stroke: hot ? C.teal : C.n200, "stroke-width": hot ? 2 : 1, opacity: oi });
+          txt(x, 200, `${w.rate}%`, 26, { w: 700, ltr: true, o: oi });
+          const h = Number(w.pay) * K * ease((t - sc[0] - (opts.at ?? 2) - i * (opts.step ?? 1.5)) / 1.2);
+          el("rect", { x: x - BW / 2, y: BASE - h, width: BW, height: h, rx: 6, fill: opts.fill ?? C.teal, opacity: oi });
+          txt(x, BASE + 34, shek(w.pay), 24, { w: 700, ltr: true, o: oi });
+          txt(x, BASE + 64, `שנה ${i + 1}`, 20, { fill: C.n600, o: oi });
+        });
+      }
+      // The verdict, at the left: what the rate did, and what the payment did.
+      function verdict(rate, pay, o) {
+        card(60, 200, 250, 180, o);
+        txt(290, 240, "אחוז הריבית:", 22, { anchor: "start", fill: C.n600, o });
+        txt(290, 278, rate, 30, { anchor: "start", w: 700, o });
+        txt(290, 320, "התשלום:", 22, { anchor: "start", fill: C.n600, o });
+        txt(290, 358, pay, 30, { anchor: "start", w: 700, fill: C.teal, o });
+      }
+      function heading(s, sub, o) {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "קבוע מה?", 84, { w: 700, o });
+          txt(640, 350, "אחוז הריבית והתשלום: שתי שאלות שונות", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 6, o, 0.8);
+          ["א׳", "ב׳", "ג׳", "ד׳"].forEach((s, i) => {
+            el("rect", { x: 760 - i * 110, y: 410, width: 90, height: 60, rx: 12, fill: i === 1 ? C.mint : C.n0, stroke: C.n200, opacity: o2 });
+            txt(805 - i * 110, 450, s, 28, { w: 700, o: o2 });
+          });
+        }
+        // Scene 2 — the loan
+        if (inScene(t, S.loan)) {
+          const o = vis(t, S.loan);
+          heading("הלוואה אחת, ארבעה מצבים", null, o);
+          const items = [
+            { k: "הלוואה", v: shek(V.loan) },
+            { k: "תקופה", v: `${V.years} שנים` },
+            { k: "אחוז הריבית", v: `${V.rate}% לשנה` },
+          ];
+          items.forEach((it, i) => {
+            const oi = after(t, S.loan, 1.5 + i * 1.5, o);
+            const x = 860 - i * 300;
+            card(x - 130, 210, 260, 130, oi);
+            txt(x, 255, it.k, 24, { fill: C.n600, o: oi });
+            txt(x, 305, it.v, 34, { w: 700, o: oi });
+          });
+          const o2 = after(t, S.loan, 9, o);
+          el("rect", { x: 330, y: 390, width: 620, height: 60, rx: 30, fill: C.mint, opacity: o2 * 0.8 });
+          txt(640, 429, "תשלום אחד בסוף כל שנה, כדי לחשב בראש", 26, { w: 600, o: o2 });
+          txt(640, 500, "מספרים להמחשה", 20, { fill: C.n600, o: o2 });
+        }
+        // Scene 3 — א׳: an equal part of the principal each year
+        if (inScene(t, S.a)) {
+          const sc = S.a, o = vis(t, sc);
+          heading("א׳: חלק שווה מהקרן, ועוד ריבית", "חוב שלא מוצמד · אחוז ריבית קבוע", o);
+          yearChart(t, sc, WAYS.a, o, { at: 2, step: 1.5 });
+          // The first year's payment, split: principal part and interest.
+          const o2 = Math.min(after(t, sc, 9, o), clamp((sc[0] + 24 - t) / 0.6));
+          if (o2 > 0) {
+            card(60, 200, 250, 150, o2);
+            txt(290, 240, "שנה 1:", 22, { anchor: "start", fill: C.n600, o: o2 });
+            txt(185, 283, iso(`${num(A[0].principal)} + ${num(A[0].interest)}`), 28, { w: 700, ltr: true, o: o2 });
+            txt(290, 325, "קרן ועוד ריבית", 22, { anchor: "start", fill: C.n600, o: o2 });
+          }
+          const o3 = after(t, sc, 25, o);
+          if (o3 > 0) verdict("לא זז", "יורד", o3);
+        }
+        // Scene 4 — ב׳: equal payments
+        if (inScene(t, S.b)) {
+          const sc = S.b, o = vis(t, sc);
+          heading("ב׳: תשלומים שווים", "חוב שלא מוצמד · אחוז ריבית קבוע", o);
+          yearChart(t, sc, WAYS.b, o, { at: 2, step: 1.2 });
+          const o2 = after(t, sc, 9, o);
+          card(60, 400, 250, 90, o2);
+          txt(290, 437, "החוב בסוף שנה 3:", 22, { anchor: "start", fill: C.n600, o: o2 });
+          txt(185, 474, shek(B[2].closing), 28, { w: 700, ltr: true, o: o2 });
+          const o3 = after(t, sc, 17, o);
+          if (o3 > 0) verdict("לא זז", "לא זז", o3);
+        }
+        // Scene 5 — ג׳: equal payments, an indexed debt
+        if (inScene(t, S.c)) {
+          const sc = S.c, o = vis(t, sc);
+          heading("ג׳: תשלומים שווים, חוב מוצמד", `המדד עולה ${V.infl}% בכל שנה (הנחה להמחשה)`, o);
+          yearChart(t, sc, WAYS.c, o, { at: 3, step: 2 });
+          const o2 = Math.min(after(t, sc, 10, o), clamp((sc[0] + 24 - t) / 0.6));
+          if (o2 > 0) {
+            card(60, 200, 250, 150, o2);
+            txt(290, 240, "בלי מדד:", 22, { anchor: "start", fill: C.n600, o: o2 });
+            txt(185, 283, shek(V.pay), 28, { w: 700, ltr: true, o: o2 });
+            txt(290, 325, "ועם המדד — יותר", 22, { anchor: "start", fill: C.n600, o: o2 });
+          }
+          const o3 = after(t, sc, 25, o);
+          if (o3 > 0) verdict("לא זז", "עולה עם המדד", o3);
+        }
+        // Scene 6 — ד׳: equal payments, a variable rate
+        if (inScene(t, S.d)) {
+          const sc = S.d, o = vis(t, sc);
+          heading("ד׳: תשלומים שווים, ריבית משתנה", `בשנה 2 האחוז עולה ל־${V.rateUp}% (דוגמה, לא תחזית)`, o);
+          yearChart(t, sc, WAYS.d, o, { at: 3, step: 2, hot: (i) => i > 0 && t - sc[0] > 9 });
+          const o2 = Math.min(after(t, sc, 16, o), clamp((sc[0] + 24 - t) / 0.6));
+          if (o2 > 0) {
+            card(60, 200, 250, 150, o2);
+            txt(290, 240, "התשלום עלה ב־", 22, { anchor: "start", fill: C.n600, o: o2 });
+            txt(185, 290, shek(V.rise), 30, { w: 700, ltr: true, o: o2 });
+            txt(290, 330, "בשנה", 22, { anchor: "start", fill: C.n600, o: o2 });
+          }
+          const o3 = after(t, sc, 24, o);
+          if (o3 > 0) verdict("זז", "זז עם האחוז", o3);
+        }
+        // Scene 7 — takeaway: the four situations side by side
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 120, "קבוע מה? ארבעת המצבים", 42, { w: 700, o });
+          const head = after(t, sc, 0.5, o);
+          txt(1150, 190, "המצב", 22, { anchor: "start", fill: C.n600, w: 600, o: head });
+          txt(560, 190, "אחוז הריבית", 22, { anchor: "start", fill: C.n600, w: 600, o: head });
+          txt(330, 190, "התשלום", 22, { anchor: "start", fill: C.n600, w: 600, o: head });
+          const rows = [
+            ["א׳: חלק שווה מהקרן", "לא זז", "יורד"],
+            ["ב׳: תשלומים שווים, לא מוצמד", "לא זז", "לא זז"],
+            ["ג׳: תשלומים שווים, מוצמד", "לא זז", "זז עם המדד"],
+            ["ד׳: ריבית משתנה", "זז", "זז עם האחוז"],
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, 1 + i * 1.2, o);
+            const y = 210 + i * 70;
+            const hot = i === 1 && t - sc[0] > 1;
+            el("rect", { x: 110, y, width: 1060, height: 58, rx: 10, fill: hot ? C.mint : C.n0, stroke: C.n200, opacity: oi * (hot ? 0.9 : 1) });
+            txt(1150, y + 38, r[0], 26, { anchor: "start", w: 600, o: oi });
+            txt(560, y + 38, r[1], 26, { anchor: "start", fill: C.n700, o: oi });
+            txt(330, y + 38, r[2], 26, { anchor: "start", w: 700, o: oi });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

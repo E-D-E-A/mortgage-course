@@ -1,0 +1,264 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.3 — "מה מודד האחוז".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-3.json: the lesson's own one-year loan
+  (100,000 ₪, unlinked at 5% or linked at 3%, the index up 2%), its table of
+  inflations and its break-even point. The rates and the inflation are the facts'
+  own inputs. All illustrations, not forecasts. No formula box: the arithmetic is
+  the lesson's own explanation steps.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — two tracks for one year; which costs more shekels?
+  2. Unlinked at 5%: the debt does not move; at the end of the year 105,000 ₪.
+  3. Linked at 3%: first the index (+2%) moves the debt to 102,000 ₪, then the
+     interest on the indexed debt, 3,060 ₪: 105,060 ₪, 60 ₪ more.
+  4. Why: 3% on a linked track is real interest, above the indexation; 5% on an
+     unlinked track is nominal, before inflation. 3% linked is 5.06% unlinked,
+     not 5%, because the interest falls on the indexation too.
+  5. Other inflations: the unlinked line is flat, the linked one rises; they meet
+     at the break-even point, 1.94%. Inflation is known only afterwards.
+  6. Takeaway — each track protects from a different risk.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.3 · צמוד מול לא צמוד</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-3.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const V = {
+        amount: fact("explain.amount"), plain: fact("explain.plain_rate"), real: fact("explain.real_rate"), infl: fact("explain.inflation"),
+        plainOwed: fact("explain.plain_owed"), indexed: fact("explain.indexed_amount"), interest: fact("explain.indexed_interest"),
+        owed: fact("explain.indexed_owed"), gap: fact("explain.gap"), added: fact("explain.added"), asPlain: fact("explain.as_plain"),
+        be: fact("explain.break_even"),
+      };
+      const ROWS = fact("explain.table");
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], plain: [12, 46], linked: [46, 86], why: [86, 122], line: [122, 156], end: [156, 176] };
+      window.duration = 176;
+      window.cues = [
+        [1, 6, "שני מסלולים, שנה אחת. באיזה תשלמו יותר?"],
+        [6, 11.5, "ומה בעצם מודד האחוז במסלול צמוד?"],
+        [13, 21, `לווים ${shek(V.amount)} לשנה, ומחזירים הכול בסוף השנה.`],
+        [21, 29, `מסלול לא צמוד ב־${V.plain}%, או מסלול צמוד ב־${V.real}%.`],
+        [29, 37, `לא צמוד: המדד לא נוגע בחוב. מוסיפים ${V.plain}%.`],
+        [37, 45, `בסוף השנה: ${shek(V.plainOwed)}.`],
+        [47, 55, `צמוד: במהלך השנה המדד עלה ב־${V.infl}%.`],
+        [55, 63, `קודם ההצמדה: החוב גדל ל־${shek(V.indexed)}.`],
+        [63, 72, `אחר כך הריבית, על החוב המוצמד: ${shek(V.interest)}.`],
+        [72, 85, `בסוף השנה ${shek(V.owed)}. יקר יותר ב־${shek(V.gap)}.`],
+        [87, 95, `למה? כי ${V.real}% בצמוד הם ריבית מעל ההצמדה.`],
+        [95, 103, "האחוז בלא צמוד: ריבית נומינלית, לפני אינפלציה."],
+        [103, 111, "האחוז בצמוד: ריבית ריאלית, מעל האינפלציה."],
+        [111, 121, `במונחים של לא צמוד: ${V.asPlain}%, ולא ${V.added}%.`],
+        [123, 131, "ומה באינפלציה אחרת? אותו חשבון, כמה פעמים."],
+        [131, 139, "באינפלציה נמוכה הצמוד זול יותר; בגבוהה, יקר יותר."],
+        [139, 147, `הם שווים באינפלציה של ${V.be}%: נקודת האיזון.`],
+        [147, 155, "מספרים להמחשה. את האינפלציה יודעים רק בדיעבד."],
+        [157, 166, "לא צמוד: מוגן מהפתעה במספר השקלים."],
+        [166, 175, "צמוד: מוגן מריבית על אינפלציה שלא הגיעה."],
+      ];
+
+      // The two accounts, side by side: unlinked on the right (read first), linked on the left.
+      function account(x, title, lines, total, o, oTotal) {
+        card(x, 190, 520, 290, o);
+        txt(x + 490, 240, title, 30, { anchor: "start", w: 700, o });
+        lines.forEach((l, i) => {
+          const oi = Math.min(o, l.o);
+          txt(x + 490, 300 + i * 52, l.k, 22, { anchor: "start", fill: C.n600, o: oi });
+          txt(x + 30, 300 + i * 52, iso(l.v), 26, { anchor: "start", ltr: true, w: 600, o: oi });
+        });
+        el("line", { x1: x + 30, x2: x + 490, y1: 412, y2: 412, stroke: C.n200, "stroke-width": 2, opacity: oTotal });
+        txt(x + 490, 455, "בסוף השנה", 24, { anchor: "start", fill: C.n700, w: 600, o: oTotal });
+        txt(x + 30, 457, shek(total), 34, { anchor: "start", ltr: true, w: 700, o: oTotal });
+      }
+
+      // The break-even chart: what is owed at the end of the year, for each inflation.
+      const X0 = 330, X1 = 1050, Y0 = 490, Y1 = 220, LO = 102000, HI = 108000;
+      const xOf = (p) => X0 + (Number(p) / Number(ROWS[ROWS.length - 1].inflation)) * (X1 - X0);
+      const yOf = (v) => Y0 - ((Number(v) - LO) / (HI - LO)) * (Y0 - Y1);
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מה מודד האחוז?", 80, { w: 700, o });
+          txt(640, 350, "צמוד מול לא צמוד, לשנה אחת", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 5, o, 0.8);
+          card(660, 410, 200, 70, o2);
+          txt(760, 455, `לא צמוד · ${V.plain}%`, 26, { w: 700, o: o2 });
+          card(420, 410, 200, 70, o2);
+          txt(520, 455, `צמוד · ${V.real}%`, 26, { w: 700, o: o2 });
+        }
+        // Scenes 2–3 — the two accounts
+        if (inScene(t, [S.plain[0], S.linked[1]])) {
+          const sc = S.plain, o = vis(t, [S.plain[0], S.linked[1]]);
+          heading(`${shek(V.amount)} לשנה אחת`, "מחזירים הכול בסוף השנה · מספרים להמחשה", o);
+          const oA = after(t, sc, 9, o);
+          account(680, `לא צמוד · ${V.plain}%`, [
+            { k: "המדד", v: "לא נוגע בחוב", o: after(t, sc, 17, o) },
+            { k: "הריבית", v: `${num(V.amount)} + ${V.plain}%`, o: after(t, sc, 19, o) },
+          ], V.plainOwed, oA, after(t, sc, 25, o));
+          const lc = S.linked;
+          const oB = after(t, lc, 1, o);
+          if (oB > 0) {
+            account(80, `צמוד · ${V.real}%`, [
+              { k: `הצמדה, המדד עלה ${V.infl}%`, v: `${num(V.amount)} → ${num(V.indexed)}`, o: after(t, lc, 9, o) },
+              { k: "ריבית", v: `${V.real}% × ${num(V.indexed)} = ${num(V.interest)}`, o: after(t, lc, 17, o) },
+            ], V.owed, oB, after(t, lc, 26, o));
+          }
+          const oG = after(t, lc, 28, o);
+          if (oG > 0) pill(640, 530, 420, `הצמוד יקר יותר ב־${shek(V.gap)}`, oG);
+        }
+        // Scene 4 — what the percent measures
+        if (inScene(t, S.why)) {
+          const sc = S.why, o = vis(t, sc);
+          heading("מה מודד האחוז", null, o);
+          const U = 48, base = 440;
+          // Unlinked: one block, the nominal rate.
+          const oP = after(t, sc, 8, o);
+          const hp = Number(V.plain) * U;
+          el("rect", { x: 820, y: base - hp, width: 150, height: hp, rx: 6, fill: C.teal, opacity: oP });
+          txt(895, base - hp / 2 + 10, `${V.plain}%`, 30, { w: 700, ltr: true, fill: C.n0, o: oP });
+          txt(895, base + 36, "לא צמוד", 24, { w: 600, o: oP });
+          txt(1000, base - hp / 2 + 8, "נומינלית: לפני אינפלציה", 22, { anchor: "end", fill: C.n700, o: after(t, sc, 9, o) });
+          // Linked: the index first, the real rate on top, and a sliver of interest on the indexation.
+          const oL = after(t, sc, 1, o);
+          const hi = Number(V.infl) * U, hr = Number(V.real) * U, hs = (Number(V.asPlain) - Number(V.added)) * U;
+          el("rect", { x: 380, y: base - hi, width: 150, height: hi, rx: 6, fill: C.n300, opacity: oL });
+          txt(455, base - hi / 2 + 10, `מדד ${V.infl}%`, 24, { w: 700, o: oL });
+          el("rect", { x: 380, y: base - hi - hr - 2, width: 150, height: hr, rx: 6, fill: C.tq2, opacity: oL });
+          txt(455, base - hi - hr / 2 + 8, `${V.real}%`, 30, { w: 700, ltr: true, o: oL });
+          txt(455, base + 36, "צמוד", 24, { w: 600, o: oL });
+          txt(355, base - hi - hr / 2 + 8, "ריאלית: מעל ההצמדה", 22, { anchor: "start", fill: C.n700, o: after(t, sc, 17, o) });
+          const oS = after(t, sc, 25, o);
+          el("rect", { x: 380, y: base - hi - hr - 4 - hs, width: 150, height: Math.max(3, hs), fill: C.navy, opacity: oS });
+          txt(355, base - hi - hr - 6, "ועוד ריבית על ההצמדה", 20, { anchor: "start", fill: C.n600, o: oS });
+          if (oS > 0) pill(640, 530, 520, `${V.real}% צמוד הם ${V.asPlain}% לא צמוד`, oS, 24);
+        }
+        // Scene 5 — the break-even point
+        if (inScene(t, S.line)) {
+          const sc = S.line, o = vis(t, sc);
+          heading("נקודת האיזון", "חוב בסוף השנה, לכל אינפלציה · מספרים להמחשה, לא תחזית", o);
+          el("line", { x1: X0 - 10, x2: X1 + 10, y1: Y0 + 10, y2: Y0 + 10, stroke: C.n300, "stroke-width": 2, opacity: o });
+          ROWS.forEach((r) => txt(xOf(r.inflation), Y0 + 40, `${r.inflation}%`, 20, { ltr: true, fill: C.n600, o }));
+          txt(640, Y0 + 72, "האינפלציה בשנה", 20, { fill: C.n600, o });
+          const draw = ease((t - sc[0] - 2) / 4);
+          const last = ROWS[ROWS.length - 1];
+          // Unlinked: flat.
+          el("line", { x1: xOf(0), x2: lerp(xOf(0), xOf(last.inflation), draw), y1: yOf(last.plain), y2: yOf(last.plain), stroke: C.teal, "stroke-width": 5, opacity: o });
+          // Linked: a straight line through the table's points.
+          el("line", { x1: xOf(0), y1: yOf(ROWS[0].indexed), x2: lerp(xOf(0), xOf(last.inflation), draw), y2: lerp(yOf(ROWS[0].indexed), yOf(last.indexed), draw), stroke: C.tq2, "stroke-width": 5, opacity: o });
+          const oP = after(t, sc, 6, o);
+          ROWS.forEach((r) => el("circle", { cx: xOf(r.inflation), cy: yOf(r.indexed), r: 7, fill: C.tq2, stroke: C.navy, "stroke-width": 1.5, opacity: oP }));
+          txt(X1 + 20, yOf(last.plain) + 8, `לא צמוד, ${V.plain}%`, 22, { anchor: "end", w: 600, o: oP });
+          txt(X1 + 20, yOf(last.indexed) + 8, `צמוד, ${V.real}%`, 22, { anchor: "end", w: 600, o: oP });
+          txt(xOf(ROWS[0].inflation) - 14, yOf(ROWS[0].indexed) + 8, shek(ROWS[0].indexed), 20, { anchor: "end", ltr: true, fill: C.n700, o: oP });
+          txt(xOf(last.inflation) - 50, yOf(last.indexed) - 22, shek(last.indexed), 20, { ltr: true, fill: C.n700, o: oP });
+          txt(xOf(0) - 14, yOf(last.plain) - 10, shek(last.plain), 20, { anchor: "end", ltr: true, fill: C.n700, o: oP });
+          const oB = after(t, sc, 17, o);
+          const xb = xOf(V.be);
+          el("line", { x1: xb, x2: xb, y1: Y1 - 10, y2: Y0 + 10, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: oB });
+          el("rect", { x: xb - 90, y: Y1 - 50, width: 180, height: 40, rx: 20, fill: C.mint, opacity: oB * 0.8 });
+          txt(xb, Y1 - 22, `נקודת האיזון: ${V.be}%`, 20, { w: 700, o: oB });
+          const oC = after(t, sc, 9, o);
+          txt(xOf(0.7), yOf(last.plain) - 22, "כאן הצמוד זול יותר", 20, { fill: C.n600, o: oC });
+          txt(xOf(3.3), yOf(last.plain) + 40, "כאן הצמוד יקר יותר", 20, { fill: C.n600, o: oC });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "כל מסלול מוגן מסיכון אחר", 44, { w: 700, o });
+          const cards = [
+            { x: 660, color: C.teal, title: "לא צמוד", lines: ["האחוז: לפני אינפלציה.", "מספר השקלים לא זז עם המדד.", "מוגן מהפתעה בשקלים."], at: 1 },
+            { x: 80, color: C.tq2, title: "צמוד", lines: ["האחוז: מעל ההצמדה.", "החוב בשקלים זז עם המדד.", "מוגן מריבית על אינפלציה", "שלא הגיעה."], at: 10 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o, 0.8);
+            card(c.x, 180, 540, 340, oc);
+            el("rect", { x: c.x + 470, y: 214, width: 40, height: 40, rx: 8, fill: c.color, opacity: oc });
+            txt(c.x + 450, 246, c.title, 36, { anchor: "start", w: 700, o: oc });
+            c.lines.forEach((line, k) => txt(c.x + 500, 320 + k * 48, line, 28, { anchor: "start", fill: C.n700, o: oc }));
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,286 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.6 — "הפריים זזה, המרווח נשאר".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-6.json. The Bank of Israel rate and the
+  1.5-point addition are official data from search summaries and the team's
+  record, so the scene marks them "לא אומת" with their date. The track, the
+  prime's rise to 5.75% and the 25-basis-point step are the lesson's teaching
+  numbers, marked as examples, not forecasts. The payment is taken ready-made
+  (its formula is lesson 3.1); recalculating it over the remaining months with
+  the end date unchanged is the course's assumption, and the scene says the
+  contract decides.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — in a prime track the spread is fixed; the prime moves the rate.
+  2. The layers, as of 9 October 2026 (not verified): 3.25% + 1.5 = prime 4.75%;
+     P−0.5 gives 4.25%. A 0.25-point rise: prime 5%, track 4.5%; the spread stays.
+  3. A 600,000 ₪ track over 20 years at 4.25%: month 1's interest 2,125 ₪, an
+     equal monthly payment of 3,715.41 ₪.
+  4. After 60 payments the balance is 493,887.20 ₪. The prime rises to 5.75%, the
+     track to 5.25%: next month's interest 411.58 ₪ more; the payment, recalculated
+     over the 180 months left, 3,970.25 ₪ — 254.84 ₪ more.
+  5. The balance falls more slowly (end of year 10: higher than without the rise),
+     and still reaches zero on the last payment.
+  6. Takeaway — fixed: the spread. Moves: the prime and the rate, at each Bank of
+     Israel decision. Not linked to the index (not verified).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.6 · מסלול הפריים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-6.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const minus = (s) => String(s).replace("-", "−");
+      const day = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+      const asOf = day(fact("boi.as_of"));
+      const V = {
+        boi: fact("boi.rate"), add: fact("boi.addition"), prime: fact("boi.prime"), rate: fact("explain.rate"),
+        margin: get("explain.rate").inputs.margin,
+        boi2: get("explain.small_prime").inputs.policy_rate, prime2: fact("explain.small_prime"), rate2: fact("explain.small_rate"), step: fact("explain.small_change"),
+        amount: fact("case.amount"), years: get("explain.path_flat").inputs.months / 12, firstInt: fact("explain.first_interest"), pay: fact("explain.payment"),
+        paid: get("explain.left_60").inputs.paid, left: fact("explain.left_60"),
+        primeUp: fact("explain.prime_up"), rateUp: fact("explain.rate_up"),
+        intB: fact("explain.interest_before"), intA: fact("explain.interest_after"), intRise: fact("explain.interest_rise"),
+        monthsLeft: get("explain.new_payment").inputs.months, newPay: fact("explain.new_payment"), payRise: fact("explain.payment_rise"),
+      };
+      const UP = fact("explain.path_up"), FLAT = fact("explain.path_flat");
+      const below = minus(V.margin).replace("−", "");
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], layers: [12, 46], pay: [46, 74], jump: [74, 116], path: [116, 150], end: [150, 172] };
+      window.duration = 172;
+      window.cues = [
+        [1, 6, "במסלול פריים, מה קבוע ומה זז?"],
+        [6, 11.5, "המרווח קבוע. הפריים זזה, ואיתה אחוז הריבית."],
+        [13, 21, `נכון ל־${asOf}: ריבית בנק ישראל ${V.boi}%.`],
+        [21, 29, `הפריים: ועוד ${V.add} נקודות אחוז, ${V.prime}%. לא אומת.`],
+        [29, 37, `במסלול P${minus(V.margin)}: ${below} נקודת אחוז מתחת לפריים, ${V.rate}%.`],
+        [37, 45, `בנק ישראל מעלה ב־${V.step}: המסלול ${V.rate2}%. המרווח נשאר.`],
+        [47, 55, `מסלול של ${shek(V.amount)} ל־${V.years} שנה, ב־${V.rate}%.`],
+        [55, 63, `הריבית של החודש הראשון: ${shek(V.firstInt)}.`],
+        [63, 73, `בתשלומים חודשיים שווים: ${shek(V.pay)} בחודש.`],
+        [75, 83, `אחרי ${V.paid} תשלומים נשארו ${shek(V.left)}.`],
+        [83, 91, `נניח שהפריים עולה ל־${V.primeUp}%. המסלול: ${V.rateUp}%.`],
+        [91, 99, `הריבית של החודש הבא, על אותה יתרה: עוד ${shek(V.intRise)}.`],
+        [99, 107, `התשלום מחושב מחדש, ל־${V.monthsLeft} החודשים שנשארו.`],
+        [107, 115, `${shek(V.newPay)} בחודש: עוד ${shek(V.payRise)}.`],
+        [117, 125, "החוב יורד לאט יותר: יותר מכל תשלום הולך לריבית."],
+        [125, 134, `בסוף שנה 10: ${shek(UP[9].balance)}, ולא ${shek(FLAT[9].balance)}.`],
+        [134, 142, "סוף ההלוואה לא זז: בתשלום האחרון, אפס."],
+        [142, 149, "כך מחשבים בקורס. איך בדיוק אצלכם — כתוב בחוזה."],
+        [151, 160, "קבוע: המרווח. זז: הפריים, ואיתה אחוז הריבית."],
+        [160, 171, "מתי? בכל החלטה של בנק ישראל. והחוב לא צמוד."],
+      ];
+
+      function box(cx, y, label, value, o, hot = false, w = 260) {
+        el("rect", { x: cx - w / 2, y, width: w, height: 120, rx: 14, fill: hot ? C.mint : C.n0, stroke: hot ? C.teal : C.n200, "stroke-width": hot ? 2 : 1, opacity: o });
+        txt(cx, y + 42, label, 22, { fill: C.n600, o });
+        txt(cx, y + 92, value, 36, { w: 700, ltr: true, o });
+      }
+      function arrowL(x1, x2, y, label, o) {
+        el("line", { x1, x2: x2 + 10, y1: y, y2: y, stroke: C.navy, "stroke-width": 2, opacity: o });
+        el("path", { d: `M ${x2} ${y} l 12 -7 l 0 14 z`, fill: C.navy, opacity: o });
+        if (label) txt((x1 + x2) / 2, y - 14, label, 24, { ltr: true, w: 700, o });
+      }
+
+      // The 20-year chart: year 1 at the right, time runs leftward.
+      const RX = 1180, LX = 560, BASE = 480;
+      const xOf = (y) => RX - (y / V.years) * (RX - LX);
+      const KP = 200 / 4000, BW = 22;
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "הפריים זזה, המרווח נשאר", 72, { w: 700, o });
+          txt(640, 350, "מסלול הפריים: מה קבוע, מה זז, ומתי", 32, { fill: C.n600, o });
+        }
+        // Scene 2 — the layers, then a small rise
+        if (inScene(t, S.layers)) {
+          const sc = S.layers, o = vis(t, sc);
+          const moved = t - sc[0] >= 25;
+          heading(moved ? `אם בנק ישראל מעלה ב־${V.step} נקודת אחוז` : "פריים ועוד מרווח", moved ? "דוגמה לחשבון, לא תחזית" : `נכון ל־${asOf} · לא אומת`, o);
+          const k = after(t, sc, 25, o);
+          box(1040, 230, "ריבית בנק ישראל", `${moved ? V.boi2 : V.boi}%`, after(t, sc, 1, o), moved);
+          arrowL(900, 780, 290, `+${V.add}`, after(t, sc, 9, o));
+          box(640, 230, "הפריים", `${moved ? V.prime2 : V.prime}%`, after(t, sc, 9, o), moved);
+          arrowL(500, 380, 290, minus(V.margin), after(t, sc, 17, o));
+          box(240, 230, `המסלול: P${minus(V.margin)}`, `${moved ? V.rate2 : V.rate}%`, after(t, sc, 17, o), moved);
+          const oK = after(t, sc, 27, o);
+          if (oK > 0) {
+            pill(840, 430, 320, `התוספת ${iso("+" + V.add)}: לא זזה`, oK, 22);
+            pill(440, 430, 320, `המרווח ${iso(minus(V.margin))}: לא זז`, oK, 22);
+          }
+          txt(840, 322, "התוספת", 18, { fill: C.n600, o: after(t, sc, 9, o) });
+          txt(440, 322, "המרווח, מהחוזה", 18, { fill: C.n600, o: after(t, sc, 17, o) });
+          void k;
+        }
+        // Scene 3 — the payment
+        if (inScene(t, S.pay)) {
+          const sc = S.pay, o = vis(t, sc);
+          heading(`מסלול פריים, P${minus(V.margin)}`, `${shek(V.amount)} · ${V.years} שנה · ${V.rate}% · מספרים להמחשה`, o);
+          box(1000, 230, "הסכום", shek(V.amount), after(t, sc, 1, o), false, 300);
+          box(640, 230, "ריבית בחודש הראשון", shek(V.firstInt), after(t, sc, 9, o), false, 300);
+          box(280, 230, "התשלום, בכל חודש", shek(V.pay), after(t, sc, 17, o), true, 300);
+          txt(640, 430, "תשלומים חודשיים שווים; את הנוסחה נבנה בשלב 3", 20, { fill: C.n600, o: after(t, sc, 17, o) });
+        }
+        // Scene 4 — the prime rises after five years
+        if (inScene(t, S.jump)) {
+          const sc = S.jump, o = vis(t, sc);
+          heading(`אחרי ${V.paid} תשלומים, הפריים עולה`, `ל־${V.primeUp}% · דוגמה, לא תחזית`, o);
+          const oB = after(t, sc, 1, o);
+          card(470, 175, 340, 80, oB);
+          txt(780, 223, "היתרה:", 24, { anchor: "start", fill: C.n600, o: oB });
+          txt(500, 225, shek(V.left), 30, { anchor: "start", ltr: true, w: 700, o: oB });
+          const oh = after(t, sc, 9, o);
+          txt(770, 300, "לפני", 24, { w: 700, fill: C.n600, o: oh });
+          txt(420, 300, "אחרי", 24, { w: 700, fill: C.n600, o: oh });
+          const rows = [
+            { k: "אחוז הריבית", a: `${V.rate}%`, b: `${V.rateUp}%`, at: 9 },
+            { k: "ריבית בחודש הבא", a: shek(V.intB), b: shek(V.intA), at: 17 },
+            { k: "התשלום", a: shek(V.pay), b: shek(V.newPay), at: 33 },
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, r.at, o);
+            const y = 320 + i * 72;
+            el("rect", { x: 160, y, width: 1000, height: 60, rx: 10, fill: i === 2 ? C.mint : C.n0, stroke: C.n200, opacity: oi * (i === 2 ? 0.9 : 1) });
+            txt(1140, y + 39, r.k, 24, { anchor: "start", w: 600, o: oi });
+            txt(770, y + 40, r.a, 26, { ltr: true, fill: C.n700, o: oi });
+            txt(600, y + 40, "←", 26, { fill: C.n600, o: oi });
+            txt(420, y + 40, r.b, 28, { ltr: true, w: 700, o: oi });
+          });
+          const oR = after(t, sc, 25, o);
+          txt(260, 320 + 72 + 40, iso(`+${money(V.intRise)} ₪`), 22, { ltr: true, w: 700, fill: C.teal, o: oR });
+          txt(260, 320 + 144 + 40, iso(`+${money(V.payRise)} ₪`), 22, { ltr: true, w: 700, fill: C.teal, o: after(t, sc, 34, o) });
+        }
+        // Scene 5 — twenty years: the payment steps up after year 5; the balance falls more slowly, and still ends at zero
+        if (inScene(t, S.path)) {
+          const sc = S.path, o = vis(t, sc);
+          heading("20 שנה: התשלום והיתרה", `הפריים עולה ל־${V.primeUp}% אחרי ${V.paid} תשלומים · דוגמה`, o);
+          el("line", { x1: LX - 10, x2: RX + 10, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+          UP.forEach((r, i) => {
+            const oi = after(t, sc, 1 + i * 0.15, o);
+            const h = Number(r.payment) * KP, x = xOf(i + 0.5);
+            el("rect", { x: x - BW / 2, y: BASE - h, width: BW, height: h, rx: 3, fill: i >= 5 ? C.teal : C.tq2, opacity: oi });
+            if (i % 5 === 4 || i === 0) txt(x, BASE + 26, String(r.year), 18, { fill: C.n600, o });
+          });
+          txt(RX + 30, BASE + 26, "שנה", 18, { fill: C.n600, o });
+          const yF = BASE - Number(FLAT[0].payment) * KP;
+          el("line", { x1: LX, x2: RX, y1: yF, y2: yF, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "9 7", opacity: o * 0.8 });
+          txt(xOf(2.5), BASE - Number(UP[0].payment) * KP - 14, shek(UP[0].payment), 20, { ltr: true, w: 700, o });
+          txt(xOf(12.5), BASE - Number(UP[5].payment) * KP - 14, shek(UP[5].payment), 20, { ltr: true, w: 700, o });
+          // Legend.
+          el("rect", { x: 1150, y: 528, width: 20, height: 20, rx: 3, fill: C.teal, opacity: o });
+          txt(1140, 545, "התשלום בכל שנה", 20, { anchor: "start", fill: C.n700, o });
+          el("line", { x1: 900, x2: 930, y1: 538, y2: 538, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "9 7", opacity: o });
+          txt(890, 545, "אילו הפריים לא הייתה זזה", 20, { anchor: "start", fill: C.n700, o });
+          // The balance at the end of year 10, both ways.
+          const oB = after(t, sc, 9, o);
+          card(60, 200, 420, 170, oB);
+          txt(450, 245, "היתרה בסוף שנה 10", 24, { anchor: "start", w: 700, o: oB });
+          txt(450, 295, "הפריים עלתה:", 22, { anchor: "start", fill: C.n700, o: oB });
+          txt(90, 295, shek(UP[9].balance), 26, { anchor: "start", ltr: true, w: 700, o: oB });
+          txt(450, 340, "בלי שינוי:", 22, { anchor: "start", fill: C.n700, o: oB });
+          txt(90, 340, shek(FLAT[9].balance), 26, { anchor: "start", ltr: true, fill: C.n700, o: oB });
+          const oE = after(t, sc, 18, o);
+          if (oE > 0) pill(270, 425, 400, `בשנה ${V.years}: היתרה אפס, בשתיהן`, oE, 22);
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "מסלול פריים", 44, { w: 700, o });
+          const rows = [
+            ["קבוע", "המרווח מהפריים, שכתוב בחוזה"],
+            ["זז", "הפריים, ואיתה אחוז הריבית והתשלום"],
+            ["מתי", "בכל החלטה של בנק ישראל; מאיזה תשלום — בחוזה"],
+            ["הצמדה", "אין: המסלול לא צמוד (לא אומת)"],
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, 1 + i * (i < 2 ? 1.5 : 4), o);
+            const y = 180 + i * 80;
+            el("rect", { x: 110, y, width: 1060, height: 64, rx: 10, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(1140, y + 42, r[0], 28, { anchor: "start", w: 700, fill: C.teal, o: oi });
+            txt(960, y + 42, r[1], 26, { anchor: "start", fill: C.n700, o: oi });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

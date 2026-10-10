@@ -1,0 +1,252 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.4 — "באיזה מובן?".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-4.json: the lesson's examples for each
+  sense (6% → 0.5% a month → 6.17% effective; 6% nominal with 2% inflation →
+  3.92% real) and the offer's 3% on a linked track. The rates are the facts' own
+  inputs. The bottom row of the four corners (the Bank of Israel's averages are
+  effective rates) is the team's research page, not verified, and says so.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — one word, two meanings; the opposite gives the meaning away.
+  2. Sense 1, a way of computing: the yearly rate written in the contract, divided
+     by 12; its opposite is the effective rate. No inflation anywhere.
+  3. Sense 2, before inflation: its opposite is the real rate. No division by 12.
+  4. Two axes, so four corners: the unlinked track's rate and the linked track's
+     rate are both "written, divided by 12", on either side of inflation.
+  5. The offer's "nominal 3%" on a linked track: nominal in sense 1, real in
+     sense 2 — no contradiction.
+  6. Takeaway — look for the opposite; with no clue, ask whoever wrote it.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.4 · ״נומינלית״ — שתי משמעויות</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-4.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const V = {
+        a: fact("a.annual"), aM: fact("a.monthly"), aE: fact("a.effective"),
+        bN: fact("b.nominal"), bI: fact("b.inflation"), bR: fact("b.real"),
+        w: fact("w.indexed"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], s1: [12, 48], s2: [48, 80], grid: [80, 156], end: [156, 176] };
+      window.duration = 176;
+      window.cues = [
+        [1, 6, "״נומינלית״: מילה אחת, שתי משמעויות."],
+        [6, 11.5, "כדי לדעת באיזו מדובר, מחפשים את ההפך שלה."],
+        [13, 21, "מובן 1: ריבית שנתית שכתובה, ומחלקים אותה ב־12."],
+        [21, 29, `למשל ${V.a}% לשנה: ${V.aM}% לחודש.`],
+        [29, 38, `אחרי 12 חודשים הסכום גדל ב־${V.aE}%.`],
+        [38, 47, "ההפך כאן: אפקטיבית. ואין כאן שום אינפלציה."],
+        [49, 57, "מובן 2: ריבית לפני אינפלציה. ההפך: ריאלית."],
+        [57, 66, `${V.bN}% נומינלית, באינפלציה של ${V.bI}%: ${V.bR}% ריאלית.`],
+        [66, 79, "כאן אין שום חלוקה ב־12. רק שקלים מול כוח קנייה."],
+        [81, 89, "אלה שני צירים נפרדים, ולכן יש ארבע פינות."],
+        [89, 98, "ציר 1: האחוז שכתוב בחוזה, או האפקטיבי?"],
+        [98, 107, "ציר 2: לפני אינפלציה, או מעליה?"],
+        [107, 117, "האחוז במסלול לא צמוד: כתוב בחוזה, לפני אינפלציה."],
+        [117, 127, "האחוז במסלול צמוד: כתוב בחוזה, ומעל האינפלציה."],
+        [129, 137, `הצעה למסלול צמוד: ״ריבית נומינלית ${V.w}%״.`],
+        [137, 146, "במובן 1 היא נומינלית: כתובה, ומחלקים אותה ב־12."],
+        [146, 155, "במובן 2 היא ריאלית. אין סתירה: אלה שני צירים."],
+        [157, 166, "ההפך מסגיר: אפקטיבית, או ריאלית ואינפלציה."],
+        [166, 175, "ואם אין שום רמז, שאלו את מי שכתב."],
+      ];
+
+      // A row of boxes joined by arrows, laid out right to left.
+      function chain(items, y, t, sc, o) {
+        items.forEach((it, i) => {
+          const oi = after(t, sc, it.at, o);
+          const x = it.x;
+          if (it.arrow) {
+            txt(x, y + 10, it.label, 26, { fill: C.n600, w: 600, o: oi, ltr: it.ltr });
+            el("line", { x1: x + 60, x2: x - 60, y1: y + 30, y2: y + 30, stroke: C.navy, "stroke-width": 2, opacity: oi });
+            el("path", { d: `M ${x - 60} ${y + 30} l 12 -7 l 0 14 z`, fill: C.navy, opacity: oi });
+            return;
+          }
+          el("rect", { x: x - 120, y: y - 50, width: 240, height: 130, rx: 14, fill: it.hot ? C.mint : C.n0, stroke: it.hot ? C.teal : C.n200, "stroke-width": it.hot ? 2 : 1, opacity: oi });
+          txt(x, y + 6, it.value, 40, { w: 700, ltr: true, o: oi });
+          txt(x, y + 50, it.label, 22, { fill: C.n700, o: oi });
+        });
+      }
+
+      // The four corners. Row headers at the right; two columns of cells.
+      const RH = 1220, COLX = [740, 320], CW = 400;
+      function grid(t, sc, o, highlight) {
+        const oH = after(t, sc, 2, o);
+        txt(COLX[0], 215, "לפני אינפלציה", 24, { w: 700, o: after(t, sc, 18, o) });
+        txt(COLX[1], 215, "מעל האינפלציה (ריאלית)", 24, { w: 700, o: after(t, sc, 18, o) });
+        txt(COLX[0], 185, "ציר 2", 18, { fill: C.n600, o: after(t, sc, 18, o) });
+        txt(COLX[1], 185, "ציר 2", 18, { fill: C.n600, o: after(t, sc, 18, o) });
+        const rows = [
+          { y: 240, head: ["כתובה בחוזה,", "מחלקים ב־12"], cells: [["האחוז במסלול", "לא צמוד"], ["האחוז במסלול", "צמוד"]], at: [27, 37] },
+          { y: 370, head: ["אפקטיבית"], cells: [["הממוצע שבנק ישראל מפרסם,", "למשכנתאות לא צמודות"], ["אותו ממוצע,", "למשכנתאות צמודות"]], at: [45, 45], note: true },
+        ];
+        rows.forEach((r, ri) => {
+          // In the answer, only the top row matters: the bottom row (and its note) steps aside.
+          if (highlight && ri === 1) return;
+          const oh = after(t, sc, 10, o);
+          txt(RH, r.y - 14, "ציר 1", 18, { anchor: "start", fill: C.n600, o: oh });
+          r.head.forEach((h, k) => txt(RH, r.y + 30 + k * 32, h, 24, { anchor: "start", w: 700, o: oh }));
+          r.cells.forEach((cell, ci) => {
+            const oc = after(t, sc, r.at[ci], o);
+            const hot = highlight && ri === 0 && ci === 1;
+            el("rect", { x: COLX[ci] - CW / 2, y: r.y, width: CW, height: 110, rx: 12, fill: hot ? C.mint : C.n0, stroke: hot ? C.teal : C.n200, "stroke-width": hot ? 3 : 1, opacity: oc });
+            cell.forEach((line, k) => txt(COLX[ci], r.y + 46 + k * 34, line, ri === 1 ? 21 : 26, { w: ri === 0 ? 700 : 400, fill: ri === 0 ? C.navy : C.n700, o: oc }));
+          });
+          if (r.note) txt(640, r.y + 140, "השורה התחתונה: לפי דף מחקר של הצוות, לא אומת", 18, { fill: C.n600, o: after(t, sc, 45, o) });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "באיזה מובן?", 84, { w: 700, o });
+          txt(640, 350, "״נומינלית״: מילה אחת, שתי משמעויות", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 6, o, 0.8);
+          card(660, 410, 260, 70, o2);
+          txt(790, 455, "מובן 1: איך מחשבים", 24, { w: 700, o: o2 });
+          card(360, 410, 260, 70, o2);
+          txt(490, 455, "מובן 2: מה מודדים", 24, { w: 700, o: o2 });
+        }
+        // Scene 2 — sense 1: a way of computing
+        if (inScene(t, S.s1)) {
+          const sc = S.s1, o = vis(t, sc);
+          heading("מובן 1: שיטת חישוב", "ההפך: ריבית אפקטיבית", o);
+          chain([
+            { x: 1060, value: `${V.a}%`, label: "לשנה, כתובה בחוזה", at: 2 },
+            { x: 850, arrow: true, label: "÷ 12", ltr: true, at: 9 },
+            { x: 640, value: `${V.aM}%`, label: "לחודש", at: 10 },
+            { x: 430, arrow: true, label: "12 חודשים", at: 17 },
+            { x: 220, value: `${V.aE}%`, label: "גדל הסכום בשנה", at: 18, hot: true },
+          ], 300, t, sc, o);
+          const o2 = after(t, sc, 24, o);
+          txt(1060, 440, "נומינלית (מובן 1)", 24, { w: 700, fill: C.teal, o: o2 });
+          txt(220, 440, "אפקטיבית", 24, { w: 700, fill: C.teal, o: o2 });
+          if (after(t, sc, 27, o) > 0) pill(640, 515, 360, "אין כאן שום אינפלציה", after(t, sc, 27, o), 24);
+        }
+        // Scene 3 — sense 2: before inflation
+        if (inScene(t, S.s2)) {
+          const sc = S.s2, o = vis(t, sc);
+          heading("מובן 2: לפני אינפלציה", "ההפך: ריבית ריאלית", o);
+          chain([
+            { x: 1060, value: `${V.bN}%`, label: "גידול במספר השקלים", at: 2 },
+            { x: 850, arrow: true, label: `אינפלציה ${V.bI}%`, at: 9 },
+            { x: 640, value: `${V.bR}%`, label: "גידול בכוח הקנייה", at: 10, hot: true },
+          ], 300, t, sc, o);
+          const o2 = after(t, sc, 12, o);
+          txt(1060, 440, "נומינלית (מובן 2)", 24, { w: 700, fill: C.teal, o: o2 });
+          txt(640, 440, "ריאלית", 24, { w: 700, fill: C.teal, o: o2 });
+          if (after(t, sc, 19, o) > 0) pill(640, 515, 380, "אין כאן שום חלוקה ב־12", after(t, sc, 19, o), 24);
+        }
+        // Scenes 4–5 — two axes, four corners; the offer's rate in its corner
+        if (inScene(t, S.grid)) {
+          const sc = S.grid, o = vis(t, sc);
+          const answer = t - sc[0] >= 48;
+          heading(answer ? `״ריבית נומינלית ${V.w}%״ במסלול צמוד` : "שני צירים, ארבע פינות", null, o);
+          grid(t, sc, o, answer);
+          if (answer) {
+            if (after(t, sc, 56, o) > 0) pill(COLX[1], 410, 370, "נומינלית במובן 1: מחלקים ב־12", after(t, sc, 56, o), 22);
+            if (after(t, sc, 66, o) > 0) pill(COLX[1], 485, 370, "ריאלית במובן 2: מעל ההצמדה", after(t, sc, 66, o), 22);
+          }
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "איך שואלים ״באיזה מובן?״", 44, { w: 700, o });
+          const cards = [
+            { x: 660, title: "מובן 1", lines: ["ההפך: אפקטיבית.", "רמזים: מצטרפת,", "חלוקה ב־12."], at: 1 },
+            { x: 80, title: "מובן 2", lines: ["ההפך: ריאלית.", "רמזים: אינפלציה, כוח קנייה,", "הצמדה."], at: 1.8 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o, 0.8);
+            card(c.x, 180, 540, 280, oc);
+            txt(c.x + 500, 240, c.title, 36, { anchor: "start", w: 700, o: oc });
+            c.lines.forEach((line, k) => txt(c.x + 500, 310 + k * 48, line, 28, { anchor: "start", fill: C.n700, o: oc }));
+          }
+          if (after(t, sc, 10, o) > 0) pill(640, 515, 420, "אין רמז? שאלו את מי שכתב", after(t, sc, 10, o), 24);
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

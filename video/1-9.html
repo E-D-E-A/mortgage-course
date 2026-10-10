@@ -1,0 +1,238 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.9 — "קודם המשפחה, אחר כך הריבית".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/1-9.json: Case A's incomes, car payment and
+  its months, the total and the disposable income, the equity, the gift and what
+  is available today (the numbers stage 1 already gives). The scene does no
+  arithmetic; bar lengths are geometry from the data's own amounts. The subtitle
+  cues (window.cues) carry the explanatory sentences — the script for narration, if
+  it is ever added.
+
+  Script (one idea: before talking about interest, the adviser finds out what the
+  family can pay and what money is available, and when):
+  1. Title. "Which rate will we get?" is not the first question: a rate is a price,
+     and it is not yet known a price of what.
+  2. The adviser's questions: ability to repay; income and obligations; liquidity;
+     timelines and plans.
+  3. Noam and Shira: 12,400 + 9,300 = 21,700 a month; the car loan, 1,450 a month
+     for 26 more months; 20,250 left — the disposable income. It is not what is
+     left to spend: they live on it and pay the new mortgage from it (Eylon:
+     "the mortgage should replace the rent — not life", awaiting his approval).
+  4. Liquidity: equity of 560,000, but if the parents' gift of 200,000 arrives only
+     in a few months, 360,000 is available today. So: when must the seller be paid?
+  5. Only then is there something to ask a price for; tracks and mix come after
+     the banks answer.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.9 · מה היועץ מברר לפני שמדברים על ריבית</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-9.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+      const num = (v) => nf.format(Number(v));
+
+      const V = {
+        noam: fact("case.noam_income"), shira: fact("case.shira_income"), total: fact("case.total_income"),
+        car: fact("case.car_payment"), carMonths: fact("case.car_months"), free: fact("case.disposable"),
+        equity: fact("case.equity"), gift: fact("case.gift"), now: fact("case.cash_now"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], questions: [12, 52], income: [52, 106], cash: [106, 138], end: [138, 155] };
+      window.duration = 155;
+      window.cues = [
+        [1, 6, "״איזו ריבית נקבל?״ — זו לא השאלה הראשונה."],
+        [6, 11.5, "ריבית היא מחיר. קודם צריך לדעת: מחיר של מה?"],
+        [13, 20, "יועץ מתחיל בשאלות על המשפחה, לא על הבנק."],
+        [20, 28, "יכולת החזר: כמה אפשר לשלם בכל חודש, ועדיין לחיות."],
+        [28, 35, "ההכנסה וההתחייבויות: ממה היא בנויה, ומה כבר יוצא."],
+        [35, 43, "נזילות: איזה כסף זמין, ומתי."],
+        [43, 51, "לוחות זמנים ותוכניות: מתי צריך את הכסף, ומה ישתנה."],
+        [53, 61, `נועם מרוויח ${shek(V.noam)} בחודש, ושירה ‏${shek(V.shira)}.`],
+        [61, 68, `יחד: ${shek(V.total)} בחודש, אחרי מס ותשלומי חובה.`],
+        [68, 76, `על הרכב הם משלמים ${shek(V.car)} בחודש, עוד ${V.carMonths} חודשים.`],
+        [76, 84, `נשארים ${shek(V.free)}: זו ההכנסה הפנויה.`],
+        [84, 92, "הכנסה פנויה היא לא מה שנשאר לבזבז."],
+        [92, 99, "ממנה הם יחיו, וממנה ישלמו גם את המשכנתא החדשה."],
+        [99, 105, "אילון: ״המשכנתא אמורה להחליף את השכירות — לא את החיים״"],
+        [107, 115, `ההון העצמי שלהם: ${shek(V.equity)}. כולו זמין היום?`],
+        [115, 123, `נניח שהמתנה מההורים, ${shek(V.gift)}, תגיע בעוד כמה חודשים.`],
+        [123, 130, `אז היום זמינים להם ${shek(V.now)}.`],
+        [130, 137, "לכן היועץ שואל: מתי צריך לשלם למוכר, וכמה?"],
+        [139, 146, "רק כשכל אלה ידועים, יש על מה לבקש מחיר."],
+        [146, 154, "ומסלולים ותמהיל? אחרי שהבנקים עונים."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      const QS = [
+        ["יכולת החזר", "כמה אפשר לשלם בכל חודש", 20],
+        ["ההכנסה", "ממה היא בנויה, וכמה בטוח שתמשיך", 28],
+        ["התחייבויות", "מה כבר משלמים, ועד מתי", 28],
+        ["נזילות", "איזה כסף זמין, ומתי", 35],
+        ["לוחות זמנים", "מתי צריך את הכסף", 43],
+        ["תוכניות", "מה צפוי להשתנות", 43],
+      ];
+      // Income bars, right to left; the whole width is the total income.
+      const BAR = { right: 1000, full: 700 };
+      const px = (v) => (Number(v) / Number(V.total)) * BAR.full;
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 270, "קודם המשפחה,", 76, { w: 700, o });
+          txt(640, 350, "אחר כך הריבית", 76, { w: 700, o });
+          txt(640, 420, "מה היועץ מברר בפגישה הראשונה", 32, { fill: C.n600, o });
+        }
+
+        // Scene 2 — the adviser's questions
+        if (inScene(t, S.questions)) {
+          const o = vis(t, S.questions);
+          txt(640, 112, "מה היועץ מברר", 40, { w: 700, o });
+          QS.forEach(([name, q, start], i) => {
+            const oi = at(t, start, o);
+            const col = i % 2, row = Math.floor(i / 2);
+            const x = col === 0 ? 660 : 140, y = 150 + row * 128;
+            box(x, y, 480, 108, oi, { stroke: C.teal, sw: 2 });
+            txt(x + 450, y + 46, name, 28, { anchor: "start", w: 700, o: oi });
+            txt(x + 450, y + 84, q, 22, { anchor: "start", fill: C.n700, o: oi });
+          });
+          txt(640, 556, "את רוב השאלות האלה גם הבנק ישאל. היועץ שואל גם בשביל המשפחה.", 20, { fill: C.n600, o: at(t, 43, o) });
+        }
+
+        // Scene 3 — Noam and Shira's disposable income
+        if (inScene(t, S.income)) {
+          const o = vis(t, S.income);
+          txt(640, 112, "נועם ושירה: כמה נשאר בכל חודש", 38, { w: 700, o });
+          // Row 1: the two incomes.
+          const o1 = at(t, 53, o);
+          txt(1180, 196, "ההכנסות", 26, { anchor: "start", w: 600, o: o1 });
+          el("rect", { x: BAR.right - px(V.noam), y: 160, width: px(V.noam) - 3, height: 56, rx: 6, fill: C.teal, opacity: o1 });
+          txt(BAR.right - px(V.noam) / 2, 197, `נועם ${num(V.noam)}`, 22, { w: 700, fill: C.n0, o: o1 });
+          el("rect", { x: BAR.right - BAR.full, y: 160, width: px(V.shira), height: 56, rx: 6, fill: C.tq2, opacity: o1 });
+          txt(BAR.right - BAR.full + px(V.shira) / 2, 197, `שירה ${num(V.shira)}`, 22, { w: 700, o: o1 });
+          const o2 = at(t, 61, o);
+          txt(BAR.right - BAR.full / 2, 252, `${num(V.noam)} + ${num(V.shira)} = ${shek(V.total)}`, 26, { w: 700, o: o2, ltr: true });
+          // Row 2: the car payment comes out first; what is left is the disposable income.
+          const o3 = at(t, 68, o);
+          txt(1180, 326, "התשלום על הרכב", 24, { anchor: "start", w: 600, o: o3 });
+          el("rect", { x: BAR.right - BAR.full, y: 290, width: px(V.car), height: 56, rx: 6, fill: C.n0, stroke: C.navy, "stroke-width": 2.5, "stroke-dasharray": "6 4", opacity: o3 });
+          txt(BAR.right - BAR.full + px(V.car) + 16, 327, `${num(V.car)} בחודש · עוד ${V.carMonths} חודשים`, 22, { anchor: "end", fill: C.n700, o: o3 });
+          const o4 = at(t, 76, o);
+          txt(1180, 416, "ההכנסה הפנויה", 26, { anchor: "start", w: 700, o: o4 });
+          el("rect", { x: BAR.right - px(V.free), y: 380, width: px(V.free), height: 56, rx: 6, fill: C.mint, opacity: o4 });
+          txt(BAR.right - px(V.free) / 2, 417, shek(V.free), 26, { w: 700, o: o4, ltr: true });
+          txt(BAR.right - BAR.full / 2, 470, `${num(V.total)} − ${num(V.car)} = ${shek(V.free)}`, 26, { w: 700, o: o4, ltr: true });
+          if (t >= 84 && t < 98.6) {
+            const o5 = Math.min(at(t, 84, o), clamp((98.6 - t) / 0.6));
+            box(240, 498, 800, 56, o5, { fill: C.navy, stroke: C.navy });
+            txt(640, 535, "לא מה שנשאר לבזבז: ממנה המחיה, וממנה המשכנתא", 24, { w: 700, fill: C.n0, o: o5 });
+          }
+          if (t >= 99) {
+            const o6 = at(t, 99, o);
+            txt(640, 524, "״המשכנתא אמורה להחליף את השכירות — לא את החיים״", 24, { w: 700, o: o6 });
+            txt(640, 554, "אילון, 2026-07-27 · ידע מהשטח, ממתין לאישור אילון", 18, { fill: C.n600, o: o6 });
+          }
+        }
+
+        // Scene 4 — liquidity: what is available, and when
+        if (inScene(t, S.cash)) {
+          const o = vis(t, S.cash);
+          txt(640, 112, "נזילות: איזה כסף זמין, ומתי", 38, { w: 700, o });
+          const full = 860, right = 1080, pe = (v) => (Number(v) / Number(V.equity)) * full;
+          const o1 = at(t, 107, o);
+          txt(right, 186, `ההון העצמי: ${shek(V.equity)}`, 28, { anchor: "start", w: 700, o: o1 });
+          const o2 = at(t, 115, o);
+          el("rect", { x: right - full, y: 210, width: full, height: 70, rx: 8, fill: C.teal, opacity: o1 });
+          el("rect", { x: right - full, y: 210, width: pe(V.gift), height: 70, rx: 8, fill: C.n0, stroke: C.navy, "stroke-width": 2.5, "stroke-dasharray": "8 6", opacity: o2 });
+          txt(right - full + pe(V.gift) / 2, 252, shek(V.gift), 24, { w: 700, o: o2, ltr: true });
+          txt(right - full + pe(V.gift) / 2, 316, "מתנה מההורים: בעוד כמה חודשים", 20, { w: 600, fill: C.n700, o: o2 });
+          const o3 = at(t, 123, o);
+          txt(right - (full - pe(V.gift)) / 2, 252, shek(V.now), 26, { w: 700, fill: C.n0, o: o3, ltr: true });
+          txt(right - (full - pe(V.gift)) / 2, 316, "זמין היום", 22, { w: 700, fill: C.teal, o: o3 });
+          const o4 = at(t, 130, o);
+          box(240, 380, 800, 64, o4, { fill: C.mint, stroke: C.mint });
+          txt(640, 421, "מתי צריך לשלם למוכר, וכמה בכל פעם?", 28, { w: 700, o: o4 });
+          txt(640, 500, "מתנה שמגיעה רק בעוד כמה חודשים: הנחה לתרגול, כמו בתרגיל בשיעור.", 18, { fill: C.n600, o: o2 });
+        }
+
+        // Scene 5 — then, and only then, a price
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 112, "עכשיו יש על מה לבקש מחיר", 40, { w: 700, o });
+          const items = [["נשאר בכל חודש", shek(V.free)], ["זמין היום", shek(V.now)], ["יגיע בהמשך", shek(V.gift)]];
+          items.forEach(([label, value], i) => {
+            const oi = at(t, 139 + i * 1.2, o);
+            const cx = 1000 - i * 360;
+            box(cx - 160, 170, 320, 150, oi, { stroke: C.teal, sw: 2.5 });
+            txt(cx, 230, label, 24, { fill: C.n700, o: oi });
+            txt(cx, 284, value, 36, { w: 700, o: oi, ltr: true });
+          });
+          const oT = at(t, 146, o);
+          txt(640, 400, "מסלולים ותמהיל — אחרי שהבנקים עונים.", 28, { w: 700, o: oT });
+          txt(640, 556, "תיק א׳ בדוי: דוגמה לימודית, לא נתוני לקוח ולא הצעת בנק.", 18, { fill: C.n600, o });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

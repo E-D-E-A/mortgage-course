@@ -1,0 +1,279 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.5 — "קבוע במה?".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-5.json: the lesson's two fixed tracks on
+  600,000 ₪ for 20 years (fixed unlinked at 5%, fixed linked at 3%), the index
+  rising 2% a year (an assumption for illustration, not a forecast), and the
+  year-by-year series the lesson's illustration draws. The payment itself is
+  taken ready-made, as in the lesson (its formula is lesson 3.1); the method is
+  described ("equal monthly payments"), not named (its name is lesson 2.9).
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — two tracks whose rate is fixed for the whole term; fixed in what?
+  2. Fixed unlinked (קל״צ): month 1's interest 2,500 ₪, the payment 3,959.73 ₪,
+     1,459.73 ₪ off the debt. Neither the rate nor the index moves anything.
+  3. Fixed linked: the original schedule's payment 3,327.59 ₪; the index goes from
+     100 to 102, so the payment is 3,394.14 ₪, and the debt 589,320.19 ₪ instead
+     of 577,764.89 ₪. The rate did not move; the index moved both.
+  4. Twenty years, the index up 2% a year: the unlinked payment is flat, the linked
+     one rises and passes it in year 9; in year 10 it is 4,056.31 ₪.
+  5. In today's purchasing power, year 10: the linked payment is still 3,327.59 ₪,
+     the unlinked one is worth 3,248.36 ₪. In shekels on paper, the other way round.
+  6. Takeaway — קל״צ is fixed in shekels; fixed linked is fixed in purchasing power.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.5 · מסלולים קבועים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-5.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const y1 = get("explain.linked_year1").inputs;
+      const V = {
+        amount: fact("case.amount"), years: fact("case.years"), ru: fact("rate.unlinked"), rl: fact("rate.linked"), pi: fact("infl.base"),
+        uPay: fact("explain.unlinked_payment"), uInt: fact("explain.unlinked_interest"), uDown: fact("explain.unlinked_down"),
+        lPay: fact("explain.linked_payment"), lY1: fact("explain.linked_year1"),
+        lBal: fact("explain.linked_balance_12"), lBalIdx: fact("explain.linked_balance_12_indexed"),
+        lY10: fact("explain.linked_year10"), uReal10: fact("explain.unlinked_real10"),
+        i0: y1.base_index, i1: y1.new_index,
+      };
+      const UN = fact("slider.unlinked"), LI = fact("slider.linked_2");
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], klz: [12, 52], linked: [52, 98], years: [98, 136], real: [136, 160], end: [160, 178] };
+      window.duration = 178;
+      window.cues = [
+        [1, 6, "שני מסלולים שבהם אחוז הריבית קבוע לכל התקופה."],
+        [6, 11.5, "בשניהם התשלום ״קבוע״. אבל קבוע במה?"],
+        [13, 21, `קבועה לא צמודה, קל״צ: ${shek(V.amount)}, ל־${V.years} שנה, ${V.ru}%.`],
+        [21, 29, `הריבית של החודש הראשון: ${shek(V.uInt)}.`],
+        [29, 38, `בתשלומים חודשיים שווים, התשלום: ${shek(V.uPay)}.`],
+        [38, 46, `השאר מוריד את החוב: ${shek(V.uDown)} בחודש הראשון.`],
+        [46, 51, "אחוז הריבית לא זז, והמדד לא נוגע בחוב."],
+        [53, 61, `קבועה צמודה: אותו סכום, אותה תקופה, ב־${V.rl}% לשנה.`],
+        [61, 69, `קודם לוח מקורי, בלי מדד: תשלום של ${shek(V.lPay)}.`],
+        [69, 78, `המדד עלה מ־${V.i0} ל־${V.i1}: משלמים ${shek(V.lY1)}.`],
+        [78, 87, `גם החוב: ${shek(V.lBalIdx)}, ולא ${shek(V.lBal)}.`],
+        [87, 97, "אחוז הריבית לא זז. המדד הזיז את התשלום ואת החוב."],
+        [99, 107, `נניח שהמדד עולה ${V.pi}% בכל שנה. הנחה להמחשה.`],
+        [107, 116, `בקל״צ: ${shek(V.uPay)} בכל חודש, עד הסוף.`],
+        [116, 125, "בצמודה התשלום עולה, ובשנה 9 עובר את הקל״צ."],
+        [125, 135, `בשנה 10 הוא ${shek(V.lY10)}, ובשנה 20 ${shek(LI[19].payment)}.`],
+        [137, 145, "ועכשיו אותה שנה 10, בכוח קנייה של היום."],
+        [145, 153, `הצמודה: ${shek(V.lPay)}, כמו בהתחלה. הקל״צ: ${shek(V.uReal10)}.`],
+        [153, 159, "בשקלים שעל הנייר, זה הפוך."],
+        [161, 169, "קל״צ: קבוע בשקלים. בכוח קנייה הוא יורד."],
+        [169, 177, "קבועה צמודה: קבועה בכוח קנייה. בשקלים היא עולה."],
+      ];
+
+      // A value card: label above, amount below.
+      function stat(cx, y, label, value, o, hot = false, w = 300) {
+        el("rect", { x: cx - w / 2, y, width: w, height: 110, rx: 14, fill: hot ? C.mint : C.n0, stroke: hot ? C.teal : C.n200, "stroke-width": hot ? 2 : 1, opacity: o });
+        txt(cx, y + 40, label, 22, { fill: C.n600, o });
+        txt(cx, y + 85, shek(value), 32, { w: 700, ltr: true, o });
+      }
+      function arrowL(x1, x2, y, label, o) {
+        el("line", { x1, x2: x2 + 10, y1: y, y2: y, stroke: C.navy, "stroke-width": 2, opacity: o });
+        el("path", { d: `M ${x2} ${y} l 12 -7 l 0 14 z`, fill: C.navy, opacity: o });
+        if (label) txt((x1 + x2) / 2, y - 14, label, 20, { ltr: true, fill: C.n700, w: 600, o });
+      }
+
+      // The 20-year chart: linked payments as bars (year 1 at the right), the unlinked payment as a flat line.
+      const RX = 1080, BAND = 44, BASE = 470, K = 220 / 5000;
+      const xOf = (i) => RX - i * BAND - BAND / 2;
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "קבוע במה?", 84, { w: 700, o });
+          txt(640, 350, "שני מסלולים שאחוז הריבית בהם קבוע", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 6, o, 0.8);
+          card(660, 410, 240, 70, o2);
+          txt(780, 455, "קבועה לא צמודה", 24, { w: 700, o: o2 });
+          card(380, 410, 240, 70, o2);
+          txt(500, 455, "קבועה צמודה", 24, { w: 700, o: o2 });
+        }
+        // Scene 2 — fixed unlinked
+        if (inScene(t, S.klz)) {
+          const sc = S.klz, o = vis(t, sc);
+          heading("קבועה לא צמודה (קל״צ)", `${shek(V.amount)} · ${V.years} שנה · ${V.ru}% לשנה · מספרים להמחשה`, o);
+          stat(1000, 200, "ריבית בחודש הראשון", V.uInt, after(t, sc, 9, o));
+          stat(640, 200, "התשלום, בכל חודש", V.uPay, after(t, sc, 17, o), true);
+          stat(280, 200, "מוריד את החוב", V.uDown, after(t, sc, 26, o));
+          // The first payment, split.
+          const oB = after(t, sc, 26, o);
+          const W = 800, x0 = 1040, wi = (Number(V.uInt) / Number(V.uPay)) * W;
+          el("rect", { x: x0 - wi, y: 360, width: wi, height: 40, rx: 4, fill: C.tq2, opacity: oB });
+          el("rect", { x: x0 - W, y: 360, width: W - wi - 3, height: 40, rx: 4, fill: C.n300, opacity: oB });
+          txt(x0 - wi / 2, 387, "ריבית", 20, { w: 600, o: oB });
+          txt(x0 - wi - (W - wi) / 2, 387, "קרן", 20, { w: 600, o: oB });
+          const oC = after(t, sc, 34, o);
+          if (oC > 0) {
+            pill(800, 470, 300, "אחוז הריבית: לא זז", oC, 22);
+            pill(470, 470, 300, "המדד: לא נוגע בחוב", oC, 22);
+          }
+        }
+        // Scene 3 — fixed linked
+        if (inScene(t, S.linked)) {
+          const sc = S.linked, o = vis(t, sc);
+          heading("קבועה צמודה", `${shek(V.amount)} · ${V.years} שנה · ${V.rl}% לשנה · מספרים להמחשה`, o);
+          const oh = after(t, sc, 9, o);
+          txt(950, 195, "בלוח המקורי, בלי מדד", 22, { fill: C.n600, w: 600, o: oh });
+          txt(360, 195, `עם המדד: ${V.i0} ← ${V.i1}`, 22, { fill: C.n600, w: 600, o: after(t, sc, 17, o) });
+          txt(1225, 268, "התשלום", 24, { anchor: "start", w: 700, o: oh });
+          stat(950, 210, "בכל חודש", V.lPay, oh);
+          const o2 = after(t, sc, 17, o);
+          arrowL(790, 530, 265, `× ${V.i1} ÷ ${V.i0}`, o2);
+          stat(360, 210, "אחרי שנה", V.lY1, o2, true);
+          const o3 = after(t, sc, 26, o);
+          txt(1225, 408, "החוב", 24, { anchor: "start", w: 700, o: o3 });
+          stat(950, 350, "אחרי 12 תשלומים", V.lBal, o3);
+          const o4 = after(t, sc, 28, o);
+          arrowL(790, 530, 405, `× ${V.i1} ÷ ${V.i0}`, o4);
+          stat(360, 350, "בשקלים", V.lBalIdx, o4, true);
+          const o5 = after(t, sc, 35, o);
+          if (o5 > 0) pill(640, 515, 560, "אחוז הריבית לא זז; המדד הזיז את השקלים", o5, 22);
+        }
+        // Scene 4 — twenty years
+        if (inScene(t, S.years)) {
+          const sc = S.years, o = vis(t, sc);
+          heading("20 שנה, בשקלים", `המדד עולה ${V.pi}% בכל שנה · הנחה להמחשה, לא תחזית`, o);
+          el("line", { x1: xOf(19) - BAND / 2, x2: RX + 10, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+          LI.forEach((r, i) => {
+            const oi = after(t, sc, 18 + i * 0.25, o);
+            const h = Number(r.payment) * K;
+            const hot = i === 8 || i === 9;
+            el("rect", { x: xOf(i) - BAND / 2 + 5, y: BASE - h, width: BAND - 10, height: h, rx: 3, fill: C.tq2, stroke: hot ? C.navy : "none", "stroke-width": 2, opacity: oi });
+            if (i % 5 === 4 || i === 0) txt(xOf(i), BASE + 28, String(r.year), 18, { fill: C.n600, o });
+          });
+          txt(RX + 30, BASE + 28, "שנה", 18, { anchor: "end", fill: C.n600, o });
+          const oU = after(t, sc, 9, o);
+          const yU = BASE - Number(UN[0].payment) * K;
+          el("line", { x1: RX, x2: lerp(RX, xOf(19) - BAND / 2, ease((t - sc[0] - 9) / 3)), y1: yU, y2: yU, stroke: C.teal, "stroke-width": 5, opacity: oU });
+          txt(RX + 30, yU + 8, `קל״צ`, 22, { anchor: "end", w: 700, fill: C.teal, o: oU });
+          txt(RX + 30, yU + 34, shek(UN[0].payment), 18, { anchor: "start", ltr: true, fill: C.n700, o: oU });
+          // Legend.
+          const oL = after(t, sc, 18, o);
+          el("rect", { x: 1060, y: 516, width: 20, height: 20, rx: 3, fill: C.tq2, opacity: oL });
+          txt(1050, 533, "קבועה צמודה: התשלום בכל שנה", 20, { anchor: "start", fill: C.n700, o: oL });
+          el("line", { x1: 700, x2: 730, y1: 526, y2: 526, stroke: C.teal, "stroke-width": 5, opacity: oL });
+          txt(690, 533, "קל״צ: אותו תשלום כל הזמן", 20, { anchor: "start", fill: C.n700, o: oL });
+          const o9 = after(t, sc, 22, o);
+          txt(xOf(8), BASE - Number(LI[8].payment) * K - 52, shek(LI[8].payment), 18, { ltr: true, w: 700, o: o9 });
+          txt(xOf(8), BASE - Number(LI[8].payment) * K - 30, "שנה 9", 16, { fill: C.n600, o: o9 });
+          const o10 = after(t, sc, 27, o);
+          txt(xOf(19), BASE - Number(LI[19].payment) * K - 14, shek(LI[19].payment), 18, { ltr: true, w: 700, o: o10 });
+        }
+        // Scene 5 — year 10 in today's purchasing power
+        if (inScene(t, S.real)) {
+          const sc = S.real, o = vis(t, sc);
+          heading("שנה 10: בשקלים, ובכוח קנייה של היום", `המדד עלה ${V.pi}% בכל שנה · הנחה להמחשה`, o);
+          const oh = after(t, sc, 1, o);
+          txt(830, 215, "קל״צ", 26, { w: 700, o: oh });
+          txt(450, 215, "קבועה צמודה", 26, { w: 700, o: oh });
+          txt(1225, 290, "בכוח קנייה", 22, { anchor: "start", w: 700, o: oh });
+          txt(1225, 316, "של היום", 22, { anchor: "start", w: 700, o: oh });
+          txt(1225, 430, "בשקלים", 22, { anchor: "start", w: 700, o: after(t, sc, 17, o) });
+          stat(830, 240, "יורד", V.uReal10, after(t, sc, 9, o));
+          stat(450, 240, "כמו בהתחלה", V.lPay, after(t, sc, 9, o), true);
+          stat(830, 380, "כמו בהתחלה", V.uPay, after(t, sc, 17, o), true);
+          stat(450, 380, "עולה", V.lY10, after(t, sc, 17, o));
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "קבוע במה?", 44, { w: 700, o });
+          const cards = [
+            { x: 660, color: C.teal, title: "קל״צ", lines: ["קבוע בשקלים.", "בכוח קנייה הוא יורד", "כשהמחירים עולים."], at: 1 },
+            { x: 80, color: C.tq2, title: "קבועה צמודה", lines: ["קבועה בכוח קנייה.", "בשקלים היא עולה", "כשהמחירים עולים."], at: 9 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o, 0.8);
+            card(c.x, 180, 540, 290, oc);
+            el("rect", { x: c.x + 470, y: 214, width: 40, height: 40, rx: 8, fill: c.color, opacity: oc });
+            txt(c.x + 450, 246, c.title, 36, { anchor: "start", w: 700, o: oc });
+            c.lines.forEach((line, k) => txt(c.x + 500, 320 + k * 48, line, 28, { anchor: "start", fill: C.n700, o: oc }));
+          }
+          txt(640, 520, "בשני המסלולים: בתשלומים שווים. כשהמחירים יורדים, הכיוונים מתהפכים.", 20, { fill: C.n600, o: after(t, sc, 9, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

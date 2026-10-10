@@ -1,0 +1,253 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.8 — "מה מחייב את הבנק בכל רגע".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number and date comes from data/lessons/1-8.json: the clocks (5 business
+  days, 24 and 12 days), Noam and Shira's invented example dates and day counts,
+  the "3 months" field claim, and the data date. The scene does no arithmetic; the
+  day axis is geometry from the data's own day numbers. The subtitle cues
+  (window.cues) carry the explanatory sentences — the script for narration, if it
+  is ever added.
+
+  Script (one idea: a pre-approval binds the bank to its terms only on condition;
+  only the signature binds it to lend):
+  1. Title. "They approved us" and "the money moved" are two different things.
+  2. Four moments: before the approval the bank must answer, not approve; from the
+     approval, at least 24 days, it holds its terms — on condition; from the
+     signature it must lend; at the drawdown the money moves.
+  3. The commitment rests on three things: what you told (a gap found in
+     underwriting lets the bank change or cancel), what you asked (another amount,
+     term or mix is another request), and time (24 days, 12 without a new lien;
+     every day counts).
+  4. Noam and Shira (invented dates): approval day 0, window end, underwriting on
+     day 20 with 4 days left, a signing postponed to day 29 — past the window.
+  5. "Rates hold 3 months" has no source found; build on 24 days.
+  Claim labels: the rules are the team's Brain transcription of a Bank of Israel
+  directive (August 2026), "לא אומת"; Eylon's sayings are field knowledge,
+  "ממתין לאישור אילון".
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.8 · אישור עקרוני מול העמדת כסף</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-8.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const at12 = (iso) => new Date(`${iso}T12:00:00Z`);
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(at12(iso));
+      const dw = (iso) => new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" }).format(at12(iso));
+      const full = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(at12(iso));
+
+      const V = {
+        answer: fact("clock.answer"), W: fact("clock.window"), W12: fact("clock.window_no_lien"),
+        months: fact("claim.eylon_rates_months"), asOf: fact("data_date"),
+        approved: fact("worked.approved"), end: fact("worked.window_end"),
+        uw: fact("worked.underwriting"), uwDay: fact("worked.underwriting_day"), uwLeft: fact("worked.underwriting_left"),
+        late: fact("worked.late"), lateDay: fact("worked.late_day"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], moments: [12, 62], three: [62, 100], example: [100, 140], end: [140, 160] };
+      window.duration = 160;
+      window.cues = [
+        [1, 6, "״אישרו לנו״ ו״הכסף עבר״ הם שני דברים שונים."],
+        [6, 11.5, "ביניהם יש בדיקה, חתימה — ושעון."],
+        [13, 21, `לפני האישור הבנק חייב לענות תוך ${V.answer} ימי עסקים — לא לאשר.`],
+        [21, 29, "אישור עקרוני ניתן לפי מה שמסרתם. אף אחד עוד לא בדק."],
+        [29, 37, `מהאישור, לפחות ${V.W} יום, הבנק מחזיק בתנאים שכתב.`],
+        [37, 45, "בתנאי שמה שמסרתם נכון, ושום דבר לא השתנה."],
+        [45, 53, "מהחתימה הבנק מחויב להלוות, לפי ההסכם."],
+        [53, 61, "ובהעמדת ההלוואה הכסף עובר — ומתחיל החוב."],
+        [63, 71, "ההתחייבות לתנאים נשענת על שלושה דברים."],
+        [71, 79, "מה שמסרתם: אם בחיתום נמצא פער, הבנק יכול לשנות או לבטל."],
+        [79, 87, "מה שביקשתם: סכום, תקופה או תמהיל אחרים — זו בקשה אחרת."],
+        [87, 94, `והזמן: אחרי ${V.W} יום, או ${V.W12} בלי שעבוד חדש, הבנק לא חייב.`],
+        [94, 99, "כל הימים נספרים, גם שבת וחג."],
+        [101, 109, `נועם ושירה קיבלו אישור ב־${dm(V.approved)}. זה יום 0.`],
+        [109, 117, `${V.W} יום אחריו: ${dw(V.end)}.`],
+        [117, 125, `החיתום ביום ${V.uwDay}: הכול כמו שנמסר. נשארו ${V.uwLeft} ימים.`],
+        [125, 133, `ואם החתימה נדחית ל־${dm(V.late)}? זה יום ${V.lateDay}.`],
+        [133, 139, "החלון נגמר. הבנק כבר לא חייב לתנאים שבאישור."],
+        [141, 149, `״הריביות תקפות ${V.months} חודשים״? לא נמצא לזה מקור.`],
+        [149, 159, `בונים על ${V.W} יום. לפי תעתיק, לא אומת; נכון ל־${full(V.asOf)}.`],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      const MOMENTS = [
+        { name: "הבקשה נשלחה", must: "לענות — לא לאשר", sub: `תוך ${V.answer} ימי עסקים`, kind: "none", start: 13 },
+        { name: "האישור העקרוני", must: "להחזיק בתנאים", sub: `לפחות ${V.W} יום — בתנאי`, kind: "cond", start: 29 },
+        { name: "החתימה", must: "להלוות", sub: "לפי ההסכם", kind: "bind", start: 45 },
+        { name: "העמדת ההלוואה", must: "הכסף עובר", sub: "ומתחיל החוב", kind: "bind", start: 53 },
+      ];
+      const xOf = (i) => 1060 - i * 280;
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "אישור עקרוני מול העמדת כסף", 64, { w: 700, o });
+          txt(640, 350, "מה מחייב את הבנק בכל רגע", 34, { fill: C.n600, o });
+        }
+
+        // Scene 2 — four moments, four different commitments
+        if (inScene(t, S.moments)) {
+          const o = vis(t, S.moments);
+          txt(640, 112, "מה הבנק חייב, בכל רגע", 40, { w: 700, o });
+          el("line", { x1: xOf(3) - 60, x2: xOf(0) + 60, y1: 200, y2: 200, stroke: C.n300, "stroke-width": 3, opacity: o });
+          MOMENTS.forEach((m, i) => {
+            const oi = at(t, m.start, o);
+            const x = xOf(i);
+            el("circle", { cx: x, cy: 200, r: 12, fill: m.kind === "none" ? C.n300 : C.teal, opacity: oi });
+            txt(x, 172, m.name, 24, { w: 700, o: oi });
+            const stroke = m.kind === "none" ? C.n300 : m.kind === "cond" ? C.tq2 : C.teal;
+            box(x - 125, 230, 250, 150, oi, { stroke, sw: 3, dash: m.kind === "cond" ? "8 6" : "none" });
+            txt(x, 266, "הבנק חייב:", 20, { fill: C.n600, o: oi });
+            txt(x, 308, m.must, 26, { w: 700, o: oi });
+            txt(x, 346, m.sub, 20, { fill: C.n700, o: oi });
+          });
+          // What the approval is: a price on data nobody checked yet.
+          const oQ = at(t, 21, o);
+          if (t < 44.6) {
+            const oq = Math.min(oQ, clamp((44.6 - t) / 0.6));
+            txt(640, 432, "״עד השלב שקיבלתי את האישור העקרוני, אף אחד לא מאמת אותך״", 24, { w: 600, o: oq });
+            txt(640, 466, "אילון, 2026-08-26 · ידע מהשטח, ממתין לאישור אילון", 18, { fill: C.n600, o: oq });
+          }
+          const oC = at(t, 37, o);
+          if (t >= 37 && t < 44.6) {
+            const oc = Math.min(oC, clamp((44.6 - t) / 0.6));
+            txt(xOf(1), 520, "בתנאי: מה שמסרתם נכון, ושום דבר לא השתנה", 22, { w: 700, fill: C.teal, o: oc });
+          }
+          const oL = at(t, 45, o);
+          box(240, 420, 800, 60, oL, { fill: C.mint, stroke: C.mint });
+          txt(640, 459, "רק מהחתימה הבנק מחויב להלוות", 26, { w: 700, o: oL });
+          txt(640, 530, "לפי תעתיק של הצוות מהוראה של בנק ישראל (אוגוסט 2026); לא אומת.", 18, { fill: C.n600, o: oL });
+        }
+
+        // Scene 3 — three things the commitment rests on
+        if (inScene(t, S.three)) {
+          const o = vis(t, S.three);
+          txt(640, 112, "ההתחייבות לתנאים נשענת על שלושה דברים", 38, { w: 700, o });
+          const pillars = [
+            ["מה שמסרתם", ["בחיתום הבנק בודק.", "פער ממה שנמסר:", "הבנק יכול לשנות או לבטל"], 71],
+            ["מה שביקשתם", ["סכום, תקופה או תמהיל אחרים", "הם בקשה אחרת,", "ואפשר לתמחר אותה מחדש"], 79],
+            ["הזמן", [`לפחות ${V.W} יום מהאישור`, `${V.W12} יום בלי שעבוד חדש`, "כל הימים נספרים"], 87],
+          ];
+          pillars.forEach(([name, lines, start], i) => {
+            const oi = at(t, start, o);
+            const cx = 1000 - i * 360;
+            box(cx - 165, 160, 330, 260, oi, { stroke: C.teal, sw: 2.5 });
+            box(cx - 120, 182, 240, 54, oi, { rx: 27, fill: C.mint, stroke: C.mint });
+            txt(cx, 218, name, 28, { w: 700, o: oi });
+            lines.forEach((l, j) => txt(cx, 290 + j * 38, l, 22, { fill: C.n700, w: j === 2 ? 600 : 400, o: oi }));
+          });
+          const oF = at(t, 94, o);
+          txt(640, 480, "שבתות וחגים נספרים: אלה ימים רגילים, לא ימי עסקים.", 24, { w: 600, o: oF });
+          txt(640, 530, "לפי תעתיק של הצוות (אוגוסט 2026); לא אומת. בנק רשאי לתת יותר ימים.", 18, { fill: C.n600, o: at(t, 87, o) });
+        }
+
+        // Scene 4 — Noam and Shira, day by day (invented dates)
+        if (inScene(t, S.example)) {
+          const o = vis(t, S.example);
+          txt(640, 112, "נועם ושירה, יום אחרי יום", 40, { w: 700, o });
+          // The day axis, right to left: day 0 at the right.
+          const right = 1120, unit = 28, y = 300;
+          const X = (d) => right - d * unit;
+          const ax = X(V.lateDay) - 40;
+          el("line", { x1: ax, x2: right + 20, y1: y, y2: y, stroke: C.n300, "stroke-width": 3, opacity: o });
+          const oW = at(t, 109, o);
+          box(X(V.W), y - 26, X(0) - X(V.W), 52, oW * 0.55, { rx: 8, fill: C.tq2, stroke: C.tq2 });
+          txt((X(0) + X(V.W)) / 2, y + 8, "האישור מחייב את התנאים", 22, { w: 700, o: oW });
+          const mark = (d, top, label, sub, start, colour = C.navy) => {
+            const om = at(t, start, o);
+            el("line", { x1: X(d), x2: X(d), y1: y - 40, y2: y + 40, stroke: colour, "stroke-width": 3, opacity: om });
+            const ty = top ? y - 96 : y + 76;
+            txt(X(d), ty, `יום ${d}`, 22, { w: 700, fill: colour, o: om });
+            txt(X(d), ty + 28, label, 20, { w: 600, o: om });
+            if (sub) txt(X(d), ty + 54, sub, 18, { fill: C.n700, o: om });
+          };
+          mark(0, false, "האישור", dm(V.approved), 101);
+          mark(V.W, true, "סוף החלון", dw(V.end), 109);
+          mark(V.uwDay, false, "חיתום: הכול כמו שנמסר", `נשארו ${V.uwLeft} ימים`, 117, C.teal);
+          mark(V.lateDay, false, "החתימה נדחתה", dm(V.late), 125);
+          const oE = at(t, 133, o);
+          box(240, 470, 800, 60, oE, { fill: C.navy, stroke: C.navy });
+          txt(640, 509, "אחרי החלון הבנק כבר לא חייב לתנאים שבאישור", 26, { w: 700, fill: C.n0, o: oE });
+          txt(640, 556, "התאריכים בדויים: דוגמה לימודית.", 18, { fill: C.n600, o });
+        }
+
+        // Scene 5 — what we build on
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 112, "על מה בונים", 40, { w: 700, o });
+          const oA = at(t, 141, o);
+          box(680, 170, 440, 200, oA, { fill: C.n100, stroke: C.n100 });
+          txt(900, 236, `״הריביות תקפות ${V.months} חודשים״`, 28, { w: 700, fill: C.n700, o: oA });
+          txt(900, 286, "נאמר בשטח, בהסתייגות.", 22, { fill: C.n700, o: oA });
+          txt(900, 320, "לא נמצא לזה מקור בהוראה.", 22, { fill: C.n700, o: oA });
+          const oB = at(t, 149, o);
+          box(160, 170, 440, 200, oB, { stroke: C.teal, sw: 3 });
+          txt(380, 250, `${V.W} יום`, 56, { w: 700, o: oB });
+          txt(380, 300, "הרצפה שבתעתיק — ועליה בונים", 22, { fill: C.n700, o: oB });
+          txt(640, 450, `״${V.months} חודשים״: אילון, 2026-07-27 · ידע מהשטח, ממתין לאישור אילון.`, 18, { fill: C.n600, o: oA });
+          txt(640, 480, `${V.W} יום: לפי תעתיק של הצוות (אוגוסט 2026); לא אומת. נכון ל־${full(V.asOf)}.`, 18, { fill: C.n600, o: oB });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

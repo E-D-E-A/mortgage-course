@@ -1,0 +1,270 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.10 — "דחיית תשלום אינה הקטנת עלות".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-10.json: the lesson's small loan
+  (100,000 ₪, 6% a year, 12 months, 3 grace months inside the term, Spitzer after
+  the grace) in three ways, its totals, and the same loan as a partial and a full
+  bullet. The loan's terms are the facts' own inputs. Grace inside the term is a
+  Mogi decision, shown with who and when.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — you can postpone payments; does that save money?
+  2. Grace: months with no principal repaid. Partial: pay only the interest, the
+     balance stays. Full: pay nothing, the interest joins the debt.
+  3. The small loan, month by month: no grace 8,606.64 ₪ each month; partial grace
+     500 ₪ for three months, then more; full grace nothing, the debt grows to
+     101,507.51 ₪, then larger payments.
+  4. Totals: no grace 103,279.73 ₪; partial 736.91 ₪ more; full 782.34 ₪ more —
+     same rate, same last month: the principal stayed with you longer.
+  5. Bullet and balloon: all the principal at the end. Partial: 500 ₪ a month, then
+     100,500 ₪; full: nothing, then 106,167.79 ₪ — 167.79 ₪ more interest.
+  6. Takeaway — postponing moves payments forward and costs interest on every
+     shekel postponed; a purchase of time, not a discount.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.10 · גרייס, בלון ובולט</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-10.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const tIn = get("explain.partial").inputs;
+      const V = {
+        P: fact("explain.principal"), rate: tIn.annual_percent, months: tIn.months, grace: tIn.grace_months,
+        none: fact("explain.none"), part: fact("explain.partial"), full: fact("explain.full"),
+        fullClose3: fact("explain.full_close_3"),
+        nonePaid: fact("explain.none_paid"), partPaid: fact("explain.partial_paid"), fullPaid: fact("explain.full_paid"),
+        noneInt: fact("explain.none_interest"), partInt: fact("explain.partial_interest"), fullInt: fact("explain.full_interest"),
+        partExtra: fact("explain.partial_extra"), fullExtra: fact("explain.full_extra"),
+        bMonthly: fact("bullet.monthly_interest"), bPartLast: fact("bullet.partial_last"), bFullLast: fact("bullet.full_last"),
+        bPartInt: fact("bullet.partial_interest"), bFullInt: fact("bullet.full_interest"), bGap: fact("bullet.gap"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], kinds: [12, 40], months: [40, 96], totals: [96, 124], bullet: [124, 152], end: [152, 174] };
+      window.duration = 174;
+      window.cues = [
+        [1, 6, "אפשר לדחות תשלומים. האם זה גם חוסך?"],
+        [6, 11.5, "דחיית תשלום אינה הקטנת עלות. נראה למה."],
+        [13, 21, "גרייס: חודשים בתחילת ההלוואה בלי להחזיר קרן."],
+        [21, 30, "גרייס חלקי: משלמים רק את הריבית. היתרה לא זזה."],
+        [30, 39, "גרייס מלא: לא משלמים כלום. הריבית מצטרפת לחוב."],
+        [41, 49, `הלוואה של ${shek(V.P)}, ${V.rate}% לשנה, ל־${V.months} חודשים.`],
+        [49, 57, `${V.grace} חודשי גרייס בתוך התקופה, ואחריהם שפיצר.`],
+        [57, 65, `בלי גרייס: ${shek(V.none[0].payment)} בכל חודש.`],
+        [65, 73, `גרייס חלקי: ${shek(V.part[0].payment)} בחודש, ואז ${shek(V.part[V.grace].payment)}.`],
+        [73, 82, `גרייס מלא: אפס, והחוב גדל ל־${shek(V.fullClose3)}.`],
+        [82, 90, `ואז ${shek(V.full[V.grace].payment)} בחודש, על חוב גדול יותר.`],
+        [90, 95, "ריבית שלא שולמה לא מחכה."],
+        [97, 105, `שולם בסך הכול, בלי גרייס: ${shek(V.nonePaid)}.`],
+        [105, 113, `גרייס חלקי: עוד ${shek(V.partExtra)}. גרייס מלא: עוד ${shek(V.fullExtra)}.`],
+        [113, 123, "אותו אחוז, אותו חודש אחרון. הקרן נשארה אצלכם יותר."],
+        [125, 133, "בלון ובוליט: כל הקרן חוזרת בבת אחת, בסוף."],
+        [133, 141, `חלקי: ${shek(V.bMonthly)} ריבית בכל חודש, ובסוף ${shek(V.bPartLast)}.`],
+        [141, 146, `מלא: כלום עד הסוף, ואז ${shek(V.bFullLast)}.`],
+        [146, 151, `עוד ${shek(V.bGap)} ריבית: ריבית על ריבית, שוב.`],
+        [153, 162, "גרייס מזיז תשלומים קדימה. על כל שקל שנדחה — ריבית."],
+        [162, 173, "זו קנייה של זמן, לא הנחה. לפעמים היא שווה את זה."],
+      ];
+
+      // Months strip: month 1 at the right, time runs leftward.
+      const RX = 1060, LX = 300;
+      const band = (RX - LX) / V.months;
+      const xOf = (i) => RX - i * band - band / 2;
+      const K = 80 / 12000;
+      function strip(rows, base, label, o, t, sc, at, fill, hasGrace = true) {
+        txt(1220, base - 30, label, 24, { anchor: "start", w: 700, o });
+        el("line", { x1: LX - 4, x2: RX + 4, y1: base, y2: base, stroke: C.n300, "stroke-width": 2, opacity: o });
+        rows.forEach((r, i) => {
+          const oi = after(t, sc, at + i * 0.2, o);
+          const h = Number(r.payment) * K;
+          const grace = hasGrace && i < V.grace;
+          el("rect", { x: xOf(i) - band / 2 + 6, y: base - h, width: band - 12, height: h, rx: 3, fill: grace ? C.n300 : fill, opacity: oi });
+          if (grace && Number(r.payment) === 0) txt(xOf(i), base - 8, "0", 16, { fill: C.n600, o: oi });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "דחיית תשלום אינה הקטנת עלות", 66, { w: 700, o });
+          txt(640, 350, "גרייס, בלון ובוליט", 32, { fill: C.n600, o });
+        }
+        // Scene 2 — the two kinds of grace
+        if (inScene(t, S.kinds)) {
+          const sc = S.kinds, o = vis(t, sc);
+          heading("גרייס: בלי להחזיר קרן, בהתחלה", null, o);
+          const cards = [
+            { x: 660, title: "גרייס חלקי", lines: ["משלמים רק את הריבית.", "היתרה נשארת כמו שהייתה."], at: 9 },
+            { x: 80, title: "גרייס מלא", lines: ["לא משלמים כלום.", "הריבית מצטרפת לחוב."], at: 18 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o, 0.8);
+            card(c.x, 190, 540, 240, oc);
+            txt(c.x + 500, 250, c.title, 36, { anchor: "start", w: 700, o: oc });
+            c.lines.forEach((line, k) => txt(c.x + 500, 320 + k * 50, line, 28, { anchor: "start", fill: C.n700, o: oc }));
+          }
+        }
+        // Scene 3 — month by month, three ways
+        if (inScene(t, S.months)) {
+          const sc = S.months, o = vis(t, sc);
+          heading(`${shek(V.P)} · ${V.rate}% לשנה · ${V.months} חודשים`, `${V.grace} חודשי גרייס בתוך התקופה (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)`, o);
+          strip(V.none, 270, "בלי גרייס", after(t, sc, 16, o), t, sc, 16, C.tq2, false);
+          strip(V.part, 380, "גרייס חלקי", after(t, sc, 24, o), t, sc, 24, C.tq2);
+          strip(V.full, 490, "גרייס מלא", after(t, sc, 32, o), t, sc, 32, C.teal);
+          txt(xOf(1), 270 - Number(V.none[0].payment) * K - 10, shek(V.none[0].payment), 18, { ltr: true, w: 700, o: after(t, sc, 18, o) });
+          txt(xOf(1), 380 - Number(V.part[0].payment) * K - 10, shek(V.part[0].payment), 18, { ltr: true, w: 700, o: after(t, sc, 26, o) });
+          txt(xOf(V.grace) - band / 2 - 8, 380 - Number(V.part[V.grace].payment) * K - 8, shek(V.part[V.grace].payment), 18, { anchor: "end", ltr: true, w: 700, o: after(t, sc, 28, o) });
+          const oF = after(t, sc, 35, o);
+          txt(xOf(1), 422, "החוב גדל:", 18, { fill: C.n600, o: oF });
+          txt(xOf(1), 446, shek(V.fullClose3), 18, { ltr: true, w: 700, o: oF });
+          txt(xOf(V.grace) - band / 2 - 8, 490 - Number(V.full[V.grace].payment) * K - 8, shek(V.full[V.grace].payment), 18, { anchor: "end", ltr: true, w: 700, o: after(t, sc, 42, o) });
+          [1, 3, 6, 9, 12].forEach((m) => txt(xOf(m - 1), 518, String(m), 16, { fill: C.n600, o: after(t, sc, 16, o) }));
+          txt(RX + 60, 518, "חודש", 16, { fill: C.n600, o: after(t, sc, 16, o) });
+        }
+        // Scene 4 — the totals
+        if (inScene(t, S.totals)) {
+          const sc = S.totals, o = vis(t, sc);
+          heading("כמה ריבית שולמה בסך הכול", `אותה הלוואה, אותו אחוז, אותו חודש אחרון`, o);
+          const rows = [
+            { k: "בלי גרייס", int: V.noneInt, paid: V.nonePaid, extra: null, at: 1 },
+            { k: "גרייס חלקי", int: V.partInt, paid: V.partPaid, extra: V.partExtra, at: 9 },
+            { k: "גרייס מלא", int: V.fullInt, paid: V.fullPaid, extra: V.fullExtra, at: 11 },
+          ];
+          const KI = 520 / 4500, R = 1000;
+          txt(R, 205, "ריבית", 20, { anchor: "start", fill: C.n600, o });
+          txt(320, 205, "שולם בסך הכול", 20, { fill: C.n600, o });
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, r.at, o);
+            const y = 230 + i * 95;
+            const w = Number(r.int) * KI;
+            txt(1210, y + 40, r.k, 24, { anchor: "start", w: 700, o: oi });
+            el("rect", { x: R - w, y, width: w, height: 56, rx: 6, fill: i ? C.teal : C.tq2, opacity: oi });
+            txt(R - 14, y + 37, shek(r.int), 22, { anchor: "end", ltr: true, w: 700, fill: i ? C.n0 : C.navy, o: oi });
+            txt(320, y + 30, shek(r.paid), 22, { ltr: true, fill: C.n700, o: oi });
+            if (r.extra) txt(320, y + 58, iso(`+${money(r.extra)} ₪`), 20, { ltr: true, w: 700, fill: C.teal, o: oi });
+          });
+        }
+        // Scene 5 — bullet and balloon: all the principal at the end
+        if (inScene(t, S.bullet)) {
+          const sc = S.bullet, o = vis(t, sc);
+          heading("בלון ובוליט: כל הקרן בסוף", `אותה הלוואה: ${shek(V.P)}, ${V.rate}% לשנה, ${V.months} חודשים`, o);
+          const CW = 66, R = 1080;
+          const rows = [
+            { k: "חלקי", cell: money(V.bMonthly), last: V.bPartLast, int: V.bPartInt, at: 9 },
+            { k: "מלא", cell: "0", last: V.bFullLast, int: V.bFullInt, at: 17 },
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, r.at, o);
+            const y = 220 + i * 140;
+            txt(1220, y + 45, r.k, 28, { anchor: "start", w: 700, o: oi });
+            for (let m = 0; m < V.months - 1; m++) {
+              el("rect", { x: R - (m + 1) * CW + 3, y, width: CW - 6, height: 70, rx: 6, fill: C.n0, stroke: C.n200, opacity: oi });
+              txt(R - m * CW - CW / 2, y + 43, r.cell, 18, { ltr: true, fill: C.n700, o: oi });
+            }
+            const xl = R - (V.months - 1) * CW;
+            el("rect", { x: xl - 190, y: y - 10, width: 190, height: 90, rx: 10, fill: C.mint, stroke: C.teal, "stroke-width": 2, opacity: oi });
+            txt(xl - 95, y + 30, `חודש ${V.months}`, 18, { fill: C.n700, o: oi });
+            txt(xl - 95, y + 62, shek(r.last), 24, { ltr: true, w: 700, o: oi });
+            txt(R, y + 104, `ריבית בסך הכול: ${shek(r.int)}`, 20, { anchor: "start", fill: C.n600, o: oi });
+          });
+          const oG = after(t, sc, 22, o);
+          if (oG > 0) pill(280, 530, 380, `ההפרש: ${shek(V.bGap)} ריבית`, oG, 22);
+          txt(1080, 530, "לפי תקציר של הוראה של בנק ישראל; בודקים בחוזה", 18, { anchor: "start", fill: C.n600, o: after(t, sc, 1, o) });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 125, "דחייה עולה ריבית", 44, { w: 700, o });
+          const lines = [
+            "גרייס, בלון ובוליט מזיזים תשלומים קדימה.",
+            "על כל שקל שנדחה משלמים ריבית, כל עוד הוא לא הוחזר.",
+            "ריבית שלא שולמה מצטרפת לחוב.",
+            "בתמורה: תשלום נמוך עכשיו. קנייה של זמן, לא הנחה.",
+          ];
+          lines.forEach((l, i) => {
+            const oi = after(t, sc, 1 + i * (i < 3 ? 1.5 : 3), o);
+            txt(1100, 210 + i * 70, l, 30, { anchor: "start", fill: i === 3 ? C.navy : C.n700, w: i === 3 ? 700 : 400, o: oi });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

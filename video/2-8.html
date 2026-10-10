@@ -1,0 +1,299 @@
+<!doctype html>
+<!--
+  Video scene for lesson 2.8 — "מחוץ לחמשת המסלולים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/2-8.json. The official rules (the
+  eligibility loan's rate rule and its place inside the financing cap, the
+  target-price discount and cap) come from summaries of official sources and the
+  team's transcription: the scene marks them "לא אומת". The couple, the averages
+  and the exchange rates are invented, for illustration. The averages and the
+  exchange rates shown are the facts' own inputs. How Mogi computes an eligibility
+  loan is a Mogi decision, with who and when.
+
+  Script (the subtitles are the narration; the picture carries the numbers):
+  1. Title — outside the five track types: three things that sound alike.
+  2. Map — eligibility loan: a track inside the mortgage, on the state's terms;
+     target price: a discount on the flat, not a track; FX: a debt in a foreign
+     currency.
+  3. Eligibility loan: a couple buys at 1,600,000 ₪ with 400,000 ₪ equity; the loan
+     is 1,200,000 ₪ and the 120,000 ₪ eligibility loan is a track inside it, not on
+     top. Its rate by rule: 0.5 point below the published average, capped at 3%
+     (3.2% → 2.7%; 4% → 3%). Not verified.
+  4. Target price: a 20% discount, at most 300,000 ₪ (not verified): 1,200,000 ₪
+     gets 240,000 ₪ off; 2,000,000 ₪ only the cap.
+  5. FX: 375,000 ₪ at 3.75 ₪ a dollar is 100,000 dollars; at 3.90 ₪ you owe
+     390,000 ₪, at 3.60 ₪, 360,000 ₪. Income in shekels, the debt not.
+  6. Takeaway — "אחר": only the contract says what is fixed; the official rules
+     here are from summaries, not verified.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 2.8 · מסלולי זכאות ומסלולים מיוחדים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/2-8.json")).json();
+      const get = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => get(id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf.format(Number(v));
+      // An amount reads left to right ("3,959.73 ₪"), as the page's ltr spans do; whole amounts drop the ".00".
+      const iso = (x) => `⁦${x}⁩`;
+      const money = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => iso(`${money(v)} ₪`);
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      // Shown from `from` until `to` seconds into the scene.
+      const during = (t, sc, from, to, o) => Math.min(after(t, sc, from, o), clamp((sc[0] + to - t) / 0.6));
+      const lerp = (a, b, x) => Number(a) + (Number(b) - Number(a)) * clamp(x);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts the text's right edge at x. LTR runs (numbers, equations) use ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: C.n200, opacity: o });
+      const pill = (cx, cy, w, s, o, size = 26) => {
+        el("rect", { x: cx - w / 2, y: cy - 28, width: w, height: 56, rx: 28, fill: C.mint, opacity: o * 0.8 });
+        txt(cx, cy + size * 0.36, s, size, { w: 700, o });
+      };
+      const heading = (s, sub, o) => {
+        txt(640, 112, s, 40, { w: 700, o });
+        if (sub) txt(640, 150, sub, 22, { fill: C.n600, o });
+      };
+
+      const fxIn = get("fx.up").inputs, fxDown = get("fx.down").inputs;
+      const lowIn = get("explain.rate_low").inputs, highIn = get("explain.rate_high").inputs;
+      const V = {
+        price: fact("worked.price"), equity: fact("worked.equity"), loan: fact("worked.loan"), elig: fact("worked.eligibility"),
+        rest: fact("worked.rest"), share: fact("worked.share"), ltvCap: fact("rule.ltv_cap"),
+        below: fact("rule.below_points"), cap: fact("rule.cap"),
+        avgLow: lowIn.average_percent, minusLow: fact("explain.minus_low"), rateLow: fact("explain.rate_low"),
+        avgHigh: highIn.average_percent, minusHigh: fact("explain.minus_high"), rateHigh: fact("explain.rate_high"),
+        tPct: fact("target.percent"), tCap: fact("target.cap"),
+        aPrice: fact("target.a.price"), aPct: fact("target.a.pct"), aDisc: fact("target.a.discount"), aAfter: fact("target.a.after"),
+        bPrice: fact("target.b.price"), bPct: fact("target.b.pct"), bDisc: fact("target.b.discount"), bAfter: fact("target.b.after"),
+        fxAmt: fact("fx.amount"), fxUnits: fact("fx.units"), fxUp: fact("fx.up"), fxDown: fact("fx.down"),
+        r0: fxIn.rate_at_start, rUp: fxIn.rate_now, rDown: fxDown.rate_now,
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], map: [12, 32], elig: [32, 80], target: [80, 112], fx: [112, 150], end: [150, 172] };
+      window.duration = 172;
+      window.cues = [
+        [1, 6, "חמישה סוגי מסלולים כבר הכרנו. מה יש מחוץ להם?"],
+        [6, 11.5, "שלושה דברים שנשמעים דומה, ושונים מאוד."],
+        [13, 22, "הלוואת זכאות: מסלול בתוך המשכנתא, בתנאים של המדינה."],
+        [22, 31, "מחיר מטרה: הנחה על הדירה. מט״ח: חוב במטבע חוץ."],
+        [33, 41, "המדינה מוציאה תעודת זכאות, ובה סוג הסיוע והסכום."],
+        [41, 49, `זוג קונה דירה ב־${shek(V.price)}, עם ${shek(V.equity)} הון עצמי.`],
+        [49, 57, `ההלוואה: ${shek(V.loan)}. הלוואת הזכאות היא חלק ממנה.`],
+        [57, 64, "היא לא באה מעל ההלוואה. לפי המקורות; לא אומת."],
+        [64, 72, `אחוז הריבית לפי כלל: ${V.below} נקודת אחוז מתחת לממוצע.`],
+        [72, 80, `ממוצע של ${V.avgLow}%: ${V.rateLow}%. ממוצע של ${V.avgHigh}%: התקרה, ${V.rateHigh}%.`],
+        [81, 89, "מחיר מטרה: תוכנית ממשלתית לדירה חדשה במחיר מופחת."],
+        [89, 97, `ההנחה: ${V.tPct}% מהמחיר, אבל לא יותר מ־${shek(V.tCap)}.`],
+        [97, 104, `דירה ב־${shek(V.aPrice)}: הנחה של ${shek(V.aDisc)}.`],
+        [104, 111, `דירה ב־${shek(V.bPrice)}: רק ${shek(V.bDisc)}, התקרה.`],
+        [113, 121, "מט״ח: החוב נמדד במטבע חוץ, ואתם משלמים בשקלים."],
+        [121, 129, `לוקחים ${shek(V.fxAmt)} כשדולר עולה ${shek(V.r0)}.`],
+        [129, 137, `החוב: ${num(V.fxUnits)} דולר. הדולר עלה ל־${shek(V.rUp)}?`],
+        [137, 143, `אתם חייבים ${shek(V.fxUp)}, לפני ששילמתם שקל.`],
+        [143, 149, `ירד ל־${shek(V.rDown)}? ${shek(V.fxDown)}. ההכנסה בשקלים; החוב לא.`],
+        [151, 160, "״אחר״: מה קבוע ומה זז כתוב רק בחוזה."],
+        [160, 171, "והכללים הרשמיים כאן: מתקצירים, ולא אומתו."],
+      ];
+
+      function hbar(xRight, y, w, h, fill, o, label, labelFill = C.navy) {
+        el("rect", { x: xRight - w, y, width: w, height: h, rx: 6, fill, opacity: o });
+        if (label) txt(xRight - w / 2, y + h / 2 + 8, label, 20, { w: 700, fill: labelFill, o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מחוץ לחמשת המסלולים", 72, { w: 700, o });
+          txt(640, 350, "הלוואת זכאות, מחיר מטרה, מט״ח ו״אחר״", 32, { fill: C.n600, o });
+        }
+        // Scene 2 — the map of three
+        if (inScene(t, S.map)) {
+          const sc = S.map, o = vis(t, sc);
+          heading("שלושה דברים, שלוש תשובות", null, o);
+          const cards = [
+            { x: 1010, title: "הלוואת זכאות", lines: ["מסלול בתוך המשכנתא", "תנאים: כללים של המדינה"], at: 1 },
+            { x: 640, title: "מחיר מטרה", lines: ["לא מסלול:", "הנחה על מחיר הדירה"], at: 10 },
+            { x: 270, title: "מט״ח", lines: ["מסלול שהחוב בו", "זז עם שער של מטבע"], at: 13 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, sc, c.at, o);
+            card(c.x - 170, 200, 340, 220, oc);
+            txt(c.x, 260, c.title, 32, { w: 700, o: oc });
+            c.lines.forEach((l, k) => txt(c.x, 320 + k * 42, l, 24, { fill: C.n700, o: oc }));
+          }
+          txt(640, 480, "״אחר״: כל מה שלא נכנס לסוגים — רק החוזה אומר מה בו", 22, { fill: C.n600, o: after(t, sc, 13, o) });
+        }
+        // Scene 3 — the eligibility loan: a track inside the loan, its rate by rule
+        if (inScene(t, S.elig)) {
+          const sc = S.elig, o = vis(t, sc);
+          const rule = t - sc[0] >= 31;
+          heading(rule ? "אחוז הריבית: לפי כלל, לא במשא ומתן" : "הלוואת זכאות: מסלול בתוך ההלוואה", "לפי תקצירים של מקורות רשמיים · לא אומת · זוג בדוי, מספרים להמחשה", o);
+          if (!rule) {
+            // The certificate: what the state issues.
+            const oC = during(t, sc, 1, 9, o);
+            if (oC > 0) {
+              card(440, 220, 400, 200, oC);
+              txt(640, 280, "תעודת זכאות", 34, { w: 700, o: oC });
+              txt(640, 330, "מי זכאי · סוג הסיוע · הסכום", 24, { fill: C.n700, o: oC });
+              txt(640, 380, "משרד הבינוי והשיכון", 20, { fill: C.n600, o: oC });
+            }
+            const W = 900, R = 1110, K = W / Number(V.price);
+            const o1 = after(t, sc, 9, o);
+            txt(R, 205, `הדירה: ${shek(V.price)}`, 24, { anchor: "start", w: 700, o: o1 });
+            hbar(R, 220, Number(V.equity) * K, 56, C.n300, o1, `הון עצמי ${shek(V.equity)}`);
+            hbar(R - Number(V.equity) * K - 4, 220, Number(V.loan) * K - 4, 56, C.tq2, o1, `ההלוואה ${shek(V.loan)}`);
+            const o2 = after(t, sc, 17, o);
+            const xL = R - Number(V.equity) * K - 4;
+            txt(xL, 345, "ההלוואה, לפי מסלולים:", 22, { anchor: "start", fill: C.n700, w: 600, o: o2 });
+            hbar(xL, 360, Number(V.elig) * K, 56, C.teal, o2);
+            hbar(xL - Number(V.elig) * K - 4, 360, Number(V.rest) * K - 4, 56, C.n200, o2, `שאר המסלולים ${shek(V.rest)}`);
+            txt(xL - (Number(V.elig) * K) / 2, 445, `זכאות ${shek(V.elig)}`, 20, { w: 700, fill: C.teal, o: o2 });
+            const o3 = after(t, sc, 25, o);
+            if (o3 > 0) pill(400, 500, 600, `לא מעל ההלוואה: עדיין בתוך התקרה של ${V.ltvCap}% מימון`, o3, 20);
+          } else {
+            const rows = [
+              { avg: V.avgLow, minus: V.minusLow, rate: V.rateLow, note: "פחות מהתקרה", at: 34 },
+              { avg: V.avgHigh, minus: V.minusHigh, rate: V.rateHigh, note: `יותר מהתקרה: ${V.cap}%`, at: 40 },
+            ];
+            const oR = after(t, sc, 31, o);
+            txt(640, 215, `הנמוך מבין: הממוצע פחות ${V.below}, והתקרה ${V.cap}%`, 26, { w: 700, o: oR });
+            rows.forEach((r, i) => {
+              const oi = after(t, sc, r.at, o);
+              const y = 250 + i * 110;
+              el("rect", { x: 160, y, width: 960, height: 90, rx: 12, fill: C.n0, stroke: C.n200, opacity: oi });
+              txt(1090, y + 55, `ממוצע שפורסם: ${r.avg}%`, 24, { anchor: "start", fill: C.n700, o: oi });
+              txt(700, y + 55, iso(`${r.avg}% − ${V.below} = ${r.minus}%`), 26, { ltr: true, w: 600, o: oi });
+              txt(470, y + 55, r.note, 22, { anchor: "start", fill: C.n600, o: oi });
+              el("rect", { x: 180, y: y + 20, width: 110, height: 50, rx: 25, fill: C.mint, opacity: oi * 0.8 });
+              txt(235, y + 54, `${r.rate}%`, 26, { w: 700, ltr: true, o: oi });
+            });
+            txt(640, 505, "ב־Mogi: מחושבת כמסלול קבועה צמודה (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 18, { fill: C.n600, o: after(t, sc, 44, o) });
+          }
+        }
+        // Scene 4 — target price: a discount on the flat, with a cap
+        if (inScene(t, S.target)) {
+          const sc = S.target, o = vis(t, sc);
+          heading("מחיר מטרה: הנחה על הדירה", "לפי תקציר של דף ממשלתי · לא אומת · דירות להמחשה", o);
+          const oR = after(t, sc, 9, o);
+          if (oR > 0) pill(640, 210, 520, `${V.tPct}% מהמחיר, ולא יותר מ־${shek(V.tCap)}`, oR, 24);
+          const flats = [
+            { x: 880, price: V.aPrice, pct: V.aPct, disc: V.aDisc, after: V.aAfter, note: "פחות מהתקרה", at: 17 },
+            { x: 400, price: V.bPrice, pct: V.bPct, disc: V.bDisc, after: V.bAfter, note: "יותר מהתקרה", at: 24 },
+          ];
+          for (const f of flats) {
+            const oi = after(t, sc, f.at, o);
+            card(f.x - 220, 260, 440, 250, oi);
+            txt(f.x + 195, 305, "המחיר:", 22, { anchor: "start", fill: C.n600, o: oi });
+            txt(f.x - 195, 305, shek(f.price), 26, { anchor: "start", ltr: true, w: 700, o: oi });
+            txt(f.x + 195, 360, `${V.tPct}% מהמחיר:`, 22, { anchor: "start", fill: C.n600, o: oi });
+            txt(f.x - 195, 360, shek(f.pct), 24, { anchor: "start", ltr: true, fill: C.n700, o: oi });
+            txt(f.x + 195, 410, `ההנחה (${f.note}):`, 22, { anchor: "start", fill: C.n600, o: oi });
+            txt(f.x - 195, 410, shek(f.disc), 26, { anchor: "start", ltr: true, w: 700, fill: C.teal, o: oi });
+            el("line", { x1: f.x - 200, x2: f.x + 200, y1: 432, y2: 432, stroke: C.n200, "stroke-width": 2, opacity: oi });
+            txt(f.x + 195, 478, "אחרי ההנחה:", 22, { anchor: "start", fill: C.n700, w: 600, o: oi });
+            txt(f.x - 195, 478, shek(f.after), 28, { anchor: "start", ltr: true, w: 700, o: oi });
+          }
+        }
+        // Scene 5 — FX: the debt moves with an exchange rate
+        if (inScene(t, S.fx)) {
+          const sc = S.fx, o = vis(t, sc);
+          heading("מט״ח: חוב שזז עם שער של מטבע", "השערים בדויים, להמחשה · ידע כלכלי כללי", o);
+          const K = 260 / 400000, BASE = 470;
+          const cols = [
+            { x: 1040, rate: V.r0, owed: V.fxAmt, label: "ביום ההלוואה", at: 9 },
+            { x: 780, rate: V.rUp, owed: V.fxUp, label: "הדולר עלה", at: 17, hot: true },
+            { x: 520, rate: V.rDown, owed: V.fxDown, label: "הדולר ירד", at: 31 },
+          ];
+          el("line", { x1: 400, x2: 1160, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+          for (const c of cols) {
+            const oi = after(t, sc, c.at, o);
+            const h = Number(c.owed) * K * ease((t - sc[0] - c.at) / 1.2);
+            el("rect", { x: c.x - 80, y: BASE - h, width: 160, height: h, rx: 6, fill: c.hot ? C.teal : C.tq2, opacity: oi });
+            txt(c.x, BASE - h - 14, shek(c.owed), 24, { ltr: true, w: 700, o: oi });
+            txt(c.x, BASE + 32, c.label, 22, { w: 600, o: oi });
+            txt(c.x, BASE + 60, `דולר = ${shek(c.rate)}`, 20, { fill: C.n600, o: oi });
+          }
+          const oU = after(t, sc, 17, o);
+          card(70, 190, 230, 80, oU);
+          txt(280, 222, "החוב בדולרים:", 20, { anchor: "start", fill: C.n600, o: oU });
+          txt(185, 255, num(V.fxUnits), 26, { w: 700, ltr: true, o: oU });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const sc = S.end, o = vis(t, sc);
+          txt(640, 120, "מחוץ לחמשת המסלולים", 44, { w: 700, o });
+          const rows = [
+            ["הלוואת זכאות", "מסלול בתוך ההלוואה; אחוז הריבית לפי כלל, לא במשא ומתן"],
+            ["מחיר מטרה", "לא מסלול: הנחה על מחיר הדירה, עם תקרה"],
+            ["מט״ח", "החוב זז עם שער המטבע; ההכנסה שלכם בשקלים"],
+            ["אחר", "מה קבוע ומה זז — כתוב רק בחוזה"],
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, sc, i < 3 ? 1 + i * 1.2 : 1 + 3.6, o);
+            const y = 170 + i * 76;
+            el("rect", { x: 80, y, width: 1120, height: 62, rx: 10, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(1180, y + 41, r[0], 26, { anchor: "start", w: 700, fill: C.teal, o: oi });
+            txt(960, y + 41, r[1], 24, { anchor: "start", fill: C.n700, o: oi });
+          });
+          txt(640, 500, "הכללים הרשמיים: מתקצירים ומתעתיק של הצוות, לא אומתו מול המקור", 20, { fill: C.n600, o: after(t, sc, 10, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

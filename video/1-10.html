@@ -1,0 +1,267 @@
+<!doctype html>
+<!--
+  Video scene for lesson 1.10 — "סדנה: עושים את זה לבד".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t,
+  so the same input always gives the same video.
+  Every number comes from data/lessons/1-10.json: Case A's price, equity, loan,
+  financing ratio and disposable income (the numbers stage 1 already gives), the
+  step count, Mogi's document list, and the window exercise (24 days, 11 used,
+  13 left). The scene does no arithmetic; bar lengths are geometry from the data's
+  own day counts. The subtitle cues (window.cues) carry the explanatory sentences —
+  the script for narration, if it is ever added.
+
+  Script (one idea: doing it yourself is the twelve steps, each with what to bring,
+  what to ask and where people fall — and most falls are a matter of time):
+  1. Title. Stage 1 meets in one piece of work: Noam and Shira's file, three
+     products (deal map, first-meeting questions, the do-it-yourself list).
+  2. The deal map: price, equity, loan, financing ratio, disposable income, and the
+     participants.
+  3. The twelve steps; for each, what to bring (Mogi collects ID, 3 payslips and
+     3 months of statements up front — Eden, 2026-08-04), what to ask, where people
+     fall.
+  4. Most falls are about time: a 24-day window; 11 days of collecting documents
+     leave 13 for appraisal, underwriting and signing. Documents ready in advance
+     keep nearly all of it. Also: an appraiser not on the chosen bank's list,
+     insurance at the last minute.
+  5. Next to every claim, where it comes from; then the stage 1 check.
+  Claim labels: the 24 days are the team's Brain transcription, "לא אומת"; the
+  11 days are an exercise assumption; Mogi's document list is a Mogi decision
+  (Eden, 2026-08-04).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 1.10 · סדנה: עושים את זה לבד</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/1-10.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+
+      const V = {
+        price: fact("case.price"), equity: fact("case.equity"), loan: fact("case.loan"), ltv: fact("case.ltv"), free: fact("case.disposable"),
+        steps: fact("steps.count"), payslips: fact("docs.payslips"), months: fact("docs.statements_months"),
+        W: fact("rule.window_days"), used: fact("ex.used_days"), left: fact("ex.days_left"),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 12], map: [12, 46], steps: [46, 90], time: [90, 140], end: [140, 155] };
+      window.duration = 155;
+      window.cues = [
+        [1, 6, "שלב 1 מתחבר כאן לעבודה אחת: התיק של נועם ושירה."],
+        [6, 11.5, "מפת עסקה, שאלות לפגישה, ורשימת ״עושים את זה לבד״."],
+        [13, 21, `דירה ב־${shek(V.price)}, והון עצמי של ${shek(V.equity)}.`],
+        [21, 29, `ההלוואה שצריך: ${shek(V.loan)}. שיעור מימון של ${V.ltv}%.`],
+        [29, 37, `ההכנסה הפנויה: ${shek(V.free)} בחודש.`],
+        [37, 45, "ומי בעסקה: מוכר, בנק, יועץ, שמאי, עורך דין, מבטח, טאבו."],
+        [47, 55, `${V.steps} הצעדים משיעור 1.7 — ולכל צעד רשימה.`],
+        [55, 63, "מה מביאים: המסמכים והנתונים שהצעד צריך."],
+        [63, 71, `למשל, Mogi אוספת מראש ${V.payslips} תלושי שכר ו־${V.months} חודשי עו״ש.`],
+        [71, 79, "מה שואלים: את הבנק, את היועץ, ואת עצמכם."],
+        [79, 89, "איפה נופלים: מה שקרה לאחרים בצעד הזה, ואיך נמנעים."],
+        [91, 99, "רוב הנפילות הן עניין של זמן."],
+        [99, 107, `נניח שהאישור העקרוני בתוקף ${V.W} יום. השעון רץ.`],
+        [107, 115, `המסמכים לא הוכנו מראש? האיסוף לקח ${V.used} ימים.`],
+        [115, 123, `נשארו ${V.left} ימים לשמאות, לחיתום ולחתימה.`],
+        [123, 131, "מסמכים מוכנים מראש משאירים כמעט את כל התוקף."],
+        [131, 139, "וכך גם שמאי שלא ברשימה של הבנק, או ביטוח ברגע האחרון."],
+        [141, 148, "ליד כל טענה ברשימה כתוב מאיפה היא, ועד כמה היא בדוקה."],
+        [148, 154, "ומכאן — בדיקת הסיום של שלב 1."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      // The twelve steps, short titles (lesson 1.7's steps, shortened to fit a box, as in its video).
+      const STEPS = [
+        ["1", "שיחה ראשונה"], ["2", "מסמכים"], ["3", "בקשה לאישור עקרוני"], ["4", "האישורים מגיעים"],
+        ["5", "בניית תמהיל"], ["6", "הצעות ומשא ומתן"], ["7", "פתיחת תיק"], ["8", "שמאות"],
+        ["9", "חיתום"], ["10", "ביטוחים"], ["11", "חתימה"], ["12", "העמדת ההלוואה"],
+      ];
+      const BOX = { w: 250, h: 56, gap: 18, right: 1166, top: 140, row: 70 };
+      function drawSteps(t, o, hl) {
+        STEPS.forEach(([n, title], i) => {
+          const col = i % 4, row = Math.floor(i / 4);
+          const x = BOX.right - (col + 1) * BOX.w - col * BOX.gap, y = BOX.top + row * BOX.row;
+          const a = Math.min(o, at(t, 47 + i * 0.4, o));
+          const on = hl?.(n);
+          const dim = hl && !on ? 0.45 : 1;
+          box(x, y, BOX.w, BOX.h, a * dim, { rx: 12, stroke: on ? C.teal : C.n300, sw: on ? 3 : 1.5 });
+          el("circle", { cx: x + BOX.w - 26, cy: y + BOX.h / 2, r: 15, fill: C.navy, opacity: a * dim });
+          txt(x + BOX.w - 26, y + BOX.h / 2 + 6, n, 16, { w: 700, fill: C.n0, o: a * dim, ltr: true });
+          txt(x + BOX.w - 52, y + BOX.h / 2 + 7, title, 20, { anchor: "start", w: 600, o: a * dim });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "עושים את זה לבד", 80, { w: 700, o });
+          txt(640, 350, "סדנה: התיק של נועם ושירה", 34, { fill: C.n600, o });
+          const o2 = at(t, 6.5, o, 0.8);
+          ["מפת עסקה", "שאלות לפגישה", "רשימת צעדים"].forEach((p, i) => {
+            const cx = 900 - i * 260;
+            box(cx - 115, 400, 230, 54, o2, { rx: 27, fill: C.mint, stroke: C.mint });
+            txt(cx, 435, p, 24, { w: 700, o: o2 });
+          });
+        }
+
+        // Scene 2 — the deal map
+        if (inScene(t, S.map)) {
+          const o = vis(t, S.map);
+          txt(640, 112, "מפת העסקה: נועם ושירה", 40, { w: 700, o });
+          box(560, 150, 600, 330, o);
+          const rows = [
+            ["מחיר הדירה", shek(V.price), 13], ["הון עצמי", shek(V.equity), 13],
+            ["ההלוואה שצריך", shek(V.loan), 21], ["שיעור מימון", `${V.ltv}%`, 21],
+            ["הכנסה פנויה בחודש", shek(V.free), 29],
+          ];
+          rows.forEach(([label, value, start], i) => {
+            const oi = at(t, start, o);
+            const y = 200 + i * 60;
+            txt(1130, y, label, 24, { anchor: "start", fill: C.n700, o: oi });
+            txt(600, y, value, 28, { anchor: "start", w: 700, o: oi, ltr: true });
+            if (i < rows.length - 1) el("line", { x1: 590, x2: 1130, y1: y + 22, y2: y + 22, stroke: C.n200, "stroke-width": 1.5, opacity: oi });
+          });
+          const people = ["המוכר", "הבנק", "יועץ", "שמאי", "עורך דין", "מבטח", "טאבו"];
+          const oP = at(t, 37, o);
+          people.forEach((p, i) => {
+            const col = i % 2, row = Math.floor(i / 2);
+            const cx = 400 - col * 190, cy = 180 + row * 70;
+            box(cx - 82, cy - 26, 164, 50, oP, { rx: 25, stroke: C.teal, sw: 2 });
+            txt(cx, cy + 8, p, 22, { w: 600, o: oP });
+          });
+          txt(640, 540, "תיק א׳ בדוי: דוגמה לימודית, לא נתוני לקוח ולא הצעת בנק. שיעור המימון — כששווי הדירה שווה למחיר.", 18, { fill: C.n600, o: at(t, 21, o) });
+        }
+
+        // Scene 3 — the steps, each with what to bring, what to ask, where people fall
+        if (inScene(t, S.steps)) {
+          const o = vis(t, S.steps);
+          txt(640, 112, `${V.steps} הצעדים`, 40, { w: 700, o });
+          const focus = t >= 55 && t < 71;
+          drawSteps(t, o, focus ? (n) => n === "2" : null);
+          const tags = [["מה מביאים", 55], ["מה שואלים", 71], ["איפה נופלים", 79]];
+          tags.forEach(([label, start], i) => {
+            const oi = at(t, start, o);
+            const cx = 980 - i * 340;
+            box(cx - 140, 370, 280, 56, oi, { rx: 28, fill: C.mint, stroke: C.mint });
+            txt(cx, 407, label, 26, { w: 700, o: oi });
+          });
+          if (focus) {
+            const oD = at(t, 63, o);
+            txt(640, 476, `למשל, בצעד 2: תעודת זהות עם ספח, ${V.payslips} תלושי שכר, ${V.months} חודשי עו״ש`, 24, { w: 600, o: oD });
+            txt(640, 512, "החלטה של Mogi: מה שהיא אוספת מכל לקוח מראש (עדן, 2026-08-04).", 18, { fill: C.n600, o: oD });
+          }
+          if (t >= 71) txt(640, 490, "ליד כל צעד ברשימה: מה מביאים, מה שואלים, ואיפה נופלים", 24, { w: 600, fill: C.n700, o: at(t, 79, o) });
+        }
+
+        // Scene 4 — most falls are a matter of time
+        if (inScene(t, S.time)) {
+          const o = vis(t, S.time);
+          txt(640, 112, "רוב הנפילות הן עניין של זמן", 40, { w: 700, o });
+          const right = 1120, full = 960, px = (d) => (Number(d) / Number(V.W)) * full;
+          const o1 = at(t, 99, o);
+          txt(right, 182, `תוקף האישור העקרוני: ${V.W} יום`, 26, { anchor: "start", w: 700, o: o1 });
+          el("rect", { x: right - full, y: 200, width: full, height: 60, rx: 8, fill: C.tq2, opacity: o1 * 0.35 });
+          // Case 1: documents not ready — collecting eats the first days.
+          const o2 = at(t, 107, o);
+          if (t < 122.6 || t >= 123) {
+            el("rect", { x: right - px(V.used), y: 200, width: px(V.used), height: 60, rx: 8, fill: C.n0, stroke: C.navy, "stroke-width": 2.5, "stroke-dasharray": "8 6", opacity: o2 * (t >= 123 ? 0.35 : 1) });
+            txt(right - px(V.used) / 2, 238, `איסוף מסמכים: ${V.used} ימים`, 22, { w: 700, o: o2 * (t >= 123 ? 0.35 : 1) });
+          }
+          const o3 = at(t, 115, o);
+          el("rect", { x: right - full, y: 200, width: full - px(V.used) - 4, height: 60, rx: 8, fill: C.teal, opacity: o3 * (t >= 123 ? 0.35 : 1) });
+          txt(right - px(V.used) - (full - px(V.used)) / 2, 238, `נשארו ${V.left} ימים: שמאות, חיתום, חתימה`, 22, { w: 700, fill: C.n0, o: o3 * (t >= 123 ? 0.35 : 1) });
+          // Case 2: documents ready in advance.
+          const o4 = at(t, 123, o);
+          txt(right, 322, "מסמכים מוכנים מראש:", 24, { anchor: "start", w: 700, o: o4 });
+          el("rect", { x: right - full, y: 340, width: full, height: 60, rx: 8, fill: C.teal, opacity: o4 });
+          txt(right - full / 2, 378, "כמעט כל התוקף נשאר לצעדים שאחרי", 22, { w: 700, fill: C.n0, o: o4 });
+          const o5 = at(t, 131, o);
+          ["שמאי שלא ברשימה של הבנק שנבחר", "ביטוח שנקנה ברגע האחרון", "סבב משא ומתן שעבר את התוקף"].forEach((f, i) => {
+            const cx = 980 - i * 340;
+            box(cx - 162, 430, 324, 56, o5, { rx: 12, stroke: C.n300 });
+            txt(cx, 464, f, 18, { w: 600, o: o5 });
+          });
+          txt(640, 532, `${V.W} יום: לפי תעתיק של הצוות (אוגוסט 2026); לא אומת. ${V.used} ימי האיסוף: הנחה לתרגיל.`, 18, { fill: C.n600, o: o1 });
+        }
+
+        // Scene 5 — where each claim comes from
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 112, "ליד כל טענה — מאיפה היא", 40, { w: 700, o });
+          const kinds = [
+            ["לא אומת", "כלל רשמי, כפי שהצוות העתיק אותו"],
+            ["ידע מהשטח", "מה שאמר איש מקצוע — ממתין לאישור אילון"],
+            ["מחקר / הצעה", "מה שהצוות כתב בדפי התהליך"],
+            ["החלטה של Mogi", "כך Mogi עובדת, לפי החלטה של הצוות"],
+          ];
+          kinds.forEach(([k, d], i) => {
+            const oi = at(t, 141 + i * 0.8, o);
+            const y = 160 + i * 74;
+            box(760, y, 360, 56, oi, { rx: 28, fill: C.n100, stroke: C.n100 });
+            txt(940, y + 37, k, 24, { w: 700, o: oi });
+            txt(730, y + 37, d, 22, { anchor: "start", fill: C.n700, o: oi });
+          });
+          const oE = at(t, 148, o, 0.8);
+          box(340, 476, 600, 60, oE, { fill: C.mint, stroke: C.mint });
+          txt(640, 515, "ומכאן: בדיקת הסיום של שלב 1", 28, { w: 700, o: oE });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
