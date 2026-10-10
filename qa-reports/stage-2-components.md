@@ -187,3 +187,30 @@ What works:
 - Keyboard: Tab goes track toggle (two buttons), the five sliders, the table button, each with a ring; the toggles take Enter, report `aria-pressed` and keep focus; the table opens with Enter.
 - No horizontal scroll, nothing under 12px, nothing clipped, no console messages from the component. (`/video/2-11.mp4` is missing from `dist/video/`.)
 
+## TrackCompare (2.12)
+
+Bugs:
+- **חשוב — printing the lesson with Ctrl+P puts the site header over the table.** The header is `sticky top-0` and has no print rule, so Chromium prints it where it sits on screen. With the table in view, it lands in the middle of a printed page and covers rows of the table. (The "הדפסה" button is not affected: it hides everything but the table.) The cause is in `BaseLayout.astro`, not the component, but this is the lesson that tells the learner to print.
+  - Steps: at 1280px scroll to the table and print the page (I printed to PDF with print media, A4).
+  - What happened: on page 2 the header (Mogi logo, "קורס המשכנתאות", "מפת הקורס", "מילון מונחים") covers the "מה קבוע" and "מה משתנה" rows.
+  - Expected: `@media print { header { position: static } }` (or hide it in print).
+  - Screenshot: `qa/components/stage-2/TrackCompare-desktop-ctrlp-pdf-02.png` (from `qa/components/stage-2/TrackCompare-print-whole-page.pdf`).
+- **קטן — the "הדפסה" button prints the on-screen scroll hint above the table.** When the button marks the block and the print layout starts, the other content is hidden and the table's box is measured narrow for a moment (269px of content in a 224px box), so the layout's script sets `data-wide-table` on the island. Its `::before` text, "בתוך הרכיב יש טבלה רחבה מהמסך: … גללו אותה הצידה…", is not hidden in print, so it is the first line on paper. After printing the attribute is gone again.
+  - Steps: at 1280px press "הדפסה" (I stubbed `window.print` and printed to PDF with print media).
+  - Expected: no scroll hint on paper (hide `astro-island[data-wide-table]::before` in `@media print`).
+  - Screenshot: `qa/components/stage-2/TrackCompare-desktop-print-button-pdf-1.png` (from `qa/components/stage-2/TrackCompare-print-button.pdf`).
+- **קטן — "סדר השיעורים" reverses on a second press, but shows no arrow.** The other three sort buttons show ↓ or ↑. The course order reverses too, and the status says "בסדר הפוך", but the button looks the same both ways.
+  - Steps: press "סדר השיעורים" twice.
+  - Expected: an arrow on this button too, or a course order that does not reverse.
+  - Screenshot: `qa/components/stage-2/TrackCompare-desktop-12-print-view.png` (taken in the reversed course order).
+
+What works:
+- **Sorting, four ways and reversed, by keyboard** (Enter for the first press, Space for the second): all eight orders match the sort rule recomputed from the page's own track data, in the phone cards and in the desktop table's columns. By "מתי הריבית יכולה לזוז": the three fixed tracks (קל״צ, קבועה צמודה, הלוואת זכאות), then משתנה צמודה and משתנה לא צמודה, then מסלול פריים, as the lesson's answer says. By "הצמדה": three non-indexed tracks first. By "כמה כוחות פועלים": קבועה לא צמודה first and משתנה צמודה last.
+- Each press updates `aria-pressed`, the arrow (↓ then ↑), the status line and the table's `<caption>`. Focus stays on the button.
+- **Phone cards:** below `md` the six tracks are cards with two badges (when the rate moves; indexed or not), the seven fields and the source; the table is hidden; cards and table always share one order.
+- **Desktop table:** six columns in `table-fixed`, no cell overflows its column at 1280px, and the risk row is shaded.
+- **Print view:** "תצוגה להדפסה" shows the table with the print note on top, also on a phone. There the table is 704px wide in a 332px box, and the island gets `data-wide-table`, so the scroll hint shows. Focus stays on the button, now named "חזרה לתצוגה הרגילה".
+- **Print emulation:** with print media the sort controls, the print buttons and the cards are `display: none`, and the table is shown even from the phone view. In the PDF from the "הדפסה" button nothing outside the block is printed (79 text elements inside it, 0 outside), the header row repeats on page 2, and the print note is under the table.
+- **The "הדפסה" button:** it adds `track-printing` to `<html>` and `data-track-print="active"` to the block before calling `window.print()` (both seen at the moment of the call), keeps focus, and `afterprint` removes both.
+- Tab order: the four sort buttons, "תצוגה להדפסה", "הדפסה", each with a ring; all are at least 44×44. No horizontal page scroll, nothing under 12px, nothing clipped, no console messages.
+
