@@ -1,0 +1,318 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.9 — "לאן הולך הכסף".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-9.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: the total paid is the loan plus all the interest — plus all the
+  indexation in a linked track; fees sit beside it; and it adds shekels from different
+  times as if they were equal):
+  1. Title.
+  2. Small numbers: 12,000 ₪ for a year at 0.5% a month, 1,032.80 ₪ (the last 1,032.78);
+     total paid 12,393.58; 12,393.58 − 12,000 = 393.58 of interest.
+  3. A real loan, 600,000 ₪, 20 years, 4.8%: 934,499.54 = 600,000 + 334,499.54 (35.8%).
+  4. 30 years: the payment falls by 745.75, the interest rises by 198,778.64 — a low payment
+     is not a low cost. Field knowledge (Eylon, 2026-09-16, awaiting his approval).
+  5. A linked track with an illustrative index of 2% a year: 600,000 + 229,398.59 +
+     151,298.28 = 980,696.87; higher than unlinked, which does not by itself make it
+     dearer. Mogi uses only the Bank of Israel forecast (a Mogi decision, who and when).
+  6. Fees: a file-opening fee up to about 360 ₪ (secondary source, Aug 2026, not verified),
+     shown beside the total, not inside it.
+  7. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.9 · סך תשלומים, ריבית, הצמדה ועמלות</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-9.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const V = {
+        sLoan: num(fact("small.loan")),
+        sPay: num(fact("small.payment")),
+        sLast: num(fact("small.last")),
+        sTotal: num(fact("small.total")),
+        sTimes: num(fact("small.times")),
+        sGap: num(fact("small.times_gap")),
+        sInt: num(fact("small.interest")),
+        loan: num(fact("big.loan")),
+        pay: num(fact("big.payment")),
+        total: num(fact("big.total")),
+        interest: num(fact("big.interest")),
+        share: pl(fact("big.interest_share")),
+        pay30: num(fact("big30.payment")),
+        total30: num(fact("big30.total")),
+        int30: num(fact("big30.interest")),
+        payGap: num(fact("big30.pay_gap")),
+        intGap: num(fact("big30.interest_gap")),
+        share30: pl(fact("big30.interest_share")),
+        lFirst: num(fact("lnk.first")),
+        lLast: num(fact("lnk.last")),
+        lTotal: num(fact("lnk.total")),
+        lInt: num(fact("lnk.interest")),
+        lInd: num(fact("lnk.indexation")),
+        lOver: num(fact("lnk.over_unlinked")),
+        fee: num(fact("fee.open")),
+        feeShare: pl(fact("fee.share_of_interest")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], small: [10, 42], big: [42, 78], long: [78, 114], linked: [114, 150], fee: [150, 172], end: [172, 186] };
+      window.duration = 186;
+      window.cues = [
+        [1, 5, "לאן הולך הכסף?"],
+        [5, 9.5, "מחברים את כל התשלומים, ומפרקים אותם."],
+        [11, 17, `‏${V.sLoan} ₪ לשנה, 0.5% לחודש: ${V.sPay} ₪ בחודש.`],
+        [17, 23, `התשלום האחרון סוגר את מה שנשאר: ${V.sLast} ₪.`],
+        [23, 29, `כל התשלומים יחד: ${V.sTotal} ₪. זה סך התשלומים.`],
+        [29, 35, "חלקי הקרן יחד מחזירים בדיוק את ההלוואה."],
+        [35, 41, `ולכן כל השאר הוא ריבית: ${V.sInt} ₪.`],
+        [43, 49, `‏${V.loan} ₪ ל־20 שנה, ב־4.8%: ${V.pay} ₪ בחודש.`],
+        [49, 56, `סך התשלומים: ${V.total} ₪.`],
+        [56, 63, `מזה ההלוואה ${V.loan} ₪, והשאר ריבית: ${V.interest} ₪.`],
+        [63, 70, `הריבית היא ${V.share}% מכל מה שתשלמו.`],
+        [70, 77, "במסלול לא צמוד: סך התשלומים = ההלוואה + כל הריבית."],
+        [79, 85, "ואם מאריכים ל־30 שנה?"],
+        [85, 92, `התשלום יורד ל־${V.pay30} ₪: ${V.payGap} ₪ פחות בחודש.`],
+        [92, 99, `אבל הריבית עולה ב־${V.intGap} ₪.`],
+        [99, 106, "החזר נמוך אינו עלות נמוכה: הקרן נשארת חוב זמן רב יותר."],
+        [106, 113, "אילון: ״אם ההחזר מאפשר, מקצרים תקופה״. ממתין לאישורו."],
+        [115, 121, "במסלול צמוד יש חלק שלישי: החוב עצמו גדל עם המדד."],
+        [121, 128, "להמחשה בלבד, לא תחזית: המדד עולה 2% בכל שנה."],
+        [128, 135, `‏3% לשנה, 20 שנה: סך התשלומים ${V.lTotal} ₪.`],
+        [135, 142, `ההלוואה, הריבית, ועוד ${V.lInd} ₪ שהמדד הוסיף.`],
+        [142, 149, "יותר מבלא צמוד, אבל לא בהכרח יקר יותר: השקלים מזמנים שונים."],
+        [151, 157, "עמלה: תשלום למלווה על שירות או על אירוע."],
+        [157, 164, `פתיחת תיק: עד כ־${V.fee} ₪, לפי מקור משני. לא אומת.`],
+        [164, 171, "בקורס, עמלות מוצגות ליד סך התשלומים, לא בתוכו."],
+        [173, 179, "סך התשלומים: ההלוואה, הריבית, וההצמדה."],
+        [179, 185, "הוא מחבר שקלים מזמנים שונים כאילו הם שווים."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      // A horizontal stacked bar, right to left: parts are [value, color, label].
+      function stack(y, h, parts, unit, o, g = 1) {
+        let x = 1100;
+        for (const [v, c, label] of parts) {
+          const w = Number(v) * unit * g;
+          el("rect", { x: x - w, y, width: w, height: h, fill: c, opacity: o });
+          if (label && w > 110) txt(x - w / 2, y + h / 2 + 8, label, 20, { w: 700, fill: c === C.teal ? C.n0 : C.navy, o: o * clamp(g * 3 - 2), ltr: true });
+          x -= w;
+        }
+        return x;
+      }
+      function legend(items, y, o) {
+        items.forEach(([c, s], i) => {
+          el("rect", { x: 1082 - i * 190, y, width: 18, height: 18, rx: 3, fill: c, opacity: o });
+          txt(1072 - i * 190, y + 15, s, 18, { anchor: "start", fill: C.n700, o });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "לאן הולך הכסף", 76, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 360, "סך תשלומים · ריבית · הצמדה · עמלות", 32, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — small numbers
+        if (inScene(t, S.small)) {
+          const o = vis(t, S.small);
+          txt(640, 132, `${V.sLoan} ₪ · שנה אחת · 0.5% לחודש`, 38, { w: 700, o });
+          const at = (s) => after(t, S.small, s, o);
+          // Twelve payments as small tiles, month 1 on the right.
+          for (let k = 0; k < 12; k++) {
+            const ok = at(1 + k * 0.25);
+            const x = 1040 - k * 76;
+            el("rect", { x, y: 180, width: 66, height: 66, rx: 8, fill: k === 11 ? C.mint : C.n0, stroke: C.n200, opacity: ok });
+            txt(x + 33, 208, String(k + 1), 16, { fill: C.n600, o: ok, ltr: true });
+            txt(x + 33, 234, k === 11 ? V.sLast : V.sPay, 13, { w: 600, o: ok, ltr: true });
+          }
+          txt(640, 280, "התשלום האחרון סוגר את מה שנשאר", 18, { fill: C.n600, o: at(7) });
+          const o2 = at(13);
+          box(330, 304, 620, 80, o2);
+          txt(640, 336, "סך התשלומים: כל התשלומים, מהראשון עד האחרון", 18, { fill: C.n600, o: o2 });
+          txt(640, 370, `${V.sTotal} ₪`, 30, { w: 700, o: o2, ltr: true });
+          const o3 = at(25);
+          box(330, 404, 620, 80, o3 * 0.6, C.mint);
+          eqn(640, 440, `${V.sTotal} − ${V.sLoan} = ${V.sInt}`, 30, { o: o3 });
+          txt(640, 470, "סך התשלומים פחות ההלוואה: הריבית", 18, { fill: C.n700, o: o3 });
+          eqn(640, 518, `${V.sPay} × 12 = ${V.sTimes}`, 20, { w: 400, fill: C.n600, o: at(17) });
+          txt(640, 546, `${V.sGap} ₪ יותר מסך התשלומים, כי התשלום האחרון קטן מהאחרים`, 17, { fill: C.n600, o: at(17) });
+        }
+        // Scene 3 — a real loan
+        if (inScene(t, S.big)) {
+          const o = vis(t, S.big);
+          txt(640, 132, `${V.loan} ₪ · 20 שנה · 4.8% · ${V.pay} ₪ בחודש`, 34, { w: 700, o });
+          const at = (s) => after(t, S.big, s, o);
+          legend([[C.n300, "ההלוואה"], [C.teal, "ריבית"]], 176, at(6));
+          const unit = 900 / Number(fact("big.total"));
+          const g = ease((t - S.big[0] - 6) / 2);
+          const x = stack(230, 90, [[fact("big.loan"), C.n300, V.loan], [fact("big.interest"), C.teal, V.interest]], unit, at(6), g);
+          txt(640, 360, `סך התשלומים: ${V.total} ₪`, 30, { w: 700, o: at(7) });
+          const o3 = at(14);
+          box(330, 400, 620, 80, o3 * 0.6, C.mint);
+          eqn(640, 452, `${V.loan} + ${V.interest} = ${V.total}`, 30, { o: o3 });
+          txt(640, 530, `הריבית: ${V.share}% מכל מה שתשלמו — ${V.share} שקלים מכל 100`, 22, { w: 600, fill: C.teal, o: at(21) });
+        }
+        // Scene 4 — 20 years or 30
+        if (inScene(t, S.long)) {
+          const o = vis(t, S.long);
+          txt(640, 128, "20 שנה או 30 שנה?", 40, { w: 700, o });
+          const at = (s) => after(t, S.long, s, o);
+          legend([[C.n300, "ההלוואה"], [C.teal, "ריבית"]], 160, o);
+          const unit = 760 / Number(fact("big30.total"));
+          const rows = [
+            { y: 200, name: "20 שנה", pay: V.pay, parts: [[fact("big.loan"), C.n300, V.loan], [fact("big.interest"), C.teal, V.interest]], from: 0 },
+            { y: 320, name: "30 שנה", pay: V.pay30, parts: [[fact("big.loan"), C.n300, V.loan], [fact("big30.interest"), C.teal, V.int30]], from: 6 },
+          ];
+          for (const r of rows) {
+            const or = at(r.from);
+            txt(1100, r.y + 26, r.name, 24, { anchor: "start", w: 700, o: or });
+            txt(1100, r.y + 54, `${r.pay} ₪ בחודש`, 18, { anchor: "start", fill: C.n600, o: or });
+            stack(r.y + 70, 40, r.parts.map(([v, c, l]) => [v, c, l]), unit, or, ease((t - S.long[0] - r.from) / 2));
+          }
+          const o3 = at(13);
+          box(200, 446, 400, 90, o3);
+          txt(400, 480, "בחודש", 18, { fill: C.n600, o: o3 });
+          txt(400, 518, `${V.payGap} ₪ פחות`, 28, { w: 700, o: o3 });
+          box(680, 446, 400, 90, o3 * 0.6, C.mint);
+          txt(880, 480, "בריבית, על כל ההלוואה", 18, { fill: C.n700, o: o3 });
+          txt(880, 518, `${V.intGap} ₪ יותר`, 28, { w: 700, o: o3 });
+          const of = at(28);
+          txt(640, 560, "ידע מהשטח: אילון, 2026-09-16 — ממתין לאישור אילון", 16, { fill: C.n600, o: of });
+        }
+        // Scene 5 — a linked track
+        if (inScene(t, S.linked)) {
+          const o = vis(t, S.linked);
+          txt(640, 128, `קבועה צמודה · ${V.loan} ₪ · 20 שנה · 3%`, 36, { w: 700, o });
+          txt(640, 162, "המדד עולה 2% בכל שנה — להמחשה בלבד, לא תחזית", 18, { fill: C.n600, o });
+          const at = (s) => after(t, S.linked, s, o);
+          legend([[C.n300, "ההלוואה"], [C.teal, "ריבית"], [C.tq2, "הצמדה"]], 188, at(14));
+          const unit = 900 / Number(fact("lnk.total"));
+          stack(232, 90, [[fact("big.loan"), C.n300, V.loan], [fact("lnk.interest"), C.teal, V.lInt], [fact("lnk.indexation"), C.tq2, V.lInd]], unit, at(14), ease((t - S.linked[0] - 14) / 2));
+          txt(640, 360, `התשלום מתחיל ב־${V.lFirst} ₪, ועולה עם המדד; האחרון ${V.lLast} ₪`, 20, { fill: C.n700, o: at(14) });
+          const o3 = at(21);
+          box(250, 384, 780, 74, o3 * 0.6, C.mint);
+          eqn(640, 432, `${V.loan} + ${V.lInt} + ${V.lInd} = ${V.lTotal}`, 28, { o: o3 });
+          txt(640, 500, `יותר מבלא צמוד ב־${V.lOver} ₪ — אבל שקל של עוד 20 שנה קונה פחות`, 20, { fill: C.n700, o: at(28) });
+          txt(640, 548, "ב־Mogi: רק התחזית שבנק ישראל מפרסם — החלטה של Mogi (אילון 2026-10-07, עדן 2026-10-08)", 16, { fill: C.n600, o: at(30) });
+        }
+        // Scene 6 — fees, beside the total
+        if (inScene(t, S.fee)) {
+          const o = vis(t, S.fee);
+          txt(640, 132, "עמלות: ליד סך התשלומים, לא בתוכו", 38, { w: 700, o });
+          const at = (s) => after(t, S.fee, s, o);
+          box(560, 190, 540, 150, o);
+          txt(830, 230, "סך התשלומים (20 שנה, 4.8%)", 20, { fill: C.n600, o });
+          txt(830, 290, `${V.total} ₪`, 40, { w: 700, o, ltr: true });
+          const of = at(6);
+          box(180, 190, 340, 150, of * 0.6, C.mint);
+          txt(350, 230, "פתיחת תיק", 20, { fill: C.n700, o: of });
+          txt(350, 290, `עד כ־${V.fee} ₪`, 34, { w: 700, o: of });
+          txt(350, 322, `${V.feeShare}% מהריבית`, 18, { fill: C.n700, o: of });
+          txt(640, 400, "חד־פעמי, בהתחלה · לא חלק מלוח הסילוקין", 22, { fill: C.n700, o: at(10) });
+          txt(640, 450, "לפי אתר מידע ציבורי — מקור משני, נכון לאוגוסט 2026, לא אומת", 18, { fill: C.n600, o: at(8) });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "סך התשלומים =", 40, { w: 600, fill: C.n700, o });
+          txt(640, 340, "ההלוואה + הריבית (+ ההצמדה)", 56, { w: 700, o });
+          const o2 = after(t, S.end, 6, o);
+          txt(640, 420, "שקלים מזמנים שונים, מחוברים כאילו הם שווים", 30, { w: 600, fill: C.teal, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

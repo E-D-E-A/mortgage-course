@@ -1,0 +1,309 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.10 — "איזו ריבית אחת מסבירה את כל התשלומים?".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-10.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: the value today of a whole schedule, at the loan's rate, is the loan;
+  turned around, the internal rate of return is the one rate at which the value today of
+  all the payments equals the money actually received):
+  1. Title.
+  2. 30,000 ₪ for three months at 0.5% a month: each payment brought to today
+     (10,049.92 + 9,999.92 + 9,950.16 = 30,000).
+  3. At 0.4% the value today is more (30,059.70), at 0.6% less (29,940.50): a higher rate
+     gives a lower value today.
+  4. A fee of 300 ₪ on day one: 29,700 received. Which rate gives 29,700? Six halving steps,
+     then a computer: 1.0076% a month; the check gives 29,699.99. That is the IRR.
+  5. Month to year: × 12 → 12.09%; compounded (power of 12, the effective rate) → 12.78%,
+     against 6% without the fee. The same kind of fee on שחר's 600,000 ₪ for 20 years
+     moves 4.8% only to 4.8071% (× 12).
+  6. The actual cost of credit — by the team's transcription of a Bank of Israel directive,
+     not verified: the IRR of the money received, compounded to a year (4.8% → 4.907%).
+  7. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.10 · ערך נוכחי ושיעור תשואה פנימי</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-10.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const rows = fact("explain.rows_05");
+      const search = fact("explain.search");
+      const V = {
+        loan: num(fact("explain.loan")),
+        fee: num(fact("explain.fee")),
+        received: num(fact("explain.received")),
+        feeShare: pl(fact("explain.fee_share")),
+        pay: num(fact("explain.payment")),
+        last: num(fact("explain.last")),
+        total: num(fact("explain.total")),
+        pv05: num(fact("explain.pv_05")),
+        pv04: num(fact("explain.pv_04")),
+        pv06: num(fact("explain.pv_06")),
+        irr: pl(fact("explain.irr")),
+        x12: pl(fact("explain.irr_x12")),
+        eff: pl(fact("explain.irr_eff")),
+        check: num(fact("explain.pv_check")),
+        bigIrr: pl(fact("explain.big_irr")),
+        bigEff: pl(fact("explain.big_eff")),
+        wLoan: num(fact("worked.loan")),
+        wFee: num(fact("worked.fee")),
+        wX12: pl(fact("worked.irr_x12")),
+        wNoFee: pl(fact("worked.x12_no_fee")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], pv: [10, 52], rates: [52, 72], search: [72, 124], year: [124, 156], cost: [156, 176], end: [176, 188] };
+      window.duration = 188;
+      window.cues = [
+        [1, 5, "איזו ריבית אחת מסבירה את כל התשלומים?"],
+        [5, 9.5, "ערך נוכחי, ושיעור תשואה פנימי (IRR)."],
+        [11, 17, `‏${V.loan} ₪ לשלושה חודשים, 0.5% לחודש, בשפיצר.`],
+        [17, 24, `שלושה תשלומים: יחד ${V.total} ₪.`],
+        [24, 31, "מעבירים כל תשלום להיום, לפי החודש שבו הוא מגיע."],
+        [31, 38, `את התשלום של חודש 1 מחלקים ב־${rows[0].growth}, של חודש 2 — פעמיים.`],
+        [38, 45, `ומחברים: ${V.pv05} ₪. בדיוק סכום ההלוואה.`],
+        [45, 51, "ההלוואה היא הערך הנוכחי של התשלומים שלה, בריבית שלה."],
+        [53, 59, `ב־0.4% לחודש הערך הנוכחי יותר: ${V.pv04} ₪.`],
+        [59, 65, `ב־0.6% לחודש הוא פחות: ${V.pv06} ₪.`],
+        [65, 71, "ריבית גבוהה יותר — ערך נוכחי נמוך יותר."],
+        [73, 79, `עכשיו עמלה של ${V.fee} ₪ ביום הראשון: הגיעו ${V.received} ₪.`],
+        [79, 86, `באיזו ריבית הערך הנוכחי של התשלומים הוא ${V.received} ₪?`],
+        [86, 93, "אין נוסחה ישירה. מחפשים: מתחילים מטווח, ומנסים את האמצע."],
+        [93, 100, "הערך הנוכחי עדיין גבוה? הריבית נמוכה מדי. נמוך? גבוהה מדי."],
+        [100, 107, "בכל צעד הטווח קטן בחצי."],
+        [107, 115, `מחשב ממשיך, ומגיע ל־${V.irr}% לחודש. בבדיקה: ${V.check} ₪.`],
+        [115, 123, "זה שיעור התשואה הפנימי: הריבית האחת שמסבירה הכול."],
+        [125, 131, `כפול 12: בערך ${V.x12}% לשנה.`],
+        [131, 138, `בחזקת 12, כמו ריבית אפקטיבית: ${V.eff}% לשנה.`],
+        [138, 145, "בלי העמלה: 6%. עמלה קטנה, על שלושה חודשים בלבד."],
+        [145, 155, `שחר: ${V.wFee} ₪ על ${V.wLoan} ₪ ל־20 שנה — רק ${V.wX12}%.`],
+        [157, 163, "לפי תעתיק של הצוות, לא אומת: זה מדד ההשוואה של בנק ישראל."],
+        [163, 169, "העלות הממשית של האשראי: ה־IRR של מה שקיבלתם, בחזקת 12."],
+        [169, 175, `גם בלי עמלה, 4.8% לשנה מקבלים עלות ממשית של ${V.bigEff}%.`],
+        [177, 182, "ה־IRR: הריבית האחת שבה הערך הנוכחי של התשלומים"],
+        [182, 187, "שווה בדיוק לכסף שקיבלתם."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "איזו ריבית אחת", 70, { w: 700, o });
+          txt(640, 360, "מסבירה את כל התשלומים?", 70, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 420, "ערך נוכחי · שיעור תשואה פנימי (IRR)", 30, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the value today of a whole schedule
+        if (inScene(t, S.pv)) {
+          const o = vis(t, S.pv);
+          txt(640, 132, `${V.loan} ₪ · שלושה חודשים · 0.5% לחודש`, 36, { w: 700, o });
+          const at = (s) => after(t, S.pv, s, o);
+          const cols = [
+            { x: 1060, label: "בסוף חודש" }, { x: 900, label: "התשלום" }, { x: 680, label: "מחלקים ב־" }, { x: 460, label: "שווה היום" },
+          ];
+          box(240, 172, 860, 220, at(1));
+          for (const c of cols) txt(c.x, 208, c.label, 18, { anchor: "start", fill: C.n600, w: 600, o: at(1) });
+          el("line", { x1: 260, x2: 1080, y1: 222, y2: 222, stroke: C.n200, "stroke-width": 1, opacity: at(1) });
+          rows.forEach((r, i) => {
+            const y = 262 + i * 46;
+            const or = at(4 + i * 1.5);
+            txt(1040, y, String(r.month), 22, { w: 600, o: or, ltr: true });
+            txt(900, y, num(r.payment), 22, { anchor: "end", o: or, ltr: true });
+            const og = at(19 + i * 1.5);
+            txt(680, y, r.growth, 22, { anchor: "end", fill: C.n700, o: og, ltr: true });
+            txt(460, y, num(r.value_today), 22, { anchor: "end", w: 700, fill: C.teal, o: og, ltr: true });
+          });
+          txt(1060, 376, `סך התשלומים: ${V.total} ₪`, 18, { anchor: "start", fill: C.n600, o: at(7) });
+          const os = at(28);
+          box(290, 420, 700, 120, os * 0.6, C.mint);
+          eqn(640, 466, `${num(rows[0].value_today)} + ${num(rows[1].value_today)} + ${num(rows[2].value_today)} = ${V.pv05}`, 28, { o: os });
+          txt(640, 512, "הערך הנוכחי, בריבית של ההלוואה = סכום ההלוואה", 20, { w: 600, fill: C.n700, o: at(35) });
+        }
+        // Scene 3 — at other rates
+        if (inScene(t, S.rates)) {
+          const o = vis(t, S.rates);
+          txt(640, 132, "אותם תשלומים, בריבית אחרת", 40, { w: 700, o });
+          const pts = [
+            { r: "0.4%", v: fact("explain.pv_04"), s: V.pv04, from: 1, x: 900 },
+            { r: "0.5%", v: fact("explain.pv_05"), s: V.pv05, from: 1, x: 640 },
+            { r: "0.6%", v: fact("explain.pv_06"), s: V.pv06, from: 7, x: 380 },
+          ];
+          const lo = Number(fact("explain.pv_06")) - 40, hi = Number(fact("explain.pv_04")) + 40;
+          const Y = (v) => 470 - ((Number(v) - lo) / (hi - lo)) * 220;
+          el("line", { x1: 300, x2: 980, y1: 500, y2: 500, stroke: C.n300, "stroke-width": 1, opacity: o });
+          el("polyline", { points: pts.map((p) => `${p.x},${Y(p.v)}`).join(" "), fill: "none", stroke: C.teal, "stroke-width": 4, opacity: after(t, S.rates, 7, o) });
+          for (const p of pts) {
+            const op = after(t, S.rates, p.from, o);
+            el("circle", { cx: p.x, cy: Y(p.v), r: 9, fill: p.r === "0.5%" ? C.navy : C.teal, opacity: op });
+            txt(p.x, Y(p.v) - 20, `${p.s} ₪`, 22, { w: 700, o: op, ltr: true });
+            txt(p.x, 528, `${p.r} לחודש`, 20, { fill: C.n600, o: op });
+          }
+          txt(640, 196, "ריבית גבוהה יותר → ערך נוכחי נמוך יותר", 22, { fill: C.teal, w: 700, o: after(t, S.rates, 13, o) });
+          txt(640, 556, "הציר האנכי לא מתחיל באפס", 15, { fill: C.n600, o });
+        }
+        // Scene 4 — the reverse question, and halving
+        if (inScene(t, S.search)) {
+          const o = vis(t, S.search);
+          txt(640, 124, `עמלה של ${V.fee} ₪: הגיעו ${V.received} ₪`, 36, { w: 700, o });
+          const at = (s) => after(t, S.search, s, o);
+          txt(640, 160, `באיזו ריבית הערך הנוכחי של שלושת התשלומים = ${V.received} ₪?`, 20, { fill: C.n700, o: at(7) });
+          const cols = [
+            { x: 1080, label: "צעד" }, { x: 990, label: "מנסים (לחודש)" }, { x: 790, label: "הערך הנוכחי" }, { x: 580, label: "המסקנה" }, { x: 420, label: "הטווח לפני הצעד" },
+          ];
+          box(180, 178, 920, 316, at(14));
+          for (const c of cols) txt(c.x, 208, c.label, 17, { anchor: "start", fill: C.n600, w: 600, o: at(14) });
+          search.forEach((r, i) => {
+            const y = 244 + i * 40;
+            const or = at(16 + i * 2.6);
+            txt(1066, y, String(r.step), 20, { w: 600, o: or, ltr: true });
+            txt(990, y, `${r.mid}%`, 20, { anchor: "start", w: 700, o: or });
+            txt(790, y, num(r.value_today), 20, { anchor: "start", o: or, ltr: true });
+            txt(580, y, r.verdict === "low" ? "נמוכה מדי" : "גבוהה מדי", 20, { anchor: "start", fill: r.verdict === "low" ? C.n700 : C.teal, o: or });
+            txt(420, y, `${r.low}%–${r.high}%`, 18, { anchor: "start", fill: C.n600, o: or, ltr: true });
+          });
+          const oi = at(35);
+          box(250, 504, 780, 60, oi * 0.6, C.mint);
+          txt(640, 542, `IRR: ${V.irr}% לחודש · בבדיקה: ${V.check} ₪`, 24, { w: 700, o: oi });
+        }
+        // Scene 5 — from a month to a year
+        if (inScene(t, S.year)) {
+          const o = vis(t, S.year);
+          txt(640, 132, "מחודש לשנה", 40, { w: 700, o });
+          const at = (s) => after(t, S.year, s, o);
+          const cards = [
+            { x: 700, from: 1, label: "כפול 12", v: `${V.x12}%` },
+            { x: 260, from: 7, label: "בחזקת 12 (ריבית אפקטיבית)", v: `${V.eff}%` },
+          ];
+          for (const c of cards) {
+            const oc = at(c.from);
+            box(c.x, 172, 320, 130, oc);
+            txt(c.x + 160, 210, c.label, 20, { fill: C.n600, o: oc });
+            txt(c.x + 160, 270, c.v, 48, { w: 700, o: oc, ltr: true });
+          }
+          txt(640, 345, `בלי העמלה: 6% לשנה · העמלה: ${V.feeShare}% מההלוואה, על שלושה חודשים בלבד`, 20, { fill: C.n700, o: at(14) });
+          const ow = at(21);
+          box(200, 384, 880, 140, ow * 0.6, C.mint);
+          txt(640, 422, `שחר (בדוי): עמלה של ${V.wFee} ₪ על ${V.wLoan} ₪, ל־20 שנה, ב־4.8%`, 20, { fill: C.n700, o: ow });
+          txt(640, 476, `כפול 12: מ־${V.wNoFee}% ל־${V.wX12}%`, 32, { w: 700, o: ow });
+          txt(640, 508, "אותה עמלה, בערך — משקל קטן בהרבה בהלוואה גדולה וארוכה", 18, { fill: C.n700, o: ow });
+        }
+        // Scene 6 — the actual cost of credit
+        if (inScene(t, S.cost)) {
+          const o = vis(t, S.cost);
+          txt(640, 132, "העלות הממשית של האשראי", 42, { w: 700, o });
+          txt(640, 172, "לפי תעתיק של הצוות מהוראה של בנק ישראל — לא אומת", 18, { fill: C.n600, o });
+          const at = (s) => after(t, S.cost, s, o);
+          box(240, 210, 800, 150, at(5));
+          txt(640, 256, "ה־IRR של הכסף שהתקבל בפועל", 26, { w: 700, o: at(5) });
+          txt(640, 296, "(הסכום פחות מה שנגבה ביום שההלוואה ניתנת)", 18, { fill: C.n600, o: at(5) });
+          txt(640, 336, "ומשנה — בחזקת 12", 24, { w: 600, fill: C.teal, o: at(8) });
+          const ob = at(13);
+          box(340, 390, 600, 110, ob * 0.6, C.mint);
+          txt(640, 428, `בלי עמלה, 4.8% לשנה (IRR של ${V.bigIrr}% לחודש)`, 20, { fill: C.n700, o: ob });
+          txt(640, 474, `עלות ממשית: ${V.bigEff}%`, 30, { w: 700, o: ob });
+          txt(640, 540, "התשלומים לפי התחזית — ולכן גם המדד הזה חזוי", 18, { fill: C.n600, o: at(15) });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 260, "שיעור תשואה פנימי (IRR)", 40, { w: 600, fill: C.n700, o });
+          txt(640, 330, "הריבית האחת שבה הערך הנוכחי של התשלומים", 40, { w: 700, o });
+          const o2 = after(t, S.end, 5, o);
+          txt(640, 390, "= הכסף שקיבלתם", 44, { w: 700, fill: C.teal, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

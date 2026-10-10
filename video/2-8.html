@@ -219,14 +219,14 @@
               el("rect", { x: 180, y: y + 20, width: 110, height: 50, rx: 25, fill: C.mint, opacity: oi * 0.8 });
               txt(235, y + 54, `${r.rate}%`, 26, { w: 700, ltr: true, o: oi });
             });
-            txt(640, 505, "ב־Mogi: מחושבת כמסלול קבועה צמודה (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 18, { fill: C.n600, o: after(t, sc, 44, o) });
+            txt(640, 505, "ב־Mogi: מחושבת כמסלול קבועה צמודה (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 18, { fill: C.n600, o: after(t, sc, 36, o) });
           }
         }
         // Scene 4 — target price: a discount on the flat, with a cap
         if (inScene(t, S.target)) {
           const sc = S.target, o = vis(t, sc);
           heading("מחיר מטרה: הנחה על הדירה", "לפי תקציר של דף ממשלתי · לא אומת · דירות להמחשה", o);
-          const oR = after(t, sc, 9, o);
+          const oR = after(t, sc, 2, o);
           if (oR > 0) pill(640, 210, 520, `${V.tPct}% מהמחיר, ולא יותר מ־${shek(V.tCap)}`, oR, 24);
           const flats = [
             { x: 880, price: V.aPrice, pct: V.aPct, disc: V.aDisc, after: V.aAfter, note: "פחות מהתקרה", at: 17 },
@@ -256,6 +256,8 @@
             { x: 780, rate: V.rUp, owed: V.fxUp, label: "הדולר עלה", at: 17, hot: true },
             { x: 520, rate: V.rDown, owed: V.fxDown, label: "הדולר ירד", at: 31 },
           ];
+          const oI = during(t, sc, 1, 9, o);
+          if (oI > 0) pill(780, 300, 560, "ההכנסה בשקלים; החוב במטבע חוץ", oI, 24);
           el("line", { x1: 400, x2: 1160, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
           for (const c of cols) {
             const oi = after(t, sc, c.at, o);

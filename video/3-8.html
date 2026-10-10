@@ -1,0 +1,345 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.8 — "מה ידוע, ומה רק חזוי".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-8.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: three numbers on the monthly payment — the first payment, known in
+  advance except for the first month's indexation in linked tracks; the payment under
+  current terms, which moves when the terms move; and the projected maximum, the result
+  of a calculation on a forecast, not a ceiling):
+  1. Title.
+  2. A fixed unlinked track (600,000 ₪, 20 years, 4.6%): 3,828.36 every month; one answer,
+     known at signing.
+  3. The same loan in a variable unlinked track reset every 5 years: years 1–5 known; after
+     that an invented forecast (not the Bank of Israel's). The projected maximum 4,030.31
+     from month 121 — not at the end; 4,030.31 − 3,828.36 = 201.95.
+  4. A forecast is not a promise: if rates rise more, the highest payment is 4,387.20; if they
+     fall, the highest is the first. The Mogi decision: a forecast, not a guaranteed ceiling.
+  5. First payment vs payment under current terms: a prime track after three years
+     (2,530.60 vs 2,722.89), and a linked track on signing day (3,327.59 vs 3,333.09, with an
+     illustrative index). The rule.
+  6. In Mogi: the headline is the payment under current terms; the first and the projected
+     maximum beside it; highlighted from 10% above (Mogi's choice) — here 5.3%.
+  7. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.8 · החזר ראשון, בתנאים הנוכחיים, מרבי חזוי</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-8.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const blocks = fact("explain.blocks");
+      const high = fact("explain.blocks_high");
+      const low = fact("explain.blocks_low");
+      const V = {
+        loan: num(fact("explain.loan")),
+        months: pl(fact("explain.months")),
+        fixed: num(fact("explain.fixed_pay")),
+        first: num(fact("explain.first")),
+        max: num(fact("explain.max")),
+        maxMonth: pl(fact("explain.max_month")),
+        gap: num(fact("explain.max_gap")),
+        highMax: num(fact("explain.high_max")),
+        highOver: num(fact("explain.high_over_forecast")),
+        lowMax: num(fact("explain.low_max")),
+        above: pl(fact("explain.above")),
+        highlightAt: num(fact("explain.highlight_at")),
+        primeLoan: num(fact("diff.prime_loan")),
+        primeFirst: num(fact("diff.prime_first")),
+        primeNow: num(fact("diff.prime_now")),
+        primeGap: num(fact("diff.prime_gap")),
+        linkedLoan: num(fact("diff.linked_loan")),
+        linkedNow: num(fact("diff.linked_now")),
+        linkedFirst: num(fact("diff.linked_first")),
+        linkedGap: num(fact("diff.linked_gap")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], fixed: [10, 30], variable: [30, 84], paths: [84, 124], differ: [124, 166], mogi: [166, 188], end: [188, 200] };
+      window.duration = 200;
+      window.cues = [
+        [1, 5, "שלושה מספרים על התשלום החודשי."],
+        [5, 9.5, "מה מהם ידוע, ומה רק חזוי?"],
+        [11, 17, `‏${V.loan} ₪ ל־20 שנה, בקבועה לא צמודה, ב־4.6%.`],
+        [17, 23, `התשלום: ${V.fixed} ₪ בכל חודש, מהראשון עד האחרון.`],
+        [23, 29, "כאן לכל שאלה על התשלום יש תשובה אחת, ידועה ביום החתימה."],
+        [31, 37, "עכשיו משתנה לא צמודה, שמתעדכנת כל 5 שנים. היום 4.6%."],
+        [37, 44, `חמש השנים הראשונות ידועות: ${V.first} ₪. זה ההחזר הראשון.`],
+        [44, 51, "ההחזר בתנאים הנוכחיים מניח ששום דבר לא יזוז. כאן: אותו סכום."],
+        [51, 58, "ומה אחרי 5 שנים? העוגן החדש עוד לא ידוע."],
+        [58, 65, "מחשבים לפי תחזית. כאן תחזית בדויה, לא של בנק ישראל."],
+        [65, 73, `התשלום הגבוה ביותר בלוח החזוי: ${V.max} ₪, מחודש ${V.maxMonth}.`],
+        [73, 79, "זה ההחזר המרבי החזוי. הוא לא בהכרח בסוף."],
+        [79, 83, `גבוה מההחזר הראשון ב־${V.gap} ₪.`],
+        [85, 92, "אבל העוגן בפועל יכול לצאת אחרת מהתחזית."],
+        [92, 99, `אם הריבית עולה יותר: עד ${V.highMax} ₪ בחודש.`],
+        [99, 106, `כלומר ${V.highOver} ₪ מעל ההחזר המרבי החזוי.`],
+        [106, 113, "אם היא יורדת: הגבוה ביותר הוא דווקא התשלום הראשון."],
+        [113, 123, "ההחזר המרבי החזוי הוא חישוב לפי תחזית, לא תקרה."],
+        [125, 131, "למה צריך גם החזר ראשון וגם החזר בתנאים הנוכחיים?"],
+        [131, 138, `פריים, לפני שלוש שנים: ההחזר הראשון היה ${V.primeFirst} ₪.`],
+        [138, 145, `הפריים עלתה. בתנאים של היום: ${V.primeNow} ₪.`],
+        [145, 152, `קבועה צמודה, ביום החתימה: בתנאים הנוכחיים ${V.linkedNow} ₪.`],
+        [152, 159, `עד התשלום הראשון המדד זז חודש: ${V.linkedFirst} ₪.`],
+        [159, 165, "ההחזר הראשון ידוע מראש, חוץ מההצמדה של החודש הראשון."],
+        [167, 173, "ב־Mogi המספר הראשי הוא ההחזר בתנאים הנוכחיים."],
+        [173, 180, "לידו: ההחזר הראשון וההחזר המרבי החזוי."],
+        [180, 187, `Mogi מדגישה מרבי שגבוה ב־10% ומעלה. כאן: ${V.above}%.`],
+        [189, 194, "ראשון: ידוע. בתנאים הנוכחיים: זז עם התנאים."],
+        [194, 199, "מרבי חזוי: תחזית, לא תקרה."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      // Payments by month, right to left; the vertical axis does not start at zero.
+      const G = { left: 200, right: 1080, base: 490, top: 280, lo: 3400, hi: 4500 };
+      const X = (m) => G.right - (m / 240) * (G.right - G.left);
+      const Y = (v) => G.base - ((Number(v) - G.lo) / (G.hi - G.lo)) * (G.base - G.top);
+      function axis(o) {
+        el("line", { x1: G.left, x2: G.right, y1: G.base + 20, y2: G.base + 20, stroke: C.n300, "stroke-width": 1, opacity: o });
+        for (const [m, s] of [[0, "1"], [60, "5"], [120, "10"], [180, "15"], [240, "20"]]) txt(X(m), G.base + 46, s, 18, { fill: C.n600, o, ltr: true });
+        txt(640, G.base + 72, "שנים (מימין לשמאל) · הציר האנכי לא מתחיל באפס", 17, { fill: C.n600, o });
+      }
+      // A path of four five-year blocks: the first solid (known), the rest dashed (forecast) or solid.
+      function path(rows, color, o, dashedAfterFirst, width = 5) {
+        rows.forEach((r, i) => {
+          const x1 = X(Number(r.from_month) - 1), x2 = X(Number(r.to_month));
+          el("line", { x1, x2, y1: Y(r.total), y2: Y(r.total), stroke: color, "stroke-width": width, "stroke-dasharray": i > 0 && dashedAfterFirst ? "12 8" : "none", opacity: o });
+          if (i > 0) el("line", { x1, x2: x1, y1: Y(rows[i - 1].total), y2: Y(r.total), stroke: color, "stroke-width": 2, opacity: o * 0.6 });
+        });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "מה ידוע, ומה רק חזוי", 76, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 360, "החזר ראשון · החזר בתנאים הנוכחיים · החזר מרבי חזוי", 30, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — a fixed track
+        if (inScene(t, S.fixed)) {
+          const o = vis(t, S.fixed);
+          txt(640, 132, `קבועה לא צמודה · ${V.loan} ₪ · 20 שנה · 4.6%`, 36, { w: 700, o });
+          axis(o);
+          const o1 = after(t, S.fixed, 4, o);
+          el("line", { x1: X(0), x2: X(240), y1: Y(fact("explain.fixed_pay")), y2: Y(fact("explain.fixed_pay")), stroke: C.teal, "stroke-width": 5, opacity: o1 });
+          txt(640, Y(fact("explain.fixed_pay")) - 18, `${V.fixed} ₪ בכל חודש`, 24, { w: 700, o: o1 });
+          const o2 = after(t, S.fixed, 13, o);
+          txt(640, 200, "ראשון = בתנאים הנוכחיים = הגבוה ביותר · ידוע ביום החתימה", 22, { fill: C.n700, w: 600, o: o2 });
+        }
+        // Scene 3 — a variable track, a forecast, and the projected maximum
+        if (inScene(t, S.variable)) {
+          const o = vis(t, S.variable);
+          txt(640, 124, "משתנה לא צמודה · מתעדכנת כל 5 שנים", 36, { w: 700, o });
+          txt(640, 158, `${V.loan} ₪ · 20 שנה · היום 4.6%`, 20, { fill: C.n600, o });
+          axis(o);
+          const o1 = after(t, S.variable, 2, o);
+          path(blocks.slice(0, 1), C.teal, o1, true);
+          txt(X(30), Y(blocks[0].total) + 34, `${num(blocks[0].total)} ₪`, 20, { w: 700, o: o1, ltr: true });
+          txt(X(30), Y(blocks[0].total) + 58, "ידוע", 18, { fill: C.n600, o: o1 });
+          const o2 = after(t, S.variable, 28, o);
+          path(blocks, C.teal, o2, true);
+          blocks.slice(1).forEach((r) => {
+            const xm = X((Number(r.from_month) - 1 + Number(r.to_month)) / 2);
+            txt(xm, Y(r.total) - 16, `${num(r.total)} ₪`, 20, { w: 700, o: o2, ltr: true });
+            txt(xm, Y(r.total) + 30, `${r.rate_1}%`, 18, { fill: C.n600, o: o2, ltr: true });
+          });
+          txt(X(180), 196, "תחזית בדויה — לא התחזית של בנק ישראל", 18, { fill: C.n700, o: o2 });
+          // The projected maximum.
+          const o3 = after(t, S.variable, 35, o);
+          const xm = X(Number(fact("explain.max_month")) - 1);
+          el("circle", { cx: xm, cy: Y(fact("explain.max")), r: 10, fill: C.navy, opacity: o3 });
+          const o4 = after(t, S.variable, 49, o);
+          eqn(420, 236, `${V.max} − ${V.first} = ${V.gap}`, 24, { w: 600, fill: C.n700, o: o4 });
+          // Labels for the three numbers.
+          const tags = [
+            { from: 7, text: `החזר ראשון: ${V.first} ₪` },
+            { from: 14, text: `החזר בתנאים הנוכחיים: ${V.first} ₪` },
+            { from: 35, text: `החזר מרבי חזוי: ${V.max} ₪`, c: C.navy },
+          ];
+          tags.forEach((g, i) => {
+            const og = after(t, S.variable, g.from, o);
+            txt(1100, 196 + 26 * i, g.text, 18, { anchor: "start", w: 700, fill: g.c ?? C.teal, o: og });
+          });
+        }
+        // Scene 4 — three paths: the forecast is not a ceiling
+        if (inScene(t, S.paths)) {
+          const o = vis(t, S.paths);
+          txt(640, 124, "תחזית אינה הבטחה", 40, { w: 700, o });
+          axis(o);
+          path(blocks, C.teal, o, true);
+          const oh = after(t, S.paths, 8, o);
+          path(high, C.navy, oh, false, 3);
+          const ol = after(t, S.paths, 22, o);
+          path(low, C.n600, ol, false, 3);
+          // legend
+          const items = [
+            { c: C.teal, dash: true, s: "לפי התחזית (בדויה)", o },
+            { c: C.navy, s: "אם הריבית עולה יותר", o: oh },
+            { c: C.n600, s: "אם הריבית יורדת", o: ol },
+          ];
+          items.forEach((it, i) => {
+            el("line", { x1: 1060 - i * 280, x2: 1100 - i * 280, y1: 172, y2: 172, stroke: it.c, "stroke-width": 4, "stroke-dasharray": it.dash ? "10 6" : "none", opacity: it.o });
+            txt(1050 - i * 280, 178, it.s, 17, { anchor: "start", fill: C.n700, o: it.o });
+          });
+          txt(X(150), Y(fact("explain.high_max")) - 16, `${V.highMax} ₪`, 20, { w: 700, o: oh, ltr: true });
+          txt(X(150), Y(fact("explain.max")) + 30, `${V.max} ₪`, 20, { w: 700, fill: C.teal, o: oh, ltr: true });
+          txt(X(30), Y(fact("explain.low_max")) - 16, `${V.lowMax} ₪`, 20, { w: 700, o: ol, ltr: true });
+          const om = after(t, S.paths, 29, o);
+          box(200, 196, 520, 60, om * 0.6, C.mint);
+          txt(460, 222, "ההחזר המרבי החזוי: חישוב לפי תחזית, לא תקרה", 18, { w: 700, o: om });
+          txt(460, 246, "החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 15, { fill: C.n700, o: om });
+        }
+        // Scene 5 — when the first payment and the payment under current terms differ
+        if (inScene(t, S.differ)) {
+          const o = vis(t, S.differ);
+          txt(640, 128, "ראשון מול בתנאים הנוכחיים", 40, { w: 700, o });
+          const cards = [
+            { x: 660, from: 6, head: "א. פריים, אחרי שלוש שנים", sub: `${V.primeLoan} ₪ · 20 שנה · מ־4.5% ל־5.5%`, a: ["החזר ראשון", `${V.primeFirst} ₪`], b: ["בתנאים הנוכחיים", `${V.primeNow} ₪`], eq: `${V.primeNow} − ${V.primeFirst} = ${V.primeGap}`, bFrom: 14 },
+            { x: 180, from: 20, head: "ב. קבועה צמודה, ביום החתימה", sub: `${V.linkedLoan} ₪ · 20 שנה · 3% · מדד להמחשה`, a: ["בתנאים הנוכחיים", `${V.linkedNow} ₪`], b: ["החזר ראשון", `${V.linkedFirst} ₪`], eq: `${V.linkedFirst} − ${V.linkedNow} = ${V.linkedGap}`, bFrom: 28 },
+          ];
+          for (const c of cards) {
+            const oc = after(t, S.differ, c.from, o);
+            box(c.x, 170, 440, 300, oc);
+            txt(c.x + 415, 210, c.head, 22, { anchor: "start", w: 700, o: oc });
+            txt(c.x + 415, 238, c.sub, 16, { anchor: "start", fill: C.n600, o: oc });
+            txt(c.x + 415, 290, c.a[0], 20, { anchor: "start", fill: C.n700, o: oc });
+            txt(c.x + 25, 290, c.a[1], 26, { anchor: "start", w: 700, o: oc, ltr: true });
+            const ob = after(t, S.differ, c.bFrom, o);
+            txt(c.x + 415, 350, c.b[0], 20, { anchor: "start", fill: C.n700, o: ob });
+            txt(c.x + 25, 350, c.b[1], 26, { anchor: "start", w: 700, fill: C.teal, o: ob, ltr: true });
+            eqn(c.x + 220, 430, c.eq, 22, { w: 600, fill: C.n700, o: ob });
+          }
+          const or = after(t, S.differ, 35, o);
+          box(180, 494, 920, 60, or * 0.6, C.mint);
+          txt(640, 532, "ההחזר הראשון ידוע מראש, חוץ מההצמדה של החודש הראשון במסלולים צמודים", 20, { w: 700, o: or });
+        }
+        // Scene 6 — how Mogi shows them
+        if (inScene(t, S.mogi)) {
+          const o = vis(t, S.mogi);
+          txt(640, 128, "איך Mogi מציגה אותם", 40, { w: 700, o });
+          const o1 = after(t, S.mogi, 1, o);
+          box(390, 168, 500, 120, o1);
+          txt(640, 206, "החזר בתנאים הנוכחיים — המספר הראשי", 20, { fill: C.n600, o: o1 });
+          txt(640, 260, `${V.first} ₪`, 44, { w: 700, o: o1, ltr: true });
+          const o2 = after(t, S.mogi, 7, o);
+          box(390, 304, 240, 92, o2);
+          txt(510, 338, "החזר ראשון", 18, { fill: C.n600, o: o2 });
+          txt(510, 376, `${V.first} ₪`, 26, { w: 700, o: o2, ltr: true });
+          box(650, 304, 240, 92, o2);
+          txt(770, 338, "החזר מרבי חזוי", 18, { fill: C.n600, o: o2 });
+          txt(770, 376, `${V.max} ₪`, 26, { w: 700, o: o2, ltr: true });
+          const o3 = after(t, S.mogi, 14, o);
+          txt(640, 440, `מודגש מ־10% מעל הראשי (בחירה של Mogi, לא כלל של בנק ישראל) · כאן ${V.above}%`, 19, { fill: C.n700, o: o3 });
+          txt(640, 472, `היה מודגש מ־${V.highlightAt} ₪ ומעלה`, 19, { fill: C.n700, o: o3 });
+          txt(640, 530, "החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 17, { fill: C.n600, o: after(t, S.mogi, 2, o) });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [
+            { y: 250, a: "החזר ראשון", b: "ידוע מראש (חוץ מהצמדה של חודש ראשון)", from: 0.5 },
+            { y: 320, a: "החזר בתנאים הנוכחיים", b: "זז כשהתנאים זזים", from: 2 },
+            { y: 390, a: "החזר מרבי חזוי", b: "תחזית, לא תקרה", from: 5.5 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.end, r.from, o);
+            txt(1060, r.y, r.a, 34, { anchor: "start", w: 700, o: or });
+            txt(620, r.y, r.b, 28, { anchor: "start", fill: C.teal, o: or });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
