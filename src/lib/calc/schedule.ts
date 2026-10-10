@@ -29,9 +29,19 @@
  * A scenario (index and rate paths) is a teaching scenario, never a forecast:
  * pages label it "תרחיש להמחשה, לא תחזית".
  *
- * Every function returns exact Decimals; money is rounded to the agora only
- * when shown (money.ts). Recomputed independently in checks/kinds/schedule.py
- * (fact kinds with the prefix sch_).
+ * Rounding: two conventions, chosen per call (the `rounding` option).
+ *  - "exact" (the default): every figure is an exact Decimal; money is rounded
+ *    to the agora only when shown (money.ts). For comparisons (3.8–3.11).
+ *  - "statement": the way a statement shows it, and what teaching tables use
+ *    (course/AUTHORING.md), so every row adds up on the printed numbers: the
+ *    balance in agorot; on a linked track the opening balance is indexed and
+ *    rounded to the agora each month; each month's interest rounded to the
+ *    agora; the payment rounded to the agora when it is set (month 1, a rate
+ *    change, an index move) and kept otherwise; the last payment clears the
+ *    balance. On a flat unlinked track this is amortization.ts's
+ *    annuityStatement / equalPrincipalStatement, row for row.
+ * Recomputed independently in checks/kinds/schedule.py (fact kinds with the
+ * prefix sch_).
  *
  * Exports are stable — later lessons import them. Add, don't rename.
  */
@@ -45,6 +55,8 @@ const D = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_UP });
 const ZERO = new D(0);
 const ONE = new D(1);
 const HUNDRED = new D(100);
+/** Rounded to the agora, half up. */
+const agorot = (x: Numeric): Decimal => new D(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
 // ---------------------------------------------------------------------------
 // Tracks and scenarios
@@ -57,6 +69,9 @@ export const TRACK_KINDS: TrackKind[] = ["fixed_unlinked", "fixed_linked", "prim
 
 /** How the principal is repaid. */
 export type ScheduleMethod = "spitzer" | "equal_principal";
+
+/** How money is rounded inside a schedule: "exact" (round only for display) or "statement" (every row in agorot). See the file comment. */
+export type Rounding = "exact" | "statement";
 
 /** DEC-3: the reset interval assumed in a first simulation, before an offer. */
 export const DEFAULT_RESET_MONTHS = 60;
@@ -83,6 +98,8 @@ export interface TrackSpec {
   method?: ScheduleMethod;
   /** Variable tracks only: months between resets. Default DEFAULT_RESET_MONTHS. */
   resetMonths?: number;
+  /** Overrides the scenario's rounding for this track. */
+  rounding?: Rounding;
 }
 
 /**
@@ -101,6 +118,8 @@ export interface Scenario {
   linkedAnchorShift?: Numeric[];
   /** Months per block. Default 12. */
   blockMonths?: number;
+  /** How every track of the mix is rounded, unless a track says otherwise. Default "exact". */
+  rounding?: Rounding;
 }
 
 function assertMonths(months: number, what = "months"): void {
@@ -194,16 +213,21 @@ export interface ScheduleRow extends PathRow {
  * rate in month t + 1 (the term is rates.length months), `factors[t]` (default 1)
  * how much the index moved in month t + 1. The engine every other function uses.
  *
- * Spitzer is amortization.ts's pathSchedule. Equal principal: each month the
- * balance is indexed, the month's interest is opening × rate ÷ 12, and the
- * principal part is opening ÷ months left. Exact, unrounded.
+ * rounding "exact" (default): Spitzer is amortization.ts's pathSchedule. Equal
+ * principal: each month the balance is indexed, the month's interest is
+ * opening × rate ÷ 12, and the principal part is opening ÷ months left.
+ * Exact, unrounded.
+ *
+ * rounding "statement": the same rules in agorot (see the file comment).
  */
-export function scheduleFromPaths(principal: Numeric, rates: Numeric[], factors?: Numeric[], method: ScheduleMethod = "spitzer"): ScheduleRow[] {
+export function scheduleFromPaths(principal: Numeric, rates: Numeric[], factors?: Numeric[], method: ScheduleMethod = "spitzer", rounding: Rounding = "exact"): ScheduleRow[] {
   const months = rates.length;
   assertMonths(months);
   if (factors && factors.length !== months) throw new RangeError("factors must have one entry per month");
   let base: PathRow[];
-  if (method === "spitzer") {
+  if (rounding === "statement") {
+    base = statementPath(principal, rates, factors, method);
+  } else if (method === "spitzer") {
     base = pathSchedule(principal, rates, factors);
   } else {
     base = [];
@@ -220,23 +244,61 @@ export function scheduleFromPaths(principal: Numeric, rates: Numeric[], factors?
     }
   }
   let ratio = ONE;
-  let previous = new D(principal);
+  let previous = rounding === "statement" ? agorot(principal) : new D(principal);
   return base.map((row) => {
     ratio = ratio.mul(row.indexFactor);
+    const paymentIndexation = new D(row.payment).minus(new D(row.payment).div(ratio));
     const out: ScheduleRow = {
       ...row,
       indexRatio: ratio,
       indexation: new D(row.opening).minus(previous),
-      paymentIndexation: new D(row.payment).minus(new D(row.payment).div(ratio)),
+      paymentIndexation: rounding === "statement" ? agorot(paymentIndexation) : paymentIndexation,
     };
     previous = new D(row.closing);
     return out;
   });
 }
 
-/** One track's schedule under a scenario. */
+/**
+ * The statement convention, month by month: index the balance and round it to
+ * the agora; round the interest to the agora; set the payment (Spitzer: the
+ * level payment on the opening balance over the months left; equal principal:
+ * the opening balance ÷ the months left) in agorot in month 1 and whenever the
+ * rate changed (Spitzer) or the index moved, and keep it otherwise; the last
+ * month pays what is left.
+ */
+function statementPath(principal: Numeric, rates: Numeric[], factors: Numeric[] | undefined, method: ScheduleMethod): PathRow[] {
+  const months = rates.length;
+  const rows: PathRow[] = [];
+  let balance = agorot(principal);
+  let set = ZERO; // Spitzer: the payment; equal principal: the principal part
+  let lastRate = new D(rates[0]);
+  for (let t = 0; t < months; t++) {
+    const factor = new D(factors ? factors[t] : 1);
+    const moved = !factor.eq(1);
+    const opening = moved ? agorot(balance.mul(factor)) : balance;
+    const rate = new D(rates[t]);
+    const left = months - t;
+    const interest = agorot(monthInterest(opening, rate));
+    if (method === "spitzer") {
+      if (t === 0 || moved || !rate.eq(lastRate)) set = agorot(annuityPayment(opening, rate, left));
+    } else if (t === 0 || moved) {
+      set = agorot(opening.div(left));
+    }
+    lastRate = rate;
+    const last = t === months - 1;
+    const principalPaid = last ? opening : method === "spitzer" ? set.minus(interest) : set;
+    const closing = opening.minus(principalPaid);
+    rows.push({ month: t + 1, opening, payment: principalPaid.plus(interest), interest, principalPaid, closing, rate, indexFactor: factor });
+    balance = closing;
+  }
+  return rows;
+}
+
+/** One track's schedule under a scenario; rounded by the track's `rounding`, else the scenario's, else "exact". */
 export function trackSchedule(track: TrackSpec, scenario: Scenario = {}): ScheduleRow[] {
-  return scheduleFromPaths(track.amount, trackRatePath(track, scenario), trackIndexFactors(track, scenario), track.method ?? "spitzer");
+  const rounding = track.rounding ?? scenario.rounding ?? "exact";
+  return scheduleFromPaths(track.amount, trackRatePath(track, scenario), trackIndexFactors(track, scenario), track.method ?? "spitzer", rounding);
 }
 
 /** What a schedule adds up to: paid = principal + interest + indexation (the balance's הפרשי הצמדה). */
@@ -313,13 +375,13 @@ export interface MixMonth {
   balance: Decimal;
 }
 
-/** Every track's schedule under one scenario, in order. */
+/** Every track's schedule under one scenario, in order (rounded as the scenario, or each track, says). */
 export function mixSchedules(tracks: TrackSpec[], scenario: Scenario = {}): ScheduleRow[][] {
   if (tracks.length === 0) throw new RangeError("a mix needs at least one track");
   return tracks.map((t) => trackSchedule(t, scenario));
 }
 
-/** The mix's cash flow, month by month, up to its longest track's last month. */
+/** The mix's cash flow, month by month, up to its longest track's last month. Set `scenario.rounding` to "statement" for a statement's figures. */
 export function mixCashFlow(tracks: TrackSpec[], scenario: Scenario = {}, schedules: ScheduleRow[][] = mixSchedules(tracks, scenario)): MixMonth[] {
   const months = Math.max(...schedules.map((s) => s.length));
   return Array.from({ length: months }, (_, t) => {
@@ -458,7 +520,7 @@ export function interimInterest(amount: Numeric, annualPercent: Numeric, days: n
 // Facts: a flat encoding of a track and a mix (shared with checks/kinds/schedule.py)
 // ---------------------------------------------------------------------------
 
-/** Flat fact inputs for one path: principal, months, method, rate, change_k_month/_rate, index_k or inflation_k (+ inflation_block_months). */
+/** Flat fact inputs for one path: principal, months, method, rate, change_k_month/_rate, index_k or inflation_k (+ inflation_block_months), and rounding when it is "statement". */
 export type PathInputs = Record<string, string | number>;
 
 /** Builds a path's flat inputs. */
@@ -471,8 +533,10 @@ export function pathInputs(p: {
   index?: Numeric[];
   inflation?: Numeric[];
   inflationBlockMonths?: number;
+  rounding?: Rounding;
 }): PathInputs {
   const out: PathInputs = { principal: String(p.principal), months: p.months, method: p.method ?? "spitzer", rate: String(p.rate) };
+  if (p.rounding && p.rounding !== "exact") out.rounding = p.rounding;
   (p.changes ?? []).forEach((c, k) => {
     out[`change_${k + 1}_month`] = c.month;
     out[`change_${k + 1}_rate`] = String(c.rate);
@@ -498,10 +562,10 @@ export function scheduleFromInputs(i: PathInputs): ScheduleRow[] {
   const index = numbered(i, "index", 0);
   const inflation = numbered(i, "inflation");
   const factors = index.length > 0 ? indexFactorsFromIndex(index, months) : inflation.length > 0 ? indexPath(inflation, Number(i.inflation_block_months ?? 12), months) : undefined;
-  return scheduleFromPaths(String(i.principal), rates, factors, (i.method as ScheduleMethod) ?? "spitzer");
+  return scheduleFromPaths(String(i.principal), rates, factors, (i.method as ScheduleMethod) ?? "spitzer", (i.rounding as Rounding) ?? "exact");
 }
 
-/** Flat fact inputs for a mix and its scenario: t{k}_kind/_amount/_rate/_months/_method/_reset, block_months, inflation_k, prime_shift_k, anchor_shift_k, linked_anchor_shift_k. */
+/** Flat fact inputs for a mix and its scenario: t{k}_kind/_amount/_rate/_months/_method/_reset/_rounding, block_months, rounding, inflation_k, prime_shift_k, anchor_shift_k, linked_anchor_shift_k. */
 export function mixInputs(tracks: TrackSpec[], scenario: Scenario = {}): PathInputs {
   const out: PathInputs = { tracks: tracks.length, block_months: scenario.blockMonths ?? 12 };
   tracks.forEach((t, k) => {
@@ -512,7 +576,9 @@ export function mixInputs(tracks: TrackSpec[], scenario: Scenario = {}): PathInp
     out[`${p}months`] = t.months;
     out[`${p}method`] = t.method ?? "spitzer";
     if (resets(t.kind)) out[`${p}reset`] = t.resetMonths ?? DEFAULT_RESET_MONTHS;
+    if (t.rounding) out[`${p}rounding`] = t.rounding;
   });
+  if (scenario.rounding && scenario.rounding !== "exact") out.rounding = scenario.rounding;
   const put = (name: string, values?: Numeric[]) => (values ?? []).forEach((v, k) => (out[`${name}_${k + 1}`] = String(v)));
   put("inflation", scenario.inflation);
   put("prime_shift", scenario.primeShift);
@@ -527,6 +593,7 @@ export function mixFromInputs(i: PathInputs): { tracks: TrackSpec[]; scenario: S
     const p = `t${k + 1}_`;
     const t: TrackSpec = { kind: i[`${p}kind`] as TrackKind, amount: String(i[`${p}amount`]), rate: String(i[`${p}rate`]), months: Number(i[`${p}months`]), method: i[`${p}method`] as ScheduleMethod };
     if (`${p}reset` in i) t.resetMonths = Number(i[`${p}reset`]);
+    if (`${p}rounding` in i) t.rounding = i[`${p}rounding`] as Rounding;
     return t;
   });
   const opt = (name: string) => {
@@ -542,5 +609,6 @@ export function mixFromInputs(i: PathInputs): { tracks: TrackSpec[]; scenario: S
   if (primeShift) scenario.primeShift = primeShift;
   if (anchorShift) scenario.anchorShift = anchorShift;
   if (linkedAnchorShift) scenario.linkedAnchorShift = linkedAnchorShift;
+  if (i.rounding) scenario.rounding = i.rounding as Rounding;
   return { tracks, scenario };
 }
