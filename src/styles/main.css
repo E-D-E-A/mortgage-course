@@ -127,6 +127,11 @@
    on an element wins; and never inside an interactive component (an Astro island),
    which lays itself out — except the lesson text a component receives (its slot). */
 @layer components {
+  /* A super- or subscript inside body text would render below 12px. */
+  main :is(sup, sub) {
+    font-size: max(0.75em, 12px);
+  }
+
   .prose-lesson {
     font-size: var(--mogi-text-body-l-size);
     line-height: 1.75;
