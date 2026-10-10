@@ -136,7 +136,7 @@ export default function lesson26(): LessonData {
   const third = ["4.25", "4.25", "5.25", "4.25"];
   const lower = ["3.25", "3.25", "3.25", "3.25"];
 
-  // Worked example: case A considers 500,000 ₪ in a prime track at P−0.6 for 25 years.
+  // Worked example (a separate exercise, not case A): Roni considers 500,000 ₪ in a prime track at P−0.6 for 25 years.
   const W = "500000";
   const WN = 300;
   const wRate = trackRate("worked.rate", v(primeNow), "-0.6");

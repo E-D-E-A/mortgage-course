@@ -937,7 +937,7 @@
       "value": "10041.93"
     },
     {
-      "id": "ex5.answer",
+      "id": "slider.full_extra",
       "kind": "difference",
       "inputs": {
         "minuend": "slider.full_interest",
@@ -965,12 +965,6 @@
         "subtrahend": "slider.none_interest"
       },
       "value": "80195.49"
-    },
-    {
-      "id": "case.loan",
-      "kind": "given",
-      "inputs": {},
-      "value": "1640000.00"
     },
     {
       "id": "worked.months",
@@ -1713,6 +1707,119 @@
       "kind": "given",
       "inputs": {},
       "value": "250000.00"
+    },
+    {
+      "id": "ex5.full_after",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 24,
+        "period": 25,
+        "field": "payment"
+      },
+      "value": "4571.33"
+    },
+    {
+      "id": "ex5.partial_after",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 24,
+        "period": 25,
+        "field": "payment"
+      },
+      "value": "4153.69"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.full_after",
+        "subtrahend": "ex5.partial_after"
+      },
+      "value": "417.64"
+    },
+    {
+      "id": "ex5.err_12",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "slider.full_after",
+        "subtrahend": "slider.partial_after"
+      },
+      "value": "197.09"
+    },
+    {
+      "id": "ex6.partial_interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "80000",
+        "annual_percent": "4.8",
+        "months": 24
+      },
+      "value": "7680.00"
+    },
+    {
+      "id": "ex6.full_interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "80000",
+        "annual_percent": "4.8",
+        "months": 24
+      },
+      "value": "8043.88"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.full_interest",
+        "subtrahend": "ex6.partial_interest"
+      },
+      "value": "363.88"
+    },
+    {
+      "id": "ex6.monthly",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "80000",
+        "annual_percent": "4.8",
+        "months": 24,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "320.00"
+    },
+    {
+      "id": "ex6.full_last",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "80000",
+        "annual_percent": "4.8",
+        "months": 24,
+        "period": 24,
+        "field": "payment"
+      },
+      "value": "88043.88"
+    },
+    {
+      "id": "ex6.formula",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "80000",
+        "rate_percent": "0.4",
+        "periods": 24
+      },
+      "value": "88043.86"
     }
   ]
 }

@@ -115,6 +115,7 @@ export default function lesson23(): LessonData {
   // Worked example: 400,000 ₪, not indexed at 4.8% against indexed at 2.7%.
   const wAmount = given("worked.amount", "400000");
   const wIndexed3 = indexedAmt("worked.indexed_3", "400000", "3");
+  const wIndexed15 = indexedAmt("worked.indexed_15", "400000", "1.5");
 
   const facts: Fact[] = [
     // Prediction and explanation: 100,000 ₪ for a year, 5% not indexed against 3% indexed, inflation 2%.
@@ -146,7 +147,8 @@ export default function lesson23(): LessonData {
     given("worked.inflation_low", "1.5"),
     given("worked.inflation_high", "3"),
     interest("worked.plain_cost", "400000", "4.8"),
-    indexedAmt("worked.indexed_15", "400000", "1.5"),
+    wIndexed15,
+    difference("worked.indexation_15", wIndexed15, wAmount),
     interest("worked.interest_15", "406000", "2.7"),
     indexedCost("worked.cost_15", "400000", "2.7", "1.5"),
     wIndexed3,
@@ -171,8 +173,8 @@ export default function lesson23(): LessonData {
     breakEven("ex3.inverted", "2.5", "4.5"),
 
     // Exercise 5: indexed 3% with inflation 2.5%, as a rate before inflation.
-    beforeInflation("ex5.answer", "3", "2.5"),
-    pointsSum("ex5.added", "3", "2.5"),
+    beforeInflation("ex5.answer", "3", "2.4"),
+    pointsSum("ex5.added", "3", "2.4"),
 
     // Exercise 6: 500,000 ₪ indexed at 3%, inflation 4%, 25,000 ₪ paid at the end of the year.
     afterPayment("ex6.answer", "500000", "3", "4", "25000"),

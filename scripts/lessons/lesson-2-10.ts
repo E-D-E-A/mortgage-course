@@ -64,7 +64,16 @@ export default function lesson210(): LessonData {
   // ── Exercises. ──
   const x3 = repCell("ex3.answer", "grace_full", "200000", "6", 120, 2, "closing", 2);
   const x4Last = repCell("ex4.answer", "bullet_partial", "250000", "4.8", 60, 60, "payment");
-  const x5Gap = difference("ex5.answer", sFullInterest, sNoneInterest);
+  const sFullExtra = difference("slider.full_extra", sFullInterest, sNoneInterest);
+  // Exercise 5: with 24 months of grace, how much more each month after full grace than after partial grace.
+  const x5Full = repCell("ex5.full_after", "grace_full", ...S, 25, "payment", 24);
+  const x5Partial = repCell("ex5.partial_after", "grace_partial", ...S, 25, "payment", 24);
+  const s12Full = repCell("slider.full_after", "grace_full", ...S, 13, "payment", 12);
+  const s12Partial = repCell("slider.partial_after", "grace_partial", ...S, 13, "payment", 12);
+  // Exercise 6: 80,000 ₪ at 4.8% for 24 months, full bullet against partial bullet.
+  const B6 = ["80000", "4.8", 24] as const;
+  const x6Partial = repTotalInterest("ex6.partial_interest", "bullet_partial", ...B6);
+  const x6Full = repTotalInterest("ex6.full_interest", "bullet_full", ...B6);
 
   const facts: Fact[] = [
     // Explanation.
@@ -102,8 +111,8 @@ export default function lesson210(): LessonData {
     repMonths("slider.months", 20),
     repCell("slider.grace_pay", "grace_partial", ...S, 1, "payment", 12),
     repCell("slider.none_pay", "spitzer", ...S, 1, "payment"),
-    repCell("slider.partial_after", "grace_partial", ...S, 13, "payment", 12),
-    repCell("slider.full_after", "grace_full", ...S, 13, "payment", 12),
+    s12Partial,
+    s12Full,
     repCell("slider.full_balance", "grace_full", ...S, 12, "closing", 12),
     sNoneInterest,
     sPartialInterest,
@@ -112,12 +121,11 @@ export default function lesson210(): LessonData {
     sPartialPaid,
     sFullPaid,
     difference("slider.partial_extra", sPartialInterest, sNoneInterest),
-    x5Gap,
+    sFullExtra,
     sFullInterest36,
     difference("slider.full_extra_36", sFullInterest36, sNoneInterest),
 
     // Worked example.
-    given("case.loan", "1640000.00"),
     repMonths("worked.months", 25),
     repMonthly("worked.monthly", "4.8"),
     wGracePay,
@@ -148,8 +156,18 @@ export default function lesson210(): LessonData {
     x4Last,
     repCell("ex4.monthly", "bullet_partial", "250000", "4.8", 60, 1, "payment"),
     given("ex4.principal", "250000.00"),
-    // Exercise 6: full bullet against partial bullet.
-    // (bullet.gap above is the answer; bullet.full_interest and bullet.partial_interest are the traps.)
+    // Exercise 5.
+    x5Full,
+    x5Partial,
+    difference("ex5.answer", x5Full, x5Partial),
+    difference("ex5.err_12", s12Full, s12Partial),
+    // Exercise 6.
+    x6Partial,
+    x6Full,
+    difference("ex6.answer", x6Full, x6Partial),
+    repCell("ex6.monthly", "bullet_partial", ...B6, 1, "payment"),
+    repCell("ex6.full_last", "bullet_full", ...B6, 24, "payment"),
+    { id: "ex6.formula", kind: "compound_balance", inputs: { principal: "80000", rate_percent: "0.4", periods: 24 }, value: moneyString(compoundBalance("80000", "0.4", 24)) },
   ];
 
   return {

@@ -202,13 +202,14 @@ def anchor_table(i, _facts=None):
 
 
 def linked_payment_table(i, _facts=None):
-    # Statement convention: each year's payment is last year's, rounded to the agora, times (1 + inflation).
+    # As lesson 2.5 teaches: each year's index is last year's printed index × (1 + inflation),
+    # rounded to two decimals; the payment is the scheduled payment × that index ÷ the base index.
     g = 1 + Decimal(i["inflation_percent"]) / HUNDRED
-    pay, index, rows = Decimal(i["payment"]), Decimal(i["base_index"]), []
+    base = Decimal(i["base_index"])
+    index, rows = base, []
     for year in range(1, int(i["years"]) + 1):
-        pay = agorot(pay * g)
-        index = index * g
-        rows.append({"period": year, "index": plain(index), "payment": str(pay)})
+        index = (index * g).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        rows.append({"period": year, "index": plain(index), "payment": str(agorot(Decimal(i["payment"]) * index / base))})
     return rows
 
 

@@ -9,7 +9,7 @@
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { plainNumber } from "../lib/calc/indexation.ts";
-import { formatShekels, formatShekelsText } from "../lib/calc/money.ts";
+import { formatShekelsText } from "../lib/calc/money.ts";
 import { breakEvenInflation, indexedAmount, indexedYearOwed, plainYearOwed } from "../lib/calc/tracks.ts";
 
 const props = withDefaults(defineProps<{ amount?: number; plain?: number; real?: number; inflation?: number }>(), {
@@ -50,6 +50,8 @@ const indexedLine = computed(() => {
 });
 const breakEvenVisible = computed(() => breakEven.value.gte(0) && breakEven.value.lte(MAX));
 const ticks = Array.from({ length: MAX + 1 }, (_, k) => k);
+/** Where inflation p sits, measured from the start (right) edge, in percent of the chart's width — for the HTML labels. */
+const fromStart = (p: number) => `${((PAD.side + (p / MAX) * (W - PAD.side * 2)) / W) * 100}%`;
 const tableRows = computed(() =>
   ticks.map((p) => {
     const b = indexedYearOwed(props.amount, String(real.value), String(p));
@@ -95,13 +97,13 @@ const tableRows = computed(() =>
     <p class="mt-3 text-body-m text-n800">
       <template v-if="gap.isZero()">שני המסלולים עולים אותו דבר.</template>
       <template v-else>המסלול ה{{ gap.isNeg() ? "צמוד" : "לא צמוד" }} זול יותר ב־<span class="ltr">{{ formatShekelsText(gap.abs()) }}</span>.</template>
-      נקודת האיזון: אינפלציה של <span class="ltr">{{ show(breakEven) }}%</span>. מעליה הצמוד יקר יותר, מתחתיה הוא זול יותר.
+      נקודת האיזון: אינפלציה של <span class="ltr">{{ show(breakEven) }}%</span>{{ breakEvenVisible ? "" : " (מחוץ לגרף, שמראה 0% עד 8%)" }}. מעליה הצמוד יקר יותר, מתחתיה הוא זול יותר.
     </p>
 
     <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-4 rounded-sm" style="background: var(--mogi-turquoise-2)"></span>לא צמוד</li>
       <li class="flex items-center gap-2"><span class="inline-block h-1 w-4 rounded-sm" style="background: var(--mogi-teal-deep)"></span>צמוד</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-0.5 w-4" style="border-top: 2px dashed var(--mogi-navy)"></span>נקודת האיזון</li>
+      <li v-if="breakEvenVisible" class="flex items-center gap-2"><span class="inline-block h-0.5 w-4" style="border-top: 2px dashed var(--mogi-navy)"></span>נקודת האיזון</li>
     </ul>
     <div class="mt-3">
       <svg :viewBox="`0 0 ${W} ${H}`" class="w-full" role="img" :aria-label="`גרף: כמה מגיע בסוף השנה בכל מסלול, לפי האינפלציה. נקודת האיזון: ${show(breakEven)}%`">
@@ -111,8 +113,9 @@ const tableRows = computed(() =>
         <line v-if="breakEvenVisible" :x1="x(breakEven.toNumber())" :x2="x(breakEven.toNumber())" :y1="PAD.top" :y2="H - PAD.bottom" stroke="var(--mogi-navy)" stroke-width="2" stroke-dasharray="6 5" />
         <circle :cx="x(inflation)" :cy="y(indexedOwed.toNumber())" r="8" fill="var(--mogi-navy)" stroke="var(--mogi-n0)" stroke-width="2" />
       </svg>
-      <div class="flex justify-between px-[1.5%] text-caption text-n600" aria-hidden="true">
-        <span v-for="k in ticks" :key="k" class="ltr w-0 text-center" :class="k % 2 ? 'max-sm:invisible' : ''">{{ k }}%</span>
+      <!-- Each label centred on its grid line: placed from the start (right) edge, then shifted by half its width. -->
+      <div class="relative h-4 text-caption text-n600" aria-hidden="true">
+        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :class="k % 2 ? 'max-sm:invisible' : ''" :style="{ insetInlineStart: fromStart(k), transform: 'translateX(50%)' }">{{ k }}%</span>
       </div>
       <p class="mt-1 text-center text-caption text-n600">האינפלציה בשנה (מימין לשמאל). הנקודה: האינפלציה שבחרתם.</p>
     </div>
@@ -132,12 +135,12 @@ const tableRows = computed(() =>
         <tbody>
           <tr v-for="r in tableRows" :key="r.p" class="border-b border-n100">
             <td class="py-1"><span class="ltr">{{ r.p }}%</span></td>
-            <td class="py-1"><span class="ltr">{{ formatShekels(r.indexed) }}</span></td>
-            <td class="py-1"><span class="ltr">{{ formatShekels(r.diff).replace("-", "−") }}</span></td>
+            <td class="py-1"><span class="ltr whitespace-nowrap">{{ formatShekelsText(r.indexed) }}</span></td>
+            <td class="py-1"><span class="ltr whitespace-nowrap">{{ formatShekelsText(r.diff).replace("-", "−") }}</span></td>
           </tr>
         </tbody>
       </table>
-      <p class="mt-1 text-caption text-n600">לא צמוד, בכל שורה: <span class="ltr">{{ formatShekels(plainOwed) }}</span>.</p>
+      <p class="mt-1 text-caption text-n600">לא צמוד, בכל שורה: <span class="ltr">{{ formatShekelsText(plainOwed) }}</span>.</p>
     </div>
   </div>
 </template>

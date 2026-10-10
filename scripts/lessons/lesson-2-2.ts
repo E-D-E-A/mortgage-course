@@ -76,18 +76,18 @@ const epMonthTable = (id: string, loan: string, months: number, rate: string, li
   }),
 });
 
-const discount = (id: string, rate: string, period: number): Fact => ({
+const discount = (id: string, rate: string, period: number, decimals = 6): Fact => ({
   id,
   kind: "trk_discount",
-  inputs: { rate, period, decimals: 6 },
-  value: discountFactor(rate, period).toFixed(6, Decimal.ROUND_HALF_UP),
+  inputs: { rate, period, decimals },
+  value: discountFactor(rate, period).toFixed(decimals, Decimal.ROUND_HALF_UP),
 });
 
-const factor = (id: string, rate: string, periods: number): Fact => ({
+const factor = (id: string, rate: string, periods: number, decimals = 6): Fact => ({
   id,
   kind: "trk_annuity_factor",
-  inputs: { rate, periods, decimals: 6 },
-  value: annuityFactor(rate, periods).toFixed(6, Decimal.ROUND_HALF_UP),
+  inputs: { rate, periods, decimals },
+  value: annuityFactor(rate, periods).toFixed(decimals, Decimal.ROUND_HALF_UP),
 });
 
 const payment = (id: string, loan: string, rate: string, periods: number): Fact => ({
@@ -236,9 +236,10 @@ export default function lesson22(): LessonData {
     epYearFact("ex5.ep_year1", "20000", 2, "6", 1, "payment"),
     epYearFact("ex5.no_interest", "20000", 2, "6", 1, "principal"),
     { id: "ex5.half_plus", kind: "trk_plain_owed", inputs: { amount: "10000", rate: "6" }, value: moneyString(new Decimal("10000").mul("1.06")) },
-    discount("ex5.factor_1", "6", 1),
-    discount("ex5.factor_2", "6", 2),
-    factor("ex5.factor_sum", "6", 2),
+    // Eight places, so the two printed factors add up to the printed sum (0.94339623 + 0.88999644 = 1.83339267).
+    discount("ex5.factor_1", "6", 1, 8),
+    discount("ex5.factor_2", "6", 2, 8),
+    factor("ex5.factor_sum", "6", 2, 8),
 
     // Exercise 6.
     ex6,

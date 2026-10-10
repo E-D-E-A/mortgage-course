@@ -28,7 +28,8 @@ import {
   primeTrackRate,
   updateMonths,
 } from "../../src/lib/calc/amortization.ts";
-import { plainNumber } from "../../src/lib/calc/indexation.ts";
+import { indexedBalance, plainNumber } from "../../src/lib/calc/indexation.ts";
+import { yearInterest } from "../../src/lib/calc/lending.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -102,6 +103,13 @@ const linkedPayment = (id: string, principal: string, months: number, block: num
   return { id, kind: "amort_path_payment", inputs: { ...p.inputs, month }, value: moneyString(p.rows[month - 1].payment) };
 };
 
+const grown = (id: string, amount: string, inflation: string, years: number): Fact => ({
+  id,
+  kind: "infl_indexed_balance",
+  inputs: { amount, inflation_percent: inflation, years },
+  value: moneyString(indexedBalance(amount, inflation, years)),
+});
+
 const difference = (id: string, minuend: Fact, subtrahend: Fact): Fact => ({
   id,
   kind: "difference",
@@ -133,12 +141,18 @@ export default function lesson27(): LessonData {
   const lRate = rateOf("linked.rate", "1.8", "1.45");
   const lRateUp = rateOf("linked.rate_up", "2.3", "1.45");
   const lRates = [v(lRate), v(lRateUp)];
-  const lFirst = linkedPayment("linked.payment_1", P, N, 60, lRates, "2", 1);
-  const l12 = linkedPayment("linked.payment_12", P, N, 60, lRates, "2", 12);
-  const l60 = linkedPayment("linked.payment_60", P, N, 60, lRates, "2", 60);
-  const l61 = linkedPayment("linked.payment_61", P, N, 60, lRates, "2", 61);
+  // Worked the way 2.5 teaches: the original schedule's payment, times the index.
+  const lPlain = payment("linked.plain_payment", P, v(lRate), N);
+  const lYear1 = grown("linked.year1", v(lPlain), "2", 1);
+  const lYear5 = grown("linked.year5", v(lPlain), "2", 5);
+  const lLeftPlain = balance("linked.left_60_plain", P, v(lRate), N, 60);
+  const lLeft = grown("linked.left_60", v(lLeftPlain), "2", 5);
+  const lNew = payment("linked.new_payment", v(lLeft), v(lRateUp), 180);
+  // The month-by-month engine gives the same end-of-year payments (checks, not shown).
+  const l12 = linkedPayment("linked.path_12", P, N, 60, lRates, "2", 12);
+  const l60 = linkedPayment("linked.path_60", P, N, 60, lRates, "2", 60);
 
-  // Worked example: case A considers 400,000 ₪ unlinked variable every 5 years, 25 years.
+  // Worked example (a separate exercise, not case A): Ori and Maya consider 400,000 ₪ unlinked variable every 5 years, 25 years.
   const W = "400000";
   const WN = 300;
   const wRate = rateOf("worked.rate", "3.5", "1.2");
@@ -177,10 +191,15 @@ export default function lesson27(): LessonData {
     // The linked variable track.
     lRate,
     lRateUp,
-    lFirst,
+    lPlain,
+    lYear1,
+    lYear5,
+    lLeftPlain,
+    lLeft,
+    lNew,
+    difference("linked.rate_part", lNew, lYear5),
     l12,
     l60,
-    l61,
 
     // Published update intervals in years, by track, from the Brain appendix (67436545, public sites, 2026-10-07; not verified).
     given("survey.date", "2026-10-07"),
@@ -241,6 +260,14 @@ export default function lesson27(): LessonData {
       inputs: { term_months: 360, interval_months: 30, now: 40 },
       value: String(40 - Math.max(0, ...updateMonths(360, 30).filter((k) => k <= 40))),
     },
+    // Prediction: two years in, the next update (every 5 years) is this many months away.
+    toNext("prediction.wait", 240, 60, 24),
+    // New exercise: next month's interest at an update, 300,000 ₪ at 5.4%.
+    interest("ex7.answer", "300000", "5.4"),
+    { id: "ex7.year", kind: "lend_year_interest", inputs: { amount: "300000", rate_percent: "5.4" }, value: moneyString(yearInterest("300000", "5.4")) },
+    interest("ex7.tenfold", "300000", "54"),
+    // New exercise: the spread mistake (today's anchor subtracted from an old rate).
+    { id: "ex8.wrong_spread", kind: "lend_rate_change", inputs: { before: "3.9", after: "4.85" }, value: plainNumber(new Decimal("4.85").minus("3.9")) },
     // Exercise 5: the anchor 3.5 → 4.25 at the update, spread 1.2.
     rateOf("ex5.answer", "4.25", "1.2"),
     rateOf("ex5.old", "3.5", "1.2"),

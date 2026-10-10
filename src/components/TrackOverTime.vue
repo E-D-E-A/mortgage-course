@@ -41,6 +41,14 @@ const inflPath = ref<number[]>(Array.from({ length: blocks }, () => (props.mode 
 const real = ref(false);
 const showIndex = ref(props.mode === "fixed");
 const showTable = ref(false);
+// Hiding the index (prime mode) puts everything back as it was: no index, shekels on paper.
+function toggleIndex() {
+  showIndex.value = !showIndex.value;
+  if (!showIndex.value) {
+    real.value = false;
+    inflPath.value = inflPath.value.map(() => 0);
+  }
+}
 const year = ref(1);
 
 const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString()}%`;
@@ -68,7 +76,7 @@ const series = computed(() => {
   const still = blockPath([trackRate(Number(props.prime))], months, months);
   return [
     { name: "הפריים שבחרתם", rows: pathSchedule(props.amount, moving) },
-    { name: `אילו הפריים נשאר ${pct(props.prime)}`, rows: pathSchedule(props.amount, still) },
+    { name: `אילו הפריים נשארה ${pct(props.prime)}`, rows: pathSchedule(props.amount, still) },
   ];
 });
 
@@ -128,8 +136,8 @@ const colours = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)"];
 
     <!-- The index path. In prime mode it is a second step. -->
     <div v-if="mode === 'prime'" class="mt-4">
-      <button type="button" class="min-h-11 text-body-m text-navy underline" :aria-expanded="showIndex" @click="showIndex = !showIndex">
-        {{ showIndex ? "הסתרת המדד" : "שלב 2: להזיז גם את המדד" }}
+      <button type="button" class="min-h-11 text-body-m text-navy underline" :aria-expanded="showIndex" @click="toggleIndex">
+        {{ showIndex ? "הסתרת המדד" : "להוסיף את המדד" }}
       </button>
     </div>
     <fieldset v-if="showIndex" class="mt-4">
@@ -206,24 +214,34 @@ const colours = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)"];
     <button type="button" class="mt-2 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
-    <div v-if="showTable" class="mt-2 max-h-80 overflow-auto">
-      <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <div v-if="showTable" class="mt-2 max-h-80 overflow-y-auto">
+      <table class="w-full border-collapse text-caption sm:text-body-m">
         <thead class="sticky top-0 bg-n0">
           <tr class="border-b border-n200 text-caption text-n600">
-            <th class="py-2 text-start">שנה</th>
-            <th v-for="(s, i) in series" :key="`p${i}`" class="py-2 text-start">תשלום: {{ s.name }}</th>
-            <th v-for="(s, i) in series" :key="`b${i}`" class="py-2 text-start">יתרה: {{ s.name }}</th>
+            <th class="py-2 pe-2 text-start">שנה</th>
+            <th class="py-2 pe-2 text-start">התשלום</th>
+            <th class="py-2 text-start">היתרה</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in yearRows" :key="r.year" class="border-b border-n100">
-            <td class="py-1">{{ r.year }}</td>
-            <td v-for="(v, i) in r.pay" :key="`p${i}`" class="py-1"><span class="ltr">{{ formatShekels(v) }}</span></td>
-            <td v-for="(v, i) in r.bal" :key="`b${i}`" class="py-1"><span class="ltr">{{ formatShekels(v) }}</span></td>
+          <tr v-for="r in yearRows" :key="r.year" class="border-b border-n100 align-top">
+            <td class="py-1 pe-2">{{ r.year }}</td>
+            <td class="py-1 pe-2">
+              <span v-for="(v, i) in r.pay" :key="i" class="flex items-center gap-1">
+                <span class="inline-block h-2 w-2 shrink-0 rounded-pill" :style="{ background: colours[i] }" aria-hidden="true"></span>
+                <span class="sr-only">{{ series[i].name }}: </span><span class="ltr">{{ formatShekels(v) }}</span>
+              </span>
+            </td>
+            <td class="py-1">
+              <span v-for="(v, i) in r.bal" :key="i" class="flex items-center gap-1">
+                <span class="inline-block h-2 w-2 shrink-0 rounded-pill" :style="{ background: colours[i] }" aria-hidden="true"></span>
+                <span class="sr-only">{{ series[i].name }}: </span><span class="ltr">{{ formatShekels(v) }}</span>
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
-      <p class="mt-1 text-caption text-n600">התשלום: בחודש האחרון של כל שנה. היתרה: בסוף השנה.</p>
+      <p class="mt-1 text-caption text-n600">בכל תא, שורה לכל מסלול, בצבע שלו במקרא: {{ series[0].name }} למעלה, {{ series[1].name }} למטה. התשלום: בחודש האחרון של כל שנה. היתרה: בסוף השנה.</p>
     </div>
   </div>
 </template>

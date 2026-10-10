@@ -4,7 +4,7 @@
 // move, or by how many forces act on them). Items with the same rank may sit in
 // any order among themselves. Up and down buttons, not dragging, so it works by
 // touch, keyboard and screen reader alike; focus stays on the moved card. After
-// a check, every card that sits above a card it should follow says so in words.
+// a check, every misplaced card says in words whether it sits too high or too low.
 import { computed, nextTick, reactive, ref } from "vue";
 import { save } from "../lib/progress.ts";
 
@@ -26,7 +26,10 @@ const props = defineProps<{
 }>();
 
 const order = reactive<number[]>(props.items.map((_, i) => i));
-const wrong = ref<Set<number>>(new Set());
+// After a check: cards that sit above a card they should follow (too high), and below one they should precede (too low).
+const tooHigh = ref<Set<number>>(new Set());
+const tooLow = ref<Set<number>>(new Set());
+const wrong = computed(() => new Set([...tooHigh.value, ...tooLow.value]));
 const checked = ref(false);
 const revealed = ref(false);
 const buttons = new Map<string, HTMLButtonElement>();
@@ -41,7 +44,8 @@ function move(pos: number, by: -1 | 1) {
   const item = order[pos];
   [order[pos], order[to]] = [order[to], order[pos]];
   checked.value = false;
-  wrong.value = new Set();
+  tooHigh.value = new Set();
+  tooLow.value = new Set();
   // Keep focus on the same card's button, or on its other button at the ends.
   nextTick(() => {
     const dir = by < 0 ? "up" : "down";
@@ -51,16 +55,17 @@ function move(pos: number, by: -1 | 1) {
   });
 }
 function check() {
-  // A card is out of place when a card above it has a higher rank.
-  const bad = new Set<number>();
-  let max = -Infinity;
-  for (const i of order) {
-    if (props.items[i].rank < max) bad.add(i);
-    max = Math.max(max, props.items[i].rank);
-  }
-  wrong.value = bad;
+  const rank = (i: number) => props.items[i].rank;
+  const high = new Set<number>();
+  const low = new Set<number>();
+  order.forEach((i, pos) => {
+    if (order.slice(pos + 1).some((j) => rank(j) < rank(i))) high.add(i);
+    if (order.slice(0, pos).some((j) => rank(j) > rank(i))) low.add(i);
+  });
+  tooHigh.value = high;
+  tooLow.value = low;
   checked.value = true;
-  save(`exercise:${props.id}`, { done: bad.size === 0 });
+  save(`exercise:${props.id}`, { done: high.size === 0 && low.size === 0 });
 }
 const allOk = computed(() => checked.value && wrong.value.size === 0);
 const right = computed(() => [...props.items].map((it, i) => ({ ...it, i })).sort((a, b) => a.rank - b.rank || a.i - b.i));
@@ -79,7 +84,8 @@ const right = computed(() => [...props.items].map((it, i) => ({ ...it, i })).sor
         <span class="w-6 shrink-0 text-center text-caption font-semibold text-n600">{{ pos + 1 }}</span>
         <span class="min-w-0 flex-1 text-body-m text-n900">
           {{ items[i].text }}
-          <span v-if="checked && wrong.has(i)" class="block text-caption font-semibold text-n800">לא במקום: צריך להיות נמוך יותר ברשימה.</span>
+          <span v-if="checked && tooHigh.has(i)" class="block text-caption font-semibold text-n800">גבוה מדי: מתחתיו יש קלף שצריך להיות מעליו.</span>
+          <span v-if="checked && tooLow.has(i)" class="block text-caption font-semibold text-n800">נמוך מדי: מעליו יש קלף שצריך להיות מתחתיו.</span>
         </span>
         <span class="flex shrink-0 gap-1">
           <button

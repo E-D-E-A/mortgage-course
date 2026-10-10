@@ -8,7 +8,7 @@
 // From `md` up it is a table with one column per track, so all six fit the
 // lesson's width; below `md` each track is a card. The learner can sort the
 // tracks by when their rate can move, by indexation, or by how many of the two
-// forces of lesson 2.11 act on them. A print view lays the table out flat, and
+// things that can change (the rate, the index) can move in them. A print view lays the table out flat, and
 // the print button prints this table only. The page passes every text, so the
 // lesson's term check reads it.
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
@@ -56,7 +56,7 @@ const MODES: { id: Mode; label: string; say: string }[] = [
   { id: "course", label: "סדר השיעורים", say: "בסדר השיעורים" },
   { id: "rate", label: "מתי הריבית יכולה לזוז", say: "לפי מתי הריבית יכולה לזוז: מאף פעם ועד עם כל שינוי בפריים" },
   { id: "index", label: "הצמדה", say: "לפי הצמדה: קודם המסלולים שלא צמודים" },
-  { id: "forces", label: "כמה כוחות פועלים", say: "לפי כמה מהכוחות של שיעור 2.11 פועלים על המסלול: מאף אחד ועד שניים" },
+  { id: "forces", label: "כמה דברים יכולים לזוז", say: "לפי כמה דברים יכולים לזוז במסלול, אחוז הריבית והמדד: משום דבר ועד שניהם" },
 ];
 const mode = ref<Mode>("course");
 const reverse = ref(false);
@@ -114,7 +114,7 @@ const badge = (t: Track) => [`הריבית זזה: ${MOVES[t.rateMoves]}`, t.ind
           :aria-pressed="mode === m.id"
           @click="sortBy(m.id)"
         >
-          {{ m.label }}<span v-if="mode === m.id && m.id !== 'course'" aria-hidden="true">{{ reverse ? " ↑" : " ↓" }}</span>
+          {{ m.label }}<span v-if="mode === m.id" aria-hidden="true">{{ reverse ? " ↑" : " ↓" }}</span>
         </button>
       </div>
       <p class="mt-2 text-caption text-n600" role="status">{{ status }} לחיצה נוספת על אותו כפתור הופכת את הסדר.</p>

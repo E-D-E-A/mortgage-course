@@ -116,13 +116,16 @@ const difference = (id: string, minuend: Fact, subtrahend: Fact): Fact => ({
   value: moneyString(new Decimal(minuend.value as string).minus(subtrahend.value as string)),
 });
 
-/** Statement convention: each year's payment is last year's, rounded to the agora, times (1 + inflation). */
+/**
+ * The half-worked table, the way the page teaches it: each year's index is last year's
+ * printed index × (1 + inflation), rounded to two decimals; the payment is C × M₁ ÷ M₀
+ * with that printed index.
+ */
 const linkedTable = (id: string, base: string, inflation: string, years: number): Fact => {
-  const g = new Decimal(1).plus(new Decimal(inflation).div(100));
-  let pay = new Decimal(base);
+  let index = new Decimal(100);
   const rows = Array.from({ length: years }, (_, k) => {
-    pay = new Decimal(moneyString(pay.mul(g)));
-    return { period: k + 1, index: plainNumber(indexedBalance("100", inflation, k + 1)), payment: moneyString(pay) };
+    index = new Decimal(plainNumber(indexedBalance(index, inflation, 1)));
+    return { period: k + 1, index: plainNumber(index), payment: moneyString(indexedAmount(base, "100", index)) };
   });
   return { id, kind: "amort_linked_payment_table", inputs: { payment: base, inflation_percent: inflation, years, base_index: "100" }, value: rows };
 };
@@ -151,7 +154,7 @@ export default function lesson25(): LessonData {
   const workedLinked = payment("worked.linked_payment", W, "3.2", WN);
   const workedIndex = chain("worked.index_5", "100", ["2.5", "2.5", "2.5", "2.5", "2.5"]);
 
-  // Exercise 6: 3% for 20 years with 5% inflation; the schedule's balance after 5 years.
+  // Exercise 6: 3% for 20 years with 6% inflation; the schedule's balance after 5 years.
   const ex6Plain = balance("ex6.plain_balance", P, "3", N, 60);
 
   const facts: Fact[] = [
@@ -215,11 +218,12 @@ export default function lesson25(): LessonData {
     real("ex5.answer", "4000", "3", 8),
     grown("ex5.indexed", "4000", "3", 8),
     { id: "ex5.simple", kind: "infl_indexed_balance", inputs: { amount: "4000", inflation_percent: "-24", years: 1 }, value: moneyString(indexedBalance("4000", "-24", 1)) },
-    // Exercise 6: the balance in shekels after five years of 5% inflation.
+    // Exercise 6: the balance in shekels after five years of 6% inflation.
     ex6Plain,
-    grown("ex6.answer", v(ex6Plain), "5", 5),
-    grown("ex6.simple", v(ex6Plain), "25", 1),
-    pathBalance("ex6.exact", P, "3", N, "5", 60),
+    // Other numbers than the guided task (which used 5%): 6% a year for five years.
+    grown("ex6.answer", v(ex6Plain), "6", 5),
+    grown("ex6.simple", v(ex6Plain), "30", 1),
+    pathBalance("ex6.exact", P, "3", N, "6", 60),
   ];
 
   return {

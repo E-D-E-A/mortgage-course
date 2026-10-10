@@ -108,14 +108,16 @@ const low = computed(() => Decimal.min(prime.value, rate.value));
           <div
             v-if="spreadNeg"
             class="h-full rounded-e-sm border-2 border-dashed"
-            :style="{ width: pct(new Decimal(String(spread)).abs()), borderColor: 'var(--mogi-navy)' }"
+            :style="{ width: pct(prime.minus(Decimal.max(rate, 0))), borderColor: 'var(--mogi-navy)' }"
           ></div>
           <div v-else class="h-full rounded-e-sm" :style="{ width: pct(spread), background: 'var(--mogi-n300)' }"></div>
         </div>
       </div>
-      <div class="flex justify-between text-caption text-n600">
-        <span v-for="k in ticks" :key="k" class="ltr w-0 text-center">{{ k }}%</span>
+      <!-- Each label centred on its point: placed from the start (right) edge, then shifted by half its width. -->
+      <div class="relative h-4 text-caption text-n600">
+        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :style="{ insetInlineStart: pct(k), transform: 'translateX(50%)' }">{{ k }}%</span>
       </div>
+      <p v-if="rate.isNeg()" class="text-caption text-n700">הריבית במסלול מתחת לאפס: הפס מראה רק את מה שירד מהפריים עד אפס.</p>
     </div>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-3" aria-live="polite">

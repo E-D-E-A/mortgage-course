@@ -76,7 +76,7 @@ const xAt = (k: number) => W - PAD - (k / months.value) * (W - PAD * 2);
 const PH = 150; // payment panels
 const BH = 200; // balance chart
 const payMax = computed(() => Math.max(...results.value.flatMap((r) => r.rows.slice(0, -1).map((x) => x.payment.toNumber())), 1) * 1.08);
-const balMax = computed(() => Math.max(...results.value.flatMap((r) => r.rows.map((x) => x.opening.toNumber()))) * 1.05);
+const balMax = computed(() => Math.max(...results.value.flatMap((r) => r.rows.map((x) => x.opening.toNumber()))) * 1.25);
 const yPay = (v: number) => PH - 2 - (v / payMax.value) * (PH - 8);
 const yBal = (v: number) => BH - 2 - (v / balMax.value) * (BH - 10);
 
@@ -231,7 +231,8 @@ const tableRows = computed(() => {
         />
         <line :x1="markerX" :x2="markerX" :y1="0" :y2="BH" stroke="var(--mogi-navy)" stroke-width="1.5" stroke-dasharray="4 3" />
       </svg>
-      <span class="pointer-events-none absolute start-1 text-caption text-n600" :style="{ top: `${(yBal(principal) / BH) * 100 - 9}%` }">
+      <!-- At the end (left) side, where every balance line is already low, and a fixed distance above its line. -->
+      <span class="pointer-events-none absolute end-1 text-caption text-n600" :style="{ top: `calc(${(yBal(principal) / BH) * 100}% - 18px)` }">
         <span class="ltr">{{ formatWholeShekels(principal) }}</span>
       </span>
     </div>

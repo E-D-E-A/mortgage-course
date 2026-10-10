@@ -1,7 +1,8 @@
 /**
  * Stage 2's nodes on the big-picture map: the anchors a rate is set from
  * (lesson 2.1), the six tracks (2.5–2.8), the repayment methods (2.9–2.10) and
- * the debt balance (2.11), with the links that say how each one moves.
+ * the debt balance (2.11) and the risk in each track (2.12), with the links that
+ * say how each one moves.
  *
  * Sources for the cards: the stage-2 lessons; the Brain's research on comparing
  * offers (7733250: the anchor and spread, the forecast per track), on leaving a
@@ -57,7 +58,7 @@ export const nodes: MapNode[] = [
     kind: "factor",
     card: {
       what: "מסלול שהריבית בו קבועה לכל התקופה, והחוב לא צמוד למדד.",
-      role: "שום כוח לא מזיז אותו: לא שינוי ריבית ולא המדד. המחיר: אם הריביות בשוק יירדו, הריבית שלו לא תרד, ויציאה מוקדמת יכולה לעלות הרבה.",
+      role: "שום דבר בו לא זז: לא אחוז הריבית ולא המדד. המחיר: אם הריביות בשוק יירדו, הריבית שלו לא תרד, ויציאה מוקדמת יכולה לעלות הרבה.",
       note: "שיעור 2.5. התשלום על יציאה מוקדמת — לפי תעתיק בצוות ב־Brain, לא אומת.",
     },
   },
@@ -93,7 +94,7 @@ export const nodes: MapNode[] = [
     kind: "factor",
     card: {
       what: "מסלול צמוד למדד, שהריבית בו נקבעת מחדש בכל נקודת עדכון: העוגן באותו יום ועוד המרווח.",
-      role: "שני הכוחות פועלים עליו: המדד מזיז את החוב בכל חודש, ובכל נקודת עדכון הריבית יכולה לזוז.",
+      role: "שני דברים זזים בו: המדד מזיז את החוב בכל חודש, ובכל נקודת עדכון אחוז הריבית יכול לזוז.",
       note: "שיעור 2.7. כל כמה זמן יש נקודת עדכון — לפי החוזה, ומשתנה מבנק לבנק.",
     },
   },
@@ -116,9 +117,9 @@ export const nodes: MapNode[] = [
     lesson: "2.8",
     kind: "factor",
     card: {
-      what: "הלוואה למי שיש לו תעודת זכאות מהמדינה. לפי התעתיק בצוות, הריבית בה קבועה והיא צמודה למדד.",
-      role: "מתנהגת כמו קבועה צמודה: הריבית לא זזה, והחוב זז עם המדד. הסכום שלה מוגבל, ולכן היא בדרך כלל רק חלק מהתמהיל.",
-      note: "שיעור 2.8. לא אומת מול המקור הרשמי.",
+      what: "הלוואה לדיור למי שמשרד הבינוי והשיכון נתן לו תעודת זכאות. אחוז הריבית בה קבוע, ונקבע לפי כלל של המדינה, לא במשא ומתן; החוב צמוד למדד.",
+      role: "מסלול אחד בתוך המשכנתא, עד הסכום שבתעודה, ובתוך התקרה של שיעור המימון — לא תוספת מעליה. הריבית לא זזה, והחוב זז עם המדד.",
+      note: "שיעור 2.8. לפי מקורות שעוד לא אומתו מול המקור הרשמי.",
     },
   },
   {
@@ -181,11 +182,23 @@ export const nodes: MapNode[] = [
       note: "שיעור 2.11.",
     },
   },
+  {
+    id: "track_risk",
+    label: "הסיכון בכל מסלול",
+    region: "mix",
+    lesson: "2.12",
+    kind: "factor",
+    card: {
+      what: "מה יכול לקרות לתשלום וליתרה במסלול בגלל דברים שלא בשליטתכם: שינוי באחוז הריבית, ועליית מחירים.",
+      role: "ריבית פועלת על כל חוב. מה שמבדיל בין המסלולים הוא אם אחוז הריבית יכול לזוז, ומתי, ואם החוב צמוד למדד. בטבלת המסלולים יש לכל מסלול משפט אחד על הסיכון שלו.",
+      note: "שיעור 2.12. איך שוקלים סיכון מול מחיר — בשלב 5.",
+    },
+  },
 ];
 
 export const links: MapLink[] = [
-  { from: "boi_rate", to: "prime", label: "הפריים זז איתה", lesson: "2.1" },
-  { from: "prime", to: "anchor", label: "הפריים הוא עוגן אחד", lesson: "2.1" },
+  { from: "boi_rate", to: "prime", label: "הפריים זזה איתה", lesson: "2.1" },
+  { from: "prime", to: "anchor", label: "הפריים היא עוגן אחד", lesson: "2.1" },
   { from: "bond_yields", to: "anchor", label: "תשואה של אג״ח ממשלתיות היא עוגן אחר", lesson: "2.1" },
   { from: "bank", to: "spread", label: "קובע אותו בהצעה, והוא נכתב בחוזה", lesson: "2.1" },
   { from: "inflation", to: "track_fixed_indexed", label: "היתרה והתשלום זזים עם המדד", lesson: "2.5" },
@@ -210,4 +223,8 @@ export const links: MapLink[] = [
   { from: "inflation", to: "debt_balance", label: "במסלול צמוד, משנה את היתרה עצמה", lesson: "2.11" },
   { from: "prime", to: "debt_balance", label: "משנה את הריבית על היתרה, לא את היתרה ביום השינוי", lesson: "2.11" },
   { from: "mix", to: "debt_balance", label: "לכל מסלול יתרה משלו", lesson: "2.11" },
+  { from: "prime", to: "track_risk", label: "בפריים: אחוז הריבית זז עם כל שינוי שלה", lesson: "2.12" },
+  { from: "anchor", to: "track_risk", label: "במסלולים המשתנים: אחוז הריבית נקבע מחדש לפיו בנקודות העדכון", lesson: "2.12" },
+  { from: "inflation", to: "track_risk", label: "במסלולים הצמודים: מזיזה את החוב ואת התשלום", lesson: "2.12" },
+  { from: "mix", to: "track_risk", label: "לכל מסלול סיכון משלו", lesson: "2.12" },
 ];

@@ -92,11 +92,14 @@ const nowText = computed(() => {
             v-for="p in points"
             :key="p"
             class="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-pill border-2 border-n0"
-            :style="{ insetInlineStart: `calc(${position(p)} - 8px)`, background: p === next ? 'var(--mogi-navy)' : 'var(--mogi-teal-deep)' }"
+            :style="{ insetInlineStart: `calc(${position(p)} - 8px)`, background: p === next ? 'var(--mogi-navy)' : p <= now ? 'var(--mogi-n400)' : 'var(--mogi-teal-deep)' }"
           ></span>
         </div>
         <div class="relative mt-1 h-4 text-caption text-n600">
-          <span v-for="(p, i) in points" v-show="i % labelEvery === 0" :key="p" class="absolute whitespace-nowrap" :style="{ insetInlineStart: `calc(${position(p)} - 10px)` }">{{ yearsText(p) }}</span>
+          <!-- A zero-width box at the point, with the label centred on it. -->
+          <span v-for="(p, i) in points" v-show="i % labelEvery === 0" :key="p" class="absolute top-0 flex w-0 justify-center" :style="{ insetInlineStart: position(p) }">
+            <span class="whitespace-nowrap">{{ yearsText(p) }}</span>
+          </span>
         </div>
       </div>
       <div>
@@ -133,6 +136,7 @@ const nowText = computed(() => {
 
     <ul class="list-reset mt-3 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-pill" style="background: var(--mogi-teal-deep)"></span>נקודת עדכון</li>
+      <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-pill" style="background: var(--mogi-n400)"></span>נקודה שעברה</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-pill bg-navy"></span>הנקודה הבאה</li>
       <li class="flex items-center gap-2"><span class="inline-block h-4 w-0 border-s-2 border-dashed border-navy"></span>היום</li>
     </ul>

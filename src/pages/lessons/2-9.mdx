@@ -23,8 +23,8 @@ import { formatShekels } from "../../lib/calc/money.ts";
 {/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("2.9");
-export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
-export const nv = (v) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(v));
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
 export const eqRows = f.rows("explain.equal");
 export const spRows = f.rows("explain.spitzer");
 export const half = f.rows("half.equal");
@@ -163,7 +163,7 @@ export const predictionOptions = [
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>התשלום הראשון: {f.shekels("slider.equal_first")} בקרן שווה, {f.shekels("slider.spitzer_first")} בשפיצר — הפרש של {f.shekels("slider.first_gap")}. התשלום האחרון בקרן שווה הוא רק {f.shekels("slider.equal_last")}. החודש הראשון שבו קרן שווה זולה יותר הוא חודש {f.plain("slider.crossover")}, קצת אחרי השנה השמינית.</li>
+    <li>התשלום הראשון: {f.shekels("slider.equal_first")} בקרן שווה, {f.shekels("slider.spitzer_first")} בשפיצר — הפרש של {f.shekels("slider.first_gap")}. התשלום האחרון בקרן שווה הוא רק {f.shekels("slider.equal_last")}. החודש הראשון שבו התשלום בקרן שווה נמוך מהתשלום בשפיצר הוא חודש {f.plain("slider.crossover")}, קצת אחרי השנה השמינית.</li>
     <li>ריבית בשפיצר: {f.shekels("slider.spitzer_interest")}. בקרן שווה: {f.shekels("slider.equal_interest")}. שפיצר משלמת {f.shekels("slider.interest_gap")} יותר. באמצע הדרך היתרה בקרן שווה היא {f.shekels("slider.equal_half")}, חצי בדיוק; בשפיצר היא עוד {f.shekels("slider.spitzer_half")}.</li>
     <li>התשלום בשפיצר ירד ל־{f.shekels("slider.spitzer_first_30")}, אבל הריבית עלתה ל־{f.shekels("slider.spitzer_interest_30")} — עוד {f.shekels("slider.interest_30_gap")}. תשלום נמוך יותר בכל חודש, ועלות גבוהה יותר בסך הכול.</li>
   </ol>
@@ -196,7 +196,10 @@ export const predictionOptions = [
 - **בכל חודש התשלום יורד באותו סכום:** היתרה קטנה ב־P ÷ n, ולכן הריבית קטנה ב־m כפול זה: <M>{f.plain("slider.monthly")}% × {n("slider.equal_part")} = {n("slider.equal_drop")}</M> ₪ בחודש.
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
-  <p class="ltr text-h3 text-navy">C<sub>k</sub> = P ÷ n + m × (P − (k − 1) × P ÷ n)</p>
+  <div class="ltr inline-grid justify-items-start gap-1 text-body-l text-navy sm:text-h3" dir="ltr">
+    <span class="whitespace-nowrap">C<sub>k</sub> = P ÷ n</span>
+    <span class="whitespace-nowrap ps-8">+ m × (P − (k − 1) × P ÷ n)</span>
+  </div>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
     <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום בחודש ה־k בקרן שווה, בשקלים (C כמו בשיעור 0.6)</dd>
     <dt class="ltr font-semibold text-n900">k</dt><dd>איזה חודש: 1 לראשון, 2 לשני, וכן הלאה (כמו בשיעור 0.6)</dd>
@@ -210,7 +213,7 @@ export const predictionOptions = [
 
 **מתי הנוסחה נכונה?** כשאחוז הריבית לא זז לאורך כל התקופה, אין הצמדה, ומשלמים כל חודש בלי הפסקה. בפועל כל ריבית מעוגלת לאגורה, והחודש האחרון מתקן את מה שהעיגול השאיר.
 
-**שפיצר — עוד לא.** את התשלום השווה אי אפשר לחשב בראש. אפשר לבדוק אותו, כמו שעשינו: מחסירים בכל חודש את הריבית ומגיעים לאפס. את הנוסחה שמוצאת אותו נבנה ב<Later lesson="3.1">שיעור 3.1</Later>, מתוך הרעיון של שיעור 0.6: סכום ההלוואה שווה לערך הנוכחי של התשלומים שלה, בריבית שלה. עד אז: מחשבון, ההמחשה, או לוח הסילוקין שהבנק נותן.
+**שפיצר — עוד לא.** את התשלום השווה אי אפשר לחשב בראש. אפשר לבדוק אותו, כמו שעשינו: מחסירים בכל חודש את הריבית ומגיעים לאפס. את הנוסחה שמוצאת אותו נבנה בשיעור 3.1, מתוך הרעיון של שיעור 0.6: סכום ההלוואה שווה לערך הנוכחי של התשלומים שלה, בריבית שלה. עד אז: מחשבון, ההמחשה, או לוח הסילוקין שהבנק נותן.
 
 <Callout title="איך מחשבים">
 <p><strong>קרן שווה, במחשבון:</strong> קודם הקרן חלקי מספר החודשים; אחר כך הריבית החודשית כפול היתרה; ומחברים.</p>
@@ -241,7 +244,9 @@ export const predictionOptions = [
 
 **צעד 6 — הריבית בסך הכול** (מלוחות הסילוקין המלאים). שפיצר: {f.shekels("worked.spitzer_interest")}. קרן שווה: {f.shekels("worked.equal_interest")}. ההפרש: <M>{n("worked.spitzer_interest")} − {n("worked.equal_interest")} = {n("worked.interest_gap")}</M> ₪ לטובת קרן שווה. באמצע הדרך, אחרי 90 חודשים, נשארו בשפיצר עוד {f.shekels("worked.spitzer_half")} מתוך 400,000 ₪ — יותר מחצי.
 
-**מה לקחת מזה.** קרן שווה זולה יותר בסך הכול, ושפיצר זולה יותר בחודשים הראשונים. **תשלום נמוך ועלות נמוכה הם שתי שאלות שונות.** מה מתאים — תלוי כמה אתם יכולים לשלם בכל חודש עכשיו, ולא רק כמה תשלמו בסוף. נחזור לזה כשנבנה תמהיל בשלב 5. זו דוגמה, לא המלצה.
+**מה לקחת מזה.** בקרן שווה משלמים פחות שקלים של ריבית בסך הכול; בשפיצר משלמים פחות בכל חודש בשנים הראשונות. **תשלום נמוך ועלות נמוכה הם שתי שאלות שונות.** מה מתאים — תלוי כמה אתם יכולים לשלם בכל חודש עכשיו, ולא רק כמה תשלמו בסוף. נחזור לזה כשנבנה תמהיל בשלב 5. זו דוגמה, לא המלצה.
+
+**ומה ״זול יותר״ באמת?** ״פחות שקלים של ריבית״ זה לא בדיוק ״זול יותר״. בערך נוכחי (שיעור 0.6), בריבית של ההלוואה עצמה, כל לוח סילוקין של ההלוואה הזו שווה בדיוק {f.shekels("worked.loan")} — סכום ההלוואה. ההבדל בין הלוחות הוא כמה זמן הכסף נשאר אצלכם. מה באמת עולה פחות תלוי גם במה שהכסף הזה יכול להרוויח אצלכם בינתיים — <Later lesson="5.6">שאלה ליעדי התמהיל</Later>.
 
 <Section kind="דוגמה חצי פתורה">
 
@@ -385,7 +390,7 @@ export const predictionOptions = [
 <p><strong>מה זה?</strong> שתי שיטות החזר. בשפיצר התשלום שווה בכל חודש. בקרן שווה החלק של הקרן שווה בכל חודש, והתשלום יורד.</p>
 <p><strong>למה זה קיים?</strong> כל הלוואה צריכה להגיע לאפס, ויש יותר מדרך אחת לחלק את הקרן לאורך הזמן. שפיצר נותנת תשלום אחיד, שקל לתכנן לפיו. קרן שווה מחזירה את הקרן מהר יותר, ולכן משלמת פחות ריבית.</p>
 <p><strong>איך זה עובד?</strong> בכל חודש: ריבית על היתרה, ומה שנשאר מהתשלום מחזיר קרן. ההבדל בין השיטות הוא כמה קרן חוזרת בכל חודש — ולכן כמה מהר היתרה יורדת.</p>
-<p><strong>איך זה משפיע עליכם?</strong> קרן שווה מתחילה בתשלום גבוה יותר ונגמרת בתשלום נמוך, ועולה פחות ריבית. שפיצר מתחילה נמוך יותר, נשארת שווה, ועולה יותר ריבית. אותו אחוז ריבית, תוצאה שונה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> קרן שווה מתחילה בתשלום גבוה יותר ונגמרת בתשלום נמוך, ומשלמים בה פחות שקלים של ריבית. שפיצר מתחילה נמוך יותר, נשארת שווה, ומשלמים בה יותר שקלים של ריבית — כי הכסף נשאר אצלכם זמן רב יותר. אותו אחוז ריבית, תוצאה שונה.</p>
 <p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים שתי שאלות נפרדות: כמה אפשר לשלם בכל חודש בשנים הראשונות, וכמה הכול יעלה עד הסוף. משווים לוחות סילוקין של אותה הלוואה בשתי השיטות, לא רק את התשלום הראשון. ואפשר לבחור שיטה שונה לכל מסלול בתמהיל.</p>
 </Callout>
 
@@ -396,9 +401,9 @@ export const predictionOptions = [
 </Section>
 
 - **כל תשלום** = ריבית של החודש (על היתרה) + החזר של חלק מהקרן.
-- **קרן שווה:** אותו חלק מהקרן בכל חודש. התשלום יורד, בכל חודש באותו סכום.
+- **קרן שווה:** אותו חלק מהקרן בכל חודש. התשלום יורד, בכל חודש באותו סכום — כל עוד אחוז הריבית לא זז ואין הצמדה.
 - **שפיצר:** אותו תשלום בכל חודש, כל עוד אחוז הריבית לא זז ואין הצמדה. בהתחלה רובו ריבית, בסוף רובו קרן.
-- **שפיצר משלמת יותר ריבית בסך הכול** — לא בגלל אחוז אחר, אלא כי היתרה שלה יורדת לאט יותר בהתחלה.
+- **בשפיצר משלמים יותר שקלים של ריבית** — לא בגלל אחוז אחר, אלא כי היתרה יורדת לאט יותר בהתחלה. בערך נוכחי, בריבית של ההלוואה, שני הלוחות שווים לסכום ההלוואה.
 - **לוח סילוקין** מראה את כל זה חודש אחר חודש. תשלום נמוך בהתחלה ועלות נמוכה בסוף הן שתי שאלות שונות.
 - **התשלום בשפיצר** נלקח בינתיים מההצעה או מחשבון; את הנוסחה שלו נבנה בשיעור 3.1.
 

@@ -190,22 +190,77 @@
       "value": "3.75"
     },
     {
-      "id": "linked.payment_1",
-      "kind": "amort_path_payment",
+      "id": "linked.plain_payment",
+      "kind": "amort_payment",
       "inputs": {
         "principal": "500000",
-        "months": 240,
-        "block_months": 60,
-        "rate_1": "3.25",
-        "rate_2": "3.75",
-        "inflation_1": "2",
-        "inflation_block_months": 240,
-        "month": 1
+        "rate_percent": "3.25",
+        "months": 240
       },
-      "value": "2840.66"
+      "value": "2835.98"
     },
     {
-      "id": "linked.payment_12",
+      "id": "linked.year1",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "2835.98",
+        "inflation_percent": "2",
+        "years": 1
+      },
+      "value": "2892.70"
+    },
+    {
+      "id": "linked.year5",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "2835.98",
+        "inflation_percent": "2",
+        "years": 5
+      },
+      "value": "3131.15"
+    },
+    {
+      "id": "linked.left_60_plain",
+      "kind": "amort_balance",
+      "inputs": {
+        "principal": "500000",
+        "rate_percent": "3.25",
+        "months": 240,
+        "paid": 60
+      },
+      "value": "403601.09"
+    },
+    {
+      "id": "linked.left_60",
+      "kind": "infl_indexed_balance",
+      "inputs": {
+        "amount": "403601.09",
+        "inflation_percent": "2",
+        "years": 5
+      },
+      "value": "445608.22"
+    },
+    {
+      "id": "linked.new_payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "445608.22",
+        "rate_percent": "3.75",
+        "months": 180
+      },
+      "value": "3240.56"
+    },
+    {
+      "id": "linked.rate_part",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "linked.new_payment",
+        "subtrahend": "linked.year5"
+      },
+      "value": "109.41"
+    },
+    {
+      "id": "linked.path_12",
       "kind": "amort_path_payment",
       "inputs": {
         "principal": "500000",
@@ -220,7 +275,7 @@
       "value": "2892.70"
     },
     {
-      "id": "linked.payment_60",
+      "id": "linked.path_60",
       "kind": "amort_path_payment",
       "inputs": {
         "principal": "500000",
@@ -233,21 +288,6 @@
         "month": 60
       },
       "value": "3131.15"
-    },
-    {
-      "id": "linked.payment_61",
-      "kind": "amort_path_payment",
-      "inputs": {
-        "principal": "500000",
-        "months": 240,
-        "block_months": 60,
-        "rate_1": "3.25",
-        "rate_2": "3.75",
-        "inflation_1": "2",
-        "inflation_block_months": 240,
-        "month": 61
-      },
-      "value": "3245.92"
     },
     {
       "id": "survey.date",
@@ -597,6 +637,52 @@
         "now": 40
       },
       "value": "10"
+    },
+    {
+      "id": "prediction.wait",
+      "kind": "amort_months_to_update",
+      "inputs": {
+        "term_months": 240,
+        "interval_months": 60,
+        "now": 24
+      },
+      "value": "36"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "5.4"
+      },
+      "value": "1350.00"
+    },
+    {
+      "id": "ex7.year",
+      "kind": "lend_year_interest",
+      "inputs": {
+        "amount": "300000",
+        "rate_percent": "5.4"
+      },
+      "value": "16200.00"
+    },
+    {
+      "id": "ex7.tenfold",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "300000",
+        "rate_percent": "54"
+      },
+      "value": "13500.00"
+    },
+    {
+      "id": "ex8.wrong_spread",
+      "kind": "lend_rate_change",
+      "inputs": {
+        "before": "3.9",
+        "after": "4.85"
+      },
+      "value": "0.95"
     },
     {
       "id": "ex5.answer",

@@ -19,7 +19,7 @@ import {
   rateChangeInterest,
   yearInterest,
 } from "../../src/lib/calc/balance.ts";
-import { indexedAmount, plainNumber, realRate } from "../../src/lib/calc/indexation.ts";
+import { indexedAmount } from "../../src/lib/calc/indexation.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 
@@ -156,6 +156,12 @@ export default function lesson211(): LessonData {
   const e5Idx = indexation("ex5.indexation", "500000", "1");
   const e5OnIdx = interestOnIdx("ex5.interest_on_indexation", "500000", "3", "1");
 
+  // Exercise 6.
+  const e6Idx = indexation("ex6.indexation", "400000", "4");
+  const e6Interest = interest("ex6.interest", "400000", "3", "4");
+  const e6Base = interest("ex6.interest_base", "400000", "3");
+  const e6Balance = given("ex6.balance", "400000.00");
+
   const facts: Fact[] = [
     balance,
     payment,
@@ -246,9 +252,14 @@ export default function lesson211(): LessonData {
     e5OnIdx,
     sum("ex5.index_total", e5Idx, e5OnIdx),
 
-    // Exercise 6: the index rise at which an indexed 3% track ends the year where an unindexed 5% track does.
-    { id: "ex6.answer", kind: "infl_real_rate", inputs: { nominal_percent: "5", inflation_percent: "3" }, value: plainNumber(realRate("5", "3")) },
-    { id: "ex6.approx", kind: "infl_real_rate_approx", inputs: { nominal_percent: "5", inflation_percent: "3" }, value: plainNumber(new Decimal(5).minus(3)) },
+    // Exercise 6: indexed 400,000 at 3%, index +4%: the smallest payment that keeps the balance from growing.
+    e6Balance,
+    e6Idx,
+    sum("ex6.indexed", e6Balance, e6Idx),
+    e6Interest,
+    e6Base,
+    sum("ex6.answer", e6Idx, e6Interest),
+    sum("ex6.no_cross", e6Idx, e6Base),
   ];
 
   return {

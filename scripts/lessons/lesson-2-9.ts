@@ -238,6 +238,7 @@ export default function lesson29(): LessonData {
     repSchedule("video.equal", "equal_principal", ...S),
 
     // Worked example.
+    given("worked.loan", "400000.00"),
     repMonths("worked.months", 15),
     repMonthly("worked.monthly", "5.4"),
     repCell("worked.equal_part", "equal_principal", ...W, 1, "principal"),

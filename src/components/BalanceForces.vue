@@ -48,7 +48,16 @@ const newRate = computed(() => new Decimal(rate.value).plus(change.value).toStri
 // Shekels with agorot only when there are any; a sign for the rows.
 const money = (v: Decimal) => formatShekelsText(v.abs());
 const signed = (v: Decimal) => (v.isZero() ? formatShekelsText(0) : `${v.isNeg() ? "−" : "+"}${money(v)}`);
-const signedPoints = (v: number) => (v === 0 ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v)}`);
+// "עלתה בנקודת אחוז אחת", "ירדה ב־0.5 נקודת אחוז", "עלתה ב־2 נקודות אחוז".
+const points = (v: number) => {
+  const a = Math.abs(v);
+  return a === 1 ? "בנקודת אחוז אחת" : a < 1 ? `ב־${a} נקודת אחוז` : `ב־${a} נקודות אחוז`;
+};
+const changePhrase = (v: number) => (v === 0 ? "לא זזה" : `${v > 0 ? "עלתה" : "ירדה"} ${points(v)}`);
+// A percent with a real minus sign ("−2%"), as the other outputs write it.
+const signedPercent = (v: number) => (v < 0 ? `−${-v}%` : `${v}%`);
+// Interest and indexation together: what the payment has to cover. Negative when the index fell further than interest added.
+const charged = computed(() => parts.value.interest.plus(parts.value.indexation));
 
 interface Row {
   key: string;
@@ -63,10 +72,10 @@ const rows = computed<Row[]>(() => {
   const p = parts.value;
   const r: Row[] = [];
   if (indexed.value)
-    r.push({ key: "idx", label: "הצמדה", note: "היתרה עצמה גדלה עם המדד", value: p.indexation, fill: "var(--mogi-teal-deep)" });
+    r.push({ key: "idx", label: "הצמדה", note: inflation.value > 0 ? "היתרה עצמה גדלה עם המדד" : inflation.value < 0 ? "היתרה עצמה קטנה עם המדד" : "המדד לא זז", value: p.indexation, fill: "var(--mogi-teal-deep)" });
   r.push({ key: "base", label: `ריבית של ${rate.value}%`, note: "על היתרה בתחילת השנה", value: p.interestBase, fill: "var(--mogi-turquoise-2)" });
   if (change.value !== 0)
-    r.push({ key: "chg", label: "ריבית מהשינוי בריבית", note: `${signedPoints(change.value)} נקודות אחוז, על היתרה בתחילת השנה`, value: p.interestFromChange, fill: "var(--mogi-turquoise-2)" });
+    r.push({ key: "chg", label: "ריבית מהשינוי בריבית", note: `הריבית ${changePhrase(change.value)}, על היתרה בתחילת השנה`, value: p.interestFromChange, fill: "var(--mogi-turquoise-2)" });
   if (indexed.value)
     r.push({ key: "x", label: "ריבית על תוספת ההצמדה", note: "של שני הכוחות יחד", value: p.interestOnIndexation, fill: STRIPES });
   r.push({ key: "pay", label: "התשלום", note: "בסוף השנה", value: p.payment.neg(), fill: "var(--mogi-n300)" });
@@ -134,16 +143,16 @@ const zeroAt = computed(() => `${pos(new Decimal(0))}%`);
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ rate }}%</span> לשנה</span>
       </label>
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">הריבית זזה בתחילת השנה ב־</span>
+        <span class="text-caption font-semibold text-n600">שינוי בריבית בתחילת השנה</span>
         <input v-model.number="change" type="range" :min="changeMin" max="3" step="0.25" />
         <span class="text-body-l font-semibold text-n900">
-          <span class="ltr">{{ signedPoints(change) }}</span> נקודות אחוז<span v-if="change !== 0" class="text-body-m font-normal text-n700"> · מעכשיו <span class="ltr">{{ newRate }}%</span></span>
+          הריבית {{ changePhrase(change) }}<span v-if="change !== 0" class="text-body-m font-normal text-n700"> · מעכשיו <span class="ltr">{{ newRate }}%</span></span>
         </span>
       </label>
       <label v-if="indexed" class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">המדד עלה השנה ב־</span>
+        <span class="text-caption font-semibold text-n600">השינוי במדד השנה</span>
         <input v-model.number="inflation" type="range" min="-2" max="8" step="0.5" />
-        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ inflation }}%</span></span>
+        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ signedPercent(inflation) }}</span></span>
       </label>
       <div v-else class="flex flex-col justify-center rounded-md bg-n50 p-3 text-body-m text-n700">במסלול לא צמוד המדד לא משנה את היתרה.</div>
       <label class="flex flex-col gap-1 sm:col-span-2">
@@ -178,7 +187,15 @@ const zeroAt = computed(() => `${pos(new Decimal(0))}%`);
       </div>
     </div>
     <p class="mt-2 text-body-m text-n800" aria-live="polite">
-      <template v-if="parts.principalPaid.gt(0)">
+      <template v-if="parts.payment.isZero()">
+        <template v-if="parts.change.gt(0)">לא שילמתם השנה, והיתרה <strong>גדלה</strong> ב־<span class="ltr">{{ money(parts.change) }}</span>.</template>
+        <template v-else-if="parts.change.lt(0)">לא שילמתם השנה, ובכל זאת היתרה ירדה ב־<span class="ltr">{{ money(parts.change) }}</span>, כי המדד ירד.</template>
+        <template v-else>לא שילמתם השנה, והיתרה לא זזה.</template>
+      </template>
+      <template v-else-if="charged.lt(0)">
+        המדד ירד יותר ממה שהריבית הוסיפה, ולכן היתרה ירדה ב־<span class="ltr">{{ money(parts.change) }}</span> — יותר מ־<span class="ltr">{{ money(parts.payment) }}</span> ששילמתם.
+      </template>
+      <template v-else-if="parts.principalPaid.gt(0)">
         מתוך <span class="ltr">{{ money(parts.payment) }}</span> ששילמתם, רק <span class="ltr">{{ money(parts.principalPaid) }}</span> הורידו את היתרה. השאר כיסה את הריבית<template v-if="indexed && !parts.indexation.isZero()"> ואת ההצמדה</template>.
       </template>
       <template v-else-if="parts.principalPaid.isZero()">התשלום כיסה בדיוק את הריבית<template v-if="indexed && !parts.indexation.isZero()"> ואת ההצמדה</template>: היתרה לא ירדה בכלל.</template>

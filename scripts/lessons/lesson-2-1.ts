@@ -190,6 +190,9 @@ export default function lesson21(): LessonData {
     monthInt("ex6.answer", "480000", "0.25"),
     { id: "ex6.year", kind: "trk_year_interest", inputs: { balance: "480000", rate: "0.25" }, value: moneyString(new Decimal("480000").mul("0.25").div(100)) },
     monthInt("ex6.spread_mix", "480000", "0.8"),
+    // The slip "× 0.25" instead of "× 0.25%": 480,000 × 25% ÷ 12.
+    monthInt("ex6.no_hundred", "480000", "25"),
+    given("ex6.as_decimal", "0.0025"),
   ];
 
   return {
