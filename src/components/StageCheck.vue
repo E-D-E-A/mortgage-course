@@ -79,6 +79,20 @@ function retry() {
   submitted.value = false;
 }
 
+// The options in a fixed, scrambled order per question: authors list the right answer
+// first, and a learner must not pass by picking the first option. The order comes from
+// the question's id, so the server and the browser draw the same page.
+function shuffled(q: Question): [NonNullable<Question["options"]>[number], number][] {
+  const opts = (q.options ?? []).map((o, j) => [o, j] as [NonNullable<Question["options"]>[number], number]);
+  let seed = [...q.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const next = () => (seed = (seed * 1103515245 + 12345) >>> 0) / 2 ** 32;
+  for (let i = opts.length - 1; i > 0; i--) {
+    const k = Math.floor(next() * (i + 1));
+    [opts[i], opts[k]] = [opts[k], opts[i]];
+  }
+  return opts;
+}
+
 const exact = (q: Question) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(q.answer));
 const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
 </script>
@@ -132,7 +146,7 @@ const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
         </label>
         <div v-else class="mt-4 grid gap-2" role="radiogroup" :aria-label="`שאלה ${i + 1}`">
           <button
-            v-for="(o, j) in q.options"
+            v-for="[o, j] in shuffled(q)"
             :key="j"
             type="button"
             role="radio"

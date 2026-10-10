@@ -72,7 +72,7 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
           <th v-if="periodLabel" class="py-2 pe-1 text-start font-semibold sm:pe-3">{{ periodLabel }}</th>
-          <th v-for="c in columns" :key="c.key" class="py-2 text-start font-semibold">{{ c.label }}</th>
+          <th v-for="c in columns" :key="c.key" class="py-2 pe-1 text-start font-semibold sm:pe-2">{{ c.label }}</th>
         </tr>
       </thead>
       <tbody>

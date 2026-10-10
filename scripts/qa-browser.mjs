@@ -84,7 +84,10 @@ for (const stage of stages) {
       const q = questions[i];
       const item = items.nth(i);
       if (q.type === "numeric") await item.locator("input").fill(right ? String(q.answer) : "1");
-      else await item.getByRole("radio").nth(right ? q.options.findIndex((o) => o.correct) : q.options.findIndex((o) => !o.correct)).click();
+      else {
+        const option = q.options.find((o) => (right ? o.correct : !o.correct));
+        await item.getByRole("radio", { name: option.text, exact: true }).click();
+      }
     }
     await page.getByRole("button", { name: "סיימתי — לבדיקה" }).click();
     return (await page.locator(`[id^=check-${stage}-result] p`).first().textContent()).trim();

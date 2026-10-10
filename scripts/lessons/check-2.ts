@@ -72,38 +72,44 @@ export default function check2(): LessonData {
         value: moneyString(disposableIncome(["15000", "8000"], ["0"])),
       },
 
-      // q1 (2.1): Bank of Israel rate 3% (supposed) → prime → a track at prime − 0.8.
+      // q1 (2.1): Bank of Israel rate 3.5% (supposed) → prime → a track at prime − 0.6.
       { id: "q1.addition", kind: "given", inputs: {}, value: PRIME_ADDITION },
-      { id: "q1.prime", kind: "lend_prime", inputs: { policy_rate: "3", addition: PRIME_ADDITION }, value: plainNumber(primeFromPolicy("3")) },
-      rateSum("q1.answer", plainNumber(primeFromPolicy("3")), "-0.8"),
-      rateSum("q1.added", plainNumber(primeFromPolicy("3")), "0.8"),
-      rateSum("q1.from_boi", "3", "-0.8"),
+      { id: "q1.prime", kind: "lend_prime", inputs: { policy_rate: "3.5", addition: PRIME_ADDITION }, value: plainNumber(primeFromPolicy("3.5")) },
+      rateSum("q1.answer", plainNumber(primeFromPolicy("3.5")), "-0.6"),
+      rateSum("q1.added", plainNumber(primeFromPolicy("3.5")), "0.6"),
+      rateSum("q1.from_boi", "3.5", "-0.6"),
 
-      // q4 (2.3): 100,000 ₪ indexed, 2% inflation, 3% real — the first year's interest.
+      // q4 (2.3): 200,000 ₪ indexed, 3% inflation, 2% real — the first year's interest.
       {
         id: "q4.indexed",
         kind: "infl_indexed_balance",
-        inputs: { amount: "100000", inflation_percent: "2", years: 1 },
-        value: moneyString(indexedBalance("100000", "2", 1)),
+        inputs: { amount: "200000", inflation_percent: "3", years: 1 },
+        value: moneyString(indexedBalance("200000", "3", 1)),
       },
-      pctOf("q4.answer", moneyString(indexedBalance("100000", "2", 1)), "3"),
-      pctOf("q4.on_original", "100000.00", "3"),
-      pctOf("q4.added_rates", "100000.00", "5"),
+      pctOf("q4.answer", moneyString(indexedBalance("200000", "3", 1)), "2"),
+      pctOf("q4.on_original", "200000.00", "2"),
+      pctOf("q4.added_rates", "200000.00", "5"),
 
-      // q5 (2.3): unindexed 5%, indexed 3% — the inflation at which they cost the same.
-      { id: "q5.answer", kind: "bond_inflation_gap", inputs: { nominal_percent: "5", real_percent: "3" }, value: percentString(inflationGap("5", "3")) },
-      rateSum("q5.subtracted", "5", "-3"),
+      // q5 (2.3): unindexed 4.5%, indexed 2.5% — the inflation at which they cost the same.
+      { id: "q5.answer", kind: "bond_inflation_gap", inputs: { nominal_percent: "4.5", real_percent: "2.5" }, value: percentString(inflationGap("4.5", "2.5")) },
+      rateSum("q5.subtracted", "4.5", "-2.5"),
 
       // q8 (2.6): prime 5% (supposed), a track at prime − 0.5, the Bank of Israel adds 0.25 points.
       rateSum("q8.prime_after", "5", "0.25"),
       rateSum("q8.answer", "5.25", "-0.5"),
       rateSum("q8.before", "5", "-0.5"),
 
-      // q12 (2.9): 120,000 ₪ over 120 months at 6% — equal principal, month 1; Spitzer as the mistake.
-      repCell("q12.principal", "equal_principal", "120000", "6", 120, 1, "principal"),
-      repCell("q12.interest", "equal_principal", "120000", "6", 120, 1, "interest"),
-      repCell("q12.answer", "equal_principal", "120000", "6", 120, 1, "payment"),
-      repPayment("q12.spitzer", "120000", "6", 120),
+      // q12 (2.9): 90,000 ₪ over 60 months at 4.8% — equal principal, month 1; Spitzer as the mistake.
+      {
+        id: "q12.monthly",
+        kind: "monthly_rate_by_division",
+        inputs: { annual_percent: "4.8", periods_per_year: 12, decimals: 4 },
+        value: roundedString(periodicRateByDivision("4.8", 12), 4),
+      },
+      repCell("q12.principal", "equal_principal", "90000", "4.8", 60, 1, "principal"),
+      repCell("q12.interest", "equal_principal", "90000", "4.8", 60, 1, "interest"),
+      repCell("q12.answer", "equal_principal", "90000", "4.8", 60, 1, "payment"),
+      repPayment("q12.spitzer", "90000", "4.8", 60),
 
       // q14 (2.10): 200,000 ₪ at 6% for 120 months, 12 months of partial grace — a grace-month payment.
       repCell("q14.answer", "grace_partial", "200000", "6", 120, 1, "payment", 12),
