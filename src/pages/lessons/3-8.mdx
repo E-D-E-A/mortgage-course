@@ -84,20 +84,20 @@ export const predictionOptions = [
 בשיעור הזה נשתמש בתחזית בדויה, כדי לראות איך זה עובד. **היא לא התחזית של בנק ישראל.** לפיה, אחוז הריבית במסלול יהיה:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[22rem] border-collapse text-body-m">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">שנים</th>
-        <th class="py-2 text-start font-semibold">התשלום החודשי</th>
-        <th class="py-2 text-start font-semibold">אחוז הריבית (תחזית בדויה)</th>
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">התשלום החודשי</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחוז הריבית (תחזית בדויה)</th>
       </tr>
     </thead>
     <tbody>
       {forecastRows.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
-          <td class="py-2"><span class="ltr">{pct(r.rate_1)}</span></td>
+          <td class="py-2 pe-3 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pct(r.rate_1)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -112,7 +112,7 @@ export const predictionOptions = [
 
 במסלול שלמעלה, ביום החתימה, שניהם {f.shekels("explain.first")}. אז למה שני שמות? כי הם עונים על שאלות שונות: ההחזר הראשון הוא התשלום של **החודש הראשון**, והוא לא משתנה אחר כך. ההחזר בתנאים הנוכחיים הוא התשלום **לפי התנאים של היום**, ולכן הוא זז כשהתנאים זזים. שתי דוגמאות שבהן הם שונים:
 
-**א. אחרי כמה שנים, כשהפריים זזה.** לפני שלוש שנים לקחתם {f.shekels("diff.prime_loan")} ב<Term t="מסלול פריים" lesson="3.8">מסלול פריים</Term> ל־20 שנה, כשאחוז הריבית במסלול היה 4.5%. ההחזר הראשון היה {f.shekels("diff.prime_first")}. מאז הפריים עלתה בנקודת אחוז אחת, והמסלול ב־5.5%. התשלום חושב מחדש על היתרה, ל־204 החודשים שנשארו (שיעור 3.6): {f.shekels("diff.prime_now")}. זה ההחזר בתנאים הנוכחיים היום — גבוה מההחזר הראשון ב־{f.shekels("diff.prime_gap")}. ההחזר הראשון נשאר מה שהיה: הוא שייך לחודש הראשון.
+**א. אחרי כמה שנים, כשהפריים זזה.** לפני שלוש שנים לקחתם {f.shekels("diff.prime_loan")} ב<Term t="מסלול פריים" lesson="3.8">מסלול פריים</Term> ל־20 שנה, כשאחוז הריבית במסלול היה 4.5%. ההחזר הראשון היה {f.shekels("diff.prime_first")}. מאז הפריים עלתה בנקודת אחוז אחת, והמסלול ב־5.5%. התשלום חושב מחדש על היתרה, לחודשים שנשארו (שיעור 3.6): {f.shekels("diff.prime_now")}. זה ההחזר בתנאים הנוכחיים היום — גבוה מההחזר הראשון ב־{f.shekels("diff.prime_gap")}. ההחזר הראשון נשאר מה שהיה: הוא שייך לחודש הראשון.
 
 **ב. במסלול צמוד, כבר ביום החתימה.** לקחתם {f.shekels("diff.linked_loan")} ל־20 שנה ב<Term t="קבועה צמודה" lesson="3.8">קבועה צמודה</Term>, ב־3% לשנה. ההחזר בתנאים הנוכחיים מניח שהמדד לא זז: {f.shekels("diff.linked_now")}. אבל עד התשלום הראשון עובר חודש, והתשלום זז עם המדד של החודש הזה (שיעור 3.5). אם המדד עולה בו בקצב של 2% לשנה (הנחה להמחשה, לא תחזית), ההחזר הראשון יוצא {f.shekels("diff.linked_first")} — {f.shekels("diff.linked_gap")} יותר.
 
@@ -125,22 +125,22 @@ export const predictionOptions = [
 התחזית היא דרך אחת, מוסכמת, לחשב את העתיד. העוגן בפועל יכול לצאת אחרת. הנה אותו מסלול בשלוש דרכים שבהן הריבית יכולה להתפתח — התחזית, ריבית שעולה יותר ממנה, וריבית שיורדת:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[20rem] border-collapse text-body-m">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">שנים</th>
-        <th class="py-2 text-start font-semibold">לפי התחזית</th>
-        <th class="py-2 text-start font-semibold">אם הריבית עולה יותר</th>
-        <th class="py-2 text-start font-semibold">אם הריבית יורדת</th>
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">לפי התחזית</th>
+        <th class="py-2 pe-3 text-start font-semibold">אם הריבית עולה יותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">אם הריבית יורדת</th>
       </tr>
     </thead>
     <tbody>
       {forecastRows.map((r, i) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_1)}</span>)</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(highRows[i].total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(highRows[i].rate_1)}</span>)</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(lowRows[i].total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(lowRows[i].rate_1)}</span>)</span></td>
+          <td class="py-2 pe-3 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_1)}</span>)</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(highRows[i].total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(highRows[i].rate_1)}</span>)</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(lowRows[i].total)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(lowRows[i].rate_1)}</span>)</span></td>
         </tr>
       ))}
     </tbody>
@@ -267,22 +267,22 @@ export const predictionOptions = [
 **צעד 3 — הלוח החזוי, תקופה אחר תקופה.**
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[20rem] border-collapse text-body-m">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">שנים</th>
-        <th class="py-2 text-start font-semibold">התמהיל בחודש</th>
-        <th class="py-2 text-start font-semibold">קבועה</th>
-        <th class="py-2 text-start font-semibold">משתנה (ובסוגריים: אחוז הריבית בתחזית)</th>
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל בחודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">קבועה</th>
+        <th class="py-2 pe-3 text-start font-semibold">משתנה (ובסוגריים: אחוז הריבית בתחזית)</th>
       </tr>
     </thead>
     <tbody>
       {workedRows.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.payment_2)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_2)}</span>)</span></td>
+          <td class="py-2 pe-3 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.payment_2)}</span><br /><span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_2)}</span>)</span></td>
         </tr>
       ))}
     </tbody>
@@ -409,20 +409,20 @@ export const predictionOptions = [
   לקחתם תמהיל של שני מסלולים. אלה התשלומים החזויים בכל תקופה (לפי תחזית בדויה):
 
   <div class="my-3 overflow-x-auto">
-    <table class="w-full min-w-[20rem] border-collapse text-body-m">
+    <table class="w-full border-collapse text-body-m">
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
-          <th class="py-1 text-start font-semibold">שנים</th>
-          <th class="py-1 text-start font-semibold">קבועה, 15 שנה</th>
-          <th class="py-1 text-start font-semibold">משתנה, 20 שנה</th>
+          <th class="py-1 pe-3 text-start font-semibold">שנים</th>
+          <th class="py-1 pe-3 text-start font-semibold">קבועה, 15 שנה</th>
+          <th class="py-1 pe-3 text-start font-semibold">משתנה, 20 שנה</th>
         </tr>
       </thead>
       <tbody>
         {ex5Rows.map((r) => (
           <tr class="border-b border-n100">
-            <td class="py-1"><span class="ltr">{years(r)}</span></td>
-            <td class="py-1"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
-            <td class="py-1"><span class="ltr">{formatShekels(r.payment_2)}</span></td>
+            <td class="py-1 pe-3"><span class="ltr">{years(r)}</span></td>
+            <td class="py-1 pe-3"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
+            <td class="py-1 pe-3"><span class="ltr">{formatShekels(r.payment_2)}</span></td>
           </tr>
         ))}
       </tbody>

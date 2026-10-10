@@ -81,7 +81,7 @@ const yearRows = computed(() =>
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      תרחיש להמחשה, לא מה שצפוי לקרות. הלוואה של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, באותו אחוז ריבית, בתשלומים
+      תרחיש להמחשה, לא מה שצפוי לקרות. הלוואה של <span class="ltr whitespace-nowrap">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, באותו אחוז ריבית, בתשלומים
       חודשיים שווים (שפיצר). המדד עולה באופן אחיד: באותו אחוז בכל חודש (השורש ה־12, שיעור 0.4), כך שאחרי 12 חודשים הוא עלה
       בדיוק באחוז שבחרתם. כל שורה מעוגלת לאגורה, כמו בלוח של בנק.
     </p>
@@ -151,7 +151,7 @@ const yearRows = computed(() =>
     <p class="mt-2 text-body-m text-n800">
       <template v-if="addedKind === 'none'">המדד לא זז, ולכן ההצמדה לא שינתה את החוב במסלול הצמוד.</template>
       <template v-else-if="addedKind === 'fell'">
-        עד סוף חודש {{ month }} המדד ירד, וההצמדה הקטינה את החוב במסלול הצמוד ב־<span class="ltr font-semibold">{{ formatShekels(addedSoFar.abs()) }}</span>.
+        {{ month < months ? `עד סוף חודש ${month}` : "עד סוף ההלוואה" }} המדד ירד, וההצמדה הקטינה את החוב במסלול הצמוד ב־<span class="ltr font-semibold">{{ formatShekels(addedSoFar.abs()) }}</span>.
         {{ month < months ? "גם התשלומים שנשארו קטנים בהתאם." : "לכן גם התשלומים היו קטנים מהלוח המקורי." }}
       </template>
       <template v-else-if="month < months">

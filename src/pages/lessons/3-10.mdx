@@ -70,19 +70,19 @@ export const predictionOptions = [
   <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">בסוף חודש</th>
-        <th class="py-2 text-start font-semibold">שווה היום</th>
-        <th class="py-2 text-start font-semibold">התשלום</th>
-        <th class="py-2 text-start font-semibold">מחלקים ב־</th>
+        <th class="py-2 pe-3 text-start font-semibold">בסוף חודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">שווה היום</th>
+        <th class="py-2 pe-3 text-start font-semibold">התשלום</th>
+        <th class="py-2 pe-3 text-start font-semibold">מחלקים ב־</th>
       </tr>
     </thead>
     <tbody>
       {rows05.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700">{r.month}</td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.value_today)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
-          <td class="py-2"><span class="ltr">{r.growth}</span></td>
+          <td class="py-2 pe-3 text-n700">{r.month}</td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.growth}</span></td>
         </tr>
       ))}
     </tbody>
@@ -109,24 +109,24 @@ export const predictionOptions = [
 בטבלה: ״נמוכה מדי״ — הערך הנוכחי עדיין יותר ממה שקיבלתם; ״גבוהה מדי״ — כבר פחות.
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[20rem] border-collapse text-body-m">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">צעד</th>
-        <th class="py-2 text-start font-semibold">מנסים (לחודש)</th>
-        <th class="py-2 text-start font-semibold">הערך הנוכחי</th>
-        <th class="py-2 text-start font-semibold">המסקנה</th>
-        <th class="py-2 text-start font-semibold">הטווח לפני הצעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">צעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">מנסים (לחודש)</th>
+        <th class="py-2 pe-3 text-start font-semibold">הערך הנוכחי</th>
+        <th class="py-2 pe-3 text-start font-semibold">המסקנה</th>
+        <th class="py-2 pe-3 text-start font-semibold">הטווח לפני הצעד</th>
       </tr>
     </thead>
     <tbody>
       {search.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700">{r.step}</td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{r.mid}%</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.value_today)}</span></td>
-          <td class="py-2">{r.verdict === "low" ? "נמוכה מדי" : "גבוהה מדי"}</td>
-          <td class="py-2"><span class="ltr">{r.low}%–{r.high}%</span></td>
+          <td class="py-2 pe-3 text-n700">{r.step}</td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{r.mid}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+          <td class="py-2 pe-3">{r.verdict === "low" ? "נמוכה מדי" : "גבוהה מדי"}</td>
+          <td class="py-2 pe-3"><span class="ltr">{r.low}%–{r.high}%</span></td>
         </tr>
       ))}
     </tbody>

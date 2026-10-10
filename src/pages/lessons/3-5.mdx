@@ -25,9 +25,9 @@ export const f = facts("3.5");
 export const amt = (id) => formatShekelsText(f.raw(id)).replace(" ₪", ""); /* Money inside an equation: the course's money format without the ₪ sign, so agorot always show two digits. */
 export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
 export const neg = (id) => formatShekelsText(String(f.raw(id)).replace("-", "")).replace(" ₪", ""); /* The size of a negative amount, for a sentence that already says "ירד". */
-export const exactNeg = (id) => `−${formatShekels(String(f.raw(id)).replace("-", ""))}`; /* A negative amount in a table, with a real minus sign. */
 export const day = (id) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${f.raw(id)}T12:00:00Z`));
 export const half = f.rows("half.table");
+export const cell = (id) => formatShekels(f.raw(id)).replace(/\s*₪/, ""); /* Money in a table cell: always with agorot, the ₪ said once under the table. */
 export const predictionOptions = [
   `${f.shekels("explain.c")}, כמו בלוח המקורי: ההצמדה נכנסת לתשלומים רק אחרי שנה`,
   `${f.shekels("m1.payment")}: חודש אחד של מדד נכנס כבר לתשלום הראשון`,
@@ -146,19 +146,19 @@ export const predictionOptions = [
   <table class="w-full border-collapse text-caption sm:text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600 whitespace-nowrap">
-        <th class="py-2 pe-2 text-start font-semibold">חודש</th>
-        <th class="py-2 pe-2 text-start font-semibold">מדד</th>
-        <th class="py-2 pe-2 text-start font-semibold">הצמדה</th>
-        <th class="py-2 pe-2 text-start font-semibold">ריבית</th>
-        <th class="py-2 pe-2 text-start font-semibold">תשלום</th>
-        <th class="py-2 pe-2 text-start font-semibold">קרן</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">חודש</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">מדד</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">הצמדה</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">ריבית</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">תשלום</th>
+        <th class="py-2 pe-1.5 sm:pe-2 text-start font-semibold">קרן</th>
         <th class="py-2 text-start font-semibold">יתרה</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">1</td><td class="py-2 pe-2"><span class="ltr">100.3</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m1.closing")}</span></td></tr>
-      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">2</td><td class="py-2 pe-2"><span class="ltr">100.5</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m2.closing")}</span></td></tr>
-      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">3</td><td class="py-2 pe-2"><span class="ltr">100.4</span></td><td class="py-2 pe-2"><span class="ltr">−{neg("m3.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m3.closing")}</span></td></tr>
+      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-1.5 sm:pe-2">1</td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">100.3</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m1.indexation")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m1.interest")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m1.payment")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m1.principal")}</span></td><td class="py-2"><span class="ltr">{cell("m1.closing")}</span></td></tr>
+      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-1.5 sm:pe-2">2</td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">100.5</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m2.indexation")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m2.interest")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m2.payment")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m2.principal")}</span></td><td class="py-2"><span class="ltr">{cell("m2.closing")}</span></td></tr>
+      <tr class="whitespace-nowrap"><td class="py-2 pe-1.5 sm:pe-2">3</td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">100.4</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">−{cell("m3.indexation").replace("-", "")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m3.interest")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m3.payment")}</span></td><td class="py-2 pe-1.5 sm:pe-2"><span class="ltr">{cell("m3.principal")}</span></td><td class="py-2"><span class="ltr">{cell("m3.closing")}</span></td></tr>
     </tbody>
   </table>
   <p class="mt-2 text-caption text-n600">הסכומים בשקלים. ״הצמדה״: הפרשי ההצמדה, מה שההצמדה הוסיפה ליתרה באותו חודש, לפני התשלום; בחודש 3 המדד ירד, ולכן הם שליליים. ״קרן״: רכיב הקרן. ״יתרה״: היתרה בסוף החודש.</p>

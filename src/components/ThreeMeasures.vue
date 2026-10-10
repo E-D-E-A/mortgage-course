@@ -107,7 +107,7 @@ const pvStatus = computed(() => {
     </label>
 
     <div class="mt-4 overflow-x-auto">
-      <table class="w-full min-w-[20rem] border-collapse text-body-m">
+      <table class="w-full border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-2 text-start font-semibold">השאלה</th>
@@ -152,7 +152,7 @@ const pvStatus = computed(() => {
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
-      <table class="w-full min-w-[20rem] border-collapse text-body-m">
+      <table class="w-full border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-2 text-start font-semibold">ריבית לשנה</th>

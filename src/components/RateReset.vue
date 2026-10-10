@@ -110,7 +110,7 @@ const yearRows = computed(() =>
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      תרחיש להמחשה, לא מה שצפוי לקרות. מסלול של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, שמתחיל ב־<span class="ltr">{{ pct(rate) }}</span>. כשאחוז
+      תרחיש להמחשה, לא מה שצפוי לקרות. מסלול של <span class="ltr whitespace-nowrap">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, שמתחיל ב־<span class="ltr">{{ pct(rate) }}</span>. כשאחוז
       הריבית זז, התשלום מחושב מחדש על היתרה, לחודשים שנשארו (הנחה של הקורס; בודקים בחוזה). כל שורה מעוגלת לאגורה, כמו בלוח של
       בנק.
     </p>
@@ -194,7 +194,7 @@ const yearRows = computed(() =>
           <dd class="ltr text-end font-semibold text-n900">{{ formatShekels(moment.newPayment) }}</dd>
         </dl>
         <p v-if="method === 'spitzer'" class="mt-2 text-caption text-n600">
-          לא נכון: נוסחה אחת על כל ההלוואה, כאילו אחוז הריבית החדש היה מהיום הראשון (<span class="ltr">{{ formatWholeShekels(amount) }}</span>, {{ months }} חודשים), הייתה
+          לא נכון: נוסחה אחת על כל ההלוואה, כאילו אחוז הריבית החדש היה מהיום הראשון (<span class="ltr whitespace-nowrap">{{ formatWholeShekels(amount) }}</span>, {{ months }} חודשים), הייתה
           נותנת <span class="ltr">{{ formatShekels(moment.oneFormula) }}</span>.
         </p>
         <p v-else class="mt-2 text-caption text-n600">בקרן שווה רכיב הקרן לא זז בשינוי: רק רכיב הריבית מחושב באחוז החדש.</p>
