@@ -250,16 +250,35 @@ export default function lesson27(): LessonData {
     // The mistakes: counting the last day as an update, or the first and the last.
     { id: "ex3.with_end", kind: "amort_update_count_with_end", inputs: { term_months: 300, interval_months: 60 }, value: String(Math.floor(300 / 60)) },
     { id: "ex3.with_ends", kind: "amort_update_count_with_ends", inputs: { term_months: 300, interval_months: 60 }, value: String(Math.floor(300 / 60) + 1) },
-    // Exercise 4: every 2.5 years, 40 months since the loan began.
-    toNext("ex4.answer", 360, 30, 40),
-    { id: "ex4.next", kind: "amort_next_update", inputs: { term_months: 360, interval_months: 30, now: 40 }, value: String(nextUpdateMonth(360, 30, 40)) },
-    // The mistake: answering how long ago the last update was.
+    // Exercise 4: 30 years, every 2.5 years, 95 months since the loan began — how many update points are left.
     {
-      id: "ex4.since_last",
-      kind: "amort_months_since_update",
-      inputs: { term_months: 360, interval_months: 30, now: 40 },
-      value: String(40 - Math.max(0, ...updateMonths(360, 30).filter((k) => k <= 40))),
+      id: "ex4.passed",
+      kind: "amort_update_points_until",
+      inputs: { term_months: 360, interval_months: 30, now: 95 },
+      value: updateMonths(360, 30).filter((k) => k <= 95),
     },
+    {
+      id: "ex4.left",
+      kind: "amort_update_points_after",
+      inputs: { term_months: 360, interval_months: 30, now: 95 },
+      value: updateMonths(360, 30).filter((k) => k > 95),
+    },
+    {
+      id: "ex4.answer",
+      kind: "amort_updates_left",
+      inputs: { term_months: 360, interval_months: 30, now: 95 },
+      value: String(updateMonths(360, 30).filter((k) => k > 95).length),
+    },
+    { id: "ex4.next", kind: "amort_next_update", inputs: { term_months: 360, interval_months: 30, now: 95 }, value: String(nextUpdateMonth(360, 30, 95)) },
+    toNext("ex4.to_next", 360, 30, 95),
+    // The mistakes: counting the last day of the loan as an update; counting the points already passed.
+    {
+      id: "ex4.with_end",
+      kind: "amort_updates_left_with_end",
+      inputs: { term_months: 360, interval_months: 30, now: 95 },
+      value: String(updateMonths(360, 30).filter((k) => k > 95).length + 1),
+    },
+    count("ex4.all", 360, 30),
     // Prediction: two years in, the next update (every 5 years) is this many months away.
     toNext("prediction.wait", 240, 60, 24),
     // New exercise: next month's interest at an update, 300,000 ₪ at 5.4%.

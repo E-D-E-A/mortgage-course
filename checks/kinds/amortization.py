@@ -180,6 +180,27 @@ def months_since_update(i, _facts=None):
     return str(now - (earlier[-1] if earlier else 0))
 
 
+def update_points_until(i, _facts=None):
+    # The update points already passed by month `now`.
+    now = int(i["now"])
+    return [k for k in update_points(i) if k <= now]
+
+
+def update_points_after(i, _facts=None):
+    # The update points still ahead after month `now`.
+    now = int(i["now"])
+    return [k for k in update_points(i) if k > now]
+
+
+def updates_left(i, _facts=None):
+    return str(len(update_points_after(i)))
+
+
+def updates_left_with_end(i, _facts=None):
+    # The mistake: counting the last day of the loan as an update too.
+    return str(len(update_points_after(i)) + 1)
+
+
 def prime_table(i, _facts=None):
     # inputs: addition, margin, date_1, policy_1, date_2, policy_2, ...
     rows, n = [], 1
@@ -231,6 +252,10 @@ KINDS = {
     "amort_update_count_with_end": update_count_with_end,
     "amort_update_count_with_ends": update_count_with_ends,
     "amort_months_since_update": months_since_update,
+    "amort_update_points_until": update_points_until,
+    "amort_update_points_after": update_points_after,
+    "amort_updates_left": updates_left,
+    "amort_updates_left_with_end": updates_left_with_end,
     "amort_prime_table": prime_table,
     "amort_anchor_table": anchor_table,
     "amort_linked_payment_table": linked_payment_table,

@@ -17,10 +17,12 @@ import Sources from "../../components/Sources.astro";
 import M from "../../components/M.astro";
 import Solution from "../../components/Solution.astro";
 import { facts } from "../../lib/facts.ts";
+import { formatShekelsText } from "../../lib/calc/money.ts";
 
 {/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("2.6");
+export const amt = (id) => formatShekelsText(f.raw(id)).replace(" ₪", ""); /* Money inside an equation: the course's money format without the ₪ sign, so agorot always show two digits ("481,852.60"). */
 export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
 export const money = (v) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v));
 export const pct = (id) => `${f.plain(id)}%`;
@@ -86,7 +88,7 @@ export const predictionOptions = [
 
 ניקח מסלול פריים של {f.shekels("case.amount")} ל־20 שנה, כלומר 240 תשלומים חודשיים, ב־P−0.5: {pct("explain.rate")}, נכון ל־{asOf}.
 
-**צעד 1 — הריבית של החודש הראשון.** אחוז הריבית לשנה חלקי 12, כמו בשיעור 0.4: <M>600,000 × {n("explain.rate")}% ÷ 12 = {n("explain.first_interest")}</M> ₪.
+**צעד 1 — הריבית של החודש הראשון.** אחוז הריבית לשנה חלקי 12, כמו בשיעור 0.4: <M>600,000 × {n("explain.rate")}% ÷ 12 = {amt("explain.first_interest")}</M> ₪.
 
 **צעד 2 — התשלום.** בתשלומים חודשיים שווים (<Later lesson="2.9">שפיצר</Later>), התשלום הוא {f.shekels("explain.payment")}. את הנוסחה נבנה בשיעור 3.1; כאן ניקח את התוצאה מוכנה, כמו שההמחשה למטה מחשבת אותה.
 
@@ -97,16 +99,16 @@ export const predictionOptions = [
 </Callout>
 
 **צעד 4 — הפריים עולה בנקודת אחוז.** נניח שהפריים עולה ל־{pct("explain.prime_up")}. אחוז הריבית במסלול עולה ל־{pct("explain.rate_up")}. הריבית של החודש הבא, על אותה יתרה:
-- לפני: <M>{n("explain.left_60")} × {n("explain.rate")}% ÷ 12 = {n("explain.interest_before")}</M> ₪.
-- אחרי: <M>{n("explain.left_60")} × {n("explain.rate_up")}% ÷ 12 = {n("explain.interest_after")}</M> ₪.
+- לפני: <M>{amt("explain.left_60")} × {n("explain.rate")}% ÷ 12 = {amt("explain.interest_before")}</M> ₪.
+- אחרי: <M>{amt("explain.left_60")} × {n("explain.rate_up")}% ÷ 12 = {amt("explain.interest_after")}</M> ₪.
 - כלומר {f.shekels("explain.interest_rise")} יותר ריבית בחודש.
 
-**צעד 5 — התשלום מחושב מחדש.** הבנק מחשב תשלום חדש: על היתרה שנשארה, {f.shekels("explain.left_60")}, ל־180 החודשים שנשארו, באחוז הריבית החדש. יוצא {f.shekels("explain.new_payment")}, כלומר <M>{n("explain.new_payment")} − {n("explain.payment")} = {n("explain.payment_rise")}</M> ₪ יותר בכל חודש.
+**צעד 5 — התשלום מחושב מחדש.** הבנק מחשב תשלום חדש: על היתרה שנשארה, {f.shekels("explain.left_60")}, ל־180 החודשים שנשארו, באחוז הריבית החדש. יוצא {f.shekels("explain.new_payment")}, כלומר <M>{amt("explain.new_payment")} − {amt("explain.payment")} = {amt("explain.payment_rise")}</M> ₪ יותר בכל חודש.
 
 **צעד 6 — מה קורה לחוב.** סוף ההלוואה לא זז: עדיין 20 שנה מההתחלה. אבל החוב יורד לאט יותר, כי יותר מכל תשלום הולך לריבית. בסוף שנה 10 נשארים {money(up[9].balance)} ₪, לעומת {money(flat[9].balance)} ₪ אילו הפריים לא הייתה זזה. בתשלום האחרון שני המסלולים מגיעים לאפס.
 
 <Callout title="״התקופה נשארת, התשלום משתנה״ — הנחה של הקורס" tone="warning">
-<p>בקורס, כשאחוז הריבית במסלול זז, מחשבים מחדש את התשלום על היתרה, למספר החודשים שנשארו, וסוף ההלוואה נשאר במקומו. כך גם בכללי החישוב של Mogi: מחילים את השינוי לפי תנאי המסלול. איך בדיוק זה עובד אצלכם — מאיזה תשלום, ומה זז — כתוב בחוזה.</p>
+<p>בקורס, כשאחוז הריבית במסלול זז, מחשבים מחדש את התשלום על היתרה, למספר החודשים שנשארו, וסוף ההלוואה נשאר במקומו. כך גם בכללי החישוב של Mogi: מחילים את השינוי לפי תנאי המסלול (החלטה של Mogi: אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08). איך בדיוק זה עובד אצלכם — מאיזה תשלום, ומה זז — כתוב בחוזה.</p>
 </Callout>
 
 **מסלול פריים וה<Term t="תמהיל" lesson="2.6">תמהיל</Term>.** פעם היה כלל שהגביל את החלק של הפריים לשליש מההלוואה. לפי בנק ישראל הוא בוטל בדצמבר 2020 (לא אומת). מה שנשאר הוא הכלל משיעור 1.4: לפחות שליש מההלוואה באחוז ריבית שנקבע לכל התקופה. מסלול פריים הוא חלק מהשאר — מקסימום שני שלישים שיכולים לזוז (לא אומת; שיעור 4.4).
@@ -157,7 +159,7 @@ export const predictionOptions = [
 
 **צעד 2 — אחוז הריבית במסלול.** <M>{n("boi.prime")} − 0.5</M>: הפריים ועוד המרווח, עם הסימן שלו. המרווח הוא s משיעור 0.9: כמספר עשרוני, ומדברים עליו בנקודות אחוז.
 
-**צעד 3 — הריבית של חודש.** <M>{n("explain.left_60")} × {n("explain.rate_up")}% ÷ 12</M>: היתרה כפול הריבית החודשית, כמו בשיעור 0.4.
+**צעד 3 — הריבית של חודש.** <M>{amt("explain.left_60")} × {n("explain.rate_up")}% ÷ 12</M>: היתרה כפול הריבית החודשית, כמו בשיעור 0.4.
 
 **צעד 4 — התשלום החדש.** התשלום מחושב מחדש על היתרה שנשארה, למספר החודשים שנשארו. את הנוסחה עצמה נבנה בשיעור 3.1, ונחזור למסלול שאחוז הריבית שלו זז באמצע הדרך בשיעור 3.6.
 
@@ -225,9 +227,9 @@ export const predictionOptions = [
 
 **צעד 3 — היתרה בעוד שנה.** אחרי 12 תשלומים נשארים {f.shekels("worked.left_12")}, ו־288 חודשים.
 
-**צעד 4 — אם הריבית עולה בחצי נקודה.** ריבית בנק ישראל 3.75%, הפריים {pct("worked.prime_up")}, והמסלול <M>{n("worked.prime_up")} − 0.6 = {n("worked.rate_up")}</M>. התשלום, מחושב מחדש על {f.shekels("worked.left_12")} ל־288 חודשים: {f.shekels("worked.payment_up")}. כלומר <M>{n("worked.payment_up")} − {n("worked.payment_stay")} = {n("worked.rise")}</M> ₪ יותר בחודש.
+**צעד 4 — אם הריבית עולה בחצי נקודה.** ריבית בנק ישראל 3.75%, הפריים {pct("worked.prime_up")}, והמסלול <M>{n("worked.prime_up")} − 0.6 = {n("worked.rate_up")}</M>. התשלום, מחושב מחדש על {f.shekels("worked.left_12")} ל־288 חודשים: {f.shekels("worked.payment_up")}. כלומר <M>{amt("worked.payment_up")} − {amt("worked.payment_stay")} = {amt("worked.rise")}</M> ₪ יותר בחודש.
 
-**צעד 5 — אם הריבית יורדת בחצי נקודה.** ריבית בנק ישראל 2.75%, הפריים {pct("worked.prime_down")}, והמסלול {pct("worked.rate_down")}. התשלום: {f.shekels("worked.payment_down")}, כלומר <M>{n("worked.payment_stay")} − {n("worked.payment_down")} = {n("worked.fall")}</M> ₪ פחות בחודש.
+**צעד 5 — אם הריבית יורדת בחצי נקודה.** ריבית בנק ישראל 2.75%, הפריים {pct("worked.prime_down")}, והמסלול {pct("worked.rate_down")}. התשלום: {f.shekels("worked.payment_down")}, כלומר <M>{amt("worked.payment_stay")} − {amt("worked.payment_down")} = {amt("worked.fall")}</M> ₪ פחות בחודש.
 
 **צעד 6 — ואם היא לא זזה?** החישוב מחדש באותו אחוז נותן בדיוק את אותו תשלום, {f.shekels("worked.payment_stay")}. לכן משווים בצעדים 4 ו־5 אליו.
 
@@ -339,7 +341,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="2.6-4">
-אחוז הריבית במסלול עלה ב־0.25 נקודת אחוז, ולכן הריבית של חודש עולה ב־<M>500,000 × 0.25% ÷ 12 = {n("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}. את המרווח לא צריך: הוא לא זז.
+אחוז הריבית במסלול עלה ב־0.25 נקודת אחוז, ולכן הריבית של חודש עולה ב־<M>500,000 × 0.25% ÷ 12 = {amt("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}. את המרווח לא צריך: הוא לא זז.
 </Solution>
 
 <NumericExercise

@@ -17,10 +17,12 @@ import Sources from "../../components/Sources.astro";
 import M from "../../components/M.astro";
 import Solution from "../../components/Solution.astro";
 import { facts } from "../../lib/facts.ts";
+import { formatShekelsText } from "../../lib/calc/money.ts";
 
 {/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("2.7");
+export const amt = (id) => formatShekelsText(f.raw(id)).replace(" ₪", ""); /* Money inside an equation: the course's money format without the ₪ sign, so agorot always show two digits ("481,852.60"). */
 export const n = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 }).format(Number(f.raw(id)));
 export const pct = (id) => `${f.plain(id)}%`;
 export const list = (id) => {
@@ -59,7 +61,7 @@ export const predictionOptions = [
 </Section>
 
 <Callout title="מספרים להמחשה">
-<p>ההלוואות, העוגנים והמרווחים בשיעור בדויים, להמחשה. הם לא נתוני שוק ולא תחזית. נתונים אמיתיים מסומנים בתאריך.</p>
+<p>ההלוואות, העוגנים והמרווחים בשיעור בדויים, להמחשה. הם לא נתוני שוק ולא תחזית. נתונים מהשוק מסומנים בתאריך ובמילים ״לא אומת״.</p>
 </Callout>
 
 ב<Term t="משתנה לא צמודה" lesson="2.7">משתנה לא צמודה</Term> אחוז הריבית בנוי משני חלקים, כמו בשיעור 2.1: עוגן ועוד <Term t="מרווח" lesson="2.7">מרווח</Term>. המרווח כתוב בחוזה, ולא זז. העוגן נקרא מחדש רק בימים מסוימים, שכתובים בחוזה: <Term t="נקודת עדכון ריבית" lesson="2.7">נקודות עדכון ריבית</Term>. בין שתי נקודות, אחוז הריבית לא זז, ולכן גם התשלום לא זז.
@@ -74,7 +76,7 @@ export const predictionOptions = [
 
 **צעד 4 — הנקודה הראשונה.** אחרי 60 תשלומים <Term t="יתרה" lesson="2.7">היתרה</Term> {f.shekels("explain.left_60")}. נניח שבאותו יום העוגן {pct("explain.anchor_up")}. המרווח לא זז, ולכן אחוז הריבית החדש <M>{n("explain.anchor_up")} + {n("explain.spread")} = {n("explain.rate_up")}</M>. הריבית של החודש הבא עולה מ־{f.shekels("explain.interest_before")} ל־{f.shekels("explain.interest_after")}.
 
-**צעד 5 — התשלום החדש.** כמו בפריים, התשלום מחושב מחדש: על {f.shekels("explain.left_60")}, ל־180 החודשים שנשארו, ב־{pct("explain.rate_up")}. יוצא {f.shekels("explain.payment_up")}, כלומר <M>{n("explain.payment_up")} − {n("explain.payment")} = {n("explain.payment_rise")}</M> ₪ יותר בכל חודש, עד הנקודה הבאה. ואם העוגן היה יורד, התשלום היה יורד.
+**צעד 5 — התשלום החדש.** כמו בפריים, התשלום מחושב מחדש: על {f.shekels("explain.left_60")}, ל־180 החודשים שנשארו, ב־{pct("explain.rate_up")}. יוצא {f.shekels("explain.payment_up")}, כלומר <M>{amt("explain.payment_up")} − {amt("explain.payment")} = {amt("explain.payment_rise")}</M> ₪ יותר בכל חודש, עד הנקודה הבאה. ואם העוגן היה יורד, התשלום היה יורד.
 
 **מה קורה לחוב.** המסלול לא צמוד, ולכן החוב בשקלים רק יורד. כשאחוז הריבית עולה בנקודת עדכון, הוא יורד לאט יותר; סוף ההלוואה לא זז (זו הנחה של הקורס, כמו בשיעור 2.6).
 
@@ -90,10 +92,10 @@ export const predictionOptions = [
 
 ההגדרה המדויקת — אילו אג״ח, ובאיזה יום קוראים את העוגן — כתובה בחוזה. מה יהיה העוגן בנקודת העדכון הבאה אף אחד לא יודע היום. עקום התשואות של היום מראה מה המחירים מגלמים, לא מה יקרה; נחזור לזה ב<Later lesson="5.4">ריבית פורוורד</Later>.
 
-**נתון אמיתי, לדוגמה.** לפי נתוני בנק ישראל כפי שתועדו בצוות, בהלוואות חדשות במשתנה צמודה בפברואר 2026, העוגן היה בממוצע {pct("market.anchor")}, המרווח בממוצע {f.plain("market.spread")} נקודות אחוז, ואחוז הריבית בממוצע {pct("market.rate")} (לא אומת מול המקור).
+**נתון מהשוק, לדוגמה (לא אומת).** לפי נתוני בנק ישראל כפי שתועדו בצוות, בהלוואות חדשות במשתנה צמודה בפברואר 2026, העוגן היה בממוצע {pct("market.anchor")}, המרווח בממוצע {f.plain("market.spread")} נקודות אחוז, ואחוז הריבית בממוצע {pct("market.rate")} (לא אומת מול המקור).
 
 <Callout title="המרווח לא ״מתגלה״ מהעוגן של היום" tone="warning">
-<p>אם אחוז הריבית שלכם נקבע לפני שנים, אי אפשר לחסר ממנו את העוגן של היום ולקבל את המרווח: העוגן של היום הוא לא העוגן שהיה אז. את המרווח לוקחים מהחוזה. כך גם בכללי החישוב של Mogi (החלטה, 2026-10-08).</p>
+<p>אם אחוז הריבית שלכם נקבע לפני שנים, אי אפשר לחסר ממנו את העוגן של היום ולקבל את המרווח: העוגן של היום הוא לא העוגן שהיה אז. את המרווח לוקחים מהחוזה. כך גם בכללי החישוב של Mogi (החלטה של Mogi: אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08).</p>
 </Callout>
 
 <Section kind="ההסבר">
@@ -112,16 +114,16 @@ export const predictionOptions = [
 
 **צעד 1 — הלוח המקורי.** כמו בשיעור 2.5, מחשבים קודם בלי מדד: 240 תשלומים שווים ב־{pct("linked.rate")} יוצאים {f.shekels("linked.plain_payment")} (תוצאה מוכנה; הנוסחה בשיעור 3.1).
 
-**צעד 2 — בין נקודות העדכון, רק המדד זז.** כל תשלום הוא התשלום מהלוח המקורי כפול כמה שהמדד עלה מיום ההלוואה. כבר בחודש הראשון המדד עלה מעט, ולכן גם התשלום הראשון קצת מעל {f.shekels("linked.plain_payment")}. בסוף השנה הראשונה: <M>{n("linked.plain_payment")} × 1.02 = {n("linked.year1")}</M> ₪. בסוף שנה 5: <M>{n("linked.plain_payment")} × 1.02<sup>5</sup> = {n("linked.year5")}</M> ₪. אחוז הריבית לא זז; המדד הזיז את התשלום.
+**צעד 2 — בין נקודות העדכון, רק המדד זז.** כל תשלום הוא התשלום מהלוח המקורי כפול כמה שהמדד עלה מיום ההלוואה. כבר בחודש הראשון המדד עלה מעט, ולכן גם התשלום הראשון קצת מעל {f.shekels("linked.plain_payment")}. בסוף השנה הראשונה: <M>{amt("linked.plain_payment")} × 1.02 = {amt("linked.year1")}</M> ₪. בסוף שנה 5: <M>{amt("linked.plain_payment")} × 1.02<sup>5</sup> = {amt("linked.year5")}</M> ₪. אחוז הריבית לא זז; המדד הזיז את התשלום.
 
-**צעד 3 — היתרה בנקודת העדכון.** לפי הלוח המקורי, אחרי 60 תשלומים נשארים {f.shekels("linked.left_60_plain")}. עם המדד: <M>{n("linked.left_60_plain")} × 1.02<sup>5</sup> = {n("linked.left_60")}</M> ₪.
+**צעד 3 — היתרה בנקודת העדכון.** לפי הלוח המקורי, אחרי 60 תשלומים נשארים {f.shekels("linked.left_60_plain")}. עם המדד: <M>{amt("linked.left_60_plain")} × 1.02<sup>5</sup> = {amt("linked.left_60")}</M> ₪.
 
 **צעד 4 — אחוז הריבית החדש.** נניח שבנקודת העדכון העוגן 2.3%: <M>2.3 + 1.45 = {n("linked.rate_up")}</M>.
 
-**צעד 5 — התשלום החדש.** מחושב מחדש על היתרה הצמודה, {f.shekels("linked.left_60")}, ל־180 החודשים שנשארו, ב־{pct("linked.rate_up")}: {f.shekels("linked.new_payment")}, לפני המדד של החודשים הבאים. לעומת {f.shekels("linked.year5")} בחודש 60, זה <M>{n("linked.new_payment")} − {n("linked.year5")} = {n("linked.rate_part")}</M> ₪ יותר — החלק שאחוז הריבית החדש הוסיף. מכאן והלאה, התשלום שוב זז עם המדד בכל חודש.
+**צעד 5 — התשלום החדש.** מחושב מחדש על היתרה הצמודה, {f.shekels("linked.left_60")}, ל־180 החודשים שנשארו, ב־{pct("linked.rate_up")}: {f.shekels("linked.new_payment")}, לפני המדד של החודשים הבאים. לעומת {f.shekels("linked.year5")} בחודש 60, זה <M>{amt("linked.new_payment")} − {amt("linked.year5")} = {amt("linked.rate_part")}</M> ₪ יותר — החלק שאחוז הריבית החדש הוסיף. מכאן והלאה, התשלום שוב זז עם המדד בכל חודש.
 
 <Callout title="״כל 5 שנים״ — של מה?">
-<p>״5 שנים״ הוא הזמן בין עדכונים של אחוז הריבית, לא אורך ההלוואה. והוא לא חל על המדד: במסלול צמוד התשלום זז עם המדד בכל חודש, גם בין העדכונים. כך מנוסח גם בכללי החישוב של Mogi.</p>
+<p>״5 שנים״ הוא הזמן בין עדכונים של אחוז הריבית, לא אורך ההלוואה. והוא לא חל על המדד: במסלול צמוד התשלום זז עם המדד בכל חודש, גם בין העדכונים. כך מנוסח גם בכללי החישוב של Mogi (החלטה של Mogi: אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08).</p>
 </Callout>
 
 <Section kind="ההסבר">
@@ -135,7 +137,7 @@ export const predictionOptions = [
 - **במשתנה לא צמודה** נמצאו עדכונים כל {list("survey.unlinked")} שנים. ״שנה״ כולל גם את המסלולים שמתעדכנים לפי המק״מ.
 - **יש בנק שמציע רק {f.plain("survey.single")} שנים**, ויש בנקים שמציעים הרבה אפשרויות. {f.plain("survey.single")} שנים הופיע כמעט אצל כל הבנקים.
 
-**ומה עושה Mogi?** בכללי החישוב ש־Mogi החליטה עליהם (המימוש עוד לא הושלם): בסימולציה ראשונה, לפני שיש הצעה, מניחים עדכון כל {f.plain("survey.assumed")} שנים, ומסמנים שזו הנחה. כשיש הצעה או חוזה, משתמשים במועדים שכתובים בהם. (החלטה של Mogi, על בסיס התשובות של אילון, איש המקצוע של הצוות; אילון אישר ב־2026-10-07.)
+**ומה עושה Mogi?** בכללי החישוב ש־Mogi החליטה עליהם (המימוש עוד לא הושלם): בסימולציה ראשונה, לפני שיש הצעה, מניחים עדכון כל {f.plain("survey.assumed")} שנים, ומסמנים שזו הנחה. כשיש הצעה או חוזה, משתמשים במועדים שכתובים בהם. (החלטה של Mogi, על בסיס התשובות של אילון, איש המקצוע של הצוות; אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08.)
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-4">
   <table class="w-full border-collapse text-caption sm:text-body-m">
@@ -279,9 +281,9 @@ export const predictionOptions = [
 
 **צעד 4 — היתרה בנקודה הראשונה.** אחרי 60 תשלומים נשארים {f.shekels("worked.left_60")}, ו־240 חודשים.
 
-**צעד 5 — אם העוגן עולה בנקודת אחוז אחת, מ־3.5% ל־4.5%.** 4.5% ועוד המרווח: {pct("worked.rate_up")}. התשלום, מחושב מחדש על {f.shekels("worked.left_60")} ל־240 חודשים: {f.shekels("worked.payment_up")}, כלומר <M>{n("worked.payment_up")} − {n("worked.payment")} = {n("worked.rise")}</M> ₪ יותר בחודש.
+**צעד 5 — אם העוגן עולה בנקודת אחוז אחת, מ־3.5% ל־4.5%.** 4.5% ועוד המרווח: {pct("worked.rate_up")}. התשלום, מחושב מחדש על {f.shekels("worked.left_60")} ל־240 חודשים: {f.shekels("worked.payment_up")}, כלומר <M>{amt("worked.payment_up")} − {amt("worked.payment")} = {amt("worked.rise")}</M> ₪ יותר בחודש.
 
-**צעד 6 — אם העוגן יורד בנקודת אחוז אחת, ל־2.5%.** 2.5% ועוד המרווח: {pct("worked.rate_down")}. התשלום: {f.shekels("worked.payment_down")}, כלומר <M>{n("worked.payment")} − {n("worked.payment_down")} = {n("worked.fall")}</M> ₪ פחות בחודש.
+**צעד 6 — אם העוגן יורד בנקודת אחוז אחת, ל־2.5%.** 2.5% ועוד המרווח: {pct("worked.rate_down")}. התשלום: {f.shekels("worked.payment_down")}, כלומר <M>{amt("worked.payment")} − {amt("worked.payment_down")} = {amt("worked.fall")}</M> ₪ פחות בחודש.
 
 **צעד 7 — תחנת היציאה.** הנקודה הראשונה, אחרי 5 שנים, היא גם תחנת יציאה. אם אז יהיה להם כדאי לעבור למסלול אחר, הם יוכלו לפרוע את המסלול הזה בלי הקנס הגדול — בתנאי שיודיעו לבנק מראש, בין {f.plain("exit.notice_min")} ל־{f.plain("exit.notice_max")} ימים לפני (לא אומת). מה עוד עולה מעבר כזה — בשלב 7.
 
@@ -412,7 +414,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="2.7-7">
-<M>300,000 × 5.4% ÷ 12 = {n("ex7.answer")}</M>, כלומר {f.shekels("ex7.answer")}. זו הנוסחה <M>I = B × m</M>, עם אחוז הריבית החדש. גם התשלום מחושב מחדש, על היתרה ולחודשים שנשארו.
+<M>300,000 × 5.4% ÷ 12 = {amt("ex7.answer")}</M>, כלומר {f.shekels("ex7.answer")}. זו הנוסחה <M>I = B × m</M>, עם אחוז הריבית החדש. גם התשלום מחושב מחדש, על היתרה ולחודשים שנשארו.
 </Solution>
 
 <ChoiceExercise
@@ -448,7 +450,7 @@ export const predictionOptions = [
   client:visible
   id="2.7-9"
   n={8}
-  level="מאתגר"
+  level="בינוני"
   options={[
     { text: `בכל יום שתרצו, בהודעה של ${f.plain("exit.notice_min")} ימים`, feedback: "תחנת יציאה היא יום מסוים: נקודת העדכון שבחוזה. ביום אחר, הקנס הגדול יכול לחול." },
     { text: `ביום נקודת העדכון שבחוזה, אם הודעתם לבנק בין ${f.plain("exit.notice_min")} ל־${f.plain("exit.notice_max")} ימים לפני`, correct: true, feedback: "נכון (לא אומת; לפי תעתיק בצוות של צו הבנקאות). זה יום אחד, וההודעה צריכה להגיע בזמן." },
@@ -464,20 +466,21 @@ export const predictionOptions = [
   id="2.7-4"
   n={9}
   level="מאתגר"
-  unit="חודשים"
+  unit="נקודות"
   tolerance={0}
   near={0}
   answer={f.raw("ex4.answer")}
   errors={[
-    { value: "30", message: "ספרתם מרווח שלם מהיום. אבל הנקודות נספרות מיום ההלוואה, כל 30 חודשים, ולא מהיום." },
-    { value: f.raw("ex4.since_last"), message: "זה כמה זמן עבר מהנקודה הקודמת. השאלה היא כמה זמן נשאר עד הבאה." },
+    { value: f.raw("ex4.with_end"), message: "ספרתם גם את היום האחרון של ההלוואה, אחרי 30 שנה. ביום הזה ההלוואה נגמרת, ואין עדכון." },
+    { value: f.raw("ex4.all"), message: `ספרתם את כל הנקודות מיום ההלוואה. אבל הנקודות בחודשים ${list("ex4.passed")} כבר עברו.` },
+    { value: f.raw("ex4.to_next"), message: "זה מספר החודשים עד הנקודה הבאה. השאלה היא כמה נקודות עוד לפניכם." },
   ]}
 >
-  לקחתם משתנה לא צמודה ל־30 שנה, עם עדכון כל 2.5 שנים, כלומר כל 30 חודשים. עברו 40 חודשים מיום ההלוואה. בעוד כמה חודשים נקודת העדכון הבאה?
+  לקחתם משתנה לא צמודה ל־30 שנה, עם עדכון כל 2.5 שנים, כלומר כל 30 חודשים. עברו 95 חודשים מיום ההלוואה. כמה נקודות עדכון עוד לפניכם, עד סוף ההלוואה?
 </NumericExercise>
 
 <Solution for="2.7-4">
-הנקודות נספרות מיום ההלוואה, כל 30 חודשים. אחרי 40 חודשים, הנקודה הבאה היא בחודש {f.plain("ex4.next")}: <M>{n("ex4.next")} − 40 = {n("ex4.answer")}</M> חודשים. היא גם תחנת יציאה.
+הנקודות נספרות מיום ההלוואה, כל 30 חודשים. אחרי 95 חודשים כבר עברו הנקודות בחודשים {list("ex4.passed")}. הבאה בחודש {f.plain("ex4.next")}, בעוד <M>{n("ex4.next")} − 95 = {n("ex4.to_next")}</M> חודשים. בחודש 360 ההלוואה נגמרת, וזה לא עדכון. לכן נשארו הנקודות בחודשים {list("ex4.left")}: {f.plain("ex4.answer")} נקודות. כל אחת מהן היא גם תחנת יציאה.
 </Solution>
 
 <Callout title="חמש שאלות על המסלולים המשתנים">
