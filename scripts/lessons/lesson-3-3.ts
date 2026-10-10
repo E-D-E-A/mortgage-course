@@ -76,11 +76,14 @@ export default function lesson33(): LessonData {
   // 4: 900,000 ₪ at 5.4% for 30 years, after 20 years.
   const ex4Answer = pvFact("ex4.answer", rPay.value as string, "5.4", 120);
   const ex4Table = statementFact("ex4.table", ...R, 240);
-  // 5: exercise 3's loan — how much of the principal was repaid in the first ten years.
-  const x5Balance = pvFact("ex5.balance", xPay.value as string, "4.8", 180);
-  assertProduct(xPay, shownSumFact("ex5.check", "4.8", 180), x5Balance);
+  // 5: exercise 3's loan — how much of the principal was repaid in the first twelve years
+  // (156 payments left: an S of its own, not one printed earlier; 3.2 printed the balance after ten years).
+  const x5Balance = pvFact("ex5.balance", xPay.value as string, "4.8", 156);
+  const x5Shown = shownSumFact("ex5.S_156_shown", "4.8", 156);
+  assertProduct(xPay, x5Shown, x5Balance);
   const lLoan = given("long.loan", "600000.00");
-  const x5Table = statementFact("ex5.table", ...X, 120);
+  const x5Table = statementFact("ex5.table", ...X, 144);
+  const x5Table120 = statementFact("ex5.table_120", ...X, 120);
   // 6: הילה's balance from 3.2 after 36 months, 264 months left at 4.2%: back to the payment.
   const dBalance = given("ex6.balance", "324675.50");
 
@@ -179,13 +182,17 @@ export default function lesson33(): LessonData {
     pvFact("ex4.err_left_180", rPay.value as string, "5.4", 240),
 
     // Exercise 5.
-    leftFact("ex5.left", 300, 120),
+    leftFact("ex5.left", 300, 144),
+    stepsFact("ex5.steps", "250000", "4.8", 156),
+    x5Shown,
     x5Balance,
     difference("ex5.answer", xLoan, x5Balance),
     x5Table,
     difference("ex5.table_repaid", xLoan, x5Table),
-    paymentsTotal("ex5.err_paid", xPay.value as string, 120),
-    slice("ex5.err_straight", "250000", "120", "300"),
+    paymentsTotal("ex5.err_paid", xPay.value as string, 144),
+    slice("ex5.err_straight", "250000", "144", "300"),
+    x5Table120,
+    difference("ex5.err_ten_years", xLoan, x5Table120),
 
     // Exercise 6.
     dBalance,

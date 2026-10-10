@@ -243,7 +243,7 @@ const yearRows = computed(() => {
     <p class="text-caption text-n600">
       תרחיש להמחשה, לא מה שצפוי לקרות. הלוואה של <span class="ltr whitespace-nowrap">{{ formatWholeShekels(loan) }}</span>, עד {{ maxTracks }} מסלולים. לכל מסלול תקופה משלו, והתשלום
       של התמהיל בכל חודש הוא סכום התשלומים של המסלולים באותו חודש. המסלול האחרון לוקח את מה שנשאר מההלוואה.
-      <template v-if="rounding === 'statement'">כל שורה מעוגלת לאגורה, כמו בלוח של בנק, ולכן התשלום האחרון של מסלול שונה באגורות.</template>
+      <template v-if="rounding === 'statement'">כל שורה מעוגלת לאגורה, לפי כלל העיגול של הקורס, ולכן התשלום האחרון של מסלול שונה באגורות.</template>
     </p>
 
     <!-- The tracks -->

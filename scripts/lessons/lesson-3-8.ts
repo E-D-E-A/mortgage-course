@@ -323,7 +323,11 @@ export default function lesson38(): LessonData {
   // 5: two tracks of different terms: the mix's highest payment is not the sum of the highest payments.
   const x5Fixed: Track = { principal: "250000", rates: ["5"], months: 180 };
   const x5Var: Track = { principal: "350000", rates: ["4.5", "5", "5.5", "6"], blockMonths: 60, months: 240 };
-  const x5Max = highest("ex5.answer", [x5Fixed, x5Var]);
+  // The answer is what the learner's table shows: the mix's payment in the first month of years 11-15
+  // (month 121). The very highest single month is month 180, where the fixed track's last payment
+  // clears its rounding; the solution names it, and the exercise accepts it as near.
+  const x5Max = payment("ex5.answer", [x5Fixed, x5Var], 121);
+  const x5Closing = highest("ex5.closing_max", [x5Fixed, x5Var]);
   const x5FixedPay = first("ex5.fixed_pay", [x5Fixed]);
   // The variable track's payment in years 16-20 (month 181), as the table shows it. (Its very last
   // payment, which clears the balance, is a few agorot more: the statement convention.)
@@ -434,7 +438,9 @@ export default function lesson38(): LessonData {
     x5VarMax,
     blocks("ex5.blocks", [x5Fixed, x5Var], 60),
     x5Max,
-    highestMonth("ex5.answer_month", [x5Fixed, x5Var]),
+    x5Closing,
+    highestMonth("ex5.closing_month", [x5Fixed, x5Var]),
+    payment("ex5.fixed_last", [x5Fixed], 180),
     sumOf("ex5.err_sum", [x5FixedPay, x5VarMax]),
     first("ex5.mix_first", [x5Fixed, x5Var]),
     // Exercise 6.

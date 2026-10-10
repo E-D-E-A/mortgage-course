@@ -25,7 +25,8 @@ export const f = facts("3.1");
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
 // A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004".
-export const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+// Strips trailing zeros from short decimals (r = 0.004), but keeps a factor's eight digits as stored (3.56904580): the lesson says "keep eight digits".
+export const dec = (s) => { const t = String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, ""); const d = (t.split(".")[1] ?? "").length; return d <= 5 ? t : String(s); };
 export const t1000 = f.rows("explain.try_1000");
 export const t1020 = f.rows("explain.try_1020");
 export const tPay = f.rows("explain.try_pay");
@@ -150,7 +151,7 @@ export const predictionOptions = [f.whole("pred.half"), f.whole("pred.half_plus"
 
 </Section>
 
-בחרו הלוואה, והזיזו את התשלום. אותו תשלום בכל חודש; המחשבון של הקורס מחשב את הריבית של כל חודש (מעוגלת לאגורה, כמו בלוח של בנק), ומראה מה נשאר אחרי התשלום האחרון. בגרף: היתרה בסוף כל חודש, והקו המקווקו הוא אפס. הכפתורים מזיזים את התשלום בשקל או באגורה. כשהיתרה יורדת מתחת לאפס, ההמחשה לא מחשבת עליה ריבית: היא רק מראה כמה שילמתם מעבר לחוב.
+בחרו הלוואה, והזיזו את התשלום. אותו תשלום בכל חודש; המחשבון של הקורס מחשב את הריבית של כל חודש (מעוגלת לאגורה, לפי כלל העיגול של הקורס; בנק יכול לעגל אחרת), ומראה מה נשאר אחרי התשלום האחרון. בגרף: היתרה בסוף כל חודש, והקו המקווקו הוא אפס. הכפתורים מזיזים את התשלום בשקל או באגורה. כשהיתרה יורדת מתחת לאפס, ההמחשה לא מחשבת עליה ריבית: היא רק מראה כמה שילמתם מעבר לחוב.
 
 <PaymentFinder
   client:visible
@@ -182,7 +183,7 @@ export const predictionOptions = [f.whole("pred.half"), f.whole("pred.half_plus"
   correct={2}
   notes={[
     `שני תשלומים של ${f.whole("pred.half")} מחזירים את הקרן ולא משאירים כלום לריבית. נשאר חוב של ${nv(t1000[1].closing)} ₪.`,
-    `${f.whole("pred.half_plus")} הם חצי מהקרן ועוד 1% מהחצי. אבל בחודש הראשון הריבית היא 1% מכל ${f.shekels("explain.loan")}, ולכן זה עדיין קצת מדי.`,
+    `${f.whole("pred.half_plus")} הם חצי מהקרן ועוד 1% מהחצי. אבל בחודש הראשון הריבית היא 1% מכל ${f.shekels("explain.loan")}, ולכן זה עדיין מעט מדי.`,
     "",
     `${f.whole("pred.first_equal")} מכסה ריבית של חודש על כל ההלוואה, פעמיים. אבל בחודש השני היתרה כבר קטנה, וגם הריבית עליה. שילמתם ${f.shekels("explain.over_1020")} יותר מדי.`,
   ]}
@@ -476,7 +477,7 @@ export const predictionOptions = [f.whole("pred.half"), f.whole("pred.half_plus"
 <p><strong>למה זה קיים?</strong> לווה רוצה לדעת מראש כמה ישלם בכל חודש, ולתכנן לפי סכום אחד. המלווה רוצה לקבל את הקרן ואת הריבית שסוכמה. התשלום השווה הוא התשלום היחיד שעונה על שני הרצונות יחד, כשהאחוז לא זז.</p>
 <p><strong>איך זה עובד?</strong> סכום ההלוואה שווה לערך הנוכחי של כל התשלומים, בריבית של ההלוואה. מכאן <span class="ltr">C = P ÷ S</span>, ו־S, סכום מקדמי ההיוון, מתקצר לנוסחה.</p>
 <p><strong>איך זה משפיע עליכם?</strong> ארבעה מספרים — סכום, אחוז, תקופה ושיטה — קובעים את ההחזר. אפשר לבדוק כל החזר שמציעים לכם, ולראות מה קורה לו כשמשנים אחד מהם.</p>
-<p><strong>איך משתמשים בזה בהחלטה?</strong> מחשבים בעצמכם את ההחזר של כל מסלול, ובודקים שהוא תואם להצעה. ובכיוון ההפוך, כמו בתרגיל 6: מתשלום חודשי שאפשר לעמוד בו מגיעים לסכום שהוא מחזיר — רק מצד החשבון. כך תעשה גם Mogi: ההחזר שהיא מציגה ללקוח יחושב לפי שיטת ההחזר של כל מסלול (החלטה של Mogi, 2026-10-08).</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מחשבים בעצמכם את ההחזר של כל מסלול, ובודקים שהוא תואם להצעה. ובכיוון ההפוך, כמו בתרגיל 6: מתשלום חודשי שאפשר לעמוד בו מגיעים לסכום שהוא מחזיר — רק מצד החשבון. כך תעשה גם Mogi: ההחזר שהיא מציגה ללקוח יחושב לפי שיטת ההחזר של כל מסלול (החלטה של Mogi: אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08).</p>
 </Callout>
 
 <Section kind="סיכום">

@@ -24,8 +24,10 @@ export const f = facts("3.3");
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
 // A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004".
-export const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+// Strips trailing zeros from short decimals (r = 0.004), but keeps a factor's eight digits as stored (3.56904580): the lesson says "keep eight digits".
+export const dec = (s) => { const t = String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, ""); const d = (t.split(".")[1] ?? "").length; return d <= 5 ? t : String(s); };
 export const ls = f.raw("long.steps_180");
+export const x5s = f.raw("ex5.steps");
 export const ws = f.raw("worked.steps_156");
 export const predictionOptions = [
   `בערך ${f.whole("pred.half")} — חצי, כי עבר חצי מהזמן`,
@@ -158,8 +160,7 @@ export const predictionOptions = [
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <div class="ltr inline-grid justify-items-start gap-1 text-body-l text-navy sm:text-h3" dir="ltr">
-    <span class="whitespace-nowrap">B<sub>k</sub> = C × (1 − (1 + r)<sup>−(n−k)</sup>)</span>
-    <span class="whitespace-nowrap ps-8">÷ r</span>
+    <span class="whitespace-nowrap">B<sub>k</sub> = C × (1 − (1 + r)<sup>−(n−k)</sup>) ÷ r</span>
   </div>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
     <dt class="ltr font-semibold text-n900">B<sub>k</sub></dt><dd>יתרת החוב אחרי k תשלומים, בשקלים (B כמו בשיעור 0.3: הסכום אחרי כמה תקופות)</dd>
@@ -328,15 +329,16 @@ export const predictionOptions = [
   near={2}
   errors={[
     { value: f.raw("ex5.err_paid"), message: "זה כל מה ששילמתם — קרן וריבית. השאלה היא כמה מהקרן הוחזר: ההלוואה פחות היתרה." },
-    { value: f.raw("ex5.balance"), message: "זו היתרה אחרי עשר שנים — מה שעוד חייבים. מה שהוחזר מהקרן הוא ההלוואה פחות היתרה." },
-    { value: f.raw("ex5.err_straight"), message: "זה הקו הישר: 120 חלקי 300 מהקרן, כמו בקרן שווה. בשפיצר רכיב הקרן קטן בהתחלה, ולכן הוחזר פחות." },
+    { value: f.raw("ex5.balance"), message: "זו היתרה אחרי 12 שנים — מה שעוד חייבים. מה שהוחזר מהקרן הוא ההלוואה פחות היתרה." },
+    { value: f.raw("ex5.err_straight"), message: "זה הקו הישר: 144 חלקי 300 מהקרן, כמו בקרן שווה. בשפיצר רכיב הקרן קטן בהתחלה, ולכן הוחזר פחות." },
+    { value: f.raw("ex5.err_ten_years"), message: "זה מה שהוחזר בעשר שנים — 120 תשלומים. השאלה היא על 12 שנים: 144 תשלומים." },
   ]}
 >
-  בהלוואה של תרגיל 3 — 250,000 ₪, 4.8% לשנה, 25 שנה, בשפיצר, {f.shekels("ex3.pay")} בחודש: כמה מהקרן החזרתם בעשר השנים הראשונות?
+  בהלוואה של תרגיל 3 — 250,000 ₪, 4.8% לשנה, 25 שנה, בשפיצר, {f.shekels("ex3.pay")} בחודש: כמה מהקרן החזרתם ב־12 השנים הראשונות?
 </NumericExercise>
 
 <Solution for="3.3-5">
-אחרי עשר שנים נשארו <M>300 − 120 = {f.plain("ex5.left")}</M> תשלומים. אותו אחוז ואותו מספר תשלומים כמו בהסבר, ולכן אותו S: <M>{dec(ls.one_minus)} ÷ {dec(ls.m)} = {dec(f.raw("long.S_180_shown"))}</M>. היתרה: <M>{n("ex3.pay")} × {dec(f.raw("long.S_180_shown"))} = {n("ex5.balance")}</M>. מה שהוחזר מהקרן: <M>250,000 − {n("ex5.balance")} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")}. מהלוח: היתרה {f.shekels("ex5.table")}, ולכן {f.shekels("ex5.table_repaid")}. זה סכום רכיבי הקרן של 120 החודשים — פחות ממחצית מ־{f.shekels("ex5.err_paid")} ששילמתם.
+אחרי 12 שנים, 144 תשלומים, נשארו <M>300 − 144 = {f.plain("ex5.left")}</M> תשלומים. ‏<M>r = {dec(x5s.m)}</M>; <M>{f.plain("long.base")}<sup>−156</sup> = {dec(x5s.discount)}</M>; <M>1 − {dec(x5s.discount)} = {dec(x5s.one_minus)}</M>; <M>S = {dec(x5s.one_minus)} ÷ {dec(x5s.m)} = {dec(f.raw("ex5.S_156_shown"))}</M>. היתרה: <M>{n("ex3.pay")} × {dec(f.raw("ex5.S_156_shown"))} = {n("ex5.balance")}</M>. מה שהוחזר מהקרן: <M>250,000 − {n("ex5.balance")} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")}. מהלוח: היתרה {f.shekels("ex5.table")}, ולכן {f.shekels("ex5.table_repaid")}. זה סכום רכיבי הקרן של 144 החודשים — פחות ממחצית מ־{f.shekels("ex5.err_paid")} ששילמתם.
 </Solution>
 
 <NumericExercise
@@ -373,7 +375,7 @@ export const predictionOptions = [
 - **יתרת החוב אחרי k תשלומים** אפשר לקרוא מלוח הסילוקין — או לחשב בלי הלוח.
 - **הנוסחה:** היתרה היא הערך הנוכחי של <M>n − k</M> התשלומים שנשארו: <M>B<sub>k</sub> = C × (1 − (1 + r)<sup>−(n−k)</sup>) ÷ r</M>.
 - **הלוח והנוסחה נבדלים באגורות** (ובהלוואה ארוכה גם בשקל), כי הלוח מעגל בכל חודש.
-- **חצי מהזמן אינו חצי מהחוב:** בשפיצר היתרה תמיד מעל הקו הישר של קרן שווה.
+- **חצי מהזמן אינו חצי מהחוב:** בשפיצר, באחוז שלא זז ובלי הצמדה, היתרה מעל הקו הישר של קרן שווה.
 - **מה ששילמתם ≠ מה שירד מהחוב:** רק רכיבי הקרן מקטינים את היתרה.
 - **מהיתרה אפשר לחזור לתשלום:** <M>C = B ÷ S</M>, על החודשים שנשארו.
 
