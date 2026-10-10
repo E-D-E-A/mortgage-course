@@ -1,0 +1,1184 @@
+{
+  "lesson": "3.12",
+  "title": "סדנה: לוח סילוקין ביד ובגיליון",
+  "note": "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; the payment rounded to the agora once; each month's interest rounded to the agora; the last payment closes the balance (amortization.ts annuityStatement). The sheet conventions are workshop.ts sheetFigures.",
+  "facts": [
+    {
+      "id": "zero",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "hand.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "12000.00"
+    },
+    {
+      "id": "hand.by_hand",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "hand.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "hand.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12
+      },
+      "value": "1032.80"
+    },
+    {
+      "id": "hand.schedule",
+      "kind": "amort_annuity_statement",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "12000.00",
+          "payment": "1032.80",
+          "interest": "60.00",
+          "principal_paid": "972.80",
+          "closing": "11027.20"
+        },
+        {
+          "period": 2,
+          "opening": "11027.20",
+          "payment": "1032.80",
+          "interest": "55.14",
+          "principal_paid": "977.66",
+          "closing": "10049.54"
+        },
+        {
+          "period": 3,
+          "opening": "10049.54",
+          "payment": "1032.80",
+          "interest": "50.25",
+          "principal_paid": "982.55",
+          "closing": "9066.99"
+        },
+        {
+          "period": 4,
+          "opening": "9066.99",
+          "payment": "1032.80",
+          "interest": "45.33",
+          "principal_paid": "987.47",
+          "closing": "8079.52"
+        },
+        {
+          "period": 5,
+          "opening": "8079.52",
+          "payment": "1032.80",
+          "interest": "40.40",
+          "principal_paid": "992.40",
+          "closing": "7087.12"
+        },
+        {
+          "period": 6,
+          "opening": "7087.12",
+          "payment": "1032.80",
+          "interest": "35.44",
+          "principal_paid": "997.36",
+          "closing": "6089.76"
+        },
+        {
+          "period": 7,
+          "opening": "6089.76",
+          "payment": "1032.80",
+          "interest": "30.45",
+          "principal_paid": "1002.35",
+          "closing": "5087.41"
+        },
+        {
+          "period": 8,
+          "opening": "5087.41",
+          "payment": "1032.80",
+          "interest": "25.44",
+          "principal_paid": "1007.36",
+          "closing": "4080.05"
+        },
+        {
+          "period": 9,
+          "opening": "4080.05",
+          "payment": "1032.80",
+          "interest": "20.40",
+          "principal_paid": "1012.40",
+          "closing": "3067.65"
+        },
+        {
+          "period": 10,
+          "opening": "3067.65",
+          "payment": "1032.80",
+          "interest": "15.34",
+          "principal_paid": "1017.46",
+          "closing": "2050.19"
+        },
+        {
+          "period": 11,
+          "opening": "2050.19",
+          "payment": "1032.80",
+          "interest": "10.25",
+          "principal_paid": "1022.55",
+          "closing": "1027.64"
+        },
+        {
+          "period": 12,
+          "opening": "1027.64",
+          "payment": "1032.78",
+          "interest": "5.14",
+          "principal_paid": "1027.64",
+          "closing": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "hand.last_payment",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 12,
+        "field": "payment"
+      },
+      "value": "1032.78"
+    },
+    {
+      "id": "hand.last_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "hand.payment",
+        "subtrahend": "hand.last_payment"
+      },
+      "value": "0.02"
+    },
+    {
+      "id": "hand.pmt_shown",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "zero",
+        "subtrahend": "hand.payment"
+      },
+      "value": "-1032.80"
+    },
+    {
+      "id": "hand.total_paid",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "convention": "statement",
+        "field": "total_paid"
+      },
+      "value": "12393.58"
+    },
+    {
+      "id": "hand.total_interest",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "convention": "statement",
+        "field": "total_interest"
+      },
+      "value": "393.58"
+    },
+    {
+      "id": "hand.err_equal_first",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "12000",
+        "annual_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "1060.00"
+    },
+    {
+      "id": "hand.err_no_interest",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "12000",
+        "weight": "1",
+        "total_weight": "12"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "hand.err_annual",
+      "kind": "ws_payment_annual_as_monthly",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12
+      },
+      "value": "1431.32"
+    },
+    {
+      "id": "hand.m1.interest.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "interest",
+        "mistake": "annual_rate"
+      },
+      "value": "720"
+    },
+    {
+      "id": "hand.m1.principal.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "principal",
+        "mistake": "whole_payment"
+      },
+      "value": "1032.8"
+    },
+    {
+      "id": "hand.m1.principal.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "principal",
+        "mistake": "equal_part"
+      },
+      "value": "1000"
+    },
+    {
+      "id": "hand.m1.principal.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "principal",
+        "mistake": "annual_rate"
+      },
+      "value": "312.8"
+    },
+    {
+      "id": "hand.m1.closing.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "closing",
+        "mistake": "whole_payment"
+      },
+      "value": "10967.2"
+    },
+    {
+      "id": "hand.m1.closing.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "closing",
+        "mistake": "equal_part"
+      },
+      "value": "11000"
+    },
+    {
+      "id": "hand.m1.closing.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 1,
+        "field": "closing",
+        "mistake": "annual_rate"
+      },
+      "value": "11687.2"
+    },
+    {
+      "id": "hand.m2.opening.stale_opening",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "opening",
+        "mistake": "stale_opening"
+      },
+      "value": "12000"
+    },
+    {
+      "id": "hand.m2.interest.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "interest",
+        "mistake": "interest_on_original"
+      },
+      "value": "60"
+    },
+    {
+      "id": "hand.m2.interest.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "interest",
+        "mistake": "annual_rate"
+      },
+      "value": "661.63"
+    },
+    {
+      "id": "hand.m2.interest.unrounded",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "interest",
+        "mistake": "unrounded"
+      },
+      "value": "55.136"
+    },
+    {
+      "id": "hand.m2.interest.truncated",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "interest",
+        "mistake": "truncated"
+      },
+      "value": "55.13"
+    },
+    {
+      "id": "hand.m2.principal.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "principal",
+        "mistake": "whole_payment"
+      },
+      "value": "1032.8"
+    },
+    {
+      "id": "hand.m2.principal.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "principal",
+        "mistake": "equal_part"
+      },
+      "value": "1000"
+    },
+    {
+      "id": "hand.m2.principal.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "principal",
+        "mistake": "interest_on_original"
+      },
+      "value": "972.8"
+    },
+    {
+      "id": "hand.m2.principal.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "principal",
+        "mistake": "annual_rate"
+      },
+      "value": "371.17"
+    },
+    {
+      "id": "hand.m2.closing.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "closing",
+        "mistake": "whole_payment"
+      },
+      "value": "9994.4"
+    },
+    {
+      "id": "hand.m2.closing.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "closing",
+        "mistake": "equal_part"
+      },
+      "value": "10027.2"
+    },
+    {
+      "id": "hand.m2.closing.unrounded",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "closing",
+        "mistake": "unrounded"
+      },
+      "value": "10049.536"
+    },
+    {
+      "id": "hand.m2.closing.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "closing",
+        "mistake": "interest_on_original"
+      },
+      "value": "10054.4"
+    },
+    {
+      "id": "hand.m2.closing.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 2,
+        "field": "closing",
+        "mistake": "annual_rate"
+      },
+      "value": "10656.03"
+    },
+    {
+      "id": "hand.m3.opening.stale_opening",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "opening",
+        "mistake": "stale_opening"
+      },
+      "value": "11027.2"
+    },
+    {
+      "id": "hand.m3.opening.loan_again",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "opening",
+        "mistake": "loan_again"
+      },
+      "value": "12000"
+    },
+    {
+      "id": "hand.m3.interest.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "interest",
+        "mistake": "interest_on_original"
+      },
+      "value": "60"
+    },
+    {
+      "id": "hand.m3.interest.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "interest",
+        "mistake": "annual_rate"
+      },
+      "value": "602.97"
+    },
+    {
+      "id": "hand.m3.interest.unrounded",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "interest",
+        "mistake": "unrounded"
+      },
+      "value": "50.2477"
+    },
+    {
+      "id": "hand.m3.interest.truncated",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "interest",
+        "mistake": "truncated"
+      },
+      "value": "50.24"
+    },
+    {
+      "id": "hand.m3.principal.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "principal",
+        "mistake": "whole_payment"
+      },
+      "value": "1032.8"
+    },
+    {
+      "id": "hand.m3.principal.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "principal",
+        "mistake": "equal_part"
+      },
+      "value": "1000"
+    },
+    {
+      "id": "hand.m3.principal.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "principal",
+        "mistake": "interest_on_original"
+      },
+      "value": "972.8"
+    },
+    {
+      "id": "hand.m3.principal.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "principal",
+        "mistake": "annual_rate"
+      },
+      "value": "429.83"
+    },
+    {
+      "id": "hand.m3.closing.whole_payment",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "closing",
+        "mistake": "whole_payment"
+      },
+      "value": "9016.74"
+    },
+    {
+      "id": "hand.m3.closing.equal_part",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "closing",
+        "mistake": "equal_part"
+      },
+      "value": "9049.54"
+    },
+    {
+      "id": "hand.m3.closing.unrounded",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "closing",
+        "mistake": "unrounded"
+      },
+      "value": "9066.9877"
+    },
+    {
+      "id": "hand.m3.closing.interest_on_original",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "closing",
+        "mistake": "interest_on_original"
+      },
+      "value": "9076.74"
+    },
+    {
+      "id": "hand.m3.closing.annual_rate",
+      "kind": "ws_hand_mistake",
+      "inputs": {
+        "principal": "12000",
+        "rate_percent": "6",
+        "months": 12,
+        "period": 3,
+        "field": "closing",
+        "mistake": "annual_rate"
+      },
+      "value": "9619.71"
+    },
+    {
+      "id": "sheet.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "sheet.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 15
+      },
+      "value": 180
+    },
+    {
+      "id": "sheet.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "5.4",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.45"
+    },
+    {
+      "id": "sheet.payment",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.statement.regular",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "statement",
+        "field": "regular"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.statement.last",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "statement",
+        "field": "last"
+      },
+      "value": "3246.15"
+    },
+    {
+      "id": "sheet.statement.total_paid",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "statement",
+        "field": "total_paid"
+      },
+      "value": "584486.00"
+    },
+    {
+      "id": "sheet.statement.total_interest",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "statement",
+        "field": "total_interest"
+      },
+      "value": "184486.00"
+    },
+    {
+      "id": "sheet.statement.final_closing",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "statement",
+        "field": "final_closing"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "sheet.exact.regular",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "exact",
+        "field": "regular"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.exact.last",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "exact",
+        "field": "last"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.exact.total_paid",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "exact",
+        "field": "total_paid"
+      },
+      "value": "584486.36"
+    },
+    {
+      "id": "sheet.exact.total_interest",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "exact",
+        "field": "total_interest"
+      },
+      "value": "184486.36"
+    },
+    {
+      "id": "sheet.exact.final_closing",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "exact",
+        "field": "final_closing"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "sheet.payment_unrounded.regular",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "payment_unrounded",
+        "field": "regular"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.payment_unrounded.last",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "payment_unrounded",
+        "field": "last"
+      },
+      "value": "3247.13"
+    },
+    {
+      "id": "sheet.payment_unrounded.total_paid",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "payment_unrounded",
+        "field": "total_paid"
+      },
+      "value": "584486.34"
+    },
+    {
+      "id": "sheet.payment_unrounded.total_interest",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "payment_unrounded",
+        "field": "total_interest"
+      },
+      "value": "184486.34"
+    },
+    {
+      "id": "sheet.payment_unrounded.final_closing",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "payment_unrounded",
+        "field": "final_closing"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "sheet.no_last_adjust.regular",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "regular"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.no_last_adjust.last",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "last"
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "sheet.no_last_adjust.total_paid",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "total_paid"
+      },
+      "value": "584487.00"
+    },
+    {
+      "id": "sheet.no_last_adjust.total_interest",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "total_interest"
+      },
+      "value": "184486.00"
+    },
+    {
+      "id": "sheet.no_last_adjust.final_closing",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "final_closing"
+      },
+      "value": "-1.00"
+    },
+    {
+      "id": "sheet.gap_exact_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sheet.exact.total_interest",
+        "subtrahend": "sheet.statement.total_interest"
+      },
+      "value": "0.36"
+    },
+    {
+      "id": "sheet.gap_unrounded_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sheet.payment_unrounded.total_interest",
+        "subtrahend": "sheet.statement.total_interest"
+      },
+      "value": "0.34"
+    },
+    {
+      "id": "sheet.gap_last",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sheet.statement.regular",
+        "subtrahend": "sheet.statement.last"
+      },
+      "value": "1.00"
+    },
+    {
+      "id": "sheet.overpaid",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sheet.no_last_adjust.total_paid",
+        "subtrahend": "sheet.statement.total_paid"
+      },
+      "value": "1.00"
+    },
+    {
+      "id": "sheet.pmt_shown",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "zero",
+        "subtrahend": "sheet.statement.regular"
+      },
+      "value": "-3247.15"
+    },
+    {
+      "id": "sheet.int_1",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "1800.00"
+    },
+    {
+      "id": "sheet.prin_1",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 1,
+        "field": "principal_paid"
+      },
+      "value": "1447.15"
+    },
+    {
+      "id": "sheet.close_1",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 1,
+        "field": "closing"
+      },
+      "value": "398552.85"
+    },
+    {
+      "id": "sheet.int_2",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 2,
+        "field": "interest"
+      },
+      "value": "1793.49"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "1800.00"
+    },
+    {
+      "id": "ex2.err_annual",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "5.4"
+      },
+      "value": "21600.00"
+    },
+    {
+      "id": "ex3.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 5
+      },
+      "value": 60
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 60,
+        "field": "closing"
+      },
+      "value": "300573.94"
+    },
+    {
+      "id": "ex3.repaid",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sheet.loan",
+        "subtrahend": "ex3.answer"
+      },
+      "value": "99426.06"
+    },
+    {
+      "id": "ex3.err_opening",
+      "kind": "ws_statement_cell",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "period": 60,
+        "field": "opening"
+      },
+      "value": "302460.02"
+    },
+    {
+      "id": "ex3.err_naive",
+      "kind": "ws_naive_balance",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "paid": 60
+      },
+      "value": "205171.00"
+    },
+    {
+      "id": "ex3.err_equal",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 180,
+        "period": 60,
+        "field": "closing"
+      },
+      "value": "266666.80"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "ws_interest_between",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "from": 1,
+        "to": 12
+      },
+      "value": "21163.66"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "ws_sheet",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "convention": "no_last_adjust",
+        "field": "final_closing"
+      },
+      "value": "-1.00"
+    }
+  ]
+}

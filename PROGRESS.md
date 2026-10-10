@@ -51,6 +51,7 @@
 - `pnpm data` — בונה את קובצי הנתונים, את מפת הקורס ואת המילון.
 - `pnpm test`, `pnpm check:python`, `pnpm check:terms` — שלוש הבדיקות. כולן חייבות לעבור לפני commit.
 - `pnpm build && pnpm screens` — צילומי מסך במחשב ובטלפון, ל־`qa/screens/`.
+- `pnpm sheets` — אחרי `pnpm data`: בונה את הגיליונות להורדה (`public/downloads/`) מהנתונים של סדנה 3.12; `python3 scripts/build-sheets.py --verify` מחשב אותם מחדש ב־LibreOffice ובודק מול הקורס עד האגורה.
 - `pnpm qa:browser` — אחרי build: כל טבלה למילוי מקבלת את התשובות הנכונות שלה, כל בדיקת סיום נותנת 0 ומלא ושומרת מעבר, ובטלפון כל טבלה למילוי נכנסת למסך וטבלה רחבה מקבלת הודעת גלילה.
 - `pnpm video 0-3` — (כל שיעור: `pnpm video X-Y`) מפיק את הסרטון, הכתוביות, תמונת השער ופריימים לבדיקה.
 

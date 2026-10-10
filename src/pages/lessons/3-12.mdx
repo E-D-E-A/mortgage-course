@@ -1,0 +1,460 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "3.12"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import ScheduleByHand from "../../components/ScheduleByHand.vue";
+import SheetMatch from "../../components/SheetMatch.vue";
+import BigPictureMap from "../../components/BigPictureMap.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { mapUpTo } from "../../components/big-picture/index.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via L(). */}
+export const f = facts("3.12");
+export const L = (x) => `⁦${x}⁩`;
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const hand = f.rows("hand.schedule");
+export const lastHand = hand[hand.length - 1];
+export const byHand = Number(f.raw("hand.by_hand"));
+export const map = mapUpTo("3.12");
+export const MARK = "תרגיל נפרד, לא התיק של נועם ושירה. הלוואות בדויות; המספרים להמחשה, לא נתוני שוק ולא הצעה של בנק.";
+export const DL = "/downloads/";
+
+{/* The named mistakes of the hand table: one message per kind of mistake; ScheduleByHand gets, per cell, the wrong numbers that exist in the data file. */}
+export const MISTAKE_TEXT = {
+  opening: {
+    stale_opening: "זו היתרה בתחילת החודש הקודם. מאז שולם תשלום, והיתרה ירדה: בתחילת החודש הזה היא היתרה בסוף החודש הקודם.",
+    loan_again: "זה סכום ההלוואה המקורי. בתחילת כל חודש היתרה היא מה שעוד נשאר לשלם: היתרה בסוף החודש הקודם.",
+  },
+  interest: {
+    interest_on_original: `חישבתם ריבית על ההלוואה המקורית, ${L(f.shekels("hand.loan"))}. הריבית של כל חודש מחושבת על היתרה בתחילת אותו חודש — והיא כבר ירדה.`,
+    annual_rate: "השתמשתם באחוז הריבית לשנה. בכל חודש משלמים ריבית של חודש אחד: אחוז הריבית לשנה חלקי 12 (הריבית החודשית, שיעור 0.4).",
+    unrounded: "החישוב נכון, אבל לא עיגלתם. בלוח כל ריבית מעוגלת לאגורה: שתי ספרות אחרי הנקודה. כשהספרה השלישית היא 5 ומעלה, מעגלים כלפי מעלה.",
+    truncated: "חתכתם את הספרות שאחרי האגורה במקום לעגל. הספרה השלישית היא 5 ומעלה, ולכן מעגלים כלפי מעלה.",
+  },
+  principal: {
+    whole_payment: "זה כל התשלום. חלק ממנו הולך לריבית של החודש, ורק השאר מקטין את החוב: הקרן היא התשלום פחות הריבית.",
+    equal_part: "זה סכום ההלוואה חלקי מספר החודשים — החלק של הקרן בקרן שווה (שיעור 2.9). בשפיצר התשלום קבוע, והקרן היא מה שנשאר ממנו אחרי הריבית.",
+    interest_on_original: "החיסור נכון, אבל הורדתם ריבית על ההלוואה המקורית. הקרן היא התשלום פחות הריבית של החודש הזה, על היתרה שלו.",
+    annual_rate: "הורדתם מהתשלום ריבית של שנה שלמה. הריבית של החודש: היתרה כפול הריבית החודשית (אחוז הריבית לשנה חלקי 12).",
+  },
+  closing: {
+    whole_payment: "הורדתם מהיתרה את כל התשלום. אבל חלק מהתשלום הוא ריבית, והוא לא מקטין את החוב. מורידים רק את הקרן.",
+    equal_part: "הורדתם את סכום ההלוואה חלקי מספר החודשים, כמו בקרן שווה. בשפיצר מורידים את הקרן של החודש: התשלום פחות הריבית.",
+    unrounded: "הריבית שלא עוגלה נכנסה ליתרה. מעגלים קודם את הריבית לאגורה, ורק אחר כך מחשבים את הקרן ואת היתרה.",
+    interest_on_original: "היתרה נבנתה על ריבית שחושבה על ההלוואה המקורית. הריבית מחושבת על היתרה בתחילת החודש.",
+    annual_rate: "היתרה נבנתה על ריבית של שנה שלמה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12.",
+  },
+};
+export const maybe = (id) => { try { return f.raw(id); } catch { return undefined; } };
+export const handMistakes = Object.fromEntries(
+  Array.from({ length: byHand }, (_, i) => i + 1).flatMap((k) =>
+    Object.entries(MISTAKE_TEXT).map(([field, texts]) => [
+      `${k}.${field}`,
+      Object.entries(texts)
+        .map(([mistake, message]) => ({ value: maybe(`hand.m${k}.${field}.${mistake}`), message }))
+        .filter((m) => m.value !== undefined),
+    ]),
+  ),
+);
+
+{/* The spreadsheet formulas, as strings (a "*" in Markdown prose turns into italics). Cells as in public/downloads/schedule-*.xlsx. */}
+export const F = {
+  monthly: "=B6/12",
+  payment: "=ROUND(-PMT(B10,B7,B5),2)",
+  pmtRaw: "=PMT(B10,B7,B5)",
+  open1: "=B5",
+  pay1: "=IF(A20=$B$7,B20+D20,$B$11)",
+  int1: "=ROUND(B20*$B$10,2)",
+  prin1: "=C20-D20",
+  close1: "=B20-E20",
+  open2: "=F20",
+  check: "=SUM(E20:E379)",
+  semicolon: "=ROUND(B20*$B$10;2)",
+};
+
+בשלב הזה גזרנו את <Term t="החזר חודשי" lesson="3.12">ההחזר החודשי</Term> <Term t="שפיצר" lesson="3.12">בשפיצר</Term> (שיעור 3.1), פירקנו כל תשלום <Term t="רכיב קרן" lesson="3.12">לרכיב קרן</Term> <Term t="רכיב ריבית" lesson="3.12">ולרכיב ריבית</Term> (3.2), עקבנו אחרי <Term t="יתרת חוב" lesson="3.12">יתרת החוב</Term> (3.3), חיברנו מסלולים לתזרים אחד (3.7), וקראנו ממנו מדדים (3.8–3.11).
+הסדנה הזו לא מוסיפה נושא. בה אתם בונים <Term t="לוח סילוקין" lesson="3.12">לוח סילוקין</Term> בעצמכם — קודם ביד, אחר כך בגיליון — ובודקים שהוא תואם עד האגורה למחשבון של הקורס.
+
+<Section kind="הסדנה">
+
+## מה תצאו איתו
+
+</Section>
+
+התוצר של שלב 3: **לוח סילוקין שבניתם בעצמכם, ובדיקה שהוא תואם למחשבון של הקורס.** שלושה שלבים:
+
+1. **ביד.** מחשבים את ההחזר, ואז ממלאים {byHand} חודשים: יתרה בתחילת החודש, ריבית, קרן, יתרה בסוף החודש. כל חודש נבדק לפני שעוברים לבא, וכל טעות נפוצה מקבלת שם.
+2. **בגיליון.** מורידים תבנית, כותבים בה את הנוסחאות של שורה אחת, ומעתיקים למטה עד החודש האחרון.
+3. **מול המחשבון.** מכניסים לגיליון הלוואה גדולה, מעתיקים ממנו ארבעה מספרים, והדף משווה אותם למחשבון של הקורס — ומסביר כל הפרש של אגורה.
+
+את הלוח שמילאתם ביד ואת ההשוואה אפשר לשמור ולהדפיס. מה שתכתבו נשמר בדפדפן שלכם. תצטרכו מחשבון לשלב 1, וגיליון אלקטרוני (Excel או Google Sheets) לשלבים 2–3. אין כאן מושג חדש; כל מה שצריך נלמד בשלב.
+
+<Callout title="תרגיל נפרד, לא התיק של נועם ושירה">
+<p><strong>{MARK}</strong></p>
+<p>לנועם ושירה נבנה <Term t="תמהיל" lesson="3.12">תמהיל</Term> רק בשלב 5. כאן שתי הלוואות בדויות, כל אחת עם <Term t="מסלול" lesson="3.12">מסלול</Term> אחד בשפיצר, בריבית קבועה ובלי הצמדה:</p>
+<ul>
+<li><strong>ביד — איתי:</strong> {f.shekels("hand.loan")}, ב־6% לשנה, ל־12 חודשים. הלוואה קטנה וקצרה, כדי שאפשר יהיה לחשב אותה במחשבון.</li>
+<li><strong>בגיליון — תמר ועידו:</strong> {f.shekels("sheet.loan")}, ב־5.4% לשנה, ל־15 שנה ({f.plain("sheet.months")} חודשים). זו ההלוואה מהדוגמה הפתורה של שיעור 2.9.</li>
+</ul>
+</Callout>
+
+<Section kind="הכללים">
+
+## ארבעה צעדים בכל חודש, ועיגול אחד
+
+</Section>
+
+כל שורה בלוח היא שלוש השורות של שיעור 3.2 — ריבית, קרן, יתרה — ועוד צעד אחד לפניהן: מאיזו יתרה מתחילים. ארבעה צעדים, תמיד באותו סדר:
+
+1. **היתרה בתחילת החודש** היא היתרה בסוף החודש הקודם. בחודש הראשון — סכום ההלוואה.
+2. **הריבית:** היתרה בתחילת החודש כפול <Term t="ריבית חודשית" lesson="3.12">הריבית החודשית</Term> (אחוז הריבית לשנה חלקי 12), מעוגלת לאגורה.
+3. **הקרן:** התשלום פחות הריבית. זה החלק שמקטין את החוב.
+4. **היתרה בסוף החודש:** היתרה בתחילת החודש פחות הקרן — לא פחות כל התשלום.
+
+<Callout title="כלל העיגול של הקורס">
+<p>התשלום מעוגל לאגורה פעם אחת, כשמחשבים אותו. הריבית של כל חודש מעוגלת לאגורה: כשהספרה השלישית אחרי הנקודה היא 5 ומעלה — כלפי מעלה, אחרת — כלפי מטה. הקרן והיתרה יוצאות מעוגלות מעצמן, כי הן חיסור של מספרים מעוגלים.</p>
+<p>בחודש האחרון התשלום הוא מה שנשאר מהיתרה, ועוד הריבית של אותו חודש. כך היתרה מגיעה לאפס בדיוק, והתשלום האחרון יכול להיות שונה מהאחרים באגורות — ובהלוואה ארוכה אפילו בשקל (נראה את זה בשלב 3).</p>
+<p>כך מחשב המחשבון של הקורס. זו הנחת החישוב של הקורס: בנק יכול לסגור את העיגול בדרך אחרת. כל ההבדלים באגורות בסדנה הזו נובעים מהכלל הזה.</p>
+</Callout>
+
+<Section kind="שלב 1">
+
+## ביד: ההחזר, ואז {byHand} חודשים
+
+</Section>
+
+**צעד 1 — ההחזר.** זו הנוסחה של התשלום בשפיצר משיעור 3.1:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-body-l text-navy sm:text-h3" dir="ltr">C = P × r ÷ (1 − (1 + r)<sup>−n</sup>)</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">C</dt><dd>התשלום בכל חודש, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">P</dt><dd>סכום ההלוואה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית לתקופה — כאן לחודש — כמספר עשרוני: אחוז הריבית לשנה חלקי 12, חלקי 100 (ה־m של שיעור 0.4). ‏6% לשנה הם {f.plain("hand.monthly")}% לחודש, כלומר 0.005</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר החודשים</dd>
+  </dl>
+</div>
+
+<NumericExercise
+  client:visible
+  id="3.12-1"
+  n={1}
+  level="בינוני"
+  answer={f.raw("hand.payment")}
+  errors={[
+    { value: f.raw("hand.err_equal_first"), message: `זה התשלום הראשון בקרן שווה: ${L(n("hand.err_no_interest"))} קרן ועוד ריבית על כל ההלוואה. בשפיצר התשלום שווה בכל חודש, ולכן נמוך יותר בהתחלה. הציבו בנוסחה.` },
+    { value: f.raw("hand.err_no_interest"), message: "זה סכום ההלוואה חלקי 12 — בלי ריבית בכלל. התשלום צריך לכסות גם את הריבית." },
+    { value: f.raw("hand.err_annual"), message: "הצבתם את אחוז הריבית לשנה (0.06) במקום r. הנוסחה עובדת בחודשים: r היא הריבית החודשית, 0.005." },
+  ]}
+>
+  איתי לווה {f.shekels("hand.loan")} ב־6% לשנה, ל־12 חודשים, בשפיצר. כמה הוא משלם בכל חודש? עגלו לאגורה. כדאי מחשבון שיודע חזקות, או גיליון.
+</NumericExercise>
+
+<Solution for="3.12-1">
+מציבים P = 12,000, r = 0.005 ו־n = 12, ומקבלים {f.shekels("hand.payment")} אחרי עיגול לאגורה. בגיליון: <span class="ltr">{"=ROUND(-PMT(6%/12,12,12000),2)"}</span>. על המינוס לפני PMT — בשלב 2.
+</Solution>
+
+**צעד 2 — חודש אחר חודש.** מלאו את {byHand} החודשים הראשונים, בארבעת הצעדים שלמעלה. בכל חודש לחצו ״בדיקה״; החודש הבא נפתח כשהחודש הזה נכון עד האגורה. אם טעיתם, ההודעה אומרת מה כנראה קרה. אחרי שתי בדיקות לא נכונות אפשר להציג את הפתרון של החודש.
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">תקועים בחודש 1? כך מתחילים</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>היתרה בתחילת החודש: {f.shekels("hand.loan")}, כל ההלוואה.</li>
+    <li>הריבית: <M>{nv(hand[0].opening)} × {f.plain("hand.monthly")}% = {nv(hand[0].interest)}</M> ₪.</li>
+    <li>הקרן: <M>{nv(hand[0].payment)} − {nv(hand[0].interest)} = {nv(hand[0].principal_paid)}</M> ₪.</li>
+    <li>היתרה בסוף החודש: <M>{nv(hand[0].opening)} − {nv(hand[0].principal_paid)} = {nv(hand[0].closing)}</M> ₪. היא היתרה בתחילת חודש 2.</li>
+  </ol>
+</details>
+
+<ScheduleByHand
+  client:visible
+  id="3.12-hand"
+  title="הלוח של איתי, ביד"
+  rows={hand}
+  months={byHand}
+  payment={f.raw("hand.payment")}
+  monthlyPercent={f.plain("hand.monthly")}
+  mistakes={handMistakes}
+  printNote={MARK}
+/>
+
+**מה רואים ב־{byHand} החודשים.** הריבית יורדת: <span class="ltr">{formatShekels(hand[0].interest)}</span>, <span class="ltr">{formatShekels(hand[1].interest)}</span>, <span class="ltr">{formatShekels(hand[2].interest)}</span> — כי היתרה יורדת. התשלום לא זז, ולכן הקרן עולה באותו סכום שהריבית יורדת. בחודש 2 העיגול כבר משנה: הריבית המדויקת היא <span class="ltr">{f.raw("hand.m2.interest.unrounded")}</span> ₪, ובלוח היא <span class="ltr">{formatShekels(hand[1].interest)}</span>.
+
+**ובסוף.** בלוח המלא (לחצו ״הלוח המלא״ למטה ברכיב) התשלום האחרון הוא {f.shekels("hand.last_payment")} — {f.shekels("hand.last_gap")} פחות מהאחרים, כי הוא סוגר את מה שהעיגולים השאירו. בסך הכול איתי משלם {f.shekels("hand.total_paid")}, ומתוכם {f.shekels("hand.total_interest")} ריבית.
+
+<Section kind="שלב 2">
+
+## בגיליון: אותו לוח, עד החודש האחרון
+
+</Section>
+
+ביד מחשבים שלושה חודשים. במשכנתא יש מאות. בגיליון כותבים את ארבעת הצעדים פעם אחת, בשורה אחת, ומעתיקים למטה.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
+  <p class="text-body-l font-semibold text-n900">להורדה</p>
+  <ul class="list-reset mt-2 grid gap-2">
+    <li><a class="inline-flex min-h-11 items-center text-body-m font-semibold text-navy underline" href={`${DL}schedule-template.xlsx`} download>תבנית לגיליון: לוח סילוקין בשפיצר (xlsx)</a><span class="block text-caption text-n600">הקלט וההוראות כבר בפנים; את עמודות הלוח ממלאים אתם.</span></li>
+    <li><a class="inline-flex min-h-11 items-center text-body-m text-navy underline" href={`${DL}schedule-solution.xlsx`} download>הגיליון הפתור (xlsx)</a><span class="block text-caption text-n600">לפתוח אחרי שניסיתם — כדי להשוות, או כשנתקעים.</span></li>
+  </ul>
+  <p class="mt-2 text-caption text-n600">שני הקבצים נפתחים ב־Excel, וגם ב־Google Sheets: מעלים ל־Google Drive ופותחים. הגיליון כבר מוגדר מימין לשמאל.</p>
+</div>
+
+בתבנית יש שלושה אזורים. **למעלה** — הקלט: סכום ההלוואה בתא B5, אחוז הריבית לשנה ב־B6, ומספר החודשים ב־B7, כבר עם ההלוואה של איתי. **באמצע** — הריבית החודשית וההחזר (B10, B11), ותאי סיכום ובדיקה. **למטה** — הלוח: כותרות בשורה 19, ומשורה 20 חודש בכל שורה (עמודה A כבר ממוספרת).
+
+**צעד 1 — הריבית החודשית.** בתא B10 כותבים <span class="ltr">{F.monthly}</span>. כתבו בתא B6 את הריבית עם סימן האחוז (6%), או כמספר עשרוני (0.06). אם תכתבו 6 בלי סימן, הגיליון יחשב 600% לשנה.
+
+**צעד 2 — ההחזר.** בתא B11 כותבים <span class="ltr">{F.payment}</span>. הפונקציה PMT מקבלת את הריבית לתקופה, את מספר התקופות ואת הסכום היום, ומחזירה את התשלום השווה — אותה נוסחה כמו בצעד 1 של שלב 1. ROUND עם 2 מעגלת לאגורה, פעם אחת.
+
+<Callout title="למה יש מינוס לפני PMT">
+<p>הגיליון סופר כסף לפי הכיוון שלו: כסף שנכנס אליכם — ההלוואה — חיובי, וכסף שיוצא מכם — התשלומים — שלילי. לכן <span class="ltr">{F.pmtRaw}</span> לבד מחזירה {f.shekels("hand.pmt_shown")}: מספר נכון, בסימן של ״יוצא״. המינוס שלפני PMT הופך אותו לחיובי, כמו בלוח. אותו דבר ב־Excel וב־Google Sheets. (דרך אחרת: לכתוב את הסכום עם מינוס, <span class="ltr">{"=ROUND(PMT(B10,B7,-B5),2)"}</span>.)</p>
+</Callout>
+
+**צעד 3 — שורת החודש הראשון (שורה 20).** ארבעת הצעדים, ועוד עמודת התשלום:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">תא</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה</th>
+        <th class="py-2 text-start font-semibold">הנוסחה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3"><span class="ltr">B20</span></td><td class="py-2 pe-3">היתרה בתחילת החודש: ההלוואה</td><td class="py-2"><span class="ltr whitespace-nowrap">{F.open1}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3"><span class="ltr">C20</span></td><td class="py-2 pe-3">התשלום: ההחזר, ובחודש האחרון — היתרה ועוד הריבית</td><td class="py-2"><span class="ltr whitespace-nowrap">{F.pay1}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3"><span class="ltr">D20</span></td><td class="py-2 pe-3">הריבית, מעוגלת לאגורה</td><td class="py-2"><span class="ltr whitespace-nowrap">{F.int1}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3"><span class="ltr">E20</span></td><td class="py-2 pe-3">הקרן: התשלום פחות הריבית</td><td class="py-2"><span class="ltr whitespace-nowrap">{F.prin1}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3"><span class="ltr">F20</span></td><td class="py-2 pe-3">היתרה בסוף החודש</td><td class="py-2"><span class="ltr whitespace-nowrap">{F.close1}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+הסימן $ נועל תא: כשמעתיקים את הנוסחה למטה, <span class="ltr">$B$10</span> נשאר B10 בכל שורה, ו־B20 הופך ל־<span class="ltr">B21, B22</span> וכן הלאה. ה־IF בעמודת התשלום אומר: ״אם זה החודש האחרון — היתרה ועוד הריבית; אחרת — ההחזר״.
+
+**צעד 4 — שורת החודש השני, והעתקה למטה.** בתא B21 כותבים <span class="ltr">{F.open2}</span> — היתרה בתחילת החודש היא היתרה בסוף החודש הקודם. את C20 עד F20 העתיקו ל־C21 עד F21. עכשיו סמנו את B21 עד F21 והעתיקו למטה, עד השורה של החודש האחרון (בהלוואה של איתי — חודש 12).
+
+**צעד 5 — בדיקה.** בתאים B13 עד B17 כבר יש נוסחאות: ההחזר בחודש האחרון, <Term t="סך תשלומים" lesson="3.12">סך התשלומים</Term>, סך הריבית, סך הקרן שהוחזרה, ובדיקה אחת. הבדיקה מראה ✓ כשסך הקרן שווה לסכום ההלוואה, והיתרה בסוף החודש האחרון היא אפס. לפני שממשיכים, השוו את {byHand} השורות הראשונות למה שמילאתם ביד.
+
+<Callout title="Excel ו־Google Sheets: שלושה דברים לדעת">
+<p><strong>מפריד הארגומנטים.</strong> ברוב ההגדרות כותבים פסיק, כמו כאן. בחלק מההגדרות האזוריות הגיליון מצפה לנקודה־פסיק: <span class="ltr">{F.semicolon}</span>. אם הנוסחה מסומנת כשגיאה — נסו את זה.</p>
+<p><strong>הסימן של PMT</strong> זהה בשניהם: התוצאה שלילית, ולכן המינוס.</p>
+<p><strong>ROUND</strong> בשניהם מעגלת כמו בקורס: חצי אגורה ומעלה — כלפי מעלה. בבדיקה שלנו (ב־LibreOffice) הגיליון הפתור התאים למחשבון של הקורס עד האגורה בכל {f.plain("sheet.months")} החודשים של ההלוואה של תמר ועידו, וגם ריבית של חצי אגורה בדיוק התעגלה כלפי מעלה, כמו בקורס. אם הגיליון שלכם שונה מהקורס באגורות — ההשוואה בשלב 3 תגיד לכם איזה עיגול חסר.</p>
+</Callout>
+
+<Section kind="שלב 3">
+
+## מול המחשבון של הקורס
+
+</Section>
+
+עכשיו הלוואה אמיתית בגודלה. בגיליון שלכם:
+
+1. שנו את הקלט להלוואה של תמר ועידו: <span class="ltr">400000</span> בתא B5, <span class="ltr">5.4%</span> בתא B6, ו־{f.plain("sheet.months")} בתא B7.
+2. העתיקו את השורות למטה עד החודש ה־{f.plain("sheet.months")} (המספר בעמודה A).
+3. העתיקו מהגיליון לכאן ארבעה מספרים, ולחצו ״השוואה״.
+
+<SheetMatch
+  client:visible
+  id="3.12-match"
+  title="הגיליון שלי מול המחשבון של הקורס"
+  principal="400000"
+  annualPercent="5.4"
+  months={Number(f.raw("sheet.months"))}
+  printNote={MARK}
+/>
+
+אפשר לשנות גם את ההלוואה שלמעלה — סכום, ריבית ותקופה — ולבדוק כל הלוואה שהכנסתם לגיליון. המחשבון של הקורס יחשב אותה מחדש.
+
+<Callout title="אגורה, ולפעמים שקל: מאיפה ההפרשים">
+<p>הנה ארבעה גיליונות של אותה הלוואה, {f.shekels("sheet.loan")} ב־5.4% ל־15 שנה, שכל אחד מעגל אחרת:</p>
+<ul>
+<li><strong>כמו הקורס</strong> — ROUND על ההחזר ועל הריבית, והחודש האחרון סוגר: ההחזר {f.shekels("sheet.statement.regular")}, התשלום האחרון {f.shekels("sheet.statement.last")}, סך הריבית {f.shekels("sheet.statement.total_interest")}.</li>
+<li><strong>בלי ROUND בכלל</strong> — סך הריבית {f.shekels("sheet.exact.total_interest")}: {f.shekels("sheet.gap_exact_interest")} יותר.</li>
+<li><strong>ROUND על הריבית, לא על ההחזר</strong> — סך הריבית {f.shekels("sheet.payment_unrounded.total_interest")}: {f.shekels("sheet.gap_unrounded_interest")} יותר.</li>
+<li><strong>גם החודש האחרון משלם את ההחזר הרגיל</strong> — סך התשלומים {f.shekels("sheet.no_last_adjust.total_paid")}: {f.shekels("sheet.overpaid")} יותר ממה שצריך, והיתרה בסוף יוצאת שלילית.</li>
+</ul>
+<p>אף אחד מהגיליונות האלה לא טועה בחשבון. כולם מחשבים את אותה ריבית חודשית; ההבדל הוא רק מתי מעגלים. ושימו לב לתשלום האחרון בגיליון שכמו הקורס: הוא נמוך ב־{f.shekels("sheet.gap_last")} מהאחרים. ההחזר המעוגל קצת גבוה מהמדויק — בשבריר אגורה — ובמשך {f.plain("sheet.months")} חודשים זה מצטבר, ועוד העיגולים של הריבית. מה שנשאר נסגר בתשלום האחרון.</p>
+<p>הפרש של אגורות, או של שקל בודד, בין גיליון למחשבון הוא כמעט תמיד מוסכמת עיגול. הפרש של עשרות שקלים ומעלה — כבר נוסחה אחרת: ריבית לא חלקי 12, יתרה שלא מתעדכנת, או קלט שונה.</p>
+</Callout>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+התרגילים על ההלוואה של תמר ועידו. תצטרכו את הגיליון שבניתם (או הגיליון הפתור), או מחשבון. מספרים להמחשה, לא נתוני שוק.
+
+<ChoiceExercise
+  client:visible
+  id="3.12-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "זו מוסכמת הסימן של הגיליון: ההלוואה נכנסת אליכם (חיובי), והתשלומים יוצאים (שלילי). מוסיפים מינוס לפני PMT", correct: true, feedback: "נכון. המספר עצמו נכון; רק הסימן אומר ״יוצא״. המינוס לפני PMT הופך אותו לחיובי, כמו בלוח." },
+    { text: "הגיליון חישב ריבית שלילית, כי הריבית בתא B6 כתובה עם סימן אחוז", feedback: "סימן האחוז בסדר: 5.4% הם 0.054. המינוס בא מ־PMT עצמה, לא מהריבית." },
+    { text: "ההלוואה כבר הוחזרה במלואה, ולכן הגיליון מראה יתרה שלילית", feedback: "PMT לא מחשבת יתרה, אלא את התשלום השווה. המינוס הוא הכיוון של הכסף: התשלום יוצא מכם." },
+    { text: "PMT מחזירה את מה שהבנק מקבל, ולכן צריך להוסיף לה את הריבית", feedback: "PMT כבר כוללת את הריבית: זה התשלום השווה שמכסה ריבית וקרן. רק הסימן הפוך." },
+  ]}
+>
+  עידו כתב בתא B11 <span class="ltr">{F.pmtRaw}</span> וקיבל {f.shekels("sheet.pmt_shown")}. למה התשלום יצא שלילי?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.12-3"
+  n={3}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_annual"), message: "זו ריבית של שנה שלמה על כל ההלוואה. בחודש אחד: הריבית החודשית, 5.4% חלקי 12." },
+    { value: f.raw("sheet.prin_1"), message: "זו הקרן של החודש הראשון — מה שנשאר מהתשלום אחרי הריבית. השאלה היא על הריבית עצמה." },
+    { value: f.raw("sheet.payment"), message: "זה כל התשלום. הריבית היא רק חלק ממנו: היתרה כפול הריבית החודשית." },
+  ]}
+>
+  כמה ריבית משלמים תמר ועידו בחודש הראשון? (אפשר לבדוק בתא D20 בגיליון.)
+</NumericExercise>
+
+<Solution for="3.12-3">
+הריבית החודשית: <M>5.4% ÷ 12 = {f.plain("sheet.monthly")}%</M>. הריבית בחודש הראשון, על כל ההלוואה: <M>{n("sheet.loan")} × {f.plain("sheet.monthly")}% = {n("ex2.answer")}</M> ₪. מתוך התשלום של {f.shekels("sheet.payment")}, השאר — {f.shekels("sheet.prin_1")} — הולך לקרן.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.12-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_naive"), message: `הורדתם מההלוואה ${f.plain("ex3.months")} תשלומים שלמים. אבל רוב כל תשלום הלך לריבית, לא לקרן. היתרה נקראת מהלוח: עמודת היתרה בסוף החודש, בשורה של חודש ${f.plain("ex3.months")}.` },
+    { value: f.raw("ex3.err_opening"), message: `זו היתרה בתחילת חודש ${f.plain("ex3.months")}, לפני התשלום שלו. אחרי ${f.plain("ex3.months")} תשלומים — היתרה בסוף אותו חודש.` },
+    { value: f.raw("ex3.err_equal"), message: "זו היתרה בקרן שווה, שבה כל חודש מחזירים אותו חלק מהקרן. בשפיצר הקרן חוזרת לאט יותר בהתחלה, ולכן היתרה גבוהה יותר." },
+  ]}
+>
+  כמה עוד חייבים תמר ועידו אחרי 5 שנים — אחרי {f.plain("ex3.months")} תשלומים?
+</NumericExercise>
+
+<Solution for="3.12-4">
+בגיליון, עמודת היתרה בסוף החודש (F), בשורה של חודש {f.plain("ex3.months")}: {f.shekels("ex3.answer")}. אחרי שליש מהתקופה הם החזירו רק <M>{n("sheet.loan")} − {n("ex3.answer")} = {n("ex3.repaid")}</M> ₪ מהקרן, כי בהתחלה רוב התשלום הוא ריבית. (נוסחת היתרה משיעור 3.3 נותנת אותו מספר, אולי בהפרש של אגורות, כי היא לא מעגלת בכל חודש.)
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.12-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex2.err_annual"), message: "זו הריבית על כל ההלוואה לשנה שלמה, כאילו היתרה לא יורדת. בפועל היתרה יורדת כל חודש, ואיתה הריבית. סכמו את עמודת הריבית ב־12 השורות הראשונות." },
+  ]}
+>
+  כמה ריבית משלמים תמר ועידו בשנה הראשונה, ב־12 התשלומים הראשונים? בגיליון: <span class="ltr">{"=SUM(D20:D31)"}</span>.
+</NumericExercise>
+
+<Solution for="3.12-5">
+<span class="ltr">{"=SUM(D20:D31)"}</span> נותן {f.shekels("ex4.answer")}. זה פחות מ־{f.shekels("ex2.err_annual")}, הריבית לשנה על כל ההלוואה, כי בכל חודש היתרה קצת נמוכה מבחודש שלפניו.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="3.12-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "בגיליון שלה אין ROUND בכלל: לא על ההחזר ולא על הריבית", correct: true, feedback: `נכון. בלי עיגול, סך הריבית הוא ${L(f.shekels("sheet.exact.total_interest"))}, ${L(f.shekels("sheet.gap_exact_interest"))} יותר מבקורס. ROUND רק על הריבית היה נותן ${L(f.shekels("sheet.payment_unrounded.total_interest"))} — קרוב, אבל לא זה.` },
+    { text: "היא לא חילקה את הריבית ב־12", feedback: "אז הריבית הייתה פי 12 בערך, ולא אגורות מעל. הפרש של עשרות אגורות על סכום כזה הוא עיגול, לא נוסחה." },
+    { text: "בגיליון שלה גם החודש האחרון משלם את ההחזר הרגיל", feedback: `זה משנה את סך התשלומים (${L(f.shekels("sheet.no_last_adjust.total_paid"))}) ואת היתרה בסוף — אבל לא את סך הריבית, שנשאר ${L(f.shekels("sheet.statement.total_interest"))}.` },
+    { text: "המחשבון של הקורס טועה: בגיליון החישוב מדויק יותר", feedback: "שניהם מדויקים — לפי מוסכמות עיגול שונות. המחשבון של הקורס מעגל את הריבית של כל חודש לאגורה, ולכן סך הריבית שלו הוא סכום של ריביות מעוגלות." },
+  ]}
+>
+  בגיליון של תמר סך הריבית יוצא {f.shekels("sheet.exact.total_interest")}. המחשבון של הקורס אומר {f.shekels("sheet.statement.total_interest")}. ההחזר החודשי שלה מוצג {f.shekels("sheet.exact.regular")}, כמו בקורס. מה ההסבר הסביר?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.12-7"
+  n={7}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  tolerance={0.005}
+  near={0}
+  errors={[
+    { value: f.raw("zero"), message: "אפס יוצא רק כשהתשלום האחרון סוגר את היתרה. כאן גם החודש האחרון משלם את ההחזר הרגיל — וההחזר המעוגל קצת גבוה מהמדויק." },
+    { value: f.raw("sheet.overpaid"), message: "הגודל נכון, הסימן לא: הם שילמו יותר ממה שנשאר, ולכן היתרה בסוף מתחת לאפס." },
+  ]}
+>
+  עידו שכח את ה־IF בעמודת התשלום: בגיליון שלו גם החודש האחרון משלם {f.shekels("sheet.statement.regular")}. מה היתרה בסוף החודש ה־{f.plain("sheet.months")} בגיליון שלו? (אם יוצא מספר שלילי, כתבו אותו עם מינוס.)
+</NumericExercise>
+
+<Solution for="3.12-7">
+החליפו בגיליון את הנוסחה בעמודת התשלום ב־<span class="ltr">{"=$B$11"}</span> בכל השורות, והסתכלו על היתרה בסוף החודש האחרון: {f.shekels("ex6.answer")}. כלומר, הם שילמו {f.shekels("sheet.overpaid")} יותר ממה שהיה צריך. במחשבון של הקורס החודש האחרון משלם רק את מה שנשאר: {f.shekels("sheet.statement.last")}.
+</Solution>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מפת התמונה הכוללת, בסוף שלב 3
+
+</Section>
+
+המפה משיעור 1.6 גדלה. בשלב 3 נכנסו אליה החישובים: ההחזר החודשי, לוח הסילוקין, תזרים התמהיל, והמדדים שקוראים ממנו — <Term t="החזר ראשון" lesson="3.12">ההחזר הראשון</Term>, <Term t="החזר בתנאים הנוכחיים" lesson="3.12">ההחזר בתנאים הנוכחיים</Term>, <Term t="החזר מרבי חזוי" lesson="3.12">ההחזר המרבי החזוי</Term>, סך התשלומים, <Term t="ערך נוכחי" lesson="3.12">הערך הנוכחי</Term> של התשלומים, <Term t="שיעור תשואה פנימי" lesson="3.12">ושיעור התשואה הפנימי (IRR)</Term>. הסדנה לא מוסיפה צומת; ״לוח סילוקין״ פתוח, כי אותו בניתם.
+
+<BigPictureMap client:visible regions={map.regions} nodes={map.nodes} links={map.links} lesson="3.12" initial="schedule" />
+
+נסו את שלושת אלה:
+1. ״לוח סילוקין״ פתוח. מה נכנס אליו, ומה יוצא ממנו?
+2. לחצו על ״תזרים התמהיל״. אילו מדדים קוראים ממנו?
+3. לחצו על ״החזר מרבי חזוי״. מה מזיז אותו, ולמה הוא לא תקרה מובטחת?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>נכנסים: ההחזר החודשי, שיטת ההחזר (קרן שווה, גרייס), המדד במסלול צמוד, והפריים והעוגן כשהריבית מתעדכנת — בכל שינוי התשלום מחושב מחדש על היתרה. יוצאים: יתרת החוב בכל חודש, ותזרים התמהיל.</li>
+    <li>ההחזר הראשון, ההחזר בתנאים הנוכחיים, ההחזר המרבי החזוי, סך התשלומים, הערך הנוכחי, ו־IRR. כל אחד עונה על שאלה אחרת (שיעור 3.11).</li>
+    <li>תזרים התמהיל, והאינפלציה — התחזית שלה מזיזה את המסלולים הצמודים. זו תחזית: אם המדד או הריביות יזוזו אחרת, גם התשלום יזוז אחרת.</li>
+  </ol>
+</details>
+
+<Section kind="סיכום">
+
+## מה לקחת מהסדנה
+
+</Section>
+
+- **כל שורה בלוח היא ארבעה צעדים:** היתרה בתחילת החודש, ריבית עליה (מעוגלת לאגורה), קרן — התשלום פחות הריבית, ויתרה בסוף — היתרה פחות הקרן.
+- **הטעויות הנפוצות** הן ריבית על ההלוואה המקורית, ריבית שנתית במקום חודשית, ריבית שלא עוגלה, והורדה של כל התשלום מהיתרה.
+- **בגיליון** כותבים שורה אחת ומעתיקים למטה: <span class="ltr">{F.payment}</span> להחזר, ROUND על הריבית, ו־IF לחודש האחרון. המינוס לפני PMT הוא מוסכמת הסימן של הגיליון.
+- **הפרש של אגורות** בין גיליון למחשבון הוא מוסכמת עיגול; הפרש גדול הוא נוסחה אחרת. המחשבון של הקורס מעגל את ההחזר פעם אחת ואת הריבית בכל חודש, והחודש האחרון סוגר את היתרה.
+- **התוצר שלכם:** לוח שבניתם ביד ובגיליון, ובדיקה שהוא תואם למחשבון. בשלב 5 נבנה בו את התמהיל של נועם ושירה, מסלול אחר מסלול.
+
+**ומכאן — בדיקת הסיום של שלב 3.** היא כוללת שאלות על כל השלב, וגם שאלות משלבים קודמים. מי שעובר אותה פותח את שלב 4.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "לוח סילוקין בשפיצר: בכל חודש ריבית על היתרה, והשאר מהתשלום לקרן; התשלום השווה הוא P × m ÷ (1 − (1 + m) בחזקת −n). PMT, ROUND, IF ו־SUM הן פונקציות הגיליון המקובלות ב־Excel וב־Google Sheets; PMT מחזירה תשלום בסימן שלילי כשהסכום חיובי, ו־ROUND מעגלת חצי כלפי מעלה." },
+    { kind: "הנחת חישוב", text: "ריבית חודשית = אחוז הריבית לשנה חלקי 12. לפי בדיקה של הצוות מול לוחות ששני בנקים פרסמו (החישוב התאים עד האגורה בכל התאים שנבדקו; Linear ENG-223, 2026-10-04; לא נבדק מול מקור רשמי).", date: "2026-10-04" },
+    { kind: "הנחת חישוב", text: "כלל העיגול של הקורס: התשלום מעוגל לאגורה פעם אחת; הריבית של כל חודש מעוגלת לאגורה, חצי ומעלה כלפי מעלה; החודש האחרון משלם את היתרה ועוד הריבית. כך מחשב המחשבון של הקורס. בנק יכול לעגל אחרת; הצוות לא קבע עדיין סף מספרי להתאמה ללוח של בנק (Brain, דף 67436545)." },
+    { kind: "הנחת חישוב", text: `שתי ההלוואות בסדנה בדויות, ואינן התיק של נועם ושירה. ${MARK} ההלוואה של תמר ועידו היא הדוגמה הפתורה של שיעור 2.9.` },
+    { kind: "בדיקת חישוב", text: `כל המספרים בסדנה חושבו ונבדקו פעמיים, בשתי שיטות נפרדות. הגיליון הפתור נבדק אחרי חישוב מחדש ב־LibreOffice: ההלוואה של איתי (12 חודשים) וההלוואה של תמר ועידו (${f.plain("sheet.months")} חודשים) תואמות למחשבון של הקורס עד האגורה בכל שורה ובכל סכום.`, date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/amortization.ts (annuityStatement) and src/lib/calc/workshop.ts (handMistake, sheetFigures) via scripts/lessons/lesson-3-12.ts and data/lessons/3-12.json, rechecked by checks/kinds/workshop.py. Components: src/components/ScheduleByHand.vue (state key schedule-by-hand:3.12-hand), src/components/SheetMatch.vue (state key sheet-match:3.12-match; imports amortization.ts and workshop.ts for live inputs), BigPictureMap.vue with src/components/big-picture/stage-3.ts at mapUpTo("3.12"). The spreadsheets: scripts/build-sheets.py writes public/downloads/schedule-template.xlsx and schedule-solution.xlsx from data/lessons/3-12.json; `python3 scripts/build-sheets.py --verify` recalculates the solution in LibreOffice and compares it with the facts. Cell addresses in the page (B5–B17, rows 19–379) are the script's layout: change both together. No field knowledge used. No video (workshop). */}
