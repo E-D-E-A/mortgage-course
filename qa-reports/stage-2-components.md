@@ -20,7 +20,19 @@ For every component and both widths I checked:
 
 **Since stage 1:** every range slider is now 44px tall (`main.css`), so the slider touch-target bug from stage 1 is fixed for all of these components.
 
-**Outside the components:** `/video/2-1.mp4` (and the other stage-2 lesson videos, see below) are missing from `dist/video/`, so the request fails on load. That is the page, not a component.
+**Console:** no component threw, warned or reported a hydration mismatch at either width. The only failed requests were the lesson videos of 2.1, 2.9 and 2.11 (`/video/2-X.mp4`); the files are in `dist/video/`, the server answers 200, and Chromium then stops the download after reading the metadata (`net::ERR_ABORTED`). Nothing is missing.
+
+## Summary
+
+| Severity | Count | Bugs |
+| --- | --- | --- |
+| חוסם | 0 | — |
+| חשוב | 7 entries, 6 causes | TrackOverTime: hiding the index in 2.6 leaves purchasing power on · TrackOverTime and RepaymentPaths: wide table on a phone with no scroll hint (one cause, two components) · BalanceForces: impossible sentence when the index falls or the payment is 0 · TrackCompare: Ctrl+P prints the sticky header over the table · TrackOrder: "צריך להיות נמוך יותר" points the wrong way · BigPictureMap: nothing is marked "חדש בשיעור הזה" in 2.12 |
+| קטן | 16 | listed under each component |
+
+Two causes repeat across components:
+- **Axis labels in `w-0 text-center` spans are not centred on their ticks** (RateLayers, LinkedOrNot; UpdatePointsTimeline has a similar fixed offset). TrackOverTime and RepaymentPaths centre theirs with `-translate-x-1/2` and are right.
+- **A table box with `overflow-auto` instead of `overflow-x-auto` is invisible to the layout's scroll-hint script** (TrackOverTime, RepaymentPaths).
 
 ## RateLayers (2.1)
 
@@ -158,7 +170,7 @@ What works:
 - The payment panels share one scale ("גובה מלא: 5,292 ₪" = 4,900 × 1.08), the month marker moves in all panels and the balance chart, and the dotted line over the grace months in 2.10 shows the partial-grace panel as interest only and the full-grace panel empty.
 - Keyboard: Tab goes amount, rate, term, (grace,) month, table button, each with a ring and an `aria-label`. End on the month slider goes to month 240; ArrowLeft steps one month; End on the grace slider goes to 36; focus stays on the slider. In the table, the way buttons take Space, report `aria-pressed`, and keep focus.
 - Extremes (2,000,000 ₪ at 8%; 5 years with 36 grace months) render without overflow, clipping or errors.
-- No horizontal page scroll, nothing under 12px, no console messages from the component. (`/video/2-9.mp4` is missing from `dist/video/`.)
+- No horizontal page scroll, nothing under 12px, no console messages.
 
 ## BalanceForces (2.11)
 
@@ -185,7 +197,7 @@ What works:
 - The waterfall is consistent: each bar starts where the one above ended; additions go left and the payment right, as the caption says; the dashed zero line is at the same place in every row.
 - Limits hold: with a 1% rate the change slider's minimum becomes −1 and the value is clamped from −2; with a 100,000 balance the payment's maximum becomes 100,000 and the value is clamped from 120,000.
 - Keyboard: Tab goes track toggle (two buttons), the five sliders, the table button, each with a ring; the toggles take Enter, report `aria-pressed` and keep focus; the table opens with Enter.
-- No horizontal scroll, nothing under 12px, nothing clipped, no console messages from the component. (`/video/2-11.mp4` is missing from `dist/video/`.)
+- No horizontal scroll, nothing under 12px, nothing clipped, no console messages.
 
 ## TrackCompare (2.12)
 
@@ -213,4 +225,46 @@ What works:
 - **Print emulation:** with print media the sort controls, the print buttons and the cards are `display: none`, and the table is shown even from the phone view. In the PDF from the "הדפסה" button nothing outside the block is printed (79 text elements inside it, 0 outside), the header row repeats on page 2, and the print note is under the table.
 - **The "הדפסה" button:** it adds `track-printing` to `<html>` and `data-track-print="active"` to the block before calling `window.print()` (both seen at the moment of the call), keeps focus, and `afterprint` removes both.
 - Tab order: the four sort buttons, "תצוגה להדפסה", "הדפסה", each with a ring; all are at least 44×44. No horizontal page scroll, nothing under 12px, nothing clipped, no console messages.
+
+## TrackOrder (2.12, both exercises)
+
+Bugs:
+- **חשוב — the note on a misplaced card points the wrong way.** A card is marked when a card with a higher rank sits above it, which means it must move **up**. The note says "לא במקום: צריך להיות נמוך יותר ברשימה" ("lower in the list").
+  - Steps: in "מיון 1", press "בדיקה" without moving anything.
+  - What happened: all five cards under "מסלול פריים" are marked "צריך להיות נמוך יותר ברשימה", including "קבועה לא צמודה", which is already last (its ↓ button is disabled) and belongs at the top. The one card that is really out of place, "מסלול פריים" at the top, is not marked. The same happens in "מיון 2".
+  - Expected: "צריך להיות גבוה יותר ברשימה" for these cards; better, mark the card that sits too high (the one above them with the higher rank), or both.
+  - Screenshot: `qa/components/stage-2/TrackOrder-phone-02-2.12-order-when-checked-wrong.png`, `qa/components/stage-2/TrackOrder-desktop-14-2.12-order-forces-checked-wrong.png`.
+
+What works:
+- Both exercises can be solved by keyboard alone. I moved cards with Enter and Space on the ↑ buttons until the order was right, pressed "בדיקה", and got the success text: "הסדר נכון. שלושה מסלולים קבועים…" and "הסדר נכון. רק קבועה לא צמודה בלי כוחות…". `mogi-course:exercise:2.12-order-when` and `…-order-forces` are saved as `{"done":true}`.
+- The marks are consistent with the rule as written: the five marked cards are exactly the ones with a higher-ranked card above them.
+- Equal ranks can be in either order: swapping two "אף פעם" cards after the right answer still checks as right. Moving a card clears the last check.
+- Focus stays on the moved card's button; at the top (↑ disabled) it moves to the same card's ↓, as the code comment says. It never fell to `<body>`. Every button has an `aria-label` naming its card and direction ("להזיז למעלה: קבועה צמודה").
+- "הצגת הסדר הנכון" opens with Enter, keeps focus, and lists the ranks by name. The lists match the lesson's answers (מיון 1: three fixed tracks, two at update points, prime; מיון 2: קבועה לא צמודה alone, four with one force, משתנה צמודה with two).
+- The ↑/↓ buttons are 44×44, the first ↑ and the last ↓ are disabled, and every Tab stop has a ring. No horizontal scroll, nothing under 12px, nothing clipped, no console messages.
+
+## BigPictureMap in 2.12
+
+Bugs:
+- **חשוב — "חדש בשיעור הזה" marks nothing in 2.12.** A node is marked new when `node.lesson === lesson`, and no node has lesson "2.12": the stage-2 nodes came in at 2.1 (פריים, עוגן, מרווח בחוזה), 2.5–2.8 (the six tracks), 2.9–2.10 (שפיצר, קרן שווה, גרייס, בלון ובוליט) and 2.11 (יתרת חוב). The legend still shows the "new" swatch, and the text above the map says "בשלב 2 נכנסו אליה הפריים, העוגן…", but all 30 nodes look like "משיעורים קודמים".
+  - Steps: open the map in 2.12 at either width.
+  - Expected: in a stage summary, mark the stage's nodes as new (for example, a `since="2.1"` prop compared by lesson number), or drop the legend entry here.
+  - Screenshot: `qa/components/stage-2/BigPictureMap-desktop-06-start-prime.png`, `qa/components/stage-2/BigPictureMap-phone-01-start-prime.png`.
+- **קטן — on the desktop map, the link lines run behind unrelated nodes.** Lines are straight from centre to centre under the buttons, so they cross other nodes and region titles, and read as links to them.
+  - Steps: select "אינפלציה" at 1280px.
+  - What happened: the line to "הלוואת זכאות" passes behind "שמאי", "מבטח" and "טאבו"; the line to "יתרת חוב" runs straight down behind "הלווים" and "הון עצמי". The mint highlight and the card's list are correct, so the information is there, but the lines suggest wrong links.
+  - Expected: lines that avoid nodes (routed around the regions, or drawn only from region edge to region edge), or a lighter line with the targets carrying the meaning.
+  - Screenshot: `qa/components/stage-2/BigPictureMap-desktop-07-inflation.png`.
+- **קטן — a space before the colon in the card's links.** The link button's `px-1` padding sits between the name and the colon: "ריבית בנק ישראל :", "קבועה צמודה :".
+  - Screenshot: `qa/components/stage-2/BigPictureMap-desktop-07-inflation.png`.
+
+What works:
+- The map at 2.12 has 30 nodes and 52 links. The three tasks match the lesson's answers, in the highlighted nodes, the drawn lines and the card's links:
+  - "פריים" (open at first): ריבית בנק ישראל, עוגן, מסלול פריים, יתרת חוב.
+  - "אינפלציה": קבועה צמודה, משתנה צמודה, הלוואת זכאות, plus ריבית בנק ישראל and יתרת חוב.
+  - "מרווח בחוזה": מסלול פריים, משתנה צמודה, משתנה לא צמודה, and הבנק.
+- On the desktop map every line starts and ends within 2px of a button's centre, after a selection, after list → map, and after resizing the window to 900px (the stage-1 bug of stale lines after the list toggle is fixed).
+- Keyboard: nodes select with Enter and Space and keep focus. A link inside the card selects that node and moves focus to it, in view. On the phone the node's own button is focused (its card opens under it); on desktop the map button is focused.
+- On a phone the list view is the only view: each node opens its card under it (`aria-expanded`, "+"/"−"), and pressing the open node closes it with focus kept on it. On desktop "הצגה כרשימה" switches to the same list and back, and keeps focus on the toggle.
+- The card's link buttons are now at least 44×44 (the stage-1 narrow-link bug is fixed); every Tab stop has a ring; no horizontal scroll, nothing under 12px, nothing clipped, no console messages.
 

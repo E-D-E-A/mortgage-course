@@ -119,7 +119,7 @@ for (const stage of stages) {
     for (let y = 0; y < 40000; y += 700) await page.evaluate((y) => scrollTo(0, y), y);
     await page.waitForTimeout(300);
     const r = await page.evaluate(() => {
-      const boxes = [...document.querySelectorAll("main .overflow-x-auto")];
+      const boxes = [...document.querySelectorAll("main .overflow-x-auto, main .overflow-auto")];
       const wide = boxes.filter((b) => b.scrollWidth > b.clientWidth + 1);
       return {
         wideWithoutHint: wide.filter((b) => {

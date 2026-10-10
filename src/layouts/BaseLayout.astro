@@ -64,7 +64,7 @@ const nav = [
       // nothing shows that, so the learner misses the columns past the edge: say it.
       function markWideTables() {
         const islands = new Map();
-        for (const box of document.querySelectorAll<HTMLElement>("main .overflow-x-auto")) {
+        for (const box of document.querySelectorAll<HTMLElement>("main .overflow-x-auto, main .overflow-auto")) {
           const wide = box.scrollWidth > box.clientWidth + 1;
           // Inside an interactive component the DOM belongs to Vue: inserting an element
           // there breaks hydration. Mark the component's wrapper instead; CSS draws the hint.

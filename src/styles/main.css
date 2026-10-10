@@ -246,3 +246,15 @@ astro-island[data-wide-table]::before {
   font-size: 0.75rem;
   color: var(--mogi-n600);
 }
+
+/* Printing: the sticky site header would sit over the middle of a long table, and the
+   on-screen scroll hints mean nothing on paper. */
+@media print {
+  body > header {
+    position: static;
+  }
+  .scroll-hint,
+  astro-island[data-wide-table]::before {
+    display: none;
+  }
+}
