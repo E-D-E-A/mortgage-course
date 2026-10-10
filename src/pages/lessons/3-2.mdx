@@ -93,7 +93,7 @@ export const predictionOptions = [
 <ul class="list-reset my-6 grid gap-3 md:hidden">
   {small.map((r) => (
     <li class="rounded-lg border border-n200 bg-n0 p-3 shadow-sm">
-      <p class="text-body-m font-semibold text-n900">חודש {r.period}</p>
+      <div class="text-body-m font-semibold text-n900">חודש {r.period}</div>
       <dl class="mt-1 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-body-m text-n700">
         {smallCols.flatMap((c) => [
           <dt class={c.key === "closing" ? "font-semibold text-n900" : ""}>{c.label}</dt>,
@@ -454,4 +454,4 @@ export const predictionOptions = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/amortization.ts and repayment.ts via scripts/lessons/lesson-3-2.ts and data/lessons/3-2.json, rechecked by checks/kinds/repayment.py, amortization.py, percent.py and compound.py. Illustration: src/components/ScheduleBuilder.vue (Spitzer only; lesson 3.4 adds the method picker). */}
+{/* Internal note: numbers come from src/lib/calc/amortization.ts and repayment.ts (and halfInterestRate, growthBase) via scripts/lessons/lesson-3-2.ts and data/lessons/3-2.json, rechecked by checks/kinds/repayment.py, amortization.py, percent.py and compound.py. Illustration: src/components/ScheduleBuilder.vue (Spitzer only; lesson 3.4 adds the method picker). */}
