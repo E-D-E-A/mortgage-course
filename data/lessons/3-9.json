@@ -1,0 +1,653 @@
+{
+  "lesson": "3.9",
+  "title": "סך תשלומים, ריבית, הצמדה ועמלות",
+  "note": "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; exact schedules, rounded to the agora only when shown. The linked track's index rises 2% a year (2.5% in exercise 4): a teaching assumption, not a forecast. Where the learner multiplies a rounded payment by the number of months, the fact does the same (met_times).",
+  "facts": [
+    {
+      "id": "prediction.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "prediction.once",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "periods": 1
+      },
+      "value": "628800.00"
+    },
+    {
+      "id": "prediction.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "periods": 20
+      },
+      "value": "1176000.00"
+    },
+    {
+      "id": "small.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "12000.00"
+    },
+    {
+      "id": "small.payment",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|12000|6|12|12|0|0"
+      },
+      "value": "1032.80"
+    },
+    {
+      "id": "small.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|12000|6|12|12|0|0"
+      },
+      "value": "12393.57"
+    },
+    {
+      "id": "small.times",
+      "kind": "met_times",
+      "inputs": {
+        "of": "small.payment",
+        "count": 12
+      },
+      "value": "12393.60"
+    },
+    {
+      "id": "small.interest",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|12000|6|12|12|0|0"
+      },
+      "value": "393.57"
+    },
+    {
+      "id": "big.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "big.payment",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|240|240|0|0"
+      },
+      "value": "3893.74"
+    },
+    {
+      "id": "big.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|240|240|0|0"
+      },
+      "value": "934498.76"
+    },
+    {
+      "id": "big.interest",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|240|240|0|0"
+      },
+      "value": "334498.76"
+    },
+    {
+      "id": "big.interest_share",
+      "kind": "met_share",
+      "inputs": {
+        "part": "big.interest",
+        "whole": "big.total",
+        "decimals": 1
+      },
+      "value": "35.8"
+    },
+    {
+      "id": "big30.payment",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|360|360|0|0"
+      },
+      "value": "3147.99"
+    },
+    {
+      "id": "big30.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|360|360|0|0"
+      },
+      "value": "1133277.17"
+    },
+    {
+      "id": "big30.interest",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|360|360|0|0"
+      },
+      "value": "533277.17"
+    },
+    {
+      "id": "big30.pay_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "big.payment",
+        "subtrahend": "big30.payment"
+      },
+      "value": "745.75"
+    },
+    {
+      "id": "big30.interest_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "big30.interest",
+        "subtrahend": "big.interest"
+      },
+      "value": "198778.41"
+    },
+    {
+      "id": "big30.interest_share",
+      "kind": "met_share",
+      "inputs": {
+        "part": "big30.interest",
+        "whole": "big30.total",
+        "decimals": 1
+      },
+      "value": "47.1"
+    },
+    {
+      "id": "lnk.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0"
+      },
+      "value": "3333.08"
+    },
+    {
+      "id": "lnk.last",
+      "kind": "met_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0",
+        "month": 240
+      },
+      "value": "4944.62"
+    },
+    {
+      "id": "lnk.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0"
+      },
+      "value": "980697.84"
+    },
+    {
+      "id": "lnk.interest",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0"
+      },
+      "value": "229399.17"
+    },
+    {
+      "id": "lnk.indexation",
+      "kind": "met_total_indexation",
+      "inputs": {
+        "tracks": "spitzer|600000|3|240|240|2|0"
+      },
+      "value": "151298.67"
+    },
+    {
+      "id": "lnk.over_unlinked",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "lnk.total",
+        "subtrahend": "big.total"
+      },
+      "value": "46199.08"
+    },
+    {
+      "id": "fee.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "360.00"
+    },
+    {
+      "id": "fee.share_of_interest",
+      "kind": "met_share",
+      "inputs": {
+        "part": "fee.open",
+        "whole": "big.interest",
+        "decimals": 2
+      },
+      "value": "0.11"
+    },
+    {
+      "id": "slider.everything",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "big.total|fee.open"
+      },
+      "value": "934858.76"
+    },
+    {
+      "id": "slider.interest_share",
+      "kind": "met_share",
+      "inputs": {
+        "part": "big.interest",
+        "whole": "slider.everything",
+        "decimals": 1
+      },
+      "value": "35.8"
+    },
+    {
+      "id": "slider.fee_share",
+      "kind": "met_share",
+      "inputs": {
+        "part": "fee.open",
+        "whole": "slider.everything",
+        "decimals": 2
+      },
+      "value": "0.04"
+    },
+    {
+      "id": "slider.everything_30",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "big30.total|fee.open"
+      },
+      "value": "1133637.17"
+    },
+    {
+      "id": "slider.interest_share_30",
+      "kind": "met_share",
+      "inputs": {
+        "part": "big30.interest",
+        "whole": "slider.everything_30",
+        "decimals": 1
+      },
+      "value": "47"
+    },
+    {
+      "id": "slider.everything_linked",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "lnk.total|fee.open"
+      },
+      "value": "981057.84"
+    },
+    {
+      "id": "slider.index_share",
+      "kind": "met_share",
+      "inputs": {
+        "part": "lnk.indexation",
+        "whole": "slider.everything_linked",
+        "decimals": 1
+      },
+      "value": "15.4"
+    },
+    {
+      "id": "worked.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "450000.00"
+    },
+    {
+      "id": "worked.pay_20",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|450000|5|240|240|0|0"
+      },
+      "value": "2969.80"
+    },
+    {
+      "id": "worked.pay_25",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|450000|5|300|300|0|0"
+      },
+      "value": "2630.66"
+    },
+    {
+      "id": "worked.pay_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.pay_20",
+        "subtrahend": "worked.pay_25"
+      },
+      "value": "339.14"
+    },
+    {
+      "id": "worked.total_20",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|450000|5|240|240|0|0"
+      },
+      "value": "712752.20"
+    },
+    {
+      "id": "worked.total_25",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|450000|5|300|300|0|0"
+      },
+      "value": "789196.56"
+    },
+    {
+      "id": "worked.total_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.total_25",
+        "subtrahend": "worked.total_20"
+      },
+      "value": "76444.36"
+    },
+    {
+      "id": "worked.int_20",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|450000|5|240|240|0|0"
+      },
+      "value": "262752.20"
+    },
+    {
+      "id": "worked.int_25",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|450000|5|300|300|0|0"
+      },
+      "value": "339196.56"
+    },
+    {
+      "id": "worked.share_20",
+      "kind": "met_share",
+      "inputs": {
+        "part": "worked.int_20",
+        "whole": "worked.total_20",
+        "decimals": 1
+      },
+      "value": "36.9"
+    },
+    {
+      "id": "worked.share_25",
+      "kind": "met_share",
+      "inputs": {
+        "part": "worked.int_25",
+        "whole": "worked.total_25",
+        "decimals": 1
+      },
+      "value": "43"
+    },
+    {
+      "id": "worked.everything_20",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "worked.total_20|fee.open"
+      },
+      "value": "713112.20"
+    },
+    {
+      "id": "half.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "half.pay_15",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|300000|4.2|180|180|0|0"
+      },
+      "value": "2249.25"
+    },
+    {
+      "id": "half.total_15",
+      "kind": "met_times",
+      "inputs": {
+        "of": "half.pay_15",
+        "count": 180
+      },
+      "value": "404865.00"
+    },
+    {
+      "id": "half.int_15",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.total_15",
+        "subtrahend": "half.loan"
+      },
+      "value": "104865.00"
+    },
+    {
+      "id": "half.pay_20",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|300000|4.2|240|240|0|0"
+      },
+      "value": "1849.71"
+    },
+    {
+      "id": "half.total_20",
+      "kind": "met_times",
+      "inputs": {
+        "of": "half.pay_20",
+        "count": 240
+      },
+      "value": "443930.40"
+    },
+    {
+      "id": "half.int_20",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.total_20",
+        "subtrahend": "half.loan"
+      },
+      "value": "143930.40"
+    },
+    {
+      "id": "half.pay_25",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|300000|4.2|300|300|0|0"
+      },
+      "value": "1616.83"
+    },
+    {
+      "id": "half.total_25",
+      "kind": "met_times",
+      "inputs": {
+        "of": "half.pay_25",
+        "count": 300
+      },
+      "value": "485049.00"
+    },
+    {
+      "id": "half.int_25",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "half.total_25",
+        "subtrahend": "half.loan"
+      },
+      "value": "185049.00"
+    },
+    {
+      "id": "ex1.payment",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|24000|5.4|24|24|0|0"
+      },
+      "value": "1057.22"
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "met_times",
+      "inputs": {
+        "of": "ex1.payment",
+        "count": 24
+      },
+      "value": "25373.28"
+    },
+    {
+      "id": "ex1.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "24000.00"
+    },
+    {
+      "id": "ex1.err_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex1.answer",
+        "subtrahend": "ex1.loan"
+      },
+      "value": "1373.28"
+    },
+    {
+      "id": "ex3.total",
+      "kind": "met_times",
+      "inputs": {
+        "of": "big30.payment",
+        "count": 360
+      },
+      "value": "1133276.40"
+    },
+    {
+      "id": "ex3.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.total",
+        "subtrahend": "ex3.loan"
+      },
+      "value": "533276.40"
+    },
+    {
+      "id": "ex3.err_simple",
+      "kind": "simple_interest",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "periods": 30
+      },
+      "value": "864000.00"
+    },
+    {
+      "id": "ex3.exact_total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|360|360|0|0"
+      },
+      "value": "1133277.17"
+    },
+    {
+      "id": "ex4.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|400000|2.8|180|180|2.5|0"
+      },
+      "value": "594069.45"
+    },
+    {
+      "id": "ex4.interest",
+      "kind": "met_total_interest",
+      "inputs": {
+        "tracks": "spitzer|400000|2.8|180|180|2.5|0"
+      },
+      "value": "103175.07"
+    },
+    {
+      "id": "ex4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "ex4.err_no_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.total",
+        "subtrahend": "ex4.loan"
+      },
+      "value": "194069.45"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.err_no_interest",
+        "subtrahend": "ex4.interest"
+      },
+      "value": "90894.38"
+    },
+    {
+      "id": "ex4.err_minus_interest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.total",
+        "subtrahend": "ex4.interest"
+      },
+      "value": "490894.38"
+    },
+    {
+      "id": "ex4.exact",
+      "kind": "met_total_indexation",
+      "inputs": {
+        "tracks": "spitzer|400000|2.8|180|180|2.5|0"
+      },
+      "value": "90894.38"
+    },
+    {
+      "id": "ex5.pay_25",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|4.8|300|300|0|0"
+      },
+      "value": "3437.98"
+    },
+    {
+      "id": "ex5.total_25",
+      "kind": "met_times",
+      "inputs": {
+        "of": "ex5.pay_25",
+        "count": 300
+      },
+      "value": "1031394.00"
+    },
+    {
+      "id": "ex5.int_25",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.total_25",
+        "subtrahend": "ex3.loan"
+      },
+      "value": "431394.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex3.answer",
+        "subtrahend": "ex5.int_25"
+      },
+      "value": "101882.40"
+    },
+    {
+      "id": "ex5.err_pay",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.pay_25",
+        "subtrahend": "big30.payment"
+      },
+      "value": "289.99"
+    }
+  ]
+}

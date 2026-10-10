@@ -1,0 +1,412 @@
+<script setup lang="ts">
+// "בונה תמהיל" — the brief's required mix builder, first version (lesson 3.7).
+// Stage 5 extends it for case A (5.7, 5.8) and stage 9 uses it again, so it is data-driven:
+//
+//  Props
+//   - loan: the whole loan, in shekels.
+//   - tracks: up to `maxTracks` tracks — { kind, amount, rate, years, method?, resetMonths? }.
+//       kind: "fixed_unlinked" | "fixed_linked" | "prime" | "variable_unlinked" | "variable_linked"
+//       amount: shekels; the LAST track always takes the rest (loan − the others), so the tracks
+//       always add up to the loan. rate: the track's annual rate at the start, in percent.
+//       years: the track's own term (Mogi decision DEC-2). method: "spitzer" (default) or
+//       "equal_principal". resetMonths: variable tracks only; default 60 (DEC-3's assumption).
+//   - scenario: { inflation, primeShift, primeFromYear, anchorShift } — the index's rise in
+//       percent a year (even inside the year); how many points prime moves, from which year of
+//       the loan; how many points a variable track's anchor is above today's at every reset.
+//       A teaching scenario, never a forecast; the component says so.
+//   - labels: { first, max, total } — the three headline cards' titles. 3.7 uses plain words;
+//       a later lesson that has taught the terms can pass them.
+//   - maxTracks (4), amountStep (10,000 ₪), editableScenario (true).
+//
+//  Shows: the mix's monthly payment over time, stacked by track (each track ends at its own
+//  term); the first payment; the highest payment in the scenario and when; all payments
+//  added up; and the exposure — how much of the loan is in prime, linked to the index, at a
+//  rate fixed for the whole term, and in variable tracks that reset. A table view per year.
+// Every number comes from src/lib/calc/schedule.ts; nothing is computed here but scaling.
+import Decimal from "decimal.js";
+import { computed, nextTick, reactive, ref } from "vue";
+import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
+import {
+  DEFAULT_RESET_MONTHS,
+  exposure,
+  mixCashFlow,
+  mixSummary,
+  resets,
+  type ScheduleMethod,
+  SUPPORTED_RESET_MONTHS,
+  type TrackKind,
+  type TrackSpec,
+} from "../lib/calc/schedule.ts";
+
+interface TrackInput {
+  kind: TrackKind;
+  amount: number;
+  rate: string | number;
+  years: number;
+  method?: ScheduleMethod;
+  resetMonths?: number;
+}
+interface ScenarioInput {
+  inflation?: number;
+  primeShift?: number;
+  primeFromYear?: number;
+  anchorShift?: number;
+}
+
+const props = withDefaults(
+  defineProps<{
+    loan?: number;
+    tracks?: TrackInput[];
+    scenario?: ScenarioInput;
+    labels?: { first?: string; max?: string; total?: string };
+    maxTracks?: number;
+    amountStep?: number;
+    editableScenario?: boolean;
+  }>(),
+  {
+    loan: 900000,
+    tracks: () => [
+      { kind: "fixed_unlinked", amount: 300000, rate: "4.8", years: 30 },
+      { kind: "prime", amount: 300000, rate: "4.25", years: 12 },
+      { kind: "fixed_linked", amount: 300000, rate: "3", years: 20 },
+    ],
+    scenario: () => ({ inflation: 2, primeShift: 1, primeFromYear: 2, anchorShift: 0 }),
+    labels: () => ({}),
+    maxTracks: 4,
+    amountStep: 10000,
+    editableScenario: true,
+  },
+);
+
+const KIND_NAMES: Record<TrackKind, string> = {
+  fixed_unlinked: "קבועה לא צמודה (קל״צ)",
+  fixed_linked: "קבועה צמודה",
+  prime: "פריים",
+  variable_unlinked: "משתנה לא צמודה",
+  variable_linked: "משתנה צמודה",
+};
+const KINDS = Object.keys(KIND_NAMES) as TrackKind[];
+const COLOURS = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)", "var(--mogi-n400)", "var(--mogi-mint)"];
+const titles = computed(() => ({
+  first: props.labels.first ?? "התשלום הראשון",
+  max: props.labels.max ?? "התשלום הגבוה ביותר בתרחיש",
+  total: props.labels.total ?? "כל התשלומים יחד",
+}));
+
+// Editable state. Each track has a stable key, so adding or removing one keeps focus and inputs in place.
+let nextKey = 0;
+interface Row extends Required<Omit<TrackInput, "rate">> {
+  key: number;
+  rate: number;
+}
+const rows = reactive<Row[]>(
+  props.tracks.slice(0, props.maxTracks).map((t) => ({
+    key: nextKey++,
+    kind: t.kind,
+    amount: t.amount,
+    rate: Number(t.rate),
+    years: t.years,
+    method: t.method ?? "spitzer",
+    resetMonths: t.resetMonths ?? DEFAULT_RESET_MONTHS,
+  })),
+);
+const scenario = reactive({
+  inflation: props.scenario.inflation ?? 0,
+  primeShift: props.scenario.primeShift ?? 0,
+  primeFromYear: props.scenario.primeFromYear ?? 2,
+  anchorShift: props.scenario.anchorShift ?? 0,
+});
+const showTable = ref(false);
+
+// The last track takes the rest; every other track can take at most what the others leave.
+const othersBefore = (i: number) => rows.slice(0, -1).reduce((s, r, k) => (k === i ? s : s + r.amount), 0);
+const maxAmount = (i: number) => Math.max(0, props.loan - othersBefore(i));
+const rest = computed(() => props.loan - rows.slice(0, -1).reduce((s, r) => s + r.amount, 0));
+const amounts = computed(() => rows.map((r, i) => (i === rows.length - 1 ? rest.value : r.amount)));
+
+const specs = computed<TrackSpec[]>(() =>
+  rows.map((r, i) => ({
+    kind: r.kind,
+    amount: String(amounts.value[i]),
+    rate: String(r.rate),
+    months: r.years * 12,
+    method: r.method,
+    ...(resets(r.kind) ? { resetMonths: r.resetMonths } : {}),
+  })),
+);
+const scenarioSpec = computed(() => ({
+  inflation: [String(scenario.inflation)],
+  primeShift: [...Array.from({ length: Math.max(scenario.primeFromYear - 1, 0) }, () => "0"), String(scenario.primeShift)],
+  anchorShift: [String(scenario.anchorShift)],
+  blockMonths: 12,
+}));
+
+// One computation for everything shown. A scenario that pushes a rate below zero is refused with a message.
+const result = computed(() => {
+  if (rest.value < 0) return { error: "המסלולים גדולים מההלוואה. הקטינו אחד מהם." };
+  try {
+    const flow = mixCashFlow(specs.value, scenarioSpec.value);
+    return { flow, summary: mixSummary(flow), exposure: exposure(specs.value) };
+  } catch {
+    return { error: "בתרחיש הזה אחוז הריבית באחד המסלולים יורד מתחת לאפס. הקטינו את הירידה, או העלו את אחוז הריבית של המסלול." };
+  }
+});
+const ok = computed(() => ("flow" in result.value ? result.value : null));
+
+const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString()}%`;
+const points = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${new Decimal(Math.abs(v)).toString()}`;
+const shareOf = (i: number) => pct(new Decimal(amounts.value[i]).div(props.loan).mul(100));
+const whenText = (month: number) => `חודש ${month} (שנה ${Math.ceil(month / 12)})`;
+const trackName = (i: number) => `מסלול ${i + 1} · ${KIND_NAMES[rows[i].kind]}`;
+const yearsText = (m: number) => (m % 12 === 0 ? `${m / 12} שנים` : `${new Decimal(m).div(12).toString()} שנים`);
+
+// Add and remove, with focus kept on something sensible.
+const addButton = ref<HTMLButtonElement | null>(null);
+const kindSelects = ref<HTMLSelectElement[]>([]);
+async function addTrack() {
+  if (rows.length >= props.maxTracks) return;
+  // The new track starts empty and takes the rest; the old last track keeps what it had.
+  rows[rows.length - 1].amount = rest.value;
+  rows.push({ key: nextKey++, kind: "fixed_unlinked", amount: 0, rate: 5, years: 20, method: "spitzer", resetMonths: DEFAULT_RESET_MONTHS });
+  await nextTick();
+  kindSelects.value[rows.length - 1]?.focus();
+}
+async function removeTrack(i: number) {
+  if (rows.length <= 1) return;
+  rows.splice(i, 1);
+  await nextTick();
+  (kindSelects.value[Math.min(i, rows.length - 1)] ?? addButton.value)?.focus();
+}
+
+// The chart: the payment each month, stacked by track.
+const W = 640;
+const H = 200;
+const PAD = { top: 12, bottom: 8, side: 10 };
+const months = computed(() => (ok.value ? ok.value.flow.length : 12));
+const x = (m: number) => W - PAD.side - (m / months.value) * (W - 2 * PAD.side);
+const chart = computed(() => {
+  if (!ok.value) return null;
+  const flow = ok.value.flow;
+  const max = Math.max(...flow.map((m) => m.payment.toNumber())) * 1.08 || 1;
+  const y = (v: number) => H - PAD.bottom - (v / max) * (H - PAD.top - PAD.bottom);
+  const n = rows.length;
+  const tops: number[][] = Array.from({ length: n }, () => []);
+  flow.forEach((m) => {
+    let c = 0;
+    m.byTrack.forEach((p, k) => {
+      c += p.toNumber();
+      tops[k].push(c);
+    });
+  });
+  // Each month is a step: the payment holds from the start of the month to its end.
+  const edge = (vals: number[]) => vals.flatMap((v, t) => [`${x(t).toFixed(1)},${y(v).toFixed(1)}`, `${x(t + 1).toFixed(1)},${y(v).toFixed(1)}`]);
+  const zero = Array.from({ length: flow.length }, () => 0);
+  const areas = tops.map((top, k) => {
+    const bottom = k === 0 ? zero : tops[k - 1];
+    return `M${edge(top).join(" L")} L${edge(bottom).reverse().join(" L")} Z`;
+  });
+  return { areas, base: y(0), maxX: x(ok.value.summary.maxMonth - 0.5) };
+});
+const ticks = computed(() => Array.from({ length: Math.floor(months.value / 60) + 1 }, (_, i) => i * 5));
+
+const exposureRows = computed(() => {
+  if (!ok.value) return [];
+  const e = ok.value.exposure;
+  return [
+    { label: "בפריים", amount: e.prime, share: e.share.prime },
+    { label: "צמוד למדד", amount: e.linked, share: e.share.linked },
+    { label: "באחוז ריבית קבוע לכל התקופה", amount: e.fixedForTerm, share: e.share.fixedForTerm },
+    { label: "במשתנה שמתעדכן כל כמה שנים", amount: e.resetting, share: e.share.resetting },
+  ];
+});
+
+const yearRows = computed(() => {
+  if (!ok.value) return [];
+  const flow = ok.value.flow;
+  return Array.from({ length: Math.floor(flow.length / 12) }, (_, k) => {
+    const m = flow[(k + 1) * 12 - 1];
+    return { year: k + 1, total: m.payment, byTrack: m.byTrack };
+  });
+});
+</script>
+
+<template>
+  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
+    <p class="text-caption text-n600">
+      תרחיש להמחשה, לא תחזית. הלוואה של <span class="ltr">{{ formatWholeShekels(loan) }}</span>, עד {{ maxTracks }} מסלולים. לכל מסלול תקופה משלו, והתשלום
+      של התמהיל בכל חודש הוא סכום התשלומים של המסלולים באותו חודש. המסלול האחרון לוקח את מה שנשאר מההלוואה.
+    </p>
+
+    <!-- The tracks -->
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <fieldset v-for="(r, i) in rows" :key="r.key" class="min-w-0 rounded-md border border-n200 p-3" :style="{ borderInlineStartWidth: '4px', borderInlineStartColor: COLOURS[i] }">
+        <legend class="px-1 text-body-m font-semibold text-n900">מסלול {{ i + 1 }}</legend>
+        <div class="flex items-end gap-2">
+          <label class="flex min-w-0 flex-1 flex-col">
+            <span class="text-caption font-semibold text-n600">סוג המסלול</span>
+            <select
+              :ref="(el) => { if (el) kindSelects[i] = el as HTMLSelectElement; }"
+              v-model="r.kind"
+              class="min-h-11 w-full rounded-md border border-n300 bg-n0 px-2 text-body-m text-n900"
+              :aria-label="`סוג מסלול ${i + 1}`"
+            >
+              <option v-for="k in KINDS" :key="k" :value="k">{{ KIND_NAMES[k] }}</option>
+            </select>
+          </label>
+          <button
+            v-if="rows.length > 1"
+            type="button"
+            class="min-h-11 min-w-11 rounded-md border border-n300 px-3 text-body-m text-n700 hover:bg-n50"
+            :aria-label="`להסיר את מסלול ${i + 1}`"
+            @click="removeTrack(i)"
+          >
+            הסרה
+          </button>
+        </div>
+
+        <label v-if="i < rows.length - 1" class="mt-2 flex flex-col">
+          <span class="text-body-m text-n800">
+            סכום: <span class="ltr font-semibold">{{ formatWholeShekels(r.amount) }}</span> · <span class="ltr">{{ shareOf(i) }}</span> מההלוואה
+          </span>
+          <input v-model.number="r.amount" type="range" min="0" :max="maxAmount(i)" :step="amountStep" :aria-label="`הסכום במסלול ${i + 1}`" />
+        </label>
+        <p v-else class="mt-2 min-h-11 text-body-m text-n800">
+          סכום (מה שנשאר): <span class="ltr font-semibold">{{ formatWholeShekels(Math.max(rest, 0)) }}</span> · <span class="ltr">{{ shareOf(i) }}</span> מההלוואה
+        </p>
+
+        <label class="mt-2 flex flex-col">
+          <span class="text-body-m text-n800">אחוז הריבית בהתחלה: <span class="ltr font-semibold">{{ pct(r.rate) }}</span></span>
+          <input v-model.number="r.rate" type="range" min="0.5" max="9" step="0.05" :aria-label="`אחוז הריבית במסלול ${i + 1}`" />
+        </label>
+
+        <label class="mt-2 flex flex-col">
+          <span class="text-body-m text-n800">התקופה: <span class="font-semibold">{{ r.years }} שנים</span></span>
+          <input v-model.number="r.years" type="range" min="4" max="30" step="1" :aria-label="`התקופה של מסלול ${i + 1}, בשנים`" />
+        </label>
+
+        <div class="mt-2 inline-flex flex-wrap rounded-md border border-n200 p-1" role="group" :aria-label="`שיטת ההחזר במסלול ${i + 1}`">
+          <button type="button" class="min-h-11 rounded-sm px-3 text-body-m" :class="r.method === 'spitzer' ? 'bg-navy text-n0' : 'text-n700 hover:bg-n50'" :aria-pressed="r.method === 'spitzer'" @click="r.method = 'spitzer'">שפיצר</button>
+          <button type="button" class="min-h-11 rounded-sm px-3 text-body-m" :class="r.method === 'equal_principal' ? 'bg-navy text-n0' : 'text-n700 hover:bg-n50'" :aria-pressed="r.method === 'equal_principal'" @click="r.method = 'equal_principal'">קרן שווה</button>
+        </div>
+
+        <label v-if="resets(r.kind)" class="mt-2 flex flex-col">
+          <span class="text-caption font-semibold text-n600">אחוז הריבית נקבע מחדש כל</span>
+          <select v-model.number="r.resetMonths" class="min-h-11 rounded-md border border-n300 bg-n0 px-2 text-body-m text-n900" :aria-label="`כל כמה זמן אחוז הריבית במסלול ${i + 1} נקבע מחדש`">
+            <option v-for="m in SUPPORTED_RESET_MONTHS" :key="m" :value="m">{{ yearsText(m) }}</option>
+          </select>
+        </label>
+      </fieldset>
+    </div>
+    <button
+      v-if="rows.length < maxTracks"
+      ref="addButton"
+      type="button"
+      class="mt-3 min-h-11 rounded-md border border-navy px-4 text-body-m font-semibold text-navy hover:bg-n50"
+      @click="addTrack"
+    >
+      להוסיף מסלול
+    </button>
+
+    <!-- The scenario -->
+    <fieldset v-if="editableScenario" class="mt-4 rounded-md border border-n200 p-3">
+      <legend class="px-1 text-body-m font-semibold text-n900">התרחיש (להמחשה, לא תחזית)</legend>
+      <div class="grid gap-x-6 gap-y-3 sm:grid-cols-3">
+        <label class="flex flex-col">
+          <span class="text-body-m text-n800">המדד עולה בשנה: <span class="ltr font-semibold">{{ pct(scenario.inflation) }}</span></span>
+          <input v-model.number="scenario.inflation" type="range" min="-1" max="6" step="0.5" aria-label="כמה המדד עולה בשנה" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-body-m text-n800">הפריים זזה משנה {{ scenario.primeFromYear }}: <span class="ltr font-semibold">{{ points(scenario.primeShift) }}</span> נקודות אחוז</span>
+          <input v-model.number="scenario.primeShift" type="range" min="-3" max="4" step="0.25" aria-label="בכמה נקודות אחוז הפריים זזה" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-body-m text-n800">העוגן בכל נקודת עדכון: <span class="ltr font-semibold">{{ points(scenario.anchorShift) }}</span> נקודות אחוז מהיום</span>
+          <input v-model.number="scenario.anchorShift" type="range" min="-2" max="3" step="0.25" aria-label="בכמה נקודות אחוז העוגן שונה מהיום בכל נקודת עדכון" />
+        </label>
+      </div>
+      <p class="mt-2 text-caption text-n600">המדד עולה באופן אחיד בתוך השנה. העוגן משפיע רק על המסלולים המשתנים, ורק בנקודות העדכון שלהם.</p>
+    </fieldset>
+
+    <!-- The results -->
+    <div role="status" aria-live="polite" class="mt-4">
+      <p v-if="!ok" class="rounded-md bg-warning-bg p-3 text-body-m text-n900">{{ "error" in result ? result.error : "" }}</p>
+      <template v-else>
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div class="rounded-md bg-n50 p-3">
+            <p class="text-caption font-semibold text-n600">{{ titles.first }}</p>
+            <p class="ltr mt-1 text-h3 text-n900">{{ formatShekels(ok.summary.firstPayment) }}</p>
+            <p class="text-caption text-n600">חודש 1</p>
+          </div>
+          <div class="rounded-md bg-n50 p-3">
+            <p class="text-caption font-semibold text-n600">{{ titles.max }}</p>
+            <p class="ltr mt-1 text-h3 text-n900">{{ formatShekels(ok.summary.maxPayment) }}</p>
+            <p class="text-caption text-n600">{{ whenText(ok.summary.maxMonth) }}</p>
+          </div>
+          <div class="rounded-md bg-n50 p-3">
+            <p class="text-caption font-semibold text-n600">{{ titles.total }}</p>
+            <p class="ltr mt-1 text-h3 text-n900">{{ formatShekels(ok.summary.totalPaid) }}</p>
+            <p class="text-caption text-n600">לאורך {{ yearsText(ok.summary.months) }}, בשקלים שעל הנייר</p>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <template v-if="ok && chart">
+      <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
+        <li v-for="(r, i) in rows" :key="r.key" class="flex items-center gap-2">
+          <span class="inline-block h-3 w-3 rounded-sm border border-n300" :style="{ background: COLOURS[i] }"></span>{{ trackName(i) }}
+        </li>
+        <li class="flex items-center gap-2"><span class="inline-block h-4 w-0 border-s-2 border-dashed border-navy"></span>החודש של התשלום הגבוה ביותר</li>
+      </ul>
+      <figure class="mt-2">
+        <figcaption class="text-caption font-semibold text-n600">התשלום של התמהיל בכל חודש, לפי מסלולים</figcaption>
+        <svg :viewBox="`0 0 ${W} ${H}`" class="mt-1 w-full" role="img" :aria-label="`גרף: התשלום החודשי של התמהיל, ${rows.length} מסלולים זה על גבי זה, לאורך ${yearsText(months)}`">
+          <path v-for="(d, k) in chart.areas" :key="rows[k].key" :d="d" :fill="COLOURS[k]" stroke="var(--mogi-n0)" stroke-width="0.75" vector-effect="non-scaling-stroke" />
+          <line :x1="PAD.side" :x2="W - PAD.side" :y1="chart.base" :y2="chart.base" stroke="var(--mogi-n300)" stroke-width="1" />
+          <line :x1="chart.maxX" :x2="chart.maxX" :y1="PAD.top" :y2="H - PAD.bottom" stroke="var(--mogi-navy)" stroke-width="1.5" stroke-dasharray="5 4" />
+        </svg>
+        <div class="relative h-4 text-caption text-n600" aria-hidden="true">
+          <span v-for="t in ticks" :key="t" class="absolute -translate-x-1/2" :style="{ left: `${(x(t * 12) / W) * 100}%` }">{{ t }}</span>
+        </div>
+        <p class="mt-1 text-center text-caption text-n600">המספרים מתחת לגרף: שנים מתחילת ההלוואה (מימין לשמאל). כשמסלול נגמר, השכבה שלו נעלמת.</p>
+      </figure>
+
+      <h3 class="mt-4 text-body-m font-semibold text-n900">החשיפה: איך ההלוואה מתחלקת</h3>
+      <ul class="list-reset mt-2 space-y-2">
+        <li v-for="e in exposureRows" :key="e.label">
+          <div class="flex flex-wrap justify-between gap-x-3 text-body-m text-n800">
+            <span>{{ e.label }}</span>
+            <span><span class="ltr font-semibold">{{ pct(e.share) }}</span> · <span class="ltr">{{ formatWholeShekels(e.amount) }}</span></span>
+          </div>
+          <div class="mt-1 h-2 rounded-pill bg-n100" aria-hidden="true">
+            <div class="h-2 rounded-pill bg-teal-deep" :style="{ width: `${Math.min(e.share.toNumber(), 100)}%` }"></div>
+          </div>
+        </li>
+      </ul>
+      <p class="mt-2 text-caption text-n600">מסלול יכול להיספר בשתי שורות: קבועה צמודה, למשל, גם צמודה למדד וגם באחוז ריבית קבוע לכל התקופה.</p>
+
+      <button type="button" class="mt-2 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+        {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
+      </button>
+      <div v-if="showTable" class="mt-2 max-h-80 overflow-auto">
+        <table class="w-full border-collapse text-caption sm:text-body-m">
+          <thead class="sticky top-0 bg-n0">
+            <tr class="border-b border-n200 text-caption text-n600">
+              <th class="py-2 pe-2 text-start">שנה</th>
+              <th class="py-2 pe-2 text-start">התמהיל</th>
+              <th v-for="(r, i) in rows" :key="r.key" class="py-2 pe-2 text-start">מסלול {{ i + 1 }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="y in yearRows" :key="y.year" class="border-b border-n100">
+              <td class="py-1 pe-2">{{ y.year }}</td>
+              <td class="py-1 pe-2 font-semibold"><span class="ltr">{{ formatShekels(y.total) }}</span></td>
+              <td v-for="(p, i) in y.byTrack" :key="rows[i].key" class="py-1 pe-2"><span class="ltr">{{ formatShekels(p) }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="mt-1 text-caption text-n600">התשלום בחודש האחרון של כל שנה: של התמהיל, ושל כל מסלול. אפס — המסלול כבר נגמר.</p>
+      </div>
+    </template>
+  </div>
+</template>

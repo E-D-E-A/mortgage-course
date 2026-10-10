@@ -5,17 +5,26 @@ import {
   annuityPayment,
   annuitySchedule,
   annuityStatement,
+  annuitySteps,
   blockPath,
+  discountSum,
+  firstMonthBelow,
   equalPrincipalSchedule,
   equalPrincipalStatement,
   indexPath,
   monthInterest,
   monthlyIndexFactor,
+  monthlyDiscountFactor,
   monthlyRate,
   monthsToNextUpdate,
   nextUpdateMonth,
   pathSchedule,
+  paymentTrial,
+  paymentsValueToday,
   primeTrackRate,
+  principalOvertakesInterest,
+  remainingBalance,
+  statementBalance,
   updateMonths,
   yearlySummary,
 } from "./amortization.ts";
@@ -169,5 +178,105 @@ describe("prime and reset points", () => {
   it("refuses a term of zero months", () => {
     expect(() => annuityPayment("1000", "5", 0)).toThrow(RangeError);
     expect(() => annuityBalance("1000", "5", 12, 13)).toThrow(RangeError);
+  });
+});
+
+describe("stage 3: where the level payment comes from", () => {
+  it("sums the discount factors by hand: two months at 1% a month", () => {
+    // 1 ÷ 1.01 = 0.990099…, 1 ÷ 1.0201 = 0.980296…; together 1.970395…
+    expect(monthlyDiscountFactor("12", 1).toFixed(8)).toBe("0.99009901");
+    expect(monthlyDiscountFactor("12", 2).toFixed(8)).toBe("0.98029605");
+    expect(discountSum("12", 2).toFixed(8)).toBe("1.97039506");
+    close(discountSum("12", 2), monthlyDiscountFactor("12", 1).plus(monthlyDiscountFactor("12", 2)), 30);
+  });
+
+  it("agrees with the long sum over 240 months, and is n at a rate of zero", () => {
+    let s = new Decimal(0);
+    for (let k = 1; k <= 240; k++) s = s.plus(monthlyDiscountFactor("4.8", k));
+    close(discountSum("4.8", 240), s, 15);
+    expect(discountSum("0", 36).toString()).toBe("36");
+  });
+
+  it("finds the payment as the loan divided by S (2,000 ₪, 1% a month, two months: 1,015.02)", () => {
+    expect(moneyString(new Decimal(2000).div(discountSum("12", 2)))).toBe("1015.02");
+    expect(moneyString(annuityPayment("2000", "12", 2))).toBe("1015.02");
+    // Lesson 2.9's three-month loan: 60,000 ₪ at 6% → 20,200.33.
+    expect(moneyString(annuityPayment("60000", "6", 3))).toBe("20200.33");
+  });
+
+  it("gives back the loan as the value today of its payments", () => {
+    close(paymentsValueToday(annuityPayment("600000", "4.8", 240), "4.8", 240), 600000, 15);
+    expect(moneyString(paymentsValueToday("1000", "0", 12))).toBe("12000.00");
+  });
+});
+
+describe("stage 3: trying a payment", () => {
+  it("leaves a debt when the payment is too small and overpays when it is too large", () => {
+    const close2 = (pay: string) => paymentTrial("2000", "12", pay, 2).map((r) => r.closing.toFixed(2));
+    expect(close2("1000")).toEqual(["1020.00", "30.20"]);
+    expect(close2("1020")).toEqual(["1000.00", "-10.00"]);
+    expect(close2("1015")).toEqual(["1005.00", "0.05"]);
+    // The rounded level payment leaves one agora: the last payment of a statement clears it.
+    expect(close2("1015.02")).toEqual(["1004.98", "0.01"]);
+  });
+
+  it("rounds each month's interest to the agora, like a statement", () => {
+    const rows = paymentTrial("60000", "6", "20200.33", 3);
+    expect(rows.map((r) => r.interest.toFixed(2))).toEqual(["300.00", "200.50", "100.50"]);
+    expect(rows[2].closing.toFixed(2)).toBe("0.01");
+  });
+});
+
+describe("stage 3: the balance at any month", () => {
+  it("is the value today of the payments still to come, the same as rolling the debt forward", () => {
+    for (const k of [0, 1, 60, 120, 239, 240]) close(remainingBalance("600000", "4.8", 240, k), annuityBalance("600000", "4.8", 240, k), 12);
+    expect(remainingBalance("600000", "4.8", 240, 240).toString()).toBe("0");
+    expect(moneyString(remainingBalance("60000", "6", 3, 1))).toBe("40099.67");
+  });
+
+  it("differs from the statement's balance only by rounding", () => {
+    expect(statementBalance("60000", "6", 3, 0).toFixed(2)).toBe("60000.00");
+    expect(statementBalance("60000", "6", 3, 1).toFixed(2)).toBe("40099.67");
+    expect(statementBalance("60000", "6", 3, 3).toFixed(2)).toBe("0.00");
+    for (const k of [12, 60, 120, 200]) {
+      const gap = statementBalance("600000", "4.8", 240, k).minus(remainingBalance("600000", "4.8", 240, k)).abs();
+      expect(gap.lt(3)).toBe(true);
+    }
+  });
+
+  it("finds the month the principal part first passes the interest part", () => {
+    // 600,000 ₪ at 4.8% for 20 years: (C − P × m) × 1.004^(k − 1) > C ÷ 2 first at k = 68.
+    expect(principalOvertakesInterest("600000", "4.8", 240)).toBe(68);
+    expect(principalOvertakesInterest("60000", "6", 3)).toBe(1);
+  });
+
+  it("refuses a month outside the loan", () => {
+    expect(() => remainingBalance("1000", "5", 12, 13)).toThrow(RangeError);
+    expect(() => statementBalance("1000", "5", 12, -1)).toThrow(RangeError);
+  });
+});
+
+describe("stage 3: the formula step by step", () => {
+  it("builds 2,000 ₪ at 1% a month for two months", () => {
+    const s = annuitySteps("2000", "12", 2);
+    expect(s.m.toString()).toBe("0.01");
+    expect(s.growth.toString()).toBe("1.0201");
+    expect(s.discount.toFixed(8)).toBe("0.98029605");
+    expect(s.oneMinus.toFixed(8)).toBe("0.01970395");
+    expect(s.top.toString()).toBe("20");
+    expect(moneyString(s.payment)).toBe("1015.02");
+    close(s.payment, annuityPayment("2000", "12", 2), 25);
+  });
+});
+
+describe("stage 3: when the balance falls below a level", () => {
+  it("finds the first month the balance is below half the loan", () => {
+    const k = firstMonthBelow("600000", "4.8", 240, "300000");
+    expect(k).not.toBeNull();
+    const rows = annuityStatement("600000", "4.8", 240);
+    expect(rows[(k as number) - 1].closing.lt(300000)).toBe(true);
+    expect(rows[(k as number) - 2].closing.gte(300000)).toBe(true);
+    expect(k).toBeGreaterThan(120);
+    expect(firstMonthBelow("600000", "4.8", 240, "0")).toBeNull();
   });
 });

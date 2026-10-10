@@ -1,0 +1,494 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "3.1"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import PaymentFinder from "../../components/PaymentFinder.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("3.1");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+{/* A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004". */}
+export const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+export const t1000 = f.rows("explain.try_1000");
+export const t1020 = f.rows("explain.try_1020");
+export const t1015 = f.rows("explain.try_1015");
+export const tPay = f.rows("explain.try_pay");
+export const tUp = f.rows("explain.try_up");
+export const st = f.raw("explain.steps");
+export const lg = f.raw("long.steps");
+export const wk = f.raw("worked.steps");
+export const x4 = f.raw("ex4.steps");
+export const x5 = f.raw("ex5.steps");
+export const predictionOptions = [f.whole("pred.half"), f.whole("pred.half_plus"), f.whole("explain.pay"), f.whole("pred.first_equal")];
+
+בשיעור 2.9 ראינו ש<Term t="שפיצר" lesson="3.1">שפיצר</Term> היא שיטת החזר שבה משלמים אותו סכום בכל חודש, ובדקנו ש־{f.shekels("three.pay")} בחודש מביאים הלוואה של 60,000 ₪ לאפס בשלושה חודשים. אבל לא ראינו מאיפה המספר הזה בא.
+בשיעור 2.2 מצאנו תשלום שווה בעזרת <Term t="ערך נוכחי" lesson="3.1">ערך נוכחי</Term>, מקדם אחר מקדם. בשיעור הזה נמצא את התשלום פעמיים: קודם בניסיונות, ואחר כך בדרך שלא צריך בה לנחש. בסוף נבנה נוסחה אחת, שעובדת גם ל־240 תשלומים.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="3.1"
+  question="לקחתם 2,000 ₪ לחודשיים, ב־12% לשנה — 1% לחודש. בכל אחד משני החודשים תשלמו אותו סכום, ואחרי התשלום השני החוב צריך להיות אפס. כמה תשלמו בכל חודש, בשקלים שלמים?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מהניחוש לנוסחה
+
+</Section>
+
+<LessonVideo lesson="3-1" />
+
+<Section kind="ההסבר">
+
+## לנחש, לבדוק, לתקן
+
+</Section>
+
+הסכום שמשלמים על הלוואה בכל חודש נקרא <Term t="החזר חודשי" lesson="3.1">החזר חודשי</Term>. בשפיצר ההחזר החודשי שווה בכל חודש. השאלה של השיעור: איך מוצאים אותו.
+
+נתחיל מההלוואה של שאלת החיזוי: {f.shekels("explain.loan")}, ב־12% לשנה, לחודשיים. הריבית החודשית: <M>12% ÷ 12 = {f.plain("explain.monthly")}%</M> (שיעור 0.4). הלוואה של חודשיים היא לא משכנתא; היא רק מאפשרת לחשב בראש.
+בכל חודש קורים שני דברים, כמו בשיעור 2.9: הריבית של החודש מצטרפת ל<Term t="יתרה" lesson="3.1">יתרה</Term>, והתשלום יורד ממנה. ננחש תשלום, ונבדוק מה נשאר אחרי החודש השני.
+
+**ניסיון 1: 1,000 ₪ — חצי מהחוב.**
+- חודש 1. הריבית: <M>1% × {nv(t1000[0].opening)} = {nv(t1000[0].interest)}</M> ₪. היתרה: <M>{nv(t1000[0].opening)} + {nv(t1000[0].interest)} − 1,000 = {nv(t1000[0].closing)}</M> ₪.
+- חודש 2. הריבית: <M>1% × {nv(t1000[1].opening)} = {nv(t1000[1].interest)}</M> ₪. היתרה: <M>{nv(t1000[1].opening)} + {nv(t1000[1].interest)} − 1,000 = {nv(t1000[1].closing)}</M> ₪.
+
+נשאר חוב של {nv(t1000[1].closing)} ₪. התשלום קטן מדי: שני תשלומים של 1,000 ₪ מחזירים את הקרן, ולא נשאר בהם כלום לריבית.
+
+**ניסיון 2: 1,020 ₪ — חצי מהקרן, ועוד ריבית של חודש על כל ההלוואה.**
+- חודש 1. היתרה: <M>{nv(t1020[0].opening)} + {nv(t1020[0].interest)} − 1,020 = {nv(t1020[0].closing)}</M> ₪.
+- חודש 2. הריבית: {nv(t1020[1].interest)} ₪. היתרה: <M>{nv(t1020[1].opening)} + {nv(t1020[1].interest)} − 1,020 = {nv(t1020[1].closing)}</M> ₪.
+
+היתרה ירדה מתחת לאפס: שילמתם {f.shekels("explain.over_1020")} יותר מדי. התשלום גדול מדי, כי בחודש השני הריבית כבר קטנה — היא מחושבת על מה שנשאר.
+
+**ניסיון 3: באמצע — 1,015 ₪.**
+- חודש 1. היתרה: <M>{nv(t1015[0].opening)} + {nv(t1015[0].interest)} − 1,015 = {nv(t1015[0].closing)}</M> ₪.
+- חודש 2. הריבית: <M>1% × {nv(t1015[1].opening)} = {nv(t1015[1].interest)}</M> ₪. היתרה: <M>{nv(t1015[1].opening)} + {nv(t1015[1].interest)} − 1,015 = {nv(t1015[1].closing)}</M> ₪.
+
+נשארו {nv(t1015[1].closing)} ₪ — חמש אגורות. כמעט.
+
+**ועוד צעד, באגורות.** בתשלום של {nv(tPay[0].payment)} ₪ נשארת בסוף אגורה אחת ({nv(tPay[1].closing)} ₪). בתשלום של {nv(tUp[0].payment)} ₪ משלמים אגורה יותר מדי. אף תשלום שלם באגורות לא מגיע לאפס בדיוק, כי התשלום המדויק נמצא בין השניים. מעגלים אותו לאגורה, {f.shekels("explain.pay")}, ואת האגורה שנשארת סוגר התשלום האחרון: {f.shekels("explain.last_pay")}.
+
+הניסיונות עובדים, אבל הם ניחוש. בהלוואה של 240 חודשים כל ניסיון הוא 240 שורות חישוב. צריך דרך שמוצאת את התשלום בבת אחת.
+
+<Section kind="ההסבר">
+
+## בלי לנחש: ערך נוכחי
+
+</Section>
+
+בשיעור 0.6 ראינו: **סכום ההלוואה הוא הערך הנוכחי של התשלומים שלה, בריבית של ההלוואה.** נכתוב את זה להלוואה שלנו. את התשלום, שעוד לא ידוע, נסמן ב־C (כמו בשיעור 0.6):
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>2,000 = C ÷ 1.01 + C ÷ 1.01<sup>2</sup></M>
+</div>
+
+התשלום הראשון מגיע אחרי חודש, ולכן מהוונים אותו פעם אחת: מחלקים ב־1.01. השני מגיע אחרי חודשיים: מחלקים ב־1.01 פעמיים.
+בשני החלקים יש אותו C, ולכן אפשר להוציא אותו מחוץ לסוגריים:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>2,000 = C × (1 ÷ 1.01 + 1 ÷ 1.01<sup>2</sup>)</M>
+</div>
+
+בסוגריים נמצא סכום מקדמי ההיוון, S, של שיעור 2.2: כמה שווים היום שני תשלומים של שקל אחד.
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1 ÷ 1.01 = {dec(f.raw("explain.f1"))}</M>
+  <M>1 ÷ 1.01<sup>2</sup> = {dec(f.raw("explain.f2"))}</M>
+  <M>S = {dec(f.raw("explain.f1"))} + {dec(f.raw("explain.f2"))} = {dec(f.raw("explain.S"))}</M>
+  <M>C = 2,000 ÷ {dec(f.raw("explain.S"))} = {n("explain.pay")}</M>
+</div>
+
+יצא {f.shekels("explain.pay")} — אותו תשלום שמצאנו בניסיונות, בלי לנחש.
+
+**למה זה עובד?** המלווה נותן היום 2,000 ₪, ומקבל בחזרה שני תשלומים. כשהערך הנוכחי שלהם, ב־1% לחודש, שווה בדיוק 2,000 ₪, המלווה קיבל בדיוק את הריבית שסוכמה, לא פחות ולא יותר. וזה בדיוק המצב שבו החוב מגיע לאפס בסוף. תשלום קטן יותר משאיר חוב; תשלום גדול יותר מחזיר יותר מדי.
+
+**אותה דרך, שלושה חודשים.** ההלוואה של שיעור 2.9: 60,000 ₪, ב־6% לשנה — <M>6% ÷ 12 = {f.plain("three.monthly")}%</M> לחודש, כלומר מחלקים ב־1.005:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S = {dec(f.raw("three.f1"))} + {dec(f.raw("three.f2"))} + {dec(f.raw("three.f3"))}</M>
+  <M>S = {dec(f.raw("three.S"))}</M>
+  <M>C = 60,000 ÷ {dec(f.raw("three.S"))} = {n("three.pay")}</M>
+</div>
+
+זה ה־{f.shekels("three.pay")} של שיעור 2.9.
+
+**ומה עם 240 תשלומים?** במשכנתא של 20 שנה, S הוא סכום של 240 מקדמים. בהלוואה של שיעור 2.9 — 600,000 ₪ ב־4.8% לשנה — הסכום הזה הוא {dec(f.raw("long.S"))}, והתשלום: <M>600,000 ÷ {dec(f.raw("long.S"))} = {n("long.pay")}</M> ₪. לחבר 240 מקדמים אפשר בגיליון, אבל יש קיצור: נוסחה ל־S. נבנה אותה בחלק ״מהדוגמה לנוסחה״.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מצאו את ההחזר שמאפס את החוב
+
+</Section>
+
+בחרו הלוואה, והזיזו את התשלום. אותו תשלום בכל חודש; המחשבון של הקורס מחשב את הריבית של כל חודש (מעוגלת לאגורה, כמו בלוח של בנק), ומראה מה נשאר אחרי התשלום האחרון. בגרף: היתרה בסוף כל חודש, והקו המקווקו הוא אפס. הכפתורים מזיזים את התשלום בשקל או באגורה.
+
+<PaymentFinder
+  client:visible
+  loans={[
+    { label: "2,000 ₪, חודשיים", principal: "2000", rate: "12", months: 2 },
+    { label: "60,000 ₪, שלושה חודשים", principal: "60000", rate: "6", months: 3 },
+    { label: "600,000 ₪, 20 שנה", principal: "600000", rate: "4.8", months: 240 },
+  ]}
+/>
+
+נסו את שלושת אלה:
+1. בהלוואה הראשונה, מצאו את התשלום, עד האגורה, שמשאיר את החוב הקטן ביותר. מה נשאר בסוף בתשלום של 1,015.02 ₪? ומה בתשלום של 1,015.03 ₪?
+2. עברו להלוואה של 20 שנה. נסו 3,500 ₪ ו־4,000 ₪ בחודש: מה נשאר בסוף בכל אחד? אחר כך מצאו את התשלום.
+3. באותה הלוואה, הזיזו את התשלום באגורה אחת: מ־3,893.74 ₪ ל־3,893.75 ₪. בכמה זז מה שנשאר בסוף? למה הרבה יותר מאגורה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>בתשלום של {nv(tPay[0].payment)} ₪ נשארת אגורה אחת, {nv(tPay[1].closing)} ₪. בתשלום של {nv(tUp[0].payment)} ₪ משלמים אגורה יותר מדי. הקרוב ביותר לאפס, מלמטה: {f.shekels("explain.pay")}.</li>
+    <li>בתשלום של 3,500 ₪ נשאר חוב של {f.shekels("long.try_3500")}. בתשלום של 4,000 ₪ שילמתם {f.shekels("long.over_4000")} יותר מדי. התשלום: {f.shekels("long.pay")}, ואחריו נשארים {f.shekels("long.try_pay")} — העיגול, שהתשלום האחרון סוגר.</li>
+    <li>מה שנשאר זז ב־{f.shekels("long.agora_effect")}: מ־{f.shekels("long.try_pay")} חוב ליתרה מתחת לאפס. האגורה הנוספת משולמת 240 פעמים, וכל אחת מהן מקטינה את החוב מוקדם יותר, ולכן גם חוסכת ריבית. בהלוואה ארוכה, עיגול קטן בתשלום מצטבר לשקלים בסוף.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="3.1"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `שני תשלומים של ${f.whole("pred.half")} מחזירים את הקרן ולא משאירים כלום לריבית. נשאר חוב של ${nv(t1000[1].closing)} ₪.`,
+    `${f.whole("pred.half_plus")} הם חצי מהקרן ועוד 1% מהחצי. אבל בחודש הראשון הריבית היא 1% מכל ${f.shekels("explain.loan")}, ולכן זה עדיין קצת מדי.`,
+    "",
+    `${f.whole("pred.first_equal")} מכסה ריבית של חודש על כל ההלוואה, פעמיים. אבל בחודש השני היתרה כבר קטנה, וגם הריבית עליה. שילמתם ${f.shekels("explain.over_1020")} יותר מדי.`,
+  ]}
+>
+  {f.shekels("explain.pay")} בכל חודש: <M>2,000 ÷ {dec(f.raw("explain.S"))} = {n("explain.pay")}</M>. התשלום הזה הוא התשלום שהערך הנוכחי שלו, פעמיים, ב־1% לחודש, שווה בדיוק 2,000 ₪.
+</PredictionReveal>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## נוסחה ל־S, ואז לתשלום
+
+</Section>
+
+**צעד 1 — התשלום הוא הקרן חלקי S.** זו הנוסחה מ־2.2, <M>C = P ÷ S</M>, כש־S הוא סכום מקדמי ההיוון של n התשלומים בריבית לתקופה r. בהחזר חודשי התקופה היא חודש, ו־r הוא הריבית החודשית: אחוז הריבית לשנה חלקי 12 (בשיעור 0.4 קראנו לה m). כל מה שחסר הוא דרך קצרה לחשב את S.
+
+**צעד 2 — כופלים את S ב־(1 + r).** נראה את זה על שני החודשים, ב־1% לחודש:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S = 1 ÷ 1.01 + 1 ÷ 1.01<sup>2</sup></M>
+  <M>S × 1.01 = 1 + 1 ÷ 1.01</M>
+</div>
+
+כל מקדם זז צעד אחד אחורה: <M>1 ÷ 1.01 × 1.01 = 1</M>, ו־<M>1 ÷ 1.01<sup>2</sup> × 1.01 = 1 ÷ 1.01</M>.
+
+**צעד 3 — מחסירים את השורה הראשונה מהשנייה.** המקדם <M>1 ÷ 1.01</M> מופיע בשתיהן, ונעלם:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S × 1.01 − S = 1 − 1 ÷ 1.01<sup>2</sup></M>
+</div>
+
+בצד שמאל: <M>S × 1.01 − S</M> הוא <M>S × 0.01</M> — S כפול הריבית. ובמספרים:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S × 0.01 = 1 − {dec(st.discount)} = {dec(st.one_minus)}</M>
+  <M>S = {dec(st.one_minus)} ÷ 0.01</M>
+</div>
+
+כלומר S הוא {dec(f.raw("explain.S6"))} (בעיגול לשש ספרות) — אותו S שקיבלנו מהחיבור.
+
+**צעד 4 — אותו דבר לכל מספר תשלומים.** עם n מקדמים קורה בדיוק אותו דבר: כופלים ב־<M>(1 + r)</M>, כל מקדם זז צעד, ומכל השורה נשארים רק 1 בהתחלה ו־<M>1 ÷ (1 + r)<sup>n</sup></M> בסוף. כל המקדמים שבאמצע מופיעים בשתי השורות ונעלמים:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>S × r = 1 − 1 ÷ (1 + r)<sup>n</sup></M>
+  <M>S = (1 − 1 ÷ (1 + r)<sup>n</sup>) ÷ r</M>
+</div>
+
+**צעד 5 — כתיב קצר: חזקה עם מינוס.** את <M>1 ÷ (1 + r)<sup>n</sup></M> כותבים בקיצור <M>(1 + r)<sup>−n</sup></M>. המינוס בחזקה פירושו ״אחד חלקי״: <M>1.01<sup>−2</sup> = 1 ÷ 1.01<sup>2</sup> = {dec(st.discount)}</M>. כך כותבים את זה גם במחשבון ובגיליון.
+
+**צעד 6 — מציבים ב־C = P ÷ S.** לחלק ב־S פירושו לכפול ב־r ולחלק ב־<M>(1 − (1 + r)<sup>−n</sup>)</M>:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-body-l text-navy sm:text-h3" dir="ltr">
+    <span class="whitespace-nowrap">C = P × r</span>
+    <span class="whitespace-nowrap ps-8">÷ (1 − (1 + r)<sup>−n</sup>)</span>
+  </div>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">C</dt><dd>ההחזר החודשי: התשלום השווה, בשקלים (C כמו בשיעור 0.6)</dd>
+    <dt class="ltr font-semibold text-n900">P</dt><dd>סכום ההלוואה — הקרן — בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית לתקופה אחת, כמספר עשרוני. בהחזר חודשי: אחוז הריבית לשנה חלקי 12, חלקי 100 (ה־m של שיעור 0.4). ‏4.8% לשנה הם 0.4% לחודש, כלומר 0.004</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר התשלומים. במשכנתא: מספר החודשים, שנים כפול 12</dd>
+    <dt class="ltr font-semibold text-n900">(1 + r)<sup>−n</sup></dt><dd>אחד חלקי <span class="ltr">(1 + r)</span> בחזקת n: כמה שווה היום שקל שמגיע בסוף התקופה ה־n</dd>
+  </dl>
+</div>
+
+**בדיקה על הדוגמאות.** חודשיים: <M>2,000 × 0.01 = {nv(st.top)}</M>, ו־<M>{nv(st.top)} ÷ {dec(st.one_minus)} = {nv(st.payment)}</M>. ובהלוואה של 20 שנה, עם <M>r = {dec(lg.m)}</M> ו־<M>n = 240</M>:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>1.004<sup>240</sup> = {dec(lg.growth)}</M>
+  <M>1.004<sup>−240</sup> = {dec(lg.discount)}</M>
+  <M>1 − {dec(lg.discount)} = {dec(lg.one_minus)}</M>
+  <M>600,000 × 0.004 = {nv(lg.top)}</M>
+  <M>{nv(lg.top)} ÷ {dec(lg.one_minus)} = {nv(lg.payment)}</M>
+</div>
+
+שימו לב ל־<M>P × r</M>: זו הריבית של החודש הראשון. הנוסחה אומרת שההחזר החודשי הוא הריבית של החודש הראשון, חלקי מספר שקטן מ־1 — ולכן הוא תמיד גדול ממנה.
+
+**מתי הנוסחה נכונה?**
+1. אחוז הריבית זהה בכל n התשלומים. כשהוא זז, מחשבים מחדש על היתרה ועל החודשים שנשארו (שיעור 3.6).
+2. התשלומים שווים, וכל אחד בסוף חודש. אין חודשים בהתחלה בלי החזר של קרן (גרייס; שיעור 3.4).
+3. אין הצמדה. בחוב צמוד היתרה והתשלום זזים עם המדד (שיעור 3.5).
+4. r ו־n מדברים על אותה תקופה: ריבית חודשית ומספר חודשים.
+5. r גדול מאפס. בריבית אפס אין מה לחלק: התשלום הוא <M>P ÷ n</M>.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון</strong> (עם מקש חזקה, <span class="ltr">x<sup>y</sup></span>): קודם <span class="ltr">1 + r</span>; אחר כך בחזקת n; אחד חלקי התוצאה; אחד פחות זה; ובסוף <span class="ltr">P × r</span> חלקי מה שיצא. השאירו שמונה ספרות אחרי הנקודה בכל צעד, ועגלו רק את התשלום.</p>
+<p><strong>בגיליון אלקטרוני</strong> (Google Sheets או Excel): את הנוסחה עצמה, <span class="ltr inline-block whitespace-nowrap">{"=600000*0.004/(1-(1+0.004)^-240)"}</span>, או הפונקציה המובנית <span class="ltr inline-block whitespace-nowrap">{"=PMT(4.8%/12,240,-600000)"}</span>. שתיהן נותנות {f.shekels("long.pay")}. המינוס לפני סכום ההלוואה ב־PMT הופך את התשובה לחיובית.</p>
+<p><strong>ביד:</strong> בשניים־שלושה תשלומים — מקדם אחר מקדם, כמו בהסבר. ליותר — מחשבון או גיליון.</p>
+</Callout>
+
+<Callout title="למה התשלום האחרון שונה באגורות">
+<p>הנוסחה נותנת תשלום עם הרבה ספרות אחרי הנקודה. בלוח סילוקין מעגלים אותו לאגורה פעם אחת, ומעגלים לאגורה גם את הריבית של כל חודש. העיגולים הקטנים מצטברים, ולכן התשלום האחרון סוגר את מה שנשאר: בהלוואה של חודשיים {f.shekels("explain.last_pay")} במקום {f.shekels("explain.pay")}; בהלוואה של 20 שנה {f.shekels("long.last_pay")} במקום {f.shekels("long.pay")}. זו הנחת החישוב של הקורס; בנק יכול לסגור את העיגול בדרך אחרת. בתרגילים, תשובה שרחוקה באגורות מתקבלת.</p>
+</Callout>
+
+<Section kind="כלי לראש">
+
+## בדיקה מהירה: בין שני גבולות
+
+</Section>
+
+לפני שסומכים על תשלום שחישבתם, בדקו שהוא בין שני מספרים שקל לחשב בראש (בהלוואה של יותר מתשלום אחד, בריבית גדולה מאפס):
+- **הוא גדול מ־<M>P ÷ n</M>,** כי חוץ מהקרן צריך לשלם גם ריבית. **והוא גדול מ־<M>P × r</M>,** הריבית של החודש הראשון; אחרת החוב לא היה יורד.
+- **הוא קטן מ־<M>P ÷ n + P × r</M>,** התשלום הראשון בקרן שווה (שיעור 2.9).
+
+בהלוואה של 20 שנה: <M>600,000 ÷ 240 = {n("bound.part")}</M> ו־<M>600,000 × 0.4% = {n("bound.interest")}</M>, ולכן התשלום בין {f.shekels("bound.part")} ל־<M>{n("bound.part")} + {n("bound.interest")} = {n("bound.upper")}</M> ₪. ואכן: {f.shekels("long.pay")}.
+זו בדיקה, לא קירוב: הטווח רחב. היא תופסת את הטעויות הגסות — ריבית שנתית במקום חודשית, או שנים במקום חודשים.
+
+<Section kind="דוגמה פתורה">
+
+## כמה ההחזר החודשי במסלול?
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>רון ומאיה הם דוגמה בדויה: תרגיל נפרד, לא התיק של נועם ושירה. הסכום ואחוז הריבית להמחשה בלבד; הם לא הצעת בנק ולא נתוני שוק.</p>
+</Callout>
+
+רון ומאיה קיבלו הצעה למסלול של 450,000 ₪, ב־5.1% לשנה, ל־25 שנה, בשפיצר. ההצעה לא מראה את ההחזר החודשי. כמה הוא?
+
+**צעד 1 — r ו־n.** <M>5.1% ÷ 12 = {f.plain("worked.monthly")}%</M> לחודש, כלומר <M>r = {dec(wk.m)}</M>. מספר התשלומים: <M>25 × 12 = {f.plain("worked.months")}</M>.
+
+**צעד 2 — החזקה.** <M>1.00425<sup>300</sup> = {dec(wk.growth)}</M>.
+
+**צעד 3 — אחד חלקי החזקה.** <M>1.00425<sup>−300</sup> = 1 ÷ {dec(wk.growth)} = {dec(wk.discount)}</M>.
+
+**צעד 4 — אחד פחות.** <M>1 − {dec(wk.discount)} = {dec(wk.one_minus)}</M>.
+
+**צעד 5 — הריבית של החודש הראשון.** <M>450,000 × {dec(wk.m)} = {nv(wk.top)}</M> ₪.
+
+**צעד 6 — התשלום.** <M>{nv(wk.top)} ÷ {dec(wk.one_minus)} = {nv(wk.payment)}</M> ₪.
+
+**צעד 7 — בדיקה בין הגבולות.** <M>450,000 ÷ 300 = {n("worked.part")}</M>, והגבול העליון: <M>{n("worked.part")} + {n("worked.int_1")} = {n("worked.upper")}</M>. ההחזר, {f.shekels("worked.pay")}, ביניהם. ובחודש הראשון, מתוכו {f.shekels("worked.int_1")} ריבית, ורק <M>{n("worked.pay")} − {n("worked.int_1")} = {n("worked.prin_1")}</M> ₪ מחזירים קרן.
+
+**מה לקחת מזה.** ארבעה מספרים — סכום, אחוז, תקופה ושיטה — קובעים את ההחזר החודשי לגמרי, כל עוד האחוז לא זז ואין הצמדה. אם בהצעה מופיע החזר שונה, יש סיבה: עיגול של אגורות, הצמדה, גרייס, או תנאי אחר. כדאי לשאול מה היא.
+
+<Section kind="דוגמה חצי פתורה">
+
+## בדקו תשלום בערך נוכחי
+
+</Section>
+
+לקחתם 30,000 ₪ ב־4.8% לשנה (0.4% לחודש) לשלושה חודשים. לפי הנוסחה, ההחזר החודשי הוא {f.shekels("half.pay")}. בדקו שהערך הנוכחי של שלושת התשלומים, בריבית של ההלוואה, הוא סכום ההלוואה.
+בכל שורה: מקדם ההיוון של חודש k הוא <M>1 ÷ 1.004<sup>k</sup></M> (שמונה ספרות אחרי הנקודה), ו״שווה היום״ הוא התשלום כפול המקדם, מעוגל לאגורה. החודש הראשון כבר מלא.
+
+<FillTable
+  client:visible
+  id="3.1-half"
+  periodLabel="חודש"
+  columns={[
+    { key: "factor", label: "מקדם היוון", format: "number" },
+    { key: "today", label: "התשלום שווה היום" },
+  ]}
+  rows={f.rows("half.rows")}
+  blanks={["2.factor", "2.today", "3.factor", "3.today", "ביחד.today"]}
+  success={`יצא ${f.shekels("half.total")}: סכום ההלוואה, עד אגורה. האגורה באה מהעיגול של כל שורה. זה מה שהנוסחה מבטיחה: הערך הנוכחי של התשלומים שווה לסכום ההלוואה.`}
+  hint="בדקו: האם חילקתם ב־1.004 פעם אחת בחודש 1, פעמיים בחודש 2 ושלוש פעמים בחודש 3? והאם כפלתם את המקדם בתשלום?"
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים ואחוזי הריבית בתרגילים הם מספרים להמחשה, לא נתוני שוק.
+התרגילים מסודרים מהקל אל המאתגר. אפשר לכתוב את התשובה עם פסיקים או בלעדיהם. מתרגיל 3 צריך מחשבון עם מקש חזקה, או גיליון.
+
+<ChoiceExercise
+  client:visible
+  id="3.1-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "לא: 24 תשלומים של 1,000 ₪ מחזירים רק את הקרן, ולא נשאר בהם כלום לריבית", correct: true, feedback: "נכון. כשיש ריבית, התשלום חייב להיות גדול מהקרן חלקי מספר החודשים. זה הגבול התחתון מ״בדיקה מהירה״." },
+    { text: "כן: 24 כפול 1,000 ₪ הם בדיוק 24,000 ₪, סכום ההלוואה", feedback: "זה היה נכון בלי ריבית. אבל בכל חודש מצטרפת ריבית ליתרה, ו־1,000 ₪ לא מכסים אותה וגם את הקרן." },
+    { text: "כן, אבל רק כשאחוז הריבית נמוך מאוד, למשל אחוז אחד לשנה", feedback: "גם ריבית נמוכה מוסיפה משהו לחוב בכל חודש. תשלום של 1,000 ₪ משאיר בסוף חוב, גם אם קטן." },
+    { text: "אי אפשר לדעת בלי לבנות את לוח הסילוקין המלא, חודש אחר חודש", feedback: "אפשר לדעת בלי הלוח: הקרן לבדה כבר דורשת 1,000 ₪ בחודש, והריבית מוסיפה עליה." },
+  ]}
+>
+  לקחתם 24,000 ₪ ל־24 חודשים, בשפיצר, בריבית שגדולה מאפס. האם ההחזר החודשי יכול להיות 1,000 ₪?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.1-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_zero"), message: "חשבתם על ריבית אחת: 1% מ־2,000 ₪, ושני תשלומים של 1,010 ₪ מכסים אותה. אבל הריבית מחושבת בכל חודש מחדש, על היתרה של אותו חודש — וגם בחודש השני יש ריבית." },
+    { value: f.rows("ex2.table")[0].closing, message: "זו היתרה אחרי החודש הראשון. המשיכו עוד חודש: ריבית על היתרה הזו, ואז התשלום השני." },
+  ]}
+>
+  לקחתם 2,000 ₪ לחודשיים, ב־1% לחודש, ובכל חודש שילמתם 1,010 ₪. כמה חוב נשאר אחרי התשלום השני?
+</NumericExercise>
+
+<Solution for="3.1-2">
+חודש 1: <M>2,000 + {nv(f.rows("ex2.table")[0].interest)} − 1,010 = {nv(f.rows("ex2.table")[0].closing)}</M>. חודש 2: הריבית <M>1% × {nv(f.rows("ex2.table")[1].opening)} = {nv(f.rows("ex2.table")[1].interest)}</M>, והיתרה <M>{nv(f.rows("ex2.table")[1].opening)} + {nv(f.rows("ex2.table")[1].interest)} − 1,010 = {n("ex2.answer")}</M>, כלומר {f.shekels("ex2.answer")}. התשלום קטן מדי.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.1-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_part"), message: "זה חצי מהקרן, בלי ריבית בכלל. כשיש ריבית, ההחזר החודשי גדול מזה." },
+    { value: f.raw("ex3.err_first_equal"), message: "זה חצי מהקרן ועוד ריבית של חודש על כל ההלוואה — התשלום הראשון בקרן שווה. בשפיצר התשלום קטן ממנו, כי בחודש השני הריבית כבר קטנה." },
+    { value: f.raw("ex3.err_half_plus"), message: "זה חצי מהקרן ועוד ריבית על החצי. בחודש הראשון הריבית היא על כל ההלוואה, ולכן זה קטן מדי. מצאו את S: חלקו את 1 ב־1.005 ואת 1 ב־1.005 בריבוע, וחברו." },
+  ]}
+>
+  לקחתם 10,000 ₪ ב־6% לשנה, לחודשיים, בשפיצר. חשבו את ההחזר החודשי בדרך של ערך נוכחי: מצאו את S, וחלקו בו את הקרן.
+</NumericExercise>
+
+<Solution for="3.1-3">
+הריבית החודשית: <M>6% ÷ 12 = {f.plain("ex3.monthly")}%</M>. המקדמים: <M>1 ÷ 1.005 = {dec(f.raw("ex3.f1"))}</M>, <M>1 ÷ 1.005<sup>2</sup> = {dec(f.raw("ex3.f2"))}</M>. ביחד <M>S = {dec(f.raw("ex3.S"))}</M>. ההחזר: <M>10,000 ÷ {dec(f.raw("ex3.S"))} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}. בדיקה: בין {f.shekels("ex3.err_part")} ל־{f.shekels("ex3.err_first_equal")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.1-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.err_annual"), message: `השתמשתם ב־4.2% כאילו זו הריבית לחודש. התשלומים חודשיים, ולכן r הוא 4.2% חלקי 12, חלקי 100: ${eq(dec(x4.m))}.` },
+    { value: f.raw("ex4.err_years"), message: "הצבתם n = 20, מספר השנים. התשלומים חודשיים, ולכן n הוא מספר החודשים: 240." },
+    { value: f.raw("ex4.err_percent"), message: `הצבתם את האחוז החודשי בלי לחלק ב־100. ‏${f.plain("ex4.monthly")}% לחודש הם ${eq(`r = ${dec(x4.m)}`)}.` },
+  ]}
+>
+  לקחתם 300,000 ₪ ב־4.2% לשנה, ל־20 שנה, בשפיצר. חשבו את ההחזר החודשי בנוסחה.
+</NumericExercise>
+
+<Solution for="3.1-4">
+<M>4.2% ÷ 12 = {f.plain("ex4.monthly")}%</M>, כלומר <M>r = {dec(x4.m)}</M>; ו־<M>n = 20 × 12 = {f.plain("ex4.months")}</M>. ‏<M>1.0035<sup>240</sup> = {dec(x4.growth)}</M>; <M>1.0035<sup>−240</sup> = {dec(x4.discount)}</M>; <M>1 − {dec(x4.discount)} = {dec(x4.one_minus)}</M>. ‏<M>300,000 × {dec(x4.m)} = {nv(x4.top)}</M>, ו־<M>{nv(x4.top)} ÷ {dec(x4.one_minus)} = {n("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.1-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_years"), message: "הצבתם n = 15, מספר השנים. בהחזר חודשי n הוא מספר החודשים: 180." },
+    { value: f.raw("ex5.err_annual"), message: `השתמשתם ב־5.4% כאילו זו הריבית לחודש. הריבית החודשית היא 5.4% חלקי 12: ${f.plain("ex5.monthly")}%, כלומר ${eq(dec(x5.m))}.` },
+  ]}
+>
+  בשיעור 2.9, בדוגמה הפתורה, לקחתם את ההחזר בשפיצר של מסלול של 400,000 ₪ ב־5.4% לשנה ל־15 שנה ״מההצעה או ממחשבון״. חשבו אותו עכשיו בעצמכם.
+</NumericExercise>
+
+<Solution for="3.1-5">
+<M>r = 5.4% ÷ 12 = {f.plain("ex5.monthly")}%</M>, כלומר <M>{dec(x5.m)}</M>; <M>n = 15 × 12 = 180</M>. ‏<M>1.0045<sup>180</sup> = {dec(x5.growth)}</M>; <M>1 − 1 ÷ {dec(x5.growth)} = {dec(x5.one_minus)}</M>. ‏<M>400,000 × {dec(x5.m)} = {nv(x5.top)}</M>, ו־<M>{nv(x5.top)} ÷ {dec(x5.one_minus)} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")} — המספר של שיעור 2.9.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.1-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_no_discount"), message: `זה ${eq("4,000 × 300")}: כל התשלומים בשקלים פשוטים. אבל חלק מכל תשלום הולך לריבית. סכום ההלוואה הוא הערך הנוכחי של התשלומים: 4,000 כפול S.` },
+    { value: f.raw("ex6.err_annual"), message: `השתמשתם ב־4.5% כאילו זו הריבית לחודש. הריבית החודשית היא 4.5% חלקי 12: ${f.plain("ex6.monthly")}%, כלומר ${eq(dec(f.raw("ex6.steps").m))}.` },
+  ]}
+>
+  אתם יכולים לשלם 4,000 ₪ בחודש, במשך 25 שנה. אחוז הריבית: 4.5% לשנה, בשפיצר. מאיזה סכום הלוואה ההחזר החודשי יהיה בדיוק 4,000 ₪? (רמז: סכום ההלוואה הוא הערך הנוכחי של התשלומים. החשבון לבדו; לפני שבנק נותן הלוואה הוא בודק עוד דברים, ונגיע אליהם בשלב 4.)
+</NumericExercise>
+
+<Solution for="3.1-6">
+הפעם התשלום ידוע, והקרן חסרה: <M>P = C × S</M>. ‏<M>r = 4.5% ÷ 12 = {f.plain("ex6.monthly")}%</M>, כלומר <M>{dec(f.raw("ex6.steps").m)}</M>; <M>n = 25 × 12 = {f.plain("ex6.months")}</M>. ‏<M>S = (1 − 1.00375<sup>−300</sup>) ÷ 0.00375 = {dec(f.raw("ex6.S"))}</M>. ‏<M>P = 4,000 × {dec(f.raw("ex6.S"))} = {n("ex6.answer")}</M>, כלומר {f.shekels("ex6.answer")}. שימו לב: 300 תשלומים של 4,000 ₪ הם {f.shekels("ex6.err_no_discount")} בשקלים פשוטים; ההפרש הוא הריבית.
+</Solution>
+
+<Callout title="חמש שאלות על החזר השפיצר">
+<p><strong>מה זה?</strong> התשלום השווה שמשלמים בכל חודש, שמביא את החוב לאפס בדיוק בסוף התקופה: <span class="ltr">C = P × r ÷ (1 − (1 + r)<sup>−n</sup>)</span>.</p>
+<p><strong>למה זה קיים?</strong> לווה רוצה לדעת מראש כמה ישלם בכל חודש, ולתכנן לפי סכום אחד. המלווה רוצה לקבל את הקרן ואת הריבית שסוכמה. התשלום השווה הוא התשלום היחיד שעונה על שני הרצונות יחד, כשהאחוז לא זז.</p>
+<p><strong>איך זה עובד?</strong> סכום ההלוואה שווה לערך הנוכחי של כל התשלומים, בריבית של ההלוואה. מכאן <span class="ltr">C = P ÷ S</span>, ו־S, סכום מקדמי ההיוון, מתקצר לנוסחה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ארבעה מספרים — סכום, אחוז, תקופה ושיטה — קובעים את ההחזר. אפשר לבדוק כל החזר שמציעים לכם, ולראות מה קורה לו כשמשנים אחד מהם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מחשבים בעצמכם את ההחזר של כל מסלול, ובודקים שהוא תואם להצעה. ובכיוון ההפוך, כמו בתרגיל 6: מתשלום חודשי שאפשר לעמוד בו מגיעים לסכום שהוא מחזיר — רק מצד החשבון.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **ההחזר החודשי בשפיצר** הוא התשלום השווה שמביא את החוב לאפס בדיוק אחרי התשלום האחרון.
+- **אפשר למצוא אותו בניסיונות:** תשלום קטן מדי משאיר חוב, גדול מדי משלם יותר מדי. בהלוואה ארוכה זה מסורבל.
+- **הדרך בלי ניחוש:** סכום ההלוואה הוא הערך הנוכחי של התשלומים, ולכן <M>C = P ÷ S</M>.
+- **הקיצור ל־S:** כופלים ב־<M>(1 + r)</M> ומחסירים, ומקבלים <M>C = P × r ÷ (1 − (1 + r)<sup>−n</sup>)</M>. בהחזר חודשי r הוא הריבית החודשית, ו־n מספר החודשים.
+- **הנוסחה נכונה** כשהאחוז לא זז, אין הצמדה ואין גרייס. התשלום מעוגל לאגורה, והתשלום האחרון סוגר את העיגול.
+- **בדיקה מהירה:** ההחזר גדול מ־<M>P ÷ n</M> ומ־<M>P × r</M>, וקטן מסכום שניהם.
+
+**בשיעור הבא — 3.2, פירוק תשלום לקרן ולריבית:** איך כל החזר חודשי מתחלק בין הריבית של החודש לבין החזר הקרן, חודש אחר חודש — ובונה לוח הסילוקין של הקורס.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "סכום הלוואה הוא הערך הנוכחי של התשלומים שלה בריבית שלה; סכום של סדרה הנדסית (כפל ב־(1 + r) וחיסור); נוסחת התשלום השווה שנובעת מהם.", code: ["S = (1 − (1 + r)^−n) ÷ r", "C = P × r ÷ (1 − (1 + r)^−n)"] },
+    { kind: "הנחת חישוב", text: "ריבית חודשית = אחוז הריבית לשנה חלקי 12. לפי בדיקה של הצוות מול לוחות ששני בנקים פרסמו (החישוב התאים עד האגורה בכל התאים שנבדקו; Linear ENG-223, 2026-10-04; לא נבדק מול מקור רשמי).", date: "2026-10-04" },
+    { kind: "הנחת חישוב", text: "עיגול: ההחזר החודשי מעוגל לאגורה פעם אחת; הריבית של כל חודש מעוגלת לאגורה; התשלום האחרון סוגר את מה שנשאר, כך שהיתרה מגיעה לאפס בדיוק. בנק יכול לעגל אחרת." },
+    { kind: "הנחת חישוב", text: "כל הסכומים ואחוזי הריבית בשיעור הם מספרים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. רון ומאיה הם דוגמה בדויה." },
+    { kind: "החלטה של Mogi", text: "ההחזר שמוצג ללקוח מחושב לפי שיטת ההחזר של כל מסלול, ובשפיצר כשזו השיטה. אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08 (Brain, דף 67436545). המימוש במנוע של Mogi עוד לא הושלם.", date: "2026-10-08" },
+    { kind: "בדיקת חישוב", text: "מודול החישוב של הקורס משחזר עד האגורה את הדוגמאות המחושבות שב־Brain: 700,000 ₪ ב־5.90% ל־20 שנה — 4,974.72 ₪; מיליון ₪ ב־3% ל־25 שנה — 4,742.11 ₪. כל המספרים בשיעור חושבו פעמיים: בנוסחה הקצרה, ובבדיקה עצמאית שמחברת את המקדמים אחד אחד.", date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/amortization.ts (annuityPayment, annuitySteps, discountSum, monthlyDiscountFactor, paymentTrial, paymentsValueToday) via scripts/lessons/lesson-3-1.ts and data/lessons/3-1.json, rechecked by checks/kinds/amortization.py (amort_*). Illustration: src/components/PaymentFinder.vue. Video: video/3-1.html. */}

@@ -1,0 +1,959 @@
+{
+  "lesson": "3.4",
+  "title": "לוחות של קרן שווה, גרייס ובולט",
+  "note": "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; each month's interest rounded to the agora; grace inside the term; the last month takes what is left.",
+  "facts": [
+    {
+      "id": "pred.answer",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "100000",
+        "annual_percent": "6",
+        "months": 60,
+        "period": 60,
+        "field": "payment"
+      },
+      "value": "134885.02"
+    },
+    {
+      "id": "pred.simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "6",
+        "periods": 5
+      },
+      "value": "130000.00"
+    },
+    {
+      "id": "pred.yearly",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "6",
+        "periods": 5
+      },
+      "value": "133822.56"
+    },
+    {
+      "id": "pred.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000.00"
+    },
+    {
+      "id": "pred.exact",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "100000",
+        "rate_percent": "0.5",
+        "periods": 60
+      },
+      "value": "134885.02"
+    },
+    {
+      "id": "loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "600000.00"
+    },
+    {
+      "id": "monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "4.8",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.4"
+    },
+    {
+      "id": "spitzer.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "months": 240
+      },
+      "value": "3893.74"
+    },
+    {
+      "id": "equal.first",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "4900.00"
+    },
+    {
+      "id": "equal.last",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 240,
+        "field": "payment"
+      },
+      "value": "2510.00"
+    },
+    {
+      "id": "equal.part",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 1,
+        "field": "principal"
+      },
+      "value": "2500.00"
+    },
+    {
+      "id": "equal.int_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "equal.int_2",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 2,
+        "field": "interest"
+      },
+      "value": "2390.00"
+    },
+    {
+      "id": "equal.second",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 2,
+        "field": "payment"
+      },
+      "value": "4890.00"
+    },
+    {
+      "id": "partial.grace_pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "partial.close_12",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 12,
+        "field": "closing"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "partial.after",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 13,
+        "field": "payment"
+      },
+      "value": "4016.41"
+    },
+    {
+      "id": "partial.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "months": 228,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00400000",
+        "growth": "2.48477186",
+        "discount": "0.40245143",
+        "one_minus": "0.59754857",
+        "top": "2400.00",
+        "payment": "4016.41"
+      }
+    },
+    {
+      "id": "left_228",
+      "kind": "amort_months_left",
+      "inputs": {
+        "months": 240,
+        "paid": 12
+      },
+      "value": 228
+    },
+    {
+      "id": "full.int_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "full.close_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 1,
+        "field": "closing"
+      },
+      "value": "602400.00"
+    },
+    {
+      "id": "full.int_2",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 2,
+        "field": "interest"
+      },
+      "value": "2409.60"
+    },
+    {
+      "id": "full.close_12",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 12,
+        "field": "closing"
+      },
+      "value": "629442.14"
+    },
+    {
+      "id": "full.formula_12",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "0.4",
+        "periods": 12
+      },
+      "value": "629442.12"
+    },
+    {
+      "id": "full.after",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12,
+        "period": 13,
+        "field": "payment"
+      },
+      "value": "4213.50"
+    },
+    {
+      "id": "full.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "629442.14",
+        "rate_percent": "4.8",
+        "months": 228,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00400000",
+        "growth": "2.48477186",
+        "discount": "0.40245143",
+        "one_minus": "0.59754857",
+        "top": "2517.77",
+        "payment": "4213.50"
+      }
+    },
+    {
+      "id": "full.added",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "full.close_12",
+        "subtrahend": "loan"
+      },
+      "value": "29442.14"
+    },
+    {
+      "id": "bp.pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "bp.last",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 240,
+        "field": "payment"
+      },
+      "value": "602400.00"
+    },
+    {
+      "id": "bf.last",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 240,
+        "field": "payment"
+      },
+      "value": "1564020.10"
+    },
+    {
+      "id": "bf.formula",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "0.4",
+        "periods": 240
+      },
+      "value": "1564020.08"
+    },
+    {
+      "id": "spitzer.paid",
+      "kind": "rep_total_paid",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240
+      },
+      "value": "934499.54"
+    },
+    {
+      "id": "spitzer.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240
+      },
+      "value": "334499.54"
+    },
+    {
+      "id": "equal.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240
+      },
+      "value": "289200.00"
+    },
+    {
+      "id": "partial.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12
+      },
+      "value": "344541.47"
+    },
+    {
+      "id": "full.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "grace_months": 12
+      },
+      "value": "360676.60"
+    },
+    {
+      "id": "bp.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240
+      },
+      "value": "576000.00"
+    },
+    {
+      "id": "bf.interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240
+      },
+      "value": "964020.10"
+    },
+    {
+      "id": "gap.partial",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "partial.interest",
+        "subtrahend": "spitzer.interest"
+      },
+      "value": "10041.93"
+    },
+    {
+      "id": "gap.full",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "full.interest",
+        "subtrahend": "spitzer.interest"
+      },
+      "value": "26177.06"
+    },
+    {
+      "id": "gap.bf",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "bf.interest",
+        "subtrahend": "spitzer.interest"
+      },
+      "value": "629520.56"
+    },
+    {
+      "id": "worked.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "worked.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "5.4",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.45"
+    },
+    {
+      "id": "worked.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 20
+      },
+      "value": 240
+    },
+    {
+      "id": "worked.left",
+      "kind": "amort_months_left",
+      "inputs": {
+        "months": 240,
+        "paid": 6
+      },
+      "value": 234
+    },
+    {
+      "id": "worked.int_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240,
+        "grace_months": 6,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "1800.00"
+    },
+    {
+      "id": "worked.close_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240,
+        "grace_months": 6,
+        "period": 1,
+        "field": "closing"
+      },
+      "value": "401800.00"
+    },
+    {
+      "id": "worked.close_6",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240,
+        "grace_months": 6,
+        "period": 6,
+        "field": "closing"
+      },
+      "value": "410922.24"
+    },
+    {
+      "id": "worked.formula_6",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "0.45",
+        "periods": 6
+      },
+      "value": "410922.23"
+    },
+    {
+      "id": "worked.added",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.close_6",
+        "subtrahend": "worked.loan"
+      },
+      "value": "10922.24"
+    },
+    {
+      "id": "worked.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "410922.24",
+        "rate_percent": "5.4",
+        "months": 234,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00450000",
+        "growth": "2.85947441",
+        "discount": "0.34971462",
+        "one_minus": "0.65028538",
+        "top": "1849.15",
+        "payment": "2843.60"
+      }
+    },
+    {
+      "id": "worked.after",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240,
+        "grace_months": 6,
+        "period": 7,
+        "field": "payment"
+      },
+      "value": "2843.60"
+    },
+    {
+      "id": "worked.spitzer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 240
+      },
+      "value": "2729.01"
+    },
+    {
+      "id": "worked.pay_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.after",
+        "subtrahend": "worked.spitzer"
+      },
+      "value": "114.59"
+    },
+    {
+      "id": "worked.full_interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240,
+        "grace_months": 6
+      },
+      "value": "265401.56"
+    },
+    {
+      "id": "worked.sp_interest",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "400000",
+        "annual_percent": "5.4",
+        "months": 240
+      },
+      "value": "254960.85"
+    },
+    {
+      "id": "worked.interest_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.full_interest",
+        "subtrahend": "worked.sp_interest"
+      },
+      "value": "10440.71"
+    },
+    {
+      "id": "half.rows",
+      "kind": "rep_schedule",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "20000",
+        "annual_percent": "6",
+        "months": 4,
+        "grace_months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "20000.00",
+          "interest": "100.00",
+          "principal": "0.00",
+          "payment": "100.00",
+          "closing": "20000.00"
+        },
+        {
+          "period": 2,
+          "opening": "20000.00",
+          "interest": "100.00",
+          "principal": "0.00",
+          "payment": "100.00",
+          "closing": "20000.00"
+        },
+        {
+          "period": 3,
+          "opening": "20000.00",
+          "interest": "100.00",
+          "principal": "9975.06",
+          "payment": "10075.06",
+          "closing": "10024.94"
+        },
+        {
+          "period": 4,
+          "opening": "10024.94",
+          "interest": "50.12",
+          "principal": "10024.94",
+          "payment": "10075.06",
+          "closing": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "half.after",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "20000",
+        "rate_percent": "6",
+        "months": 2
+      },
+      "value": "10075.06"
+    },
+    {
+      "id": "ex2.part",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "180000",
+        "weight": "1",
+        "total_weight": "180"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "ex2.interest",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "180000",
+        "rate_percent": "0.5"
+      },
+      "value": "900.00"
+    },
+    {
+      "id": "ex2.answer_sum",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "ex2.part|ex2.interest"
+      },
+      "value": "1900.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "equal_principal",
+        "principal": "180000",
+        "annual_percent": "6",
+        "months": 180,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "1900.00"
+    },
+    {
+      "id": "ex2.err_spitzer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "180000",
+        "rate_percent": "6",
+        "months": 180
+      },
+      "value": "1518.94"
+    },
+    {
+      "id": "ex3.grace_pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "300000",
+        "annual_percent": "4.2",
+        "months": 240,
+        "grace_months": 24,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "1050.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_partial",
+        "principal": "300000",
+        "annual_percent": "4.2",
+        "months": 240,
+        "grace_months": 24,
+        "period": 25,
+        "field": "payment"
+      },
+      "value": "1981.73"
+    },
+    {
+      "id": "ex3.err_no_grace",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "4.2",
+        "months": 240
+      },
+      "value": "1849.71"
+    },
+    {
+      "id": "ex3.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "4.2",
+        "months": 216,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00350000",
+        "growth": "2.12693096",
+        "discount": "0.47016101",
+        "one_minus": "0.52983899",
+        "top": "1050.00",
+        "payment": "1981.73"
+      }
+    },
+    {
+      "id": "ex3.left",
+      "kind": "amort_months_left",
+      "inputs": {
+        "months": 240,
+        "paid": 24
+      },
+      "value": 216
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "grace_full",
+        "principal": "200000",
+        "annual_percent": "6",
+        "months": 120,
+        "grace_months": 6,
+        "period": 6,
+        "field": "closing"
+      },
+      "value": "206075.51"
+    },
+    {
+      "id": "ex4.err_simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "200000",
+        "rate_percent": "0.5",
+        "periods": 6
+      },
+      "value": "206000.00"
+    },
+    {
+      "id": "ex4.formula",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "200000",
+        "rate_percent": "0.5",
+        "periods": 6
+      },
+      "value": "206075.50"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_full",
+        "principal": "150000",
+        "annual_percent": "4.8",
+        "months": 120,
+        "period": 120,
+        "field": "payment"
+      },
+      "value": "242179.15"
+    },
+    {
+      "id": "ex5.formula",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "150000",
+        "rate_percent": "0.4",
+        "periods": 120
+      },
+      "value": "242179.18"
+    },
+    {
+      "id": "ex5.err_simple",
+      "kind": "simple_balance",
+      "inputs": {
+        "principal": "150000",
+        "rate_percent": "4.8",
+        "periods": 10
+      },
+      "value": "222000.00"
+    },
+    {
+      "id": "ex5.err_yearly",
+      "kind": "compound_balance",
+      "inputs": {
+        "principal": "150000",
+        "rate_percent": "4.8",
+        "periods": 10
+      },
+      "value": "239719.90"
+    },
+    {
+      "id": "ex6.bp",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "150000",
+        "annual_percent": "4.8",
+        "months": 120
+      },
+      "value": "72000.00"
+    },
+    {
+      "id": "ex6.sp",
+      "kind": "rep_total_interest",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "150000",
+        "annual_percent": "4.8",
+        "months": 120
+      },
+      "value": "39163.11"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.bp",
+        "subtrahend": "ex6.sp"
+      },
+      "value": "32836.89"
+    },
+    {
+      "id": "ex6.bp_pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "bullet_partial",
+        "principal": "150000",
+        "annual_percent": "4.8",
+        "months": 120,
+        "period": 1,
+        "field": "payment"
+      },
+      "value": "600.00"
+    }
+  ]
+}

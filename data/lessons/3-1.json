@@ -1,0 +1,1071 @@
+{
+  "lesson": "3.1",
+  "title": "מאיפה בא החזר השפיצר",
+  "note": "Teaching numbers, not market rates. Monthly rate = annual ÷ 12; each month's interest rounded to the agora; the level payment rounded once; the last month takes what is left.",
+  "facts": [
+    {
+      "id": "pred.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000.00"
+    },
+    {
+      "id": "pred.half",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "2000",
+        "weight": "1",
+        "total_weight": "2"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "pred.int_half",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "1000",
+        "rate_percent": "1"
+      },
+      "value": "10.00"
+    },
+    {
+      "id": "pred.int_all",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "2000",
+        "rate_percent": "1"
+      },
+      "value": "20.00"
+    },
+    {
+      "id": "pred.half_plus",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "pred.half|pred.int_half"
+      },
+      "value": "1010.00"
+    },
+    {
+      "id": "pred.first_equal",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "pred.half|pred.int_all"
+      },
+      "value": "1020.00"
+    },
+    {
+      "id": "explain.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000.00"
+    },
+    {
+      "id": "explain.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "12",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "1"
+    },
+    {
+      "id": "explain.try_1000",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1000.00",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1000.00",
+          "closing": "1020.00"
+        },
+        {
+          "period": 2,
+          "opening": "1020.00",
+          "interest": "10.20",
+          "payment": "1000.00",
+          "closing": "30.20"
+        }
+      ]
+    },
+    {
+      "id": "explain.try_1020",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1020.00",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1020.00",
+          "closing": "1000.00"
+        },
+        {
+          "period": 2,
+          "opening": "1000.00",
+          "interest": "10.00",
+          "payment": "1020.00",
+          "closing": "-10.00"
+        }
+      ]
+    },
+    {
+      "id": "explain.zero",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "explain.last_1020",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1020.00",
+        "months": 2
+      },
+      "value": "-10.00"
+    },
+    {
+      "id": "explain.over_1020",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.zero",
+        "subtrahend": "explain.last_1020"
+      },
+      "value": "10.00"
+    },
+    {
+      "id": "explain.try_1015",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1015.00",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1015.00",
+          "closing": "1005.00"
+        },
+        {
+          "period": 2,
+          "opening": "1005.00",
+          "interest": "10.05",
+          "payment": "1015.00",
+          "closing": "0.05"
+        }
+      ]
+    },
+    {
+      "id": "explain.try_pay",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1015.02",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1015.02",
+          "closing": "1004.98"
+        },
+        {
+          "period": 2,
+          "opening": "1004.98",
+          "interest": "10.05",
+          "payment": "1015.02",
+          "closing": "0.01"
+        }
+      ]
+    },
+    {
+      "id": "explain.try_up",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1015.03",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1015.03",
+          "closing": "1004.97"
+        },
+        {
+          "period": 2,
+          "opening": "1004.97",
+          "interest": "10.05",
+          "payment": "1015.03",
+          "closing": "-0.01"
+        }
+      ]
+    },
+    {
+      "id": "explain.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "months": 2
+      },
+      "value": "1015.02"
+    },
+    {
+      "id": "explain.last_pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "2000",
+        "annual_percent": "12",
+        "months": 2,
+        "period": 2,
+        "field": "payment"
+      },
+      "value": "1015.03"
+    },
+    {
+      "id": "explain.f1",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "12",
+        "month": 1,
+        "decimals": 8
+      },
+      "value": "0.99009901"
+    },
+    {
+      "id": "explain.f2",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "12",
+        "month": 2,
+        "decimals": 8
+      },
+      "value": "0.98029605"
+    },
+    {
+      "id": "explain.S",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "12",
+        "months": 2,
+        "decimals": 8
+      },
+      "value": "1.97039506"
+    },
+    {
+      "id": "explain.S6",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "12",
+        "months": 2,
+        "decimals": 6
+      },
+      "value": "1.970395"
+    },
+    {
+      "id": "explain.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "months": 2,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.01000000",
+        "growth": "1.02010000",
+        "discount": "0.98029605",
+        "one_minus": "0.01970395",
+        "top": "20.00",
+        "payment": "1015.02"
+      }
+    },
+    {
+      "id": "three.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "three.f1",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "6",
+        "month": 1,
+        "decimals": 8
+      },
+      "value": "0.99502488"
+    },
+    {
+      "id": "three.f2",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "6",
+        "month": 2,
+        "decimals": 8
+      },
+      "value": "0.99007450"
+    },
+    {
+      "id": "three.f3",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "6",
+        "month": 3,
+        "decimals": 8
+      },
+      "value": "0.98514876"
+    },
+    {
+      "id": "three.S",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "6",
+        "months": 3,
+        "decimals": 8
+      },
+      "value": "2.97024814"
+    },
+    {
+      "id": "three.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "60000",
+        "rate_percent": "6",
+        "months": 3
+      },
+      "value": "20200.33"
+    },
+    {
+      "id": "long.S",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "4.8",
+        "months": 240,
+        "decimals": 8
+      },
+      "value": "154.09330295"
+    },
+    {
+      "id": "long.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "months": 240
+      },
+      "value": "3893.74"
+    },
+    {
+      "id": "long.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "months": 240,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00400000",
+        "growth": "2.60670013",
+        "discount": "0.38362679",
+        "one_minus": "0.61637321",
+        "top": "2400.00",
+        "payment": "3893.74"
+      }
+    },
+    {
+      "id": "long.last_pay",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "600000",
+        "annual_percent": "4.8",
+        "months": 240,
+        "period": 240,
+        "field": "payment"
+      },
+      "value": "3895.68"
+    },
+    {
+      "id": "long.try_3500",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "payment": "3500.00",
+        "months": 240
+      },
+      "value": "158157.51"
+    },
+    {
+      "id": "long.try_pay",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "payment": "3893.74",
+        "months": 240
+      },
+      "value": "1.94"
+    },
+    {
+      "id": "long.try_up",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "payment": "3893.75",
+        "months": 240
+      },
+      "value": "-2.03"
+    },
+    {
+      "id": "long.try_4000",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "600000",
+        "rate_percent": "4.8",
+        "payment": "4000.00",
+        "months": 240
+      },
+      "value": "-42680.02"
+    },
+    {
+      "id": "long.over_4000",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "explain.zero",
+        "subtrahend": "long.try_4000"
+      },
+      "value": "42680.02"
+    },
+    {
+      "id": "long.agora_effect",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "long.try_pay",
+        "subtrahend": "long.try_up"
+      },
+      "value": "3.97"
+    },
+    {
+      "id": "long.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "4.8",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.4"
+    },
+    {
+      "id": "bound.part",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "600000",
+        "weight": "1",
+        "total_weight": "240"
+      },
+      "value": "2500.00"
+    },
+    {
+      "id": "bound.interest",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "600000",
+        "rate_percent": "0.4"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "bound.upper",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "bound.part|bound.interest"
+      },
+      "value": "4900.00"
+    },
+    {
+      "id": "bound.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "240"
+    },
+    {
+      "id": "worked.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "450000",
+        "rate_percent": "5.1",
+        "months": 300,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00425000",
+        "growth": "3.56904580",
+        "discount": "0.28018693",
+        "one_minus": "0.71981307",
+        "top": "1912.50",
+        "payment": "2656.94"
+      }
+    },
+    {
+      "id": "worked.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "450000",
+        "rate_percent": "5.1",
+        "months": 300
+      },
+      "value": "2656.94"
+    },
+    {
+      "id": "worked.int_1",
+      "kind": "rep_cell",
+      "inputs": {
+        "method": "spitzer",
+        "principal": "450000",
+        "annual_percent": "5.1",
+        "months": 300,
+        "period": 1,
+        "field": "interest"
+      },
+      "value": "1912.50"
+    },
+    {
+      "id": "worked.prin_1",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.pay",
+        "subtrahend": "worked.int_1"
+      },
+      "value": "744.44"
+    },
+    {
+      "id": "worked.part",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "450000",
+        "weight": "1",
+        "total_weight": "300"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "worked.upper",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "worked.part|worked.int_1"
+      },
+      "value": "3412.50"
+    },
+    {
+      "id": "worked.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "5.1",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.425"
+    },
+    {
+      "id": "worked.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 25
+      },
+      "value": 300
+    },
+    {
+      "id": "half.pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "30000",
+        "rate_percent": "4.8",
+        "months": 3
+      },
+      "value": "10080.11"
+    },
+    {
+      "id": "half.factor_1",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "4.8",
+        "month": 1,
+        "decimals": 8
+      },
+      "value": "0.99601594"
+    },
+    {
+      "id": "half.factor_2",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "4.8",
+        "month": 2,
+        "decimals": 8
+      },
+      "value": "0.99204775"
+    },
+    {
+      "id": "half.factor_3",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "4.8",
+        "month": 3,
+        "decimals": 8
+      },
+      "value": "0.98809536"
+    },
+    {
+      "id": "half.today_1",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10080.11",
+        "rate_percent": "0.4",
+        "periods": 1
+      },
+      "value": "10039.95"
+    },
+    {
+      "id": "half.today_2",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10080.11",
+        "rate_percent": "0.4",
+        "periods": 2
+      },
+      "value": "9999.95"
+    },
+    {
+      "id": "half.today_3",
+      "kind": "value_today",
+      "inputs": {
+        "amount": "10080.11",
+        "rate_percent": "0.4",
+        "periods": 3
+      },
+      "value": "9960.11"
+    },
+    {
+      "id": "half.total",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "half.today_1|half.today_2|half.today_3"
+      },
+      "value": "30000.01"
+    },
+    {
+      "id": "half.rows",
+      "kind": "given",
+      "inputs": {},
+      "value": [
+        {
+          "period": "1",
+          "factor": "0.99601594",
+          "today": "10039.95"
+        },
+        {
+          "period": "2",
+          "factor": "0.99204775",
+          "today": "9999.95"
+        },
+        {
+          "period": "3",
+          "factor": "0.98809536",
+          "today": "9960.11"
+        },
+        {
+          "period": "ביחד",
+          "factor": "",
+          "today": "30000.01"
+        }
+      ]
+    },
+    {
+      "id": "ex2.table",
+      "kind": "amort_trial_table",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1010.00",
+        "months": 2
+      },
+      "value": [
+        {
+          "period": 1,
+          "opening": "2000.00",
+          "interest": "20.00",
+          "payment": "1010.00",
+          "closing": "1010.00"
+        },
+        {
+          "period": 2,
+          "opening": "1010.00",
+          "interest": "10.10",
+          "payment": "1010.00",
+          "closing": "10.10"
+        }
+      ]
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "amort_trial_last",
+      "inputs": {
+        "principal": "2000",
+        "rate_percent": "12",
+        "payment": "1010.00",
+        "months": 2
+      },
+      "value": "10.10"
+    },
+    {
+      "id": "ex2.err_zero",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "10000",
+        "rate_percent": "6",
+        "months": 2
+      },
+      "value": "5037.53"
+    },
+    {
+      "id": "ex3.err_part",
+      "kind": "mix_slice",
+      "inputs": {
+        "loan": "10000",
+        "weight": "1",
+        "total_weight": "2"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "ex3.int_all",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "10000",
+        "rate_percent": "0.5"
+      },
+      "value": "50.00"
+    },
+    {
+      "id": "ex3.int_part",
+      "kind": "percent_of",
+      "inputs": {
+        "amount": "5000",
+        "rate_percent": "0.5"
+      },
+      "value": "25.00"
+    },
+    {
+      "id": "ex3.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "ex3.f1",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "6",
+        "month": 1,
+        "decimals": 8
+      },
+      "value": "0.99502488"
+    },
+    {
+      "id": "ex3.f2",
+      "kind": "amort_discount_factor",
+      "inputs": {
+        "rate_percent": "6",
+        "month": 2,
+        "decimals": 8
+      },
+      "value": "0.99007450"
+    },
+    {
+      "id": "ex3.S",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "6",
+        "months": 2,
+        "decimals": 8
+      },
+      "value": "1.98509938"
+    },
+    {
+      "id": "ex3.err_first_equal",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "ex3.err_part|ex3.int_all"
+      },
+      "value": "5050.00"
+    },
+    {
+      "id": "ex3.err_half_plus",
+      "kind": "rep_sum",
+      "inputs": {
+        "facts": "ex3.err_part|ex3.int_part"
+      },
+      "value": "5025.00"
+    },
+    {
+      "id": "ex4.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "4.2",
+        "months": 240,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00350000",
+        "growth": "2.31297233",
+        "discount": "0.43234413",
+        "one_minus": "0.56765587",
+        "top": "1050.00",
+        "payment": "1849.71"
+      }
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "4.2",
+        "months": 240
+      },
+      "value": "1849.71"
+    },
+    {
+      "id": "ex4.err_annual",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "50.4",
+        "months": 240
+      },
+      "value": "12600.65"
+    },
+    {
+      "id": "ex4.err_years",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "4.2",
+        "months": 20
+      },
+      "value": "15557.35"
+    },
+    {
+      "id": "ex4.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 20
+      },
+      "value": 240
+    },
+    {
+      "id": "ex4.err_percent",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "300000",
+        "rate_percent": "420",
+        "months": 240
+      },
+      "value": "105000.00"
+    },
+    {
+      "id": "ex4.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "4.2",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.35"
+    },
+    {
+      "id": "ex5.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00450000",
+        "growth": "2.24382713",
+        "discount": "0.44566713",
+        "one_minus": "0.55433287",
+        "top": "1800.00",
+        "payment": "3247.15"
+      }
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 180
+      },
+      "value": "3247.15"
+    },
+    {
+      "id": "ex5.err_years",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "5.4",
+        "months": 15
+      },
+      "value": "27636.72"
+    },
+    {
+      "id": "ex5.err_annual",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "400000",
+        "rate_percent": "64.8",
+        "months": 180
+      },
+      "value": "21601.67"
+    },
+    {
+      "id": "ex5.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "5.4",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.45"
+    },
+    {
+      "id": "ex5.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 15
+      },
+      "value": 180
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "4000.00",
+        "rate_percent": "4.5",
+        "months": 300
+      },
+      "value": "719641.29"
+    },
+    {
+      "id": "ex6.S",
+      "kind": "amort_discount_sum",
+      "inputs": {
+        "rate_percent": "4.5",
+        "months": 300,
+        "decimals": 8
+      },
+      "value": "179.91032184"
+    },
+    {
+      "id": "ex6.err_no_discount",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "4000.00",
+        "periods": 300
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "ex6.err_annual",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "4000.00",
+        "rate_percent": "54",
+        "months": 300
+      },
+      "value": "88888.73"
+    },
+    {
+      "id": "ex6.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "4.5",
+        "periods_per_year": 12,
+        "decimals": 3
+      },
+      "value": "0.375"
+    },
+    {
+      "id": "ex6.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 25
+      },
+      "value": 300
+    },
+    {
+      "id": "ex6.steps",
+      "kind": "amort_formula_steps",
+      "inputs": {
+        "principal": "4000",
+        "rate_percent": "4.5",
+        "months": 300,
+        "decimals": 8
+      },
+      "value": {
+        "m": "0.00375000",
+        "growth": "3.07374253",
+        "discount": "0.32533629",
+        "one_minus": "0.67466371",
+        "top": "15.00",
+        "payment": "22.23"
+      }
+    }
+  ]
+}

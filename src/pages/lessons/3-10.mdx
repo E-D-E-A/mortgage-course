@@ -1,0 +1,437 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "3.10"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import OneRateSearch from "../../components/OneRateSearch.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("3.10");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const rows05 = f.rows("explain.rows_05");
+export const search = f.rows("explain.search");
+export const halfRows = [
+  ...f.rows("half.rows").map((r) => ({ period: String(r.month), payment: r.payment, growth: r.growth, value_today: r.value_today })),
+  { period: "יחד", value_today: f.raw("half.pv") },
+];
+export const predictionOptions = [
+  "6% — העמלה לא משנה את אחוז הריבית",
+  "קצת יותר מ־6%: עמלה קטנה, שינוי קטן",
+  `בערך ${f.plain("explain.irr_x12")}% — פי שניים בערך`,
+  "פחות מ־6%, כי קיבלתם פחות כסף",
+];
+
+בשיעור הקודם חיברנו את כל התשלומים של הלוואה: <Term t="סך תשלומים" lesson="3.10">סך התשלומים</Term>. ראינו שהוא מחבר שקל של היום עם שקל של עוד עשרים שנה, כאילו הם שווים.
+בשיעור 0.6 למדנו כלי שלא עושה את זה: <Term t="ערך נוכחי" lesson="3.10">ערך נוכחי</Term> — כל תשלום מועבר להיום בנפרד, ורק אז מחברים. היום נפעיל אותו על לוח סילוקין שלם, ואחר כך נהפוך את השאלה: נחפש את הריבית.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="3.10"
+  question={`לקחתם ${f.shekels("explain.loan")} לשלושה חודשים, ב־6% לשנה (0.5% לחודש), בשפיצר. ביום שקיבלתם את הכסף נגבתה עמלה של ${f.shekels("explain.fee")}, ולכן הגיעו אליכם ${f.shekels("explain.received")}. התשלומים לא השתנו. איזה אחוז ריבית לשנה אתם משלמים בפועל, על הכסף שקיבלתם?`}
+  options={predictionOptions}
+/>
+
+<Section kind="ההסבר">
+
+## הערך הנוכחי של לוח שלם, והריבית שמסבירה אותו
+
+</Section>
+
+### ערך נוכחי של לוח סילוקין
+
+נתחיל בלי עמלה. לקחתם {f.shekels("explain.loan")} לשלושה חודשים, ב־6% לשנה — 0.5% לחודש — ב<Term t="שפיצר" lesson="3.10">שפיצר</Term>. התשלום: {f.shekels("explain.payment")}, שלוש פעמים. סך התשלומים: {f.shekels("explain.total")}.
+
+עכשיו נעביר כל תשלום להיום, ב־0.5% לחודש, בדיוק כמו בשיעור 0.6 — רק שכאן התקופה היא חודש:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[22rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">בסוף חודש</th>
+        <th class="py-2 text-start font-semibold">שווה היום</th>
+        <th class="py-2 text-start font-semibold">התשלום</th>
+        <th class="py-2 text-start font-semibold">מחלקים ב־</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows05.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.month}</td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2"><span class="ltr">{r.growth}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+ביחד: {f.shekels("explain.pv_05")} — בדיוק סכום ההלוואה. זה מה שראינו בשיעור 0.6: **סכום ההלוואה הוא הערך הנוכחי של התשלומים שלה, בריבית שלה.**
+
+ומה אם מהוונים בריבית אחרת?
+- ב־0.4% לחודש הערך הנוכחי הוא {f.shekels("explain.pv_04")} — יותר מההלוואה.
+- ב־0.6% לחודש הוא {f.shekels("explain.pv_06")} — פחות.
+
+ככל שהריבית גבוהה יותר, כל תשלום מתכווץ יותר כשמביאים אותו להיום, והערך הנוכחי יורד. ורק ריבית אחת נותנת בדיוק את מה שקיבלתם: כאן, 0.5% לחודש.
+
+### השאלה ההפוכה: איזו ריבית?
+
+עכשיו העמלה. אותם שלושה תשלומים, אבל ביום הראשון הגיעו אליכם רק {f.shekels("explain.received")}. באיזו ריבית חודשית הערך הנוכחי של שלושת התשלומים שווה בדיוק {f.shekels("explain.received")}?
+
+ב־0.5% הערך הנוכחי הוא {f.shekels("explain.pv_05")} — יותר ממה שקיבלתם. לכן הריבית גבוהה יותר. אין נוסחה שמוציאה אותה ישר, אבל אפשר לחפש אותה בשיטה מסודרת: **חצייה.**
+1. בוחרים ריבית נמוכה מדי (0.5%) וריבית גבוהה מדי (2%).
+2. מנסים את האמצע. אם הערך הנוכחי שם עדיין גבוה ממה שקיבלתם — האמצע נמוך מדי, והוא הגבול התחתון החדש. אחרת — הוא הגבול העליון החדש.
+3. חוזרים על זה. בכל צעד הטווח קטן בחצי.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">צעד</th>
+        <th class="py-2 text-start font-semibold">מנסים (לחודש)</th>
+        <th class="py-2 text-start font-semibold">הערך הנוכחי</th>
+        <th class="py-2 text-start font-semibold">המסקנה</th>
+        <th class="py-2 text-start font-semibold">הטווח לפני הצעד</th>
+      </tr>
+    </thead>
+    <tbody>
+      {search.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700">{r.step}</td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{r.mid}%</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.value_today)}</span></td>
+          <td class="py-2">{r.verdict === "low" ? "יותר ממה שקיבלתם: נמוכה מדי" : "פחות ממה שקיבלתם: גבוהה מדי"}</td>
+          <td class="py-2"><span class="ltr">{r.low}%–{r.high}%</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+אחרי שישה צעדים הריבית כבר נמצאת בטווח צר. מחשב ממשיך עוד כמה עשרות צעדים, ומגיע ל־{f.plain("explain.irr")}% לחודש (בעיגול). בבדיקה: בריבית הזו הערך הנוכחי של שלושת התשלומים הוא {f.shekels("explain.pv_check")} — {f.shekels("explain.received")} בקירוב, וההבדל הוא רק העיגול של הריבית.
+
+לריבית הזו קוראים <Term t="שיעור תשואה פנימי" lesson="3.10">שיעור תשואה פנימי</Term>, ובאנגלית IRR: **הריבית האחת שבה הערך הנוכחי של כל התשלומים שווה בדיוק לכסף שקיבלתם.**
+- **״פנימי״** — כי היא יוצאת מהתשלומים עצמם, ולא מריבית בשוק.
+- **״תשואה״** — כי מהצד של <Term t="מלווה" lesson="3.10">המלווה</Term>, זו התשואה שהוא מקבל על הכסף שנתן.
+
+### מחודש לשנה
+
+ה־IRR יוצא לחודש, כי התשלומים חודשיים. כדי לדבר עליו לשנה יש שתי דרכים — אותן שתיים משיעור 0.4, בכיוון ההפוך:
+- **כפול 12**, כמו שמחלקים ב־12 אחוז ריבית של חוזה: <M>{f.plain("explain.irr")}% × 12</M> הם בערך {f.plain("explain.irr_x12")}% לשנה. (בחישוב בלי עיגול בדרך.)
+- **בחזקת 12**, כמו <Term t="ריבית אפקטיבית" lesson="3.10">ריבית אפקטיבית</Term>: כמה הכסף גדל בפועל בשנה, כשהריבית מצטרפת אליו כל חודש. כאן — {f.plain("explain.irr_eff")}% לשנה.
+
+בלי העמלה היו לכם 6% לשנה. עמלה של {f.shekels("explain.fee")} — {f.plain("explain.fee_share")}% מההלוואה — הכפילה בערך את הריבית. איך? היא נגבתה פעם אחת, אבל כל ההלוואה נמשכה שלושה חודשים בלבד, ולכן כל המחיר שלה מתרכז בשלושה חודשים. כשמתרגמים לשנה, זה נראה כמו מחיר שחוזר שוב ושוב לאורך כל השנה.
+
+### העלות הממשית של האשראי
+
+לפי התעתיק בצוות של <Later lesson="5.1">הוראה 451</Later> של בנק ישראל (נספח 4; לא אומת), המדד שבנק ישראל קובע להשוואת מחיר של הלוואה לדיור הוא בדיוק זה: <Term t="העלות הממשית של האשראי" lesson="3.10">העלות הממשית של האשראי</Term>. בלשון התעתיק: ״העלות הממשית של האשראי משקפת את שיעור התשואה הפנימי שהוא השיעור בו הערך הנוכחי של התשלומים העתידיים בגין האשראי שווה לערך הנוכחי של סכום האשראי״. ולפי אותו תעתיק:
+- **מה שקיבלתם** הוא סכום ההלוואה פחות תשלומים שנגבים ביום שההלוואה ניתנת. אילו תשלומים בדיוק נכנסים לכאן — שאלה משפטית שעוד פתוחה בצוות.
+- **התשלומים** הם התשלומים לפי התחזית (שיעור 3.8). לכן גם המדד הזה חזוי, לא מובטח.
+- **ההמרה לשנה היא בחזקת 12.** לכן גם הלוואה בלי שום עמלה, ב־4.8% לשנה (0.4% לחודש, IRR של {f.plain("explain.big_irr")}%), מקבלת עלות ממשית של {f.plain("explain.big_eff")}% — לא כי יש בה משהו נסתר, אלא כי זו ריבית אפקטיבית (שיעור 0.4).
+
+באישור העקרוני תפגשו את המדד הזה בשם <Later lesson="5.3">ריבית כוללת חזויה</Later> (לפי תקציר של מקור רשמי; לא אומת).
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## איזו ריבית אחת מסבירה את כל התשלומים?
+
+</Section>
+
+הלוואה של 600,000 ₪ ב־4.8% לשנה ל־20 שנה. הפס האפור הוא מה שקיבלתם בפועל. הפס הכהה הוא הערך הנוכחי של כל 240 התשלומים, בריבית שאתם מנסים. הזיזו את הריבית עד ששני הפסים שווים — בעזרת המחוון, ובכפתורים לכוונון עדין.
+
+<OneRateSearch client:visible amount={600000} rate="4.8" years={20} />
+
+נסו את שלושת אלה:
+1. בלי עמלה: מצאו את הריבית שמאזנת. מה יצא?
+2. הזיזו את העמלה ל־{f.shekels("slider.fee_big")}. איפה הריבית מאזנת עכשיו?
+3. החזירו את העמלה ל־0, ועברו ל״קרן שווה״. התשלום הראשון השתנה — האם השתנתה גם הריבית שמאזנת?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.plain("slider.x12_fee0")}% לשנה (כפול 12) — בדיוק אחוז הריבית שבחוזה. בחזקת 12: {f.plain("slider.eff_fee0")}%.</li>
+    <li>בערך {f.plain("slider.x12_fee6000")}% (כפול 12), ובחזקת 12 {f.plain("slider.eff_fee6000")}%. עמלה של {f.plain("slider.fee_share")}% מההלוואה מוסיפה כאן רק עשיריות של נקודת אחוז, כי היא מתפרסת על 20 שנה.</li>
+    <li>התשלום הראשון עלה מ־{f.shekels("slider.sp_first")} ל־{f.shekels("slider.ep_first")}, אבל הריבית שמאזנת נשארה {f.plain("slider.x12_ep")}%. כל לוח של אותה הלוואה, בריבית שלה, שווה היום בדיוק את ההלוואה. נחזור לזה בשיעור הבא.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה
+
+</Section>
+
+**צעד 1 — הערך הנוכחי של כל התשלומים.** זו הנוסחה משיעור 0.6, כשהתקופה היא חודש: כל תשלום C<sub>k</sub> מחולק ב־(1 + r), בחזקת מספר החודש.
+
+**צעד 2 — משווים למה שקיבלתם.** מה שקיבלתם הוא ההלוואה P, פחות העמלות שנגבו ביום הראשון. נסמן אותן ב־T.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-h3 text-navy" dir="ltr">
+    <span class="whitespace-nowrap">P − T = C<sub>1</sub> ÷ (1 + r)<sup>1</sup></span>
+    <span class="whitespace-nowrap ps-8">+ C<sub>2</sub> ÷ (1 + r)<sup>2</sup></span>
+    <span class="whitespace-nowrap ps-8">+ … + C<sub>n</sub> ÷ (1 + r)<sup>n</sup></span>
+  </div>
+  <p class="ltr mt-3 text-h3 text-navy">e = (1 + r)<sup>12</sup> − 1</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">P</dt><dd>סכום ההלוואה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">T</dt><dd>תשלומים שנגבים ביום שמקבלים את הכסף (למשל עמלה), בשקלים. בלי עמלה — 0. (בנספח של בנק ישראל מסמנים אותם באות אחרת; בקורס האות A שמורה לעוגן.)</dd>
+    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום בסוף חודש k, בשקלים (כמו בשיעור 0.6). במסלול משתנה או צמוד — התשלום החזוי</dd>
+    <dt class="ltr font-semibold text-n900">k</dt><dd>מספר החודש: 1, 2, …</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר התשלומים</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>שיעור התשואה הפנימי, לחודש, כמספר עשרוני (1% הם 0.01). זה הנעלם — מחפשים אותו</dd>
+    <dt class="ltr font-semibold text-n900">e</dt><dd>אותה ריבית לשנה, אפקטיבית, כמספר עשרוני (כמו בשיעור 0.4). כפול 100 — באחוזים</dd>
+  </dl>
+</div>
+
+הדרך השנייה לשנה, כפול 12, היא פשוט <span class="ltr">12 × r</span>.
+
+**מתי הנוסחה נכונה?**
+1. כל תשלום מגיע בסוף החודש שלו, ויש תשלום אחד בחודש (אפשר גם 0, למשל בגרייס מלא).
+2. T הוא רק מה שנגבה ביום הראשון. מה שמשולם אחר כך — נמצא בתוך התשלומים.
+3. הערך הנוכחי יורד כשהריבית עולה. בהלוואה רגילה — כסף אחד שמקבלים, ואחריו תשלומים — זה תמיד כך, ולכן יש ריבית אחת בדיוק שמאזנת.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני</strong> — הדרך הנוחה. בעמודה אחת: בתא הראשון מה שקיבלתם, עם מינוס (בדוגמה: <span class="ltr">-{n("explain.received")}</span>); מתחתיו כל התשלומים, אחד בכל תא. ואז <span class="ltr">=IRR(A1:A4)</span> נותן את הריבית לחודש. לשנה: כפול 12, או <span class="ltr">=(1+IRR(A1:A4))^12-1</span>.</p>
+<p>כשכל התשלומים שווים, אפשר גם <span class="ltr">=RATE(3, {n("explain.payment")}, -{n("explain.received")})</span>: מספר התשלומים, התשלום, ומה שקיבלתם עם מינוס.</p>
+<p><strong>ביד:</strong> בחצייה, כמו בטבלה למעלה — כל צעד הוא חישוב של ערך נוכחי. ביד זה ארוך; כדאי לעשות צעד או שניים כדי להבין, ולהשאיר את השאר לגיליון.</p>
+</Callout>
+
+<Callout title="כמה מדויק החיפוש">
+<p>המחשבון של הקורס ממשיך בחצייה עד שהטווח צר מ־10<sup>−12</sup> נקודות אחוז לחודש, ובדיקה נפרדת מוצאת את אותה ריבית בשיטה אחרת. אנחנו מציגים ארבע ספרות אחרי הנקודה לחודש. הלוחות מחושבים בלי עיגול בדרך; לכן, בדוגמה בלי עמלה, ה־IRR יוצא בדיוק אחוז הריבית של החוזה.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="3.10"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "אחוז הריבית בחוזה לא השתנה, אבל קיבלתם פחות כסף ואתם מחזירים אותו דבר. על הכסף שבאמת הגיע אליכם — הריבית גבוהה יותר.",
+    `העמלה קטנה ביחס להלוואה (${f.plain("explain.fee_share")}%), אבל ההלוואה קצרה מאוד. בחישוב לשנה היא מכפילה בערך את הריבית: ${f.plain("explain.irr_x12")}% (כפול 12) מול 6%.`,
+    "",
+    "קיבלתם פחות, אבל אתם מחזירים אותו דבר — ולכן כל שקל שקיבלתם עולה לכם יותר, לא פחות.",
+  ]}
+>
+  מחפשים את הריבית החודשית שבה שלושת התשלומים שווים היום {f.shekels("explain.received")}: {f.plain("explain.irr")}% לחודש. כפול 12 — {f.plain("explain.irr_x12")}% לשנה; בחזקת 12 — {f.plain("explain.irr_eff")}%.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## שחר: עמלה של 360 ₪ על 600,000 ₪
+
+</Section>
+
+שחר (בדוי) לוקח {f.shekels("worked.loan")} ל־20 שנה, ב־4.8% לשנה, בשפיצר. ביום שהכסף מגיע נגבית עמלה של {f.shekels("worked.fee")} (נניח שזו עמלת פתיחת התיק, שיעור 3.9). מה העלות הממשית של ההלוואה שלו?
+
+**צעד 1 — התשלומים ומה שקיבל.** התשלום: {f.shekels("worked.payment")}, 240 פעמים. מה שקיבל בפועל: <M>{n("worked.loan")} − {n("worked.fee")} = {n("worked.received")}</M> ₪.
+
+**צעד 2 — בודקים בריבית של החוזה.** ב־0.4% לחודש הערך הנוכחי של התשלומים הוא {f.shekels("worked.pv_own")} — יותר ממה שקיבל. לכן ה־IRR גבוה מ־0.4%.
+
+**צעד 3 — מוצאים את ה־IRR.** בגיליון, עמודה של <span class="ltr">-{n("worked.received")}</span> ואחריו 240 תשלומים, ו־IRR: {f.plain("worked.irr")}% לחודש.
+
+**צעד 4 — לשנה, כפול 12.** {f.plain("worked.irr_x12")}% — לעומת {f.plain("worked.x12_no_fee")}% בלי העמלה.
+
+**צעד 5 — העלות הממשית (בחזקת 12).** {f.plain("worked.irr_eff")}% — לעומת {f.plain("worked.eff_no_fee")}% בלי העמלה.
+
+**מה לקחת מזה.** אותה עמלה, בערך, שהכפילה את הריבית של ההלוואה הקצרה בשאלת החיזוי, מזיזה את ההלוואה של שחר רק באלפיות האחוז. המשקל של עמלה תלוי בגודל ההלוואה ובזמן שהיא נמשכת. לכן משווים הלוואות לפי העלות הממשית, ולא לפי אחוז הריבית ועמלה בנפרד.
+
+<Section kind="דוגמה חצי פתורה">
+
+## האם 1.5% לחודש הוא ה־IRR?
+
+</Section>
+
+לקחתם {f.shekels("half.loan")} לשלושה חודשים, ב־12% לשנה (1% לחודש), בשפיצר: {f.shekels("half.payment")} בכל חודש. נגבתה עמלה של {f.shekels("half.fee")}, ולכן קיבלתם {f.shekels("half.received")}. בדקו את 1.5% לחודש: השלימו את הטבלה, וקבעו אם הריבית הזו נמוכה מדי או גבוהה מדי. החודש הראשון כבר מלא.
+
+<FillTable
+  client:visible
+  id="3.10-half"
+  periodLabel="חודש"
+  columns={[
+    { key: "payment", label: "התשלום" },
+    { key: "growth", label: "מחלקים ב־", format: "plain" },
+    { key: "value_today", label: "שווה היום" },
+  ]}
+  rows={halfRows}
+  blanks={["2.growth", "2.value_today", "3.growth", "3.value_today", "יחד.value_today"]}
+  success={`נכון. ${f.shekels("half.pv")} הוא קצת יותר מ־${f.shekels("half.received")}, ולכן 1.5% עוד נמוך מדי — ה־IRR מעט מעליו: ${f.plain("half.irr")}% לחודש, בעיגול.`}
+  hint="1.015 בחזקת מספר החודש; את התשלום מחלקים בו. ״יחד״ הוא סכום שלוש השורות."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והעמלות בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא העמלות של בנק.
+התרגילים מסודרים מהקל אל המאתגר. בתרגילים 3 ו־5 תצטרכו מחשבון או גיליון.
+
+<ChoiceExercise
+  client:visible
+  id="3.10-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אחוז הריבית שכתוב בחוזה", feedback: "לפעמים הם יוצאים שווים — כשאין עמלות והתשלומים לפי החוזה. אבל ה־IRR מחושב מהתשלומים ומהכסף שהתקבל בפועל, ולכן יכול לצאת אחר." },
+    { text: "הריבית האחת שבה הערך הנוכחי של כל התשלומים שווה לכסף שקיבלתם", correct: true, feedback: "נכון. זו ההגדרה: ריבית אחת שמסבירה את כל התשלומים יחד, כולל עמלות שהקטינו את מה שקיבלתם." },
+    { text: "סך הריבית בשקלים, חלקי סכום ההלוואה", feedback: "זה מחבר שקלים מזמנים שונים בלי להתחשב בזמן. ה־IRR מהוון כל תשלום לפי מתי הוא מגיע." },
+    { text: "הריבית שבנק ישראל קובע", feedback: "ה־IRR של הלוואה יוצא מהתשלומים שלה עצמה — לכן ״פנימי״. הוא לא ריבית שמישהו קובע." },
+  ]}
+>
+  מה זה שיעור התשואה הפנימי (IRR) של הלוואה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.10-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_total"), message: "זה סך התשלומים, בלי היוון. הערך הנוכחי מחלק כל תשלום ב־1.004 בחזקת מספר החודש." },
+  ]}
+>
+  לקחתם {f.shekels("ex2.loan")} לחצי שנה, ב־4.8% לשנה (0.4% לחודש), בשפיצר: {f.shekels("ex2.payment")} בכל חודש, 6 פעמים. מה הערך הנוכחי של ששת התשלומים, ב־0.4% לחודש? (רמז: אפשר בלי לחשב.)
+</NumericExercise>
+
+<Solution for="3.10-2">
+סכום ההלוואה הוא הערך הנוכחי של התשלומים שלה, בריבית שלה (שיעור 0.6). לכן: {f.shekels("ex2.answer")}. אפשר לבדוק בגיליון, שורה לכל חודש.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.10-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  tolerance={0.01}
+  near={0.02}
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_x12"), tolerance: 0.01, message: `זה כפול 12 — הדרך הראשונה. השאלה היא על ריבית אפקטיבית: ${eq("(1 + 0.0045)^12 − 1")}.` },
+  ]}
+>
+  ה־IRR של הלוואה הוא 0.45% לחודש. מהי הריבית האפקטיבית לשנה, כמו בעלות הממשית של האשראי? (שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="3.10-3">
+<M>1.0045<sup>12</sup> − 1</M>, כפול 100: {f.plain("ex3.answer")}%. כפול 12 היה יוצא רק {f.plain("ex3.err_x12")}% — ההבדל הוא הריבית על הריבית בתוך השנה (שיעור 0.4).
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="3.10-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "נמוך מ־0.5%, כי קיבלתם פחות", feedback: "קיבלתם פחות ומחזירים אותו דבר — זה מייקר, לא מוזיל." },
+    { text: "בדיוק 0.5%, כי התשלומים לא השתנו", feedback: "ב־0.5% התשלומים שווים היום את כל ההלוואה, אבל אליכם הגיע פחות ממנה. כדי להגיע למה שקיבלתם צריך להוון בריבית גבוהה יותר." },
+    { text: "גבוה מ־0.5%: שם הערך הנוכחי הוא כל ההלוואה, ואליכם הגיע פחות", correct: true, feedback: "נכון. ככל שהריבית עולה, הערך הנוכחי יורד. כדי שירד למה שקיבלתם, הריבית צריכה להיות מעל 0.5%." },
+    { text: "אי אפשר לדעת בלי לחשב את כל 24 התשלומים", feedback: "את המספר המדויק — לא. אבל את הכיוון אפשר לדעת: ב־0.5% הערך הנוכחי הוא ההלוואה כולה, ומה שקיבלתם קטן ממנה." },
+  ]}
+>
+  לקחתם {f.shekels("ex4.loan")} לשנתיים, ב־6% לשנה (0.5% לחודש). נגבתה עמלה של {f.shekels("ex4.fee")}, ולכן קיבלתם {f.shekels("ex4.received")}. ה־IRR לחודש הוא:
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.10-5"
+  n={5}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0.03}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: "6", tolerance: 0.01, message: "זה אחוז הריבית שבחוזה. אבל קיבלתם פחות מההלוואה, ולכן ה־IRR גבוה יותר. בתא הראשון שימו את מה שקיבלתם, לא את ההלוואה." },
+    { value: f.raw("ex5.err_effective"), tolerance: 0.01, message: "זו הריבית בחזקת 12. השאלה היא על כפול 12." },
+    { value: f.raw("ex5.err_monthly"), tolerance: 0.01, message: "זה ה־IRR לחודש. כפלו ב־12." },
+  ]}
+>
+  לקחתם {f.shekels("ex5.loan")} לשנה, ב־6% לשנה, בשפיצר: {f.shekels("ex5.payment")} בכל חודש, 12 פעמים. נגבתה עמלה של {f.shekels("ex5.fee")}, ולכן קיבלתם {f.shekels("ex5.received")}. מה ה־IRR לשנה, כפול 12? (בגיליון; שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="3.10-5">
+בגיליון: בתא A1 <span class="ltr">-{n("ex5.received")}</span>, בתאים A2 עד A13 התשלום {n("ex5.payment")}, ואז <span class="ltr">=IRR(A1:A13)*12</span>. יוצא {f.plain("ex5.answer")}%, מול 6% בחוזה — עמלה של {f.plain("ex5.fee_share")}% מההלוואה, בהלוואה של שנה אחת. (בחזקת 12: {f.plain("ex5.err_effective")}%.)
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="3.10-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "אותה עמלה, אותה תוספת לריבית: היא מוסיפה בשתיהן אותן נקודות אחוז", feedback: `לא. ב־600,000 ₪ ל־20 שנה ה־IRR (כפול 12) יוצא ${f.plain("ex6.long")}%; ב־30,000 ₪ לשלושה חודשים — ${f.plain("ex6.short")}%.` },
+    { text: "היא מייקרת יותר את ההלוואה הקצרה והקטנה, כי היא גדולה יותר ביחס לסכום ומתפרסת על פחות זמן", correct: true, feedback: `נכון. ${f.plain("ex6.short")}% מול ${f.plain("ex6.long")}% (כפול 12), למרות שאחוז הריבית בחוזה זהה.` },
+    { text: "היא מייקרת יותר את ההלוואה הגדולה, כי עליה משלמים יותר ריבית", feedback: "בהלוואה הגדולה והארוכה העמלה זניחה ביחס לכסף ולזמן. ה־IRR כמעט לא זז." },
+    { text: "היא לא משנה את המחיר של אף אחת, כי היא לא ריבית", feedback: "עמלה שנגבית ביום הראשון מקטינה את מה שקיבלתם, ולכן מעלה את ה־IRR. זה בדיוק מה שהעלות הממשית מודדת." },
+  ]}
+>
+  שתי הלוואות, שתיהן ב־4.8% לשנה, ובשתיהן עמלה של {f.shekels("ex6.fee")} ביום הראשון: 600,000 ₪ ל־20 שנה, ו־30,000 ₪ לשלושה חודשים. מה נכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על שיעור תשואה פנימי">
+<p><strong>מה זה?</strong> הריבית האחת שבה הערך הנוכחי של כל התשלומים שווה בדיוק לכסף שקיבלתם. בהלוואה עם תשלום כל חודש — ריבית לחודש, שמעבירים לשנה כפול 12 או בחזקת 12.</p>
+<p><strong>למה זה קיים?</strong> לכל הלוואה יש הרבה פרטים: אחוז ריבית, עמלות, תקופה, שיטת החזר, ובמסלולים משתנים — תחזית. כדי להשוות הלוואות צריך מספר אחד שמכיל את כולם. לפי התעתיק בצוות, בנק ישראל קבע אותו כמדד ההשוואה: העלות הממשית של האשראי (לא אומת).</p>
+<p><strong>איך זה עובד?</strong> מחפשים: מנסים ריבית, מהוונים את כל התשלומים, ומשווים למה שקיבלתם. גבוה מדי — מעלים את הריבית; נמוך מדי — מורידים. בגיליון — פונקציה אחת.</p>
+<p><strong>איך זה משפיע עליכם?</strong> עמלה ביום הראשון מעלה את ה־IRR, ויותר ככל שההלוואה קצרה וקטנה. ובמסלולים משתנים ה־IRR מחושב מתשלומים חזויים, ולכן גם הוא חזוי.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשמשווים הצעות לאותה הלוואה, ה־IRR (העלות הממשית) אומר כמה עולה כל שקל לכל חודש שהוא אצלכם. הוא לא אומר כמה שקלים תשלמו בסך הכול, ולא כמה זה שווה לכם היום — ובשיעור הבא נראה ששלוש השאלות האלה יכולות לתת שלוש תשובות שונות.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **ערך נוכחי של לוח:** מהוונים כל תשלום לפי החודש שלו, ומחברים. בריבית של ההלוואה הוא שווה בדיוק לסכום ההלוואה.
+- **ריבית גבוהה יותר — ערך נוכחי נמוך יותר.** לכן יש ריבית אחת בדיוק שבה הערך הנוכחי שווה לכסף שקיבלתם.
+- **שיעור תשואה פנימי (IRR)** = הריבית האחת הזו. מוצאים אותה בחיפוש: בחצייה, או בגיליון (IRR, RATE).
+- **מחודש לשנה:** כפול 12 (כמו אחוז ריבית של חוזה), או בחזקת 12 (ריבית אפקטיבית) — שתי הדרכים משיעור 0.4.
+- **העלות הממשית של האשראי:** ה־IRR של הכסף שהתקבל בפועל, בחזקת 12. לפי התעתיק בצוות, זה מדד ההשוואה של בנק ישראל (לא אומת).
+- **עמלה ביום הראשון** מעלה את ה־IRR — הרבה בהלוואה קצרה וקטנה, מעט בהלוואה גדולה וארוכה.
+
+**בשיעור הבא — 3.11, למה סך תשלומים, ערך נוכחי ו־IRR הם שלושה מדדים שונים:** שני לוחות סילוקין, שלוש שאלות — וכל מדד יכול לבחור לוח אחר.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ערך נוכחי של סדרת תשלומים, שיעור תשואה פנימי, וחיפוש בחצייה הם מתמטיקה פיננסית ונומרית בסיסית. ההמרה מחודש לשנה בכפל ב־12 או בחזקת 12 — שיעור 0.4.", code: ["P − T = Σ Cₖ ÷ (1 + r)ᵏ", "e = (1 + r)¹² − 1"] },
+    { kind: "לא אומת", text: "העלות הממשית של האשראי (הוראת בנק ישראל 451, נספח 4): שיעור התשואה הפנימי החודשי שבו סכום ההלוואה פחות התשלומים שנגבים ביום העמדת האשראי שווה לערך הנוכחי של התשלומים החזויים, ומומר לשנה כ־((1 + IRR)^12 − 1) × 100. לפי תעתיק בצוות ב־Brain (דף 7733250, מגרסה 22 של ההוראה שהורדה ב־2026-08-03), ממתין לבדיקה מול המקור.", date: "2026-08-03" },
+    { kind: "מחקר / הצעה", text: "אילו תשלומים נכנסים כ״נגבים ביום העמדת האשראי״ (בנספח: ״תוספת״ כהגדרתה בחוק אשראי הוגן) — שאלה משפטית שהצוות סימן כפתוחה (Brain, דף 7733250, אוגוסט 2026).", date: "2026-08-17" },
+    { kind: "לא אומת", text: "באישור העקרוני המדד מוצג כ״ריבית הכוללת החזויה״, שהיא העלות הממשית של האשראי לפי חוק אשראי הוגן. לפי תקציר של מקור רשמי (הסבר של בנק ישראל על הרפורמה ומפתח הוראה 451, נקרא ב־2026-10-09); ממתין לבדיקה.", date: "2026-10-09" },
+    { kind: "הנחת חישוב", text: "כל הסכומים, אחוזי הריבית והעמלות בשיעור בדויים, להמחשה; העמלה של 360 ₪ בדוגמה הפתורה היא הנחה (שיעור 3.9: ״עד כ־360 ₪״, לא אומת). ריבית חודשית = אחוז הריבית לשנה חלקי 12. הלוחות מחושבים בלי עיגול בדרך. ה־IRR נמצא בחצייה עד 10⁻¹² נקודות אחוז לחודש, ומוצג מעוגל. שחר בדוי." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ה־IRR בחצייה (TypeScript) ובשיטת ניוטון (Python), בנפרד.", date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/metrics.ts (irrMonthly, bisectionSteps, presentValue; schedules from schedule.ts) via scripts/lessons/lesson-3-10.ts and data/lessons/3-10.json, rechecked by checks/kinds/metrics.py (Newton's method). Illustration: src/components/OneRateSearch.vue. The map lists no video for this lesson. */}

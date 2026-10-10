@@ -1,0 +1,488 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "3.8"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import ForecastPaths from "../../components/ForecastPaths.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("3.8");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (v) => `${v}%`;
+export const years = (row) => row.years;
+export const forecastRows = f.rows("explain.blocks");
+export const highRows = f.rows("explain.blocks_high");
+export const lowRows = f.rows("explain.blocks_low");
+export const workedRows = f.rows("worked.blocks");
+export const ex5Rows = f.rows("ex5.blocks");
+export const ex6Rows = f.rows("ex6.blocks");
+export const halfRows = f.rows("half.blocks").map((r) => ({ period: years(r), fixed: r.payment_1, variable: r.payment_2, total: r.total }));
+export const predictionOptions = [
+  `שלא תשלמו אף פעם יותר מ־${f.whole("explain.max")} בחודש`,
+  `שבחודש ה־${f.plain("explain.max_month")} התשלום יעלה בדיוק ל־${f.whole("explain.max")}`,
+  `רק את ההחזר הראשון; ${f.whole("explain.max")} הוא חישוב לפי תחזית`,
+  "שום דבר: גם ההחזר הראשון הוא תחזית",
+];
+
+בשיעור הקודם חיברנו את ה<Term t="מסלול" lesson="3.8">מסלולים</Term> של <Term t="תמהיל" lesson="3.8">תמהיל</Term> לתזרים אחד: תשלום אחד בכל חודש, מהחודש הראשון ועד האחרון. זה <Term t="לוח סילוקין" lesson="3.8">לוח סילוקין</Term> של מאות שורות, ואף אחד לא קורא מאות שורות.
+לכן מסכמים אותו בכמה מספרים. בשיעור הזה — שלושה מספרים על התשלום החודשי, והשאלה החשובה עליהם: מה מהם ידוע, ומה רק חזוי.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="3.8"
+  question={`ביקשתם הלוואה של 600,000 ₪ ל־20 שנה, במסלול משתנה לא צמוד שהריבית בו מתעדכנת כל 5 שנים. באישור העקרוני כתוב: החזר ראשון ${f.whole("explain.first")}, החזר מרבי חזוי ${f.whole("explain.max")}. מה מזה ידוע כבר היום, אם תקבלו את ההלוואה בתנאים האלה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="ההסבר">
+
+## שלושה מספרים על התשלום החודשי
+
+</Section>
+
+### כששום דבר לא זז
+
+נתחיל מהמקרה הפשוט. לקחתם {f.shekels("explain.loan")} ל־20 שנה ({f.plain("explain.months")} חודשים) ב<Term t="קבועה לא צמודה" lesson="3.8">קבועה לא צמודה</Term>, ב־4.6% לשנה, ב<Term t="שפיצר" lesson="3.8">שפיצר</Term>.
+אחוז הריבית קבוע, והחוב לא צמוד למדד. לכן התשלום בכל חודש הוא {f.shekels("explain.fixed_pay")} — מהראשון ועד האחרון.
+במסלול כזה, כל מה שנשאל על התשלום החודשי — מה הראשון, מה הרגיל, מה הגבוה ביותר — יש לו תשובה אחת, והיא ידועה ביום שחותמים.
+
+### כשהריבית מתעדכנת
+
+עכשיו אותו סכום, אותה תקופה ואותו אחוז ריבית היום, 4.6%, אבל ב<Term t="משתנה לא צמודה" lesson="3.8">משתנה לא צמודה</Term> שהריבית בה מתעדכנת כל 5 שנים (שיעור 2.7). בכל <Term t="נקודת עדכון ריבית" lesson="3.8">נקודת עדכון</Term> נקבע אחוז ריבית חדש: ה<Term t="עוגן" lesson="3.8">עוגן</Term> של אותו יום, ועוד ה<Term t="מרווח" lesson="3.8">מרווח</Term> שבחוזה. והתשלום מחושב מחדש על היתרה שנשארה, לחודשים שנשארו (שיעור 3.6).
+
+**חמש השנים הראשונות ידועות.** עד העדכון הראשון אחוז הריבית הוא 4.6%, ולכן התשלום הוא {f.shekels("explain.first")} — בדיוק כמו בקבועה. לתשלום של החודש הראשון קוראים <Term t="החזר ראשון" lesson="3.8">החזר ראשון</Term>.
+
+**ומה יקרה אחרי 5 שנים?** בעוד 5 שנים ייקבע עוגן חדש, ואף אחד לא יודע היום מה הוא יהיה. יש שתי דרכים לענות בכל זאת על ״כמה אשלם״:
+
+1. **להניח ששום דבר לא יזוז.** מחשבים את התשלום לפי אחוז הריבית של היום, כאילו הוא יישאר עד הסוף. זה ה<Term t="החזר בתנאים הנוכחיים" lesson="3.8">החזר בתנאים הנוכחיים</Term>: כאן {f.shekels("explain.first")}. במסלול הזה, בלי גרייס (שיעור 2.10), הוא שווה להחזר הראשון. הוא לא ממוצע על כל חיי ההלוואה, והוא לא הבטחה לעתיד.
+2. **להשתמש ב<Term t="תחזית" lesson="3.8">תחזית</Term>.** תחזית היא הערכה של ערך עתידי — כאן, של העוגן בכל נקודת עדכון — לפי כלל קבוע ממקור מוגדר. בהלוואות לדיור, בנק ישראל מפרסם את נתוני התחזית שהבנקים משתמשים בהם, מתוך ה<Term t="עקום תשואות" lesson="3.8">עקומי התשואות</Term> שלו (שיעור 0.12; לפי תעתיק בצוות, לא אומת). איך מוציאים מהם עוגן לכל תקופה — בשיעור על <Later lesson="5.4">ריבית עוגן עתידית</Later>.
+
+בשיעור הזה נשתמש בתחזית בדויה, כדי לראות איך זה עובד. **היא לא התחזית של בנק ישראל.** לפיה, אחוז הריבית במסלול יהיה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[22rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנים</th>
+        <th class="py-2 text-start font-semibold">התשלום החודשי</th>
+        <th class="py-2 text-start font-semibold">אחוז הריבית (תחזית בדויה)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {forecastRows.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
+          <td class="py-2"><span class="ltr">{pct(r.rate_1)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+התשלום הגבוה ביותר בלוח הזה הוא {f.shekels("explain.max")}, החל מחודש {f.plain("explain.max_month")}. לזה קוראים <Term t="החזר מרבי חזוי" lesson="3.8">החזר מרבי חזוי</Term>: התשלום החודשי הגבוה ביותר בלוח סילוקין שמחושב לפי התחזית. כאן הוא גבוה מההחזר הראשון ב־<M>{n("explain.max")} − {n("explain.first")} = {n("explain.max_gap")}</M> ₪.
+
+שימו לב: הוא לא בשנים 16–20, למרות שהן האחרונות. בתחזית הזו אחוז הריבית שם יורד ל־{pct(forecastRows[3].rate_1)}, ולכן התשלום יורד. ההחזר המרבי נמצא איפה שהתשלום הגבוה ביותר, ולא בהכרח בסוף.
+
+### תחזית אינה הבטחה
+
+התחזית היא דרך אחת, מוסכמת, לחשב את העתיד. העוגן בפועל יכול לצאת אחרת. הנה אותו מסלול בשלוש דרכים שבהן הריבית יכולה להתפתח — התחזית, ריבית שעולה יותר ממנה, וריבית שיורדת:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנים</th>
+        <th class="py-2 text-start font-semibold">לפי התחזית</th>
+        <th class="py-2 text-start font-semibold">אם הריבית עולה יותר</th>
+        <th class="py-2 text-start font-semibold">אם הריבית יורדת</th>
+      </tr>
+    </thead>
+    <tbody>
+      {forecastRows.map((r, i) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.total)}</span> <span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_1)}</span>)</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(highRows[i].total)}</span> <span class="text-caption text-n600">(<span class="ltr">{pct(highRows[i].rate_1)}</span>)</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(lowRows[i].total)}</span> <span class="text-caption text-n600">(<span class="ltr">{pct(lowRows[i].rate_1)}</span>)</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+- אם הריבית עולה יותר מהתחזית, התשלום הגבוה ביותר הוא {f.shekels("explain.high_max")} — גבוה מההחזר המרבי החזוי ב־{f.shekels("explain.high_over_forecast")}.
+- אם היא יורדת, התשלום הגבוה ביותר הוא דווקא הראשון: {f.shekels("explain.low_max")}.
+
+אף אחת משלוש הדרכים האלה איננה ״הנכונה״, והקורס לא אומר מה הסיכוי של כל אחת. החשוב: **ההחזר המרבי החזוי הוא תוצאה של חישוב לפי תחזית, לא תקרה.** התשלום בפועל יכול לעבור אותו.
+
+<Callout title="מה מובטח, ומה חזוי" tone="warning">
+<p><strong>מובטח</strong> (בתנאי החוזה): אחוז הריבית עד העדכון הראשון, ולכן ההחזר הראשון והתשלומים עד אז; המרווח; מתי יהיו העדכונים; ושיטת ההחזר.</p>
+<p><strong>חזוי:</strong> העוגן בכל עדכון, ולכן כל תשלום אחרי העדכון הראשון — וגם ההחזר המרבי החזוי.</p>
+<p>זו גם החלטה של Mogi: ״ההחזר המרבי החזוי הוא תחזית, לא תקרה מובטחת״, ומסבירים ללקוח שתשלום במסלול משתנה או צמוד יכול להשתנות (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08).</p>
+</Callout>
+
+### איפה תפגשו את שלושת המספרים
+
+**באישור העקרוני.** לפי התעתיק בצוות של <Later lesson="5.1">הוראה 451</Later> של בנק ישראל (מאוגוסט 2026, לא אומת), הבנק מציג באישור העקרוני את ההחזר הראשון ואת ההחזר החודשי הגבוה ביותר הצפוי לפי התחזיות. לכן לבנק יש לוח סילוקין חזוי שלם, ולא רק תשלום אחד.
+
+**ב־Mogi** (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08):
+- המספר הראשי הוא ההחזר בתנאים הנוכחיים.
+- ליד הוא מוצגים ההחזר הראשון (גם כשהוא שווה לראשי) וההחזר המרבי החזוי.
+- כשההחזר המרבי החזוי גבוה מהראשי ב־10% או יותר, Mogi מדגישה אותו. 10% הוא בחירה של Mogi, לא כלל של בנק ישראל. בדוגמה שלנו הוא גבוה ב־{f.plain("explain.above")}% בלבד, ולכן לא מודגש. הוא היה מודגש מ־{f.shekels("explain.highlight_at")} ומעלה.
+- התחזית היא רק נתוני התחזית שבנק ישראל מפרסם להוראה הזו. לא תחזית כללית של הכלכלה, ולא ״המדד יעלה 2% בכל שנה״.
+- כשלמסלול אחד בתמהיל אין תחזית בכלל (למשל מסלול במט״ח, שיעור 2.8), גם ההחזר המרבי החזוי של התמהיל כולו לא מוצג כשלם. נתון חסר אינו אפס.
+
+**בבדיקת ההכנסה של הבנק.** כשהבנק בודק אם ההחזר מתאים להכנסה (<Later lesson="4.3">יחס החזר</Later>), הוא משתמש בהחזר הראשון על כל הסכום, ובלי ״זעזוע ריבית״ שרירותי — לא בהחזר המרבי החזוי. בהלוואה עם גרייס — בתשלום שאחרי הגרייס. כך החליטה Mogi, לפי נספח א׳ בהוראה אחרת של בנק ישראל כפי שהצוות העתיק אותו (לא אומת).
+
+**במסלול צמוד.** כאן גם המדד זז, והתשלום משתנה כמעט בכל חודש, גם בלי עדכון ריבית (שיעור 3.5). התחזית צריכה גם את המדד, והיא נלקחת מ<Term t="ציפיות אינפלציה" lesson="3.8">ציפיות האינפלציה</Term> שבנק ישראל מפרסם (לפי אותו תעתיק, לא אומת). כשהתחזית היא שהמדד עולה, בשפיצר התשלום עולה כל חודש, ולכן ההחזר המרבי החזוי יוצא בסוף.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## התחזית מול מה שקורה
+
+</Section>
+
+זה המסלול מההסבר. הקו המקווקו הוא התחזית הבדויה. הקו המלא הוא ״מה שקרה בפועל״: אתם קובעים אותו במחוונים, אחרי כל עדכון. חמש השנים הראשונות ידועות, ולכן אין להן מחוון.
+
+<ForecastPaths client:visible amount={600000} years={20} blockYears={5} forecast={["4.6", "5.1", "5.5", "5.3"]} />
+
+נסו את שלושת אלה:
+1. השאירו את המחוונים כמו התחזית. מה ההחזר הגבוה ביותר בפועל, ובאיזה חודש?
+2. הזיזו את שנים 11–15 ל־6.5%. מה קרה להחזר הגבוה ביותר? ומה קרה להחזר המרבי החזוי?
+3. הורידו את שלוש התקופות אל מתחת ל־4.6% (למשל 4%, 3.5%, 3.5%). איזה תשלום הוא עכשיו הגבוה ביותר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.shekels("explain.max")}, מחודש {f.plain("explain.max_month")} — בדיוק ההחזר המרבי החזוי, כי ״מה שקרה״ זהה לתחזית.</li>
+    <li>ההחזר הגבוה ביותר בפועל עלה ל־{f.shekels("slider.high_max")}, מחודש {f.plain("slider.high_max_month")}. ההחזר המרבי החזוי לא זז: הוא נשאר {f.shekels("explain.max")}. התחזית לא יודעת מה יקרה, ולכן היא גם לא מגבילה את מה שיקרה.</li>
+    <li>ההחזר הראשון, {f.shekels("explain.low_max")}: כל עדכון רק הוריד את התשלום. גם זה ״לא כמו בתחזית״ — הפעם לטובתכם.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## ההחזר המרבי, במילים ובסימנים
+
+</Section>
+
+**צעד 1 — הלוח החזוי.** מחשבים את כל התשלומים לפי התחזית: עד העדכון הראשון — לפי אחוז הריבית של היום; בכל עדכון — אחוז ריבית חזוי חדש, והתשלום מחושב מחדש על היתרה שנשארה, לחודשים שנשארו, באותה נוסחה של שיעור 3.1 (שיעור 3.6).
+
+**צעד 2 — בתמהיל, מחברים כל חודש.** התשלום של התמהיל בחודש k הוא סכום התשלומים של כל המסלולים באותו חודש (שיעור 3.7). מסלול שנגמר לא מוסיף כלום.
+
+**צעד 3 — לוקחים את הגבוה ביותר.**
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">החזר מרבי חזוי = max ( C<sub>1</sub>, C<sub>2</sub>, …, C<sub>n</sub> )</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">max</dt><dd>״הגבוה ביותר מבין״ — בוחרים את המספר הגדול ברשימה</dd>
+    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום של כל ההלוואה בחודש k, לפי התחזית, בשקלים (כמו C בשיעור 0.6). המספר הקטן למטה הוא מספר החודש</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר החודשים עד התשלום האחרון של המסלול הארוך ביותר</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">וההחזר הראשון הוא פשוט <span class="ltr">C<sub>1</sub></span>.</p>
+</div>
+
+**מתי זה נכון?**
+1. כל התשלומים מחושבים לפי אותה תחזית, מאותו יום.
+2. בתמהיל — לוקחים את הגבוה ביותר **אחרי** שמחברים את המסלולים בכל חודש, לא את הגבוה של כל מסלול לחוד. שני מסלולים יכולים להגיע לשיא שלהם בחודשים שונים.
+3. אם למסלול כלשהו אין תחזית, אין לתמהיל החזר מרבי חזוי שלם.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה של התשלום החזוי בכל חודש (או בכל תקופה בין עדכונים), ובתא אחד <span class="ltr">=MAX(B2:B241)</span>. בתמהיל — עמודה לכל מסלול, עמודת סכום, ו־MAX על עמודת הסכום.</p>
+<p><strong>במחשבון:</strong> מסלול שהריבית בו מתעדכנת כל כמה שנים — מספיק לחשב את התשלום פעם אחת לכל תקופה, כי בין עדכון לעדכון הוא לא זז (במסלול לא צמוד).</p>
+</Callout>
+
+<Callout title="עיגול">
+<p>כאן כל התשלומים מחושבים בלי עיגול בדרך, ומעוגלים לאגורה רק כשמציגים אותם. בלוח של בנק כל חודש מעוגל לאגורה, ולכן מספרים שם יכולים להיות שונים מכאן באגורות.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="3.8"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `${f.whole("explain.max")} הוא התשלום הגבוה ביותר לפי תחזית אחת. אם העוגן יעלה יותר ממנה, התשלום יעבור אותו — בדוגמה של השיעור עד ${f.whole("explain.high_max")}.`,
+    "התחזית היא חישוב, לא לוח זמנים מובטח. בחודש הזה ייקבע אחוז ריבית לפי העוגן של אותו יום, ואף אחד לא יודע היום מה הוא יהיה.",
+    "",
+    "ההחזר הראשון מחושב מאחוז הריבית של היום, שקבוע עד העדכון הראשון. אם תקבלו את ההלוואה בתנאים האלה, הוא ידוע.",
+  ]}
+>
+  ההחזר הראשון, {f.shekels("explain.first")}, מחושב מאחוז הריבית של היום, שלא זז עד העדכון הראשון. {f.shekels("explain.max")} הוא התשלום הגבוה ביותר בלוח שמחושב לפי תחזית — לא תקרה ולא לוח זמנים.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## גלית ואורן: תמהיל של שני מסלולים
+
+</Section>
+
+גלית ואורן, זוג בדוי (תרגיל נפרד, לא התיק של נועם ושירה), קיבלו אישור עקרוני על תמהיל של שני מסלולים, שניהם ל־20 שנה בשפיצר:
+- {f.shekels("worked.fixed_amount")} בקבועה לא צמודה, 5.2%;
+- {f.shekels("worked.var_amount")} במשתנה לא צמודה, 4.6% היום, עם עדכון כל 5 שנים.
+
+הם רוצים לדעת: כמה ישלמו בחודש הראשון, מה ההחזר המרבי החזוי, ומה מזה מובטח. (התחזית — אותה תחזית בדויה מההסבר.)
+
+**צעד 1 — כל מסלול בנפרד, בתנאים הנוכחיים.** הקבועה: {f.shekels("worked.fixed_pay")} בכל חודש. המשתנה: {f.shekels("worked.var_first")} עד העדכון הראשון.
+
+**צעד 2 — ההחזר הראשון של התמהיל.** <M>{n("worked.fixed_pay")} + {n("worked.var_first")} = {n("worked.first")}</M> ₪. כאן זה גם ההחזר בתנאים הנוכחיים.
+
+**צעד 3 — הלוח החזוי, תקופה אחר תקופה.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[32rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">שנים</th>
+        <th class="py-2 text-start font-semibold">התמהיל בחודש</th>
+        <th class="py-2 text-start font-semibold">קבועה</th>
+        <th class="py-2 text-start font-semibold">משתנה (אחוז הריבית בתחזית)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {workedRows.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 text-n700"><span class="ltr">{years(r)}</span></td>
+          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.total)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
+          <td class="py-2"><span class="ltr">{formatShekels(r.payment_2)}</span> <span class="text-caption text-n600">(<span class="ltr">{pct(r.rate_2)}</span>)</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 4 — ההחזר המרבי החזוי.** הגבוה ביותר בעמודה ״התמהיל בחודש״: {f.shekels("worked.max")}, מחודש {f.plain("worked.max_month")}. הוא גבוה מההחזר הראשון ב־{f.shekels("worked.max_gap")}, כלומר ב־{f.plain("worked.above")}% — פחות מ־10%, ולכן Mogi לא תדגיש אותו.
+
+**צעד 5 — מה מובטח.** בקבועה — הכול: {f.shekels("worked.fixed_pay")} בכל חודש, 20 שנה. במשתנה — רק 5 השנים הראשונות. כל מה שאחרי זה תלוי בעוגן שעוד לא ידוע. אילו העוגן היה עולה כמו בעמודה ״אם הריבית עולה יותר״ בהסבר, התשלום הגבוה ביותר של התמהיל היה {f.shekels("worked.high_max")} — {f.shekels("worked.high_gap")} מעל ההחזר המרבי החזוי.
+
+**מה לקחת מזה.** חצי מהתמהיל בקבועה חוסם את חצי מהשינוי: כאן ההחזר המרבי החזוי רחוק מהראשון בפחות מאשר במסלול המשתנה לבדו. זו דוגמה, לא המלצה; למחיר של הקבועה, ולבחירה בין המסלולים, נגיע בשלב 5.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הלוח החזוי
+
+</Section>
+
+תמהיל אחר (מספרים להמחשה): {formatShekels("200000")} בקבועה לא צמודה ל־10 שנים, ו־{formatShekels("400000")} במשתנה לא צמודה ל־20 שנה, עם עדכון כל 5 שנים. התשלומים של כל מסלול כבר בטבלה, לפי תחזית בדויה. השלימו את התשלום של התמהיל בכל תקופה. התקופה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="3.8-half"
+  periodLabel="שנים"
+  columns={[
+    { key: "fixed", label: "קבועה" },
+    { key: "variable", label: "משתנה" },
+    { key: "total", label: "התמהיל בחודש" },
+  ]}
+  rows={halfRows}
+  blanks={[`${halfRows[1].period}.total`, `${halfRows[2].period}.total`, `${halfRows[3].period}.total`]}
+  success={`נכון. ההחזר המרבי החזוי של התמהיל הוא ${f.shekels("half.max")}, בשנים 6–10 — ולא בשנים 11–15, שבהן התשלום של המשתנה לבדו הוא הגבוה ביותר. הקבועה כבר נגמרה שם.`}
+  hint="בכל תקופה מחברים את שני התשלומים של אותה תקופה. מסלול שנגמר תורם 0."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והתחזיות בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא התחזית של בנק ישראל.
+התרגילים מסודרים מהקל אל המאתגר. בתרגיל 3 תצטרכו מחשבון או גיליון.
+
+<ChoiceExercise
+  client:visible
+  id="3.8-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "רק ההחזר הראשון ידוע; את השאר אפשר רק לחזות", feedback: "בקבועה לא צמודה שום דבר לא זז: לא אחוז הריבית ולא המדד. אין מה לחזות." },
+    { text: "שלושתם שווים, וכולם ידועים ביום החתימה", correct: true, feedback: "נכון. אחוז הריבית קבוע והחוב לא צמוד, ולכן בשפיצר כל התשלומים שווים: הראשון, ״בתנאים הנוכחיים״ והגבוה ביותר." },
+    { text: "ההחזר המרבי החזוי גבוה מהראשון, כי ריביות נוטות לעלות", feedback: "במסלול קבוע הריבית לא משתנה, מה שלא יקרה בשוק. וגם במסלול משתנה, הקורס לא מניח לאן ריביות ״נוטות״." },
+    { text: "אי אפשר לדעת עד שבנק ישראל יפרסם תחזית", feedback: "תחזית צריך רק למה שזז: עוגן או מדד. בקבועה לא צמודה אין כאלה." },
+  ]}
+>
+  לקחתם הלוואה בקבועה לא צמודה, בשפיצר. מה נכון לגבי ההחזר הראשון, ההחזר בתנאים הנוכחיים וההחזר המרבי החזוי?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.8-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_tenth"), message: `זה 10% מההחזר — התוספת בלבד. Mogi מדגישה כשההחזר המרבי גבוה ב־10% או יותר, כלומר מ־${eq(`${n("ex2.base")} + ${n("ex2.err_tenth")}`)} ₪ ומעלה.` },
+    { value: f.raw("ex2.base"), message: "זה ההחזר בתנאים הנוכחיים עצמו. ההדגשה מתחילה רק כשההחזר המרבי גבוה ממנו ב־10%." },
+  ]}
+>
+  ההחזר בתנאים הנוכחיים של תמהיל הוא {f.shekels("ex2.base")}. מאיזה החזר מרבי חזוי, לכל הפחות, Mogi תדגיש אותו?
+</NumericExercise>
+
+<Solution for="3.8-2">
+להוסיף 10% זה להכפיל ב־1.1 (שיעור 0.1): <M>{n("ex2.base")} × 1.1 = {n("ex2.answer")}</M> ₪. מהחזר מרבי חזוי כזה ומעלה, Mogi מדגישה אותו.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.8-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_flat"), message: "זה התשלום של חמש השנים הראשונות, ב־4%. בעדכון אחוז הריבית עלה ל־5%, והתשלום מחושב מחדש." },
+    { value: f.raw("ex3.err_full_amount"), message: "חישבתם על כל 400,000 ₪ ול־300 חודשים. אחרי 5 שנים של תשלומים נשארה יתרה קטנה יותר, ונשארו 240 חודשים." },
+    { value: f.raw("ex3.err_all_months"), message: "היתרה נכונה, אבל מספר החודשים לא: עברו 60 חודשים מתוך 300, ולכן נשארו 240." },
+  ]}
+>
+  לקחתם {formatShekels("400000")} ל־25 שנה (300 חודשים) במשתנה לא צמודה, עם עדכון כל 5 שנים. היום אחוז הריבית 4%, והתשלום {f.shekels("ex3.first")}. אחרי 60 תשלומים היתרה היא {f.shekels("ex3.balance_60")}, ולפי התחזית אחוז הריבית החדש יהיה 5%. מה יהיה התשלום החזוי מחודש 61?
+</NumericExercise>
+
+<Solution for="3.8-3">
+התשלום מחושב מחדש על היתרה שנשארה, לחודשים שנשארו: {f.shekels("ex3.balance_60")}, 5% לשנה (5 חלקי 12 לחודש), ו־240 חודשים. בגיליון: <span class="ltr">{`=PMT(5%/12, 240, -${f.raw("ex3.balance_60")})`}</span>. התשלום החזוי: {f.shekels("ex3.answer")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="3.8-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "הוא צודק: הבנק מתחייב להחזר המרבי שכתב", feedback: "הבנק מתחייב לתנאי החוזה: המרווח, מועדי העדכון, שיטת ההחזר. את העוגן העתידי הוא לא קובע, ולכן גם לא את התשלום שייצא ממנו." },
+    { text: "הוא צודק, כי התחזית של בנק ישראל מדויקת", feedback: "התחזית מחושבת לפי כלל קבוע ממקור מוגדר — זה מה שהופך אותה לאחידה ובדיקה. זה לא הופך אותה לוודאית." },
+    { text: "הוא טועה: זה חישוב לפי תחזית. אם העוגן יעלה יותר ממנה, התשלום יעבור אותו", correct: true, feedback: "נכון. ההחזר המרבי החזוי הוא תוצאה של חישוב, לא תקרה. כדאי לבדוק גם מה קורה אם הריבית עולה יותר מהתחזית." },
+    { text: "הוא טועה: התשלום תמיד מגיע להחזר המרבי בסוף ההלוואה", feedback: "לא תמיד, ולא בהכרח בסוף. בהסבר ראינו תחזית שבה השיא בשנים 11–15, ודרך אחרת שבה השיא הוא דווקא התשלום הראשון." },
+  ]}
+>
+  חבר אומר: ״באישור העקרוני כתוב החזר מרבי חזוי של {f.whole("explain.max")}. אז אני יודע שלא אשלם יותר מזה אף פעם.״ מה נכון?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="3.8-5"
+  n={5}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_sum"), message: `חיברתם את הגבוה של כל מסלול לחוד: ${eq(`${n("ex5.fixed_pay")} + ${n("ex5.var_max")}`)}. אבל המשתנה מגיע לשיא שלו בשנים 16–20, כשהקבועה כבר נגמרה. מחברים כל תקופה, ורק אז לוקחים את הגבוה.` },
+    { value: f.raw("ex5.mix_first"), message: "זה ההחזר הראשון של התמהיל. אחרי העדכונים, לפי התחזית, התשלום עולה." },
+    { value: f.raw("ex5.var_max"), message: "זה השיא של המסלול המשתנה לבדו, בשנים 16–20. בתקופות שבהן גם הקבועה משלמת, התמהיל משלם יותר." },
+  ]}
+>
+  תמהיל של שני מסלולים, תשלומים חזויים בכל תקופה (לפי תחזית בדויה):
+
+  <div class="my-3 overflow-x-auto">
+    <table class="w-full min-w-[20rem] border-collapse text-body-m">
+      <thead>
+        <tr class="border-b border-n200 text-caption text-n600">
+          <th class="py-1 text-start font-semibold">שנים</th>
+          <th class="py-1 text-start font-semibold">קבועה, 15 שנה</th>
+          <th class="py-1 text-start font-semibold">משתנה, 20 שנה</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ex5Rows.map((r) => (
+          <tr class="border-b border-n100">
+            <td class="py-1"><span class="ltr">{years(r)}</span></td>
+            <td class="py-1"><span class="ltr">{formatShekels(r.payment_1)}</span></td>
+            <td class="py-1"><span class="ltr">{formatShekels(r.payment_2)}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  מה ההחזר המרבי החזוי של התמהיל?
+</NumericExercise>
+
+<Solution for="3.8-5">
+מחברים כל תקופה: {ex5Rows.map((r) => `${years(r)}: ${formatShekels(r.total)}`).join(" · ")}. הגבוה ביותר: {f.shekels("ex5.answer")}, בשנים 11–15. בשנים 16–20 המשתנה לבדו משלם יותר מאי פעם ({f.shekels("ex5.var_max")}), אבל הקבועה כבר נגמרה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="3.8-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.05}
+  near={0.1}
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_of_max"), tolerance: 0.05, message: `חילקתם את ההפרש בהחזר המרבי. ״גבוה ב־X% מ...״ נמדד מול מה שמשווים אליו — ההחזר בתנאים הנוכחיים: ${eq(`${n("ex6.gap")} ÷ ${n("ex6.first")}`)}.` },
+  ]}
+>
+  מסלול משתנה של {formatShekels("500000")} ל־20 שנה. ההחזר בתנאים הנוכחיים: {f.shekels("ex6.first")}. לפי התחזית, התשלומים בכל תקופה של 5 שנים: {ex6Rows.map((r) => formatShekels(r.total)).join(", ")}. בכמה אחוזים ההחזר המרבי החזוי גבוה מההחזר בתנאים הנוכחיים? (ספרה אחת אחרי הנקודה.) האם Mogi תדגיש אותו?
+</NumericExercise>
+
+<Solution for="3.8-6">
+ההחזר המרבי החזוי: {f.shekels("ex6.max")}. ההפרש: <M>{n("ex6.max")} − {n("ex6.first")} = {n("ex6.gap")}</M>. באחוזים מההחזר בתנאים הנוכחיים: <M>{n("ex6.gap")} ÷ {n("ex6.first")} × 100 = {f.plain("ex6.answer")}%</M> (בעיגול). פחות מ־10%, ולכן Mogi לא תדגיש — אבל זה קרוב: ההדגשה הייתה מתחילה מ־{f.shekels("ex6.highlight_at")}.
+</Solution>
+
+<Callout title="חמש שאלות על שלושת ההחזרים">
+<p><strong>מה זה?</strong> שלושה מספרים שמסכמים את התשלום החודשי: ההחזר הראשון (החודש הראשון), ההחזר בתנאים הנוכחיים (כאילו שום דבר לא יזוז) וההחזר המרבי החזוי (הגבוה ביותר בלוח שמחושב לפי תחזית).</p>
+<p><strong>למה זה קיים?</strong> במסלול משתנה או צמוד אי אפשר לדעת היום את כל התשלומים. בנק ישראל דורש שהבנק יציג גם את התשלום של היום וגם את הגבוה ביותר לפי תחזית אחידה (לפי תעתיק בצוות, לא אומת), כדי שהלווים יראו את שני הצדדים, ושאפשר יהיה להשוות בין בנקים.</p>
+<p><strong>איך זה עובד?</strong> הראשון וה״נוכחי״ מחושבים מהתנאים של היום. המרבי — מלוח שלם שמחושב לפי התחזית: בכל עדכון אחוז ריבית חזוי, תשלום מחושב מחדש, ובתמהיל מחברים את המסלולים בכל חודש ולוקחים את הגבוה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההחזר הראשון הוא מה שתשלמו עכשיו, והוא גם מה שהבנק בודק מול ההכנסה. ההחזר המרבי החזוי מראה עד כמה התשלום יכול לעלות לפי התחזית — אבל הוא לא תקרה, ובפועל אפשר לשלם יותר או פחות.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים שתי שאלות: האם ההחזר הראשון מתאים לתקציב היום, והאם גם ההחזר המרבי החזוי — ועוד קצת מעליו — מתאים. אם התשובה השנייה ״בקושי״, שוקלים יותר מסלולים קבועים, ומקבלים בתמורה מחיר אחר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **החזר ראשון** — התשלום בחודש הראשון, לפי התנאים של היום.
+- **החזר בתנאים הנוכחיים** — התשלום כאילו שום דבר לא יזוז. המספר הראשי ב־Mogi; לא ממוצע ולא הבטחה.
+- **החזר מרבי חזוי** — התשלום הגבוה ביותר בלוח שמחושב לפי **תחזית**. הוא לא בהכרח בסוף, והוא **לא תקרה**.
+- **מובטח:** מה שבחוזה (אחוז קבוע, מרווח, מועדי עדכון). **חזוי:** כל מה שתלוי בעוגן או במדד העתידיים.
+- **בתמהיל:** מחברים את המסלולים בכל חודש, ורק אז לוקחים את הגבוה.
+- **Mogi:** תחזית רק מנתוני בנק ישראל; מדגישה החזר מרבי שגבוה ב־10% ומעלה; ובבדיקת ההכנסה משמש ההחזר הראשון, לא המרבי.
+
+**בשיעור הבא — 3.9, <Later lesson="3.9" quiet>סך תשלומים</Later>, ריבית, הצמדה ו<Later lesson="3.9" quiet>עמלות</Later>:** מהתשלום של חודש אחד אל כל הכסף שיוצא לאורך כל ההלוואה — ולאן כל שקל ממנו הולך.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "המספר הראשי הוא ״החזר חודשי בתנאים הנוכחיים״ (לא ממוצע על כל חיי ההלוואה); ליד הוא ההחזר הראשון, גם כשהוא שווה, וההחזר המרבי החזוי, כשאפשר לחשב את התחזית כולה; מדגישים אותו כשהוא גבוה ב־10% ומעלה (סף שבחרה Mogi); ״החזר מרבי חזוי הוא תחזית, לא תקרה מובטחת״; כשלמסלול אין תחזית, ההחזר המרבי של התמהיל לא מוצג כשלם. Brain, דף 67436545 (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם).", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "תחזיות רק מנתוני התחזית שבנק ישראל מפרסם לחישובים לפי הוראת בנק ישראל 451; לא תחזית המקרו של חטיבת המחקר, ולא הנחה של אינפלציה קבועה. Brain, דף 67436545 (אותה החלטה).", date: "2026-10-08" },
+    { kind: "לא אומת", text: "האישור העקרוני מציג את ההחזר החודשי הראשון ואת ההחזר החודשי הגבוה ביותר הצפוי לפי התחזיות (הוראת בנק ישראל 451, סעיף 4ג(ב4)). לפי תעתיק בצוות ב־Brain (דף 7733250, מגרסה 22 של ההוראה, שהורדה ב־2026-08-03), ממתין לבדיקה מול המקור.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "בנק ישראל מפרסם קובץ תחזיות (עקום נומינלי ועקום ריאלי, וההפרש ביניהם) שמשמש לחישובים לפי הוראת בנק ישראל 451, ומעדכן אותו פעמיים בחודש. לפי תעתיק בצוות ב־Brain (דפים 7831553, 2026-08-03, ו־67469313, 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "ההחזר שנכנס לבדיקת ההכנסה: בהלוואה רגילה — ההחזר הראשון על כל הסכום; עם גרייס — ההחזר אחרי הגרייס; בלי זעזוע ריבית שרירותי. החלטה של Mogi (Brain, דף 67436545) שנשענת על נספח א׳ של הוראת בנק ישראל 329 — הכלל הרשמי לפי תעתיק בצוות, לא אומת.", date: "2026-10-08" },
+    { kind: "ידע מתמטי כללי", text: "ההחזר המרבי הוא המקסימום של רשימת התשלומים; בתמהיל — של סכום המסלולים בכל חודש, שאינו בהכרח סכום המקסימומים." },
+    { kind: "הנחת חישוב", text: "כל הסכומים, אחוזי הריבית והתחזיות בשיעור בדויים, להמחשה — לא נתוני שוק ולא התחזית של בנק ישראל. ריבית חודשית = אחוז הריבית לשנה חלקי 12. בכל עדכון התשלום מחושב מחדש על היתרה שנשארה, לחודשים שנשארו (הנחת הקורס; חוזה יכול לקבוע אחרת). הלוחות מחושבים בלי עיגול בדרך, ומעוגלים לאגורה כשמציגים. גלית ואורן — זוג בדוי." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/metrics.ts (built on schedule.ts and amortization.ts) via scripts/lessons/lesson-3-8.ts and data/lessons/3-8.json, rechecked by checks/kinds/metrics.py. Illustration: src/components/ForecastPaths.vue. The map lists no video for this lesson. */}

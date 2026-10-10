@@ -1,0 +1,249 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.1 — "מהניחוש לנוסחה" (the map's "גזירה צעד אחר צעד").
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-1.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+  The formula is built on screen one step at a time, each symbol said as it appears.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.1 · מאיפה בא החזר השפיצר</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,015.02", "2,000".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A signed amount in an equation, with a real minus sign and no direction mark: "−10".
+      const sgn = (v) => (String(v).startsWith("-") ? `−${num(String(v).slice(1))}` : num(v));
+      const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const t1000 = fact("explain.try_1000");
+      const t1020 = fact("explain.try_1020");
+      const t1015 = fact("explain.try_1015");
+      const st = fact("explain.steps");
+      const lg = fact("long.steps");
+      const V = {
+        loan: shek(fact("explain.loan")),
+        monthly: fact("explain.monthly"),
+        left1000: shek(t1000[1].closing),
+        over1020: shek(fact("explain.over_1020")),
+        left1015: shek(t1015[1].closing),
+        f1: dec(fact("explain.f1")),
+        f2: dec(fact("explain.f2")),
+        S: dec(fact("explain.S")),
+        pay: shek(fact("explain.pay")),
+        payN: num(fact("explain.pay")),
+        loanN: num(fact("explain.loan")),
+        oneMinus: dec(st.one_minus),
+        discount: dec(st.discount),
+        longPay: shek(fact("long.pay")),
+        longMonthly: fact("long.monthly"),
+        lgM: dec(lg.m),
+        lgOneMinus: dec(lg.one_minus),
+        lgTop: num(lg.top),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], tries: [10, 51], pv: [51, 92], shortcut: [92, 132], formula: [132, 159], end: [159, 172] };
+      window.duration = 172;
+      window.cues = [
+        [1, 5, "איך מוצאים את ההחזר החודשי בשפיצר?"],
+        [5, 9.5, `נתחיל מהלוואה קטנה: ${V.loan}, ${V.monthly}% לחודש, חודשיים.`],
+        [11, 17, "ננחש תשלום, ונבדוק מה נשאר אחרי החודש השני."],
+        [17, 25, `1,000 ₪ בחודש: נשאר חוב של ${V.left1000}. קטן מדי.`],
+        [25, 33, `1,020 ₪ בחודש: שילמנו ${V.over1020} יותר מדי.`],
+        [33, 41, `1,015 ₪ בחודש: נשארו ${V.left1015}. כמעט.`],
+        [41, 50, "בהלוואה של 240 חודשים, לנחש ככה זה ארוך מדי."],
+        [53, 60, "בלי לנחש: ההלוואה שווה לערך הנוכחי של התשלומים."],
+        [60, 68, "כל תשלום מהוונים לפי החודש שבו הוא מגיע."],
+        [68, 76, "בשני החלקים יש C. מוציאים אותו מחוץ לסוגריים."],
+        [76, 83, `בסוגריים: S, סכום מקדמי ההיוון — ${V.S}.`],
+        [83, 91, `התשלום: ${V.loanN} חלקי S — ${V.pay}.`],
+        [93, 100, "ל־240 תשלומים צריך דרך קצרה לחשב את S."],
+        [100, 108, "כופלים את S ב־1.01: כל מקדם זז צעד אחד."],
+        [108, 116, "מחסירים את S: כל מה שבאמצע נעלם."],
+        [116, 124, "נשאר: S כפול r שווה 1 פחות המקדם האחרון."],
+        [124, 131, "וכך לכל מספר תשלומים, n."],
+        [133, 141, "התשלום הוא P כפול r, חלקי 1 פחות המקדם האחרון."],
+        [141, 150, `‏600,000 ₪, ${V.longMonthly}% לחודש, 240 חודשים: ${V.longPay}.`],
+        [150, 158, "זה התשלום שראינו בשיעור 2.9."],
+        [161, 166, "ההלוואה היא הערך הנוכחי של התשלומים שלה."],
+        [166, 171, "ומזה יוצא ההחזר החודשי."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right, with exponents: parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "isolate" });
+        for (const p of parts) {
+          const ns = "http://www.w3.org/2000/svg";
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מהניחוש לנוסחה", 76, { w: 700, o });
+          txt(640, 344, "מאיפה בא החזר השפיצר", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 4.5, o);
+          box(400, 400, 480, 104, o2);
+          txt(640, 444, V.loan, 36, { w: 700, o: o2, ltr: true });
+          txt(640, 484, `${V.monthly}% לחודש · חודשיים · אותו תשלום בכל חודש`, 20, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — three tries: what is left after the second month
+        if (inScene(t, S.tries)) {
+          const o = vis(t, S.tries);
+          txt(640, 140, "ננחש, ונבדוק מה נשאר", 42, { w: 700, o });
+          txt(640, 184, "היתרה אחרי החודש השני", 22, { fill: C.n600, o });
+          const rows = [
+            { from: 6, pay: "1,000 ₪", rows: t1000, left: t1000[1].closing, note: "חוב נשאר", y: 230 },
+            { from: 14, pay: "1,020 ₪", rows: t1020, left: fact("explain.over_1020"), note: "שילמנו יותר מדי", y: 330 },
+            { from: 22, pay: "1,015 ₪", rows: t1015, left: t1015[1].closing, note: "חוב נשאר: כמעט אפס", y: 430 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.tries, r.from, o);
+            box(160, r.y, 960, 80, or);
+            txt(1090, r.y + 50, `תשלום ${r.pay}`, 26, { anchor: "start", w: 700, o: or });
+            eqn(640, r.y + 34, [num(r.rows[0].opening), ` + ${num(r.rows[0].interest)} − ${r.pay.replace(" ₪", "")} = ${num(r.rows[0].closing)}`], 20, { w: 400, fill: C.n700, o: or });
+            eqn(640, r.y + 62, [num(r.rows[1].opening), ` + ${num(r.rows[1].interest)} − ${r.pay.replace(" ₪", "")} = ${sgn(r.rows[1].closing)}`], 20, { w: 400, fill: C.n700, o: or });
+            txt(200, r.y + 36, shek(r.left), 28, { anchor: "end", w: 700, o: or, ltr: true, fill: C.teal });
+            txt(200, r.y + 64, r.note, 18, { anchor: "end", fill: C.n600, o: or });
+          }
+        }
+        // Scene 3 — present value: the loan is the value today of its payments
+        if (inScene(t, S.pv)) {
+          const o = vis(t, S.pv);
+          txt(640, 140, "בלי לנחש: ערך נוכחי", 42, { w: 700, o });
+          const o1 = after(t, S.pv, 2, o);
+          eqn(640, 230, [`${V.loanN} = C ÷ 1.01 + C ÷ `, ["1.01", "2"]], 38, { o: o1 });
+          const o1b = after(t, S.pv, 9, o);
+          txt(610, 275, "אחרי חודש", 18, { fill: C.n600, o: o1b });
+          txt(790, 275, "אחרי חודשיים", 18, { fill: C.n600, o: o1b });
+          const o2 = after(t, S.pv, 17, o);
+          eqn(640, 340, [`${V.loanN} = C × (1 ÷ 1.01 + 1 ÷ `, ["1.01", "2"], ")"], 38, { o: o2 });
+          const o3 = after(t, S.pv, 25, o);
+          eqn(640, 420, [`S = ${V.f1} + ${V.f2} = ${V.S}`], 32, { o: o3, fill: C.teal });
+          txt(640, 456, "S — סכום מקדמי ההיוון: כמה שווים היום שני תשלומים של שקל", 18, { fill: C.n600, o: o3 });
+          const o4 = after(t, S.pv, 32, o);
+          box(390, 480, 500, 76, o4 * 0.6, C.mint);
+          eqn(640, 530, [`C = ${V.loanN} ÷ ${V.S} = ${V.payN}`], 34, { w: 700, o: o4 });
+        }
+        // Scene 4 — the shortcut for S
+        if (inScene(t, S.shortcut)) {
+          const o = vis(t, S.shortcut);
+          txt(640, 140, "קיצור ל־S", 42, { w: 700, o });
+          const o1 = after(t, S.shortcut, 2, o);
+          eqn(640, 220, ["S        = 1 ÷ 1.01 + 1 ÷ ", ["1.01", "2"]], 34, { o: o1 });
+          const o2 = after(t, S.shortcut, 8, o);
+          eqn(640, 280, ["S × 1.01 = 1 + 1 ÷ 1.01"], 34, { o: o2 });
+          const o3 = after(t, S.shortcut, 16, o);
+          el("line", { x1: 400, x2: 880, y1: 302, y2: 302, stroke: C.n300, "stroke-width": 2, opacity: o3 });
+          eqn(640, 350, ["S × 1.01 − S = 1 − 1 ÷ ", ["1.01", "2"]], 34, { o: o3, fill: C.teal });
+          const o4 = after(t, S.shortcut, 24, o);
+          eqn(640, 420, [`S × 0.01 = 1 − ${V.discount} = ${V.oneMinus}`], 28, { w: 400, fill: C.n700, o: o4 });
+          const o5 = after(t, S.shortcut, 32, o);
+          box(330, 450, 620, 96, o5 * 0.6, C.mint);
+          eqn(640, 508, ["S = (1 − 1 ÷ ", ["(1 + r)", "n"], ") ÷ r"], 38, { w: 700, o: o5 });
+          txt(640, 538, "r — הריבית לחודש · n — מספר התשלומים", 18, { fill: C.n700, o: o5 });
+        }
+        // Scene 5 — the formula, and a check on 240 payments
+        if (inScene(t, S.formula)) {
+          const o = vis(t, S.formula);
+          txt(640, 140, "ההחזר החודשי", 42, { w: 700, o });
+          const o1 = after(t, S.formula, 1, o);
+          box(330, 175, 620, 110, o1);
+          eqn(640, 245, ["C = P × r ÷ (1 − ", ["(1 + r)", "−n"], ")"], 44, { w: 700, o: o1 });
+          txt(640, 315, "P — סכום ההלוואה · r — הריבית לחודש · n — מספר החודשים", 20, { fill: C.n600, o: o1 });
+          txt(640, 345, "המינוס בחזקה: ״אחד חלקי״", 20, { fill: C.n600, o: o1 });
+          const o2 = after(t, S.formula, 9, o);
+          eqn(640, 410, [`r = ${V.lgM}`, "   ·   n = 240   ·   ", ["1 − 1.004", "−240"], ` = ${V.lgOneMinus}`], 24, { w: 400, fill: C.n700, o: o2 });
+          const o3 = after(t, S.formula, 12, o);
+          box(370, 440, 540, 90, o3 * 0.6, C.mint);
+          eqn(640, 498, [`600,000 × ${V.lgM} ÷ ${V.lgOneMinus} = ${num(fact("long.pay"))}`], 30, { w: 700, o: o3 });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 280, "ההלוואה היא הערך הנוכחי", 48, { w: 700, o });
+          txt(640, 345, "של התשלומים שלה.", 48, { w: 700, o });
+          const o2 = after(t, S.end, 6, o);
+          eqn(640, 440, ["C = P × r ÷ (1 − ", ["(1 + r)", "−n"], ")"], 34, { w: 600, o: o2, fill: C.teal });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

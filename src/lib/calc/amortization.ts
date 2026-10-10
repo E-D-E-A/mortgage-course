@@ -272,3 +272,123 @@ export function monthsToNextUpdate(termMonths: number, intervalMonths: number, n
   const next = nextUpdateMonth(termMonths, intervalMonths, now);
   return next === null ? null : next - now;
 }
+
+// ── Stage 3: where the level payment comes from, and the balance at any month. ──
+// Added for lessons 3.1–3.4; lessons 3.5–3.7 build on remainingBalance. Stable.
+
+function assertPaid(months: number, paid: number): void {
+  if (!Number.isInteger(paid) || paid < 0 || paid > months) throw new RangeError(`paid must be a whole number from 0 to ${months}, got ${paid}`);
+}
+
+/**
+ * S, the sum of `months` monthly discount factors at a nominal annual rate:
+ * 1 ÷ (1 + m) + 1 ÷ (1 + m)² + … + 1 ÷ (1 + m)^n, by its short form
+ * (1 − (1 + m)^−n) ÷ m (lesson 3.1). What n payments of one shekel, one at the
+ * end of each month, are worth today. At a rate of zero, n. Exact.
+ */
+export function discountSum(annualPercent: Numeric, months: number): Decimal {
+  assertMonths(months);
+  const m = monthlyRate(annualPercent).div(HUNDRED);
+  if (m.isZero()) return new D(months);
+  return ONE.minus(ONE.plus(m).pow(-months)).div(m);
+}
+
+/** One monthly discount factor, 1 ÷ (1 + m)^k: what one shekel paid at the end of month k is worth today. Exact. */
+export function monthlyDiscountFactor(annualPercent: Numeric, month: number): Decimal {
+  if (!Number.isInteger(month) || month < 0) throw new RangeError(`month must be a whole number of at least 0, got ${month}`);
+  return ONE.div(ONE.plus(monthlyRate(annualPercent).div(HUNDRED)).pow(month));
+}
+
+/**
+ * The value today of `months` equal monthly payments of `payment`, one at the
+ * end of each month, at a nominal annual rate: C × S. The inverse of
+ * annuityPayment: paymentsValueToday(annuityPayment(P, a, n), a, n) = P. Exact.
+ */
+export function paymentsValueToday(payment: Numeric, annualPercent: Numeric, months: number): Decimal {
+  return new D(payment).mul(discountSum(annualPercent, months));
+}
+
+/**
+ * The balance after `paid` level payments, as the value today of the payments
+ * still to come: C × (1 − (1 + m)^−(n − k)) ÷ m, C the exact (unrounded) level
+ * payment (lesson 3.3). The same number as annuityBalance, which rolls the debt
+ * forward instead. `paid` from 0 (the principal) to `months` (zero). Exact.
+ * A statement's balance (statementBalance) can differ by a few agorot, because
+ * it rounds the payment and each month's interest.
+ */
+export function remainingBalance(principal: Numeric, annualPercent: Numeric, months: number, paid: number): Decimal {
+  assertMonths(months);
+  assertPaid(months, paid);
+  if (paid === months) return new D(0);
+  return paymentsValueToday(annuityPayment(principal, annualPercent, months), annualPercent, months - paid);
+}
+
+/** The balance a statement shows after `paid` months of the level payment: annuityStatement's closing balance (0 paid: the principal). */
+export function statementBalance(principal: Numeric, annualPercent: Numeric, months: number, paid: number): Decimal {
+  assertMonths(months);
+  assertPaid(months, paid);
+  if (paid === 0) return agorot(principal);
+  return annuityStatement(principal, annualPercent, months)[paid - 1].closing;
+}
+
+/**
+ * A trial (lesson 3.1): pay the same `payment` every month and see what is left.
+ * Statement convention: each month's interest rounded to the agora, the
+ * payment taken off as it is. The balance is NOT forced to zero: what is left
+ * after the last month is positive when the payment was too small, negative
+ * when it was too large (overpaid).
+ */
+export function paymentTrial(principal: Numeric, annualPercent: Numeric, payment: Numeric, months: number): AmortizationRow[] {
+  assertMonths(months);
+  const pay = new D(payment);
+  const rows: AmortizationRow[] = [];
+  let balance = agorot(principal);
+  for (let month = 1; month <= months; month++) {
+    const interest = agorot(monthInterest(balance, annualPercent));
+    const principalPaid = pay.minus(interest);
+    rows.push({ month, opening: balance, payment: pay, interest, principalPaid, closing: balance.minus(principalPaid) });
+    balance = balance.minus(principalPaid);
+  }
+  return rows;
+}
+
+/**
+ * The first month in which the principal part of the level payment is larger
+ * than the interest part (statement convention), or null when it never is.
+ */
+export function principalOvertakesInterest(principal: Numeric, annualPercent: Numeric, months: number): number | null {
+  const k = annuityStatement(principal, annualPercent, months).findIndex((r) => r.principalPaid.gt(r.interest));
+  return k < 0 ? null : k + 1;
+}
+
+/** The level payment's formula, one step at a time, for a worked example (lesson 3.1). Exact. */
+export interface AnnuitySteps {
+  /** The monthly rate as a decimal: annual ÷ 12 ÷ 100. */
+  m: Decimal;
+  /** (1 + m)^n */
+  growth: Decimal;
+  /** (1 + m)^−n = 1 ÷ (1 + m)^n */
+  discount: Decimal;
+  /** 1 − (1 + m)^−n */
+  oneMinus: Decimal;
+  /** P × m: the first month's interest */
+  top: Decimal;
+  /** P × m ÷ (1 − (1 + m)^−n) */
+  payment: Decimal;
+}
+export function annuitySteps(principal: Numeric, annualPercent: Numeric, months: number): AnnuitySteps {
+  assertMonths(months);
+  const m = monthlyRate(annualPercent).div(HUNDRED);
+  if (m.isZero()) throw new RangeError("the steps need a rate above zero; at zero the payment is principal ÷ months");
+  const growth = ONE.plus(m).pow(months);
+  const discount = ONE.div(growth);
+  const oneMinus = ONE.minus(discount);
+  const top = new D(principal).mul(m);
+  return { m, growth, discount, oneMinus, top, payment: top.div(oneMinus) };
+}
+
+/** The first month after which a statement's level-payment balance is below `threshold` (lesson 3.3: "when is half the debt repaid?"), or null. */
+export function firstMonthBelow(principal: Numeric, annualPercent: Numeric, months: number, threshold: Numeric): number | null {
+  const k = annuityStatement(principal, annualPercent, months).findIndex((r) => r.closing.lt(threshold));
+  return k < 0 ? null : k + 1;
+}

@@ -260,3 +260,116 @@ KINDS = {
     "amort_anchor_table": anchor_table,
     "amort_linked_payment_table": linked_payment_table,
 }
+
+
+# ── Stage 3 (lessons 3.1–3.4): sums of discount factors, trials, balances. ──
+# Each one by the long road: factors summed one by one, balances discounted payment by
+# payment, where the TypeScript uses the short formulas.
+
+def fixed(x, decimals):
+    """Exactly `decimals` places, half up: "0.99009901"."""
+    return format(Decimal(x).quantize(Decimal(1).scaleb(-int(decimals)), rounding=ROUND_HALF_UP), "f")
+
+
+def monthly(rate_percent):
+    return Decimal(rate_percent) / TWELVE / HUNDRED
+
+
+def factor_sum(rate_percent, months):
+    m = monthly(rate_percent)
+    return sum((1 / (1 + m) ** k for k in range(1, int(months) + 1)), Decimal(0))
+
+
+def discount_factor(i, _facts=None):
+    return fixed(1 / (1 + monthly(i["rate_percent"])) ** int(i["month"]), i["decimals"])
+
+
+def discount_sum(i, _facts=None):
+    return fixed(factor_sum(i["rate_percent"], i["months"]), i["decimals"])
+
+
+def payments_value_today(i, _facts=None):
+    return str(agorot(Decimal(i["payment"]) * factor_sum(i["rate_percent"], i["months"])))
+
+
+def remaining_balance(i, _facts=None):
+    n, k = int(i["months"]), int(i["paid"])
+    c = level_payment(i["principal"], i["rate_percent"], n)
+    return str(agorot(c * factor_sum(i["rate_percent"], n - k))) if k < n else "0.00"
+
+
+def statement_balance(i, _facts=None):
+    k = int(i["paid"])
+    if k == 0:
+        return str(agorot(i["principal"]))
+    return statement(i, "annuity")[k - 1]["closing"]
+
+
+def trial_rows(i):
+    b, pay = agorot(i["principal"]), agorot(str(i["payment"]))
+    rate = Decimal(i["rate_percent"])
+    rows = []
+    for k in range(1, int(i["months"]) + 1):
+        interest = agorot(b * rate / TWELVE / HUNDRED)
+        closing = b + interest - pay
+        rows.append({"period": k, "opening": str(b), "interest": str(interest), "payment": str(pay), "closing": str(closing)})
+        b = closing
+    return rows
+
+
+def trial_table(i, _facts=None):
+    return trial_rows(i)
+
+
+def trial_last(i, _facts=None):
+    return trial_rows(i)[-1]["closing"]
+
+
+def principal_overtakes(i, _facts=None):
+    for r in statement(i, "annuity"):
+        if Decimal(r["principal_paid"]) > Decimal(r["interest"]):
+            return r["period"]
+    return None
+
+
+def formula_steps(i, _facts=None):
+    """The level payment's formula one step at a time; each step shown to `decimals` places."""
+    d = i["decimals"]
+    m = monthly(i["rate_percent"])
+    growth = (1 + m) ** int(i["months"])
+    one_minus = 1 - 1 / growth
+    top = Decimal(i["principal"]) * m
+    return {
+        "m": fixed(m, d),
+        "growth": fixed(growth, d),
+        "discount": fixed(1 / growth, d),
+        "one_minus": fixed(one_minus, d),
+        "top": str(agorot(top)),
+        "payment": str(agorot(top / one_minus)),
+    }
+
+
+def month_below(i, _facts=None):
+    for r in statement(i, "annuity"):
+        if Decimal(r["closing"]) < Decimal(str(i["threshold"])):
+            return r["period"]
+    return None
+
+
+def months_left(i, _facts=None):
+    return int(i["months"]) - int(i["paid"])
+
+
+KINDS.update({
+    "amort_months_left": months_left,
+    "amort_month_below": month_below,
+    "amort_discount_factor": discount_factor,
+    "amort_discount_sum": discount_sum,
+    "amort_payments_value_today": payments_value_today,
+    "amort_remaining_balance": remaining_balance,
+    "amort_statement_balance": statement_balance,
+    "amort_trial_table": trial_table,
+    "amort_trial_last": trial_last,
+    "amort_principal_overtakes": principal_overtakes,
+    "amort_formula_steps": formula_steps,
+})
