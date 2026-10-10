@@ -31,7 +31,8 @@
  *
  * Rounding: two conventions, chosen per call (the `rounding` option).
  *  - "exact" (the default): every figure is an exact Decimal; money is rounded
- *    to the agora only when shown (money.ts). For comparisons (3.8–3.11).
+ *    to the agora only when shown (money.ts). Kept as the default so callers
+ *    that do not ask for statement rounding are unchanged.
  *  - "statement": the way a statement shows it, and what teaching tables use
  *    (course/AUTHORING.md), so every row adds up on the printed numbers: the
  *    balance in agorot; on a linked track the opening balance is indexed and
