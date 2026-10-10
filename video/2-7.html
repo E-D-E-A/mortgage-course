@@ -221,12 +221,18 @@
           legendPoint(o);
           const oR = after(t, sc, 9, o);
           rateChip(0, every, `${V.lRate}%`, oR);
+          // The two forces, named before the curve is drawn.
+          const oF = during(t, sc, 1, 24, o);
+          if (oF > 0) {
+            pill(640, 290, 560, "אחוז הריבית: רק בנקודות העדכון", Math.min(oF, after(t, sc, 2, 1)), 24);
+            pill(640, 370, 560, "החוב: זז עם המדד, כל חודש", Math.min(oF, after(t, sc, 4, 1)), 24);
+          }
           // The original schedule's payment, then the index moving it a little every month.
           const oP = after(t, sc, 25, o);
           const yP = yOf(V.lPlain);
           el("line", { x1: xOf(0), x2: xOf(every), y1: yP, y2: yP, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "8 6", opacity: oP * 0.7 });
           txt(xOf(0) + 12, yP + 6, shek(V.lPlain), 18, { anchor: "start", ltr: true, fill: C.n700, o: oP });
-          const grow = ease((t - sc[0] - 25) / 6);
+          const grow = ease((t - sc[0] - 24.5) / 6);
           const steps = 60;
           let d = "";
           for (let m = 0; m <= steps * grow; m++) {
@@ -246,7 +252,7 @@
           el("line", { x1: xOf(every), x2: xOf(every), y1: yOf(V.lY5), y2: yOf(V.lNew), stroke: C.teal, "stroke-width": 6, opacity: oN });
           el("line", { x1: xOf(every), x2: xOf(every + 0.6), y1: yOf(V.lNew), y2: yOf(V.lNew) - 3, stroke: C.teal, "stroke-width": 6, opacity: oN });
           txt(xOf(every) - 20, yOf(V.lNew) - 16, shek(V.lNew), 20, { anchor: "end", ltr: true, w: 700, o: oN });
-          txt((xOf(every) + xOf(every * 2)) / 2, AX - 60, "ומשם — שוב עם המדד", 20, { fill: C.n700, w: 600, o: after(t, sc, 43, o) });
+          txt((xOf(every) + xOf(every * 2)) / 2, AX - 60, "ומשם — שוב עם המדד", 20, { fill: C.n700, w: 600, o: after(t, sc, 41, o) });
           // Legend for the two forces.
           const oL = after(t, sc, 25, o);
           el("line", { x1: 870, x2: 900, y1: 540, y2: 540, stroke: C.tq2, "stroke-width": 6, opacity: oL });
