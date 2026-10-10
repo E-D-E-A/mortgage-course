@@ -1,0 +1,310 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.4 — "אותם שלושה כללים, תשלום אחר".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-4.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: every schedule, in every method, is built by the same three row
+  rules; the method decides only the payment):
+  1. Title.
+  2. The three rules of 3.2: interest part, principal part, closing balance.
+  3. One loan (600,000 ₪, 4.8% a year, 20 years; 12 grace months inside the term — a
+     Mogi decision, with who and when) in six methods, each card the shape of its
+     payments: Spitzer 3,893.74; equal principal 4,900 down to 2,510; partial grace
+     2,400 then 4,016.41; full grace 0 then 4,213.50; partial bullet 2,400 and 602,400
+     at the end; full bullet 0 and 1,564,020.10 at the end.
+  4. When the payment is smaller than the interest part, the principal part is negative
+     and rule 3 adds it to the balance: full grace, 600,000 + 2,400 = 602,400; month 2's
+     interest is on the interest too; after 12 months the debt grew by 29,442.14.
+  5. The interest over the whole loan in each method: deferring principal raises it.
+  6. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.4 · לוחות של קרן שווה, גרייס ובוליט</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-4.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const V = {
+        loan: num(fact("loan")),
+        monthly: pl(fact("monthly")),
+        sp: num(fact("spitzer.pay")),
+        eqFirst: num(fact("equal.first")),
+        eqLast: num(fact("equal.last")),
+        eqPart: num(fact("equal.part")),
+        grace: num(fact("partial.grace_pay")),
+        pAfter: num(fact("partial.after")),
+        fAfter: num(fact("full.after")),
+        bpLast: num(fact("bp.last")),
+        bfLast: num(fact("bf.last")),
+        int1: num(fact("full.int_1")),
+        close1: num(fact("full.close_1")),
+        int2: num(fact("full.int_2")),
+        close12: num(fact("full.close_12")),
+        added: num(fact("full.added")),
+        pClose12: num(fact("partial.close_12")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], rules: [10, 34], methods: [34, 112], negative: [112, 148], interest: [148, 172], end: [172, 184] };
+      window.duration = 184;
+      window.cues = [
+        [1, 5, "קרן שווה, גרייס ובוליט."],
+        [5, 9.5, "אותם שלושה כללים, תשלום אחר."],
+        [11, 17, "בשיעור 3.2 בנינו לוח משלושה כללים."],
+        [17, 23, "רכיב ריבית: היתרה כפול הריבית החודשית."],
+        [23, 28, "רכיב קרן: התשלום פחות רכיב הריבית."],
+        [28, 33, "יתרה בסוף: היתרה בהתחלה פחות רכיב הקרן."],
+        [35, 41, "הכללים לא משתנים בשום שיטה. רק התשלום משתנה."],
+        [41, 47, `אותה הלוואה: ${V.loan} ₪, ‏4.8% לשנה, 20 שנה.`],
+        [47, 53, `שפיצר: ${V.sp} ₪ בכל חודש.`],
+        [53, 60, `קרן שווה: רכיב קרן קבוע, ולכן מ־${V.eqFirst} ₪ ויורד.`],
+        [60, 67, `גרייס חלקי: 12 חודשים רק רכיב הריבית, ${V.grace} ₪.`],
+        [67, 74, `ואז שפיצר על היתרה, על החודשים שנשארו: ${V.pAfter} ₪.`],
+        [74, 82, `גרייס מלא: 12 חודשים בלי תשלום, ואז ${V.fAfter} ₪.`],
+        [82, 89, "בוליט חלקי: רק רכיב הריבית, והקרן בחודש האחרון."],
+        [89, 97, `בוליט מלא: אפס עד הסוף, ואז ${V.bfLast} ₪ בבת אחת.`],
+        [97, 104, "הגרייס בתוך התקופה: כך החליטה Mogi."],
+        [104, 111, "בהצעה אמיתית קובעים התנאים שבה."],
+        [113, 120, "כשהתשלום קטן מרכיב הריבית, רכיב הקרן שלילי."],
+        [120, 127, `גרייס מלא, חודש 1: תשלום 0, רכיב ריבית ${V.int1} ₪.`],
+        [127, 134, `כלל 3 מוסיף אותו ליתרה: ${V.close1} ₪. החוב גדל.`],
+        [134, 141, `חודש 2: ריבית גם על הריבית של חודש 1 — ${V.int2} ₪.`],
+        [141, 147, `אחרי 12 חודשים החוב גדל ב־${V.added} ₪.`],
+        [149, 156, "כמה ריבית בכל שיטה, על כל ההלוואה?"],
+        [156, 163, "באותו אחוז ריבית: ככל שהקרן חוזרת מאוחר יותר,"],
+        [163, 171, "הריבית מחושבת על חוב גדול יותר, ויש יותר ממנה."],
+        [173, 178, "בכל שיטה, אותם שלושה כללים."],
+        [178, 183, "השיטה קובעת רק כמה משלמים בכל חודש."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      // A method's card: its name, a line of numbers, and the shape of its payments (month 1 on the right).
+      const max = Number(fact("equal.first"));
+      function card(x, y, name, line, path, spike, o) {
+        const w = 370, h = 176;
+        box(x, y, w, h, o);
+        txt(x + w - 20, y + 34, name, 24, { anchor: "start", w: 700, o });
+        txt(x + w - 20, y + 62, line, 17, { anchor: "start", fill: C.n700, o });
+        const l = x + 24, r = x + w - 24, base = y + h - 18, top = y + 82;
+        const X = (m) => r - (m / 240) * (r - l);
+        const Y = (v) => base - (Number(v) / max) * (base - top);
+        el("line", { x1: l, x2: r, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
+        el("polyline", { points: path.map(([m, v]) => `${X(m)},${Y(v)}`).join(" "), fill: "none", stroke: C.teal, "stroke-width": 4, "stroke-linejoin": "round", opacity: o });
+        if (spike) {
+          el("line", { x1: X(240), x2: X(240), y1: base, y2: top - 4, stroke: C.teal, "stroke-width": 4, opacity: o });
+          el("path", { d: `M ${X(240) - 7} ${top + 6} L ${X(240)} ${top - 8} L ${X(240) + 7} ${top + 6} Z`, fill: C.teal, opacity: o });
+        }
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "אותם שלושה כללים, תשלום אחר", 64, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 360, "קרן שווה · גרייס · בוליט", 32, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the three rules
+        if (inScene(t, S.rules)) {
+          const o = vis(t, S.rules);
+          txt(640, 140, "שלושה כללים בכל שורה", 42, { w: 700, o });
+          const rules = [
+            { y: 230, no: "1", a: "רכיב ריבית", b: "היתרה בתחילת החודש × הריבית החודשית", from: 6 },
+            { y: 330, no: "2", a: "רכיב קרן", b: "התשלום − רכיב הריבית", from: 12 },
+            { y: 430, no: "3", a: "יתרה בסוף", b: "היתרה בתחילת החודש − רכיב הקרן", from: 17 },
+          ];
+          for (const r of rules) {
+            const or = after(t, S.rules, r.from, o);
+            box(200, r.y - 46, 880, 80, or);
+            el("circle", { cx: 1030, cy: r.y - 6, r: 22, fill: C.navy, opacity: or });
+            txt(1030, r.y + 3, r.no, 24, { w: 700, fill: C.n0, o: or, ltr: true });
+            txt(990, r.y + 3, r.a, 28, { anchor: "start", w: 700, o: or });
+            txt(780, r.y + 3, `= ${r.b}`, 24, { anchor: "start", fill: C.n700, o: or });
+          }
+        }
+        // Scene 3 — six methods, one loan
+        if (inScene(t, S.methods)) {
+          const o = vis(t, S.methods);
+          txt(640, 112, "השיטה קובעת רק את התשלום", 34, { w: 700, o });
+          const o0 = after(t, S.methods, 7, o);
+          txt(640, 142, `${V.loan} ₪ · 4.8% לשנה · 20 שנה · בשיטות עם גרייס: 12 חודשי גרייס`, 18, { fill: C.n600, o: o0 });
+          const sp = fact("spitzer.pay"), g = fact("partial.grace_pay");
+          const cards = [
+            { x: 850, y: 160, from: 13, name: "שפיצר", line: `${V.sp} ₪ בכל חודש`, path: [[0, sp], [240, sp]] },
+            { x: 455, y: 160, from: 19, name: "קרן שווה", line: `מ־${V.eqFirst} ₪ עד ${V.eqLast} ₪`, path: [[0, fact("equal.first")], [240, fact("equal.last")]] },
+            { x: 60, y: 160, from: 26, name: "גרייס חלקי, ואז שפיצר", line: `${V.grace} ₪, ואז ${V.pAfter} ₪`, path: [[0, g], [12, g], [12, fact("partial.after")], [240, fact("partial.after")]] },
+            { x: 850, y: 352, from: 40, name: "גרייס מלא, ואז שפיצר", line: `0 ₪, ואז ${V.fAfter} ₪`, path: [[0, 0], [12, 0], [12, fact("full.after")], [240, fact("full.after")]] },
+            { x: 455, y: 352, from: 48, name: "בוליט חלקי", line: `${V.grace} ₪; בסוף ${V.bpLast} ₪`, path: [[0, g], [240, g]], spike: true },
+            { x: 60, y: 352, from: 55, name: "בוליט מלא", line: `0 ₪; בסוף ${V.bfLast} ₪`, path: [[0, 0], [240, 0]], spike: true },
+          ];
+          for (const c of cards) card(c.x, c.y, c.name, c.line, c.path, c.spike, after(t, S.methods, c.from, o));
+          const od = after(t, S.methods, 63, o);
+          box(250, 536, 780, 30, od * 0.6, C.mint);
+          txt(640, 557, "הגרייס בתוך התקופה — החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 16, { fill: C.n700, o: od });
+        }
+        // Scene 4 — a negative principal part: full grace, month by month
+        if (inScene(t, S.negative)) {
+          const o = vis(t, S.negative);
+          txt(640, 132, "כשהתשלום קטן מרכיב הריבית", 40, { w: 700, o });
+          txt(640, 170, `גרייס מלא · ${V.loan} ₪ · ${V.monthly}% לחודש`, 22, { fill: C.n600, o });
+          const cols = [
+            { x: 1080, label: "חודש" },
+            { x: 960, label: "התשלום" },
+            { x: 800, label: "רכיב ריבית" },
+            { x: 620, label: "רכיב קרן" },
+            { x: 440, label: "יתרה בסוף" },
+          ];
+          box(180, 196, 920, 210, o);
+          for (const c of cols) txt(c.x, 230, c.label, 18, { anchor: "start", fill: C.n600, w: 600, o });
+          el("line", { x1: 200, x2: 1080, y1: 246, y2: 246, stroke: C.n200, "stroke-width": 1, opacity: o });
+          const rows = [
+            { y: 286, m: "1", pay: "0", i: V.int1, c: V.close1, from: 8 },
+            { y: 334, m: "2", pay: "0", i: V.int2, c: "…", from: 22 },
+            { y: 382, m: "12", pay: "0", i: "…", c: V.close12, from: 29 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.negative, r.from, o);
+            txt(1064, r.y, r.m, 22, { w: 600, o: or, ltr: true });
+            txt(960, r.y, r.pay, 22, { anchor: "end", o: or, ltr: true });
+            txt(800, r.y, r.i, 22, { anchor: "end", fill: C.teal, w: 700, o: or, ltr: true });
+            txt(620, r.y, "שלילי", 22, { anchor: "start", fill: C.n700, o: or });
+            txt(440, r.y, r.c, 22, { anchor: "end", w: 700, o: or, ltr: true });
+          }
+          const eqs = [
+            { s: 15, e: 22, label: "כלל 3: רכיב הקרן השלילי נוסף ליתרה", text: `${V.pClose12} + ${V.int1} = ${V.close1}` },
+            { s: 22, e: 29, label: "רכיב הריבית של חודש 2, גם על הריבית של חודש 1", text: `${V.monthly}% × ${V.close1} = ${V.int2}` },
+            { s: 29, e: 36.6, label: "אחרי 12 חודשים", text: `החוב גדל ב־${V.added} ₪`, he: true },
+          ];
+          for (const q of eqs) {
+            const oq = during(t, S.negative, q.s, q.e, o);
+            if (oq <= 0) continue;
+            box(290, 436, 700, 110, oq * 0.6, C.mint);
+            txt(640, 474, q.label, 22, { fill: C.n700, w: 600, o: oq });
+            if (q.he) txt(640, 522, q.text, 32, { w: 700, o: oq });
+            else eqn(640, 522, q.text, 32, { o: oq });
+          }
+        }
+        // Scene 5 — the interest over the whole loan, method by method
+        if (inScene(t, S.interest)) {
+          const o = vis(t, S.interest);
+          txt(640, 130, "הריבית על כל ההלוואה, בכל שיטה", 38, { w: 700, o });
+          const rows = [
+            { name: "קרן שווה", v: fact("equal.interest") },
+            { name: "שפיצר", v: fact("spitzer.interest") },
+            { name: "גרייס חלקי", v: fact("partial.interest") },
+            { name: "גרייס מלא", v: fact("full.interest") },
+            { name: "בוליט חלקי", v: fact("bp.interest") },
+            { name: "בוליט מלא", v: fact("bf.interest") },
+          ];
+          const unit = 560 / Number(fact("bf.interest"));
+          rows.forEach((r, i) => {
+            const y = 168 + i * 64;
+            const or = after(t, S.interest, 1 + i * 0.8, o);
+            txt(1100, y + 34, r.name, 22, { anchor: "start", w: 600, o: or });
+            const w = Number(r.v) * unit * ease((t - S.interest[0] - 1 - i * 0.8) / 2);
+            el("rect", { x: 930 - w, y: y + 8, width: w, height: 40, rx: 6, fill: i < 2 ? C.n300 : C.teal, opacity: or });
+            txt(930 - w - 12, y + 36, `${num(r.v)} ₪`, 22, { anchor: "end", w: 700, o: or, ltr: true });
+          });
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 290, "בכל שיטה, אותם שלושה כללים", 54, { w: 700, o });
+          const o2 = after(t, S.end, 5, o);
+          txt(640, 370, "השיטה קובעת רק את התשלום", 36, { w: 600, fill: C.teal, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

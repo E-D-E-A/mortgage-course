@@ -1,0 +1,316 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.5 — "לוח צמוד, חודש אחרי חודש" (הצמדה לאורך ציר הזמן).
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-5.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: in a linked schedule the balance is indexed month by month, the
+  payment is always measured against the base index, and the indexation added to the
+  debt is repaid slowly, not at once):
+  1. Title.
+  2. The base index, and monthly indexation from the first payment (a Mogi decision, with
+     who and when). The index series 100 → 100.3 → 100.5 → 100.4 is an illustration.
+  3. From which day the schedule counts: money by the 15th / from the 16th (the team's
+     transcription of the Bank of Israel directive, not verified), with the lesson's dates;
+     the days between the money and the start are the interim period.
+  4. Month 1 of 400,000 ₪ at 3% (original payment 2,218.39): index the balance
+     (401,200; indexation 1,200), interest on the indexed balance (1,003), the payment
+     against the base index (2,225.05 — only 6.66 more), principal and closing balance.
+     Every row rounded to the agora: the course's assumption; a bank can round otherwise.
+  5. Months 2 and 3: the balance divides by the previous index, the payment always by the
+     base; in month 3 the index fell and both fell.
+  6. The indexation is not paid at once: if the index stayed at 100.3, the payments add
+     1,596.66 = 1,200 + 396.66 of interest on it, over the whole loan.
+  7. Takeaway.
+  No symbolic formula appears: the lesson builds it in "מהדוגמה לנוסחה".
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.5 · הצמדה לאורך ציר הזמן</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-5.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const day = (s) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${s}T12:00:00Z`));
+      const ix = [0, 1, 2, 3].map((k) => pl(fact(`index.${k}`)));
+      const V = {
+        amount: num(fact("case.amount")),
+        rate: pl(fact("case.rate")),
+        c: num(fact("explain.c")),
+        ind1: num(fact("m1.indexation")),
+        open1: num(fact("m1.opening")),
+        int1: num(fact("m1.interest")),
+        pay1: num(fact("m1.payment")),
+        extra1: num(fact("m1.payment_extra")),
+        prin1: num(fact("m1.principal")),
+        close1: num(fact("m1.closing")),
+        open2: num(fact("m2.opening")),
+        pay2: num(fact("m2.payment")),
+        open3: num(fact("m3.opening")),
+        pay3: num(fact("m3.payment")),
+        fall3: num(String(fact("m3.indexation")).replace("-", "")),
+        payFall3: num(fact("m3.payment_fall")),
+        rise1: pl(fact("index.rise1")),
+        extraTotal: num(fact("once.payment_extra_total")),
+        indTotal: num(fact("once.indexation_total")),
+        interestOn: num(fact("once.interest_on")),
+        earlyDays: pl(fact("early.days")),
+        lateDays: pl(fact("late.days")),
+      };
+      const D = {
+        earlyPay: day(fact("early.payout")), earlyStart: day(fact("early.start")), earlyFirst: day(fact("early.first")),
+        latePay: day(fact("late.payout")), lateStart: day(fact("late.start")), lateFirst: day(fact("late.first")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], base: [10, 38], start: [38, 76], m1: [76, 124], m23: [124, 160], later: [160, 186], end: [186, 198] };
+      window.duration = 198;
+      window.cues = [
+        [1, 5, "לוח סילוקין צמוד, חודש אחרי חודש."],
+        [5, 9.5, "מאיפה מודדים, ממתי סופרים, ומה קורה בכל שורה."],
+        [11, 17, "כל סכום צמוד נמדד מול נקודת התחלה אחת: מדד הבסיס."],
+        [17, 24, "בקורס: בכל תשלום המדד זז חודש אחד יותר."],
+        [24, 30, "גם בכללי החישוב של Mogi ההצמדה חודשית."],
+        [30, 37, "המדדים כאן הם תרחיש להמחשה, לא תחזית."],
+        [39, 46, "הכסף מגיע ביום העמדת ההלוואה. הלוח לא תמיד מתחיל בו."],
+        [46, 53, "כסף עד ה־15 בחודש: סופרים מה־1 באותו חודש."],
+        [53, 60, "כסף מה־16 ואילך: סופרים מה־1 בחודש הבא."],
+        [60, 67, "כך לפי תעתיק של הצוות מהוראה של בנק ישראל. לא אומת."],
+        [67, 75, "על הימים שבין הכסף ללוח, תקופת הביניים: ריבית או זיכוי."],
+        [77, 83, `‏${V.amount} ₪, ‏${V.rate}% לשנה, 240 תשלומים. בלי מדד: ${V.c} ₪.`],
+        [83, 90, `חודש 1, המדד ${ix[1]}: קודם מצמידים את היתרה.`],
+        [90, 97, `ההצמדה הוסיפה לחוב ${V.ind1} ₪: אלה הפרשי ההצמדה.`],
+        [97, 104, "הריבית מחושבת על היתרה אחרי ההצמדה."],
+        [104, 111, "התשלום: התשלום המקורי, כפול המדד, חלקי מדד הבסיס."],
+        [111, 117, `התשלום עלה רק ב־${V.extra1} ₪.`],
+        [117, 123, "רכיב הקרן מוריד את היתרה, כמו בכל לוח."],
+        [125, 132, `חודש 2, המדד ${ix[2]}: שתי חלוקות שונות.`],
+        [132, 139, `היתרה כבר מוצמדת ל־${ix[1]}: מצמידים רק את התוספת של החודש.`],
+        [139, 146, "התשלום — תמיד מול מדד הבסיס."],
+        [146, 153, `חודש 3: המדד ירד ל־${ix[3]}, והיתרה ירדה ב־${V.fall3} ₪.`],
+        [153, 159, `וגם התשלום ירד, ב־${V.payFall3} ₪.`],
+        [161, 167, `לאן הלכו ${V.ind1} ₪, אם התשלום עלה רק ב־${V.extra1} ₪?`],
+        [167, 173, "הם נשארו בחוב, ומוחזרים לאט, עד סוף ההלוואה."],
+        [173, 179, `אם המדד יישאר ${ix[1]}: התשלומים יחד יעלו ב־${V.extraTotal} ₪.`],
+        [179, 185, `‏${V.indTotal} ₪ הפרשי הצמדה, ועוד ${V.interestOn} ₪ ריבית עליהם.`],
+        [187, 192, "היתרה מוצמדת חודש אחרי חודש."],
+        [192, 197, "התשלום — תמיד מול מדד הבסיס."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      // A line of the month-1 steps: a label on the right, the equation on the left.
+      function step(y, label, eq, o, hi) {
+        if (hi) el("rect", { x: 190, y: y - 34, width: 900, height: 50, rx: 10, fill: C.mint, opacity: o * 0.6 });
+        txt(1070, y, label, 22, { anchor: "start", w: 600, fill: C.n700, o });
+        eqn(210, y, eq, 26, { anchor: "start", o });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "לוח צמוד, חודש אחרי חודש", 68, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 360, "מדד בסיס · יום ההתחלה · שורה בלוח", 32, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the base index, and an illustrative series
+        if (inScene(t, S.base)) {
+          const o = vis(t, S.base);
+          txt(640, 136, "מדד הבסיס: מאיפה מודדים", 42, { w: 700, o });
+          const left = 300, right = 980, base = 460, top = 260;
+          const lo = Number(fact("index.0")) - 0.1, hi = Number(fact("index.2")) + 0.1;
+          const X = (k) => right - (k / 3) * (right - left);
+          const Y = (v) => base - ((Number(v) - lo) / (hi - lo)) * (base - top);
+          el("line", { x1: left - 30, x2: right + 30, y1: base + 30, y2: base + 30, stroke: C.n300, "stroke-width": 1, opacity: o });
+          const labels = ["מדד הבסיס", "תשלום 1", "תשלום 2", "תשלום 3"];
+          for (let k = 0; k < 4; k++) {
+            const ok = after(t, S.base, 2 + k * 4, o);
+            if (k > 0) el("line", { x1: X(k - 1), x2: X(k), y1: Y(fact(`index.${k - 1}`)), y2: Y(fact(`index.${k}`)), stroke: C.teal, "stroke-width": 4, opacity: ok });
+            el("circle", { cx: X(k), cy: Y(fact(`index.${k}`)), r: k === 0 ? 11 : 8, fill: k === 0 ? C.navy : C.teal, opacity: ok });
+            txt(X(k), Y(fact(`index.${k}`)) - 22, ix[k], 24, { w: 700, o: ok, ltr: true });
+            txt(X(k), base + 60, labels[k], 20, { fill: k === 0 ? C.navy : C.n600, w: k === 0 ? 700 : 400, o: ok });
+          }
+          const od = after(t, S.base, 14, o);
+          box(250, 176, 780, 34, od * 0.6, C.mint);
+          txt(640, 199, "ההצמדה חודשית — החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08)", 17, { fill: C.n700, o: od });
+          const os = after(t, S.base, 20, o);
+          txt(640, 550, "סדרת המדדים: תרחיש להמחשה, לא תחזית", 20, { fill: C.n600, o: os });
+        }
+        // Scene 3 — from which day the schedule counts
+        if (inScene(t, S.start)) {
+          const o = vis(t, S.start);
+          txt(640, 136, "מאיזה יום הלוח סופר", 42, { w: 700, o });
+          const cases = [
+            { y: 200, from: 8, head: "כסף עד ה־15", rows: [["הכסף הגיע", D.earlyPay], ["הלוח סופר מ־", D.earlyStart], ["התשלום הראשון", D.earlyFirst]], gap: `${V.earlyDays} ימי ביניים: הבנק מזכה` },
+            { y: 380, from: 15, head: "כסף מה־16 ואילך", rows: [["הכסף הגיע", D.latePay], ["הלוח סופר מ־", D.lateStart], ["התשלום הראשון", D.lateFirst]], gap: `${V.lateDays} ימי ביניים: הבנק גובה ריבית` },
+          ];
+          for (const c of cases) {
+            const oc = after(t, S.start, c.from, o);
+            box(130, c.y, 1020, 150, oc);
+            txt(1120, c.y + 40, c.head, 26, { anchor: "start", w: 700, fill: C.teal, o: oc });
+            c.rows.forEach(([a, b], i) => {
+              const x = 1000 - i * 320;
+              txt(x, c.y + 86, a, 18, { anchor: "start", fill: C.n600, o: oc });
+              txt(x, c.y + 116, b, 22, { anchor: "start", w: 700, o: oc });
+            });
+            const og = after(t, S.start, 29, oc);
+            txt(160, c.y + 40, c.gap, 18, { anchor: "end", fill: C.n700, o: og });
+          }
+          const ov = after(t, S.start, 22, o);
+          txt(640, 560, "לפי תעתיק של הצוות מהוראה של בנק ישראל (סעיפים 17–18) — לא אומת", 17, { fill: C.n600, o: ov });
+        }
+        // Scene 4 — month 1, step by step
+        if (inScene(t, S.m1)) {
+          const o = vis(t, S.m1);
+          txt(640, 128, `חודש 1 · המדד ${ix[1]} · מדד הבסיס ${ix[0]}`, 36, { w: 700, o });
+          txt(640, 164, `${V.amount} ₪ · ${V.rate}% לשנה · 240 תשלומים · בלי מדד: ${V.c} ₪`, 20, { fill: C.n600, o });
+          const at = (s) => after(t, S.m1, s, o);
+          const rel = t - S.m1[0];
+          step(222, "1. מצמידים את היתרה", `${V.amount} × ${ix[1]} ÷ ${ix[0]} = ${V.open1}`, at(8), rel >= 8 && rel < 21);
+          step(282, "2. רכיב הריבית", `${V.open1} × ${V.rate}% ÷ 12 = ${V.int1}`, at(21), rel >= 21 && rel < 28);
+          step(342, "3. התשלום", `${V.c} × ${ix[1]} ÷ ${ix[0]} = ${V.pay1}`, at(28), rel >= 28 && rel < 41);
+          step(402, "4. רכיב הקרן", `${V.pay1} − ${V.int1} = ${V.prin1}`, at(41), rel >= 41);
+          step(462, "5. היתרה בסוף החודש", `${V.open1} − ${V.prin1} = ${V.close1}`, at(41), rel >= 41);
+          const oi = during(t, S.m1, 14, 48, o);
+          if (oi > 0) {
+            txt(640, 522, `הפרשי ההצמדה: ${V.ind1} ₪ נוספו לחוב · התשלום עלה רק ב־${V.extra1} ₪`, 22, { w: 700, fill: C.teal, o: Math.min(oi, at(35)) });
+            txt(640, 522, `הפרשי ההצמדה: ${V.ind1} ₪ נוספו לחוב`, 22, { w: 700, fill: C.teal, o: Math.min(oi, 1 - at(35)) });
+          }
+          txt(640, 560, "כל שורה מעוגלת לאגורה — הנחת החישוב של הקורס; בנק יכול לעגל אחרת", 16, { fill: C.n600, o: at(2) });
+        }
+        // Scene 5 — months 2 and 3
+        if (inScene(t, S.m23)) {
+          const o = vis(t, S.m23);
+          txt(640, 128, "חודש 2 וחודש 3: שתי חלוקות שונות", 38, { w: 700, o });
+          const at = (s) => after(t, S.m23, s, o);
+          const rel = t - S.m23[0];
+          box(170, 160, 940, 176, at(1));
+          txt(1070, 200, `חודש 2 · המדד ${ix[2]}`, 24, { anchor: "start", w: 700, o: at(1) });
+          step(244, "היתרה: רק התוספת", `${V.close1} × ${ix[2]} ÷ ${ix[1]} = ${V.open2}`, at(8), rel >= 8 && rel < 15);
+          const o2 = at(15);
+          if (rel >= 15 && rel < 22) el("rect", { x: 190, y: 270, width: 900, height: 50, rx: 10, fill: C.mint, opacity: o2 * 0.6 });
+          txt(1070, 304, "התשלום: מול הבסיס", 22, { anchor: "start", w: 600, fill: C.n700, o: o2 });
+          eqn(210, 304, `${V.c} × ${ix[2]} ÷ ${ix[0]} = ${V.pay2}`, 26, { anchor: "start", o: o2 });
+          box(170, 352, 940, 186, at(22));
+          txt(1070, 392, `חודש 3 · המדד ירד ל־${ix[3]}`, 24, { anchor: "start", w: 700, o: at(22) });
+          step(440, "היתרה", `${num(fact("m2.closing"))} × ${ix[3]} ÷ ${ix[2]} = ${V.open3}`, at(22), rel >= 22 && rel < 29);
+          step(500, "התשלום", `${V.c} × ${ix[3]} ÷ ${ix[0]} = ${V.pay3}`, at(29), rel >= 29);
+        }
+        // Scene 6 — the indexation stays in the debt
+        if (inScene(t, S.later)) {
+          const o = vis(t, S.later);
+          txt(640, 132, "הפרשי ההצמדה לא משולמים בבת אחת", 40, { w: 700, o });
+          const at = (s) => after(t, S.later, s, o);
+          box(200, 180, 400, 130, at(1));
+          txt(400, 222, "נוספו לחוב בחודש 1", 20, { fill: C.n600, o: at(1) });
+          txt(400, 276, `${V.ind1} ₪`, 40, { w: 700, o: at(1), ltr: true });
+          box(680, 180, 400, 130, at(1));
+          txt(880, 222, "נוספו לתשלום 1", 20, { fill: C.n600, o: at(1) });
+          txt(880, 276, `${V.extra1} ₪`, 40, { w: 700, o: at(1), ltr: true });
+          txt(640, 352, `השאר נשאר בחוב: היתרה גדלה ב־${V.rise1}%, וכל התשלומים שנשארו גדלים ב־${V.rise1}%`, 20, { fill: C.n700, o: at(7) });
+          const o3 = at(13);
+          box(250, 390, 780, 150, o3 * 0.6, C.mint);
+          txt(640, 428, `אם המדד יישאר ${ix[1]} עד הסוף (הנחה להמחשה): כל התוספות לתשלומים`, 20, { fill: C.n700, o: o3 });
+          eqn(640, 482, `${V.indTotal} + ${V.interestOn} = ${V.extraTotal}`, 34, { w: 700, o: o3 });
+          txt(640, 518, "הפרשי ההצמדה · ועוד הריבית עליהם, לאורך כל ההלוואה", 18, { fill: C.n700, o: at(19) });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 280, "היתרה מוצמדת חודש אחרי חודש", 52, { w: 700, o });
+          const o2 = after(t, S.end, 5, o);
+          txt(640, 360, "התשלום — תמיד מול מדד הבסיס", 40, { w: 600, fill: C.teal, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
