@@ -113,9 +113,9 @@ const low = computed(() => Decimal.min(prime.value, rate.value));
           <div v-else class="h-full rounded-e-sm" :style="{ width: pct(spread), background: 'var(--mogi-n300)' }"></div>
         </div>
       </div>
-      <!-- Each label centred on its point: placed from the start (right) edge, then shifted by half its width. -->
+      <!-- Each label centred on its point: placed from the right edge (the scale starts there; the span itself is LTR, so a physical side), then shifted by half its width. -->
       <div class="relative h-4 text-caption text-n600">
-        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :style="{ insetInlineStart: pct(k), transform: 'translateX(50%)' }">{{ k }}%</span>
+        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :style="{ right: pct(k), transform: 'translateX(50%)' }">{{ k }}%</span>
       </div>
       <p v-if="rate.isNeg()" class="text-caption text-n700">הריבית במסלול מתחת לאפס: הפס מראה רק את מה שירד מהפריים עד אפס.</p>
     </div>

@@ -113,9 +113,9 @@ const tableRows = computed(() =>
         <line v-if="breakEvenVisible" :x1="x(breakEven.toNumber())" :x2="x(breakEven.toNumber())" :y1="PAD.top" :y2="H - PAD.bottom" stroke="var(--mogi-navy)" stroke-width="2" stroke-dasharray="6 5" />
         <circle :cx="x(inflation)" :cy="y(indexedOwed.toNumber())" r="8" fill="var(--mogi-navy)" stroke="var(--mogi-n0)" stroke-width="2" />
       </svg>
-      <!-- Each label centred on its grid line: placed from the start (right) edge, then shifted by half its width. -->
+      <!-- Each label centred on its grid line: placed from the right edge (the scale starts there; the span itself is LTR, so a physical side), then shifted by half its width. -->
       <div class="relative h-4 text-caption text-n600" aria-hidden="true">
-        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :class="k % 2 ? 'max-sm:invisible' : ''" :style="{ insetInlineStart: fromStart(k), transform: 'translateX(50%)' }">{{ k }}%</span>
+        <span v-for="k in ticks" :key="k" class="ltr absolute top-0 whitespace-nowrap" :class="k % 2 ? 'max-sm:invisible' : ''" :style="{ right: fromStart(k), transform: 'translateX(50%)' }">{{ k }}%</span>
       </div>
       <p class="mt-1 text-center text-caption text-n600">האינפלציה בשנה (מימין לשמאל). הנקודה: האינפלציה שבחרתם.</p>
     </div>
