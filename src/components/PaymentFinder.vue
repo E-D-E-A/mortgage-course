@@ -39,22 +39,29 @@ watch(which, () => {
   typed.value = low.value.toFixed(2);
 });
 const clampPay = (v: number) => Math.min(high.value.toNumber(), Math.max(low.value.toNumber(), Math.round(v * 100) / 100));
+const typedError = ref("");
+/** Every change of the payment (slider, step buttons, "show me") clears an old typing message. */
 function setPayment(v: number) {
   payment.value = clampPay(v);
   typed.value = payment.value.toFixed(2);
+  typedError.value = "";
 }
 function fromSlider(e: Event) {
   setPayment(Number((e.target as HTMLInputElement).value));
 }
-const typedError = ref("");
+// Digits with an optional point and grouping commas, a ₪ sign and spaces around — nothing else
+// ("1e3", "Infinity" and "1/2" are refused, not read as numbers).
+const PLAIN_NUMBER = /^[-−]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/;
 function fromTyped() {
-  const v = Number(typed.value.replace(/[₪,\s]/g, ""));
-  if (!Number.isFinite(v) || typed.value.trim() === "") {
+  const text = typed.value.replace(/[₪\s]/g, "");
+  if (!PLAIN_NUMBER.test(text)) {
     typedError.value = "כתבו מספר, למשל 1015.5";
     return;
   }
-  typedError.value = v < low.value.toNumber() || v > high.value.toNumber() ? `התשלום כאן בין ${formatWholeShekels(low.value)} ל־${formatWholeShekels(high.value)}.` : "";
+  const v = Number(text.replace(/,/g, "").replace("−", "-"));
+  const outside = v < low.value.toNumber() || v > high.value.toNumber();
   setPayment(v);
+  if (outside) typedError.value = `התשלום כאן בין ${formatWholeShekels(low.value)} ל־${formatWholeShekels(high.value)}.`;
 }
 
 const rows = computed(() => paymentTrial(loan.value.principal, loan.value.rate, payment.value.toFixed(2), loan.value.months));
@@ -135,8 +142,8 @@ const shown = computed(() => {
     </div>
     <p v-if="typedError" class="mt-1 text-caption text-n700">{{ typedError }}</p>
     <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="צעדים קטנים">
-      <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment - 1)">−1 ₪</button>
-      <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment + 1)">+1 ₪</button>
+      <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment - 1)"><span class="ltr">−1</span> ₪</button>
+      <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment + 1)"><span class="ltr">+1</span> ₪</button>
       <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment - 0.01)">−אגורה</button>
       <button type="button" class="min-h-11 min-w-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50" @click="setPayment(payment + 0.01)">+אגורה</button>
     </div>
@@ -155,7 +162,7 @@ const shown = computed(() => {
         <template v-if="state === 'low'">התשלום קטן מדי: הוא לא מספיק לריבית ולכל הקרן. נסו יותר.</template>
         <template v-else-if="state === 'high'">התשלום גדול מדי: החוב נגמר לפני הסוף. נסו פחות.</template>
         <template v-else>
-          זה התשלום. מה שנשאר (<span class="ltr">{{ formatShekels(last.abs()) }}</span>) הוא העיגול לאגורה; בלוח סילוקין, התשלום האחרון סוגר אותו.
+          זה התשלום, מעוגל לאגורה. מה שנשאר (<span class="ltr">{{ formatShekels(last.abs()) }}</span>) הוא מה שהעיגולים השאירו לאורך כל החודשים; בלוח סילוקין, התשלום האחרון סוגר אותו.
         </template>
       </p>
     </div>

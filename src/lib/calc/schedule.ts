@@ -424,6 +424,20 @@ export function mixSummary(flow: MixMonth[]): MixSummary {
   };
 }
 
+/**
+ * The last month of the run that starts at the highest payment: the months after
+ * mixSummary's maxMonth that keep paying the same, compared to the agora (lesson
+ * 3.7: "the highest payment, from month 61 to month 179"). maxMonth itself when
+ * the next month already differs.
+ */
+export function maxRunEnd(flow: MixMonth[]): number {
+  const { maxPayment, maxMonth } = mixSummary(flow);
+  const cents = (d: Decimal) => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+  let end = maxMonth;
+  while (end < flow.length && cents(flow[end].payment).eq(cents(maxPayment))) end++;
+  return end;
+}
+
 /** How much of a mix sits in each kind of exposure, in shekels and in percent of the loan. */
 export interface Exposure {
   total: Decimal;

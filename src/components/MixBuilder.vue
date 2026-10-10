@@ -17,6 +17,8 @@
 //   - labels: { first, max, total } — the three headline cards' titles. 3.7 uses plain words;
 //       a later lesson that has taught the terms can pass them.
 //   - maxTracks (4), amountStep (10,000 ₪), editableScenario (true).
+//   - rounding: "statement" (default; every row in agorot, as the lessons' tables and a bank
+//       statement) or "exact" (rounded only for display) — schedule.ts's two conventions.
 //
 //  Shows: the mix's monthly payment over time, stacked by track (each track ends at its own
 //  term); the first payment; the highest payment in the scenario and when; all payments
@@ -32,6 +34,7 @@ import {
   mixCashFlow,
   mixSummary,
   resets,
+  type Rounding,
   type ScheduleMethod,
   SUPPORTED_RESET_MONTHS,
   type TrackKind,
@@ -62,6 +65,7 @@ const props = withDefaults(
     maxTracks?: number;
     amountStep?: number;
     editableScenario?: boolean;
+    rounding?: Rounding;
   }>(),
   {
     loan: 900000,
@@ -75,6 +79,7 @@ const props = withDefaults(
     maxTracks: 4,
     amountStep: 10000,
     editableScenario: true,
+    rounding: "statement",
   },
 );
 
@@ -139,6 +144,7 @@ const scenarioSpec = computed(() => ({
   primeShift: [...Array.from({ length: Math.max(scenario.primeFromYear - 1, 0) }, () => "0"), String(scenario.primeShift)],
   anchorShift: [String(scenario.anchorShift)],
   blockMonths: 12,
+  rounding: props.rounding,
 }));
 
 // One computation for everything shown. A scenario that pushes a rate below zero is refused with a message.
@@ -159,7 +165,8 @@ const points = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${new Decimal(
 const shareOf = (i: number) => pct(new Decimal(amounts.value[i]).div(props.loan).mul(100));
 const whenText = (month: number) => `חודש ${month} (שנה ${Math.ceil(month / 12)})`;
 const trackName = (i: number) => `מסלול ${i + 1} · ${KIND_NAMES[rows[i].kind]}`;
-const yearsText = (m: number) => (m % 12 === 0 ? `${m / 12} שנים` : `${new Decimal(m).div(12).toString()} שנים`);
+// "שנה" for one year, "N שנים" otherwise ("2.5 שנים").
+const yearsText = (m: number) => (m === 12 ? "שנה" : `${new Decimal(m).div(12).toString()} שנים`);
 
 // Add and remove, with focus kept on something sensible.
 const addButton = ref<HTMLButtonElement | null>(null);
@@ -234,8 +241,9 @@ const yearRows = computed(() => {
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      תרחיש להמחשה, לא תחזית. הלוואה של <span class="ltr">{{ formatWholeShekels(loan) }}</span>, עד {{ maxTracks }} מסלולים. לכל מסלול תקופה משלו, והתשלום
+      תרחיש להמחשה, לא מה שצפוי לקרות. הלוואה של <span class="ltr">{{ formatWholeShekels(loan) }}</span>, עד {{ maxTracks }} מסלולים. לכל מסלול תקופה משלו, והתשלום
       של התמהיל בכל חודש הוא סכום התשלומים של המסלולים באותו חודש. המסלול האחרון לוקח את מה שנשאר מההלוואה.
+      <template v-if="rounding === 'statement'">כל שורה מעוגלת לאגורה, כמו בלוח של בנק, ולכן התשלום האחרון של מסלול שונה באגורות.</template>
     </p>
 
     <!-- The tracks -->
@@ -310,7 +318,7 @@ const yearRows = computed(() => {
 
     <!-- The scenario -->
     <fieldset v-if="editableScenario" class="mt-4 rounded-md border border-n200 p-3">
-      <legend class="px-1 text-body-m font-semibold text-n900">התרחיש (להמחשה, לא תחזית)</legend>
+      <legend class="px-1 text-body-m font-semibold text-n900">התרחיש (להמחשה, לא מה שצפוי לקרות)</legend>
       <div class="grid gap-x-6 gap-y-3 sm:grid-cols-3">
         <label class="flex flex-col">
           <span class="text-body-m text-n800">המדד עולה בשנה: <span class="ltr font-semibold">{{ pct(scenario.inflation) }}</span></span>
@@ -341,7 +349,7 @@ const yearRows = computed(() => {
           <div class="rounded-md bg-n50 p-3">
             <p class="text-caption font-semibold text-n600">{{ titles.max }}</p>
             <p class="ltr mt-1 text-h3 text-n900">{{ formatShekels(ok.summary.maxPayment) }}</p>
-            <p class="text-caption text-n600">{{ whenText(ok.summary.maxMonth) }}</p>
+            <p class="text-caption text-n600">לראשונה ב{{ whenText(ok.summary.maxMonth) }}</p>
           </div>
           <div class="rounded-md bg-n50 p-3">
             <p class="text-caption font-semibold text-n600">{{ titles.total }}</p>

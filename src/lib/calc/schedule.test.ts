@@ -10,6 +10,7 @@ import {
   mixFromInputs,
   mixInputs,
   mixSummary,
+  maxRunEnd,
   oneFormulaPayment,
   pathInputs,
   rateChangesPath,
@@ -239,6 +240,15 @@ describe("a mix: one cash flow", () => {
     expect(up.maxPayment.gt(up.firstPayment)).toBe(true);
     const total = mixCashFlow(tracks).reduce((s, m) => s.plus(m.payment), new Decimal(0));
     close(flat.totalPaid, total);
+  });
+
+  it("finds where the run at the highest payment ends", () => {
+    // Flat: the highest payment is month 1, and it holds while both tracks pay (exact: to month 144).
+    expect(maxRunEnd(mixCashFlow(tracks))).toBe(144);
+    // Prime 2 points up from month 13: highest from month 13 to the prime's last month.
+    const up = mixCashFlow(tracks, { primeShift: ["0", "2"] });
+    expect(mixSummary(up).maxMonth).toBe(13);
+    expect(maxRunEnd(up)).toBe(144);
   });
 
   it("ties equal payments to the agora: the first month wins", () => {

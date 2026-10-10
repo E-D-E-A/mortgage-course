@@ -178,7 +178,7 @@ export default function lesson35(): LessonData {
   const two = pathInputs({ principal: P, months: N, rate: R, inflation: ["2"], rounding: S });
   const four = pathInputs({ principal: P, months: N, rate: R, inflation: ["4"], rounding: S });
 
-  // Worked example: Yael, a linked track of 250,000 ₪ for 25 years at 3.2%, paid out on 18 December 2026.
+  // Worked example: Hadas, a linked track of 250,000 ₪ for 25 years at 3.2%, paid out on 18 December 2026.
   const W = "250000";
   const WN = 300;
   const WR = "3.2";

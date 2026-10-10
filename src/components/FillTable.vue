@@ -74,16 +74,16 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
     <table class="w-full border-collapse text-caption sm:text-body-m">
       <thead>
         <tr class="border-b border-n200 text-caption text-n600">
-          <th v-if="periodLabel" class="py-2 pe-3 text-start align-bottom font-semibold last:pe-0">{{ periodLabel }}</th>
-          <th v-for="c in columns" :key="c.key" class="py-2 pe-3 text-start align-bottom font-semibold last:pe-0">{{ c.label }}</th>
+          <th v-if="periodLabel" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3">{{ periodLabel }}</th>
+          <th v-for="c in columns" :key="c.key" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3">{{ c.label }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
-          <td v-if="periodLabel" class="py-2 pe-3 text-n700 last:pe-0">
+          <td v-if="periodLabel" class="py-2 pe-2 text-n700 last:pe-0 sm:pe-3">
             <template v-for="(p, j) in namePieces(row, i)" :key="j"><span v-if="p.ltr" class="ltr whitespace-nowrap">{{ p.text }}</span><template v-else>{{ p.text }}</template></template>
           </td>
-          <td v-for="c in columns" :key="c.key" class="py-2 pe-3 last:pe-0">
+          <td v-for="c in columns" :key="c.key" class="py-2 pe-2 last:pe-0 sm:pe-3">
             <template v-if="isBlank(row, i, c.key) && !revealed">
               <input
                 v-model="entered[keyOf(row, i, c.key)]"

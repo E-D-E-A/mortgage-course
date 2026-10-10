@@ -29,7 +29,7 @@ export const ls = f.raw("long.steps_180");
 export const ws = f.raw("worked.steps_156");
 export const predictionOptions = [
   `בערך ${f.whole("pred.half")} — חצי, כי עבר חצי מהזמן`,
-  `בערך ${f.whole("pred.answer")}`,
+  `בערך ${f.floorThousands("pred.answer")}`,
   `כמעט אפס: כבר שילמתם ${f.whole("pred.paid_180")}, יותר מכל ההלוואה`,
   "אי אפשר לדעת בלי לוח הסילוקין של הבנק",
 ];
@@ -82,10 +82,10 @@ export const predictionOptions = [
 **בהלוואה של 20 שנה** — 600,000 ₪ ב־4.8% לשנה (<M>{f.plain("long.monthly")}%</M> לחודש), {f.shekels("long.pay")} בחודש — אחרי 60 תשלומים, חמש שנים, נשארו <M>240 − 60 = {f.plain("long.left_60")}</M> תשלומים. את S של 180 תשלומים לא מחברים מקדם אחר מקדם; משתמשים בקיצור של שיעור 3.1, עם 180 במקום n:
 
 <div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
-  <M>1.004<sup>−180</sup> = {dec(ls.discount)}</M>
+  <M>{f.plain("long.base")}<sup>−180</sup> = {dec(ls.discount)}</M>
   <M>1 − {dec(ls.discount)} = {dec(ls.one_minus)}</M>
-  <M>S = {dec(ls.one_minus)} ÷ 0.004 = {dec(f.raw("long.S_180"))}</M>
-  <M>{n("long.pay")} × {dec(f.raw("long.S_180"))} = {n("long.pv_60")}</M>
+  <M>S = {dec(ls.one_minus)} ÷ {dec(ls.m)} = {dec(f.raw("long.S_180_shown"))}</M>
+  <M>{n("long.pay")} × {dec(f.raw("long.S_180_shown"))} = {n("long.pv_60")}</M>
 </div>
 
 הלוח אומר {f.shekels("long.table_60")}: הפרש של {f.shekels("long.gap_60")}, אחרי 60 חודשים של עיגול.
@@ -103,7 +103,7 @@ export const predictionOptions = [
 - אחרי 10 שנים, באמצע הדרך: {f.shekels("long.table_120")}.
 - אחרי 15 שנים: {f.shekels("long.table_180")}.
 
-היתרה יורדת מתחת לחצי מההלוואה, 300,000 ₪, רק אחרי חודש {f.plain("long.half_month")} — יותר משתים־עשרה שנים מתוך עשרים. הסיבה היא מה שראינו בשיעור 3.2: בהלוואה ארוכה בשפיצר, בהתחלה רוב התשלום ריבית, ורכיב הקרן קטן. החוב יורד לאט בהתחלה, ומהר בסוף.
+היתרה יורדת מתחת לחצי מההלוואה, 300,000 ₪, רק אחרי חודש {f.plain("long.half_month")} — אחרי יותר ממחצית התקופה. הסיבה היא מה שראינו בשיעור 3.2: בשפיצר רכיב הקרן מתחיל קטן מ־<M>P ÷ n</M>, ורק אחר כך גדל. בהלוואה הזו, ב־4.8% ל־20 שנה, בהתחלה רוב התשלום אפילו ריבית. החוב יורד לאט בהתחלה, ומהר בסוף.
 
 <Section kind="המחשה: הזיזו בעצמכם">
 
@@ -125,7 +125,7 @@ export const predictionOptions = [
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>״קרוב״: בבונה {f.shekels("long.table_60")}, הפרש של {f.shekels("long.gap_60")}. הבונה מזהה שהפרש כזה בא מעיגול, ולא מטעות.</li>
     <li>{f.shekels("pred.answer")} — יותר משני שלישים מההלוואה, אחרי חצי מהזמן.</li>
-    <li>חודש {f.plain("long.half_month")}, בשנה 13: היתרה {f.shekels("long.table_below")}.</li>
+    <li>חודש {f.plain("long.half_month")}: היתרה {f.shekels("long.table_below")}.</li>
   </ol>
 </details>
 
@@ -135,13 +135,13 @@ export const predictionOptions = [
   options={predictionOptions}
   correct={1}
   notes={[
-    "חצי היה נכון אילו בכל חודש הוחזר אותו חלק מהקרן, כמו בקרן שווה. בשפיצר, בהתחלה רוב התשלום ריבית, והקרן יורדת לאט.",
+    "חצי היה נכון אילו בכל חודש הוחזר אותו חלק מהקרן, כמו בקרן שווה. בשפיצר רכיב הקרן מתחיל קטן מזה, והחוב יורד לאט בהתחלה.",
     "",
     `שילמתם ${f.whole("pred.paid_180")}, אבל רובם היו רכיבי ריבית. רק רכיבי הקרן מקטינים את החוב.`,
     "את היתרה אפשר לחשב בעצמכם: הערך הנוכחי של 180 התשלומים שנשארו. הנוסחה בהמשך השיעור.",
   ]}
 >
-  מהלוח: {f.shekels("pred.answer")}. בנוסחה: נשארו 180 תשלומים של {f.shekels("pred.pay")}, ב־{f.plain("pred.monthly")}% לחודש, ו־<M>{n("pred.pay")} × {dec(f.raw("pred.S_180"))} = {n("pred.pv")}</M> — אותו סכום, עד שקל של עיגול.
+  מהלוח: {f.shekels("pred.answer")}. בנוסחה: נשארו 180 תשלומים של {f.shekels("pred.pay")}, ב־{f.plain("pred.monthly")}% לחודש, ו־<M>{n("pred.pay")} × {dec(f.raw("pred.S_180"))} = {n("pred.pv")}</M>: הפרש של {f.shekels("pred.gap")} מהלוח, מ־180 חודשים של עיגול.
 </PredictionReveal>
 
 <Section kind="מהדוגמה לנוסחה">
@@ -180,7 +180,7 @@ export const predictionOptions = [
 
 <Callout title="איך מחשבים">
 <p><strong>במחשבון:</strong> כמו בשיעור 3.1 — חזקה, אחד חלקי, אחד פחות, חלקי r — ובסוף כפול C במקום P חלקי.</p>
-<p><strong>בגיליון אלקטרוני:</strong> הנוסחה עצמה, <span class="ltr inline-block whitespace-nowrap">{"=3893.74*(1-(1+0.004)^-180)/0.004"}</span>, או הפונקציה המובנית לערך נוכחי, <span class="ltr inline-block whitespace-nowrap">{"=PV(4.8%/12,180,-3893.74)"}</span>. שתיהן נותנות {f.shekels("long.pv_60")}.</p>
+<p><strong>בגיליון אלקטרוני:</strong> הנוסחה עצמה, <span class="ltr inline-block whitespace-nowrap">{`=${f.raw("long.pay")}*(1-(1+${dec(ls.m)})^-180)/${dec(ls.m)}`}</span>, או הפונקציה המובנית לערך נוכחי, <span class="ltr inline-block whitespace-nowrap">{`=PV(4.8%/12,180,-${f.raw("long.pay")})`}</span>. שתיהן נותנות {f.shekels("long.pv_60")}.</p>
 </Callout>
 
 <Callout title="למה הנוסחה והלוח נבדלים באגורות, ולפעמים בשקל">
@@ -189,11 +189,11 @@ export const predictionOptions = [
 
 <Section kind="כלי לראש">
 
-## היתרה בשפיצר תמיד מעל הקו הישר
+## היתרה בשפיצר מעל הקו הישר (באחוז קבוע, בלי הצמדה)
 
 </Section>
 
-בקרן שווה היתרה יורדת בקו ישר: אחרי k תשלומים נשאר <M>P × (n − k) ÷ n</M> (שיעור 2.9). בשפיצר, בריבית גדולה מאפס, היתרה תמיד **מעל** הקו הזה, כי בהתחלה רכיב הקרן קטן מ־<M>P ÷ n</M>.
+בקרן שווה היתרה יורדת בקו ישר: אחרי k תשלומים נשאר <M>P × (n − k) ÷ n</M> (שיעור 2.9). בשפיצר, בריבית גדולה מאפס שלא זזה ובלי הצמדה, היתרה **מעל** הקו הזה, כי בהתחלה רכיב הקרן קטן מ־<M>P ÷ n</M>.
 זו בדיקה מהירה ליתרה שחישבתם: אם יצא לכם פחות מהקו הישר, משהו לא בסדר. בהלוואה שלנו, אחרי 60 חודשים: הקו הישר {f.shekels("long.straight_60")}, והיתרה {f.shekels("long.table_60")} — מעליו, כמו שצריך.
 
 <Section kind="דוגמה פתורה">
@@ -203,18 +203,18 @@ export const predictionOptions = [
 </Section>
 
 <Callout title="דוגמה לימודית">
-<p>יעל ותומר הם דוגמה בדויה: תרגיל נפרד, לא התיק של נועם ושירה. הסכום ואחוז הריבית להמחשה בלבד.</p>
+<p>ענבל ורועי הם דוגמה בדויה: תרגיל נפרד, לא התיק של נועם ושירה. הסכום ואחוז הריבית להמחשה בלבד.</p>
 </Callout>
 
-יעל ותומר לקחו 500,000 ₪ ב־4.5% לשנה, ל־20 שנה, בשפיצר. ההחזר החודשי, בנוסחה של שיעור 3.1: {f.shekels("worked.pay")}. אחרי שבע שנים בדיוק הם מוכרים את הדירה, ומהכסף של המכירה מחזירים את ההלוואה. כמה הם עוד חייבים?
+ענבל ורועי לקחו 500,000 ₪ ב־4.5% לשנה, ל־20 שנה, בשפיצר. ההחזר החודשי, בנוסחה של שיעור 3.1: {f.shekels("worked.pay")}. אחרי שבע שנים בדיוק הם מוכרים את הדירה, ומהכסף של המכירה מחזירים את ההלוואה. כמה הם עוד חייבים?
 
 **צעד 1 — כמה תשלומים נשארו.** <M>20 × 12 = {f.plain("worked.months")}</M> תשלומים בסך הכול; שולמו <M>7 × 12 = {f.plain("worked.paid_months")}</M>; נשארו <M>{f.plain("worked.months")} − {f.plain("worked.paid_months")} = {f.plain("worked.left")}</M>.
 
 **צעד 2 — הריבית החודשית.** <M>4.5% ÷ 12 = {f.plain("worked.monthly")}%</M>, כלומר <M>r = {dec(ws.m)}</M>.
 
-**צעד 3 — S של {f.plain("worked.left")} תשלומים.** <M>1.00375<sup>−156</sup> = {dec(ws.discount)}</M>; <M>1 − {dec(ws.discount)} = {dec(ws.one_minus)}</M>; <M>{dec(ws.one_minus)} ÷ {dec(ws.m)} = {dec(f.raw("worked.S_156"))}</M>.
+**צעד 3 — S של {f.plain("worked.left")} תשלומים.** <M>{f.plain("worked.base")}<sup>−156</sup> = {dec(ws.discount)}</M>; <M>1 − {dec(ws.discount)} = {dec(ws.one_minus)}</M>; <M>{dec(ws.one_minus)} ÷ {dec(ws.m)} = {dec(f.raw("worked.S_156_shown"))}</M>.
 
-**צעד 4 — היתרה.** <M>{n("worked.pay")} × {dec(f.raw("worked.S_156"))} = {n("worked.pv")}</M> ₪. בלוח: {f.shekels("worked.table_84")} — הפרש של אגורות, מהעיגול.
+**צעד 4 — היתרה.** <M>{n("worked.pay")} × {dec(f.raw("worked.S_156_shown"))} = {n("worked.pv")}</M> ₪. בלוח: {f.shekels("worked.table_84")} — הפרש של אגורות, מהעיגול.
 
 **צעד 5 — מה זה אומר.** בשבע שנים הם שילמו <M>{f.plain("worked.paid_months")} × {n("worked.pay")} = {n("worked.paid_84")}</M> ₪, אבל החוב ירד רק ב־<M>500,000 − {n("worked.table_84")} = {n("worked.repaid")}</M> ₪. מהכסף של המכירה, קודם מחזירים את היתרה; רק מה שנשאר אחרי זה נשאר אצלם. כשמחזירים הלוואה לפני הזמן יכולים להתווסף גם תשלומים נוספים — נגיע אליהם בשלב 7.
 
@@ -238,7 +238,7 @@ export const predictionOptions = [
   rows={f.rows("half.rows")}
   blanks={["2.s", "2.balance", "3.s", "3.balance"]}
   success={`בלוח המלא היתרות הן ${f.shekels("half.table_1")}, ${f.shekels("half.table_2")} ו־${f.shekels("half.table_3")}: אותן יתרות, עד אגורה של עיגול.`}
-  hint="בדקו: S של תשלום אחד הוא 1 ÷ 1.005; של שניים — ועוד 1 ÷ 1.005 בריבוע. והיתרה היא ההחזר כפול S, לא הקרן כפול S."
+  hint={`בדקו: S של תשלום אחד הוא 1 ÷ ${f.plain("small.base")}; של שניים — ועוד 1 ÷ ${f.plain("small.base")} בריבוע. והיתרה היא ההחזר כפול S, לא הקרן כפול S.`}
 />
 
 <Section kind="תרגול">
@@ -256,7 +256,7 @@ export const predictionOptions = [
   n={1}
   level="קל"
   options={[
-    { text: "יותר מחצי, כי בהתחלה רוב התשלום הוא רכיב ריבית", correct: true, feedback: "נכון. בשפיצר, בריבית גדולה מאפס, היתרה תמיד מעל הקו הישר. בהלוואה ארוכה ההפרש גדול." },
+    { text: "יותר מחצי, כי בהתחלה רכיב הקרן קטן מהקרן חלקי מספר החודשים", correct: true, feedback: "נכון. בשפיצר, בריבית גדולה מאפס שלא זזה, רכיב הקרן מתחיל קטן מהחלק השווה וגדל, ולכן היתרה מעל הקו הישר. בהלוואה ארוכה ההפרש גדול." },
     { text: "חצי בדיוק, כי עבר חצי מהזמן של ההלוואה", feedback: "זה נכון בקרן שווה, שבה מחזירים בכל חודש אותו חלק מהקרן. בשפיצר רכיב הקרן קטן בהתחלה." },
     { text: "פחות מחצי, כי שילמתם כבר הרבה כסף", feedback: "שילמתם הרבה, אבל רובו רכיבי ריבית. רק רכיבי הקרן מקטינים את החוב." },
     { text: "זה תלוי בבנק, ואי אפשר לחשב את זה בעצמכם", feedback: "כשהסכום, האחוז, התקופה והשיטה ידועים, אפשר לחשב: הערך הנוכחי של התשלומים שנשארו." },
@@ -272,14 +272,14 @@ export const predictionOptions = [
   level="קל"
   answer={f.raw("small.pv_2")}
   errors={[
-    { value: f.raw("small.pay"), message: "זה התשלום שנשאר, בשקלים של עוד חודש. היתרה היום היא הערך הנוכחי שלו: מחלקים ב־1.005." },
+    { value: f.raw("small.pay"), message: `זה התשלום שנשאר, בשקלים של עוד חודש. היתרה היום היא הערך הנוכחי שלו: מחלקים ב־${f.plain("small.base")}.` },
   ]}
 >
   בהלוואה של שיעור 2.9 (60,000 ₪, 6% לשנה, שלושה חודשים, {f.shekels("small.pay")} בחודש) שילמתם שני תשלומים. נשאר תשלום אחד. כמה היתרה עכשיו?
 </NumericExercise>
 
 <Solution for="3.3-2">
-נשאר תשלום אחד, בעוד חודש. הערך הנוכחי שלו: <M>{n("small.pay")} ÷ 1.005 = {n("small.pv_2")}</M>, כלומר {f.shekels("small.pv_2")}. בלוח: {f.shekels("small.table_2")} — אגורה של עיגול. (התשלום האחרון בלוח, {f.shekels("ex2.payment")}, סוגר אותה.)
+נשאר תשלום אחד, בעוד חודש. הערך הנוכחי שלו: <M>{n("small.pay")} ÷ {f.plain("small.base")} = {n("small.pv_2")}</M>, כלומר {f.shekels("small.pv_2")}. בלוח: {f.shekels("small.table_2")} — אגורה של עיגול. (התשלום האחרון בלוח, {f.shekels("ex2.payment")}, סוגר אותה.)
 </Solution>
 
 <NumericExercise
@@ -297,7 +297,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="3.3-3">
-נשארו <M>300 − 60 = {f.plain("ex3.left")}</M> תשלומים. ‏<M>S = (1 − 1.004<sup>−240</sup>) ÷ 0.004 = {dec(f.raw("ex3.S_240"))}</M>. היתרה: <M>{n("ex3.pay")} × {dec(f.raw("ex3.S_240"))} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}. בלוח: {f.shekels("ex3.table")}.
+נשארו <M>300 − 60 = {f.plain("ex3.left")}</M> תשלומים. ‏<M>S = (1 − {f.plain("long.base")}<sup>−240</sup>) ÷ {dec(ls.m)} = {dec(f.raw("ex3.S_240"))}</M>. היתרה: <M>{n("ex3.pay")} × {dec(f.raw("ex3.S_240"))} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}. בלוח: {f.shekels("ex3.table")}.
 </Solution>
 
 <NumericExercise
@@ -316,7 +316,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="3.3-4">
-נשארו <M>360 − 240 = {f.plain("ex4.left")}</M> תשלומים, ב־<M>{f.plain("pred.monthly")}%</M> לחודש. ‏<M>S = (1 − 1.0045<sup>−120</sup>) ÷ 0.0045 = {dec(f.raw("ex4.S_120"))}</M>. היתרה: <M>{n("pred.pay")} × {dec(f.raw("ex4.S_120"))} = {n("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}. בלוח: {f.shekels("ex4.table")} — הפרש של שקל וחצי, מ־240 חודשים של עיגול.
+נשארו <M>360 − 240 = {f.plain("ex4.left")}</M> תשלומים, ב־<M>{f.plain("pred.monthly")}%</M> לחודש. ‏<M>S = (1 − {f.plain("ex4.base")}<sup>−120</sup>) ÷ {dec(f.raw("ex4.steps").m)} = {dec(f.raw("ex4.S_120"))}</M>. היתרה: <M>{n("pred.pay")} × {dec(f.raw("ex4.S_120"))} = {n("ex4.answer")}</M>, כלומר {f.shekels("ex4.answer")}. בלוח: {f.shekels("ex4.table")} — הפרש של {f.shekels("ex4.gap")}, מ־240 חודשים של עיגול.
 </Solution>
 
 <NumericExercise
@@ -328,13 +328,15 @@ export const predictionOptions = [
   near={2}
   errors={[
     { value: f.raw("ex5.err_paid"), message: "זה כל מה ששילמתם — קרן וריבית. השאלה היא כמה מהקרן הוחזר: ההלוואה פחות היתרה." },
+    { value: f.raw("ex5.balance"), message: "זו היתרה אחרי עשר שנים — מה שעוד חייבים. מה שהוחזר מהקרן הוא ההלוואה פחות היתרה." },
+    { value: f.raw("ex5.err_straight"), message: "זה הקו הישר: 120 חלקי 300 מהקרן, כמו בקרן שווה. בשפיצר רכיב הקרן קטן בהתחלה, ולכן הוחזר פחות." },
   ]}
 >
-  בהלוואה של 600,000 ₪, 4.8% לשנה, 20 שנה, בשפיצר ({f.shekels("long.pay")} בחודש): כמה מהקרן החזרתם בחמש השנים הראשונות?
+  בהלוואה של תרגיל 3 — 250,000 ₪, 4.8% לשנה, 25 שנה, בשפיצר, {f.shekels("ex3.pay")} בחודש: כמה מהקרן החזרתם בעשר השנים הראשונות?
 </NumericExercise>
 
 <Solution for="3.3-5">
-היתרה אחרי 60 תשלומים, בנוסחה: {f.shekels("long.pv_60")} (מההסבר). מה שהוחזר מהקרן: <M>600,000 − {n("long.pv_60")} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")}. מהלוח: {f.shekels("long.repaid_60")}. זה סכום רכיבי הקרן של 60 החודשים, פחות ממחצית מ־{f.shekels("ex5.err_paid")} ששילמתם.
+אחרי עשר שנים נשארו <M>300 − 120 = {f.plain("ex5.left")}</M> תשלומים. אותו אחוז ואותו מספר תשלומים כמו בהסבר, ולכן אותו S: <M>{dec(ls.one_minus)} ÷ {dec(ls.m)} = {dec(f.raw("long.S_180_shown"))}</M>. היתרה: <M>{n("ex3.pay")} × {dec(f.raw("long.S_180_shown"))} = {n("ex5.balance")}</M>. מה שהוחזר מהקרן: <M>250,000 − {n("ex5.balance")} = {n("ex5.answer")}</M>, כלומר {f.shekels("ex5.answer")}. מהלוח: היתרה {f.shekels("ex5.table")}, ולכן {f.shekels("ex5.table_repaid")}. זה סכום רכיבי הקרן של 120 החודשים — פחות ממחצית מ־{f.shekels("ex5.err_paid")} ששילמתם.
 </Solution>
 
 <NumericExercise
@@ -344,14 +346,14 @@ export const predictionOptions = [
   level="מאתגר"
   answer={f.raw("ex6.answer")}
   errors={[
-    { value: f.raw("ex6.err_full_term"), message: "הצבתם 300 חודשים — כל התקופה. מהיתרה הזו נשארו רק 264 חודשים." },
+    { value: f.raw("ex6.err_full_term"), message: `הצבתם 300 חודשים — כל התקופה. מהיתרה הזו נשארו רק ${f.plain("ex6.left")} חודשים.` },
   ]}
 >
-  בשיעור 3.2 דנה לקחה 350,000 ₪ ב־4.2% לשנה ל־25 שנה, ובדוח שלה כתוב שאחרי 36 תשלומים היתרה היא {f.shekels("ex6.balance")}. נניח שאתם יודעים רק את היתרה, את האחוז ואת מספר החודשים שנשארו (264). איזה החזר חודשי מביא את היתרה הזו לאפס בדיוק בזמן? (רמז: היתרה היא הערך הנוכחי של מה שנשאר. הפכו את הנוסחה.)
+  בשיעור 3.2 הילה לקחה 350,000 ₪ ב־4.2% לשנה ל־25 שנה, ובדוח שלה כתוב שאחרי 36 תשלומים היתרה היא {f.shekels("ex6.balance")}. נניח שאתם יודעים רק את היתרה, את האחוז ואת מספר החודשים שנשארו ({f.plain("ex6.left")}). איזה החזר חודשי מביא את היתרה הזו לאפס בדיוק בזמן? (רמז: היתרה היא הערך הנוכחי של מה שנשאר. הפכו את הנוסחה.)
 </NumericExercise>
 
 <Solution for="3.3-6">
-היתרה היא <M>C × S</M>, ולכן <M>C = B ÷ S</M> — הנוסחה של שיעור 3.1, על היתרה במקום על הקרן. ‏<M>r = {f.plain("ex6.monthly")}%</M> לחודש; <M>S = (1 − 1.0035<sup>−264</sup>) ÷ 0.0035 = {dec(f.raw("ex6.S_264"))}</M>. ‏<M>{n("ex6.balance")} ÷ {dec(f.raw("ex6.S_264"))} = {n("ex6.answer")}</M>, כלומר {f.shekels("ex6.answer")} — בדיוק ההחזר של דנה. כך מחשבים תשלום מחדש כשמשהו משתנה באמצע הדרך (שיעור 3.6).
+היתרה היא <M>C × S</M>, ולכן <M>C = B ÷ S</M> — הנוסחה של שיעור 3.1, על היתרה במקום על הקרן. ‏<M>r = {f.plain("ex6.monthly")}%</M> לחודש; <M>S = (1 − {f.plain("ex6.base")}<sup>−264</sup>) ÷ {dec(f.raw("ex6.steps").m)} = {dec(f.raw("ex6.S_264"))}</M>. ‏<M>{n("ex6.balance")} ÷ {dec(f.raw("ex6.S_264"))} = {n("ex6.answer")}</M>, כלומר {f.shekels("ex6.answer")} — בדיוק ההחזר של הילה. כך מחשבים תשלום מחדש כשמשהו משתנה באמצע הדרך (שיעור 3.6).
 </Solution>
 
 <Callout title="חמש שאלות על יתרת החוב">
@@ -388,7 +390,7 @@ export const predictionOptions = [
     { kind: "ידע מתמטי כללי", text: "יתרת הלוואה בתשלומים שווים היא הערך הנוכחי של התשלומים שנשארו, בריבית של ההלוואה; מכאן גם חישוב מחדש של תשלום על יתרה.", code: ["B_k = C × (1 − (1 + r)^−(n−k)) ÷ r", "C = B ÷ S"] },
     { kind: "הנחת חישוב", text: "ריבית חודשית = אחוז הריבית לשנה חלקי 12. לפי בדיקה של הצוות מול לוחות ששני בנקים פרסמו (החישוב התאים עד האגורה בכל התאים שנבדקו; Linear ENG-223, 2026-10-04; לא נבדק מול מקור רשמי).", date: "2026-10-04" },
     { kind: "הנחת חישוב", text: "עיגול: בלוח, ההחזר החודשי והריבית של כל חודש מעוגלים לאגורה, והתשלום האחרון סוגר את מה שנשאר. בנוסחה מעגלים פעם אחת, בסוף. לכן הם נבדלים באגורות, ובהלוואה ארוכה גם בשקל. בנק יכול לעגל אחרת." },
-    { kind: "הנחת חישוב", text: "כל הסכומים ואחוזי הריבית בשיעור הם מספרים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. יעל ותומר הם דוגמה בדויה." },
+    { kind: "הנחת חישוב", text: "כל הסכומים ואחוזי הריבית בשיעור הם מספרים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. ענבל ורועי הם דוגמה בדויה." },
     { kind: "בדיקת חישוב", text: "כל יתרה בשיעור חושבה פעמיים: בנוסחה הקצרה, ובבדיקה עצמאית שמהוונת את התשלומים שנשארו אחד אחד. היתרות מהלוח חושבו שורה אחר שורה, ונבדקו גם הן בנפרד.", date: "2026-10-10" },
   ]}
 />

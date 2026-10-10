@@ -10,7 +10,15 @@
 import { firstMonthBelow } from "../../src/lib/calc/amortization.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given, repCell, repMonths, repPayment, slice } from "./lesson-2-9.ts";
-import { factorFact, leftFact, monthlyFact, paymentsTotal, pvFact, remainingFact, statementFact, stepsFact, sumFact } from "./lesson-3-1.ts";
+import { baseFact, factorFact, leftFact, monthlyFact, paymentsTotal, pvFact, remainingFact, shownSumFact, statementFact, stepsFact, sumFact } from "./lesson-3-1.ts";
+import Decimal from "decimal.js";
+import { moneyString } from "../../src/lib/calc/money.ts";
+
+/** The page prints "C × S = B" with S the calculator's S; make sure that product is the balance fact it shows. */
+function assertProduct(payment: Fact, shownSum: Fact, balance: Fact): void {
+  const product = moneyString(new Decimal(payment.value as string).mul(shownSum.value as string));
+  if (product !== balance.value) throw new Error(`lesson 3.3: ${payment.id} × ${shownSum.id} = ${product}, but ${balance.id} = ${balance.value}`);
+}
 
 const belowFact = (id: string, principal: string, annual: string, months: number, threshold: string): Fact => ({
   id,
@@ -27,6 +35,8 @@ export default function lesson33(): LessonData {
   const R = ["900000", "5.4", 360] as const;
   const rPay = repPayment("pred.pay", ...R);
   const rPaid180 = paymentsTotal("pred.paid_180", rPay.value as string, 180);
+  const rPv = pvFact("pred.pv", rPay.value as string, "5.4", 180);
+  const rAnswer = statementFact("pred.answer", ...R, 180);
 
   // ── Explanation, small: lesson 2.9's 60,000 ₪ at 6% for three months. ──
   const T = ["60000", "6", 3] as const;
@@ -37,14 +47,18 @@ export default function lesson33(): LessonData {
   const lPay = repPayment("long.pay", ...L);
   const lTable60 = statementFact("long.table_60", ...L, 60);
   const lPv60 = pvFact("long.pv_60", lPay.value as string, "4.8", 180);
+  const lShown = shownSumFact("long.S_180_shown", "4.8", 180);
+  assertProduct(lPay, lShown, lPv60);
 
-  // ── Worked example: יעל ותומר, 500,000 ₪ at 4.5% for 20 years; they sell after 7 years. ──
+  // ── Worked example: ענבל ורועי, 500,000 ₪ at 4.5% for 20 years; they sell after 7 years. ──
   const W = ["500000", "4.5", 240] as const;
   const wPay = repPayment("worked.pay", ...W);
   const wPv = pvFact("worked.pv", wPay.value as string, "4.5", 156);
   const wPaid = paymentsTotal("worked.paid_84", wPay.value as string, 84);
   const wLoan = given("worked.loan", "500000.00");
   const wTable = statementFact("worked.table_84", ...W, 84);
+  const wShown = shownSumFact("worked.S_156_shown", "4.5", 156);
+  assertProduct(wPay, wShown, wPv);
 
   // ── Half-worked: 40,000 ₪ at 6% (0.5% a month), four months. ──
   const H = ["40000", "6", 4] as const;
@@ -60,9 +74,14 @@ export default function lesson33(): LessonData {
   const x3Paid = paymentsTotal("ex3.paid_60", xPay.value as string, 60);
   const xLoan = given("ex3.loan", "250000.00");
   // 4: 900,000 ₪ at 5.4% for 30 years, after 20 years.
-  // 5: how much of 600,000 ₪ was repaid in the first five years.
+  const ex4Answer = pvFact("ex4.answer", rPay.value as string, "5.4", 120);
+  const ex4Table = statementFact("ex4.table", ...R, 240);
+  // 5: exercise 3's loan — how much of the principal was repaid in the first ten years.
+  const x5Balance = pvFact("ex5.balance", xPay.value as string, "4.8", 180);
+  assertProduct(xPay, shownSumFact("ex5.check", "4.8", 180), x5Balance);
   const lLoan = given("long.loan", "600000.00");
-  // 6: דנה's balance from 3.2 after 36 months, 264 months left at 4.2%: back to the payment.
+  const x5Table = statementFact("ex5.table", ...X, 120);
+  // 6: הילה's balance from 3.2 after 36 months, 264 months left at 4.2%: back to the payment.
   const dBalance = given("ex6.balance", "324675.50");
 
   const facts: Fact[] = [
@@ -70,15 +89,17 @@ export default function lesson33(): LessonData {
     rPay,
     rPaid180,
     slice("pred.half", "900000", "1", "2"),
-    statementFact("pred.answer", ...R, 180),
     remainingFact("pred.formula", ...R, 180),
     monthlyFact("pred.monthly", "5.4", 2),
     sumFact("pred.S_180", "5.4", 180),
-    pvFact("pred.pv", rPay.value as string, "5.4", 180),
+    rPv,
+    rAnswer,
+    difference("pred.gap", rPv, rAnswer),
 
     // Explanation, small.
     tPay,
     monthlyFact("small.monthly", "6", 2),
+    baseFact("small.base", "6"),
     statementFact("small.table_1", ...T, 1),
     statementFact("small.table_2", ...T, 2),
     factorFact("small.f1", "6", 1),
@@ -95,6 +116,8 @@ export default function lesson33(): LessonData {
     lPay,
     stepsFact("long.steps_180", ...L.slice(0, 2) as [string, string], 180),
     sumFact("long.S_180", "4.8", 180),
+    lShown,
+    baseFact("long.base", "4.8"),
     lPv60,
     lTable60,
     difference("long.gap_60", lTable60, lPv60),
@@ -115,6 +138,8 @@ export default function lesson33(): LessonData {
     leftFact("worked.left", 240, 84),
     stepsFact("worked.steps_156", "500000", "4.5", 156),
     sumFact("worked.S_156", "4.5", 156),
+    wShown,
+    baseFact("worked.base", "4.5"),
     wPv,
     wTable,
     wLoan,
@@ -144,20 +169,31 @@ export default function lesson33(): LessonData {
 
     // Exercise 4.
     sumFact("ex4.S_120", "5.4", 120),
+    baseFact("ex4.base", "5.4"),
+    stepsFact("ex4.steps", "900000", "5.4", 120),
+    ex4Answer,
+    ex4Table,
+    difference("ex4.gap", ex4Answer, ex4Table),
     leftFact("ex4.left", 360, 240),
-    pvFact("ex4.answer", rPay.value as string, "5.4", 120),
     slice("ex4.err_straight", "900000", "120", "360"),
     pvFact("ex4.err_left_180", rPay.value as string, "5.4", 240),
-    statementFact("ex4.table", ...R, 240),
 
     // Exercise 5.
-    difference("ex5.answer", lLoan, lPv60),
-    paymentsTotal("ex5.err_paid", lPay.value as string, 60),
+    leftFact("ex5.left", 300, 120),
+    x5Balance,
+    difference("ex5.answer", xLoan, x5Balance),
+    x5Table,
+    difference("ex5.table_repaid", xLoan, x5Table),
+    paymentsTotal("ex5.err_paid", xPay.value as string, 120),
+    slice("ex5.err_straight", "250000", "120", "300"),
 
     // Exercise 6.
     dBalance,
     monthlyFact("ex6.monthly", "4.2", 2),
     sumFact("ex6.S_264", "4.2", 264),
+    baseFact("ex6.base", "4.2"),
+    leftFact("ex6.left", 300, 36),
+    stepsFact("ex6.steps", "324675.50", "4.2", 264),
     paymentOnBalance("ex6.answer", "324675.50", "4.2", 264),
     paymentOnBalance("ex6.err_full_term", "324675.50", "4.2", 300),
   ];

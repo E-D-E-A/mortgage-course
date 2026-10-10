@@ -5,7 +5,8 @@
 // card shows that month's row: the balance, what the index added (הפרשי הצמדה), the interest,
 // the payment, the part that lowered the debt, and the balance after. The charts show the
 // payment and the balance over the whole term.
-// Every number comes from src/lib/calc/schedule.ts; nothing is computed here but scaling.
+// Every number comes from src/lib/calc/schedule.ts, in its statement rounding (every row in
+// agorot, as in the lesson's tables); nothing is computed here but scaling.
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
@@ -30,19 +31,22 @@ const inflation = ref(props.inflation);
 const month = ref(props.month);
 const showTable = ref(false);
 
-const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString()}%`;
+// A real minus sign, not a hyphen, when the index falls.
+const pct = (v: Decimal.Value) => `${new Decimal(v).toDecimalPlaces(2).toString().replace("-", "−")}%`;
 const names = [`צמוד למדד, ${pct(props.rate)}`, `לא צמוד, ${pct(props.rate)}`];
 const colours = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)"];
 
 const series = computed<ScheduleRow[][]>(() => [
-  scheduleFromInputs(pathInputs({ principal: props.amount, months, rate: props.rate, inflation: [inflation.value] })),
-  scheduleFromInputs(pathInputs({ principal: props.amount, months, rate: props.rate })),
+  scheduleFromInputs(pathInputs({ principal: props.amount, months, rate: props.rate, inflation: [inflation.value], rounding: "statement" })),
+  scheduleFromInputs(pathInputs({ principal: props.amount, months, rate: props.rate, rounding: "statement" })),
 ]);
 const row = computed(() => series.value.map((s) => s[month.value - 1]));
 const addedSoFar = computed(() => scheduleTotals(series.value[0], month.value).indexation);
 
 // Signed money for "what the index added": a real minus when the index fell.
 const signed = (v: Decimal) => (v.isNeg() ? `−${formatShekels(v.abs())}` : formatShekels(v));
+// What the sentence under the cards says: the index rose, fell, or did not move; and whether payments are left.
+const addedKind = computed(() => (addedSoFar.value.isZero() ? "none" : addedSoFar.value.isNeg() ? "fell" : "rose"));
 
 const W = 640;
 const H = 170;
@@ -77,8 +81,9 @@ const yearRows = computed(() =>
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      תרחיש להמחשה, לא תחזית. הלוואה של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, באותו אחוז ריבית, בתשלומים
-      חודשיים שווים (שפיצר). המדד עולה באופן אחיד: קצת בכל חודש, כך שאחרי 12 חודשים הוא עלה בדיוק באחוז שבחרתם.
+      תרחיש להמחשה, לא מה שצפוי לקרות. הלוואה של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, באותו אחוז ריבית, בתשלומים
+      חודשיים שווים (שפיצר). המדד עולה באופן אחיד: באותו אחוז בכל חודש (השורש ה־12, שיעור 0.4), כך שאחרי 12 חודשים הוא עלה
+      בדיוק באחוז שבחרתם. כל שורה מעוגלת לאגורה, כמו בלוח של בנק.
     </p>
 
     <label class="mt-4 flex flex-col">
@@ -144,8 +149,19 @@ const yearRows = computed(() =>
       </div>
     </div>
     <p class="mt-2 text-body-m text-n800">
-      עד סוף חודש {{ month }}, ההצמדה הוסיפה לחוב במסלול הצמוד <span class="ltr font-semibold">{{ signed(addedSoFar) }}</span>. את הסכום הזה לא שילמתם בבת אחת: הוא
-      נוסף ליתרה, ומשולם לאורך התשלומים שנשארו.
+      <template v-if="addedKind === 'none'">המדד לא זז, ולכן ההצמדה לא שינתה את החוב במסלול הצמוד.</template>
+      <template v-else-if="addedKind === 'fell'">
+        עד סוף חודש {{ month }} המדד ירד, וההצמדה הקטינה את החוב במסלול הצמוד ב־<span class="ltr font-semibold">{{ formatShekels(addedSoFar.abs()) }}</span>.
+        {{ month < months ? "גם התשלומים שנשארו קטנים בהתאם." : "לכן גם התשלומים היו קטנים מהלוח המקורי." }}
+      </template>
+      <template v-else-if="month < months">
+        עד סוף חודש {{ month }}, ההצמדה הוסיפה לחוב במסלול הצמוד <span class="ltr font-semibold">{{ formatShekels(addedSoFar) }}</span>. את הסכום הזה לא שילמתם
+        בבת אחת: הוא נוסף ליתרה, ומשולם לאורך התשלומים שנשארו.
+      </template>
+      <template v-else>
+        עד סוף ההלוואה, ההצמדה הוסיפה לחוב במסלול הצמוד <span class="ltr font-semibold">{{ formatShekels(addedSoFar) }}</span>. הסכום הזה לא שולם בבת אחת: הוא
+        נוסף ליתרה, ושולם לאורך כל התשלומים.
+      </template>
     </p>
 
     <button type="button" class="mt-2 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">

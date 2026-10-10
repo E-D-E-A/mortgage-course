@@ -9,12 +9,16 @@
  * Every number the page and its exercises show is a fact here; the page reads
  * data/lessons/3-7.json and checks/kinds/schedule.py recomputes each one. The
  * mixes are invented (not case A, which gets its mix in stage 5); index and
- * prime paths are teaching scenarios, not forecasts.
+ * prime paths are teaching scenarios, not forecasts. Every scenario uses the
+ * statement rounding of schedule.ts (every row in agorot, course/AUTHORING.md),
+ * so the sums the page prints hold on its printed numbers; MixBuilder.vue too.
  */
 import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
+import { primeTrackRate } from "../../src/lib/calc/amortization.ts";
 import {
   exposure,
+  maxRunEnd,
   mixCashFlow,
   mixInputs,
   mixSummary,
@@ -66,12 +70,12 @@ const sum = (id: string, terms: string[]): Fact => ({
 });
 
 /** The half-worked table: the explanation's mix, nothing moving, at a few months. */
-const halfTable = (tracks: TrackSpec[], months: number[]): Fact => {
-  const flow = mixCashFlow(tracks);
+const halfTable = (tracks: TrackSpec[], scenario: Scenario, months: number[]): Fact => {
+  const flow = mixCashFlow(tracks, scenario);
   return {
     id: "half.table",
     kind: "sch_mix_rows",
-    inputs: { ...mixInputs(tracks), ...Object.fromEntries(months.map((m, k) => [`month_${k + 1}`, m])) },
+    inputs: { ...mixInputs(tracks, scenario), ...Object.fromEntries(months.map((m, k) => [`month_${k + 1}`, m])) },
     value: months.map((m) => ({
       period: m,
       t1: moneyString(flow[m - 1].byTrack[0]),
@@ -89,9 +93,9 @@ export default function lesson37(): LessonData {
     { kind: "prime", amount: "300000", rate: "4.25", months: 144 },
     { kind: "fixed_linked", amount: "300000", rate: "3", months: 240 },
   ];
-  const FLAT: Scenario = {};
+  const FLAT: Scenario = { rounding: "statement" };
   // The stated scenario (a teaching scenario, not a forecast): the index rises 2% a year, evenly; prime is 1 point higher from year 2.
-  const SC: Scenario = { inflation: ["2"], primeShift: ["0", "1"] };
+  const SC: Scenario = { inflation: ["2"], primeShift: ["0", "1"], rounding: "statement" };
   const t1 = payment("explain.t1", "300000", "4.8", 360);
   const t2 = payment("explain.t2", "300000", "4.25", 144);
   const t3 = payment("explain.t3", "300000", "3", 240);
@@ -99,20 +103,20 @@ export default function lesson37(): LessonData {
   const flat145 = at("flat.m145", MIX, FLAT, 145);
   const flatTotal = summary("flat", MIX, FLAT);
   const sc = summary("sc", MIX, SC);
-  const one = mixFact("wrong.one_formula", "sch_one_formula", MIX, {}, {}, moneyString(oneFormulaPayment(MIX)));
+  const one = mixFact("wrong.one_formula", "sch_one_formula", MIX, FLAT, {}, moneyString(oneFormulaPayment(MIX)));
 
   // The illustration's tasks.
   const LONG_PRIME = MIX.map((t, k) => (k === 1 ? { ...t, months: 300 } : t));
   const VARIABLE = MIX.map((t, k) => (k === 2 ? { ...t, kind: "variable_linked" as const, rate: "3.25" } : t));
   const SCV: Scenario = { ...SC, anchorShift: ["1"] };
 
-  // Worked example: Lior (invented), 700,000 ₪ in three tracks.
+  // Worked example: Yonatan (invented), 700,000 ₪ in three tracks.
   const W: TrackSpec[] = [
     { kind: "fixed_unlinked", amount: "350000", rate: "5", months: 300 },
     { kind: "prime", amount: "200000", rate: "4.5", months: 180 },
     { kind: "variable_unlinked", amount: "150000", rate: "4.6", months: 240, resetMonths: 60 },
   ];
-  const WS: Scenario = { primeShift: ["0", "0.5"], anchorShift: ["1"] };
+  const WS: Scenario = { primeShift: ["0", "0.5"], anchorShift: ["1"], rounding: "statement" };
   const w1 = payment("worked.t1", "350000", "5", 300);
   const w2 = payment("worked.t2", "200000", "4.5", 180);
   const w3 = payment("worked.t3", "150000", "4.6", 240);
@@ -129,7 +133,7 @@ export default function lesson37(): LessonData {
   ];
   const ex5a = payment("ex5.t1", "400000", "5", 300);
   const ex5b = payment("ex5.t2", "200000", "4", 120);
-  const EX6: Scenario = { inflation: ["3"] };
+  const EX6: Scenario = { inflation: ["3"], rounding: "statement" };
 
   const facts: Fact[] = [
     given("case.loan", "900000.00"),
@@ -144,6 +148,8 @@ export default function lesson37(): LessonData {
     difference("flat.drop_145", flat1, flat145),
     at("flat.m241", MIX, FLAT, 241),
     ...flatTotal,
+    at("flat.m144", MIX, FLAT, 144),
+    difference("flat.max_over_first", flatTotal[1], flat1),
 
     // Under the stated scenario.
     ...sc,
@@ -186,12 +192,19 @@ export default function lesson37(): LessonData {
     at("worked.m181", W, WS, 181),
     at("worked.m241", W, WS, 241),
     ...summary("worked", W, WS),
+    mixFact("worked.max_end", "sch_mix_max_run_end", W, WS, {}, String(maxRunEnd(mixCashFlow(W, WS)))),
+    at("worked.m180", W, WS, 180),
+    difference("worked.dip_180", at("worked.m61", W, WS, 61), at("worked.m180", W, WS, 180)),
+    // The new rates, and the months left at the prime's change.
+    { id: "worked.prime_new", kind: "amort_prime_track_rate", inputs: { prime: "4.5", margin: "0.5" }, value: plainNumber(primeTrackRate("4.5", "0.5")) },
+    { id: "worked.var_new", kind: "amort_prime_track_rate", inputs: { prime: "4.6", margin: "1" }, value: plainNumber(primeTrackRate("4.6", "1")) },
+    { id: "worked.left_13", kind: "sch_months_left", inputs: { months: 180, paid: 12 }, value: "168" },
     share("worked.exp_prime", W, "prime"),
     share("worked.exp_fixed", W, "fixed_for_term"),
     share("worked.exp_resetting", W, "resetting"),
 
     // Half-worked table.
-    halfTable(MIX, [1, 144, 145, 240, 241]),
+    halfTable(MIX, FLAT, [1, 144, 145, 240, 241]),
 
     // Exercise 2: two tracks' payments in one month.
     sum("ex2.answer", ["2140.55", "1385.20"]),
@@ -209,7 +222,7 @@ export default function lesson37(): LessonData {
     ex5a,
     ex5b,
     at("ex5.answer", EX5, FLAT, 1),
-    mixFact("ex5.one_formula", "sch_one_formula", EX5, {}, {}, moneyString(oneFormulaPayment(EX5))),
+    mixFact("ex5.one_formula", "sch_one_formula", EX5, FLAT, {}, moneyString(oneFormulaPayment(EX5))),
     // Exercise 6: the exercise-3 mix in month 12, with the index rising 3% a year.
     at("ex6.answer", EX3, EX6, 12),
     at("ex6.no_index", EX3, FLAT, 12),

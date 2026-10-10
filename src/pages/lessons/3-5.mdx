@@ -111,6 +111,10 @@ export const predictionOptions = [
 
 מסלול קבועה צמודה של {f.shekels("case.amount")}, ל־20 שנה (240 תשלומים), ב־3%. מדד הבסיס 100. בתרחיש להמחשה, המדד ביום התשלומים הראשונים: 100.3, 100.5, ואז 100.4 (המדד יכול גם לרדת).
 
+<Callout title="עיגול, כמו בלוח של בנק">
+<p>כמו בשיעור 3.2, כל שורה בשיעור מעוגלת לאגורה: היתרה אחרי ההצמדה, הריבית והתשלום. לכן כל חשבון שמופיע כאן מתקיים בדיוק על המספרים שמוצגים, ומי שמחשב שורה אחרי שורה במחשבון יקבל אותם. בתשלום האחרון הלוח סוגר את העיגול: משלמים בדיוק את מה שנשאר.</p>
+</Callout>
+
 **צעד 0 — הלוח המקורי.** כמו בשיעור 2.5, מחשבים קודם בלי מדד. ב<Term t="שפיצר" lesson="3.5">שפיצר</Term>, ה<Term t="החזר חודשי" lesson="3.5">החזר החודשי</Term> בנוסחה משיעור 3.1: <M>C = {amt("explain.c")}</M> ₪.
 
 **חודש 1, צעד 1 — ההצמדה של היתרה.** לפני התשלום, היתרה זזה עם המדד:
@@ -129,6 +133,8 @@ export const predictionOptions = [
 
 **ובלי הצמדה?** אותה הלוואה, לא צמודה: הריבית {f.shekels("u1.interest")}, רכיב הקרן {f.shekels("u1.principal")}, והיתרה {f.shekels("u1.closing")}. בצמוד היתרה גבוהה ב־{f.shekels("m1.gap")}, אף ששילמתם יותר.
 
+**בדיקה.** היתרה הלא צמודה אחרי חודש 1, כפול המדד חלקי מדד הבסיס: <M>{amt("u1.closing")} × 100.3 ÷ 100 = {amt("check.m1")}</M> — בדיוק היתרה הצמודה. זה לא מקרה: בלוח צמוד שאחוז הריבית בו קבוע, כל הלוח המקורי, היתרה והתשלום, מוכפל ב־<M>M<sub>k</sub> ÷ M<sub>0</sub></M> (עד עיגול של אגורה פה ושם). לכן היתרה מוצמדת חודש אחרי חודש, והתשלום — תמיד מול מדד הבסיס.
+
 **חודש 2 — המדד 100.5.** כאן יש שתי חלוקות שונות, וזה הצעד שהכי קל לבלבל:
 - **היתרה** כבר מוצמדת למדד 100.3. לכן מצמידים אותה רק בתוספת של החודש: <M>{amt("m1.closing")} × 100.5 ÷ 100.3 = {amt("m2.opening")}</M>. הפרשי ההצמדה: {f.shekels("m2.indexation")}.
 - **התשלום** הוא תמיד התשלום מהלוח המקורי מול מדד הבסיס: <M>{amt("explain.c")} × 100.5 ÷ 100 = {amt("m2.payment")}</M>.
@@ -139,28 +145,24 @@ export const predictionOptions = [
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-4">
   <table class="w-full border-collapse text-caption sm:text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
+      <tr class="border-b border-n200 text-caption text-n600 whitespace-nowrap">
         <th class="py-2 pe-2 text-start font-semibold">חודש</th>
-        <th class="py-2 pe-2 text-start font-semibold">המדד</th>
-        <th class="py-2 pe-2 text-start font-semibold">הפרשי הצמדה</th>
+        <th class="py-2 pe-2 text-start font-semibold">מדד</th>
+        <th class="py-2 pe-2 text-start font-semibold">הצמדה</th>
         <th class="py-2 pe-2 text-start font-semibold">ריבית</th>
         <th class="py-2 pe-2 text-start font-semibold">תשלום</th>
-        <th class="py-2 pe-2 text-start font-semibold">רכיב קרן</th>
-        <th class="py-2 text-start font-semibold">יתרה בסוף</th>
+        <th class="py-2 pe-2 text-start font-semibold">קרן</th>
+        <th class="py-2 text-start font-semibold">יתרה</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100"><td class="py-2 pe-2">1</td><td class="py-2 pe-2"><span class="ltr">100.3</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m1.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m1.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m1.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m1.principal")}</span></td><td class="py-2"><span class="ltr">{f.shekelsExact("m1.closing")}</span></td></tr>
-      <tr class="border-b border-n100"><td class="py-2 pe-2">2</td><td class="py-2 pe-2"><span class="ltr">100.5</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m2.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m2.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m2.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m2.principal")}</span></td><td class="py-2"><span class="ltr">{f.shekelsExact("m2.closing")}</span></td></tr>
-      <tr><td class="py-2 pe-2">3</td><td class="py-2 pe-2"><span class="ltr">100.4</span></td><td class="py-2 pe-2"><span class="ltr">{exactNeg("m3.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m3.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m3.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{f.shekelsExact("m3.principal")}</span></td><td class="py-2"><span class="ltr">{f.shekelsExact("m3.closing")}</span></td></tr>
+      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">1</td><td class="py-2 pe-2"><span class="ltr">100.3</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m1.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m1.closing")}</span></td></tr>
+      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">2</td><td class="py-2 pe-2"><span class="ltr">100.5</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m2.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m2.closing")}</span></td></tr>
+      <tr class="border-b border-n100 whitespace-nowrap"><td class="py-2 pe-2">3</td><td class="py-2 pe-2"><span class="ltr">100.4</span></td><td class="py-2 pe-2"><span class="ltr">−{neg("m3.indexation")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.interest")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.payment")}</span></td><td class="py-2 pe-2"><span class="ltr">{amt("m3.principal")}</span></td><td class="py-2"><span class="ltr">{amt("m3.closing")}</span></td></tr>
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">הפרשי ההצמדה בטבלה: מה שההצמדה הוסיפה ליתרה באותו חודש, לפני התשלום. בחודש 3 המדד ירד, ולכן הם שליליים.</p>
+  <p class="mt-2 text-caption text-n600">הסכומים בשקלים. ״הצמדה״: הפרשי ההצמדה, מה שההצמדה הוסיפה ליתרה באותו חודש, לפני התשלום; בחודש 3 המדד ירד, ולכן הם שליליים. ״קרן״: רכיב הקרן. ״יתרה״: היתרה בסוף החודש.</p>
 </div>
-
-<Callout title="עיגול">
-<p>הסכומים בשיעור מחושבים ברצף, ומעוגלים לאגורה רק כשהם מוצגים. מי שמחשב שורה אחרי שורה עם יתרה מעוגלת יכול לקבל אגורה אחרת פה ושם. לוח של בנק מעגל כל שורה (שיעור 3.2), ולכן גם הוא יכול להיבדל באגורות.</p>
-</Callout>
 
 <Section kind="ההסבר">
 
@@ -170,9 +172,9 @@ export const predictionOptions = [
 
 בחודש 1 ההצמדה הוסיפה לחוב {f.shekels("m1.indexation")}, אבל התשלום עלה רק ב־{f.shekels("m1.payment_extra")}. לאן הלך השאר?
 
-**הוא נשאר בחוב.** היתרה גדלה ב־0.3%, ולכן כל התשלומים שנשארו גדלו ב־0.3%. את {f.shekels("m1.indexation")} מחזירים לאט, תשלום אחרי תשלום, עד סוף ההלוואה.
+**הוא נשאר בחוב.** היתרה גדלה ב־{f.plain("index.rise1")}%, ולכן כל התשלומים שנשארו גדלו ב־{f.plain("index.rise1")}%. את {f.shekels("m1.indexation")} מחזירים לאט, תשלום אחרי תשלום, עד סוף ההלוואה.
 
-**וכמה זה בסוף?** נניח שהמדד נשאר 100.3 עד הסוף. אז כל אחד מ־240 התשלומים גבוה ב־0.3% מהלוח המקורי, ויחד התוספות האלה הן {f.shekels("once.payment_extra_total")}. זה {f.shekels("once.indexation_total")} של הפרשי הצמדה, ועוד {f.shekels("once.interest_on")}: הריבית על התוספת, על כל השנים שהיא נשארה בחוב. זה בדיוק החלק של ״ריבית על תוספת ההצמדה״ משיעור 2.11, הפעם לאורך כל ההלוואה.
+**וכמה זה בסוף?** נניח שהמדד נשאר 100.3 עד הסוף. אז כל תשלום גבוה ב־{f.shekels("m1.payment_extra")} מהלוח המקורי ({f.plain("index.rise1")}% יותר), והתשלום האחרון סוגר את העיגול. כל התשלומים בצמוד יחד: {f.shekels("once.paid_total")}; בלא צמוד: {f.shekels("unlinked.paid_total")}. ההפרש, כל התוספות יחד, הוא {f.shekels("once.payment_extra_total")}. זה {f.shekels("once.indexation_total")} של הפרשי הצמדה, ועוד {f.shekels("once.interest_on")}: הריבית על התוספת, על כל השנים שהיא נשארה בחוב. זה בדיוק החלק של ״ריבית על תוספת ההצמדה״ משיעור 2.11, הפעם לאורך כל ההלוואה.
 
 **ורכיבי הקרן?** בשיעור 3.2 ראינו שבהלוואה לא צמודה כל רכיבי הקרן יחד שווים לסכום ההלוואה. בצמוד הם שווים לסכום ההלוואה **ועוד** כל הפרשי ההצמדה: בדוגמה, {f.shekels("once.principal_total")}.
 
@@ -182,23 +184,21 @@ export const predictionOptions = [
 
 </Section>
 
-אותה הלוואה, {f.shekels("case.amount")} ל־20 שנה ב־3%, פעם צמודה (בגוון הכהה) ופעם לא צמודה (בגוון הבהיר). בהמחשה המדד עולה באופן אחיד, באותו אחוז בכל שנה. הזיזו את עליית המדד, ובחרו חודש: הכרטיסים מראים את השורה של החודש בלוח של כל מסלול.
+אותה הלוואה, {f.shekels("case.amount")} ל־20 שנה ב־3%, פעם צמודה (בגוון הכהה) ופעם לא צמודה (בגוון הבהיר). בהמחשה המדד עולה בכל חודש באותו אחוז, כך שאחרי 12 חודשים הוא עלה בדיוק באחוז שבחרתם. ב־2% לשנה, המדד עולה בכל חודש {f.plain("slider.monthly_root")}% בערך: השורש ה־12 של 1.02, כמו בשיעור 0.4 — ולא 2% חלקי 12, שהם {f.plain("slider.monthly_div")}% בערך. גם כאן כל שורה מעוגלת לאגורה. הזיזו את עליית המדד, ובחרו חודש: הכרטיסים מראים את השורה של החודש בלוח של כל מסלול.
 
 <LinkedSchedule client:visible amount={400000} years={20} rate="3" inflation={2} month={1} />
 
-נסו את ארבעת אלה:
+נסו את שלושת אלה:
 1. במצב ההתחלה, 2% בשנה, בחודש 1: כמה הוסיפה ההצמדה, ובכמה התשלום הצמוד גבוה מהלא צמוד?
 2. הזיזו את החודש ל־120 (סוף שנה 10). מה התשלום והיתרה בכל מסלול? וכמה הוסיפה ההצמדה לחוב עד עכשיו?
-3. הזיזו את המדד ל־0%. מה קורה לשני הקווים?
-4. הזיזו את המדד ל־4%, וחזרו לחודש 12 ואז לחודש 60. האם היתרה הצמודה ירדה מתחת ל־400,000 ₪?
+3. הזיזו את המדד ל־0%, ומה קורה לשני הקווים? אחר כך ל־4%, וחזרו לחודש 12 ואז לחודש 60. האם היתרה הצמודה ירדה מתחת ל־400,000 ₪?
 
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>ההצמדה הוסיפה {f.shekels("slider.m1_indexation")}: המדד עלה רק חלק קטן מ־2% בחודש אחד. התשלום הצמוד {f.shekels("slider.m1_payment")}, מול {f.shekels("explain.c")} בלא צמוד.</li>
+    <li>ההצמדה הוסיפה {f.shekels("slider.m1_indexation")}: בחודש אחד המדד עלה רק כ־{f.plain("slider.monthly_root")}%. התשלום הצמוד {f.shekels("slider.m1_payment")}, מול {f.shekels("explain.c")} בלא צמוד.</li>
     <li>בצמוד: התשלום {f.shekels("slider.m120_payment")} והיתרה {f.shekels("slider.m120_balance")}. בלא צמוד: התשלום עדיין {f.shekels("explain.c")}, והיתרה {f.shekels("slider.u120_balance")}. עד סוף שנה 10, ההצמדה הוסיפה לחוב {f.shekels("slider.indexation_120")}.</li>
-    <li>שני הקווים אחד על השני. בלי עליית מדד, אין הפרשי הצמדה, והלוח הצמוד הוא בדיוק הלוח המקורי.</li>
-    <li>בסוף חודש 12 היתרה הצמודה {f.shekels("slider.four_m12_balance")}: אחרי שנה של תשלומים, יותר ממה שלוויתם. בסוף חודש 60 היא כבר {f.shekels("slider.four_m60_balance")}, מתחת ל־400,000 ₪. ככל שהיתרה קטנה, אותו אחוז מדד מוסיף לה פחות שקלים, ורכיב הקרן גדל.</li>
+    <li>ב־0% שני הקווים אחד על השני: בלי עליית מדד אין הפרשי הצמדה, והלוח הצמוד הוא בדיוק הלוח המקורי. ב־4%, בסוף חודש 12 היתרה הצמודה {f.shekels("slider.four_m12_balance")}: אחרי שנה של תשלומים, יותר ממה שלוויתם. בסוף חודש 60 היא כבר {f.shekels("slider.four_m60_balance")}, מתחת ל־400,000 ₪. ככל שהיתרה קטנה, אותו אחוז מדד מוסיף לה פחות שקלים, ורכיב הקרן גדל.</li>
   </ol>
 </details>
 
@@ -212,16 +212,16 @@ export const predictionOptions = [
 
 **צעד 2 — הפרשי ההצמדה.** היתרה אחרי ההצמדה, פחות היתרה לפניה.
 
-**צעד 3 — הריבית.** <M>I = B × m</M> משיעור 0.4, על היתרה אחרי ההצמדה.
+**צעד 3 — הריבית.** <M>I = r × B</M>, כמו בשיעור 3.2, על היתרה אחרי ההצמדה, ומעגלים לאגורה.
 
-**צעד 4 — התשלום.** הנוסחה משיעור 2.5: התשלום מהלוח המקורי, כפול המדד, חלקי מדד הבסיס.
+**צעד 4 — התשלום.** הנוסחה משיעור 2.5: התשלום מהלוח המקורי, כפול המדד, חלקי מדד הבסיס, ומעגלים לאגורה.
 
 **צעד 5 — היתרה החדשה.** היתרה אחרי ההצמדה, פחות רכיב הקרן: התשלום פחות הריבית.
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="text-body-l text-navy sm:text-h3">היתרה אחרי ההצמדה = <span class="ltr">B<sub>k−1</sub> × M<sub>k</sub> ÷ M<sub>k−1</sub></span></p>
   <p class="mt-2 text-body-l text-navy sm:text-h3">הפרשי ההצמדה = היתרה אחרי ההצמדה − <span class="ltr">B<sub>k−1</sub></span></p>
-  <p class="mt-2 text-body-l text-navy sm:text-h3"><span class="ltr">I</span> = היתרה אחרי ההצמדה × <span class="ltr">m</span></p>
+  <p class="mt-2 text-body-l text-navy sm:text-h3"><span class="ltr">I</span> = <span class="ltr">r</span> × היתרה אחרי ההצמדה</p>
   <p class="ltr mt-2 text-body-l text-navy sm:text-h3">C<sub>k</sub> = C × M<sub>k</sub> ÷ M<sub>0</sub></p>
   <p class="mt-2 text-body-l text-navy sm:text-h3"><span class="ltr">B<sub>k</sub></span> = היתרה אחרי ההצמדה − <span class="ltr">(C<sub>k</sub> − I)</span></p>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
@@ -230,7 +230,7 @@ export const predictionOptions = [
     <dt class="ltr font-semibold text-n900">B<sub>k</sub></dt><dd>היתרה אחרי תשלום k, בשקלים</dd>
     <dt class="ltr font-semibold text-n900">M<sub>0</sub></dt><dd>M (מדד): מדד הבסיס של ההלוואה</dd>
     <dt class="ltr font-semibold text-n900">M<sub>k</sub></dt><dd>המדד של תשלום k (ו־<span class="ltr">M<sub>k−1</sub></span> של התשלום הקודם)</dd>
-    <dt class="ltr font-semibold text-n900">m</dt><dd>הריבית החודשית: אחוז הריבית לשנה חלקי 12, כמספר עשרוני. 3% לשנה הם <span class="ltr">0.03 ÷ 12</span></dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>אחוז הריבית לתקופה, כאן לחודש: אחוז הריבית לשנה חלקי 12, כמספר עשרוני. 3% לשנה הם <span class="ltr">0.03 ÷ 12</span>. זו ה־m משיעור 0.4</dd>
     <dt class="ltr font-semibold text-n900">I</dt><dd>רכיב הריבית של החודש, בשקלים</dd>
     <dt class="ltr font-semibold text-n900">C</dt><dd>התשלום מהלוח המקורי, בלי מדד (שיעור 3.1)</dd>
     <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום בפועל של חודש k, בשקלים</dd>
@@ -245,14 +245,14 @@ export const predictionOptions = [
 
 <Callout title="איך מחשבים">
 <p><strong>במחשבון:</strong> שורה אחרי שורה — היתרה, ×, המדד החדש, ÷, המדד הקודם; אחר כך × 3 ÷ 100 ÷ 12 לריבית; התשלום מהלוח המקורי × המדד ÷ מדד הבסיס; ואז חיסור.</p>
-<p><strong>בגיליון אלקטרוני</strong>, שורה לכל חודש. בעמודה A המדד (ב־A1 מדד הבסיס), ב־B1 התשלום מהלוח המקורי, וב־F1 סכום ההלוואה. בשורה 2:</p>
+<p><strong>בגיליון אלקטרוני</strong>, שורה לכל חודש. אותיות העמודות בגיליון אינן האותיות של הנוסחאות. בעמודה A המדד (בתא A1 מדד הבסיס), בתא B1 התשלום מהלוח המקורי, ובתא F1 סכום ההלוואה. בשורה 2:</p>
 <ul class="list-reset space-y-1">
-<li>היתרה אחרי ההצמדה (C2): <span class="ltr inline-block whitespace-nowrap">{"=F1*A2/A1"}</span></li>
-<li>הריבית (D2): <span class="ltr inline-block whitespace-nowrap">{"=C2*3%/12"}</span></li>
-<li>התשלום (E2): <span class="ltr inline-block whitespace-nowrap">{"=$B$1*A2/$A$1"}</span></li>
-<li>היתרה בסוף (F2): <span class="ltr inline-block whitespace-nowrap">{"=C2-(E2-D2)"}</span></li>
+<li>היתרה אחרי ההצמדה, בעמודה C: <span class="ltr inline-block whitespace-nowrap">{"=ROUND(F1*A2/A1,2)"}</span></li>
+<li>הריבית, בעמודה D: <span class="ltr inline-block whitespace-nowrap">{"=ROUND(C2*3%/12,2)"}</span></li>
+<li>התשלום, בעמודה E: <span class="ltr inline-block whitespace-nowrap">{"=ROUND($B$1*A2/$A$1,2)"}</span></li>
+<li>היתרה בסוף, בעמודה F: <span class="ltr inline-block whitespace-nowrap">{"=C2-(E2-D2)"}</span></li>
 </ul>
-<p>מעתיקים את שורה 2 למטה. הסימן $ שומר על מדד הבסיס ועל התשלום המקורי קבועים בכל השורות.</p>
+<p>מעתיקים את שורה 2 למטה. הסימן $ שומר על מדד הבסיס ועל התשלום המקורי קבועים בכל השורות. ROUND מעגל לאגורה, כמו בלוח. בשורה האחרונה התשלום הוא היתרה אחרי ההצמדה ועוד הריבית, כדי לסגור את העיגול.</p>
 </Callout>
 
 <PredictionReveal
@@ -263,7 +263,7 @@ export const predictionOptions = [
   notes={[
     "ההצמדה חודשית, לא שנתית. כבר בתשלום הראשון המדד זז חודש אחד ממדד הבסיס, והתשלום זז איתו.",
     "",
-    `ה־${f.shekels("m1.indexation")} נוספו לחוב, לא לתשלום. התשלום עולה באותו אחוז כמו המדד, 0.3%, כלומר ב־${f.shekels("m1.payment_extra")}. את השאר מחזירים לאט, עד סוף ההלוואה.`,
+    `ה־${f.shekels("m1.indexation")} נוספו לחוב, לא לתשלום. התשלום עולה באותו אחוז כמו המדד, ${f.plain("index.rise1")}%, כלומר ב־${f.shekels("m1.payment_extra")}. את השאר מחזירים לאט, עד סוף ההלוואה.`,
     "ההצמדה לא נדחית לסוף. היא נכנסת לכל תשלום ולכל יתרה, בכל חודש.",
   ]}
 >
@@ -271,12 +271,12 @@ export const predictionOptions = [
 </PredictionReveal>
 
 <Callout title="כלל אצבע: המדד עולה באחוז, התשלום עולה באותו אחוז">
-<p>במסלול צמוד שאחוז הריבית בו קבוע, בשפיצר: כמה שהמדד עלה מאז מדד הבסיס, באחוזים — באותו אחוז התשלום גבוה מהלוח המקורי. המדד עלה 0.3%? התשלום גבוה ב־0.3%. זה נכון בדיוק, לא רק בקירוב, כל עוד אחוז הריבית לא זז. ההצמדה של היתרה באותו חודש, בשקלים, גדולה הרבה יותר: היא מחושבת על כל החוב, לא רק על התשלום.</p>
+<p>במסלול צמוד שאחוז הריבית בו קבוע, בשפיצר: כמה שהמדד עלה מאז מדד הבסיס, באחוזים — באותו אחוז התשלום גבוה מהלוח המקורי. המדד עלה {f.plain("index.rise1")}%? התשלום גבוה ב־{f.plain("index.rise1")}%. זה נכון בדיוק (עד עיגול לאגורה), לא רק בקירוב, כל עוד אחוז הריבית לא זז. ההצמדה של היתרה באותו חודש, בשקלים, גדולה הרבה יותר: היא מחושבת על כל החוב, לא רק על התשלום.</p>
 </Callout>
 
 <Section kind="דוגמה פתורה">
 
-## הלוח של יעל, מהיום הראשון
+## הלוח של הדס, מהיום הראשון
 
 </Section>
 
@@ -284,7 +284,7 @@ export const predictionOptions = [
 <p>נתוני הלקוח, אחוז הריבית והמדד להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.</p>
 </Callout>
 
-תרגיל נפרד, לא התיק של נועם ושירה: יעל לוקחת מסלול קבועה צמודה של {f.shekels("worked.amount")}, ל־25 שנה (300 תשלומים), ב־3.2%. הכסף מגיע ב־{day("worked.payout")}. היא שואלת: מתי התשלום הראשון, מה יקרה בימים שעד אז, ומה תהיה היתרה אחרי התשלום הראשון?
+תרגיל נפרד, לא התיק של נועם ושירה: הדס לוקחת מסלול קבועה צמודה של {f.shekels("worked.amount")}, ל־25 שנה (300 תשלומים), ב־3.2%. הכסף מגיע ב־{day("worked.payout")}. היא שואלת: מתי התשלום הראשון, מה יקרה בימים שעד אז, ומה תהיה היתרה אחרי התשלום הראשון?
 
 **צעד 1 — מאיזה יום הלוח סופר.** ה־18 בחודש הוא מה־16 ואילך. לפי הכלל, כפי שתועתק: סופרים מ־{day("worked.start")}, והתשלום הראשון ב־{day("worked.first")}.
 
@@ -299,8 +299,8 @@ export const predictionOptions = [
 
 **צעד 6 — היתרה.** רכיב הקרן: <M>{amt("worked.payment")} − {amt("worked.interest")} = {amt("worked.principal")}</M>. היתרה: <M>{amt("worked.opening")} − {amt("worked.principal")} = {amt("worked.closing")}</M>.
 
-<Callout title="מה לקחת מזה" tone="warning">
-<p>אחרי התשלום הראשון יעל חייבת {f.shekels("worked.closing")}: יותר מ־{f.shekels("worked.amount")} שלוותה. בתחילת הלוח, כשהיתרה גדולה ורכיב הקרן קטן, חודש של מדד עולה יכול להוסיף לחוב יותר ממה שהתשלום מוריד ממנו. זה לא אומר שהיא שילמה ״לחינם״: התשלום כיסה את הריבית וחלק מהקרן; ההצמדה הוסיפה לקרן מצד שני.</p>
+<Callout title="מה לקחת מזה">
+<p>אחרי התשלום הראשון הדס חייבת {f.shekels("worked.closing")}: יותר מ־{f.shekels("worked.amount")} שלוותה. בתחילת הלוח, כשהיתרה גדולה ורכיב הקרן קטן, חודש של מדד עולה יכול להוסיף לחוב יותר ממה שהתשלום מוריד ממנו. זה לא אומר שהיא שילמה ״לחינם״: התשלום כיסה את הריבית וחלק מהקרן; ההצמדה הוסיפה לקרן מצד שני.</p>
 </Callout>
 
 <Section kind="דוגמה חצי פתורה">
@@ -408,10 +408,10 @@ export const predictionOptions = [
   answer={f.raw("ex5.answer")}
   errors={[
     { value: f.raw("ex5.c"), message: "זה התשלום מהלוח המקורי. כבר בתשלום הראשון המדד זז חודש אחד, והתשלום מוצמד." },
-    { value: f.raw("ex5.four_percent"), message: `כפלתם ב־1.04. המדד עלה מ־100 ל־100.4, כלומר 0.4%: כופלים ב־${eq("100.4 ÷ 100")}.` },
+    { value: f.raw("ex5.four_percent"), message: `כפלתם ב־${eq("104 ÷ 100")}. המדד עלה מ־100 ל־100.4, כלומר ${f.plain("worked.rise")}%: כופלים ב־${eq("100.4 ÷ 100")}.` },
   ]}
 >
-  אותו מסלול: 320,000 ₪ ל־20 שנה ב־3.5%. התשלום מהלוח המקורי {f.shekels("ex5.c")}. מדד הבסיס 100, והמדד של התשלום הראשון 100.4. כמה תשלמו בתשלום הראשון?
+  המסלול של תרגיל 4 הוא ל־20 שנה, ב־3.5%. התשלום מהלוח המקורי שלכם {f.shekels("ex5.c")}. מדד הבסיס 100, והמדד של התשלום הראשון 100.4. כמה תשלמו בתשלום הראשון?
 </NumericExercise>
 
 <Solution for="3.5-5">
@@ -488,7 +488,7 @@ export const predictionOptions = [
     { kind: "לא אומת", text: "תקופת הביניים: הבנק גובה ריבית כשהכסף הועמד לפני היום שממנו ההלוואה נספרת, ומזכה כשהוא הועמד אחריו; באחוז הריבית של ההלוואה (סעיף 18(ג)); החשבון נעשה עם התשלום הראשון או חודש לפניו; ההצמדה לפי מדד הבסיס (סעיף 18(ד)). הוראת בנק ישראל 451, סעיף 18. לפי תעתיק בצוות ב־Brain (דף 9895937, 2026-08-04), ממתין לבדיקה מול המקור.", date: "2026-08-04" },
     { kind: "לא אומת", text: "הלמ״ס מפרסמת את מדד המחירים לצרכן ב־15 בחודש, על החודש הקודם (פרטים בשיעור 0.7). לפי תקציר של מקור רשמי; ממתין לבדיקה.", href: "https://www.cbs.gov.il/en/Pages/Release-Calendar.aspx", date: "2026-10-09" },
     { kind: "החלטה של Mogi", text: "בכללי החישוב של Mogi ההצמדה למדד חודשית, ותשלום צמוד יכול לזוז גם כשאחוז הריבית לא זז. דף ההחלטה ב־Brain (67436545): אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08. כטענה על השוק: לא אומת.", date: "2026-10-08" },
-    { kind: "הנחת חישוב", text: "מדד הבסיס הוא המדד ביום שממנו הלוח סופר, וכל תשלום מוצמד בחודש אחד יותר מהקודם, כבר מהתשלום הראשון. היתרה מוצמדת לפני התשלום, והריבית מחושבת על היתרה המוצמדת. ריבית על תקופת ביניים לפי ימים מתוך 365. סדרת המדדים, עליית המדד בהמחשה, ההלוואות ואחוזי הריבית בדויים; יעל בדויה. תשלומים חודשיים, ריבית חודשית = אחוז הריבית לשנה חלקי 12. עיגול לאגורה רק בהצגה.", code: ["B × M_k ÷ M_(k−1)", "C × M_k ÷ M_0", "I = B × m"] },
+    { kind: "הנחת חישוב", text: "מדד הבסיס הוא המדד ביום שממנו הלוח סופר, וכל תשלום מוצמד בחודש אחד יותר מהקודם, כבר מהתשלום הראשון. היתרה מוצמדת לפני התשלום, והריבית מחושבת על היתרה המוצמדת. ריבית על תקופת ביניים לפי ימים מתוך 365. סדרת המדדים, עליית המדד בהמחשה, ההלוואות ואחוזי הריבית בדויים; הדס בדויה. תשלומים חודשיים, ריבית חודשית = אחוז הריבית לשנה חלקי 12. כל שורה מעוגלת לאגורה, כמו בלוח של בנק: היתרה אחרי ההצמדה, הריבית, והתשלום (התשלום המקורי המעוגל כפול המדד חלקי מדד הבסיס); התשלום האחרון סוגר את היתרה. בהמחשה המדד עולה בכל חודש בשורש ה־12 של העלייה השנתית.", code: ["B × M_k ÷ M_(k−1)", "C × M_k ÷ M_0", "I = r × B"] },
     { kind: "ידע מתמטי כללי", text: "ההצמדה של סכום: הסכום כפול המדד החדש, חלקי המדד שממנו מודדים. כפל של שני יחסי מדדים עוקבים שווה ליחס בין המדד האחרון לראשון." },
     { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו פעמיים, בשתי שיטות נפרדות: מודול החישוב של הקורס (שמשאיר את התשלום ומצמיד אותו) ובדיקה עצמאית ב־Python (שמחשבת את התשלום מחדש מהיתרה המוצמדת בכל חודש). שתי השיטות נתנו אותם מספרים.", date: "2026-10-10" },
   ]}

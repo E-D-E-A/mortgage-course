@@ -66,6 +66,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 1
       },
       "value": "5900.94"
@@ -91,6 +92,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 145
       },
       "value": "3237.79"
@@ -125,6 +127,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 241
       },
       "value": "1574.00"
@@ -149,7 +152,8 @@
         "t3_amount": "300000",
         "t3_rate": "3",
         "t3_months": 240,
-        "t3_method": "spitzer"
+        "t3_method": "spitzer",
+        "rounding": "statement"
       },
       "value": "5900.94"
     },
@@ -173,9 +177,10 @@
         "t3_amount": "300000",
         "t3_rate": "3",
         "t3_months": 240,
-        "t3_method": "spitzer"
+        "t3_method": "spitzer",
+        "rounding": "statement"
       },
-      "value": "5900.94"
+      "value": "5901.57"
     },
     {
       "id": "flat.max_month",
@@ -197,9 +202,10 @@
         "t3_amount": "300000",
         "t3_rate": "3",
         "t3_months": 240,
-        "t3_method": "spitzer"
+        "t3_method": "spitzer",
+        "rounding": "statement"
       },
-      "value": "1"
+      "value": "144"
     },
     {
       "id": "flat.total",
@@ -221,9 +227,45 @@
         "t3_amount": "300000",
         "t3_rate": "3",
         "t3_months": 240,
-        "t3_method": "spitzer"
+        "t3_method": "spitzer",
+        "rounding": "statement"
       },
-      "value": "1349442.94"
+      "value": "1349441.81"
+    },
+    {
+      "id": "flat.m144",
+      "kind": "sch_mix_payment",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "300000",
+        "t1_rate": "4.8",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "300000",
+        "t2_rate": "4.25",
+        "t2_months": 144,
+        "t2_method": "spitzer",
+        "t3_kind": "fixed_linked",
+        "t3_amount": "300000",
+        "t3_rate": "3",
+        "t3_months": 240,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "month": 144
+      },
+      "value": "5901.57"
+    },
+    {
+      "id": "flat.max_over_first",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "flat.max",
+        "subtrahend": "flat.m1"
+      },
+      "value": "0.63"
     },
     {
       "id": "sc.first",
@@ -246,6 +288,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
@@ -273,11 +316,12 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
       },
-      "value": "6485.07"
+      "value": "6485.33"
     },
     {
       "id": "sc.max_month",
@@ -300,6 +344,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
@@ -327,11 +372,12 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
       },
-      "value": "1458674.88"
+      "value": "1458673.99"
     },
     {
       "id": "sc.m12",
@@ -354,6 +400,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -382,6 +429,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -410,6 +458,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -439,6 +488,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -468,13 +518,14 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
         "track": 2,
         "month": 144
       },
-      "value": "2800.98"
+      "value": "2801.24"
     },
     {
       "id": "sc.t3_144",
@@ -497,6 +548,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -526,6 +578,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -540,7 +593,7 @@
         "minuend": "sc.max",
         "subtrahend": "sc.first"
       },
-      "value": "581.38"
+      "value": "581.64"
     },
     {
       "id": "sc.total_over_flat",
@@ -549,7 +602,7 @@
         "minuend": "sc.total",
         "subtrahend": "flat.total"
       },
-      "value": "109231.94"
+      "value": "109232.18"
     },
     {
       "id": "exp.prime",
@@ -671,7 +724,8 @@
         "t3_amount": "300000",
         "t3_rate": "3",
         "t3_months": 240,
-        "t3_method": "spitzer"
+        "t3_method": "spitzer",
+        "rounding": "statement"
       },
       "value": "5347.05"
     },
@@ -705,6 +759,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
@@ -732,11 +787,12 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
       },
-      "value": "5838.42"
+      "value": "5839.85"
     },
     {
       "id": "long.max_month",
@@ -759,6 +815,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
@@ -786,11 +843,12 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1"
       },
-      "value": "1592619.11"
+      "value": "1592617.08"
     },
     {
       "id": "var.first",
@@ -814,6 +872,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -843,12 +902,13 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
         "anchor_shift_1": "1"
       },
-      "value": "6685.36"
+      "value": "6685.63"
     },
     {
       "id": "var.max_month",
@@ -872,6 +932,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
@@ -901,12 +962,13 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "inflation_1": "2",
         "prime_shift_1": "0",
         "prime_shift_2": "1",
         "anchor_shift_1": "1"
       },
-      "value": "1497636.20"
+      "value": "1497634.00"
     },
     {
       "id": "var.exp_fixed",
@@ -1018,12 +1080,13 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
         "month": 1
       },
-      "value": "4533.14"
+      "value": "4533.15"
     },
     {
       "id": "worked.t2_13",
@@ -1047,6 +1110,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1077,6 +1141,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1106,6 +1171,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1136,6 +1202,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1165,6 +1232,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1194,6 +1262,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1",
@@ -1223,11 +1292,12 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1"
       },
-      "value": "4533.14"
+      "value": "4533.15"
     },
     {
       "id": "worked.max",
@@ -1251,6 +1321,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1"
@@ -1279,6 +1350,7 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1"
@@ -1307,11 +1379,107 @@
         "t3_months": 240,
         "t3_method": "spitzer",
         "t3_reset": 60,
+        "rounding": "statement",
         "prime_shift_1": "0",
         "prime_shift_2": "0.5",
         "anchor_shift_1": "1"
       },
-      "value": "1138772.18"
+      "value": "1138770.80"
+    },
+    {
+      "id": "worked.max_end",
+      "kind": "sch_mix_max_run_end",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "350000",
+        "t1_rate": "5",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "200000",
+        "t2_rate": "4.5",
+        "t2_months": 180,
+        "t2_method": "spitzer",
+        "t3_kind": "variable_unlinked",
+        "t3_amount": "150000",
+        "t3_rate": "4.6",
+        "t3_months": 240,
+        "t3_method": "spitzer",
+        "t3_reset": 60,
+        "rounding": "statement",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0.5",
+        "anchor_shift_1": "1"
+      },
+      "value": "179"
+    },
+    {
+      "id": "worked.m180",
+      "kind": "sch_mix_payment",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "350000",
+        "t1_rate": "5",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "200000",
+        "t2_rate": "4.5",
+        "t2_months": 180,
+        "t2_method": "spitzer",
+        "t3_kind": "variable_unlinked",
+        "t3_amount": "150000",
+        "t3_rate": "4.6",
+        "t3_months": 240,
+        "t3_method": "spitzer",
+        "t3_reset": 60,
+        "rounding": "statement",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0.5",
+        "anchor_shift_1": "1",
+        "month": 180
+      },
+      "value": "4646.66"
+    },
+    {
+      "id": "worked.dip_180",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.m61",
+        "subtrahend": "worked.m180"
+      },
+      "value": "0.02"
+    },
+    {
+      "id": "worked.prime_new",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.5",
+        "margin": "0.5"
+      },
+      "value": "5"
+    },
+    {
+      "id": "worked.var_new",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "4.6",
+        "margin": "1"
+      },
+      "value": "5.6"
+    },
+    {
+      "id": "worked.left_13",
+      "kind": "sch_months_left",
+      "inputs": {
+        "months": 180,
+        "paid": 12
+      },
+      "value": "168"
     },
     {
       "id": "worked.exp_prime",
@@ -1412,6 +1580,7 @@
         "t3_rate": "3",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month_1": 1,
         "month_2": 144,
         "month_3": 145,
@@ -1429,9 +1598,9 @@
         {
           "period": 144,
           "t1": "1574.00",
-          "t2": "2663.15",
+          "t2": "2663.78",
           "t3": "1663.79",
-          "total": "5900.94"
+          "total": "5901.57"
         },
         {
           "period": 145,
@@ -1444,8 +1613,8 @@
           "period": 240,
           "t1": "1574.00",
           "t2": "0.00",
-          "t3": "1663.79",
-          "total": "3237.79"
+          "t3": "1664.72",
+          "total": "3238.72"
         },
         {
           "period": 241,
@@ -1486,6 +1655,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 150
       },
       "value": "3185.35"
@@ -1511,6 +1681,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 1
       },
       "value": "5716.48"
@@ -1536,6 +1707,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "track": 1,
         "month": 150
       },
@@ -1562,6 +1734,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "track": 2,
         "month": 1
       },
@@ -1588,6 +1761,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "track": 3,
         "month": 150
       },
@@ -1689,6 +1863,7 @@
         "t2_rate": "4",
         "t2_months": 120,
         "t2_method": "spitzer",
+        "rounding": "statement",
         "month": 1
       },
       "value": "4363.26"
@@ -1708,7 +1883,8 @@
         "t2_amount": "200000",
         "t2_rate": "4",
         "t2_months": 120,
-        "t2_method": "spitzer"
+        "t2_method": "spitzer",
+        "rounding": "statement"
       },
       "value": "3850.09"
     },
@@ -1733,6 +1909,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "3",
         "month": 12
       },
@@ -1759,6 +1936,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "month": 12
       },
       "value": "5716.48"
@@ -1784,6 +1962,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "3",
         "track": 3,
         "month": 12
@@ -1811,6 +1990,7 @@
         "t3_rate": "3.2",
         "t3_months": 240,
         "t3_method": "spitzer",
+        "rounding": "statement",
         "inflation_1": "3",
         "track": 2,
         "month": 12

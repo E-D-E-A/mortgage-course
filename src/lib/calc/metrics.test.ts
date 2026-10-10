@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
-import { annuityBalance, annuityPayment } from "./amortization.ts";
+import { annuityBalance, annuityPayment, annuityStatement } from "./amortization.ts";
 import {
   annualByMultiplication,
   bisectionSteps,
@@ -192,5 +192,47 @@ describe("annual conversions of a monthly rate (lesson 0.4)", () => {
     expect(annualByMultiplication("0.4").toString()).toBe("4.8");
     // 1.005^12 = 1.06167781186449956…
     expect(effectiveAnnual("0.5").toDecimalPlaces(10).toString()).toBe("6.1677811864");
+  });
+});
+
+describe("the statement convention (rounding: \"statement\")", () => {
+  it("gives the same rows as annuityStatement on a flat unlinked track, so 3.9 agrees with 2.9 and 3.12", () => {
+    const rows = trackRows({ principal: "12000", rates: ["6"], months: 12, rounding: "statement" });
+    const statement = annuityStatement("12000", "6", 12);
+    expect(rows.map((r) => money(r.payment))).toEqual(statement.map((r) => money(r.payment)));
+    // Hand: payment 1,032.80; month 1 interest 60.00; the last payment clears the balance: 1,032.78.
+    expect(money(rows[0].interest)).toBe("60.00");
+    expect(money(rows[11].payment)).toBe("1032.78");
+    expect(money(totalPaid(rows.map((r) => r.payment)))).toBe("12393.58");
+  });
+
+  it("totals the interest of 600,000 at 4.8% over 20 years as 2.9 does", () => {
+    const b = breakdown({ principal: "600000", rates: ["4.8"], months: 240, rounding: "statement" });
+    const statement = annuityStatement("600000", "4.8", 240);
+    const interest = statement.reduce((s, r) => s.plus(r.interest), new Decimal(0));
+    expect(money(b.interest)).toBe(money(interest));
+    expect(money(b.interest)).toBe("334499.54");
+  });
+
+  it("rounds each month's interest in a full grace, then pays the statement level payment", () => {
+    const rows = trackRows({ principal: "400000", rates: ["6"], months: 180, method: "grace_full", graceMonths: 12, rounding: "statement" });
+    // Month 1: 400,000 × 0.5% = 2,000.00, nothing paid; month 2: 402,000 × 0.5% = 2,010.00.
+    expect(rows.slice(0, 2).map((r) => money(r.interest))).toEqual(["2000.00", "2010.00"]);
+    expect(rows[0].payment.isZero()).toBe(true);
+    expect(rows.every((r) => r.payment.equals(r.payment.toDecimalPlaces(2)))).toBe(true);
+    expect(rows[179].closing.isZero()).toBe(true);
+  });
+
+  it("carries a linked track's set payment with the index: the first payment already has one month of it", () => {
+    const linked = { principal: "600000", rates: ["3"], months: 240, inflationPercent: "2", rounding: "statement" as const };
+    const set = annuityPayment("600000", "3", 240).toDecimalPlaces(2);
+    const factor = new Decimal(1.02).pow(new Decimal(1).div(12));
+    expect(money(trackPayments(linked)[0])).toBe(money(set.mul(factor)));
+    expect(trackPayments({ ...linked, inflationPercent: "0" })[0].toString()).toBe(set.toString());
+  });
+
+  it("keeps the value today at the loan's own rate within agorot of the loan", () => {
+    const p = trackPayments({ principal: "400000", rates: ["6"], months: 180, rounding: "statement" });
+    expect(presentValue(p, "0.5").minus(400000).abs().lt("0.05")).toBe(true);
   });
 });

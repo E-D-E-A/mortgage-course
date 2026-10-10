@@ -21,14 +21,19 @@
     },
     {
       "id": "explain.b36",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "500000",
-        "rate_percent": "4.8",
         "months": 240,
-        "paid": 36
+        "method": "spitzer",
+        "rate": "4.8",
+        "rounding": "statement",
+        "change_1_month": 37,
+        "change_1_rate": "6",
+        "month": 36,
+        "field": "closing"
       },
-      "value": "451903.77"
+      "value": "451903.63"
     },
     {
       "id": "explain.left",
@@ -43,7 +48,8 @@
       "id": "explain.r",
       "kind": "sch_monthly_decimal",
       "inputs": {
-        "rate_percent": "6"
+        "rate_percent": "6",
+        "decimals": 8
       },
       "value": "0.005"
     },
@@ -51,7 +57,8 @@
       "id": "explain.base",
       "kind": "sch_growth_base",
       "inputs": {
-        "rate_percent": "6"
+        "rate_percent": "6",
+        "decimals": 8
       },
       "value": "1.005"
     },
@@ -60,33 +67,35 @@
       "kind": "sch_power",
       "inputs": {
         "rate_percent": "6",
-        "months": 204
+        "months": 204,
+        "decimals": 8
       },
-      "value": "0.361513"
+      "value": "0.36151257"
     },
     {
       "id": "explain.one_minus",
       "kind": "sch_one_minus_power",
       "inputs": {
         "rate_percent": "6",
-        "months": 204
+        "months": 204,
+        "decimals": 8
       },
-      "value": "0.638487"
+      "value": "0.63848743"
     },
     {
       "id": "explain.interest_old",
       "kind": "amort_month_interest",
       "inputs": {
-        "balance": "451903.77",
+        "balance": "451903.63",
         "rate_percent": "4.8"
       },
-      "value": "1807.62"
+      "value": "1807.61"
     },
     {
       "id": "explain.top",
       "kind": "amort_month_interest",
       "inputs": {
-        "balance": "451903.77",
+        "balance": "451903.63",
         "rate_percent": "6"
       },
       "value": "2259.52"
@@ -98,6 +107,21 @@
         "minuend": "explain.top",
         "subtrahend": "explain.interest_old"
       },
+      "value": "451.91"
+    },
+    {
+      "id": "explain.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.2"
+    },
+    {
+      "id": "explain.rule",
+      "kind": "amort_month_interest",
+      "inputs": {
+        "balance": "451903.63",
+        "rate_percent": "1.2"
+      },
       "value": "451.90"
     },
     {
@@ -108,6 +132,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 37,
@@ -128,7 +153,7 @@
       "id": "explain.check",
       "kind": "sch_recalc_payment",
       "inputs": {
-        "balance": "451903.77",
+        "balance": "451903.63",
         "rate_percent": "6",
         "months_left": 204
       },
@@ -142,6 +167,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 240,
@@ -173,7 +199,7 @@
       "id": "wrong.full_term",
       "kind": "sch_recalc_payment",
       "inputs": {
-        "balance": "451903.77",
+        "balance": "451903.63",
         "rate_percent": "6",
         "months_left": 240
       },
@@ -187,12 +213,29 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 36,
         "field": "principal_paid"
       },
       "value": "2083.33"
+    },
+    {
+      "id": "ep.interest_36",
+      "kind": "sch_row",
+      "inputs": {
+        "principal": "500000",
+        "months": 240,
+        "method": "equal_principal",
+        "rate": "4.8",
+        "rounding": "statement",
+        "change_1_month": 37,
+        "change_1_rate": "6",
+        "month": 36,
+        "field": "interest"
+      },
+      "value": "1708.33"
     },
     {
       "id": "ep.principal_37",
@@ -202,6 +245,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 37,
@@ -217,12 +261,13 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 36,
         "field": "closing"
       },
-      "value": "425000.00"
+      "value": "425000.12"
     },
     {
       "id": "ep.payment_36",
@@ -232,12 +277,13 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 36,
         "field": "payment"
       },
-      "value": "3791.67"
+      "value": "3791.66"
     },
     {
       "id": "ep.payment_37",
@@ -247,6 +293,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 37,
@@ -262,6 +309,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 37,
@@ -273,7 +321,7 @@
       "id": "ep.interest_37_old",
       "kind": "amort_month_interest",
       "inputs": {
-        "balance": "425000.00",
+        "balance": "425000.12",
         "rate_percent": "4.8"
       },
       "value": "1700.00"
@@ -288,6 +336,24 @@
       "value": "425.00"
     },
     {
+      "id": "ep.payment_jump",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ep.payment_37",
+        "subtrahend": "ep.payment_36"
+      },
+      "value": "416.67"
+    },
+    {
+      "id": "ep.interest_fall",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ep.interest_36",
+        "subtrahend": "ep.interest_37_old"
+      },
+      "value": "8.33"
+    },
+    {
       "id": "slider.variable_60",
       "kind": "sch_row",
       "inputs": {
@@ -295,6 +361,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 60,
@@ -310,23 +377,29 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 61,
         "field": "payment"
       },
-      "value": "3508.57"
+      "value": "3508.56"
     },
     {
       "id": "slider.variable_b60",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "500000",
-        "rate_percent": "4.8",
         "months": 240,
-        "paid": 60
+        "method": "spitzer",
+        "rate": "4.8",
+        "rounding": "statement",
+        "change_1_month": 61,
+        "change_1_rate": "6",
+        "month": 60,
+        "field": "closing"
       },
-      "value": "415777.46"
+      "value": "415777.25"
     },
     {
       "id": "slider.lower_37",
@@ -336,6 +409,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "3.6",
         "month": 37,
@@ -351,23 +425,27 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 37,
         "change_1_rate": "6",
         "month": 120,
         "field": "closing"
       },
-      "value": "318757.51"
+      "value": "318757.47"
     },
     {
       "id": "slider.balance_120_flat",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "500000",
-        "rate_percent": "4.8",
         "months": 240,
-        "paid": 120
+        "method": "spitzer",
+        "rate": "4.8",
+        "rounding": "statement",
+        "month": 120,
+        "field": "closing"
       },
-      "value": "308760.88"
+      "value": "308760.42"
     },
     {
       "id": "worked.amount",
@@ -387,14 +465,19 @@
     },
     {
       "id": "worked.b60",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "360000",
-        "rate_percent": "4.2",
         "months": 300,
-        "paid": 60
+        "method": "spitzer",
+        "rate": "4.2",
+        "rounding": "statement",
+        "change_1_month": 61,
+        "change_1_rate": "4.8",
+        "month": 60,
+        "field": "closing"
       },
-      "value": "314674.74"
+      "value": "314674.85"
     },
     {
       "id": "worked.left",
@@ -409,7 +492,8 @@
       "id": "worked.r",
       "kind": "sch_monthly_decimal",
       "inputs": {
-        "rate_percent": "4.8"
+        "rate_percent": "4.8",
+        "decimals": 8
       },
       "value": "0.004"
     },
@@ -417,7 +501,8 @@
       "id": "worked.base",
       "kind": "sch_growth_base",
       "inputs": {
-        "rate_percent": "4.8"
+        "rate_percent": "4.8",
+        "decimals": 8
       },
       "value": "1.004"
     },
@@ -426,24 +511,26 @@
       "kind": "sch_power",
       "inputs": {
         "rate_percent": "4.8",
-        "months": 240
+        "months": 240,
+        "decimals": 8
       },
-      "value": "0.383627"
+      "value": "0.38362679"
     },
     {
       "id": "worked.one_minus",
       "kind": "sch_one_minus_power",
       "inputs": {
         "rate_percent": "4.8",
-        "months": 240
+        "months": 240,
+        "decimals": 8
       },
-      "value": "0.616373"
+      "value": "0.61637321"
     },
     {
       "id": "worked.top",
       "kind": "amort_month_interest",
       "inputs": {
-        "balance": "314674.74",
+        "balance": "314674.85",
         "rate_percent": "4.8"
       },
       "value": "1258.70"
@@ -456,6 +543,7 @@
         "months": 300,
         "method": "spitzer",
         "rate": "4.2",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "4.8",
         "month": 61,
@@ -480,6 +568,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "5",
+        "rounding": "statement",
         "change_1_month": 13,
         "change_1_rate": "5.5",
         "change_2_month": 25,
@@ -491,7 +580,7 @@
         {
           "period": 1,
           "month": 13,
-          "balance": "388050.75",
+          "balance": "388050.79",
           "left": "228",
           "rate": "5.5",
           "payment": "2746.96"
@@ -499,7 +588,7 @@
         {
           "period": 2,
           "month": 25,
-          "balance": "376132.59",
+          "balance": "376132.61",
           "left": "216",
           "rate": "6",
           "payment": "2851.70"
@@ -507,7 +596,7 @@
         {
           "period": 3,
           "month": 49,
-          "balance": "351437.33",
+          "balance": "351437.24",
           "left": "192",
           "rate": "5.25",
           "payment": "2709.33"
@@ -522,6 +611,15 @@
         "paid": 84
       },
       "value": "216"
+    },
+    {
+      "id": "ex3.y_months",
+      "kind": "ltv_times",
+      "inputs": {
+        "amount": "7",
+        "factor": "12"
+      },
+      "value": "84.00"
     },
     {
       "id": "ex3.years_as_months",
@@ -579,7 +677,8 @@
       "id": "ex4.r",
       "kind": "sch_monthly_decimal",
       "inputs": {
-        "rate_percent": "6"
+        "rate_percent": "6",
+        "decimals": 8
       },
       "value": "0.005"
     },
@@ -587,7 +686,8 @@
       "id": "ex4.base",
       "kind": "sch_growth_base",
       "inputs": {
-        "rate_percent": "6"
+        "rate_percent": "6",
+        "decimals": 8
       },
       "value": "1.005"
     },
@@ -596,18 +696,20 @@
       "kind": "sch_power",
       "inputs": {
         "rate_percent": "6",
-        "months": 180
+        "months": 180,
+        "decimals": 8
       },
-      "value": "0.407482"
+      "value": "0.40748243"
     },
     {
       "id": "ex4.one_minus",
       "kind": "sch_one_minus_power",
       "inputs": {
         "rate_percent": "6",
-        "months": 180
+        "months": 180,
+        "decimals": 8
       },
-      "value": "0.592518"
+      "value": "0.59251757"
     },
     {
       "id": "ex4.old_rate",
@@ -631,12 +733,17 @@
     },
     {
       "id": "ex5.b24",
-      "kind": "amort_balance",
+      "kind": "sch_row",
       "inputs": {
         "principal": "400000",
-        "rate_percent": "4.8",
         "months": 240,
-        "paid": 24
+        "method": "spitzer",
+        "rate": "4.8",
+        "rounding": "statement",
+        "change_1_month": 25,
+        "change_1_rate": "5.4",
+        "month": 24,
+        "field": "closing"
       },
       "value": "374967.75"
     },
@@ -653,7 +760,8 @@
       "id": "ex5.r",
       "kind": "sch_monthly_decimal",
       "inputs": {
-        "rate_percent": "5.4"
+        "rate_percent": "5.4",
+        "decimals": 8
       },
       "value": "0.0045"
     },
@@ -661,7 +769,8 @@
       "id": "ex5.base",
       "kind": "sch_growth_base",
       "inputs": {
-        "rate_percent": "5.4"
+        "rate_percent": "5.4",
+        "decimals": 8
       },
       "value": "1.0045"
     },
@@ -670,18 +779,20 @@
       "kind": "sch_power",
       "inputs": {
         "rate_percent": "5.4",
-        "months": 216
+        "months": 216,
+        "decimals": 8
       },
-      "value": "0.379151"
+      "value": "0.37915145"
     },
     {
       "id": "ex5.one_minus",
       "kind": "sch_one_minus_power",
       "inputs": {
         "rate_percent": "5.4",
-        "months": 216
+        "months": 216,
+        "decimals": 8
       },
-      "value": "0.620849"
+      "value": "0.62084855"
     },
     {
       "id": "ex5.answer",
@@ -691,6 +802,7 @@
         "months": 240,
         "method": "spitzer",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 25,
         "change_1_rate": "5.4",
         "month": 25,
@@ -736,6 +848,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 61,
@@ -751,6 +864,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "month": 61,
         "field": "payment"
       },
@@ -764,6 +878,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 60,
@@ -779,6 +894,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 61,
@@ -794,6 +910,7 @@
         "months": 240,
         "method": "equal_principal",
         "rate": "4.8",
+        "rounding": "statement",
         "change_1_month": 61,
         "change_1_rate": "6",
         "month": 61,

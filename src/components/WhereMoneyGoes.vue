@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Lesson 3.9: "לאן הולך הכסף" — everything a loan costs, split into what it is
 // made of: the principal coming back, the interest, what the index added to the
-// debt (a linked track), and a one-time fee. One track, Spitzer, exact schedule
-// from metrics.ts; the index path is a teaching assumption, never a forecast.
+// debt (a linked track), and a one-time fee. One track, Spitzer, in the
+// statement convention from metrics.ts (each month's interest in agorot, as in
+// 2.9, 3.9 and 3.12); the index path is a teaching assumption, never a forecast.
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { type Track, trackRows } from "../lib/calc/metrics.ts";
@@ -29,6 +30,7 @@ const track = computed<Track>(() => ({
   rates: [String(rate.value)],
   months: years.value * 12,
   inflationPercent: linked.value ? String(inflation.value) : "0",
+  rounding: "statement",
 }));
 const rows = computed(() => trackRows(track.value));
 const sum = (f: (r: (typeof rows.value)[number]) => Decimal) => rows.value.reduce((s, r) => s.plus(f(r)), new Decimal(0));
@@ -46,12 +48,30 @@ const parts = computed(() =>
   ].map((p) => ({ ...p, share: everything.value.isZero() ? new Decimal(0) : p.value.div(everything.value).mul(100) })),
 );
 const visible = computed(() => parts.value.filter((p) => p.value.gt(0)));
+// A small share keeps two decimals (a 360 ₪ fee is 0.04%), so it can be read off the screen.
 const shareText = (d: Decimal) => {
   if (d.isZero()) return "0%";
   const r = d.toDecimalPlaces(1);
-  return r.isZero() ? "פחות מ־0.1%" : `${r.toString()}%`;
+  if (!r.isZero()) return `${r.toString()}%`;
+  const r2 = d.toDecimalPlaces(2);
+  return r2.isZero() ? "פחות מ־0.01%" : `${r2.toString()}%`;
 };
-const per100 = (d: Decimal) => d.toDecimalPlaces(0).toString();
+// "Of every 100 ₪", in whole shekels that add up to exactly 100: round each part down,
+// then give the shekels left to the parts with the largest remainders.
+const per100 = computed(() => {
+  const exact = parts.value.map((p) => p.share);
+  const down = exact.map((d) => d.floor());
+  let left = 100 - down.reduce((s, d) => s + d.toNumber(), 0);
+  const order = exact.map((d, i) => ({ i, rem: d.minus(down[i]) })).sort((a, b) => b.rem.comparedTo(a.rem));
+  const out = down.map((d) => d.toNumber());
+  for (const o of order) {
+    if (left <= 0) break;
+    out[o.i] += 1;
+    left -= 1;
+  }
+  return out;
+});
+const yearsWord = (n: number) => (n <= 10 ? "שנים" : "שנה");
 
 const yearRows = computed(() =>
   Array.from({ length: years.value }, (_, k) => {
@@ -78,7 +98,7 @@ const yearRows = computed(() =>
       <label class="flex flex-col">
         <span class="text-caption font-semibold text-n600">תקופה</span>
         <input v-model.number="years" type="range" min="5" max="30" step="1" aria-label="תקופה בשנים" />
-        <span class="text-body-l font-semibold text-n900">{{ years }} שנה (<span class="ltr">{{ years * 12 }}</span> תשלומים)</span>
+        <span class="text-body-l font-semibold text-n900">{{ years }} {{ yearsWord(years) }} (<span class="ltr">{{ years * 12 }}</span> תשלומים)</span>
       </label>
       <label class="flex flex-col">
         <span class="text-caption font-semibold text-n600">עמלה חד־פעמית ביום שמקבלים את הכסף</span>
@@ -126,10 +146,10 @@ const yearRows = computed(() =>
       </li>
     </ul>
     <p class="mt-2 text-body-m text-n800">
-      מכל 100 ₪ שתשלמו: <span class="ltr font-semibold">{{ per100(parts[0].share) }}</span> ₪ מחזירים את ההלוואה,
-      <span class="ltr font-semibold">{{ per100(parts[1].share) }}</span> ₪ הם ריבית<template v-if="linked">, ו־<span class="ltr font-semibold">{{ per100(parts[2].share) }}</span> ₪ הם מה שהמדד הוסיף</template>.
+      מכל 100 ₪ שתשלמו: <span class="ltr font-semibold">{{ per100[0] }}</span> ₪ מחזירים את ההלוואה,
+      <span class="ltr font-semibold">{{ per100[1] }}</span> ₪ הם ריבית<template v-if="linked">, <span class="ltr font-semibold">{{ per100[2] }}</span> ₪ הם מה שהמדד הוסיף</template><template v-if="per100[3] > 0">, <span class="ltr font-semibold">{{ per100[3] }}</span> ₪ הם העמלה</template>.
     </p>
-    <p class="mt-1 text-caption text-n600">המספרים בשקלים כפי שישולמו, בלי עיגול בדרך. ״מכל 100 ₪״ מעוגל לשקל.</p>
+    <p class="mt-1 text-caption text-n600">המספרים בשקלים כפי שישולמו, לפי הלוח: הריבית של כל חודש מעוגלת לאגורה, כמו בשיעורים 2.9 ו־3.12. ״מכל 100 ₪״ מעוגל לשקלים שלמים, כך שהחלקים מסתכמים ב־100.</p>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה, שנה אחר שנה" }}

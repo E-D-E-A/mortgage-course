@@ -13,7 +13,7 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import type { Method } from "../../src/lib/calc/repayment.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given, percentOfFact, repCell, repMonths, repPayment, repSchedule, repSum, repTotalInterest, repTotalPaid, slice } from "./lesson-2-9.ts";
-import { leftFact, monthlyFact, stepsFact } from "./lesson-3-1.ts";
+import { baseFact, leftFact, monthlyFact, paymentsTotal, stepsFact } from "./lesson-3-1.ts";
 
 const compound = (id: string, principal: string, ratePercent: string, periods: number): Fact => ({
   id,
@@ -64,6 +64,10 @@ export default function lesson34(): LessonData {
   // 6: partial bullet vs Spitzer on the same loan.
   const x6Bp = repTotalInterest("ex6.bp", "bullet_partial", "150000", "4.8", 120);
   const x6Sp = repTotalInterest("ex6.sp", "spitzer", "150000", "4.8", 120);
+  const x6SpPay = repPayment("ex6.sp_pay", "150000", "4.8", 120);
+  const x6SpTotal = paymentsTotal("ex6.sp_total", x6SpPay.value as string, 120);
+  const x6Loan = given("ex6.loan", "150000.00");
+  const x6SpRough = difference("ex6.sp_rough", x6SpTotal, x6Loan);
 
   const facts: Fact[] = [
     // Prediction.
@@ -72,10 +76,13 @@ export default function lesson34(): LessonData {
     compound("pred.yearly", "100000", "6", 5),
     given("pred.loan", "100000.00"),
     compound("pred.exact", "100000", "0.5", 60),
+    baseFact("pred.base", "6"),
+    monthlyFact("pred.monthly", "6", 2),
 
     // The row rules on the explanation's loan.
     loan,
     monthlyFact("monthly", "4.8", 2),
+    baseFact("base", "4.8"),
     repPayment("spitzer.pay", ...L),
     cell("equal.first", "equal_principal", 1, "payment"),
     cell("equal.last", "equal_principal", 240, "payment"),
@@ -118,6 +125,7 @@ export default function lesson34(): LessonData {
     // Worked example.
     wLoan,
     monthlyFact("worked.monthly", "5.4", 2),
+    baseFact("worked.base", "5.4"),
     repMonths("worked.months", 20),
     leftFact("worked.left", 240, 6),
     repCell("worked.int_1", "grace_full", ...W, 1, "interest", 6),
@@ -141,6 +149,8 @@ export default function lesson34(): LessonData {
     x2Part,
     x2Int,
     repSum("ex2.answer_sum", [x2Part, x2Int]),
+    monthlyFact("ex2.monthly", "6", 2),
+    repMonths("ex2.months", 15),
     repCell("ex2.answer", "equal_principal", "180000", "6", 180, 1, "payment"),
     repPayment("ex2.err_spitzer", "180000", "6", 180),
     // Exercise 3.
@@ -149,20 +159,32 @@ export default function lesson34(): LessonData {
     repPayment("ex3.err_no_grace", "300000", "4.2", 240),
     stepsFact("ex3.steps", "300000", "4.2", 216),
     leftFact("ex3.left", 240, 24),
+    baseFact("ex3.base", "4.2"),
     // Exercise 4.
     repCell("ex4.answer", "grace_full", "200000", "6", 120, 6, "closing", 6),
     simple("ex4.err_simple", "200000", "0.5", 6),
     compound("ex4.formula", "200000", "0.5", 6),
+    baseFact("ex4.base", "6"),
+    monthlyFact("ex4.monthly", "6", 2),
     // Exercise 5.
     repCell("ex5.answer", "bullet_full", "150000", "4.8", 120, 120, "payment"),
     compound("ex5.formula", "150000", "0.4", 120),
     simple("ex5.err_simple", "150000", "4.8", 10),
     compound("ex5.err_yearly", "150000", "4.8", 10),
+    baseFact("ex5.base", "4.8"),
+    baseFact("ex5.yearly_base", "4.8", 1),
+    repMonths("ex5.months", 10),
     // Exercise 6.
     x6Bp,
     x6Sp,
     difference("ex6.answer", x6Bp, x6Sp),
     repCell("ex6.bp_pay", "bullet_partial", "150000", "4.8", 120, 1, "payment"),
+    monthlyFact("ex6.monthly", "4.8", 2),
+    x6SpPay,
+    x6SpTotal,
+    x6Loan,
+    x6SpRough,
+    difference("ex6.rough_answer", x6Bp, x6SpRough),
   ];
 
   return {

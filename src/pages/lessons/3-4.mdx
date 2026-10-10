@@ -38,6 +38,7 @@ export const predictionOptions = [
 
 בשיעור 3.2 בנינו לוח סילוקין בשפיצר משלושה כללים שחוזרים בכל שורה: <Term t="רכיב ריבית" lesson="3.4">רכיב הריבית</Term> הוא היתרה כפול הריבית החודשית; <Term t="רכיב קרן" lesson="3.4">רכיב הקרן</Term> הוא התשלום פחות רכיב הריבית; והיתרה בסוף החודש היא היתרה בתחילתו פחות רכיב הקרן.
 בשלב 2 הכרנו עוד שיטות: <Term t="קרן שווה" lesson="3.4">קרן שווה</Term> (שיעור 2.9), <Term t="גרייס חלקי" lesson="3.4">גרייס חלקי</Term>, <Term t="גרייס מלא" lesson="3.4">גרייס מלא</Term>, <Term t="בלון" lesson="3.4">בלון</Term> ו<Term t="בוליט" lesson="3.4">בוליט</Term> (שיעור 2.10). בשיעור הזה נראה ששלושת הכללים לא משתנים בשום שיטה. רק דבר אחד משתנה: כמה משלמים בכל חודש.
+בלון, לפי ההגדרה ששיעור 2.10 הביא, הוא אותה הלוואה כמו בוליט — הקרן חוזרת בסוף — ולכן הלוחות של בוליט למטה הם גם הלוחות של בלון. ״בולט״ בכותרת השיעור הוא הכתיב של ההוראה של בנק ישראל; ״בוליט״ — של אפליקציית Mogi, וכך נכתוב כאן.
 
 <Section kind="לפני שמתחילים: נחשו">
 
@@ -111,8 +112,8 @@ export const predictionOptions = [
 מחודש 13 זה שפיצר על {f.shekels("partial.close_12")}, על <M>240 − 12 = {f.plain("left_228")}</M> החודשים שנשארו — הנוסחה של שיעור 3.1, עם {f.plain("left_228")} במקום n:
 
 <div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
-  <M>1 − 1.004<sup>−{f.plain("left_228")}</sup> = {dec(ps.one_minus)}</M>
-  <M>600,000 × 0.004 = {nv(ps.top)}</M>
+  <M>1 − {f.plain("base")}<sup>−{f.plain("left_228")}</sup> = {dec(ps.one_minus)}</M>
+  <M>600,000 × {dec(ps.m)} = {nv(ps.top)}</M>
   <M>{nv(ps.top)} ÷ {dec(ps.one_minus)} = {nv(ps.payment)}</M>
 </div>
 
@@ -121,8 +122,8 @@ export const predictionOptions = [
 - חודש 2: רכיב ריבית <M>{f.plain("monthly")}% × {n("full.close_1")} = {n("full.int_2")}</M> — ריבית גם על הריבית של חודש 1.
 - בסוף חודש 12: {f.shekels("full.close_12")}. החוב גדל ב־{f.shekels("full.added")}.
 
-זו ריבית דריבית של שיעור 0.3, חודש אחר חודש: בקיצור, <M>600,000 × 1.004<sup>12</sup> = {n("full.formula_12")}</M> — שתי אגורות פחות מהלוח, כי בלוח מעוגל כל חודש לאגורה.
-מחודש 13: שפיצר על היתרה שגדלה, על {f.plain("left_228")} החודשים שנשארו: <M>{n("full.close_12")} × 0.004 = {nv(fs.top)}</M>, ו־<M>{nv(fs.top)} ÷ {dec(fs.one_minus)} = {nv(fs.payment)}</M> ₪.
+זו ריבית דריבית של שיעור 0.3, חודש אחר חודש: בקיצור, <M>600,000 × {f.plain("base")}<sup>12</sup> = {n("full.formula_12")}</M> — שתי אגורות פחות מהלוח, כי בלוח מעוגל כל חודש לאגורה.
+מחודש 13: שפיצר על היתרה שגדלה, על {f.plain("left_228")} החודשים שנשארו: <M>{n("full.close_12")} × {dec(fs.m)} = {nv(fs.top)}</M>, ו־<M>{nv(fs.top)} ÷ {dec(fs.one_minus)} = {nv(fs.payment)}</M> ₪.
 
 <Section kind="ההסבר">
 
@@ -132,7 +133,7 @@ export const predictionOptions = [
 
 **בוליט חלקי.** בכל חודש רק רכיב הריבית, {f.shekels("bp.pay")}, והיתרה לא זזה. בחודש 240: כל הקרן ועוד רכיב הריבית, {f.shekels("bp.last")}.
 
-**בוליט מלא.** עד החודש האחרון לא משלמים כלום; היתרה גדלה בכל חודש, בריבית דריבית, כמו בגרייס מלא — רק לאורך כל התקופה. בחודש 240 משלמים הכול בבת אחת: {f.shekels("bf.last")}. בקיצור: <M>600,000 × 1.004<sup>240</sup> = {n("bf.formula")}</M> — שוב אגורות של עיגול.
+**בוליט מלא.** עד החודש האחרון לא משלמים כלום; היתרה גדלה בכל חודש, בריבית דריבית, כמו בגרייס מלא — רק לאורך כל התקופה. בחודש 240 משלמים הכול בבת אחת: {f.shekels("bf.last")}. בקיצור: <M>600,000 × {f.plain("base")}<sup>240</sup> = {n("bf.formula")}</M> — שוב אגורות של עיגול.
 
 ההחזר של בוליט מלא לא ״נעלם״: הוא מצטבר לתשלום אחד, ענק. כפי שראינו בשיעור 2.10, הלוואה כזו מתאימה רק כשיודעים מאיפה יבוא הכסף לסוף.
 
@@ -179,7 +180,7 @@ export const predictionOptions = [
     "",
   ]}
 >
-  {f.shekels("pred.answer")}: בכל חודש רכיב הריבית — 0.5% מהיתרה — מצטרף לחוב, ובחודש הבא יש ריבית גם עליו. בקיצור: 100,000 כפול 1.005 בחזקת 60, כלומר {f.shekels("pred.exact")}; בלוח, כל חודש מעוגל לאגורה.
+  {f.shekels("pred.answer")}: בכל חודש רכיב הריבית — {f.plain("pred.monthly")}% מהיתרה — מצטרף לחוב, ובחודש הבא יש ריבית גם עליו. בקיצור: <M>100,000 × {f.plain("pred.base")}<sup>60</sup> = {n("pred.exact")}</M>; בלוח, כל חודש מעוגל לאגורה.
 </PredictionReveal>
 
 <Section kind="מהדוגמה לנוסחה">
@@ -190,7 +191,7 @@ export const predictionOptions = [
 
 **צעד 1 — הכללים של כל שורה, בכל שיטה,** כמו בשיעור 3.2: <M>I<sub>k</sub> = r × B<sub>k−1</sub></M>, רכיב הקרן הוא <M>C<sub>k</sub> − I<sub>k</sub></M>, והיתרה <M>B<sub>k</sub> = B<sub>k−1</sub> − (C<sub>k</sub> − I<sub>k</sub>)</M>. התשלום יכול להשתנות מחודש לחודש, ולכן כותבים אותו <M>C<sub>k</sub></M>.
 
-**צעד 2 — התשלום של כל שיטה.** מספר חודשי הגרייס מסומן ב־g (אות שאינה בטבלת האותיות של הקורס, ולכן לא מתבלבלת עם אחרת).
+**צעד 2 — התשלום של כל שיטה.** מספר חודשי הגרייס מסומן ב־g — אות חדשה בטבלת האותיות של הקורס, ומעכשיו היא תסמן תמיד חודשי גרייס.
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
   <dl class="grid gap-x-4 gap-y-3 text-body-m text-n700 sm:grid-cols-[auto_1fr]">
@@ -216,7 +217,7 @@ export const predictionOptions = [
   </dl>
 </div>
 
-**מתי הנוסחאות נכונות?** כשאחוז הריבית לא זז ואין הצמדה, וכשהגרייס בתוך התקופה — כך בקורס, לפי החלטה של Mogi (אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08). בהצעה אמיתית קובעים התנאים שבה: יש הלוואות שבהן הגרייס מתווסף לתקופה. ובהלוואה בבוליט, החוזה קובע אם משלמים ריבית לאורך הדרך — בודקים בו (שיעור 2.10).
+**מתי הנוסחאות נכונות?** כשאחוז הריבית לא זז ואין הצמדה, וכשהגרייס בתוך התקופה — כך בקורס, לפי החלטה של Mogi (אילון אישר ב־2026-10-07, ועדן קיבל ב־2026-10-08). בהצעה אמיתית קובעים התנאים שבה: אם בחוזה הגרייס מתווסף לתקופה, n גדל ב־g. ובהלוואה בבוליט, החוזה קובע אם משלמים ריבית לאורך הדרך — בודקים בו (שיעור 2.10).
 
 <Callout title="איך מחשבים">
 <p><strong>בגיליון אלקטרוני:</strong> אותן חמש עמודות של שיעור 3.2 — חודש, יתרה בתחילת החודש, רכיב ריבית, רכיב קרן, יתרה בסוף. משתנה רק עמודת התשלום: בקרן שווה הקרן חלקי n ועוד רכיב הריבית; בגרייס חלקי רכיב הריבית עד חודש g, ואחר כך ההחזר מהנוסחה; בגרייס מלא אפס עד חודש g; וכן הלאה.</p>
@@ -241,9 +242,9 @@ export const predictionOptions = [
 
 **צעד 1 — הריבית החודשית ומספר החודשים.** <M>5.4% ÷ 12 = {f.plain("worked.monthly")}%</M>; <M>20 × 12 = {f.plain("worked.months")}</M> חודשים, ומהם <M>{f.plain("worked.months")} − 6 = {f.plain("worked.left")}</M> אחרי הגרייס.
 
-**צעד 2 — היתרה בסוף הגרייס.** חודש 1: רכיב ריבית {f.shekels("worked.int_1")}, והיתרה {f.shekels("worked.close_1")}. וכך שישה חודשים, עד {f.shekels("worked.close_6")}. בקיצור: <M>400,000 × 1.0045<sup>6</sup> = {n("worked.formula_6")}</M> (אגורה של עיגול). החוב גדל ב־{f.shekels("worked.added")}.
+**צעד 2 — היתרה בסוף הגרייס.** חודש 1: רכיב ריבית {f.shekels("worked.int_1")}, והיתרה {f.shekels("worked.close_1")}. וכך שישה חודשים, עד {f.shekels("worked.close_6")}. בקיצור: <M>400,000 × {f.plain("worked.base")}<sup>6</sup> = {n("worked.formula_6")}</M> (אגורה של עיגול). החוב גדל ב־{f.shekels("worked.added")}.
 
-**צעד 3 — ההחזר אחרי הגרייס.** שפיצר על {f.shekels("worked.close_6")}, ל־{f.plain("worked.left")} חודשים: <M>{n("worked.close_6")} × {dec(ws.m)} = {nv(ws.top)}</M>; <M>1 − 1.0045<sup>−{f.plain("worked.left")}</sup> = {dec(ws.one_minus)}</M>; <M>{nv(ws.top)} ÷ {dec(ws.one_minus)} = {nv(ws.payment)}</M> ₪.
+**צעד 3 — ההחזר אחרי הגרייס.** שפיצר על {f.shekels("worked.close_6")}, ל־{f.plain("worked.left")} חודשים: <M>{n("worked.close_6")} × {dec(ws.m)} = {nv(ws.top)}</M>; <M>1 − {f.plain("worked.base")}<sup>−{f.plain("worked.left")}</sup> = {dec(ws.one_minus)}</M>; <M>{nv(ws.top)} ÷ {dec(ws.one_minus)} = {nv(ws.payment)}</M> ₪.
 
 **צעד 4 — ההשוואה לשפיצר בלי גרייס.** בלי גרייס ההחזר היה {f.shekels("worked.spitzer")} — <M>{n("worked.after")} − {n("worked.spitzer")} = {n("worked.pay_gap")}</M> ₪ פחות בכל חודש, {f.plain("worked.left")} חודשים. בסך הכול, מהלוחות המלאים: ריבית {f.shekels("worked.full_interest")} עם הגרייס, מול {f.shekels("worked.sp_interest")} בלעדיו — <M>{n("worked.full_interest")} − {n("worked.sp_interest")} = {n("worked.interest_gap")}</M> ₪ יותר.
 
@@ -304,7 +305,7 @@ export const predictionOptions = [
   answer={f.raw("ex2.answer")}
   errors={[
     { value: f.raw("ex2.part"), message: "זה רק רכיב הקרן. בקרן שווה מוסיפים לו את רכיב הריבית של החודש." },
-    { value: f.raw("ex2.interest"), message: "זה רק רכיב הריבית. הוסיפו את רכיב הקרן: הקרן חלקי 180." },
+    { value: f.raw("ex2.interest"), message: `זה רק רכיב הריבית. הוסיפו את רכיב הקרן: הקרן חלקי ${f.plain("ex2.months")}.` },
     { value: f.raw("ex2.err_spitzer"), message: "זה ההחזר בשפיצר. בקרן שווה התשלום הראשון גבוה יותר." },
   ]}
 >
@@ -312,7 +313,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="3.4-2">
-רכיב הקרן: <M>180,000 ÷ 180 = {n("ex2.part")}</M>. רכיב הריבית: <M>0.5% × 180,000 = {n("ex2.interest")}</M>. התשלום: <M>{n("ex2.part")} + {n("ex2.interest")} = {n("ex2.answer_sum")}</M>, כלומר {f.shekels("ex2.answer")}.
+רכיב הקרן: <M>180,000 ÷ {f.plain("ex2.months")} = {n("ex2.part")}</M>. רכיב הריבית: <M>{f.plain("ex2.monthly")}% × 180,000 = {n("ex2.interest")}</M>. התשלום: <M>{n("ex2.part")} + {n("ex2.interest")} = {n("ex2.answer_sum")}</M>, כלומר {f.shekels("ex2.answer")}.
 </Solution>
 
 <NumericExercise
@@ -322,7 +323,7 @@ export const predictionOptions = [
   level="בינוני"
   answer={f.raw("ex3.answer")}
   errors={[
-    { value: f.raw("ex3.err_no_grace"), message: "זה ההחזר בשפיצר על 240 חודשים, בלי גרייס. הגרייס בתוך התקופה: אחרי 24 חודשים נשארו 216 חודשים להחזיר את כל הקרן." },
+    { value: f.raw("ex3.err_no_grace"), message: `זה ההחזר בשפיצר על 240 חודשים, בלי גרייס. הגרייס בתוך התקופה: אחרי 24 חודשים נשארו ${f.plain("ex3.left")} חודשים להחזיר את כל הקרן.` },
     { value: f.raw("ex3.grace_pay"), message: "זה התשלום בחודשי הגרייס — רק רכיב הריבית. השאלה היא על התשלום אחרי הגרייס." },
   ]}
 >
@@ -330,7 +331,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="3.4-3">
-בגרייס חלקי היתרה לא זזה: אחרי 24 חודשים היא עדיין 300,000 ₪. נשארו <M>240 − 24 = {f.plain("ex3.left")}</M> חודשים. ‏<M>r = {dec(x3.m)}</M>; <M>1 − 1.0035<sup>−{f.plain("ex3.left")}</sup> = {dec(x3.one_minus)}</M>; <M>300,000 × {dec(x3.m)} = {nv(x3.top)}</M>; <M>{nv(x3.top)} ÷ {dec(x3.one_minus)} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}.
+בגרייס חלקי היתרה לא זזה: אחרי 24 חודשים היא עדיין 300,000 ₪. נשארו <M>240 − 24 = {f.plain("ex3.left")}</M> חודשים. ‏<M>r = {dec(x3.m)}</M>; <M>1 − {f.plain("ex3.base")}<sup>−{f.plain("ex3.left")}</sup> = {dec(x3.one_minus)}</M>; <M>300,000 × {dec(x3.m)} = {nv(x3.top)}</M>; <M>{nv(x3.top)} ÷ {dec(x3.one_minus)} = {n("ex3.answer")}</M>, כלומר {f.shekels("ex3.answer")}.
 </Solution>
 
 <NumericExercise
@@ -340,14 +341,14 @@ export const predictionOptions = [
   level="בינוני"
   answer={f.raw("ex4.answer")}
   errors={[
-    { value: f.raw("ex4.err_simple"), message: "חישבתם ריבית של 0.5% על 200,000 ₪ בכל חודש — ריבית פשוטה. אבל בגרייס מלא הריבית מצטרפת לחוב, ובחודש הבא יש ריבית גם עליה." },
+    { value: f.raw("ex4.err_simple"), message: `חישבתם ריבית של ${f.plain("ex4.monthly")}% על 200,000 ₪ בכל חודש — ריבית פשוטה. אבל בגרייס מלא הריבית מצטרפת לחוב, ובחודש הבא יש ריבית גם עליה.` },
   ]}
 >
   לקחתם 200,000 ₪ ב־6% לשנה, עם 6 חודשי גרייס מלא בתחילת ההלוואה. מה היתרה בסוף חודש 6?
 </NumericExercise>
 
 <Solution for="3.4-4">
-בכל חודש רכיב הריבית — 0.5% מהיתרה — מצטרף לחוב. בקיצור: <M>200,000 × 1.005<sup>6</sup> = {n("ex4.formula")}</M>. בלוח, כשכל חודש מעוגל לאגורה: {f.shekels("ex4.answer")}. שתי התשובות מתקבלות.
+בכל חודש רכיב הריבית — {f.plain("ex4.monthly")}% מהיתרה — מצטרף לחוב. בקיצור: <M>200,000 × {f.plain("ex4.base")}<sup>6</sup> = {n("ex4.formula")}</M>. בלוח, כשכל חודש מעוגל לאגורה: {f.shekels("ex4.answer")}. שתי התשובות מתקבלות.
 </Solution>
 
 <NumericExercise
@@ -358,14 +359,14 @@ export const predictionOptions = [
   answer={f.raw("ex5.answer")}
   errors={[
     { value: f.raw("ex5.err_simple"), message: "זו ריבית פשוטה: 4.8% מ־150,000 ₪ כפול 10 שנים. אבל בבוליט מלא הריבית מצטרפת לחוב בכל חודש, ויש ריבית גם עליה." },
-    { value: f.raw("ex5.err_yearly"), message: "חישבתם ריבית דריבית שמצטרפת פעם בשנה, 1.048 בחזקת 10. הריבית מצטרפת בכל חודש: 1.004 בחזקת 120." },
+    { value: f.raw("ex5.err_yearly"), message: `חישבתם ריבית דריבית שמצטרפת פעם בשנה, ${f.plain("ex5.yearly_base")} בחזקת 10. הריבית מצטרפת בכל חודש: ${f.plain("ex5.base")} בחזקת ${f.plain("ex5.months")}.` },
   ]}
 >
   לקחתם 150,000 ₪ ב־4.8% לשנה, ל־10 שנים, בבוליט מלא. כמה תשלמו בחודש האחרון?
 </NumericExercise>
 
 <Solution for="3.4-5">
-120 חודשים, בכל אחד רכיב הריבית מצטרף לחוב. בחודש האחרון משלמים את כל מה שהצטבר: <M>150,000 × 1.004<sup>120</sup> = {n("ex5.formula")}</M>. בלוח, עם עיגול בכל חודש: {f.shekels("ex5.answer")}. שתי התשובות מתקבלות.
+{f.plain("ex5.months")} חודשים, בכל אחד רכיב הריבית מצטרף לחוב. בחודש האחרון משלמים את כל מה שהצטבר: <M>150,000 × {f.plain("ex5.base")}<sup>{f.plain("ex5.months")}</sup> = {n("ex5.formula")}</M>. בלוח, עם עיגול בכל חודש: {f.shekels("ex5.answer")}. שתי התשובות מתקבלות.
 </Solution>
 
 <NumericExercise
@@ -378,11 +379,12 @@ export const predictionOptions = [
     { value: f.raw("ex6.bp"), message: "זו כל הריבית בבוליט חלקי. השאלה היא על ההפרש בינה לבין הריבית בשפיצר." },
   ]}
 >
-  אותה הלוואה, 150,000 ₪ ב־4.8% לשנה ל־10 שנים, אבל בבוליט חלקי: בכל חודש רק רכיב הריבית, והקרן בסוף. בכמה שקלים של ריבית תשלמו יותר מאשר בשפיצר? (את הריבית בשפיצר קחו מהבונה, ״מזה ריבית״.)
+  אותה הלוואה, 150,000 ₪ ב־4.8% לשנה ל־10 שנים, אבל בבוליט חלקי: בכל חודש רק רכיב הריבית, והקרן בסוף. בכמה שקלים של ריבית תשלמו יותר מאשר בשפיצר? (את הריבית בשפיצר קחו מהבונה, ״מזה ריבית״; או חשבו אותה כמו בשיעור 3.2: מספר החודשים כפול ההחזר החודשי בשפיצר, פחות 150,000 ₪.)
 </NumericExercise>
 
 <Solution for="3.4-6">
-בבוליט חלקי היתרה לא זזה, ורכיב הריבית בכל חודש הוא <M>0.4% × 150,000 = {n("ex6.bp_pay")}</M>. ב־120 חודשים: {f.shekels("ex6.bp")}. בשפיצר, מהבונה: {f.shekels("ex6.sp")}. ההפרש: <M>{n("ex6.bp")} − {n("ex6.sp")} = {n("ex6.answer")}</M>, כלומר {f.shekels("ex6.answer")}. הקרן נשארת אצלכם עשר שנים שלמות, ועל כולה משלמים ריבית.
+בבוליט חלקי היתרה לא זזה, ורכיב הריבית בכל חודש הוא <M>{f.plain("ex6.monthly")}% × 150,000 = {n("ex6.bp_pay")}</M>. ב־120 חודשים: {f.shekels("ex6.bp")}. בשפיצר, מהבונה: {f.shekels("ex6.sp")}. ההפרש: <M>{n("ex6.bp")} − {n("ex6.sp")} = {n("ex6.answer")}</M>, כלומר {f.shekels("ex6.answer")}.
+בלי הבונה: ההחזר בשפיצר, בנוסחה של שיעור 3.1, הוא {f.shekels("ex6.sp_pay")}; <M>120 × {n("ex6.sp_pay")} = {n("ex6.sp_total")}</M>, ו־<M>{n("ex6.sp_total")} − 150,000 = {n("ex6.sp_rough")}</M>. ההפרש: <M>{n("ex6.bp")} − {n("ex6.sp_rough")} = {n("ex6.rough_answer")}</M> — שונה באגורות, כי בלוח התשלום האחרון סוגר את העיגול. שתי התשובות מתקבלות. הקרן נשארת אצלכם עשר שנים שלמות, ועל כולה משלמים ריבית.
 </Solution>
 
 <Callout title="חמש שאלות על לוחות בכל שיטה">

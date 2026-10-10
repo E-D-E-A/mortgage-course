@@ -54,8 +54,10 @@ const fRate = ref(field(props.rate));
 const fMonths = ref(field(props.months));
 const fGrace = ref(field(props.grace));
 
+// Only digits, a point, grouping commas, a minus, % and ₪ may appear: "1e1" or "12abc" is refused, not read as 11 or 12.
+const NUMERIC_TEXT = /^[\d.,\s%₪−-]*$/;
 function read(f: Field, min: number, max: number, whole: boolean, what: string) {
-  const v = parseAnswer(f.text);
+  const v = NUMERIC_TEXT.test(f.text) ? parseAnswer(f.text) : null;
   if (v === null) f.error = `כתבו ${what} במספרים.`;
   else if (whole && !Number.isInteger(v)) f.error = `${what}: מספר שלם.`;
   else if (v < min || v > max) f.error = `${what}: בין ${new Intl.NumberFormat("he-IL").format(min)} ל־${new Intl.NumberFormat("he-IL").format(max)}.`;
@@ -254,7 +256,7 @@ watch([loan, method], () => {
       <template v-if="noPayments">עד החודש האחרון אין תשלומים, ולכן הגרף ריק.</template>
       <template v-else>גובה מלא: <span class="ltr">{{ formatWholeShekels(payMax) }}</span> בחודש.</template>
       החודשים רצים מימין לשמאל.
-      <template v-if="isBullet">התשלום בחודש האחרון, <span class="ltr">{{ formatShekels(lastRow.payment) }}</span>, גבוה מדי לגרף, ולכן הוא לא מצויר.</template>
+      <template v-if="isBullet && n > 1">התשלום בחודש האחרון, <span class="ltr">{{ formatShekels(lastRow.payment) }}</span>, גבוה מדי לגרף, ולכן הוא לא מצויר.</template>
     </p>
 
     <h3 class="mt-5 text-body-l font-semibold text-n900">היתרה לאורך הזמן</h3>
@@ -271,14 +273,15 @@ watch([loan, method], () => {
     <!-- The schedule itself. -->
     <h3 class="mt-5 text-body-l font-semibold text-n900">לוח הסילוקין, חודש אחר חודש</h3>
     <div v-if="pages > 1" class="mt-2 flex flex-wrap items-center gap-2">
-      <button type="button" class="min-h-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50 disabled:opacity-50" :disabled="page === 1" @click="page--">שנה קודמת</button>
+      <!-- aria-disabled, not disabled: a disabled button drops keyboard focus to <body> the moment it is pressed at the first or last year. -->
+      <button type="button" class="min-h-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50 aria-disabled:opacity-50" :aria-disabled="page === 1" @click="page = Math.max(1, page - 1)">שנה קודמת</button>
       <label class="flex items-center gap-2 text-body-m text-n700">
         <span>שנה</span>
         <select v-model.number="page" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900" aria-label="איזו שנה בטבלה">
           <option v-for="p in pages" :key="p" :value="p">{{ p }}</option>
         </select>
       </label>
-      <button type="button" class="min-h-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50 disabled:opacity-50" :disabled="page === pages" @click="page++">שנה הבאה</button>
+      <button type="button" class="min-h-11 rounded-md border border-n200 px-3 text-body-m text-n800 hover:bg-n50 aria-disabled:opacity-50" :aria-disabled="page === pages" @click="page = Math.min(pages, page + 1)">שנה הבאה</button>
       <span class="text-caption text-n600">חודשים <span class="ltr">{{ (page - 1) * 12 + 1 }}–{{ Math.min(page * 12, n) }}</span></span>
     </div>
     <table class="mt-2 hidden w-full border-collapse text-body-m lg:table">

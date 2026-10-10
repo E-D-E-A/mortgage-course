@@ -63,12 +63,22 @@ function nodeClass(n: MapNode) {
 // The regions in the map's 3-column layout; the result region spans the row.
 const grid: Record<string, string> = { result: "sm:col-span-3" };
 
-// Lines from the selected node to its linked nodes, measured from the rendered buttons.
+// Lines from the selected node to its linked nodes, measured from the rendered buttons and regions.
+// A straight line from centre to centre would run behind unrelated nodes and read as a link to them,
+// so a line travels only in the empty gaps: out of the selected node's region frame, along the gutters
+// between the regions, and into the linked node's region frame. Inside a region it reaches the node
+// only when nothing else stands in the way; the node's mint fill marks it either way. A link inside
+// one region gets no line, only the fill.
 const mapEl = ref<HTMLElement | null>(null);
 const buttons = new Map<string, HTMLElement>();
 const setButton = (id: string) => (el: unknown) => {
   if (el instanceof HTMLElement) buttons.set(id, el);
   else buttons.delete(id);
+};
+const regionEls = new Map<string, HTMLElement>();
+const setRegion = (id: string) => (el: unknown) => {
+  if (el instanceof HTMLElement) regionEls.set(id, el);
+  else regionEls.delete(id);
 };
 // The list view's node buttons, for moving focus to a node opened from a card.
 const listButtons = new Map<string, HTMLElement>();
@@ -76,25 +86,90 @@ const setListButton = (id: string) => (el: unknown) => {
   if (el instanceof HTMLElement) listButtons.set(id, el);
   else listButtons.delete(id);
 };
-const lines = ref<{ id: string; x1: number; y1: number; x2: number; y2: number }[]>([]);
+interface Box {
+  l: number;
+  r: number;
+  t: number;
+  b: number;
+}
+const lines = ref<{ id: string; d: string; ends: { x: number; y: number }[] }[]>([]);
 const size = ref({ w: 0, h: 0 });
 function measure() {
   const box = mapEl.value?.getBoundingClientRect();
-  const from = buttons.get(selected.value)?.getBoundingClientRect();
-  if (!box || !from || box.width === 0) {
+  const from = byId.value.get(selected.value);
+  const fromEl = buttons.get(selected.value);
+  if (!box || !from || !fromEl || box.width === 0) {
     lines.value = [];
     return;
   }
   size.value = { w: box.width, h: box.height };
-  const centre = (r: DOMRect) => ({ x: r.left - box.left + r.width / 2, y: r.top - box.top + r.height / 2 });
-  const a = centre(from);
-  lines.value = [...linked.value]
-    .map((id) => buttons.get(id)?.getBoundingClientRect())
-    .filter((r): r is DOMRect => !!r && r.width > 0)
-    .map((r, k) => {
-      const b = centre(r);
-      return { id: String(k), x1: a.x, y1: a.y, x2: b.x, y2: b.y };
-    });
+  const rel = (el: Element): Box => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left - box.left, r: r.right - box.left, t: r.top - box.top, b: r.bottom - box.top };
+  };
+  const regionBox = new Map([...regionEls].map(([id, el]) => [id, rel(el)]));
+  const rows = [...new Set([...regionBox.values()].map((r) => Math.round(r.t)))].sort((x, y) => x - y);
+  const rowOf = (r: Box) => rows.indexOf(Math.round(r.t));
+  // The horizontal gutter under row i, and the vertical gutters between columns.
+  const gutterBelow = (i: number) => {
+    const bottom = Math.max(...[...regionBox.values()].filter((r) => rowOf(r) === i).map((r) => r.b));
+    const nextTop = Math.min(...[...regionBox.values()].filter((r) => rowOf(r) === i + 1).map((r) => r.t));
+    return (bottom + nextTop) / 2;
+  };
+  const firstRow = [...regionBox.values()].filter((r) => rowOf(r) === 0).sort((x, y) => x.l - y.l);
+  const columnGutters = firstRow.slice(1).map((r, i) => (firstRow[i].r + r.l) / 2);
+  // Everything a stub inside a region must not cross: other nodes and the region titles.
+  const obstacles = (regionId: string, except: string[]) => [
+    ...props.nodes.filter((n) => n.region === regionId && !except.includes(n.id)).flatMap((n) => (buttons.get(n.id) ? [rel(buttons.get(n.id) as HTMLElement)] : [])),
+    ...[...(regionEls.get(regionId)?.querySelectorAll("h3") ?? [])].map(rel),
+  ];
+  const clear = (x: number, y1: number, y2: number, obs: Box[]) => obs.every((o) => x < o.l - 2 || x > o.r + 2 || Math.max(y1, y2) < o.t || Math.min(y1, y2) > o.b);
+  // The point where a line meets a region frame, above or below a node, plus a stub to the node when clear.
+  const port = (nodeId: string, side: "top" | "bottom", others: string[]) => {
+    const n = byId.value.get(nodeId);
+    const el = buttons.get(nodeId);
+    const frame = n && regionBox.get(n.region);
+    if (!n || !el || !frame) return null;
+    const nb = rel(el);
+    const x = Math.min(Math.max((nb.l + nb.r) / 2, frame.l + 12), frame.r - 12);
+    const edge = side === "top" ? frame.t : frame.b;
+    const nodeEdge = side === "top" ? nb.t : nb.b;
+    const stub = clear(x, nodeEdge, edge, obstacles(n.region, [nodeId, ...others])) ? { x, y: nodeEdge } : null;
+    return { x, y: edge, stub };
+  };
+
+  const fromBox = regionBox.get(from.region);
+  if (!fromBox) {
+    lines.value = [];
+    return;
+  }
+  const out: { id: string; d: string; ends: { x: number; y: number }[] }[] = [];
+  for (const id of linked.value) {
+    const to = byId.value.get(id);
+    const toBox = to && regionBox.get(to.region);
+    if (!to || !toBox || to.region === from.region || !buttons.get(id)) continue;
+    const ra = rowOf(fromBox);
+    const rb = rowOf(toBox);
+    // Leave toward the other region: down when it is lower or in the same row, up when it is higher.
+    const down = rb >= ra;
+    const a = port(from.id, down ? "bottom" : "top", [id]);
+    const b = port(id, rb === ra ? "bottom" : down ? "top" : "bottom", [from.id]);
+    if (!a || !b) continue;
+    const gA = down ? gutterBelow(ra) : gutterBelow(ra - 1);
+    const gB = rb === ra ? gA : down ? gutterBelow(rb - 1) : gutterBelow(rb);
+    const pts: { x: number; y: number }[] = [];
+    if (a.stub) pts.push(a.stub);
+    pts.push({ x: a.x, y: a.y }, { x: a.x, y: gA });
+    if (Math.abs(gA - gB) > 1) {
+      // Rows apart: along a gutter between columns, so no region in between is crossed.
+      const xv = columnGutters.reduce((best, g) => (Math.abs(g - a.x) + Math.abs(g - b.x) < Math.abs(best - a.x) + Math.abs(best - b.x) ? g : best), columnGutters[0] ?? a.x);
+      pts.push({ x: xv, y: gA }, { x: xv, y: gB });
+    }
+    pts.push({ x: b.x, y: gB }, { x: b.x, y: b.y });
+    if (b.stub) pts.push(b.stub);
+    out.push({ id, d: pts.map((p, k) => `${k ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" "), ends: [pts[0], pts[pts.length - 1]] });
+  }
+  lines.value = out;
 }
 // The map element is re-created when the learner goes list → map, so it is re-observed each time.
 let observer: ResizeObserver | null = null;
@@ -152,20 +227,13 @@ function toggleInList(id: string) {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <line
-            v-for="l in lines"
-            :key="l.id"
-            :x1="l.x1"
-            :y1="l.y1"
-            :x2="l.x2"
-            :y2="l.y2"
-            stroke="var(--mogi-teal-deep)"
-            stroke-width="2"
-            stroke-dasharray="6 4"
-          />
+          <g v-for="l in lines" :key="l.id">
+            <path :d="l.d" fill="none" stroke="var(--mogi-teal-deep)" stroke-width="2" stroke-dasharray="6 4" stroke-linejoin="round" />
+            <circle v-for="(e, k) in l.ends" :key="k" :cx="e.x" :cy="e.y" r="3.5" fill="var(--mogi-teal-deep)" />
+          </g>
         </svg>
         <div class="relative grid grid-cols-3 gap-3">
-          <section v-for="r in regions" :key="r.id" class="rounded-lg border border-n200 p-3" :class="grid[r.id]" :aria-label="r.label">
+          <section v-for="r in regions" :key="r.id" :ref="setRegion(r.id)" class="rounded-lg border border-n200 p-3" :class="grid[r.id]" :aria-label="r.label">
             <h3 class="relative inline-block bg-n0 px-1 text-caption font-semibold text-n600">{{ r.label }}</h3>
             <div v-if="inRegion(r.id).length" class="mt-2 flex flex-wrap gap-2">
               <button

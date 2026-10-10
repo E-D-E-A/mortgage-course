@@ -232,6 +232,16 @@ def mix_max_month(i, _facts=None):
     return str(f.index(max(f)) + 1)
 
 
+def mix_max_run_end(i, _facts=None):
+    """The last month of the run that starts at the highest payment, compared to the agora."""
+    f = [agorot(x) for x in flow(i)[0]]
+    top = max(f)
+    m = f.index(top)
+    while m + 1 < len(f) and f[m + 1] == top:
+        m += 1
+    return str(m + 1)
+
+
 def mix_total(i, _facts=None):
     return money(sum(flow(i)[0], Decimal(0)))
 
@@ -308,27 +318,29 @@ def half_linked(i, _facts=None):
     return rows
 
 
-def dec6(x):
-    q = Decimal(x).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP).normalize()
+def dec(x, i):
+    """Shown to `decimals` places (default 6), half up, trailing zeros dropped."""
+    places = int(i.get("decimals", 6))
+    q = Decimal(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP).normalize()
     return format(q, "f")
 
 
 def monthly_decimal(i, _facts=None):
-    return dec6(Decimal(i["rate_percent"]) / TWELVE / HUNDRED)
+    return dec(Decimal(i["rate_percent"]) / TWELVE / HUNDRED, i)
 
 
 def growth_base(i, _facts=None):
-    return dec6(1 + Decimal(i["rate_percent"]) / TWELVE / HUNDRED)
+    return dec(1 + Decimal(i["rate_percent"]) / TWELVE / HUNDRED, i)
 
 
 def power(i, _facts=None):
     r = Decimal(i["rate_percent"]) / TWELVE / HUNDRED
-    return dec6((1 + r) ** (-int(i["months"])))
+    return dec((1 + r) ** (-int(i["months"])), i)
 
 
 def one_minus_power(i, _facts=None):
     r = Decimal(i["rate_percent"]) / TWELVE / HUNDRED
-    return dec6(1 - (1 + r) ** (-int(i["months"])))
+    return dec(1 - (1 + r) ** (-int(i["months"])), i)
 
 
 def reset_table(i, _facts=None):
@@ -394,6 +406,7 @@ KINDS = {
     "sch_mix_first": mix_first,
     "sch_mix_max": mix_max,
     "sch_mix_max_month": mix_max_month,
+    "sch_mix_max_run_end": mix_max_run_end,
     "sch_mix_total": mix_total,
     "sch_mix_yearly": mix_yearly,
     "sch_mix_share": mix_share,

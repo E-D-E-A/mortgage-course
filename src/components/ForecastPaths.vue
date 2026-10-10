@@ -4,7 +4,9 @@
 // One variable unlinked track, its rate reset every few years. A fixed, invented
 // forecast path gives "the highest payment under the forecast"; the learner moves
 // the rates that actually come (from the first reset on) and sees that path's own
-// highest payment beside it. Every number comes from metrics.ts.
+// highest payment beside it. Every number comes from metrics.ts, in the
+// statement convention (each month's interest in agorot; the last payment clears
+// the balance), the same as the lesson's tables.
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { highestPayment, percentAbove, type Track, trackPayments } from "../lib/calc/metrics.ts";
@@ -22,7 +24,7 @@ const today = props.forecast[0];
 const actual = ref<number[]>(props.forecast.map(Number));
 const showTable = ref(false);
 
-const track = (rates: (string | number)[]): Track => ({ principal: props.amount, rates: rates.map(String), blockMonths, months });
+const track = (rates: (string | number)[]): Track => ({ principal: props.amount, rates: rates.map(String), blockMonths, months, rounding: "statement" });
 const current = computed(() => trackPayments(track([today])));
 const forecastPays = computed(() => trackPayments(track(props.forecast)));
 const actualPays = computed(() => trackPayments(track(actual.value)));
@@ -91,7 +93,7 @@ const rows = computed(() =>
       <li class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">החזר ראשון</p>
         <p class="text-h3 text-navy"><span class="ltr">{{ formatShekels(actualPays[0]) }}</span></p>
-        <p class="text-caption text-n600">מחושב מהריבית של היום. בכל המסלולים — אותו מספר.</p>
+        <p class="text-caption text-n600">ידוע מראש: בתחזית ובמה שקרה בפועל — אותו מספר. (כאן המסלול לא צמוד; במסלול צמוד הוא זז גם עם המדד של החודש הראשון.)</p>
       </li>
       <li class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">החזר בתנאים הנוכחיים</p>
@@ -115,6 +117,7 @@ const rows = computed(() =>
           <template v-else-if="vsForecast.lt(-0.005)">נמוך מההחזר המרבי החזוי ב־<span class="ltr">{{ formatShekels(vsForecast.abs()) }}</span>.</template>
           <template v-else>שווה להחזר המרבי החזוי.</template>
         </p>
+        <p v-if="aMax.month === months" class="mt-1 text-caption text-n600">זה התשלום האחרון: הוא סוגר את היתרה, ולכן יכול לצאת שונה באגורות מהתשלומים שלפניו.</p>
       </li>
     </ul>
 

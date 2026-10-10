@@ -3,7 +3,7 @@
 // learner sees the total paid, the IRR (× 12) and the value today at a rate the
 // money could earn meanwhile — and which schedule each measure calls cheaper.
 // Moving that rate shows the third answer change while the first two stay.
-// Every number comes from metrics.ts (exact schedules).
+// Every number comes from metrics.ts (statement schedules, as the lesson's tables).
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { annualByMultiplication, irrMonthly, type Method, presentValueAtAnnual, totalPaid, trackPayments } from "../lib/calc/metrics.ts";
@@ -37,7 +37,7 @@ const showTable = ref(false);
 const sides = computed(() => {
   const p = pairs[pair.value];
   return [p.a, p.b].map((s, i) => {
-    const pays = trackPayments({ principal: s.amount, rates: [s.rate], months: s.years * 12, method: s.method });
+    const pays = trackPayments({ principal: s.amount, rates: [s.rate], months: s.years * 12, method: s.method, rounding: "statement" });
     return { ...s, i, pays, total: totalPaid(pays), irr: annualByMultiplication(irrMonthly(pays, s.amount)) };
   });
 });
@@ -68,6 +68,11 @@ const x = (r: number) => W - PAD.side - (r / 10) * (W - 2 * PAD.side);
 const y = (v: number) => H - PAD.bottom - ((v - yMin.value) / (yMax.value - yMin.value)) * (H - PAD.top - PAD.bottom);
 const path = (c: number[]) => c.map((v, i) => `${i === 0 ? "M" : "L"}${x(grid[i]).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
 const tableRates = Array.from({ length: 11 }, (_, i) => i);
+// One short line for screen readers (and everyone): only the present-value answer moves with the slider.
+const pvStatus = computed(() => {
+  const w = measures.value[2].winner;
+  return w === null ? `בריבית ${earn.value}%: בערך נוכחי שני הלוחות שווים.` : `בריבית ${earn.value}%: בערך נוכחי ${sides.value[w].name} נמוך יותר.`;
+});
 </script>
 
 <template>
@@ -102,7 +107,7 @@ const tableRates = Array.from({ length: 11 }, (_, i) => i);
     </label>
 
     <div class="mt-4 overflow-x-auto">
-      <table class="w-full min-w-[20rem] border-collapse text-body-m" aria-live="polite">
+      <table class="w-full min-w-[20rem] border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-2 text-start font-semibold">השאלה</th>
@@ -123,6 +128,9 @@ const tableRates = Array.from({ length: 11 }, (_, i) => i);
         </tbody>
       </table>
     </div>
+
+    <p class="mt-2 text-body-m text-n800" aria-live="polite">{{ pvStatus }}</p>
+    <p class="mt-1 text-caption text-n600">״שווים״ בערך נוכחי: ההפרש קטן מחצי שקל. אלה אגורות של עיגול, כי כל לוח מעוגל לאגורה בכל חודש.</p>
 
     <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li v-for="s in sides" :key="s.i" class="flex items-center gap-2"><span class="inline-block h-1 w-5 rounded-sm" :style="{ background: colours[s.i] }"></span>{{ s.name }}</li>

@@ -24,7 +24,18 @@ export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("3.2");
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
+// A factor or a decimal rate as computed, without trailing zeros: "0.00400000" → "0.004".
+export const dec = (s) => String(s).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
 export const small = f.rows("small.rows");
+export const ls = f.raw("long.steps");
+// The small table's columns, in the order the row rules run.
+export const smallCols = [
+  { key: "opening", label: "יתרה בהתחלה" },
+  { key: "interest", label: "רכיב ריבית" },
+  { key: "principal_paid", label: "רכיב קרן" },
+  { key: "payment", label: "התשלום" },
+  { key: "closing", label: "יתרה בסוף" },
+];
 export const predictionOptions = [
   "כבר מהחודש הראשון",
   `בחודש ${f.plain("long.overtake")}, אחרי פחות משש שנים`,
@@ -60,43 +71,49 @@ export const predictionOptions = [
 
 כך נראה לוח הסילוקין של ההלוואה הקטנה משיעור 2.9 — {f.shekels("small.pay")} בחודש על 60,000 ₪, ב־6% לשנה (<M>6% ÷ 12 = {f.plain("small.monthly")}%</M> לחודש), לשלושה חודשים — עם שני הרכיבים:
 
-<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[32rem] border-collapse text-body-m">
+<div class="my-6 hidden rounded-lg border border-n200 bg-n0 p-4 shadow-sm md:block">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">חודש</th>
-        <th class="py-2 text-start font-semibold">יתרה בתחילת החודש</th>
-        <th class="py-2 text-start font-semibold">רכיב ריבית</th>
-        <th class="py-2 text-start font-semibold">רכיב קרן</th>
-        <th class="py-2 text-start font-semibold">התשלום</th>
-        <th class="py-2 text-start font-semibold">יתרה בסוף החודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">חודש</th>
+        {smallCols.map((c) => <th class="py-2 pe-3 text-start font-semibold">{c.label}</th>)}
       </tr>
     </thead>
     <tbody>
       {small.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 text-n700">{r.period}</td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.opening)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.interest)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.principal_paid)}</span></td>
-          <td class="py-2"><span class="ltr">{formatShekels(r.payment)}</span></td>
-          <td class="py-2 font-semibold text-n900"><span class="ltr">{formatShekels(r.closing)}</span></td>
+          <td class="py-2 pe-3 text-n700">{r.period}</td>
+          {smallCols.map((c) => <td class={c.key === "closing" ? "py-2 pe-3 font-semibold text-n900" : "py-2 pe-3"}><span class="ltr whitespace-nowrap">{formatShekels(r[c.key])}</span></td>)}
         </tr>
       ))}
     </tbody>
   </table>
 </div>
 
+<ul class="list-reset my-6 grid gap-3 md:hidden">
+  {small.map((r) => (
+    <li class="rounded-lg border border-n200 bg-n0 p-3 shadow-sm">
+      <p class="text-body-m font-semibold text-n900">חודש {r.period}</p>
+      <dl class="mt-1 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-body-m text-n700">
+        {smallCols.flatMap((c) => [
+          <dt class={c.key === "closing" ? "font-semibold text-n900" : ""}>{c.label}</dt>,
+          <dd class={c.key === "closing" ? "text-end font-semibold text-n900" : "text-end"}><span class="ltr">{formatShekels(r[c.key])}</span></dd>,
+        ])}
+      </dl>
+    </li>
+  ))}
+</ul>
+
 שלושה כללים שמחזיקים בכל שורה של כל לוח:
 1. **רכיב ריבית ועוד רכיב קרן הם התשלום.** בחודש 1: <M>{nv(small[0].interest)} + {nv(small[0].principal_paid)} = {nv(small[0].payment)}</M>.
 2. **היתרה בתחילת החודש פחות רכיב הקרן היא היתרה בסוף החודש,** וממנה מתחיל החודש הבא: <M>{nv(small[0].opening)} − {nv(small[0].principal_paid)} = {nv(small[0].closing)}</M>.
 3. **כל רכיבי הקרן יחד הם סכום ההלוואה:** <M>{nv(small[0].principal_paid)} + {nv(small[1].principal_paid)} + {nv(small[2].principal_paid)} = {n("small.prin_sum")}</M>. וכל רכיבי הריבית יחד — {f.shekels("small.interest")} — הם הריבית ששילמתם בסך הכול.
 
-שימו לב: בהלוואה הקצרה הזו, רוב התשלום הוא קרן כבר מהחודש הראשון. בהלוואה ארוכה זה הפוך.
+שימו לב: בהלוואה הקצרה הזו, רוב התשלום הוא קרן כבר מהחודש הראשון. בהלוואה ארוכה זה יכול להיות הפוך — תלוי באחוז הריבית.
 
 <Section kind="ההסבר">
 
-## בהלוואה ארוכה: בהתחלה, רוב התשלום ריבית
+## בהלוואה ארוכה: כמה מהתשלום הוא ריבית
 
 </Section>
 
@@ -113,6 +130,35 @@ export const predictionOptions = [
 **החודש האחרון, 240.** רכיב הריבית רק {f.shekels("long.int_last")}, ורכיב הקרן {f.shekels("long.prin_last")}. (התשלום האחרון, {f.shekels("long.pay_last")}, סוגר את העיגול — שיעור 3.1.)
 
 **בסך הכול** שולמו {f.shekels("long.paid")}: רכיבי הקרן יחד הם <M>{n("long.paid")} − {n("long.interest")} = {n("long.principal_sum")}</M> ₪ — כל ההלוואה — ורכיבי הריבית יחד הם {f.shekels("long.interest")}.
+
+**האם בהלוואה ארוכה התשלום הראשון הוא תמיד בעיקר ריבית? לא — זה תלוי באחוז.** רכיב הריבית של החודש הראשון הוא <M>P × r</M>, והתשלום, מהנוסחה של שיעור 3.1, הוא <M>P × r ÷ (1 − (1 + r)<sup>−n</sup>)</M>. כשמחלקים את הראשון בשני, <M>P × r</M> מצטמצם, ונשאר החלק של הריבית בתשלום הראשון (<M>I<sub>1</sub></M> הוא רכיב הריבית של חודש 1; I כמו בשיעור 0.2):
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>I<sub>1</sub> ÷ C = 1 − (1 + r)<sup>−n</sup></M>
+  <M>1 − {f.plain("long.base")}<sup>−240</sup> = {dec(ls.one_minus)}</M>
+</div>
+
+כאן החלק גדול מחצי. הוא גדול מחצי רק כש־<M>(1 + r)<sup>−n</sup></M> קטן מחצי — כלומר כשחוב שלא משלמים עליו כלום היה גדל פי 2 ויותר במשך תקופת ההלוואה (ריבית דריבית, שיעור 0.3). זה קורה מעל אחוז ריבית שתלוי בתקופה, בערך:
+
+<div class="my-4 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">תקופה</th>
+        <th class="py-2 text-start font-semibold">התשלום הראשון בעיקר ריבית, מעל</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">15 שנה</td><td class="py-2"><span class="ltr">{f.plain("half_rate.180")}%</span> לשנה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">20 שנה</td><td class="py-2"><span class="ltr">{f.plain("half_rate.240")}%</span> לשנה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">25 שנה</td><td class="py-2"><span class="ltr">{f.plain("half_rate.300")}%</span> לשנה</td></tr>
+      <tr><td class="py-2 pe-3">30 שנה</td><td class="py-2"><span class="ltr">{f.plain("half_rate.360")}%</span> לשנה</td></tr>
+    </tbody>
+  </table>
+</div>
+
+באחוז נמוך מזה, רכיב הקרן גדול יותר כבר מהחודש הראשון. למשל אותה הלוואה, 600,000 ₪ ל־20 שנה, ב־3% לשנה (<M>{f.plain("low.monthly")}%</M> לחודש): ההחזר החודשי {f.shekels("low.pay")}, ובחודש הראשון רכיב הריבית {f.shekels("low.int_1")} ורכיב הקרן {f.shekels("low.prin_1")}.
+מה שנכון בכל אחוז גדול מאפס: רכיב הקרן של החודש הראשון קטן מ־<M>P ÷ n</M> — כאן <M>{n("low.prin_1")}</M> מול <M>{n("low.part")}</M> (הבדיקה המהירה של שיעור 3.1) — ומשם הוא רק גדל.
 
 <Section kind="המחשה: הזיזו בעצמכם">
 
@@ -145,7 +191,7 @@ export const predictionOptions = [
   options={predictionOptions}
   correct={1}
   notes={[
-    `בחודש הראשון רכיב הריבית הוא ${f.shekels("long.int_1")} ורכיב הקרן רק ${f.shekels("long.prin_1")}. בהלוואה ארוכה, בהתחלה רוב התשלום ריבית.`,
+    `בחודש הראשון רכיב הריבית הוא ${f.shekels("long.int_1")} ורכיב הקרן רק ${f.shekels("long.prin_1")}. בהלוואה הזו, ב־4.8% ל־20 שנה, בהתחלה רוב התשלום ריבית.`,
     "",
     "רכיב הקרן גדל בקצב של הריבית החודשית, כמו ריבית דריבית — לא בקו ישר. לכן הוא עובר את רכיב הריבית לפני אמצע הדרך.",
     `בשנה האחרונה רכיב הריבית כבר קטן מאוד: ${f.shekels("long.int_last")} בחודש האחרון. רכיב הקרן עבר אותו הרבה קודם.`,
@@ -169,7 +215,7 @@ export const predictionOptions = [
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <div class="ltr inline-grid justify-items-start gap-1 text-body-l text-navy sm:text-h3" dir="ltr">
     <span class="whitespace-nowrap">I<sub>k</sub> = r × B<sub>k−1</sub></span>
-    <span class="whitespace-nowrap">C − I<sub>k</sub></span>
+    <span class="whitespace-nowrap">רכיב הקרן = C − I<sub>k</sub></span>
     <span class="whitespace-nowrap">B<sub>k</sub> = B<sub>k−1</sub> − (C − I<sub>k</sub>)</span>
   </div>
   <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
@@ -182,7 +228,7 @@ export const predictionOptions = [
   </dl>
 </div>
 
-**צעד 4 — למה רכיב הקרן גדל בקצב של הריבית.** בחודש הבא היתרה קטנה ברכיב הקרן של החודש הזה. לכן רכיב הריבית קטן ב־r כפול רכיב הקרן הזה. התשלום לא זז, ולכן רכיב הקרן גדל בדיוק באותו סכום: הוא מוכפל ב־<M>(1 + r)</M>. בדוגמה: <M>{n("long.prin_1")} × 1.004 = {n("long.prin_1_grown")}</M> — רכיב הקרן של חודש 2. (בלוח יכולה להיות אגורה של הפרש, מהעיגול.)
+**צעד 4 — למה רכיב הקרן גדל בקצב של הריבית.** בחודש הבא היתרה קטנה ברכיב הקרן של החודש הזה. לכן רכיב הריבית קטן ב־r כפול רכיב הקרן הזה. בדוגמה: <M>{f.plain("long.monthly")}% × {n("long.prin_1")} = {n("long.prin_1_rate")}</M> — בדיוק ההפרש בין {f.shekels("long.int_1")} ל־{f.shekels("long.int_2")}. התשלום לא זז, ולכן רכיב הקרן גדל בדיוק באותו סכום: הוא מוכפל ב־<M>(1 + r)</M>: <M>{n("long.prin_1")} × {f.plain("long.base")} = {n("long.prin_1_grown")}</M> — רכיב הקרן של חודש 2. (בלוח יכולה להיות אגורה של הפרש, מהעיגול.)
 
 **צעד 5 — מכאן כל רכיב קרן, בלי הלוח.** רכיב הקרן הראשון הוא <M>C − P × r</M>, וכל חודש מכפיל אותו ב־<M>(1 + r)</M>:
 
@@ -194,7 +240,7 @@ export const predictionOptions = [
 
 <Callout title="איך מחשבים">
 <p><strong>ביד או במחשבון:</strong> שורה אחר שורה. בכל שורה שלוש פעולות: כפל (ריבית), חיסור (קרן), חיסור (יתרה). עגלו את הריבית לאגורה לפני שממשיכים.</p>
-<p><strong>בגיליון אלקטרוני:</strong> בעמודה A מספר החודש; ב־B היתרה בתחילת החודש (בשורה הראשונה — סכום ההלוואה); ב־C רכיב הריבית, <span class="ltr inline-block whitespace-nowrap">{"=ROUND(B2*0.004,2)"}</span>; ב־D רכיב הקרן, ההחזר החודשי פחות C; ב־E היתרה בסוף, B פחות D. בשורה הבאה B היא ה־E של השורה הקודמת. מעתיקים למטה 240 שורות. את הגיליון המלא נבנה בסדנה של שיעור 3.12.</p>
+<p><strong>בגיליון אלקטרוני</strong> (אותיות העמודות בגיליון אינן האותיות של הנוסחאות): בעמודה A מספר החודש; בעמודה B היתרה בתחילת החודש (בשורה 2 — סכום ההלוואה); בעמודה C רכיב הריבית, <span class="ltr inline-block whitespace-nowrap">{`=ROUND(B2*${dec(ls.m)},2)`}</span>; בעמודה D רכיב הקרן, <span class="ltr inline-block whitespace-nowrap">{`=${f.raw("long.pay")}-C2`}</span>; בעמודה E היתרה בסוף, <span class="ltr inline-block whitespace-nowrap">{"=B2-D2"}</span>. בשורה הבאה, B3 הוא <span class="ltr inline-block whitespace-nowrap">{"=E2"}</span>, ומעתיקים למטה עד החודש האחרון. בשורה האחרונה רכיב הקרן הוא כל היתרה שנשארה (<span class="ltr inline-block whitespace-nowrap">{"=B241"}</span> בהלוואה של 240 חודשים), כדי לסגור את העיגול; התשלום בה הוא היתרה ועוד הריבית. את הגיליון המלא נבנה בסדנה של שיעור 3.12.</p>
 </Callout>
 
 <Callout title="למה הלוח שלכם יכול להיבדל באגורה">
@@ -203,7 +249,7 @@ export const predictionOptions = [
 
 <Section kind="כלי לראש">
 
-## רכיב הקרן מוכפל בערך כל 72 ÷ אחוז הריבית שנים
+## כלל ה־72: מתי רכיב הקרן מוכפל
 
 </Section>
 
@@ -212,15 +258,15 @@ export const predictionOptions = [
 
 <Section kind="דוגמה פתורה">
 
-## שורה אחת בלוח של דנה
+## שורה אחת בלוח של הילה
 
 </Section>
 
 <Callout title="דוגמה לימודית">
-<p>דנה היא דוגמה בדויה: תרגיל נפרד, לא התיק של נועם ושירה. הסכום ואחוז הריבית להמחשה בלבד.</p>
+<p>הילה היא דוגמה בדויה: תרגיל נפרד, לא התיק של נועם ושירה. הסכום ואחוז הריבית להמחשה בלבד.</p>
 </Callout>
 
-דנה לקחה מסלול של 350,000 ₪ ב־4.2% לשנה, ל־25 שנה, בשפיצר. ההחזר החודשי, בנוסחה של שיעור 3.1: {f.shekels("worked.pay")}. בדוח שקיבלה כתוב שבתחילת חודש 37 — אחרי שלוש שנים — היתרה היא {f.shekels("worked.open_37")}. מה יש בתשלום של חודש 37, ומה תהיה היתרה אחריו?
+הילה לקחה מסלול של 350,000 ₪ ב־4.2% לשנה, ל־25 שנה, בשפיצר. ההחזר החודשי, בנוסחה של שיעור 3.1: {f.shekels("worked.pay")}. בדוח שקיבלה כתוב שבתחילת חודש 37 — אחרי שלוש שנים — היתרה היא {f.shekels("worked.open_37")}. מה יש בתשלום של חודש 37, ומה תהיה היתרה אחריו?
 
 **צעד 1 — הריבית החודשית.** <M>4.2% ÷ 12 = {f.plain("worked.monthly")}%</M>.
 
@@ -230,7 +276,7 @@ export const predictionOptions = [
 
 **צעד 4 — היתרה בסוף החודש.** <M>{n("worked.open_37")} − {n("worked.prin_37")} = {n("worked.close_37")}</M> ₪.
 
-**מה לקחת מזה.** כדי לחשב שורה אחת לא צריך את כל הלוח: מספיקים היתרה בתחילת החודש, הריבית החודשית וההחזר החודשי. ואחרי שלוש שנים, עדיין יותר ממחצית מהתשלום של דנה היא ריבית: {f.shekels("worked.int_37")} מתוך {f.shekels("worked.pay")}.
+**מה לקחת מזה.** כדי לחשב שורה אחת לא צריך את כל הלוח: מספיקים היתרה בתחילת החודש, הריבית החודשית וההחזר החודשי. ואחרי שלוש שנים, עדיין יותר ממחצית מהתשלום של הילה היא ריבית: {f.shekels("worked.int_37")} מתוך {f.shekels("worked.pay")}.
 
 <Section kind="דוגמה חצי פתורה">
 
@@ -286,7 +332,7 @@ export const predictionOptions = [
   level="קל"
   answer={f.raw("ex2.answer")}
   errors={[
-    { value: f.raw("ex2.err_annual"), message: "זו הריבית של שנה שלמה. רכיב הריבית הוא של חודש: 4.8% חלקי 12, כלומר 0.4%." },
+    { value: f.raw("ex2.err_annual"), message: `זו הריבית של שנה שלמה. רכיב הריבית הוא של חודש: 4.8% חלקי 12, כלומר ${f.plain("ex.monthly")}%.` },
     { value: f.raw("ex.pay"), message: "זה כל ההחזר החודשי. רכיב הריבית הוא רק החלק שלו שמשלם את הריבית של החודש." },
   ]}
 >
@@ -323,6 +369,7 @@ export const predictionOptions = [
   answer={f.raw("ex4.answer")}
   errors={[
     { value: f.raw("ex2.answer"), message: "זה רכיב הריבית של החודש הראשון. בחודש השני היתרה כבר קטנה ברכיב הקרן של החודש הראשון, ואיתה הריבית." },
+    { value: f.raw("ex4.err_whole"), message: `הורדתם מהיתרה את כל התשלום. רק רכיב הקרן מקטין אותה: ${eq(`250,000 − ${n("ex3.answer")}`)}.` },
   ]}
 >
   כמה הוא רכיב הריבית בחודש השני?
@@ -359,7 +406,7 @@ export const predictionOptions = [
   near={2}
   errors={[
     { value: f.raw("ex6.paid"), message: "זה כל מה ששולם — קרן וריבית יחד. רכיבי הקרן יחד הם סכום ההלוואה; החסירו אותו." },
-    { value: f.raw("ex6.n_times_c"), message: "זה 300 כפול ההחזר החודשי — כל התשלומים. רכיבי הקרן יחד הם 250,000 ₪; מה שנשאר הוא הריבית." },
+    { value: f.raw("ex6.n_times_c"), message: `זה ${f.plain("ex.months")} כפול ההחזר החודשי — כל התשלומים. רכיבי הקרן יחד הם 250,000 ₪; מה שנשאר הוא הריבית.` },
   ]}
 >
   כמה ריבית תשלמו בסך הכול, לאורך כל 25 השנים? (רמז: מה הסכום של כל רכיבי הקרן?)
@@ -373,7 +420,7 @@ export const predictionOptions = [
 <p><strong>מה זה?</strong> שני החלקים של כל תשלום. רכיב הריבית משלם את הריבית של החודש; רכיב הקרן מקטין את החוב.</p>
 <p><strong>למה זה קיים?</strong> המלווה גובה בכל חודש ריבית על הכסף שעוד אצלכם. רק מה שמעבר לה מחזיר את מה שלקחתם. הפירוק מראה כמה מהתשלום ״עובד״ להקטנת החוב.</p>
 <p><strong>איך זה עובד?</strong> רכיב הריבית הוא היתרה כפול הריבית החודשית. רכיב הקרן הוא התשלום פחות רכיב הריבית. בשפיצר רכיב הקרן גדל בכל חודש פי <span class="ltr">(1 + r)</span>.</p>
-<p><strong>איך זה משפיע עליכם?</strong> בהלוואה ארוכה, בשנים הראשונות רוב התשלום הוא ריבית, והחוב יורד לאט. מי שמוכר דירה או מחזיר הלוואה אחרי כמה שנים מגלה שהחוב ירד פחות ממה שחשב.</p>
+<p><strong>איך זה משפיע עליכם?</strong> בכל אחוז ריבית גדול מאפס, רכיב הקרן מתחיל קטן והחוב יורד לאט בשנים הראשונות; בהלוואה ארוכה באחוז כמו בדוגמאות של השיעור, רוב התשלום בהתחלה הוא בכלל ריבית. מי שמוכר דירה או מחזיר הלוואה אחרי כמה שנים מגלה שהחוב ירד פחות ממה שחשב.</p>
 <p><strong>איך משתמשים בזה בהחלטה?</strong> קוראים לוח סילוקין לפי שני הרכיבים, ולא רק לפי התשלום: כמה ריבית תשלמו בשנים הקרובות, ומתי ההלוואה מתחילה לרדת מהר. ובודקים שורה מהלוח שקיבלתם — בבונה, או ביד.</p>
 </Callout>
 
@@ -386,7 +433,7 @@ export const predictionOptions = [
 - **כל תשלום = רכיב ריבית + רכיב קרן.** רכיב הריבית הוא היתרה בתחילת החודש כפול הריבית החודשית; רכיב הקרן הוא מה שנשאר.
 - **רק רכיב הקרן מקטין את החוב.** כל רכיבי הקרן יחד הם סכום ההלוואה; כל רכיבי הריבית יחד הם הריבית ששולמה.
 - **בשפיצר** רכיב הריבית יורד ורכיב הקרן עולה, בכל חודש פי <M>(1 + r)</M>, כל עוד אחוז הריבית לא זז ואין הצמדה.
-- **בהלוואה ארוכה**, בהתחלה רוב התשלום ריבית. בהלוואה קצרה — לא.
+- **בהלוואה ארוכה**, באחוז ריבית כמו בדוגמה (4.8% ל־20 שנה), בהתחלה רוב התשלום ריבית. באחוז נמוך יותר — למשל 3% ל־20 שנה — רכיב הקרן גדול מרכיב הריבית כבר מהחודש הראשון. בכל אחוז גדול מאפס, רכיב הקרן מתחיל קטן מ־<M>P ÷ n</M> וגדל.
 - **לוח סילוקין** נבנה משלוש שורות שחוזרות בכל חודש: ריבית, קרן, יתרה. הבונה של הקורס עושה את זה לכל הלוואה, ובודק שורה מהלוח שלכם.
 
 **בשיעור הבא — 3.3, יתרת החוב בכל נקודת זמן:** איך יודעים כמה עוד חייבים אחרי k תשלומים — בלי לבנות את כל הלוח עד שם.
@@ -399,10 +446,10 @@ export const predictionOptions = [
 
 <Sources
   items={[
-    { kind: "ידע מתמטי כללי", text: "פירוק תשלום שווה לריבית על היתרה ולהחזר קרן; רכיב הקרן בתשלום שווה גדל בכל תקופה פי (1 + r).", code: ["I_k = r × B_(k−1)", "C − I_k", "B_k = B_(k−1) − (C − I_k)", "(C − P × r) × (1 + r)^(k−1)"] },
+    { kind: "ידע מתמטי כללי", text: "פירוק תשלום שווה לריבית על היתרה ולהחזר קרן; רכיב הקרן בתשלום שווה גדל בכל תקופה פי (1 + r); החלק של הריבית בתשלום הראשון הוא 1 − (1 + r)^−n, ולכן הוא גדול מחצי רק כש־(1 + r)^n גדול מ־2.", code: ["I_k = r × B_(k−1)", "רכיב הקרן = C − I_k", "I_1 ÷ C = 1 − (1 + r)^−n", "B_k = B_(k−1) − (C − I_k)", "(C − P × r) × (1 + r)^(k−1)"] },
     { kind: "הנחת חישוב", text: "ריבית חודשית = אחוז הריבית לשנה חלקי 12. לפי בדיקה של הצוות מול לוחות ששני בנקים פרסמו (החישוב התאים עד האגורה בכל התאים שנבדקו; Linear ENG-223, 2026-10-04; לא נבדק מול מקור רשמי).", date: "2026-10-04" },
     { kind: "הנחת חישוב", text: "עיגול: ההחזר החודשי מעוגל לאגורה פעם אחת; רכיב הריבית של כל חודש מעוגל לאגורה; התשלום האחרון סוגר את מה שנשאר. בנק יכול לעגל אחרת." },
-    { kind: "הנחת חישוב", text: "כל הסכומים ואחוזי הריבית בשיעור הם מספרים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. דנה היא דוגמה בדויה." },
+    { kind: "הנחת חישוב", text: "כל הסכומים ואחוזי הריבית בשיעור הם מספרים להמחשה. הם לא ריביות שוק ולא הצעה של בנק. הילה היא דוגמה בדויה." },
     { kind: "בדיקת חישוב", text: "הבונה מחשב בעזרת מודול החישוב של הקורס, שמשחזר עד האגורה את הדוגמאות המחושבות שב־Brain. כל המספרים בשיעור חושבו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-10" },
   ]}
 />

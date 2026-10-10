@@ -3,7 +3,7 @@
 // and sees the value today of every payment at that rate against the money
 // actually received (the loan less a fee taken on the day of payout); they move
 // the rate until the two are equal. That rate is the IRR. Every number comes
-// from metrics.ts (exact schedules; the IRR by bisection).
+// from metrics.ts (statement schedules, as the lesson's tables; the IRR by bisection).
 import Decimal from "decimal.js";
 import { computed, ref } from "vue";
 import { annualByMultiplication, effectiveAnnual, irrMonthly, type Method, presentValue, trackPayments } from "../lib/calc/metrics.ts";
@@ -17,7 +17,7 @@ const guess = ref(4); // percent a year (× 12)
 const exact = ref(false);
 const showTable = ref(false);
 
-const payments = computed(() => trackPayments({ principal: props.amount, rates: [props.rate], months: props.years * 12, method: method.value }));
+const payments = computed(() => trackPayments({ principal: props.amount, rates: [props.rate], months: props.years * 12, method: method.value, rounding: "statement" }));
 const received = computed(() => new Decimal(props.amount).minus(fee.value));
 const monthly = computed(() => new Decimal(guess.value).div(12));
 const pvAtGuess = computed(() => presentValue(payments.value, monthly.value));
@@ -90,7 +90,11 @@ const tableRows = computed(() => tableRates.map((r) => ({ r, pv: presentValue(pa
         <div class="mt-1 h-5 rounded-sm bg-n100"><div class="h-full rounded-sm" :style="{ width: width(pvAtGuess), background: 'var(--mogi-teal-deep)' }"></div></div>
       </div>
       <p class="rounded-md p-3 text-body-m text-n800" :class="verdict === 'found' ? 'bg-success-bg' : 'bg-n50'">
-        <template v-if="verdict === 'found'"><strong class="text-n900">מצאתם.</strong> בריבית הזו התשלומים שווים היום בדיוק (עד שקלים בודדים) את מה שקיבלתם.</template>
+        <template v-if="verdict === 'found'">
+          <strong class="text-n900">מצאתם.</strong> זו הריבית הקרובה ביותר בצעדים של 0.01.
+          <template v-if="gap.abs().gte(0.005)">ההפרש בין שני הפסים: <span class="ltr">{{ formatShekels(gap.abs()) }}</span> — הריבית המדויקת נמצאת בין שני צעדים (״הראו לי את הריבית המדויקת״).</template>
+          <template v-else>בריבית הזו התשלומים שווים היום את מה שקיבלתם.</template>
+        </template>
         <template v-else-if="verdict === 'low'">
           הערך הנוכחי גבוה ממה שקיבלתם ב־<span class="ltr">{{ formatShekels(gap) }}</span>: הריבית שניסיתם <strong>נמוכה מדי</strong>. העלו אותה.
         </template>

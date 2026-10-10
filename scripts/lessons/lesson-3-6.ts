@@ -6,15 +6,19 @@
  * Every number the page and its exercises show is a fact here; the page reads
  * data/lessons/3-6.json and checks/kinds/schedule.py (with amortization.py for the
  * stage-2 kinds) recomputes each one. Prime and anchor moves are teaching
- * scenarios, not forecasts. Schedules from src/lib/calc/schedule.ts.
+ * scenarios, not forecasts. Schedules from src/lib/calc/schedule.ts, in its
+ * statement rounding (every row in agorot, course/AUTHORING.md), so every
+ * equality the page prints holds on its printed numbers. RateReset.vue uses the same.
  */
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { pathInputs, recalculatedPayment, recalculationSteps, resetPoints, scheduleFromInputs } from "../../src/lib/calc/schedule.ts";
 import { plainNumber } from "../../src/lib/calc/indexation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { balance, difference, given, interest, payment, schRow, v } from "./lesson-3-5.ts";
+import { difference, given, interest, payment, schRow, v } from "./lesson-3-5.ts";
 
-const dec6 = (x: { toDecimalPlaces: (n: number) => { toString: () => string } }) => x.toDecimalPlaces(6).toString();
+/** The formula's in-between values are shown to eight places, as lesson 3.1 teaches. */
+const PLACES = 8;
+const dec8 = (x: { toDecimalPlaces: (n: number) => { toString: () => string } }) => x.toDecimalPlaces(PLACES).toString();
 
 const recalc = (id: string, bal: string, rate: string, left: number): Fact => ({
   id,
@@ -34,10 +38,10 @@ const monthsLeft = (id: string, months: number, paid: number): Fact => ({
 const steps = (prefix: string, rate: string, left: number): Fact[] => {
   const s = recalculationSteps("1", rate, left);
   return [
-    { id: `${prefix}.r`, kind: "sch_monthly_decimal", inputs: { rate_percent: rate }, value: dec6(s.r) },
-    { id: `${prefix}.base`, kind: "sch_growth_base", inputs: { rate_percent: rate }, value: dec6(s.r.plus(1)) },
-    { id: `${prefix}.power`, kind: "sch_power", inputs: { rate_percent: rate, months: left }, value: dec6(s.power) },
-    { id: `${prefix}.one_minus`, kind: "sch_one_minus_power", inputs: { rate_percent: rate, months: left }, value: dec6(s.oneMinus) },
+    { id: `${prefix}.r`, kind: "sch_monthly_decimal", inputs: { rate_percent: rate, decimals: PLACES }, value: dec8(s.r) },
+    { id: `${prefix}.base`, kind: "sch_growth_base", inputs: { rate_percent: rate, decimals: PLACES }, value: dec8(s.r.plus(1)) },
+    { id: `${prefix}.power`, kind: "sch_power", inputs: { rate_percent: rate, months: left, decimals: PLACES }, value: dec8(s.power) },
+    { id: `${prefix}.one_minus`, kind: "sch_one_minus_power", inputs: { rate_percent: rate, months: left, decimals: PLACES }, value: dec8(s.oneMinus) },
   ];
 };
 
@@ -45,31 +49,34 @@ export default function lesson36(): LessonData {
   // The explanation: a prime track of 500,000 ₪ for 20 years at 4.8%; from month 37, 6%.
   const P = "500000";
   const N = 240;
-  const path = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 37, rate: "6" }] });
+  const S = "statement" as const; // every teaching row in agorot
+  const path = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 37, rate: "6" }], rounding: S });
   const c0 = payment("explain.c0", P, "4.8", N);
-  const b36 = balance("explain.b36", P, "4.8", N, 36);
+  const b36 = schRow("explain.b36", path, 36, "closing");
   const c37 = schRow("explain.c37", path, 37, "payment");
   const i36old = interest("explain.interest_old", v(b36), "4.8");
   const i36new = interest("explain.top", v(b36), "6");
 
   // The same loan in equal principal.
-  const ep = pathInputs({ principal: P, months: N, rate: "4.8", method: "equal_principal", changes: [{ month: 37, rate: "6" }] });
+  const ep = pathInputs({ principal: P, months: N, rate: "4.8", method: "equal_principal", changes: [{ month: 37, rate: "6" }], rounding: S });
   const ep36 = schRow("ep.payment_36", ep, 36, "payment");
   const ep37 = schRow("ep.payment_37", ep, 37, "payment");
   const epInterestNew = schRow("ep.interest_37", ep, 37, "interest");
   const epB36 = schRow("ep.balance_36", ep, 36, "closing");
   const epInterestOld = interest("ep.interest_37_old", v(epB36), "4.8");
+  const epInterest36 = schRow("ep.interest_36", ep, 36, "interest");
 
   // The illustration's tasks: the variable track resets at month 61; prime falls by 1.2 points.
-  const variable = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 61, rate: "6" }] });
-  const lower = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 37, rate: "3.6" }] });
+  const variable = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 61, rate: "6" }], rounding: S });
+  const lower = pathInputs({ principal: P, months: N, rate: "4.8", changes: [{ month: 37, rate: "3.6" }], rounding: S });
+  const flat = pathInputs({ principal: P, months: N, rate: "4.8", rounding: S });
 
   // Worked example: Galit, a variable unlinked track of 360,000 ₪ for 25 years at 4.2%, reset after 5 years to 4.8%.
   const W = "360000";
   const WN = 300;
-  const worked = pathInputs({ principal: W, months: WN, rate: "4.2", changes: [{ month: 61, rate: "4.8" }] });
+  const worked = pathInputs({ principal: W, months: WN, rate: "4.2", changes: [{ month: 61, rate: "4.8" }], rounding: S });
   const wc0 = payment("worked.c0", W, "4.2", WN);
-  const wb60 = balance("worked.b60", W, "4.2", WN, 60);
+  const wb60 = schRow("worked.b60", worked, 60, "closing");
   const wc61 = schRow("worked.c61", worked, 61, "payment");
 
   // Half-worked table: a prime track of 400,000 ₪ for 20 years at 5%, prime moves three times.
@@ -82,6 +89,7 @@ export default function lesson36(): LessonData {
       { month: 25, rate: "6" },
       { month: 49, rate: "5.25" },
     ],
+    rounding: S,
   });
   const halfRows = resetPoints(scheduleFromInputs(halfPath)).map((p, k) => ({
     period: k + 1,
@@ -93,11 +101,11 @@ export default function lesson36(): LessonData {
   }));
 
   // Exercise 5: 400,000 ₪ at 4.8% for 20 years; after 24 payments the rate is 5.4%.
-  const ex5 = pathInputs({ principal: "400000", months: 240, rate: "4.8", changes: [{ month: 25, rate: "5.4" }] });
-  const ex5b = balance("ex5.b24", "400000", "4.8", 240, 24);
+  const ex5 = pathInputs({ principal: "400000", months: 240, rate: "4.8", changes: [{ month: 25, rate: "5.4" }], rounding: S });
+  const ex5b = schRow("ex5.b24", ex5, 24, "closing");
   // Exercise 6: 480,000 ₪ in equal principal for 20 years at 4.8%; from month 61, 6%.
-  const ex6 = pathInputs({ principal: "480000", months: 240, rate: "4.8", method: "equal_principal", changes: [{ month: 61, rate: "6" }] });
-  const ex6flat = pathInputs({ principal: "480000", months: 240, rate: "4.8", method: "equal_principal" });
+  const ex6 = pathInputs({ principal: "480000", months: 240, rate: "4.8", method: "equal_principal", changes: [{ month: 61, rate: "6" }], rounding: S });
+  const ex6flat = pathInputs({ principal: "480000", months: 240, rate: "4.8", method: "equal_principal", rounding: S });
   const ex6b = schRow("ex6.balance", ex6, 60, "closing");
 
   const facts: Fact[] = [
@@ -111,6 +119,9 @@ export default function lesson36(): LessonData {
     i36old,
     i36new,
     difference("explain.interest_rise", i36new, i36old),
+    // The rule of thumb: 1.2 points of the balance, ÷ 12.
+    given("explain.points", "1.2"),
+    interest("explain.rule", v(b36), "1.2"),
     c37,
     difference("explain.rise", c37, c0),
     recalc("explain.check", v(b36), "6", 204),
@@ -122,6 +133,7 @@ export default function lesson36(): LessonData {
 
     // Equal principal.
     schRow("ep.principal_36", ep, 36, "principal_paid"),
+    epInterest36,
     schRow("ep.principal_37", ep, 37, "principal_paid"),
     epB36,
     ep36,
@@ -129,14 +141,17 @@ export default function lesson36(): LessonData {
     epInterestNew,
     epInterestOld,
     difference("ep.jump", epInterestNew, epInterestOld),
+    difference("ep.payment_jump", ep37, ep36),
+    // Month 37 at the old rate charges less interest than month 36, because the balance fell by a principal part.
+    difference("ep.interest_fall", epInterest36, epInterestOld),
 
     // Illustration tasks.
     schRow("slider.variable_60", variable, 60, "payment"),
     schRow("slider.variable_61", variable, 61, "payment"),
-    balance("slider.variable_b60", P, "4.8", N, 60),
+    schRow("slider.variable_b60", variable, 60, "closing"),
     schRow("slider.lower_37", lower, 37, "payment"),
     schRow("slider.balance_120_up", path, 120, "closing"),
-    balance("slider.balance_120_flat", P, "4.8", N, 120),
+    schRow("slider.balance_120_flat", flat, 120, "closing"),
 
     // Worked example.
     given("worked.amount", "360000.00"),
@@ -153,6 +168,7 @@ export default function lesson36(): LessonData {
 
     // Exercise 3: months left after 7 years of a 25-year loan.
     monthsLeft("ex3.answer", 300, 84),
+    { id: "ex3.y_months", kind: "ltv_times", inputs: { amount: "7", factor: "12" }, value: "84.00" },
     difference("ex3.years_as_months", given("ex3.n", "300"), given("ex3.y", "7")),
     difference("ex3.years_left", given("ex3.t", "25"), given("ex3.y2", "7")),
     given("ex3.n", "300"),

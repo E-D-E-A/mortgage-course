@@ -41,7 +41,7 @@ const pieces = numberPieces;
       </div>
       <div v-if="node.card.when">
         <dt class="text-caption font-semibold text-n600">מתי הוא נכנס</dt>
-        <dd><template v-for="(p, j) in pieces(node.card.when ?? "")" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template></dd>
+        <dd><template v-for="(p, j) in pieces(node.card.when ?? '')" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template></dd>
       </div>
     </dl>
     <div v-if="outgoing.length || incoming.length" class="mt-3">
@@ -50,18 +50,18 @@ const pieces = numberPieces;
         <li v-for="l in outgoing" :key="`o-${l.to}`">
           <span class="font-semibold">{{ node.label }}</span>
           <span aria-hidden="true"> ← </span><span class="sr-only"> אל </span>
-          <button type="button" class="min-h-11 min-w-11 px-1 text-navy underline" @click="emit('select', l.to)">{{ byId.get(l.to)?.label }}</button>:
+          <button type="button" class="min-h-11 min-w-11 ps-1 text-navy underline" @click="emit('select', l.to)">{{ byId.get(l.to)?.label }}</button>:
           <template v-for="(p, j) in pieces(l.label)" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template>
         </li>
         <li v-for="l in incoming" :key="`i-${l.from}`">
-          <button type="button" class="min-h-11 min-w-11 px-1 text-navy underline" @click="emit('select', l.from)">{{ byId.get(l.from)?.label }}</button>
+          <button type="button" class="min-h-11 min-w-11 ps-1 text-navy underline" @click="emit('select', l.from)">{{ byId.get(l.from)?.label }}</button>
           <span aria-hidden="true"> ← </span><span class="sr-only"> אל </span>
           <span class="font-semibold">{{ node.label }}</span>:
           <template v-for="(p, j) in pieces(l.label)" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template>
         </li>
       </ul>
     </div>
-    <p v-if="node.card.note" class="mt-3 text-caption text-n600"><template v-for="(p, j) in pieces(node.card.note ?? "")" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template></p>
+    <p v-if="node.card.note" class="mt-3 text-caption text-n600"><template v-for="(p, j) in pieces(node.card.note ?? '')" :key="j"><span v-if="p.ltr" class="ltr">{{ p.text }}</span><template v-else>{{ p.text }}</template></template></p>
     <p v-if="node.lesson !== lesson" class="mt-1 text-caption text-n600">נכנס למפה בשיעור <span class="ltr">{{ node.lesson }}</span>.</p>
   </div>
 </template>

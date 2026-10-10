@@ -6,7 +6,8 @@
 // the balance left, the months left, the payment before and after, and — as a warning — what one
 // formula over the whole loan would have said. The method switch shows that equal principal
 // recalculates differently: its principal part does not move, only the interest.
-// Every number comes from src/lib/calc/schedule.ts; nothing is computed here but scaling.
+// Every number comes from src/lib/calc/schedule.ts, in its statement rounding (every row in
+// agorot, as in the lesson's tables); nothing is computed here but scaling.
 import Decimal from "decimal.js";
 import { computed, ref, watch } from "vue";
 import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
@@ -48,12 +49,14 @@ const colours = ["var(--mogi-teal-deep)", "var(--mogi-turquoise-2)"];
 
 // The move: zero before changeMonth, `change` from it on (one value per month).
 const shiftPath = computed(() => [...Array.from({ length: changeMonth.value - 1 }, () => "0"), String(change.value)]);
-const track = computed(() => ({ kind: kind.value, amount: props.amount, rate: props.rate, months, method: method.value, resetMonths: DEFAULT_RESET_MONTHS }));
+const track = computed(() => ({ kind: kind.value, amount: props.amount, rate: props.rate, months, method: method.value, resetMonths: DEFAULT_RESET_MONTHS, rounding: "statement" as const }));
 const series = computed<ScheduleRow[][]>(() => {
   const moved = kind.value === "prime" ? { primeShift: shiftPath.value, blockMonths: 1 } : { anchorShift: shiftPath.value, blockMonths: 1 };
   return [trackSchedule(track.value, moved), trackSchedule(track.value)];
 });
+// Plain strings for screen readers; the legend draws the signed number in an LTR span (below).
 const names = computed(() => [`עם השינוי (${points(change.value)} ${unit(change.value)} מחודש ${changeMonth.value})`, `בלי שינוי, ${pct(props.rate)} כל הדרך`]);
+const anchorName = computed(() => (kind.value === "prime" ? "את הפריים" : "את העוגן"));
 
 // The month the rate (and so the payment) first changes, or null when it never does.
 const resetAt = computed(() => {
@@ -107,8 +110,9 @@ const yearRows = computed(() =>
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      תרחיש להמחשה, לא תחזית. מסלול של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, שמתחיל ב־<span class="ltr">{{ pct(rate) }}</span>. כשאחוז
-      הריבית זז, התשלום מחושב מחדש על היתרה, לחודשים שנשארו (הנחה של הקורס; בודקים בחוזה).
+      תרחיש להמחשה, לא מה שצפוי לקרות. מסלול של <span class="ltr">{{ formatWholeShekels(amount) }}</span> ל־{{ years }} שנה, שמתחיל ב־<span class="ltr">{{ pct(rate) }}</span>. כשאחוז
+      הריבית זז, התשלום מחושב מחדש על היתרה, לחודשים שנשארו (הנחה של הקורס; בודקים בחוזה). כל שורה מעוגלת לאגורה, כמו בלוח של
+      בנק.
     </p>
 
     <div class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -142,8 +146,13 @@ const yearRows = computed(() =>
     </div>
 
     <ul class="list-reset mt-3 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
-      <li v-for="(n, i) in names" :key="i" class="flex items-center gap-2">
-        <span class="inline-block h-1 w-5 rounded-sm" :style="{ background: colours[i] }"></span>{{ n }}
+      <li class="flex items-center gap-2">
+        <span class="inline-block h-1 w-5 rounded-sm" :style="{ background: colours[0] }"></span>
+        <span>עם השינוי (<span class="ltr">{{ points(change) }}</span> {{ unit(change) }} מחודש {{ changeMonth }})</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="inline-block h-1 w-5 rounded-sm" :style="{ background: colours[1] }"></span>
+        <span>בלי שינוי, <span class="ltr">{{ pct(rate) }}</span> כל הדרך</span>
       </li>
       <li class="flex items-center gap-2"><span class="inline-block h-4 w-0 border-s-2 border-dashed border-n500"></span>{{ kind === "prime" ? "הפריים זזה" : "העוגן זז" }}</li>
       <li class="flex items-center gap-2"><span class="inline-block h-4 w-0 border-s-2 border-dashed border-navy"></span>התשלום מחושב מחדש</li>
@@ -191,7 +200,7 @@ const yearRows = computed(() =>
         <p v-else class="mt-2 text-caption text-n600">בקרן שווה רכיב הקרן לא זז בשינוי: רק רכיב הריבית מחושב באחוז החדש.</p>
       </template>
       <p v-else class="text-body-m text-n800">
-        אחוז הריבית לא זז עד סוף ההלוואה: {{ change === 0 ? "לא הזזתם את העוגן" : "אחרי החודש שבחרתם אין עוד נקודת עדכון" }}. שני הקווים אחד על השני.
+        אחוז הריבית לא זז עד סוף ההלוואה: {{ change === 0 ? `לא הזזתם ${anchorName}` : "אחרי החודש שבחרתם אין עוד נקודת עדכון" }}. שני הקווים אחד על השני.
       </p>
     </div>
 

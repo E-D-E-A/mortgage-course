@@ -53,6 +53,25 @@
       "value": "134885.02"
     },
     {
+      "id": "pred.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "6",
+        "periods_per_year": 12
+      },
+      "value": "1.005"
+    },
+    {
+      "id": "pred.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
+    },
+    {
       "id": "loan",
       "kind": "given",
       "inputs": {},
@@ -67,6 +86,15 @@
         "decimals": 2
       },
       "value": "0.4"
+    },
+    {
+      "id": "base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 12
+      },
+      "value": "1.004"
     },
     {
       "id": "spitzer.pay",
@@ -504,6 +532,15 @@
       "value": "0.45"
     },
     {
+      "id": "worked.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "5.4",
+        "periods_per_year": 12
+      },
+      "value": "1.0045"
+    },
+    {
       "id": "worked.months",
       "kind": "rep_months_in_years",
       "inputs": {
@@ -747,6 +784,24 @@
       "value": "1900.00"
     },
     {
+      "id": "ex2.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
+    },
+    {
+      "id": "ex2.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 15
+      },
+      "value": 180
+    },
+    {
       "id": "ex2.answer",
       "kind": "rep_cell",
       "inputs": {
@@ -835,6 +890,15 @@
       "value": 216
     },
     {
+      "id": "ex3.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.2",
+        "periods_per_year": 12
+      },
+      "value": "1.0035"
+    },
+    {
       "id": "ex4.answer",
       "kind": "rep_cell",
       "inputs": {
@@ -867,6 +931,25 @@
         "periods": 6
       },
       "value": "206075.50"
+    },
+    {
+      "id": "ex4.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "6",
+        "periods_per_year": 12
+      },
+      "value": "1.005"
+    },
+    {
+      "id": "ex4.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.5"
     },
     {
       "id": "ex5.answer",
@@ -912,6 +995,32 @@
       "value": "239719.90"
     },
     {
+      "id": "ex5.base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 12
+      },
+      "value": "1.004"
+    },
+    {
+      "id": "ex5.yearly_base",
+      "kind": "amort_growth_base",
+      "inputs": {
+        "rate_percent": "4.8",
+        "periods_per_year": 1
+      },
+      "value": "1.048"
+    },
+    {
+      "id": "ex5.months",
+      "kind": "rep_months_in_years",
+      "inputs": {
+        "years": 10
+      },
+      "value": 120
+    },
+    {
       "id": "ex6.bp",
       "kind": "rep_total_interest",
       "inputs": {
@@ -954,6 +1063,59 @@
         "field": "payment"
       },
       "value": "600.00"
+    },
+    {
+      "id": "ex6.monthly",
+      "kind": "monthly_rate_by_division",
+      "inputs": {
+        "annual_percent": "4.8",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "0.4"
+    },
+    {
+      "id": "ex6.sp_pay",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "150000",
+        "rate_percent": "4.8",
+        "months": 120
+      },
+      "value": "1576.36"
+    },
+    {
+      "id": "ex6.sp_total",
+      "kind": "payments_total",
+      "inputs": {
+        "payment": "1576.36",
+        "periods": 120
+      },
+      "value": "189163.20"
+    },
+    {
+      "id": "ex6.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "150000.00"
+    },
+    {
+      "id": "ex6.sp_rough",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.sp_total",
+        "subtrahend": "ex6.loan"
+      },
+      "value": "39163.20"
+    },
+    {
+      "id": "ex6.rough_answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.bp",
+        "subtrahend": "ex6.sp_rough"
+      },
+      "value": "32836.80"
     }
   ]
 }

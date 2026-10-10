@@ -24,6 +24,7 @@ export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("3.6");
 export const amt = (id) => formatShekelsText(f.raw(id)).replace(" ₪", ""); /* Money inside an equation: the course's money format without the ₪ sign, so agorot always show two digits. */
 export const half = f.rows("half.table");
+export const num = (id) => String(Number(f.raw(id))); /* A whole count stored as money ("84.00"), shown as "84". */
 export const predictionOptions = [
   f.shekels("wrong.one_formula"),
   f.shekels("explain.c37"),
@@ -54,12 +55,16 @@ export const predictionOptions = [
 </Section>
 
 <Callout title="מספרים להמחשה">
-<p>ההלוואות, אחוזי הריבית והתנועות של הפריים ושל העוגן בשיעור בדויים. הם תרחיש להמחשה, לא תחזית ולא נתוני שוק.</p>
+<p>ההלוואות, אחוזי הריבית והתנועות של הפריים ושל העוגן בשיעור בדויים. הם תרחיש להמחשה, לא מה שצפוי לקרות ולא נתוני שוק.</p>
+</Callout>
+
+<Callout title="עיגול, כמו בלוח של בנק">
+<p>כמו בשיעור 3.2, כל שורה בלוח מעוגלת לאגורה: הריבית של כל חודש, והתשלום כשהוא נקבע; התשלום האחרון סוגר את מה שנשאר. היתרות בשיעור הן היתרות של הלוח הזה. הנוסחה של היתרה משיעור 3.3 נותנת כמעט אותו מספר — ההבדל הוא אגורות של עיגול. בתוך הנוסחה של התשלום משאירים שמונה ספרות אחרי הנקודה, ומעגלים רק את התשלום.</p>
 </Callout>
 
 המסלול מהשאלה: {f.shekels("case.amount")}, 240 תשלומים, ב־4.8%. בתשלומים שווים (<Term t="שפיצר" lesson="3.6">שפיצר</Term>), התשלום {f.shekels("explain.c0")}. מהחודש ה־37 אחוז הריבית 6%.
 
-**צעד 1 — כמה חוב נשאר.** אחרי 36 תשלומים, בנוסחה של היתרה משיעור 3.3: {f.shekels("explain.b36")}. זה הסכום שנשאר להחזיר. 36 התשלומים ששילמתם כבר מאחוריכם, באחוז הישן.
+**צעד 1 — כמה חוב נשאר.** אחרי 36 תשלומים, בלוח (שיעורים 3.2–3.3): {f.shekels("explain.b36")}. זה הסכום שנשאר להחזיר. 36 התשלומים ששילמתם כבר מאחוריכם, באחוז הישן.
 
 **צעד 2 — כמה חודשים נשארו.** <M>240 − 36 = {f.plain("explain.left")}</M>. סוף ההלוואה לא זז.
 
@@ -67,9 +72,9 @@ export const predictionOptions = [
 
 **צעד 4 — המונה: הריבית של החודש הראשון באחוז החדש.** <M>{amt("explain.b36")} × {f.plain("explain.r")} = {amt("explain.top")}</M>. באחוז הישן הריבית הייתה {f.shekels("explain.interest_old")}, כלומר {f.shekels("explain.interest_rise")} פחות.
 
-**צעד 5 — המכנה.** <M>{f.plain("explain.base")}<sup>−{f.plain("explain.left")}</sup> = {f.plain("explain.power")}</M> בערך, ולכן <M>1 − {f.plain("explain.power")} = {f.plain("explain.one_minus")}</M> בערך.
+**צעד 5 — המכנה.** <M>{f.plain("explain.base")}<sup>−{f.plain("explain.left")}</sup> = {f.plain("explain.power")}</M> (שמונה ספרות אחרי הנקודה), ולכן <M>1 − {f.plain("explain.power")} = {f.plain("explain.one_minus")}</M>.
 
-**צעד 6 — התשלום החדש.** <M>{amt("explain.top")} ÷ {f.plain("explain.one_minus")}</M> נותן בערך {f.whole("explain.c37")}. בלי לעגל באמצע: {f.shekels("explain.c37")}. כלומר {f.shekels("explain.rise")} יותר בכל חודש, מהחודש ה־37 ועד הסוף.
+**צעד 6 — התשלום החדש.** <M>{amt("explain.top")} ÷ {f.plain("explain.one_minus")} = {amt("explain.c37")}</M>, מעוגל לאגורה. כלומר {f.shekels("explain.rise")} יותר בכל חודש, מהחודש ה־37 ועד הסוף.
 
 **בדיקה.** אם ממשיכים את הלוח חודש אחרי חודש ב־6%, עם התשלום החדש, היתרה אחרי התשלום ה־240 היא {f.shekels("explain.end")}. ההלוואה נגמרת בדיוק בזמן.
 
@@ -98,9 +103,9 @@ export const predictionOptions = [
 </Section>
 
 ב<Term t="קרן שווה" lesson="3.6">קרן שווה</Term> (שיעור 2.9) אין תשלום אחד לכל התקופה, ולכן אין גם תשלום ״לחשב מחדש״. אותה הלוואה, {f.shekels("case.amount")} ל־240 חודשים, בקרן שווה:
-- **<Term t="רכיב קרן" lesson="3.6">רכיב הקרן</Term> לא זז:** בחודש 36 {f.shekels("ep.principal_36")}, ובחודש 37 {f.shekels("ep.principal_37")}. היתרה חלקי החודשים שנשארו נותנת את אותו מספר.
+- **<Term t="רכיב קרן" lesson="3.6">רכיב הקרן</Term> לא זז:** בחודש 36 {f.shekels("ep.principal_36")}, ובחודש 37 {f.shekels("ep.principal_37")}. היתרה חלקי החודשים שנשארו נותנת את אותו מספר (עד אגורה של עיגול).
 - **רק <Term t="רכיב ריבית" lesson="3.6">רכיב הריבית</Term> משתנה:** אחרי 36 תשלומים היתרה {f.shekels("ep.balance_36")}. באחוז הישן הריבית של החודש הבא הייתה {f.shekels("ep.interest_37_old")}; באחוז החדש היא {f.shekels("ep.interest_37")}, כלומר {f.shekels("ep.jump")} יותר.
-- **התשלום:** בחודש 36 {f.shekels("ep.payment_36")}, ובחודש 37 {f.shekels("ep.payment_37")}.
+- **התשלום:** בחודש 36 <M>{amt("ep.principal_36")} + {amt("ep.interest_36")} = {amt("ep.payment_36")}</M>, ובחודש 37 <M>{amt("ep.principal_37")} + {amt("ep.interest_37")} = {amt("ep.payment_37")}</M>.
 
 אותו שינוי בריבית, אותה הלוואה, ונוסחה אחרת לגמרי. זה הצד הראשון של ״נוסחה אחת לא מתאימה לכל מסלול״: גם שיטת ההחזר קובעת את החישוב.
 
@@ -149,19 +154,17 @@ export const predictionOptions = [
 
 <RateReset client:visible amount={500000} years={20} rate="4.8" kind="prime" changeMonth={37} change={1.2} method="spitzer" />
 
-נסו את ארבעת אלה:
-1. במצב ההתחלה (פריים, +1.2 מחודש 37): מה בכרטיס? השוו לצעדים 1–6 בהסבר.
+נסו את שלושת אלה:
+1. במצב ההתחלה (פריים, <span class="ltr">+1.2</span> נקודות אחוז מחודש 37): מה בכרטיס? השוו לצעדים 1–6 בהסבר.
 2. עברו ל״משתנה לא צמודה, כל 5 שנים״, בלי לשנות דבר אחר. מתי התשלום זז עכשיו, וכמה הוא?
-3. חזרו לפריים, ועברו לקרן שווה. בכמה התשלום קפץ בחודש 37, ולמה הקו לא ישר לפני ואחרי?
-4. בשפיצר, הזיזו את השינוי ל־1.2 נקודות אחוז למטה. מה קרה לתשלום?
+3. חזרו לפריים, ועברו לקרן שווה. בכמה התשלום קפץ בחודש 37, ולמה הקו לא ישר לפני ואחרי? אחר כך חזרו לשפיצר, והזיזו את השינוי ל־1.2 נקודות אחוז למטה. מה קרה לתשלום?
 
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>היתרה {f.shekels("explain.b36")}, {f.plain("explain.left")} חודשים, התשלום לפני {f.shekels("explain.c0")} ואחרי {f.shekels("explain.c37")}: אותם מספרים כמו בהסבר. ״נוסחה אחת על כל ההלוואה״ הייתה נותנת {f.shekels("wrong.one_formula")}.</li>
     <li>העוגן זז בחודש 37, אבל אחוז הריבית מתעדכן רק בנקודת העדכון, מחודש 61. עד חודש 60 התשלום {f.shekels("slider.variable_60")}; אחרי 60 תשלומים היתרה {f.shekels("slider.variable_b60")}, והתשלום החדש {f.shekels("slider.variable_61")}.</li>
-    <li>הוא קפץ מ־{f.shekels("ep.payment_36")} ל־{f.shekels("ep.payment_37")}. בקרן שווה התשלום יורד בכל חודש, כי הריבית מחושבת על יתרה שקטנה. בשינוי רק רכיב הריבית עלה, ב־{f.shekels("ep.jump")}; רכיב הקרן נשאר {f.shekels("ep.principal_37")}.</li>
-    <li>התשלום ירד ל־{f.shekels("slider.lower_37")}, והחוב יורד מהר יותר מהקו הבהיר. אותה נוסחה, באחוז נמוך יותר.</li>
+    <li>הוא קפץ מ־{f.shekels("ep.payment_36")} ל־{f.shekels("ep.payment_37")}, כלומר ב־{f.shekels("ep.payment_jump")}. רכיב הקרן נשאר {f.shekels("ep.principal_37")}; רק רכיב הריבית זז: הוא עלה ב־{f.shekels("ep.jump")} בגלל האחוז החדש, וירד ב־{f.shekels("ep.interest_fall")} כי היתרה קטנה ברכיב קרן אחד, כמו בכל חודש. לכן הקו לא ישר: בקרן שווה התשלום יורד בכל חודש, כי הריבית מחושבת על יתרה שקטנה. ובשפיצר, 1.2 נקודות אחוז למטה: התשלום ירד ל־{f.shekels("slider.lower_37")}, והחוב יורד מהר יותר מהקו הבהיר. אותה נוסחה, באחוז נמוך יותר.</li>
   </ol>
 </details>
 
@@ -214,7 +217,7 @@ export const predictionOptions = [
 </PredictionReveal>
 
 <Callout title="כלל אצבע: הריבית של החודש הבא, ולא יותר">
-<p>שינוי של נקודת אחוז מזיז את רכיב הריבית של החודש הבא באחוז אחד מהיתרה, חלקי 12 (שיעור 2.6). בהסבר: {f.shekels("explain.interest_rise")}. התשלום עצמו עולה בפחות ({f.shekels("explain.rise")}), כי התשלום החדש מחזיר פחות קרן בכל חודש. הכלל נותן סדר גודל; את התשלום מחשבים בנוסחה.</p>
+<p>שינוי של s נקודות אחוז מזיז את רכיב הריבית של החודש הבא ב־s% מהיתרה, חלקי 12 (שיעור 2.6). בהסבר, {f.plain("explain.points")} נקודות אחוז: <M>{f.plain("explain.points")}% × {amt("explain.b36")} ÷ 12 = {amt("explain.rule")}</M> — כמו הפרש הריביות בצעד 4, {f.shekels("explain.interest_rise")}, עד אגורה של עיגול. התשלום עצמו עולה בפחות ({f.shekels("explain.rise")}), כי התשלום החדש מחזיר פחות קרן בכל חודש. הכלל נותן סדר גודל; את התשלום מחשבים בנוסחה.</p>
 </Callout>
 
 <Section kind="דוגמה פתורה">
@@ -231,17 +234,17 @@ export const predictionOptions = [
 
 **צעד 1 — התשלום עד עכשיו.** 300 תשלומים ב־4.2%, בנוסחה משיעור 3.1: {f.shekels("worked.c0")}.
 
-**צעד 2 — היתרה בנקודת העדכון.** אחרי 60 תשלומים (שיעור 3.3): {f.shekels("worked.b60")}.
+**צעד 2 — היתרה בנקודת העדכון.** אחרי 60 תשלומים, בלוח (שיעורים 3.2–3.3): {f.shekels("worked.b60")}.
 
 **צעד 3 — החודשים שנשארו.** <M>300 − 60 = {f.plain("worked.left")}</M>.
 
 **צעד 4 — הריבית החודשית החדשה.** <M>4.8% ÷ 12 = {f.plain("worked.r")}</M>.
 
-**צעד 5 — המונה והמכנה.** <M>{amt("worked.b60")} × {f.plain("worked.r")} = {amt("worked.top")}</M>. <M>{f.plain("worked.base")}<sup>−{f.plain("worked.left")}</sup> = {f.plain("worked.power")}</M> בערך, ולכן המכנה <M>{f.plain("worked.one_minus")}</M> בערך.
+**צעד 5 — המונה והמכנה.** <M>{amt("worked.b60")} × {f.plain("worked.r")} = {amt("worked.top")}</M>. <M>{f.plain("worked.base")}<sup>−{f.plain("worked.left")}</sup> = {f.plain("worked.power")}</M>, ולכן המכנה <M>1 − {f.plain("worked.power")} = {f.plain("worked.one_minus")}</M>.
 
-**צעד 6 — התשלום החדש.** <M>{amt("worked.top")} ÷ {f.plain("worked.one_minus")}</M>, בלי לעגל באמצע: {f.shekels("worked.c61")}. כלומר {f.shekels("worked.rise")} יותר בכל חודש, עד נקודת העדכון הבאה.
+**צעד 6 — התשלום החדש.** <M>{amt("worked.top")} ÷ {f.plain("worked.one_minus")} = {amt("worked.c61")}</M>, מעוגל לאגורה. כלומר {f.shekels("worked.rise")} יותר בכל חודש, עד נקודת העדכון הבאה.
 
-<Callout title="מה לקחת מזה" tone="warning">
+<Callout title="מה לקחת מזה">
 <p>גלית לא יודעת היום מה יהיה העוגן בעוד 5 שנים, ולכן גם לא את התשלום של אחרי נקודת העדכון. מה שהיא כן יכולה לעשות היום: לחשב כמה התשלום יהיה אם העוגן יעלה בנקודה, או בשתיים, ולשאול אם היא יכולה לשאת את זה. ואילו המסלול היה צמוד, היא הייתה מציבה ב־B את היתרה המוצמדת (שיעור 3.5).</p>
 </Callout>
 
@@ -256,17 +259,17 @@ export const predictionOptions = [
 <FillTable
   client:visible
   id="3.6-half"
-  periodLabel="שינוי"
+  periodLabel="מחודש"
+  rowKey="month"
   rows={half}
   columns={[
-    { key: "month", label: "מחודש", format: "number" },
-    { key: "balance", label: "היתרה", format: "shekels" },
     { key: "left", label: "חודשים שנשארו", format: "number" },
     { key: "rate", label: "אחוז חדש", format: "percent" },
+    { key: "balance", label: "היתרה", format: "shekels" },
     { key: "payment", label: "התשלום החדש", format: "shekels" },
   ]}
-  blanks={["2.payment", "3.payment"]}
-  success="בכל שינוי הצבתם את מה שנכון באותו רגע: היתרה, החודשים שנשארו, והאחוז החדש. כשהפריים ירדה בשינוי 3, גם התשלום ירד."
+  blanks={[`${half[1].month}.payment`, `${half[2].month}.payment`]}
+  success="בכל שינוי הצבתם את מה שנכון באותו רגע: היתרה, החודשים שנשארו, והאחוז החדש. כשהפריים ירדה בשינוי השלישי, גם התשלום ירד."
   hint={`r הוא האחוז החדש חלקי 12, כמספר עשרוני: 6% הם ${f.plain("explain.r")}. n הוא מספר החודשים שנשארו, לא 240. B היא היתרה שבשורה, לא 400,000.`}
 />
 
@@ -318,7 +321,7 @@ export const predictionOptions = [
   unit="חודשים"
   answer={f.raw("ex3.answer")}
   errors={[
-    { value: f.raw("ex3.years_as_months"), message: "חיסרתם שנים מחודשים. 7 שנים הן 84 חודשים: מחסרים 84 מ־300." },
+    { value: f.raw("ex3.years_as_months"), message: `חיסרתם שנים מחודשים. 7 שנים הן ${num("ex3.y_months")} חודשים: מחסרים ${num("ex3.y_months")} מ־300.` },
     { value: f.raw("ex3.years_left"), message: "אלה שנים, לא חודשים. בנוסחה n הוא מספר החודשים שנשארו." },
   ]}
 >
@@ -326,7 +329,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="3.6-3">
-25 שנה הן 300 חודשים, ו־7 שנים הן 84 חודשים. <M>300 − 84 = {f.plain("ex3.answer")}</M>.
+25 שנה הן 300 חודשים, ו־7 שנים הן <M>7 × 12 = {num("ex3.y_months")}</M> חודשים. <M>300 − {num("ex3.y_months")} = {f.plain("ex3.answer")}</M>.
 </Solution>
 
 <NumericExercise
@@ -354,16 +357,16 @@ export const predictionOptions = [
   level="מאתגר"
   answer={f.raw("ex5.answer")}
   errors={[
-    { value: f.raw("ex5.one_formula"), message: "זו נוסחה אחת על כל ההלוואה, כאילו 5.4% היה מההתחלה. מציבים את היתרה אחרי 24 תשלומים, ואת 216 החודשים שנשארו." },
-    { value: f.raw("ex5.principal_left"), message: "הצבתם 400,000 ₪ ל־216 חודשים. 24 התשלומים כבר הורידו מהחוב: מציבים את היתרה." },
-    { value: f.raw("ex5.full_term"), message: "הצבתם את היתרה, אבל ל־240 חודשים. נשארו 216." },
+    { value: f.raw("ex5.one_formula"), message: `זו נוסחה אחת על כל ההלוואה, כאילו 5.4% היה מההתחלה. מציבים את היתרה אחרי 24 תשלומים, ואת ${f.plain("ex5.left")} החודשים שנשארו.` },
+    { value: f.raw("ex5.principal_left"), message: `הצבתם 400,000 ₪ ל־${f.plain("ex5.left")} חודשים. 24 התשלומים כבר הורידו מהחוב: מציבים את היתרה.` },
+    { value: f.raw("ex5.full_term"), message: `הצבתם את היתרה, אבל ל־240 חודשים. נשארו ${f.plain("ex5.left")}.` },
   ]}
 >
-  לקחתם מסלול פריים של 400,000 ₪ ל־20 שנה, ב־4.8%. אחרי 24 תשלומים אחוז הריבית במסלול עולה ל־5.4%. מה התשלום החדש? (רמז: קודם היתרה, בנוסחה משיעור 3.3.)
+  לקחתם מסלול פריים של 400,000 ₪ ל־20 שנה, ב־4.8%. אחרי 24 תשלומים אחוז הריבית במסלול עולה ל־5.4%. מה התשלום החדש? (רמז: קודם היתרה אחרי 24 תשלומים — בבונה הלוח משיעור 3.2, או בנוסחה משיעור 3.3. הנוסחה יכולה לצאת שונה מהלוח באגורות; בתשלום החדש זה כמעט לא מורגש.)
 </NumericExercise>
 
 <Solution for="3.6-5">
-היתרה אחרי 24 תשלומים ב־4.8%: {f.shekels("ex5.b24")}. נשארו <M>240 − 24 = {f.plain("ex5.left")}</M> חודשים. <M>r = 5.4% ÷ 12 = {f.plain("ex5.r")}</M>. <M>{amt("ex5.b24")} × {f.plain("ex5.r")}</M> חלקי <M>(1 − {f.plain("ex5.base")}<sup>−{f.plain("ex5.left")}</sup>)</M>: {f.shekels("ex5.answer")}.
+היתרה אחרי 24 תשלומים ב־4.8%, בלוח: {f.shekels("ex5.b24")}. נשארו <M>240 − 24 = {f.plain("ex5.left")}</M> חודשים. <M>r = 5.4% ÷ 12 = {f.plain("ex5.r")}</M>. <M>{amt("ex5.b24")} × {f.plain("ex5.r")}</M> חלקי <M>(1 − {f.plain("ex5.base")}<sup>−{f.plain("ex5.left")}</sup>)</M>: {f.shekels("ex5.answer")}.
 </Solution>
 
 <NumericExercise
@@ -430,7 +433,7 @@ export const predictionOptions = [
 <Sources
   items={[
     { kind: "החלטה של Mogi", text: "שינוי בפריים מוחל לפי תנאי המסלול; בסימולציה ראשונה, לפני הצעה, מניחים עדכון ריבית כל 5 שנים במסלולים המשתנים, ומסמנים שזו הנחה. דף ההחלטה ב־Brain (67436545): אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08. כטענה על השוק: לא אומת.", date: "2026-10-08" },
-    { kind: "הנחת חישוב", text: "כשאחוז הריבית במסלול זז, התשלום מחושב מחדש על היתרה, למספר החודשים שנשארו, וסוף ההלוואה לא זז. חוזה יכול לקבוע אחרת. תשלומים חודשיים בסוף כל חודש; הריבית החודשית היא אחוז הריבית לשנה חלקי 12. ההלוואות, אחוזי הריבית והשינויים בפריים ובעוגן בדויים; גלית בדויה. עיגול לאגורה רק בסוף; הערכים של החזקה והמכנה מוצגים בעיגול ל־6 ספרות.", code: ["C = B × r ÷ (1 − (1 + r)^−n)", "קרן שווה: B ÷ n + B × r"] },
+    { kind: "הנחת חישוב", text: "כשאחוז הריבית במסלול זז, התשלום מחושב מחדש על היתרה, למספר החודשים שנשארו, וסוף ההלוואה לא זז. חוזה יכול לקבוע אחרת. תשלומים חודשיים בסוף כל חודש; הריבית החודשית היא אחוז הריבית לשנה חלקי 12. ההלוואות, אחוזי הריבית והשינויים בפריים ובעוגן בדויים; גלית בדויה. כל שורה בלוח מעוגלת לאגורה (הריבית של החודש, והתשלום כשהוא נקבע), והתשלום האחרון סוגר את היתרה; הערכים של החזקה והמכנה מוצגים בעיגול ל־8 ספרות.", code: ["C = B × r ÷ (1 − (1 + r)^−n)", "קרן שווה: B ÷ n + B × r"] },
     { kind: "ידע מתמטי כללי", text: "הנוסחה של תשלום שווה (שיעור 3.1) נכונה כשאחוז הריבית קבוע לכל התקופה שהיא מכסה. ברגע של שינוי, היתרה שנשארה היא כמו הלוואה חדשה לחודשים שנשארו." },
     { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו פעמיים, בשתי שיטות נפרדות: מודול החישוב של הקורס (לוח חודש אחרי חודש) ובדיקה עצמאית ב־Python. התשלום החדש חושב גם בנוסחה על היתרה וגם בלוח המלא, ושתי הדרכים נתנו אותו מספר; בסוף הלוח היתרה אפס.", date: "2026-10-10" },
   ]}
