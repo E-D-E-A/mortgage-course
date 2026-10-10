@@ -1,0 +1,312 @@
+<!doctype html>
+<!--
+  Video scene for lesson 3.2 — "שני רכיבים בכל תשלום" (פירוק תשלום לקרן ולריבית).
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/3-2.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: every payment is an interest component plus a principal component,
+  and in a Spitzer loan the principal component grows month by month):
+  1. Title — two components in every payment.
+  2. The small loan of 2.9 (60,000 ₪, 0.5% a month, 3 months): the three rows of its
+     schedule. Interest = opening balance × monthly rate; principal = what is left of
+     the payment; only principal lowers the balance; the principal parts add up to the loan.
+  3. The long loan (600,000 ₪, 4.8% a year, 20 years, 3,893.74 ₪): month 1, month 2
+     (interest down by 5.97 ₪, principal up by the same), month 68 (the first month
+     principal is larger, after less than six years), month 240.
+  4. Together: the principal parts are the loan, the interest parts are the interest paid.
+     Is the first payment always mostly interest? It depends on the rate: at 3% a year
+     the principal part is larger from month 1.
+  5. Takeaway.
+  No formula appears: the lesson builds it in "מהדוגמה לנוסחה".
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 3.2 · פירוק תשלום לקרן ולריבית</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/3-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count or a rate as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const small = fact("small.rows");
+      const V = {
+        smallLoan: num(small[0].opening),
+        smallMonthly: pl(fact("small.monthly")),
+        smallPay: num(fact("small.pay")),
+        smallSum: num(fact("small.prin_sum")),
+        longLoan: num(fact("long.principal_sum")),
+        longPay: num(fact("long.pay")),
+        int1: num(fact("long.int_1")),
+        prin1: num(fact("long.prin_1")),
+        int2: num(fact("long.int_2")),
+        prin2: num(fact("long.prin_2")),
+        drop: num(fact("long.int_drop")),
+        k: pl(fact("long.overtake")),
+        intK: num(fact("long.int_k")),
+        prinK: num(fact("long.prin_k")),
+        intK1: num(fact("long.int_k1")),
+        prinK1: num(fact("long.prin_k1")),
+        intLast: num(fact("long.int_last")),
+        prinLast: num(fact("long.prin_last")),
+        payLast: num(fact("long.pay_last")),
+        paid: num(fact("long.paid")),
+        interest: num(fact("long.interest")),
+        lowPay: num(fact("low.pay")),
+        lowInt: num(fact("low.int_1")),
+        lowPrin: num(fact("low.prin_1")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], small: [10, 52], long: [52, 120], total: [120, 136], rate: [136, 156], end: [156, 170] };
+      window.duration = 170;
+      window.cues = [
+        [1, 5, "שני רכיבים בכל תשלום."],
+        [5, 9.5, "כמה מהתשלום הוא ריבית, וכמה ממנו מחזיר קרן?"],
+        [11, 17, `‏${V.smallLoan} ₪, ${V.smallMonthly}% לחודש, שלושה חודשים: ${V.smallPay} ₪ בחודש.`],
+        [17, 24, "רכיב הריבית: היתרה בתחילת החודש, כפול הריבית החודשית."],
+        [24, 31, `חודש 1: ${V.smallMonthly}% מ־${V.smallLoan} ₪ הם ${num(small[0].interest)} ₪.`],
+        [31, 38, `רכיב הקרן הוא מה שנשאר מהתשלום: ${num(small[0].principal_paid)} ₪.`],
+        [38, 45, "רק רכיב הקרן מקטין את היתרה. ממנה מתחיל החודש הבא."],
+        [45, 51, `רכיבי הקרן יחד הם כל ההלוואה: ${V.smallSum} ₪.`],
+        [53, 59, `עכשיו הלוואה ארוכה: ${V.longLoan} ₪, ‏4.8% לשנה, 20 שנה.`],
+        [59, 65, `ההחזר החודשי: ${V.longPay} ₪.`],
+        [65, 72, `חודש 1: ${V.int1} ₪ ריבית, ורק ${V.prin1} ₪ קרן.`],
+        [72, 79, `חודש 2: הריבית קטנה ב־${V.drop} ₪, והקרן גדלה באותו סכום.`],
+        [79, 86, "וכך בכל חודש: היתרה קטנה, הריבית קטנה, הקרן גדלה."],
+        [86, 93, `חודש ${V.k}: לראשונה, רכיב הקרן גדול מרכיב הריבית.`],
+        [93, 100, `‏${V.prinK} ₪ קרן מול ${V.intK} ₪ ריבית.`],
+        [100, 106, "זה קורה אחרי פחות משש שנים, לא באמצע הדרך."],
+        [106, 113, "כי הגידול של רכיב הקרן מצטבר, כמו ריבית דריבית."],
+        [113, 119, `בחודש האחרון: רק ${V.intLast} ₪ ריבית.`],
+        [121, 127, `כל רכיבי הקרן יחד: ${V.longLoan} ₪ — כל ההלוואה.`],
+        [127, 135, `כל רכיבי הריבית יחד: ${V.interest} ₪ — הריבית ששולמה.`],
+        [137, 143, "האם התשלום הראשון הוא תמיד בעיקר ריבית?"],
+        [143, 149, "לא. זה תלוי באחוז הריבית ובתקופה."],
+        [149, 155, `ב־3% לשנה: ${V.lowInt} ₪ ריבית ו־${V.lowPrin} ₪ קרן, כבר בחודש 1.`],
+        [157, 163, "בכל תשלום: רכיב ריבית ועוד רכיב קרן."],
+        [163, 169, "ורק רכיב הקרן מקטין את החוב."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right.
+      const eqn = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+      function legend(o, y) {
+        el("rect", { x: 1096, y, width: 18, height: 18, rx: 3, fill: C.teal, opacity: o });
+        txt(1086, y + 15, "רכיב ריבית", 20, { anchor: "start", fill: C.n700, o });
+        el("rect", { x: 946, y, width: 18, height: 18, rx: 3, fill: C.n300, opacity: o });
+        txt(936, y + 15, "רכיב קרן", 20, { anchor: "start", fill: C.n700, o });
+      }
+      // One payment as a stacked bar: principal (grey) at the bottom, interest (teal) on top.
+      function payBar(x, base, w, scale, interest, principal, o, g = 1) {
+        const hp = Number(principal) * scale * g, hi = Number(interest) * scale * g;
+        el("rect", { x, y: base - hp, width: w, height: hp, fill: C.n300, opacity: o });
+        el("rect", { x, y: base - hp - hi, width: w, height: hi, fill: C.teal, opacity: o });
+        return { top: base - hp - hi, mid: base - hp };
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שני רכיבים בכל תשלום", 72, { w: 700, o });
+          const o2 = after(t, S.title, 4, o);
+          txt(640, 360, "כמה הולך לריבית, וכמה מחזיר קרן", 32, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the small loan's schedule, row by row
+        if (inScene(t, S.small)) {
+          const o = vis(t, S.small);
+          txt(640, 140, `${V.smallLoan} ₪ · ${V.smallMonthly}% לחודש · 3 חודשים`, 38, { w: 700, o });
+          txt(640, 178, `התשלום: ${V.smallPay} ₪ בחודש (האחרון סוגר את העיגול)`, 20, { fill: C.n600, o });
+          const cols = [
+            { x: 1100, label: "חודש", key: "period" },
+            { x: 980, label: "יתרה בהתחלה", key: "opening" },
+            { x: 810, label: "רכיב ריבית", key: "interest", c: C.teal },
+            { x: 650, label: "רכיב קרן", key: "principal_paid" },
+            { x: 490, label: "התשלום", key: "payment" },
+            { x: 330, label: "יתרה בסוף", key: "closing" },
+          ];
+          box(150, 200, 980, 210, o);
+          for (const c of cols) txt(c.x, 236, c.label, 18, { anchor: "start", fill: C.n600, w: 600, o });
+          el("line", { x1: 170, x2: 1110, y1: 252, y2: 252, stroke: C.n200, "stroke-width": 1, opacity: o });
+          // Row 1 builds cell by cell with the cues; rows 2 and 3 follow.
+          const cellFrom = { period: 2, opening: 2, interest: 14, principal_paid: 21, payment: 21, closing: 28 };
+          small.forEach((r, i) => {
+            const y = 290 + i * 48;
+            for (const c of cols) {
+              const oc = after(t, S.small, i === 0 ? cellFrom[c.key] : 26 + i * 3, o);
+              if (c.key === "period") txt(c.x - 16, y, String(r.period), 22, { w: 600, o: oc, ltr: true });
+              else txt(c.x, y, num(r[c.key]), 22, { anchor: "end", w: c.key === "closing" ? 700 : 400, fill: c.c ?? C.navy, o: oc, ltr: true });
+            }
+          });
+          // The equation under the table follows the cues.
+          const eqs = [
+            { s: 14, e: 21, text: `${num(small[0].opening)} × ${V.smallMonthly}% = ${num(small[0].interest)}`, label: "רכיב הריבית" },
+            { s: 21, e: 28, text: `${num(small[0].payment)} − ${num(small[0].interest)} = ${num(small[0].principal_paid)}`, label: "רכיב הקרן" },
+            { s: 28, e: 35, text: `${num(small[0].opening)} − ${num(small[0].principal_paid)} = ${num(small[0].closing)}`, label: "היתרה בסוף החודש" },
+            { s: 35, e: 42.6, text: `${num(small[0].principal_paid)} + ${num(small[1].principal_paid)} + ${num(small[2].principal_paid)} = ${V.smallSum}`, label: "רכיבי הקרן יחד" },
+          ];
+          for (const q of eqs) {
+            const oq = during(t, S.small, q.s, q.e, o);
+            if (oq <= 0) continue;
+            box(250, 440, 780, 110, oq * 0.6, C.mint);
+            txt(640, 478, q.label, 22, { fill: C.n700, w: 600, o: oq });
+            eqn(640, 526, q.text, 32, { o: oq });
+          }
+        }
+        // Scene 3 — the long loan: four months of its schedule
+        if (inScene(t, S.long)) {
+          const o = vis(t, S.long);
+          txt(640, 132, `${V.longLoan} ₪ · 4.8% לשנה · 20 שנה`, 36, { w: 700, o });
+          const o0 = after(t, S.long, 7, o);
+          txt(640, 170, `ההחזר החודשי: ${V.longPay} ₪`, 22, { fill: C.n600, o: o0 });
+          legend(o0, 200);
+          const base = 520, scale = 250 / Number(fact("long.pay_last")), w = 96;
+          const months = [
+            { x: 1000, m: "1", i: fact("long.int_1"), p: fact("long.prin_1"), from: 13 },
+            { x: 790, m: "2", i: fact("long.int_2"), p: fact("long.prin_2"), from: 20 },
+            { x: 500, m: V.k, i: fact("long.int_k"), p: fact("long.prin_k"), from: 34 },
+            { x: 230, m: "240", i: fact("long.int_last"), p: fact("long.prin_last"), from: 61 },
+          ];
+          el("line", { x1: 160, x2: 1130, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o0 });
+          for (const b of months) {
+            const ob = after(t, S.long, b.from, o);
+            const g = ease((t - S.long[0] - b.from) / 1.5);
+            const { top, mid } = payBar(b.x, base, w, scale, b.i, b.p, ob, g);
+            txt(b.x + w / 2, base + 30, `חודש ${b.m}`, 20, { w: 600, fill: C.n700, o: ob });
+            // Labels to the left of the bar: interest by the teal part, principal by the grey part.
+            const yi = Math.max(top + 20, Math.min((top + mid) / 2 + 8, mid - 8));
+            txt(b.x - 12, yi, num(b.i), 20, { anchor: "end", w: 700, fill: C.teal, o: ob * g, ltr: true });
+            txt(b.x - 12, Math.max(mid + 28, (mid + base) / 2 + 8), num(b.p), 20, { anchor: "end", w: 700, fill: C.n700, o: ob * g, ltr: true });
+          }
+          // The two gaps in time.
+          const og = after(t, S.long, 34, o);
+          txt(650, 470, "…", 40, { fill: C.n600, o: og, ltr: true });
+          const og2 = after(t, S.long, 61, o);
+          txt(380, 470, "…", 40, { fill: C.n600, o: og2, ltr: true });
+          // Notes that follow the cues.
+          const notes = [
+            { s: 20, e: 34, text: `ריבית: ${V.drop} ₪ פחות · קרן: ${V.drop} ₪ יותר` },
+            { s: 41, e: 61, text: `בחודש שלפניו: ${V.prinK1} ₪ קרן, ${V.intK1} ₪ ריבית` },
+          ];
+          for (const n of notes) {
+            const on = during(t, S.long, n.s, n.e, o);
+            if (on <= 0) continue;
+            box(160, 192, 600, 50, on);
+            txt(460, 225, n.text, 22, { w: 600, fill: C.n700, o: on });
+          }
+        }
+        // Scene 4 — all the components together
+        if (inScene(t, S.total)) {
+          const o = vis(t, S.total);
+          txt(640, 140, "כל התשלומים יחד", 42, { w: 700, o });
+          txt(640, 180, `${V.longLoan} ₪ · 4.8% לשנה · 20 שנה`, 22, { fill: C.n600, o });
+          const rows = [
+            { y: 230, name: "רכיבי הקרן", v: fact("long.principal_sum"), c: C.n300, from: 1 },
+            { y: 320, name: "רכיבי הריבית", v: fact("long.interest"), c: C.teal, from: 7 },
+          ];
+          const unit = 600 / Number(fact("long.principal_sum"));
+          for (const r of rows) {
+            const or = after(t, S.total, r.from, o);
+            txt(1110, r.y + 42, r.name, 26, { anchor: "start", w: 600, o: or });
+            const w = Number(r.v) * unit * ease((t - S.total[0] - r.from) / 2);
+            el("rect", { x: 900 - w, y: r.y, width: w, height: 64, rx: 8, fill: r.c, opacity: or });
+            txt(900 - w - 16, r.y + 42, shek(r.v), 28, { anchor: "end", w: 700, o: or, ltr: true });
+          }
+          const o3 = after(t, S.total, 9, o);
+          box(330, 430, 620, 90, o3 * 0.6, C.mint);
+          txt(640, 462, "שולמו בסך הכול", 20, { fill: C.n700, o: o3 });
+          eqn(640, 502, `${V.longLoan} + ${V.interest} = ${V.paid}`, 30, { o: o3 });
+        }
+        // Scene 5 — it depends on the rate: month 1 at 4.8% and at 3%
+        if (inScene(t, S.rate)) {
+          const o = vis(t, S.rate);
+          txt(640, 140, "חודש 1 — תלוי באחוז הריבית", 42, { w: 700, o });
+          txt(640, 180, `${V.longLoan} ₪ · 20 שנה`, 22, { fill: C.n600, o });
+          legend(o, 210);
+          const base = 520, scale = 260 / Number(fact("long.pay")), w = 120;
+          const cards = [
+            { x: 820, label: "4.8% לשנה", i: fact("long.int_1"), p: fact("long.prin_1"), pay: V.longPay, from: 1 },
+            { x: 360, label: "3% לשנה", i: fact("low.int_1"), p: fact("low.prin_1"), pay: V.lowPay, from: 12 },
+          ];
+          for (const k of cards) {
+            const ok = after(t, S.rate, k.from, o);
+            const g = ease((t - S.rate[0] - k.from) / 1.5);
+            const { top, mid } = payBar(k.x, base, w, scale, k.i, k.p, ok, g);
+            txt(k.x + w / 2, base + 30, k.label, 22, { w: 700, o: ok });
+            txt(k.x - 14, (top + mid) / 2 + 8, num(k.i), 22, { anchor: "end", w: 700, fill: C.teal, o: ok * g, ltr: true });
+            txt(k.x - 14, (mid + base) / 2 + 8, num(k.p), 22, { anchor: "end", w: 700, fill: C.n700, o: ok * g, ltr: true });
+            txt(k.x + w + 14, top + 8, `החזר ${k.pay} ₪`, 18, { anchor: "end", fill: C.n600, o: ok * g });
+          }
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "בכל תשלום:", 40, { w: 600, fill: C.n700, o });
+          txt(640, 340, "רכיב ריבית + רכיב קרן", 60, { w: 700, o });
+          const o2 = after(t, S.end, 6, o);
+          txt(640, 430, "רק רכיב הקרן מקטין את החוב", 36, { w: 600, fill: C.teal, o: o2 });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

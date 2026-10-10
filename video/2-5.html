@@ -212,6 +212,8 @@
           const sc = S.years, o = vis(t, sc);
           heading("20 שנה, בשקלים", `המדד עולה ${V.pi}% בכל שנה · הנחה להמחשה, לא תחזית`, o);
           el("line", { x1: xOf(19) - BAND / 2, x2: RX + 10, y1: BASE, y2: BASE, stroke: C.n300, "stroke-width": 2, opacity: o });
+          const oA = during(t, sc, 1, 9, o);
+          if (oA > 0) pill(640, 320, 520, `המדד עולה ${V.pi}% בכל שנה: הנחה להמחשה`, oA, 24);
           LI.forEach((r, i) => {
             const oi = after(t, sc, 18 + i * 0.25, o);
             const h = Number(r.payment) * K;
