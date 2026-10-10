@@ -614,6 +614,54 @@
       "value": "401200.00"
     },
     {
+      "id": "once.but_last",
+      "kind": "amort_months_left",
+      "inputs": {
+        "months": 240,
+        "paid": 1
+      },
+      "value": 239
+    },
+    {
+      "id": "once.last_payment",
+      "kind": "sch_row",
+      "inputs": {
+        "principal": "400000",
+        "months": 240,
+        "method": "spitzer",
+        "rate": "3",
+        "rounding": "statement",
+        "index_0": "100",
+        "index_1": "100.3",
+        "month": 240,
+        "field": "payment"
+      },
+      "value": "2223.53"
+    },
+    {
+      "id": "unlinked.last_payment",
+      "kind": "sch_row",
+      "inputs": {
+        "principal": "400000",
+        "months": 240,
+        "method": "spitzer",
+        "rate": "3",
+        "rounding": "statement",
+        "month": 240,
+        "field": "payment"
+      },
+      "value": "2218.61"
+    },
+    {
+      "id": "once.last_extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "once.last_payment",
+        "subtrahend": "unlinked.last_payment"
+      },
+      "value": "4.92"
+    },
+    {
       "id": "slider.m1_payment",
       "kind": "sch_row",
       "inputs": {

@@ -24,7 +24,9 @@ The default inputs, and the figures --verify expects, are read from data/lessons
 src/styles/tokens.css. The output is byte-for-byte reproducible: fixed document dates and
 fixed zip timestamps.
 
---verify needs LibreOffice (soffice) on the PATH. It recalculates the solution three times — with
+When LibreOffice (soffice) is on the PATH, each file is recalculated once and the computed values
+are stored beside the formulas, so a preview that does not recalculate (a phone, Quick Look) shows
+the table; without it the files carry formulas only. --verify needs LibreOffice. It recalculates the solution three times — with
 its default inputs (the hand loan), with the sheet loan of the page, and with a loan whose first
 interest is exactly half an agora (a rounding tie) — reads the computed
 cells back with openpyxl, and compares every row and total with an independent Python
@@ -234,12 +236,40 @@ def instructions(wb, kind, t, font):
 # ── reproducible output ────────────────────────────────────────────────────
 
 
-def save(wb, path):
+def with_cached(xml, cached):
+    """Write each formula cell's computed value into the sheet XML (openpyxl writes formulas with an
+    empty value), so a viewer that does not recalculate — a phone's file preview, Quick Look — shows
+    the numbers. Excel and Sheets still recalculate on open (fullCalcOnLoad)."""
+
+    def fill(m):
+        ref, attrs, formula = m.group(1), m.group(2), m.group(3)
+        value = cached.get(ref)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return f'<c r="{ref}"{attrs}><f>{formula}</f><v>{repr(float(value)) if isinstance(value, float) else value}</v></c>'
+        text = "" if value is None else str(value)
+        text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        return f'<c r="{ref}"{attrs} t="str"><f>{formula}</f><v>{text}</v></c>'
+
+    return re.sub(r'<c r="([A-Z]+[0-9]+)"((?: s="[0-9]+")?)><f>(.*?)</f><v></v></c>', fill, xml)
+
+
+def cached_values(xlsx):
+    """Recalculate xlsx in LibreOffice; return {cell: value} for every formula cell of the schedule sheet."""
+    with tempfile.TemporaryDirectory() as d:
+        out = recalc(xlsx, Path(d))
+        formulas = load_workbook(xlsx)["לוח סילוקין"]
+        values = load_workbook(out, data_only=True)["לוח סילוקין"]
+        return {c.coordinate: values[c.coordinate].value for row in formulas.iter_rows() for c in row if c.data_type == "f"}
+
+
+def save(wb, path, cached=None):
     tmp = path.with_suffix(".tmp.xlsx")
     wb.save(tmp)
     with zipfile.ZipFile(tmp) as src, zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as dst:
         for info in src.infolist():
             data = src.read(info.filename)
+            if cached and info.filename == "xl/worksheets/sheet1.xml":
+                data = with_cached(data.decode("utf-8"), cached).encode("utf-8")
             if info.filename == "docProps/core.xml":
                 text = data.decode("utf-8")
                 text = re.sub(r"(<dcterms:(?:created|modified)[^>]*>)[^<]*(</dcterms:)", rf"\g<1>{FIXED_DATE}\g<2>", text)
@@ -419,10 +449,14 @@ def main():
     loan, rate, months = int(Decimal(h["principal"])), float(Decimal(h["rate_percent"]) / 100), int(h["months"])
     OUT.mkdir(parents=True, exist_ok=True)
     paths = {}
+    have_office = bool(shutil.which("soffice") or shutil.which("libreoffice"))
     for kind in ("template", "solution"):
         paths[kind] = OUT / f"schedule-{kind}.xlsx"
         save(build(kind, loan, rate, months), paths[kind])
-        print(f"wrote {paths[kind].relative_to(ROOT)}")
+        if have_office:
+            # Store the computed values beside the formulas (see with_cached); the build stays reproducible.
+            save(build(kind, loan, rate, months), paths[kind], cached_values(paths[kind]))
+        print(f"wrote {paths[kind].relative_to(ROOT)}" + ("" if have_office else " (no LibreOffice: formulas without stored values)"))
     if "--verify" in sys.argv:
         print("verifying in LibreOffice:")
         problems = verify(paths["template"], paths["solution"], F)
