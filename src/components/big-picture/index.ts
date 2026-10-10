@@ -6,6 +6,8 @@ import * as stage0 from "./stage-0.ts";
 import * as stage1 from "./stage-1.ts";
 import * as stage2 from "./stage-2.ts";
 import * as stage3 from "./stage-3.ts";
+import * as stage4 from "./stage-4.ts";
+import * as stage4market from "./stage-4-market.ts";
 import type { BigPicture, MapLink, MapNode, Region } from "./types.ts";
 
 export type { BigPicture, MapLink, MapNode, Region, RegionId } from "./types.ts";
@@ -20,7 +22,7 @@ export const REGIONS: Region[] = [
   { id: "result", label: "התוצאה", empty: "יתמלא בשלבים 3, 5 ו־6." },
 ];
 
-const STAGES = [stage0, stage1, stage2, stage3];
+const STAGES = [stage0, stage1, stage2, stage3, stage4, stage4market];
 const ALL_NODES: MapNode[] = STAGES.flatMap((s) => s.nodes);
 const ALL_LINKS: MapLink[] = STAGES.flatMap((s) => s.links);
 
