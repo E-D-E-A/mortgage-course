@@ -122,7 +122,7 @@
         el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
       // An equation, left to right, with exponents: parts are strings, or [base, exponent] pairs.
       function eqn(x, y, parts, size, opts = {}) {
-        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "isolate" });
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
         for (const p of parts) {
           const ns = "http://www.w3.org/2000/svg";
           if (typeof p === "string") {
@@ -228,7 +228,7 @@
           const o2 = after(t, S.formula, 9, o);
           eqn(640, 410, [`r = ${V.lgM}`, "   ·   n = 240   ·   ", ["1 − 1.004", "−240"], ` = ${V.lgOneMinus}`], 24, { w: 400, fill: C.n700, o: o2 });
           const o3 = after(t, S.formula, 12, o);
-          box(370, 440, 540, 90, o3 * 0.6, C.mint);
+          box(320, 440, 640, 90, o3 * 0.6, C.mint);
           eqn(640, 498, [`600,000 × ${V.lgM} ÷ ${V.lgOneMinus} = ${num(fact("long.pay"))}`], 30, { w: 700, o: o3 });
         }
         // Scene 6 — takeaway

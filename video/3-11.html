@@ -155,9 +155,10 @@
           el("line", { x1: left, x2: right, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
           txt(right, base + 50, "שנה (התשלום בחודש הראשון של כל שנה, מימין לשמאל)", 16, { anchor: "start", fill: C.n600, o });
           const o2 = after(t, S.setup, 7, o);
-          txt(right - band / 2 + 8, base - sYears[0] * scale - 50, V.sFirst, 20, { anchor: "start", w: 700, o: o2, ltr: true, fill: C.teal });
           const o3 = after(t, S.setup, 13, o);
-          txt(right - band / 2 - 20, base - eYears[0] * scale - 16, V.eFirst, 20, { anchor: "start", w: 700, o: o3, ltr: true });
+          el("rect", { x: 200, y: 180, width: 400, height: 84, rx: 12, fill: C.n0, stroke: C.n200, opacity: Math.max(o2, o3) });
+          txt(580, 214, `שפיצר: ${V.sFirst} בכל חודש`, 22, { anchor: "start", w: 600, o: o2 });
+          txt(580, 248, `קרן שווה: מ־${V.eFirst}, ויורדת`, 22, { anchor: "start", w: 600, o: o3 });
         }
         // Scene 3 — question 1: the total paid
         if (inScene(t, S.total)) {
@@ -250,8 +251,8 @@
           ];
           for (const r of rows) {
             const or = after(t, S.end, r.from, o);
-            txt(700, r.y, r.q, 28, { anchor: "start", fill: C.n700, o: or });
-            txt(560, r.y, r.a, 28, { anchor: "start", w: 700, o: or });
+            txt(960, r.y, r.q, 28, { anchor: "start", fill: C.n700, o: or });
+            txt(660, r.y, r.a, 28, { anchor: "start", w: 700, o: or });
           }
         }
       };
