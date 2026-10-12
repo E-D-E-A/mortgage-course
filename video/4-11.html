@@ -159,21 +159,21 @@
         if (inScene(t, S.ltv)) {
           const o = vis(t, S.ltv);
           txt(640, 100, "שיעור מימון: מול מה מודדים?", 40, { w: 700, o });
-          const X = (p) => 1100 - p * 9;
+          const X = (p) => 1020 - p * 8;
           const rows = [
-            { y: 200, name: "מול המחיר", sub: `${money(V.vloan)} ÷ ${money(V.price)}`, v: V.onPrice, from: 8 },
-            { y: 330, name: "מול השמאות", sub: `${money(V.vloan)} ÷ ${money(V.appraisal)}`, v: V.onValue, from: 18 },
+            { y: 190, name: "מול המחיר", sub: `${money(V.vloan)} ÷ ${money(V.price)}`, v: V.onPrice, from: 8 },
+            { y: 320, name: "מול השמאות", sub: `${money(V.vloan)} ÷ ${money(V.appraisal)}`, v: V.onValue, from: 18 },
           ];
           // ceiling line
           const oc = after(t, S.ltv, 3, o);
-          el("line", { x1: X(75), x2: X(75), y1: 160, y2: 430, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: oc });
+          el("line", { x1: X(75), x2: X(75), y1: 160, y2: 440, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: oc });
           txt(X(75), 148, "תקרה 75% (לא אומת)", 24, { w: 700, o: oc });
           rows.forEach((r) => {
             const or = after(t, S.ltv, r.from, o);
             const w = (X(0) - X(r.v)) * ease((t - S.ltv[0] - r.from) / 3);
             el("rect", { x: X(0) - w, y: r.y, width: w, height: 60, rx: 8, fill: r.v > 75 ? C.tq2 : C.teal, opacity: or });
-            txt(1180, r.y + 25, r.name, 26, { anchor: "start", w: 700, o: or });
-            txt(1180, r.y + 54, r.sub, 18, { anchor: "start", o: or, fill: C.n600, ltr: true });
+            txt(1180, r.y + 40, r.name, 26, { anchor: "start", w: 700, o: or });
+            txt(X(0), r.y + 86, r.sub, 20, { anchor: "end", o: or, fill: C.n600, ltr: true });
             txt(X(r.v) - 12, r.y + 42, `${r.v}%`, 30, { anchor: "end", w: 700, o: or, ltr: true });
           });
           const o3 = after(t, S.ltv, 30, o);

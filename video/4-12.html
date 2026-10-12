@@ -155,7 +155,7 @@
             const oi = after(t, S.tower, from, o);
             const start = cum;
             cum += l.v;
-            const y = 170 + i * 56;
+            const y = 165 + i * 52;
             const k = ease((t - S.tower[0] - from) / 2);
             const x0 = X(start), x1 = X(start + l.v * k);
             const left = Math.min(x0, x1), w = Math.abs(x1 - x0);
@@ -166,34 +166,34 @@
             txt(Math.min(x0, X(start + l.v)) - 10, y + 29, sg(l.s), 26, { anchor: "end", w: 700, o: oi, ltr: true });
           });
           const ot = after(t, S.tower, 50, o);
-          el("line", { x1: X(Number(V.spread)), x2: X(Number(V.spread)), y1: 160, y2: 520, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "4 6", opacity: ot });
-          el("rect", { x: 140, y: 468, width: 460, height: 64, rx: 14, fill: C.mint, opacity: ot * 0.8 });
-          txt(370, 510, `מרווח ${V.spread}  ·  ריבית ${V.anchor} + ${V.spread} = ${V.rate}%`, 26, { w: 700, o: ot, ltr: true });
+          el("line", { x1: X(Number(V.spread)), x2: X(Number(V.spread)), y1: 160, y2: 478, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "4 6", opacity: ot });
+          el("rect", { x: 140, y: 492, width: 520, height: 56, rx: 14, fill: C.mint, opacity: ot * 0.8 });
+          txt(400, 529, `מרווח ${V.spread}  ·  ריבית ${V.anchor} + ${V.spread} = ${V.rate}%`, 26, { w: 700, o: ot, ltr: true });
         }
         // 4 — what is known about each layer
         if (inScene(t, S.known)) {
           const o = vis(t, S.known);
           txt(640, 100, "מה ידוע על כל רכיב", 40, { w: 700, o });
-          el("rect", { x: 820, y: 135, width: 360, height: 36, rx: 8, fill: C.n100, opacity: o });
-          txt(1000, 160, "מי אמר", 22, { w: 700, o, fill: C.n700 });
-          el("rect", { x: 470, y: 135, width: 300, height: 36, rx: 8, fill: C.n100, opacity: o });
-          txt(620, 160, "הגודל", 22, { w: 700, o, fill: C.n700 });
+          el("rect", { x: 680, y: 135, width: 300, height: 36, rx: 8, fill: C.n100, opacity: o });
+          txt(830, 160, "מי אמר", 22, { w: 700, o, fill: C.n700 });
+          el("rect", { x: 360, y: 135, width: 260, height: 36, rx: 8, fill: C.n100, opacity: o });
+          txt(490, 160, "הגודל", 22, { w: 700, o, fill: C.n700 });
           LAYERS.forEach((l, i) => {
             const oi = after(t, S.known, 1 + i * 3, o);
             const y = 190 + i * 58;
             txt(1180, y + 28, l.name, 26, { anchor: "start", w: 700, o: oi });
             const who = l.who || "ידע כללי, בלי מספרים";
-            el("rect", { x: 820, y, width: 270, height: 40, rx: 20, fill: l.who ? C.tq2 : C.n200, opacity: oi });
-            txt(955, y + 28, who, 20, { w: 600, o: oi });
-            el("rect", { x: 520, y, width: 200, height: 40, rx: 20, fill: C.warn, opacity: oi });
-            txt(620, y + 28, "לא ידוע", 22, { w: 700, o: oi });
+            el("rect", { x: 690, y, width: 280, height: 40, rx: 20, fill: l.who ? C.tq2 : C.n200, opacity: oi });
+            txt(830, y + 28, who, 20, { w: 600, o: oi });
+            el("rect", { x: 390, y, width: 200, height: 40, rx: 20, fill: C.warn, opacity: oi });
+            txt(490, y + 28, "לא ידוע", 22, { w: 700, o: oi });
           });
         }
         // 5 — what a gap of 0.3 points costs
         if (inScene(t, S.gap)) {
           const o = vis(t, S.gap);
           txt(640, 100, "פער של מרווח, במספרים", 40, { w: 700, o });
-          const BASE = 470, UNIT = 0.062;
+          const BASE = 440, UNIT = 0.045;
           const bar = (x, v, fill, label, sub, from) => {
             const oi = after(t, S.gap, from, o);
             const h = v * UNIT * ease((t - S.gap[0] - from) / 2.5);
@@ -210,7 +210,7 @@
           txt(290, 320, V.monthDiff, 40, { w: 700, o: o3, ltr: true });
           const o4 = after(t, S.gap, 26, o);
           txt(290, 360, `×${V.months} חודשים = ${V.totalDiff}`, 24, { w: 700, o: o4, ltr: true });
-          txt(640, 520, `${V.loan} ל־25 שנה. היחידה של טובי לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
+          txt(640, 548, `${V.loan} ל־25 שנה. היחידה של טובי לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
         }
         // 6 — closing
         if (inScene(t, S.end)) {
