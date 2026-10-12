@@ -143,6 +143,7 @@ A lesson that needs a **new interactive illustration**: write it as `src/compone
 `<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב`.
 
 - **The official sites are blocked in this environment** (Bank of Israel, CBS, gov.il, Knesset). Nothing official may be marked `עובדה מאומתת` until someone opens the primary document. Facts that come from the team's transcription in the Brain: kind `לא אומת`, text "לפי תעתיק בצוות ב־Brain (דף N, תאריך), ממתין לבדיקה מול המקור". From search summaries only: `לא אומת`, "לפי תקציר של מקור רשמי; ממתין לבדיקה". Always date the data (for example "ריבית בנק ישראל 3.25%, מ־2026-09-03").
+- **What a bank's public form asks** (the questionnaire records in the team's repo) is a team record, not something this course opened: kind `לא אומת`, text "כפי שתועד בריפו של הצוות ב־<תאריך>; לא נבדק מחדש מול האתר של הבנק". `עובדה מאומתת` is only for what the author of the page actually opened and read at its primary source (coordinator, 2026-10-12).
 - Field knowledge (`research/field-knowledge.md`): kind `ידע מהשטח`, text names who said it and when, plus "ממתין לאישור אילון". Never the do-not-teach items.
 - No real client data, ever. No real bank's branding in examples; examples use "בנק א׳".
 - The LLM never computes: you may write sentences, never numbers that a calculation produces.
