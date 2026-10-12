@@ -140,7 +140,14 @@ export const predictionOptions = [
 אבי ניגש עם שומות של שנתיים: {f.shekels("case.assess_old")} ו־{f.shekels("case.assess_latest")} נטו לשנה. (אלה מספרים להמחשה, ולא חישוב מס.) אפשר לקבל ממנו חודשי בשתי דרכים:
 
 - **לפי השומה האחרונה בלבד:** <M>{n("case.assess_latest")} ÷ 12 = {n("case.avi_latest")}</M>
-- **לפי ממוצע השנתיים:** <M>({n("case.assess_old")} + {n("case.assess_latest")}) ÷ (2 × 12) = {n("case.assess_total")} ÷ 24 = {n("case.avi_avg")}</M>
+- **לפי ממוצע השנתיים:** מחברים את שתי ההכנסות השנתיות, ומחלקים ב־24 (שנתיים, 12 חודשים בכל אחת):
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>({n("case.assess_old")} + {n("case.assess_latest")}) ÷ (2 × 12)</M>
+  <M>= {n("case.assess_total")} ÷ 24</M>
+  <M>= {n("case.avi_avg")}</M>
+</div>
+
 
 אבל אבי מצהיר על {f.shekels("case.avi_declared")}. מ־{f.shekels("case.avi_declared")} ל־{f.shekels("case.avi_avg")}, לפי הממוצע, יש פער של <M>{n("case.avi_declared")} − {n("case.avi_avg")} = {n("case.avi_gap")}</M> בחודש; ולפי השומה האחרונה לבדה — {f.shekels("case.avi_gap_latest")}. זה התרגיל המרכזי של התיק של אבי.
 
