@@ -50,7 +50,7 @@
       const V = {
         aviD: fact("case.avi_declared"), aviR: fact("case.avi_recognised"), michal: fact("case.michal"),
         hhD: fact("case.hh_declared"), hhR: fact("case.hh_recognised"), gap: fact("case.hh_gap"), aviGap: fact("case.avi_gap"),
-        pay: fact("case.payment"), rD: fact("case.ratio_declared"), rR: fact("case.ratio_recognised"), cap: fact("rule.regulatory_cap"),
+        pay: fact("case.payment"), rD: fact("case.ratio_declared"), rR: fact("case.ratio_recognised"), cap: fact("rule.regulatory_cap"), cap40: fact("demo.cap_high"),
         W: fact("rule.window"), docs: fact("worked.docs_day"), fin: fact("worked.finished_day"), left: fact("worked.left"),
         approved: fact("worked.approved"), end: fact("worked.window_end"),
       };
@@ -89,8 +89,8 @@
       const S = { title: [0, 10], decl: [10, 50], ratio: [50, 85], four: [85, 122], clock: [122, 152] };
       window.duration = 152;
       window.cues = [
-        [1, 5, "אישור עקרוני ניתן על מה שהלווים אמרו."],
-        [5, 9.5, "בחיתום הבנק פותח את התיק ובודק."],
+        [1, 5, "בדרך כלל, אישור עקרוני ניתן על מה שנאמר."],
+        [5, 9.5, "לפי הצוות, בחיתום הבנק בודק מול מסמכים."],
         [11, 19, "מוצהר: מה שנמסר. מאומת: מה שנמצא במסמכים."],
         [19, 27, `אבי הצהיר על ${num(V.aviD)} ₪ בחודש.`],
         [27, 35, `מהשומות שלו אפשר להכיר ב־${num(V.aviR)} ₪.`],
@@ -99,12 +99,13 @@
         [51, 59, `אותה הלוואה, אותו החזר: ${num(V.pay)} ₪.`],
         [59, 68, `על המוצהר: יחס החזר של ${V.rD}%.`],
         [68, 77, `על המאומת: ${V.rR}%. אותו החזר, הכנסה אחרת.`],
-        [77, 84, `${V.cap}% היא מגבלת בנק ישראל (לא אומת).`],
+        [77, 80.5, `${V.cap}% היא מגבלת בנק ישראל (לא אומת).`],
+        [80.5, 84.5, `${V.cap40}%: מגבלת ההון, לפי תיעוד הצוות (לא אומת).`],
         [86, 94, "לבנק ארבע תשובות, לפי מחקר הצוות."],
         [94, 102, "ממשיך, מבקש עוד מסמכים, משנה תנאים או מבטל."],
         [102, 111, "מה מכריע ביניהן? אין לנו מקור."],
         [111, 121, "לכן מחשבים מראש את ההשלכות במספרים."],
-        [123, 131, `האישור ביום 0. החלון: לפחות ${V.W} יום.`],
+        [123, 131, `האישור ביום 0. הרצפה: ${V.W} יום.`],
         [131, 139, `המסמכים נשלחו ביום ${V.docs}.`],
         [139, 146, `החיתום הסתיים ביום ${V.fin}: נשארו ${V.left} ימים.`],
         [146, 151.5, "התאריכים בדויים. הכללים לפי תעתיק; לא אומת."],
@@ -174,6 +175,12 @@
           txt(X(V.cap), y - 122, `${V.cap}%`, 28, { w: 700, ltr: true, o: oC });
           txt(X(V.cap), y - 92, "מגבלת בנק ישראל", 20, { w: 600, o: oC });
           txt(X(V.cap), y - 66, "לפי תעתיק של הצוות; לא אומת", 17, { fill: C.n600, o: oC });
+          const oH = at(t, 80.5, o);
+          el("line", { x1: X(V.cap40), x2: X(V.cap40), y1: y - 40, y2: y + 12, stroke: C.warn, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oH });
+          txt(X(V.cap40) + 70, y + 150, `${V.cap40}%`, 28, { w: 700, ltr: true, fill: C.warn, o: oH });
+          txt(X(V.cap40) + 70, y + 180, "מגבלת ההון", 20, { w: 600, o: oH });
+          txt(X(V.cap40) + 70, y + 204, "לפי תיעוד הצוות; לא אומת", 17, { fill: C.n600, o: oH });
+          el("line", { x1: X(V.cap40), x2: X(V.cap40) + 70, y1: y + 12, y2: y + 130, stroke: C.warn, "stroke-width": 2, opacity: oH });
           txt(640, 560, "יחס החזר = ההחזר חלקי ההכנסה, כפול 100. מה בנק מסוים עושה בפועל — לא ידוע.", 19, { fill: C.n600, o: at(t, 68, o) });
         }
 
@@ -209,7 +216,7 @@
           el("line", { x1: X(V.W) - 30, x2: right + 20, y1: y, y2: y, stroke: C.n300, "stroke-width": 3, opacity: o });
           const oW = at(t, 123, o);
           box(X(V.W), y - 26, X(0) - X(V.W), 52, oW * 0.45, { rx: 8, fill: C.tq2, stroke: C.tq2 });
-          txt((X(0) + X(V.W)) / 2 - 70, y + 8, `החלון: לפחות ${V.W} יום`, 22, { w: 700, o: oW });
+          txt((X(0) + X(V.W)) / 2 - 70, y + 8, `${V.W} יום: הרצפה`, 22, { w: 700, o: oW });
           const mark = (d, top, label, sub, start, colour = C.navy) => {
             const om = at(t, start, o);
             el("line", { x1: X(d), x2: X(d), y1: y - 40, y2: y + 40, stroke: colour, "stroke-width": 3, opacity: om });
@@ -221,7 +228,7 @@
           mark(0, false, "האישור", dw(V.approved), 123);
           mark(V.docs, true, "המסמכים נשלחו", "", 131);
           mark(V.fin, false, "החיתום הסתיים", `נשארו ${V.left} ימים`, 139, C.teal);
-          mark(V.W, true, "סוף החלון", dw(V.end), 123);
+          mark(V.W, true, `${V.W} יום מהאישור`, dw(V.end), 123);
           txt(640, 500, "אין הוראה שקובעת כמה זמן מותר לחיתום. לפי תעתיק של הצוות; לא אומת.", 20, { fill: C.n600, o: at(t, 146, o) });
           txt(640, 540, "התאריכים בדויים: דוגמה לימודית.", 18, { fill: C.n600, o });
         }

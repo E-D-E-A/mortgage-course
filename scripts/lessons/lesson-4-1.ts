@@ -78,6 +78,7 @@ export default function lesson41(): LessonData {
   add(sum("slip.mandatory", MANDATORY));
   add(net("slip.net", "10700", MANDATORY));
   add(given("slip.loan", OTHER[0]));
+  add(given("slip.loan_months", 10));
   add(given("slip.dues", OTHER[1]));
   add(sum("slip.other", OTHER));
   add(netToPay("slip.ntp", "8200", OTHER));
@@ -111,14 +112,15 @@ export default function lesson41(): LessonData {
   add(given("ex1.loan", "500"));
   add(net("ex1.net", "12000", ["3000"]));
   add(netToPay("ex1.ntp", "9000", ["500"]));
-  // 2: net from a payslip's lines.
-  add(given("ex2.gross", "14200"));
-  add(given("ex2.tax", "1850"));
-  add(given("ex2.ni", "1250"));
-  add(given("ex2.pension", "850"));
-  add(net("ex2.answer", "14200", ["1850", "1250", "850"]));
-  add(net("ex2.err_tax_only", "14200", ["1850"]));
-  add(sum("ex2.err_deductions", ["1850", "1250", "850"]));
+  // 2: a household of two (invented): one payslip, one assessment — declared against recognised.
+  add(given("hx.net_pay", "9200"));
+  add(given("hx.annual", "66000"));
+  const hxMonthly = add(monthly("hx.assess_monthly", "66000"));
+  const hxDeclared = add(given("hx.declared", "16000"));
+  const hxRec = add(sum("hx.recognised", ["9200", hxMonthly.value as string]));
+  add(difference("hx.answer", hxDeclared, hxRec));
+  add(given("hx.err_declared", "16000"));
+  add(sum("hx.err_annual_sum", ["9200", "66000"]));
   // 3: three months' average.
   add(given("ex3.m1", "9150"));
   add(given("ex3.m2", "9300"));
@@ -126,6 +128,11 @@ export default function lesson41(): LessonData {
   add(average("ex3.answer", ["9150", "9300", "9600"]));
   add(sum("ex3.err_sum", ["9150", "9300", "9600"]));
   add(average("ex3.err_two", ["9300", "9600"]));
+  // The rounding callout: three months that do not average to whole agorot.
+  add(given("round.m1", "8000"));
+  add(given("round.m2", "8000"));
+  add(given("round.m3", "8001"));
+  add(average("round.avg", ["8000", "8000", "8001"]));
   // 4: a self-employed person's monthly income from one assessment: 130,000 before tax, 28,000 tax.
   add(given("ex4.before_tax", "130000"));
   add(given("ex4.tax", "28000"));

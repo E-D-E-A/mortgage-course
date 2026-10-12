@@ -4,7 +4,9 @@
 // server and in the browser), so the right one is not always first. `ordered`
 // keeps the written order, for options that form a scale.
 import { computed, ref } from "vue";
+import { splitVerdict } from "../lib/bidi.ts";
 import { save } from "../lib/progress.ts";
+import BidiText from "./BidiText.vue";
 
 interface Option {
   text: string;
@@ -26,6 +28,9 @@ const shown = computed(() => {
   }
   return opts;
 });
+
+// The verdict word in front of the feedback; a feedback that opens with its own is not given a second one.
+const verdict = computed(() => (picked.value === null ? null : splitVerdict(props.options[picked.value].feedback, !!props.options[picked.value].correct)));
 
 function pick(i: number) {
   picked.value = i;
@@ -56,12 +61,11 @@ function pick(i: number) {
         :aria-pressed="picked === i"
         @click="pick(i)"
       >
-        {{ o.text }}
+        <BidiText :text="o.text" />
       </button>
     </div>
-    <p v-if="picked !== null" class="mt-3 text-body-m text-n800" aria-live="polite">
-      <strong class="text-n900">{{ options[picked].correct ? "נכון." : "לא בדיוק." }}</strong>
-      {{ options[picked].feedback }}
+    <p v-if="verdict" class="mt-3 text-body-m text-n800" aria-live="polite">
+      <strong class="text-n900">{{ verdict.lead }}</strong>{{ " " }}<BidiText :text="verdict.rest" />
     </p>
   </div>
 </template>

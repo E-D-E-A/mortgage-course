@@ -31,6 +31,8 @@ export default function lesson43(): LessonData {
   add(ratio("small.ratio_numerator", smallNum.value as string, "10000"));
 
   // ── Which payment ──
+  add(given("grace.months_left", 288));
+  add(given("grace.years_left", 24));
   add(qualifying("grace.after", { amount: "1000000", ratePercent: "4.5", months: 300, graceMonths: 12 }));
   add(qualifying("grace.during", { amount: "1000000", ratePercent: "4.5", months: 300, bullet: true }));
   add(qualifying("bullet.interest", { amount: "400000", ratePercent: "5", months: 120, bullet: true }));
@@ -50,6 +52,10 @@ export default function lesson43(): LessonData {
   const rRec = add(ratio("b.ratio_recognised", P, "15700"));
   add(ratio("b.ratio_latest", P, "16200"));
   add(ratio("b.ratio_ntp", P, "15250"));
+  // Exercise 5: the bank does not count Avi's income at all (status: not included).
+  add(ratio("ex5.answer", P, "8200"));
+  add(ratio("ex5.err_avi", P, "7500"));
+  add(given("ex5.michal", "8200"));
   add({ ...difference("b.ratio_gap", rRec, rDecl) });
 
   // The checker's tasks, on case B (income lines 7,500 + 8,200; מיכל's loan of 400 with 10 payments left does not count).

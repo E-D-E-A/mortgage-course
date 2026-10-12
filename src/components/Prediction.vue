@@ -1,12 +1,14 @@
 <script setup lang="ts">
 // "Guess first": the learner commits to an answer before the explanation.
 // The guess is kept and shown again by <PredictionReveal> at the end.
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { load, save } from "../lib/progress.ts";
 
 const props = defineProps<{ id: string; question: string; options: string[] }>();
 const choice = ref<number | null>(null);
 const locked = ref(false);
+// The button that locked the guess disappears, and focus would fall to <body>: it moves to the line that replaces it.
+const savedLine = ref<HTMLElement | null>(null);
 
 onMounted(() => {
   const saved = load<number>(`prediction:${props.id}`);
@@ -20,6 +22,7 @@ function lock() {
   if (choice.value === null) return;
   save(`prediction:${props.id}`, choice.value);
   locked.value = true;
+  nextTick(() => savedLine.value?.focus());
 }
 </script>
 
@@ -47,7 +50,7 @@ function lock() {
     >
       זה הניחוש שלי
     </button>
-    <p v-else class="mt-4 text-body-m text-n600">
+    <p v-else ref="savedLine" tabindex="-1" class="mt-4 text-body-m text-n600">
       שמרנו את הניחוש שלכם. בהמשך השיעור תגלו אם צדקתם — אין צורך לנחש נכון, רק לנחש.
     </p>
   </div>

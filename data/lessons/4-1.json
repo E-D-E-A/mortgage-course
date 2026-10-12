@@ -304,6 +304,12 @@
       "value": "400"
     },
     {
+      "id": "slip.loan_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 10
+    },
+    {
       "id": "slip.dues",
       "kind": "given",
       "inputs": {},
@@ -489,54 +495,61 @@
       "value": "8500.00"
     },
     {
-      "id": "ex2.gross",
+      "id": "hx.net_pay",
       "kind": "given",
       "inputs": {},
-      "value": "14200"
+      "value": "9200"
     },
     {
-      "id": "ex2.tax",
+      "id": "hx.annual",
       "kind": "given",
       "inputs": {},
-      "value": "1850"
+      "value": "66000"
     },
     {
-      "id": "ex2.ni",
-      "kind": "given",
-      "inputs": {},
-      "value": "1250"
-    },
-    {
-      "id": "ex2.pension",
-      "kind": "given",
-      "inputs": {},
-      "value": "850"
-    },
-    {
-      "id": "ex2.answer",
-      "kind": "aff_payslip_net",
+      "id": "hx.assess_monthly",
+      "kind": "aff_annual_to_monthly",
       "inputs": {
-        "gross": "14200",
-        "mandatory": "1850|1250|850"
+        "annual": "66000"
       },
-      "value": "10250.00"
+      "value": "5500.00"
     },
     {
-      "id": "ex2.err_tax_only",
-      "kind": "aff_payslip_net",
-      "inputs": {
-        "gross": "14200",
-        "mandatory": "1850"
-      },
-      "value": "12350.00"
+      "id": "hx.declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000"
     },
     {
-      "id": "ex2.err_deductions",
+      "id": "hx.recognised",
       "kind": "hh_sum",
       "inputs": {
-        "amounts": "1850|1250|850"
+        "amounts": "9200|5500.00"
       },
-      "value": "3950.00"
+      "value": "14700.00"
+    },
+    {
+      "id": "hx.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "hx.declared",
+        "subtrahend": "hx.recognised"
+      },
+      "value": "1300.00"
+    },
+    {
+      "id": "hx.err_declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000"
+    },
+    {
+      "id": "hx.err_annual_sum",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "9200|66000"
+      },
+      "value": "75200.00"
     },
     {
       "id": "ex3.m1",
@@ -579,6 +592,32 @@
         "amounts": "9300|9600"
       },
       "value": "9450.00"
+    },
+    {
+      "id": "round.m1",
+      "kind": "given",
+      "inputs": {},
+      "value": "8000"
+    },
+    {
+      "id": "round.m2",
+      "kind": "given",
+      "inputs": {},
+      "value": "8000"
+    },
+    {
+      "id": "round.m3",
+      "kind": "given",
+      "inputs": {},
+      "value": "8001"
+    },
+    {
+      "id": "round.avg",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "8000|8000|8001"
+      },
+      "value": "8000.33"
     },
     {
       "id": "ex4.before_tax",

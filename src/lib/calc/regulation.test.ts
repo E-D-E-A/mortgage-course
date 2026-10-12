@@ -16,6 +16,7 @@ import {
   RULES,
   variableSharePercent,
   variableWithin,
+  withMinus,
 } from "./regulation.ts";
 import { percentString } from "./percent.ts";
 
@@ -169,5 +170,18 @@ describe("the living budget (lesson 4.6)", () => {
     // 22,000 − 1,000 − 13,500 = 7,500.
     expect(largestPaymentForBudget("22000", ["1000"], "13500").toFixed(0)).toBe("7500");
     expect(largestPaymentForBudget("10000", ["1000"], "13500").toFixed(0)).toBe("0");
+  });
+});
+
+describe("the minus sign", () => {
+  it("writes a negative amount with the course's minus, not the hyphen", () => {
+    expect(withMinus("-2,950.00 ₪")).toBe("−2,950.00 ₪");
+    expect(withMinus("\u200e-3,333.34 ₪")).toBe("−3,333.34 ₪");
+    expect(withMinus("הפרש -600")).toBe("הפרש −600");
+  });
+
+  it("leaves a positive amount and a hyphen between words alone", () => {
+    expect(withMinus("2,950.00 ₪")).toBe("2,950.00 ₪");
+    expect(withMinus("שנתיים-שלוש")).toBe("שנתיים-שלוש");
   });
 });

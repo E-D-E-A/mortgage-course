@@ -81,8 +81,10 @@ export default function lesson(): LessonData {
   // The half-worked example: two parents, children aged 2, 16, 19 and 20, all at home.
   const halfAges = [2, 16, 19, 20];
 
-  // Exercise 3: a self-employed borrower's yearly net income, per the accountant.
-  const yearly = given("ex3.yearly", "210000");
+  // The explanation's example (shown in the page and the video): a yearly net income of 210,000 ₪.
+  const explainYearly = given("explain.yearly", "210000");
+  // Exercise 3: another self-employed borrower, so the answer is not on the page above it.
+  const yearly = given("ex3.yearly", "186000");
   // Exercise 5: Discount's on-screen payment, 30 years at 5.5%, for 1,000,000 ₪.
   const interestYear = given("ex5.interest_year", "55000");
 
@@ -112,9 +114,11 @@ export default function lesson(): LessonData {
       under("half.poalim", halfAges, 21),
       household("half.discount", 2, halfAges),
 
+      explainYearly,
+      monthly("explain.monthly", "210000"),
       yearly,
-      monthly("ex3.answer", "210000"),
-      { id: "ex3.err_two_years", kind: "forms_monthly_from_yearly", inputs: { yearly: "105000" }, value: moneyString(monthlyFromYearly("105000")) },
+      monthly("ex3.answer", "186000"),
+      { id: "ex3.err_two_years", kind: "forms_monthly_from_yearly", inputs: { yearly: "93000" }, value: moneyString(monthlyFromYearly("93000")) },
 
       given("ex4.value", "1800000"),
       ceilingLoan("ex4.answer", "1800000", "50"),

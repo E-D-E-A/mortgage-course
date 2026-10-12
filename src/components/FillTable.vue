@@ -4,8 +4,16 @@
 // checked — shekels to the agora (within 2 agorot, so a total from rounded
 // rows and one from the formula both count), percent or points to 0.005,
 // a date shown only. The first rows are usually given; the learner fills the rest.
-import { reactive, ref } from "vue";
-import { numberPieces } from "../lib/bidi.ts";
+//
+// On a phone a table with more columns than the box can hold becomes a stack of cards, one per row: the
+// row's name as the heading, then "column name: value" pairs (a blank is its label with a full-width
+// input under it), in the same order and with the same checks. It is the same table markup restyled by
+// CSS (see the style block), so the inputs, their names and the "show the full table" view are unchanged.
+// Which tables stack is decided by measuring: five columns or more start stacked (no flash on the server
+// render), and below `sm` every table is measured with the plain layout and stacked only if it overflows.
+// From `sm` up, and in print, it is always the plain table.
+import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { glueShekelSign, numberPieces, withMinus } from "../lib/bidi.ts";
 import { formatShekels } from "../lib/calc/money.ts";
 import { parseAnswer, save } from "../lib/progress.ts";
 
@@ -38,6 +46,8 @@ const props = withDefaults(
 const entered = reactive<Record<string, string>>({});
 const result = reactive<Record<string, "ok" | "bad" | undefined>>({});
 const revealed = ref(false);
+const root = ref<HTMLElement | null>(null);
+const stacked = ref(props.columns.length + (props.periodLabel ? 1 : 0) >= 5);
 const nameOf = (row: Row, i: number) => String(row[props.rowKey] ?? i + 1);
 const keyOf = (row: Row, i: number, col: string) => `${nameOf(row, i)}.${col}`;
 const isBlank = (row: Row, i: number, col: string) => props.blanks.includes(keyOf(row, i, col));
@@ -48,8 +58,8 @@ const dateFormat = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "lo
 const percentFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4, useGrouping: false });
 function show(value: string | number | undefined, format: Format = "shekels"): string {
   if (value === undefined || value === "") return "";
-  if (format === "shekels") return formatShekels(String(value));
-  if (format === "percent") return `${percentFormat.format(Number(value))}%`;
+  if (format === "shekels") return glueShekelSign(withMinus(formatShekels(String(value))));
+  if (format === "percent") return withMinus(`${percentFormat.format(Number(value))}%`);
   if (format === "date") return dateFormat.format(new Date(`${value}T12:00:00Z`));
   return String(value);
 }
@@ -67,23 +77,62 @@ function check() {
   save(`exercise:${props.id}`, { done: allOk() });
 }
 const allOk = () => props.blanks.every((b) => result[b] === "ok");
+
+// Below `sm`: does the plain table overflow its box? Measured with the stacked layout switched off,
+// in the same frame, so nothing is painted in between.
+const phone = "(max-width: 639.98px)";
+let observer: ResizeObserver | null = null;
+let lastWidth = -1;
+function fit() {
+  const el = root.value;
+  if (!el || !globalThis.matchMedia?.(phone).matches) return;
+  const was = el.hasAttribute("data-stacked");
+  el.removeAttribute("data-stacked");
+  const overflows = el.scrollWidth > el.clientWidth + 1;
+  if (was) el.setAttribute("data-stacked", "");
+  stacked.value = overflows;
+}
+onMounted(() => {
+  fit();
+  if (typeof ResizeObserver !== "undefined" && root.value) {
+    observer = new ResizeObserver(() => {
+      const w = root.value?.clientWidth ?? 0;
+      if (w === lastWidth) return;
+      lastWidth = w;
+      fit();
+    });
+    observer.observe(root.value);
+  }
+  // The web font changes the widths a little once it has loaded.
+  document.fonts?.ready.then(fit);
+});
+onBeforeUnmount(() => observer?.disconnect());
+// Inputs and the values they stand for have different widths.
+watch(revealed, () => nextTick(fit));
 </script>
 
 <template>
-  <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-5">
-    <table class="w-full border-collapse text-caption sm:text-body-m">
-      <thead>
-        <tr class="border-b border-n200 text-caption text-n600">
-          <th v-if="periodLabel" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3">{{ periodLabel }}</th>
-          <th v-for="c in columns" :key="c.key" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3">{{ c.label }}</th>
+  <div ref="root" class="ft-root my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-3 shadow-sm sm:p-5" :data-stacked="stacked ? '' : undefined">
+    <table class="w-full border-collapse text-caption sm:text-body-m" role="table">
+      <thead role="rowgroup">
+        <tr class="border-b border-n200 text-caption text-n600" role="row">
+          <th v-if="periodLabel" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3" role="columnheader">{{ periodLabel }}</th>
+          <th v-for="c in columns" :key="c.key" class="py-2 pe-2 text-start align-bottom font-semibold last:pe-0 sm:pe-3" role="columnheader">{{ c.label }}</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100">
-          <td v-if="periodLabel" class="py-2 pe-2 text-n700 last:pe-0 sm:pe-3">
+      <tbody role="rowgroup">
+        <tr v-for="(row, i) in rows" :key="nameOf(row, i)" class="border-b border-n100" role="row">
+          <td v-if="periodLabel" class="ft-name py-2 pe-2 text-n700 last:pe-0 sm:pe-3" :data-label="periodLabel" role="cell">
             <template v-for="(p, j) in namePieces(row, i)" :key="j"><span v-if="p.ltr" class="ltr whitespace-nowrap">{{ p.text }}</span><template v-else>{{ p.text }}</template></template>
           </td>
-          <td v-for="c in columns" :key="c.key" class="py-2 pe-2 last:pe-0 sm:pe-3">
+          <td
+            v-for="c in columns"
+            :key="c.key"
+            class="py-2 pe-2 last:pe-0 sm:pe-3"
+            :class="isBlank(row, i, c.key) && !revealed ? 'ft-blank' : ''"
+            :data-label="c.label"
+            role="cell"
+          >
             <template v-if="isBlank(row, i, c.key) && !revealed">
               <input
                 v-model="entered[keyOf(row, i, c.key)]"
@@ -130,3 +179,75 @@ const allOk = () => props.blanks.every((b) => result[b] === "ok");
     </p>
   </div>
 </template>
+
+<style>
+/* The stacked layout: the same table, drawn as one card per row on a phone (see the script's header).
+   Screen only and below `sm` (40rem); print and wider screens keep the plain table. */
+@media screen and (max-width: 639.98px) {
+  .ft-root[data-stacked] table,
+  .ft-root[data-stacked] tbody,
+  .ft-root[data-stacked] tr,
+  .ft-root[data-stacked] td {
+    display: block;
+  }
+  /* The column names move into each cell; the header row stays for assistive technology only. */
+  .ft-root[data-stacked] thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .ft-root[data-stacked] tbody tr {
+    margin-block-end: var(--mogi-space-3);
+    padding: var(--mogi-space-2) var(--mogi-space-3);
+    border: 1px solid var(--mogi-n200);
+    border-radius: var(--mogi-radius-md);
+    background: var(--mogi-n0);
+  }
+  .ft-root[data-stacked] tbody tr:last-child {
+    margin-block-end: 0;
+  }
+  .ft-root[data-stacked] td {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--mogi-space-1) var(--mogi-space-3);
+    padding: var(--mogi-space-1) 0;
+    font-size: var(--mogi-text-body-m-size);
+    line-height: var(--mogi-text-body-m-line);
+  }
+  .ft-root[data-stacked] td::before {
+    content: attr(data-label);
+    color: var(--mogi-n600);
+    font-size: var(--mogi-text-caption-size);
+    line-height: var(--mogi-text-caption-line);
+  }
+  /* The row's name is the card's heading: "חודש 3". */
+  .ft-root[data-stacked] td.ft-name {
+    display: block;
+    margin-block-end: var(--mogi-space-1);
+    padding-block-end: var(--mogi-space-2);
+    border-block-end: 1px solid var(--mogi-n100);
+    color: var(--mogi-n900);
+    font-weight: 600;
+  }
+  .ft-root[data-stacked] td.ft-name::before {
+    content: attr(data-label) " ";
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  /* A blank: its label, then the input across the card. */
+  .ft-root[data-stacked] td.ft-blank::before {
+    flex: 1 0 100%;
+  }
+  .ft-root[data-stacked] td.ft-blank input {
+    width: 100%;
+    max-width: none;
+    min-height: 44px;
+  }
+}
+</style>

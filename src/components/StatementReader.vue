@@ -35,6 +35,9 @@ const avg = computed(() => average(shown.value.map((r) => r.avi)));
 const lowest = computed(() => shown.value.map((r) => Number(r.closing)).reduce((a, b) => Math.min(a, b)));
 const vsDeclared = computed(() => avg.value.minus(props.declared));
 const vsRecognised = computed(() => avg.value.minus(props.recognised));
+// Negative amounts are written with the course's minus sign, not the hyphen the number formatter uses.
+const signed = (v: unknown) => formatShekels(v as never).replace(/^-/, "−").replace(/^‎-/, "−");
+const monthsLabel = computed(() => (months.value === 1 ? "בחודש האחרון" : `ב־${months.value} החודשים האחרונים`));
 const above = (d: { isNegative: () => boolean; isZero: () => boolean }) => !d.isNegative() && !d.isZero();
 </script>
 
@@ -60,8 +63,8 @@ const above = (d: { isNegative: () => boolean; isZero: () => boolean }) => !d.is
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in rows" :key="r.month" class="border-b border-n100" :class="shown.includes(r) ? '' : 'opacity-40'">
-            <td class="py-2 text-n700">{{ r.month }}</td>
+          <tr v-for="r in rows" :key="r.month" class="border-b border-n100" :class="shown.includes(r) ? '' : 'opacity-50'">
+            <td class="py-2 text-n700">{{ r.month }}<span v-if="!shown.includes(r)" class="block text-caption text-n600">לא נקרא</span></td>
             <td class="py-2"><span class="ltr">{{ formatShekels(r.avi) }}</span></td>
             <td class="py-2"><span class="ltr">{{ formatShekels(r.michal) }}</span></td>
             <td class="py-2"><span class="ltr">{{ formatShekels(r.debits) }}</span></td>
@@ -75,7 +78,7 @@ const above = (d: { isNegative: () => boolean; isZero: () => boolean }) => !d.is
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">ממוצע ההפקדות של אבי</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ formatShekelsText(avg) }}</span></p>
-        <p class="text-caption text-n600">ב־{{ months }} {{ months === 1 ? "החודש האחרון" : "החודשים האחרונים" }}</p>
+        <p class="text-caption text-n600">{{ monthsLabel }}</p>
       </div>
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">מול מה שהוצהר (<span class="ltr">{{ formatShekelsText(declared) }}</span>)</p>
@@ -102,8 +105,8 @@ const above = (d: { isNegative: () => boolean; isZero: () => boolean }) => !d.is
         <tbody>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">חודשים שנקראו</th><td class="py-1">{{ months }}</td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">ממוצע ההפקדות של אבי</th><td class="py-1"><span class="ltr">{{ formatShekels(avg) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הפרש מול ההצהרה</th><td class="py-1"><span class="ltr">{{ formatShekels(vsDeclared) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הפרש מול ההכרה</th><td class="py-1"><span class="ltr">{{ formatShekels(vsRecognised) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הפרש מול ההצהרה</th><td class="py-1"><span class="ltr">{{ signed(vsDeclared) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הפרש מול ההכרה</th><td class="py-1"><span class="ltr">{{ signed(vsRecognised) }}</span></td></tr>
           <tr><th class="py-1 text-start font-normal text-n600">היתרה הנמוכה בסוף חודש</th><td class="py-1"><span class="ltr">{{ formatShekels(lowest) }}</span></td></tr>
         </tbody>
       </table>

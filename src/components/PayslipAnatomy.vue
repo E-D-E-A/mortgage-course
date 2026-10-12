@@ -6,7 +6,7 @@
 // to the employer loan in each case (lesson 4.2). Every amount comes from the
 // page (the lesson's facts); every sum and average from affordability.ts.
 import { computed, ref } from "vue";
-import { averageMonthly, payslipNet, payslipNetToPay } from "../lib/calc/affordability.ts";
+import { averageMonthly, OBLIGATION_MONTHS, payslipNet, payslipNetToPay } from "../lib/calc/affordability.ts";
 import { monthlyTotal } from "../lib/calc/household.ts";
 import { formatShekels } from "../lib/calc/money.ts";
 
@@ -20,7 +20,13 @@ interface Month {
   mandatory: Line[];
   other: Line[];
 }
-const props = defineProps<{ months: Month[]; person: string }>();
+const props = defineProps<{
+  months: Month[];
+  person: string;
+  /** How many payments are left on the employer loan in the "other deductions" (lesson 4.2's 18-month rule decides what that means). */
+  loanMonthsLeft?: number;
+}>();
+const loanLong = computed(() => props.loanMonthsLeft !== undefined && props.loanMonthsLeft > OBLIGATION_MONTHS);
 
 const selected = ref(1);
 const basis = ref<"net" | "net_to_pay">("net");
@@ -62,7 +68,7 @@ const sh = (v: string | number | { toString(): string }) => formatShekels(String
       </div>
     </div>
 
-    <div class="mt-4 rounded-md border border-dashed border-n300 bg-n50 p-3 sm:p-4" :aria-label="`תלוש שכר לדוגמה של ${person}, ${month.name}`">
+    <div class="mt-4 rounded-md border border-dashed border-n300 bg-n50 p-3 sm:p-4" role="group" :aria-label="`תלוש שכר לדוגמה של ${person}, ${month.name}`">
       <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-n200 pb-2">
         <p class="text-body-m font-semibold text-n900">תלוש שכר · {{ person }} · {{ month.name }}</p>
         <p class="text-caption text-n600">מסמך לדוגמה · מעסיק בדוי · מספרים להמחשה</p>
@@ -123,12 +129,22 @@ const sh = (v: string | number | { toString(): string }) => formatShekels(String
         <p class="text-h2 text-navy"><span class="ltr">{{ sh(avg) }}</span></p>
       </div>
       <div class="rounded-md bg-n50 p-3 text-body-m text-n800">
-        <p v-if="basis === 'net'">
-          ההחזר על ההלוואה ממעביד <strong>לא</strong> ירד כאן. הוא התחייבות של {{ person }}, ונבדוק בנפרד אם היא נספרת (שיעור 4.2). דמי הוועד לא יורדים בכלל.
-        </p>
-        <p v-else>
-          ההחזר על ההלוואה ממעביד ודמי הוועד <strong>כבר ירדו</strong>. אם נוריד את ההלוואה שוב כהתחייבות — ספרנו אותה פעמיים.
-        </p>
+        <template v-if="loanLong">
+          <p v-if="basis === 'net'">
+            ההחזר על ההלוואה למעסיק <strong>לא</strong> ירד כאן. נשארו לה מעל {{ OBLIGATION_MONTHS }} תשלומים, ולכן היא תיבדק בנפרד כהתחייבות (שיעור 4.2).
+          </p>
+          <p v-else>
+            ההחזר על ההלוואה למעסיק <strong>כבר ירד</strong>. נשארו לה מעל {{ OBLIGATION_MONTHS }} תשלומים, ולכן אם נוריד אותה שוב כהתחייבות — ספרנו אותה פעמיים.
+          </p>
+        </template>
+        <template v-else>
+          <p v-if="basis === 'net'">
+            ההחזר על ההלוואה למעסיק <strong>לא</strong> ירד כאן. נשארו לה {{ loanMonthsLeft ?? "מעט" }} תשלומים, פחות מ־{{ OBLIGATION_MONTHS }}, ולכן היא לא תיספר כהתחייבות: הבנק לא רואה אותה בכלל.
+          </p>
+          <p v-else>
+            ההחזר על ההלוואה למעסיק ודמי הוועד <strong>כבר ירדו</strong>: {{ sh(fig.other) }} בחודש הזה. ההלוואה לא הייתה נספרת כהתחייבות בכל מקרה, ולכן ההכנסה כאן נמוכה בסכום הזה.
+          </p>
+        </template>
       </div>
     </div>
 

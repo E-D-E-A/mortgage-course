@@ -67,6 +67,16 @@ def variable_share(i, _facts=None):
     return pct(Decimal(i["variable"]) / Decimal(i["loan"]) * HUNDRED)
 
 
+def two_thirds_rounded(i, _facts=None):
+    """Two thirds rounded the usual way, to the agora: slightly MORE than two thirds when the digits repeat."""
+    return money(Decimal(i["amount"]) * 2 / 3)
+
+
+def two_thirds_cut(i, _facts=None):
+    """Two thirds cut (not rounded) to three decimals: the digits go on."""
+    return str((Decimal(i["amount"]) * 2 / 3).quantize(Decimal("0.001"), rounding=ROUND_DOWN))
+
+
 def months(i, _facts=None):
     return int(i["years"]) * 12
 
@@ -170,6 +180,8 @@ KINDS = {
     "reg_min_fixed": min_fixed,
     "reg_variable_share": variable_share,
     "reg_months": months,
+    "reg_two_thirds_rounded": two_thirds_rounded,
+    "reg_two_thirds_cut": two_thirds_cut,
     "reg_check": check,
     "reg_ratio": ratio,
     "reg_weighted": weighted,

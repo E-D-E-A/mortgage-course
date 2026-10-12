@@ -17,13 +17,17 @@
  *  - Payments are the level payment (שפיצר) of amortization.ts, each track's
  *    payment rounded to the agora before they are added (as a statement shows
  *    them), so every sum printed on a page adds up.
+ *  - Balances follow the course's statement convention (amortization.ts,
+ *    annuityStatement): the payment is set once, each month's interest is rounded
+ *    to the agora, the last payment clears the balance. `mixBalanceFormula` is the
+ *    unrounded closed form, kept only to show how far a spreadsheet formula strays.
  *
  * Rates are nominal annual percent strings; money is exact until shown, except
  * where a function says it rounds. Recomputed independently in
  * checks/kinds/underwriting.py. Exports are stable: add, don't rename.
  */
 import Decimal from "decimal.js";
-import { annuityBalance, annuityPayment } from "./amortization.ts";
+import { annuityBalance, annuityPayment, annuityStatement } from "./amortization.ts";
 
 export type Numeric = Decimal.Value;
 
@@ -113,8 +117,18 @@ export function scaleMix(tracks: Track[], newLoan: Numeric): Track[] {
   return tracks.map((t) => ({ ...t, principal: new Decimal(t.principal).mul(target).div(loan).toDecimalPlaces(2, Decimal.ROUND_HALF_UP) }));
 }
 
-/** What the mix still owes after `paid` monthly payments: the tracks' balances added, exact. */
+/** The balance of one track after each payment, by the statement convention: index 0 is the principal, index n is zero. */
+function statementBalances(t: Track): Decimal[] {
+  return [agorot(t.principal), ...annuityStatement(t.principal, t.ratePercent, t.months).map((r) => r.closing)];
+}
+
+/** What the mix still owes after `paid` monthly payments (statement convention): the tracks' balances added. A track that has ended owes nothing. */
 export function mixBalance(tracks: Track[], paid: number): Decimal {
+  return tracks.reduce((s, t) => s.plus(statementBalances(t)[Math.min(paid, t.months)]), new Decimal(0));
+}
+
+/** The same, by the unrounded closed formula: P × (1 + m)^k − C × ((1 + m)^k − 1) ÷ m. It differs from the statement by agorot. */
+export function mixBalanceFormula(tracks: Track[], paid: number): Decimal {
   return tracks.reduce((s, t) => s.plus(annuityBalance(t.principal, t.ratePercent, t.months, Math.min(paid, t.months))), new Decimal(0));
 }
 
@@ -122,11 +136,15 @@ export function mixBalance(tracks: Track[], paid: number): Decimal {
  * The first number of payments after which the mix owes no more than
  * `threshold` (lesson 4.9: below ₪30,000 the bank may not require the
  * insurances, as the team transcribed the directive). 0 if the loan starts at
- * or below it.
+ * or below it. Statement convention.
  */
 export function paymentsUntilBalanceAtMost(tracks: Track[], threshold: Numeric): number {
   const limit = nonNegative(threshold, "the threshold");
+  const all = tracks.map(statementBalances);
   const longest = Math.max(...tracks.map((t) => t.months));
-  for (let k = 0; k <= longest; k++) if (mixBalance(tracks, k).lte(limit)) return k;
+  for (let k = 0; k <= longest; k++) {
+    const owed = all.reduce((s, b, i) => s.plus(b[Math.min(k, tracks[i].months)]), new Decimal(0));
+    if (owed.lte(limit)) return k;
+  }
   return longest;
 }

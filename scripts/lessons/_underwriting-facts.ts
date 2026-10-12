@@ -12,6 +12,7 @@ import {
   lowerOf,
   maxLoanAtRatio,
   mixBalance,
+  mixBalanceFormula,
   mixPayment,
   paymentsUntilBalanceAtMost,
   ratioPercent,
@@ -117,6 +118,37 @@ export const balance = (id: string, tracks: Track[], paid: number): Fact => ({
   kind: "uw_mix_balance",
   inputs: { ...trackInputs(tracks), paid },
   value: moneyString(mixBalance(tracks, paid)),
+});
+
+export const balanceFormula = (id: string, tracks: Track[], paid: number): Fact => ({
+  id,
+  kind: "uw_mix_balance_formula",
+  inputs: { ...trackInputs(tracks), paid },
+  value: moneyString(mixBalanceFormula(tracks, paid)),
+});
+
+/** The gap between two percentages, in percentage points: a − b, to `decimals` places, trailing zeros dropped. */
+export const pointsGap = (id: string, a: string, b: string, decimals = 1): Fact => ({
+  id,
+  kind: "uw_points_gap",
+  inputs: { a, b, decimals },
+  value: plain(new Decimal(a).minus(b), decimals),
+});
+
+/** The payment for each 1,000 ₪ of loan: payment ÷ loan × 1,000, to `decimals` places. */
+export const perThousand = (id: string, payment: string, loan: string, decimals = 4): Fact => ({
+  id,
+  kind: "uw_per_thousand",
+  inputs: { payment, loan, decimals },
+  value: plain(new Decimal(payment).div(loan).mul(1000), decimals),
+});
+
+/** The loan a payment allows when the payment per shekel is that of a known loan: allowed × loan ÷ payment, to the agora. */
+export const loanByPayment = (id: string, allowed: string, payment: string, loan: string): Fact => ({
+  id,
+  kind: "uw_loan_by_payment",
+  inputs: { allowed, payment, loan },
+  value: moneyString(new Decimal(allowed).mul(loan).div(payment)),
 });
 
 export const untilAtMost = (id: string, tracks: Track[], threshold: string): Fact => ({
@@ -227,6 +259,7 @@ export const statementTable = (
       michal: moneyString(m.michal),
       deposits: moneyString(deposits),
       debits: moneyString(m.debits),
+      change: moneyString(deposits.minus(m.debits)),
       closing: moneyString(bal.plus(deposits).minus(m.debits)),
     };
     bal = bal.plus(deposits).minus(m.debits);

@@ -24,6 +24,7 @@ import {
   perPerson,
   PTI_CAPITAL_THRESHOLD,
   PTI_LIMIT,
+  withMinus,
 } from "../lib/calc/regulation.ts";
 
 const props = withDefaults(
@@ -56,14 +57,18 @@ const lowest = computed(() => {
 });
 const over = computed(() => margin.value.isNeg());
 
-// The bar: the whole month is the net income. Widths are shares of it; a negative "left" shows as an empty segment.
-const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / net.value) * 100))}%`;
+// The bar: the whole month is the net income. Widths are shares of it. When the payments are more than the income the scale is the payments, so the two segments keep their true proportion to each other, and "what is left" is empty.
+const scale = computed(() => Math.max(net.value, payment.value + other.value));
+const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / scale.value) * 100))}%`;
+const overIncome = computed(() => payment.value + other.value > net.value);
+const monthsText = (n: number) => (n === 1 ? "חודש אחד" : `${n} חודשים`);
+const money = (v: Decimal.Value) => withMinus(formatShekelsText(v));
 </script>
 
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">
-      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% ו־40% לפי תעתיק של הצוות להוראה 329, נכון ל־2026-10-09, לא אומתו מול המקור.
+      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת. מגבלת ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203).
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
@@ -84,7 +89,7 @@ const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / ne
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">כמה חודשי תשלום נשארו להלוואה הזו</span>
         <input v-model.number="months" type="range" min="1" max="60" step="1" />
-        <span class="text-body-l font-semibold text-n900">{{ months }} חודשים</span>
+        <span class="text-body-l font-semibold text-n900">{{ monthsText(months) }}</span>
         <span class="text-caption text-n600">
           {{ counted ? `מעל ${OBLIGATION_MONTHS}: היא מנוכה מההכנסה הפנויה.` : `${OBLIGATION_MONTHS} או פחות: היא לא מנוכה, אבל המשפחה עדיין משלמת אותה.` }}
         </span>
@@ -101,6 +106,11 @@ const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / ne
       </label>
     </div>
 
+    <!-- Phone only: the headline figures stay on screen under the thumb while a slider moves; the full cards are below. -->
+    <p class="sticky bottom-2 z-10 mt-4 rounded-md border border-n200 bg-n0 p-3 text-body-m text-n800 shadow-md sm:hidden" role="status">
+      נשאר לחיים: <span class="ltr font-semibold">{{ money(left) }}</span> · {{ over ? "חסר" : "מעל התקציב" }}: <span class="ltr font-semibold">{{ money(margin.abs()) }}</span> · יחס החזר: <span class="ltr font-semibold">{{ ratio ? percentString(ratio) + "%" : "—" }}</span>
+    </p>
+
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>המשכנתא</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-n300)"></span>ההלוואה הקיימת</li>
@@ -114,7 +124,7 @@ const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / ne
     <div
       class="relative mt-4"
       role="img"
-      :aria-label="`מתוך ${formatShekelsText(net)} בחודש: משכנתא ${formatShekelsText(payment)}, הלוואה קיימת ${formatShekelsText(other)}, נשאר לחיים ${formatShekelsText(left)}; התקציב שצריך ${formatShekelsText(budget)}.`"
+      :aria-label="`מתוך ${formatShekelsText(net)} בחודש: משכנתא ${formatShekelsText(payment)}, הלוואה קיימת ${formatShekelsText(other)}, נשאר לחיים ${money(left)}; התקציב שצריך ${formatShekelsText(budget)}.`"
     >
       <div class="flex h-10 w-full overflow-hidden rounded-sm bg-n50">
         <div class="h-full" :style="{ width: share(payment), background: 'var(--mogi-teal-deep)' }"></div>
@@ -124,15 +134,16 @@ const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / ne
       <div class="absolute -top-2 -bottom-2 border-e-2 border-dashed border-navy" :style="{ insetInlineEnd: share(budget) }"></div>
     </div>
     <div class="mt-1 flex justify-between text-caption text-n600" aria-hidden="true">
-      <span>כל ההכנסה: <span class="ltr">{{ formatShekelsText(net) }}</span></span>
+      <span v-if="overIncome" class="text-n800">התשלומים גדולים מההכנסה: הפס מראה את התשלומים ביחס זה לזה, ולא נשאר כלום לחיים.</span>
+      <span v-else>כל ההכנסה: <span class="ltr">{{ formatShekelsText(net) }}</span></span>
       <span>0 ₪</span>
     </div>
 
     <div class="mt-5 grid gap-3 sm:grid-cols-3">
       <div class="rounded-md p-3" :class="over ? 'bg-warning-bg' : 'bg-n50'">
         <p class="text-caption text-n600">נשאר לחיים</p>
-        <p class="text-h2 text-navy"><span class="ltr">{{ formatShekelsText(left) }}</span></p>
-        <p class="text-caption text-n600">לנפש: <span class="ltr">{{ formatShekelsText(each) }}</span></p>
+        <p class="text-h2 text-navy"><span class="ltr">{{ money(left) }}</span></p>
+        <p class="text-caption text-n600">לנפש: <span class="ltr">{{ money(each) }}</span></p>
       </div>
       <div class="rounded-md p-3" :class="over ? 'bg-warning-bg' : 'bg-n50'">
         <p class="text-caption text-n600">{{ over ? "חסר מול התקציב" : "מעל התקציב" }}</p>
@@ -161,13 +172,13 @@ const share = (v: Decimal.Value) => `${Math.max(0, Math.min(100, (Number(v) / ne
         <tbody>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הכנסה נטו</th><td class="py-1"><span class="ltr">{{ formatShekels(net) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">המשכנתא</th><td class="py-1"><span class="ltr">{{ formatShekels(payment) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה קיימת</th><td class="py-1"><span class="ltr">{{ formatShekels(other) }}</span> · {{ months }} חודשים</td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה קיימת</th><td class="py-1"><span class="ltr">{{ formatShekels(other) }}</span> · {{ monthsText(months) }}</td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הכנסה פנויה (אחרי כלל 18 החודשים)</th><td class="py-1"><span class="ltr">{{ formatShekels(disposable) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">נשאר לחיים</th><td class="py-1"><span class="ltr">{{ formatShekels(left) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">לנפש</th><td class="py-1"><span class="ltr">{{ formatShekels(each) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">נשאר לחיים</th><td class="py-1"><span class="ltr">{{ withMinus(formatShekels(left)) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">לנפש</th><td class="py-1"><span class="ltr">{{ withMinus(formatShekels(each)) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">תקציב מחיה</th><td class="py-1"><span class="ltr">{{ formatShekels(budget) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר מרבי לפי המגבלה ({{ PTI_LIMIT }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxLimit) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר בסף ההון ({{ PTI_CAPITAL_THRESHOLD }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxThreshold) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר במגבלת ההון ({{ PTI_CAPITAL_THRESHOLD }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxThreshold) }}</span></td></tr>
           <tr><th class="py-1 text-start font-normal text-n600">החזר מרבי לפי התקציב</th><td class="py-1"><span class="ltr">{{ formatShekels(familyMax) }}</span></td></tr>
         </tbody>
       </table>

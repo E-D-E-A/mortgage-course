@@ -24,6 +24,8 @@ import {
   addDays,
   appraisalTable,
   balance,
+  balanceFormula,
+  pointsGap,
   difference,
   given,
   lower,
@@ -77,6 +79,9 @@ export default function lesson49(): LessonData {
   facts.push(dividePercent("case.edge_appraisal", LOAN, CEILING));
   facts.push(difference("case.room", "case.max_loan_appraisal", "case.loan", facts));
 
+  const val = (id: string) => String(facts.find((f) => f.id === id)!.value);
+  facts.push(pointsGap("case.ltv_gap", val("case.ltv_appraisal"), val("case.ltv_price")));
+
   // Prediction: the ratio at the price, at the appraisal, and the wrong "it falls".
   facts.push(ratio("prediction.ltv_up", LOAN, APPRAISAL, 1));
   facts.push(ratio("prediction.ltv_price", LOAN, PRICE, 1));
@@ -85,6 +90,9 @@ export default function lesson49(): LessonData {
   facts.push(balance("life.after_60", AVI, 60));
   facts.push(balance("life.after_120", AVI, 120));
   facts.push(balance("life.after_240", AVI, 240));
+  // The unrounded closed formula (what a one-cell spreadsheet formula gives), to show the difference.
+  facts.push(balanceFormula("life.after_120_formula", AVI, 120));
+  facts.push(difference("life.formula_gap", "life.after_120", "life.after_120_formula", facts));
   facts.push(untilAtMost("life.months_to_30k", AVI, "30000"));
   facts.push(given("life.months_total", 300));
   facts.push(countDifference("life.months_left_30k", "life.months_total", "life.months_to_30k", facts));

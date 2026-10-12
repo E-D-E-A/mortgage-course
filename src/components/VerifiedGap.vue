@@ -29,6 +29,8 @@ const props = defineProps<{
   aviVerified: number;
   michal: number;
   caps: Cap[];
+  /** The financing-ratio ceiling for the deal, in percent ("75"): a separate limit from the repayment-ratio cap. */
+  financingCeiling: string;
   source: string;
 }>();
 
@@ -37,6 +39,7 @@ const verifiedEquity = ref(props.equity);
 const picked = ref(0);
 const showTable = ref(false);
 const cap = computed(() => props.caps[picked.value]);
+const financingCap = computed(() => (props.price * Number(props.financingCeiling)) / 100);
 
 const columns = computed(() =>
   [
@@ -97,7 +100,8 @@ const changed = computed(() => verifiedIncome.value !== props.aviDeclared || ver
         <p class="text-caption text-n600">הלוואה: <span class="ltr">{{ formatShekelsText(c.loan) }}</span> · החזר חודשי: <span class="ltr">{{ formatShekels(c.payment) }}</span></p>
         <p class="mt-2 text-caption text-n600">יחס ההחזר</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ pct(c.ratio) }}</span></p>
-        <p class="text-caption text-n600">הלוואה מרבית בתקרה: <span class="ltr">{{ formatShekelsText(c.most) }}</span></p>
+        <p class="text-caption text-n600">הלוואה מרבית לפי יחס ההחזר בלבד: <span class="ltr">{{ formatShekelsText(c.most) }}</span></p>
+        <p class="text-caption text-n600">תקרת שיעור המימון (<span class="ltr">{{ financingCeiling }}%</span> מהמחיר): <span class="ltr">{{ formatShekelsText(financingCap) }}</span>. ההלוואה בפועל לא תעלה על הנמוכה משתיהן.</p>
         <p class="mt-2 text-body-m text-n800" role="status">
           <template v-if="c.over">מעל התקרה. כדי להישאר בתוכה, ההלוואה צריכה להיות קטנה ב־<span class="ltr">{{ formatShekelsText(c.loan - c.most.toNumber()) }}</span>, כלומר עוד הון עצמי.</template>
           <template v-else>בתוך התקרה.</template>
@@ -133,7 +137,8 @@ const changed = computed(() => verifiedIncome.value !== props.aviDeclared || ver
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ formatShekels(c.loan) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר חודשי</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ formatShekels(c.payment) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">יחס ההחזר</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ pct(c.ratio) }}</span></td></tr>
-          <tr><th class="py-1 text-start font-normal text-n600">הלוואה מרבית (<span class="ltr">{{ cap.value }}%</span>)</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ formatShekels(c.most) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה מרבית לפי יחס ההחזר (<span class="ltr">{{ cap.value }}%</span>)</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ formatShekels(c.most) }}</span></td></tr>
+          <tr><th class="py-1 text-start font-normal text-n600">תקרת שיעור המימון (<span class="ltr">{{ financingCeiling }}%</span>)</th><td v-for="c in columns" :key="c.key" class="py-1"><span class="ltr">{{ formatShekels(financingCap) }}</span></td></tr>
         </tbody>
       </table>
     </div>

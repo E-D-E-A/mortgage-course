@@ -117,7 +117,8 @@ const reasonText: Record<ObligationReason, string> = {
 };
 const placeText = { income: "יורדת מההכנסה", payment: "מתווספת לתשלום", none: "לא נספרת" } as const;
 const placeClass = { income: "bg-n100 text-n900", payment: "bg-mint text-n900", none: "bg-n0 text-n600 border border-n200" } as const;
-const sh = (v: Decimal | number | string) => formatShekels(String(v));
+// A negative amount is written with the course's real minus, not the hyphen of Intl.
+const sh = (v: Decimal | number | string) => formatShekels(String(v)).replace("-", "−");
 const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasing: "ליסינג", alimony: "מזונות", rent: "שכר דירה", mortgage: "משכנתא קיימת", other: "אחר" };
 </script>
 
@@ -138,7 +139,8 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
       <li v-for="(o, i) in obligations" :key="i" class="rounded-md border border-n200 p-3">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <p class="text-body-m font-semibold text-n900">{{ o.label }} <span class="font-normal text-n600">({{ kindLabel[o.kind] }})</span></p>
-          <span class="rounded-pill px-3 py-1 text-caption font-semibold" :class="placeClass[verdicts[i].placement]">{{ placeText[verdicts[i].placement] }}</span>
+          <span v-if="!Number(o.monthly)" class="rounded-pill border border-n200 px-3 py-1 text-caption font-semibold text-n600">ריקה: אין תשלום</span>
+          <span v-else class="rounded-pill px-3 py-1 text-caption font-semibold" :class="placeClass[verdicts[i].placement]">{{ placeText[verdicts[i].placement] }}</span>
         </div>
         <div class="mt-2 grid gap-3 sm:grid-cols-2">
           <label class="flex flex-col gap-1">
@@ -155,11 +157,11 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
         </div>
         <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-body-m text-n800">
           <label v-if="o.kind !== 'rent'" class="flex min-h-11 items-center gap-2">
-            <input v-model="o.unknown" type="checkbox" class="h-5 w-5" />
+            <input v-model="o.unknown" type="checkbox" class="h-5 w-5" :aria-label="`אין תאריך סיום: ${o.label}`" />
             אין תאריך סיום
           </label>
           <label v-if="o.kind === 'rent'" class="flex min-h-11 items-center gap-2">
-            <input v-model="o.rentContinues" type="checkbox" class="h-5 w-5" />
+            <input v-model="o.rentContinues" type="checkbox" class="h-5 w-5" :aria-label="`ימשיכו לשלם אחרי הקנייה: ${o.label}`" />
             ימשיכו לשלם אחרי הקנייה (לא יגורו בדירה שקונים)
           </label>
           <label v-if="o.kind === 'mortgage'" class="flex min-h-11 items-center gap-2">
@@ -171,7 +173,10 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
             </select>
           </label>
         </div>
-        <p class="mt-1 text-caption text-n600">{{ reasonText[verdicts[i].reason] }}</p>
+        <p class="mt-1 text-caption text-n600">
+          {{ reasonText[verdicts[i].reason] }}
+          <span v-if="o.kind !== 'rent' && !o.unknown && o.months === 18"> — ב־18 בדיוק זו שאלה פתוחה; לפי התעתיק היא לא נספרת.</span>
+        </p>
       </li>
     </ul>
 
@@ -206,12 +211,23 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
       </p>
     </template>
 
+    <!-- A compact result that follows the learner down the sliders (on a phone the full results are far below them). -->
+    <div class="sticky bottom-0 z-sticky -mx-4 mt-4 border-t border-n200 bg-n0 px-4 py-2 text-body-m text-n900 shadow-md sm:-mx-5 sm:px-5" aria-hidden="true">
+      <span class="text-caption text-n600">עכשיו:</span>
+      <span class="font-semibold">הכנסה פנויה <span class="ltr">{{ sh(disposable) }}</span></span>
+      <template v-if="mode === 'ratio'">
+        <span class="text-n600"> · </span>
+        <span class="font-semibold">יחס ההחזר <span v-if="ratio !== null" class="ltr">{{ percentString(ratio) }}%</span><span v-else>—</span></span>
+      </template>
+    </div>
+
     <!-- Results -->
     <div class="mt-5 grid gap-3" :class="mode === 'ratio' ? 'sm:grid-cols-3' : 'sm:grid-cols-2'" role="status">
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">ההכנסה הפנויה</p>
         <p class="text-h2 text-navy"><span class="ltr">{{ sh(disposable) }}</span></p>
         <p class="text-caption text-n600"><span class="ltr">{{ sh(recognised) }}</span> מוכרת, פחות <span class="ltr">{{ sh(deducted) }}</span> התחייבויות</p>
+        <p v-if="disposable.lte(0)" class="text-caption font-semibold text-n800">ההתחייבויות גדולות מההכנסה, ולכן אין הכנסה פנויה.</p>
       </div>
       <div v-if="mode === 'ratio'" class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">התשלום ביחס ההחזר</p>

@@ -56,7 +56,7 @@ const lines = computed<Line[]>(() => {
     {
       key: "threshold",
       kind: "סף הון",
-      name: "הוראה 329, מעל 40%",
+      name: "מגבלת ההון (40%)",
       percent: threshold,
       crossed: r.gt(threshold),
       color: "var(--mogi-warning)",
@@ -67,7 +67,7 @@ const lines = computed<Line[]>(() => {
     {
       key: "limit",
       kind: "מגבלה רגולטורית",
-      name: "הוראה 329, עד 50%",
+      name: "הוראה 329: עד 50%",
       percent: ban,
       crossed: r.gt(ban),
       color: "var(--mogi-danger)",
@@ -81,13 +81,27 @@ const maxByPolicy = computed(() => maxPaymentAt(income.value, policy.value));
 const maxByThreshold = computed(() => maxPaymentAt(income.value, threshold));
 const maxByLimit = computed(() => maxPaymentAt(income.value, ban));
 const SCALE = 70;
+// Labels sit at up to three heights, chosen by how close a line is to the one before it, so lines a few points apart (35 and 40, or 48 and 50) never cover each other's numbers.
+const TOPS = ["-1.5rem", "-2.75rem", "-4rem"];
+const labelTops = computed(() => {
+  const order = [...lines.value].sort((a, b) => a.percent.comparedTo(b.percent));
+  const tops: Record<string, string> = {};
+  let level = 0;
+  order.forEach((l, i) => {
+    if (i > 0 && l.percent.minus(order[i - 1].percent).abs().lt(9)) level = (level + 1) % TOPS.length;
+    else level = 0;
+    tops[l.key] = TOPS[level];
+  });
+  return tops;
+});
+const labelTop = (key: string) => labelTops.value[key];
 const pos = (p: Decimal.Value) => `${Math.min(100, (Number(p) / SCALE) * 100)}%`;
 </script>
 
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">
-      מספרים להמחשה. 50% ו־40% לפי תעתיק של הצוות להוראה 329, נכון ל־2026-10-09, לא אומתו מול המקור. הקו של בנק א׳ הוא המצאה לצורך השיעור: בנק אמיתי יכול להציב קו אחר, ולא ידוע לנו איזה.
+      מספרים להמחשה. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת מול המקור. מגבלת ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203). הקו של בנק א׳ הוא מספר להמחשה: בנק אמיתי יכול להציב קו אחר, ולא ידוע לנו איזה.
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
@@ -109,16 +123,16 @@ const pos = (p: Decimal.Value) => `${Math.min(100, (Number(p) / SCALE) * 100)}%`
 
     <p class="mt-4 text-body-l text-n900">יחס ההחזר: <span class="ltr font-semibold">{{ percentString(ratio) }}%</span></p>
 
-    <div class="relative mt-14" role="img" :aria-label="`יחס החזר ${percentString(ratio)}%. מדיניות בנק א׳ ${policy}%, סף הון ${PTI_CAPITAL_THRESHOLD}%, מגבלה רגולטורית ${PTI_LIMIT}%.`">
+    <div class="relative mt-20" role="img" :aria-label="`יחס החזר ${percentString(ratio)}%. מדיניות בנק א׳ ${policy}%, סף הון ${PTI_CAPITAL_THRESHOLD}%, מגבלה רגולטורית ${PTI_LIMIT}%.`">
       <div class="h-4 w-full overflow-hidden rounded-sm bg-n50">
         <div class="h-full" :style="{ width: pos(ratio), background: 'var(--mogi-navy)' }"></div>
       </div>
-      <!-- The labels sit at two heights, so lines a few points apart (35, 40) do not cover each other's numbers. -->
+      <!-- The labels sit at up to three heights (labelTop), so lines a few points apart do not cover each other's numbers. -->
       <div
         v-for="l in lines"
         :key="l.key"
         class="absolute bottom-0 border-s-4 border-dashed"
-        :style="{ insetInlineStart: pos(l.percent), borderColor: l.color, top: l.key === 'threshold' ? '-2.75rem' : '-1.5rem' }"
+        :style="{ insetInlineStart: pos(l.percent), borderColor: l.color, top: labelTop(l.key) }"
       >
         <span class="absolute -top-1 start-1 whitespace-nowrap text-caption font-semibold text-n800"><span class="ltr">{{ percentString(l.percent) }}%</span></span>
       </div>

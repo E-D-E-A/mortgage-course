@@ -34,6 +34,18 @@
       "value": "35"
     },
     {
+      "id": "rule.financing_ceiling",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "case.michal_ntp",
+      "kind": "given",
+      "inputs": {},
+      "value": "7750"
+    },
+    {
       "id": "case.price",
       "kind": "given",
       "inputs": {},
@@ -164,9 +176,9 @@
       "inputs": {
         "part": "6186.17",
         "whole": "19200.00",
-        "decimals": 2
+        "decimals": 1
       },
-      "value": "32.22"
+      "value": "32.2"
     },
     {
       "id": "case.ratio_recognised",
@@ -187,6 +199,44 @@
         "decimals": 1
       },
       "value": "68.5"
+    },
+    {
+      "id": "case.ratio_gap",
+      "kind": "uw_points_gap",
+      "inputs": {
+        "a": "39.4",
+        "b": "32.2",
+        "decimals": 1
+      },
+      "value": "7.2"
+    },
+    {
+      "id": "case.hh_ntp",
+      "kind": "uw_total",
+      "inputs": {
+        "amount_1": "7500",
+        "amount_2": "7750"
+      },
+      "value": "15250.00"
+    },
+    {
+      "id": "case.ratio_ntp",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "6186.17",
+        "whole": "15250.00",
+        "decimals": 1
+      },
+      "value": "40.6"
+    },
+    {
+      "id": "case.fin_cap",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "1650000",
+        "percent": "75"
+      },
+      "value": "1237500.00"
     },
     {
       "id": "demo.max_loan_regulatory",
@@ -283,6 +333,35 @@
         "step": 1000
       },
       "value": "1227000.00"
+    },
+    {
+      "id": "demo.allowed_low",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "15700.00",
+        "percent": "35"
+      },
+      "value": "5495.00"
+    },
+    {
+      "id": "demo.per_thousand",
+      "kind": "uw_per_thousand",
+      "inputs": {
+        "payment": "6186.17",
+        "loan": "1130000",
+        "decimals": 4
+      },
+      "value": "5.4745"
+    },
+    {
+      "id": "demo.loan_unrounded",
+      "kind": "uw_loan_by_payment",
+      "inputs": {
+        "allowed": "5495.00",
+        "payment": "6186.17",
+        "loan": "1130000"
+      },
+      "value": "1003747.07"
     },
     {
       "id": "demo.loan_shortfall",
@@ -428,6 +507,35 @@
       "value": "40.8"
     },
     {
+      "id": "ex5.pay_1",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "585000",
+        "rate_percent": "4.60",
+        "months": 300
+      },
+      "value": "3284.91"
+    },
+    {
+      "id": "ex5.pay_2",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "585000",
+        "rate_percent": "4.10",
+        "months": 300
+      },
+      "value": "3120.24"
+    },
+    {
+      "id": "demo.total_short",
+      "kind": "uw_total",
+      "inputs": {
+        "amount_1": "127000.00",
+        "amount_2": "40000.00"
+      },
+      "value": "167000.00"
+    },
+    {
       "id": "ex5.pay_gap",
       "kind": "difference",
       "inputs": {
@@ -440,25 +548,25 @@
       "id": "ex7.approved",
       "kind": "given",
       "inputs": {},
-      "value": "2026-11-02"
+      "value": "2026-11-04"
     },
     {
       "id": "ex7.window_end",
       "kind": "uw_add_days",
       "inputs": {
-        "start": "2026-11-02",
+        "start": "2026-11-04",
         "days": 24
       },
-      "value": "2026-11-26"
+      "value": "2026-11-28"
     },
     {
       "id": "ex7.asked",
       "kind": "uw_add_days",
       "inputs": {
-        "start": "2026-11-02",
+        "start": "2026-11-04",
         "days": 18
       },
-      "value": "2026-11-20"
+      "value": "2026-11-22"
     },
     {
       "id": "ex7.reply_days",
@@ -476,26 +584,26 @@
       "id": "ex7.replied",
       "kind": "uw_add_days",
       "inputs": {
-        "start": "2026-11-20",
+        "start": "2026-11-22",
         "days": 5
       },
-      "value": "2026-11-25"
+      "value": "2026-11-27"
     },
     {
       "id": "ex7.finished",
       "kind": "uw_add_days",
       "inputs": {
-        "start": "2026-11-25",
+        "start": "2026-11-27",
         "days": 4
       },
-      "value": "2026-11-29"
+      "value": "2026-12-01"
     },
     {
       "id": "ex7.answer",
       "kind": "uw_days_between",
       "inputs": {
-        "from": "2026-11-26",
-        "to": "2026-11-29"
+        "from": "2026-11-28",
+        "to": "2026-12-01"
       },
       "value": 3
     },
@@ -503,8 +611,8 @@
       "id": "ex7.err_from_ask",
       "kind": "uw_days_between",
       "inputs": {
-        "from": "2026-11-20",
-        "to": "2026-11-29"
+        "from": "2026-11-22",
+        "to": "2026-12-01"
       },
       "value": 9
     },
@@ -512,8 +620,8 @@
       "id": "ex7.err_from_approval",
       "kind": "uw_days_between",
       "inputs": {
-        "from": "2026-11-02",
-        "to": "2026-11-29"
+        "from": "2026-11-04",
+        "to": "2026-12-01"
       },
       "value": 27
     },

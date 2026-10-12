@@ -2,15 +2,17 @@
 // The regulation checker (בודק עמידה ברגולציה), first in lesson 4.4 and
 // reused in 5.10 and 8.7. The learner sets a loan — the deal type, the value,
 // the loan, the payment and the disposable income it is measured against, the
-// part at a changing rate, the longest term — and sees the five lines of
-// Directive 329 as the team transcribed them: four bans and one capital
-// threshold. Each line shows the case's number, the line, and how much room is
-// left (or how far over) in shekels or months. Every number comes from
-// regulation.ts; the deal labels and the source note come from the page.
+// part at a changing rate, the longest term — and sees five lines: four bans
+// and one capital line, as the team recorded them (the capital line's
+// directive is not settled, and the page's caption says so). Each line shows
+// the case's number, the line, and how much room is left (or how far over) in
+// shekels or months. On a phone the verdict sits right under the sliders and
+// sticks to the bottom of the screen while they move. Every number comes from
+// regulation.ts; the deal labels and the caption come from the page.
 import { computed, ref, watch } from "vue";
 import { formatShekels, formatShekelsText } from "../lib/calc/money.ts";
 import { percentString } from "../lib/calc/percent.ts";
-import { checkRegulation, type DealType, type LineResult, LTV_CEILINGS, passesAllLimits, RULES } from "../lib/calc/regulation.ts";
+import { checkRegulation, type DealType, type LineResult, LTV_CEILINGS, passesAllLimits, RULES, withMinus } from "../lib/calc/regulation.ts";
 
 interface Deal {
   id: DealType;
@@ -26,7 +28,7 @@ const props = withDefaults(
     income?: number;
     variable?: number;
     termYears?: number;
-    /** What the page calls the 40% line. Lesson 4.4 says "קו ההון" (the term "סף הון" comes in 4.5); later lessons pass nothing. */
+    /** What the page calls the 40% line. Lesson 4.4 says "מגבלת ההון" (the term "סף הון" comes in 4.5); later lessons pass nothing. */
     capitalName?: string;
   }>(),
   { value: 1700000, loan: 1200000, payment: 7000, income: 16000, variable: 840000, termYears: 30, capitalName: "סף הון" },
@@ -76,35 +78,41 @@ const ruleOf = (l: LineResult) => {
 const dealLabel = computed(() => props.deals.find((d) => d.id === deal.value)?.label ?? "");
 
 const isTerm = (l: LineResult) => l.id === "term";
-const fmtYears = (months: number) => {
-  const y = Math.floor(months / 12);
-  const m = months % 12;
-  return m === 0 ? `${y} שנים` : `${y} שנים ו־${m} חודשים`;
-};
-function actualText(l: LineResult): string {
-  return isTerm(l) ? fmtYears(l.actual.toNumber()) : `${percentString(l.actual)}%`;
+const yearsOf = (months: number) => Math.floor(months / 12);
+const monthsOf = (months: number) => months % 12;
+const monthWord = (n: number) => (n === 1 ? "חודש" : "חודשים");
+// A percent to two decimals; if that rounds onto the line while the verdict says "over", show more digits so the screen never says "50%" beside "crossed".
+function percentText(l: LineResult): string {
+  const rounded = percentString(l.actual);
+  if (l.status === "over" && rounded === percentString(l.limit)) return l.actual.toDecimalPlaces(4).toString();
+  return rounded;
+}
+// The left-to-right pieces of each sentence are separate spans in the template; this is the plain text for the label of the chart.
+function actualPlain(l: LineResult): string {
+  if (isTerm(l)) {
+    const y = yearsOf(l.actual.toNumber());
+    const m = monthsOf(l.actual.toNumber());
+    return m === 0 ? `${y} שנים` : `${y} שנים ו־${m} ${monthWord(m)}`;
+  }
+  return `${percentText(l)}%`;
 }
 function limitText(l: LineResult): string {
-  if (isTerm(l)) return `עד ${fmtYears(l.limit.toNumber())}`;
+  if (isTerm(l)) return `עד ${yearsOf(l.limit.toNumber())} שנה`;
   if (l.id === "variable") return "עד שני שלישים";
   if (l.id === "capital") return `קו: ${percentString(l.limit)}%`;
   return `עד ${percentString(l.limit)}%`;
 }
-const roomWhat: Record<string, [string, string]> = {
-  ltv: ["אפשר ללוות עוד", "ההלוואה גדולה מהמותר ב־"],
-  pti: ["ההחזר יכול לגדול עוד", "ההחזר גדול מהמותר ב־"],
-  capital: ["עד הסף נשארו בהחזר", "ההחזר מעל הסף ב־"],
-  variable: ["אפשר להעביר למשתנה עוד", "בריבית משתנה יש יותר מהמותר ב־"],
-  term: ["עד הקו נשארו", "התקופה ארוכה מהמותר ב־"],
+// Room sentences: a Hebrew lead, then the number as its own left-to-right piece (no space after "ב־").
+const roomLead: Record<string, [string, string]> = {
+  ltv: ["אפשר ללוות עוד ", "ההלוואה גדולה מהמותר ב־"],
+  pti: ["ההחזר יכול לגדול עוד ", "ההחזר גדול מהמותר ב־"],
+  capital: ["עד המגבלה נשארו בהחזר ", "ההחזר מעל המגבלה ב־"],
+  variable: ["אפשר להעביר למשתנה עוד ", "בריבית משתנה יש יותר מהמותר ב־"],
+  term: ["עד הקו נשארו ", "התקופה ארוכה מהמותר ב־"],
 };
-function roomText(l: LineResult): string {
-  const [left, over] = roomWhat[l.id];
-  const neg = l.room.isNeg();
-  const amount = l.room.abs();
-  const shown = isTerm(l) ? `${amount.toNumber()} חודשים` : formatShekelsText(amount);
-  return `${neg ? over : left} ${shown}`;
-}
-const statusText = (l: LineResult) => (l.status === "over" ? "חוצה — אסור" : l.status === "above" ? "מעל הסף — מותר" : "בתוך הקו");
+const roomLeadOf = (l: LineResult) => roomLead[l.id][l.room.isNeg() ? 1 : 0];
+const roomAmount = (l: LineResult) => (isTerm(l) ? `${l.room.abs().toNumber()}` : formatShekelsText(l.room.abs()));
+const statusText = (l: LineResult) => (l.status === "over" ? "חוצה — אסור" : l.status === "above" ? `מעל ${props.capitalName} — מותר` : "בתוך הקו");
 const statusClass = (l: LineResult) => (l.status === "over" ? "bg-danger-bg" : l.status === "above" ? "bg-warning-bg" : "bg-success-bg");
 
 // The bar: the case's number against the line. The scale is a bit beyond the line, so both fit.
@@ -166,9 +174,23 @@ const flips = (l: LineResult) => Math.min(100, (l.limit.toNumber() / scaleMax(l)
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">התקופה של המסלול הארוך ביותר</span>
         <input v-model.number="years" type="range" min="5" max="35" step="1" />
-        <span class="text-body-l font-semibold text-n900">{{ years }} שנים</span>
+        <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ years }}</span> שנים</span>
       </label>
     </div>
+
+    <!-- The verdict sits under the sliders; on a phone it sticks to the bottom of the screen while a slider moves. -->
+    <p
+      class="sticky bottom-2 z-10 mt-4 rounded-md border border-n200 p-3 text-body-m text-n800 shadow-md sm:static sm:shadow-none"
+      :class="ok ? 'bg-n50' : 'bg-danger-bg'"
+      role="status"
+    >
+      <template v-if="ok">
+        ההלוואה לא חוצה אף אחד מארבעת האיסורים<template v-if="aboveThreshold">. יחס ההחזר מעל {{ capitalName }}: זה מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה</template>. עמידה בקווים אינה אישור: בנק רשאי לסרב גם להלוואה כזו.
+      </template>
+      <template v-else>
+        ההלוואה חוצה {{ crossed.length === 1 ? "איסור אחד" : `${crossed.length} איסורים` }}: {{ crossed.map((l) => ruleOf(l).label).join(", ") }}. בנק לא יכול לאשר אותה כך.
+      </template>
+    </p>
 
     <ul class="list-reset mt-5 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm" style="background: var(--mogi-teal-deep)"></span>המספר של התיק</li>
@@ -186,7 +208,7 @@ const flips = (l: LineResult) => Math.min(100, (l.limit.toNumber() / scaleMax(l)
           </p>
           <span class="rounded-pill px-2 py-0.5 text-caption text-n900" :class="statusClass(l)">{{ statusText(l) }}</span>
         </div>
-        <div class="relative mt-6" role="img" :aria-label="`${ruleOf(l).label}: ${actualText(l)}, ${limitText(l)}.`">
+        <div class="relative mt-6" role="img" :aria-label="`${ruleOf(l).label}: ${actualPlain(l)}, ${limitText(l)}.`">
           <div class="h-3 w-full overflow-hidden rounded-sm bg-n50">
             <div class="h-full" :style="{ width: pos(l, l.actual.toNumber()), background: 'var(--mogi-teal-deep)' }"></div>
           </div>
@@ -195,26 +217,24 @@ const flips = (l: LineResult) => Math.min(100, (l.limit.toNumber() / scaleMax(l)
           </div>
         </div>
         <p class="mt-2 text-body-m text-n800">
-          בתיק: <span class="ltr font-semibold">{{ actualText(l) }}</span>
-          <span class="text-n600"> · {{ roomText(l) }}</span>
+          בתיק:
+          <template v-if="isTerm(l)">
+            <span class="ltr font-semibold">{{ yearsOf(l.actual.toNumber()) }}</span> שנים<template v-if="monthsOf(l.actual.toNumber())">
+              ו־<span class="ltr font-semibold">{{ monthsOf(l.actual.toNumber()) }}</span> {{ monthWord(monthsOf(l.actual.toNumber())) }}</template>
+          </template>
+          <span v-else class="ltr font-semibold">{{ percentText(l) }}%</span>
+          <span class="text-n600">
+            · {{ roomLeadOf(l) }}<span class="ltr whitespace-nowrap">{{ roomAmount(l) }}</span><template v-if="isTerm(l)"> חודשים</template></span
+          >
         </p>
       </li>
     </ol>
-
-    <p class="mt-4 rounded-md p-3 text-body-m text-n800" :class="ok ? 'bg-n50' : 'bg-danger-bg'" role="status">
-      <template v-if="ok">
-        ההלוואה לא חוצה אף אחד מארבעת האיסורים<template v-if="aboveThreshold">. יחס ההחזר מעל {{ capitalName }}: זה מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה</template>.
-      </template>
-      <template v-else>
-        ההלוואה חוצה {{ crossed.length === 1 ? "איסור אחד" : `${crossed.length} איסורים` }}: {{ crossed.map((l) => ruleOf(l).label).join(", ") }}. בנק לא יכול לאשר אותה כך.
-      </template>
-    </p>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
-      <table class="w-full border-collapse text-body-m">
+      <table class="w-full min-w-[30rem] border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-1 pe-3 text-start font-semibold">הקו</th>
@@ -225,12 +245,18 @@ const flips = (l: LineResult) => Math.min(100, (l.limit.toNumber() / scaleMax(l)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="l in lines" :key="l.id" class="border-b border-n100">
+          <tr v-for="l in lines" :key="l.id" class="border-b border-n100 align-top">
             <th class="py-1 pe-3 text-start font-normal text-n700">{{ ruleOf(l).label }}</th>
-            <td class="py-1 pe-3"><span class="ltr">{{ actualText(l) }}</span></td>
+            <td class="py-1 pe-3">
+              <template v-if="isTerm(l)"><span class="ltr">{{ yearsOf(l.actual.toNumber()) }}</span> שנים</template>
+              <span v-else class="ltr">{{ percentText(l) }}%</span>
+            </td>
             <td class="py-1 pe-3">{{ limitText(l) }}</td>
             <td class="py-1 pe-3">{{ statusText(l) }}</td>
-            <td class="py-1"><span v-if="isTerm(l)">{{ l.room.toNumber() }} חודשים</span><span v-else class="ltr">{{ formatShekels(l.room) }}</span></td>
+            <td class="py-1">
+              <template v-if="isTerm(l)"><span class="ltr">{{ withMinus(String(l.room.toNumber())) }}</span> חודשים</template>
+              <span v-else class="ltr whitespace-nowrap">{{ withMinus(formatShekels(l.room)) }}</span>
+            </td>
           </tr>
           <tr>
             <th class="py-1 pe-3 text-start font-normal text-n700">סוג העסקה</th>

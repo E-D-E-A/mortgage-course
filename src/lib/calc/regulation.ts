@@ -18,6 +18,7 @@
  *   checkRegulation(input)   all five lines at once: a LineResult per line
  *   leftForLiving(net, out)  what stays each month after every payment the family makes
  *   perPerson(amount, n)     an amount per member of the household
+ *   withMinus(text)          a formatted number with the course's minus sign "−" in place of the hyphen-minus (and the LRM mark Intl adds)
  *   largestPaymentForBudget(net, other, budget)   the payment the family's own budget allows
  *
  * The payment-to-income ratio itself is lesson 4.3's, and lives in
@@ -70,6 +71,11 @@ function positive(value: Numeric, name: string): Decimal {
 /** Rounded down to the agora: the safe side of a maximum. */
 export function floorAgora(value: Numeric): Decimal {
   return new Decimal(value).toDecimalPlaces(2, Decimal.ROUND_DOWN);
+}
+
+/** The course writes a negative amount with "−" (U+2212), not the hyphen-minus Intl uses: "−2,950.00 ₪". Display only. */
+export function withMinus(text: string): string {
+  return text.replace(/^[\u200e\u200f]?-/, "−").replace(/(\s)[\u200e\u200f]?-(?=\d)/g, "$1−");
 }
 
 // ── The numbers ────────────────────────────────────────────────────────────

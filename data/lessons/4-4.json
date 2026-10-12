@@ -117,25 +117,25 @@
       "id": "rp.appraisal",
       "kind": "given",
       "inputs": {},
-      "value": "1800000.00"
+      "value": "1500000.00"
     },
     {
       "id": "rp.value",
       "kind": "reg_reduced_value",
       "inputs": {
         "price": "1400000",
-        "appraisal": "1800000"
+        "appraisal": "1500000"
       },
-      "value": "1800000.00"
+      "value": "1500000.00"
     },
     {
       "id": "rp.max_loan",
       "kind": "reg_max_loan",
       "inputs": {
-        "value": "1800000",
+        "value": "1500000",
         "deal": "only_home"
       },
-      "value": "1350000.00"
+      "value": "1125000.00"
     },
     {
       "id": "rp.max_loan_at_price",
@@ -153,7 +153,7 @@
         "minuend": "rp.price",
         "subtrahend": "rp.max_loan"
       },
-      "value": "50000.00"
+      "value": "275000.00"
     },
     {
       "id": "rp.equity_at_price",
@@ -163,6 +163,24 @@
         "subtrahend": "rp.max_loan_at_price"
       },
       "value": "350000.00"
+    },
+    {
+      "id": "rp.equity_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rp.equity_at_price",
+        "subtrahend": "rp.equity"
+      },
+      "value": "75000.00"
+    },
+    {
+      "id": "rp.equity_share",
+      "kind": "ltv_share",
+      "inputs": {
+        "part": "275000.00",
+        "whole": "1400000.00"
+      },
+      "value": "19.64"
     },
     {
       "id": "e2.income",
@@ -231,6 +249,22 @@
         "loan": "1000000"
       },
       "value": "333333.34"
+    },
+    {
+      "id": "r.rounded_up",
+      "kind": "reg_two_thirds_rounded",
+      "inputs": {
+        "amount": "1000000"
+      },
+      "value": "666666.67"
+    },
+    {
+      "id": "r.cut",
+      "kind": "reg_two_thirds_cut",
+      "inputs": {
+        "amount": "1000000"
+      },
+      "value": "666666.666"
     },
     {
       "id": "r.at_6666",
@@ -790,16 +824,16 @@
       "id": "ex6.appraisal",
       "kind": "given",
       "inputs": {},
-      "value": "1500000.00"
+      "value": "1300000.00"
     },
     {
       "id": "ex6.max_loan",
       "kind": "reg_max_loan",
       "inputs": {
-        "value": "1500000",
+        "value": "1300000",
         "deal": "only_home"
       },
-      "value": "1125000.00"
+      "value": "975000.00"
     },
     {
       "id": "ex6.answer",
@@ -808,7 +842,7 @@
         "minuend": "ex6.price",
         "subtrahend": "ex6.max_loan"
       },
-      "value": "75000.00"
+      "value": "225000.00"
     },
     {
       "id": "ex6.max_loan_at_price",
@@ -829,13 +863,19 @@
       "value": "300000.00"
     },
     {
+      "id": "ex6.quarter_pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
       "id": "ex6.quarter",
       "kind": "ltv_max_loan",
       "inputs": {
-        "value": "1500000",
+        "value": "1300000",
         "ceiling": "25"
       },
-      "value": "375000.00"
+      "value": "325000.00"
     },
     {
       "id": "ex7.loan",

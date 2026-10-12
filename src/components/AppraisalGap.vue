@@ -32,7 +32,7 @@ const used = computed(() => lowerOf(price.value, appraisal.value));
 const sides = computed(() =>
   [
     { key: "price", title: "מול המחיר", value: price.value },
-    { key: "lower", title: "מול הנמוך מבין המחיר לשמאות", value: used.value.toNumber() },
+    { key: "lower", title: "מול הנמוך מבין המחיר והשמאות", value: used.value.toNumber() },
   ].map((s) => {
     const ratio = ltvPercent(loan.value, s.value);
     const most = maxLoan(s.value, ceiling.value.value);
@@ -108,7 +108,7 @@ const below = computed(() => appraisal.value < price.value);
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
-      <table class="w-full min-w-[22rem] border-collapse text-body-m">
+      <table class="w-full min-w-[26rem] border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
             <th class="py-1 text-start font-semibold"></th>
@@ -116,10 +116,10 @@ const below = computed(() => appraisal.value < price.value);
           </tr>
         </thead>
         <tbody>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">השווי לחישוב</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr">{{ formatShekels(s.value) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">השווי לחישוב</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr whitespace-nowrap">{{ formatShekels(s.value) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">שיעור המימון</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr">{{ pct(s.ratio) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה מרבית (<span class="ltr">{{ ceiling.value }}%</span>)</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr">{{ formatShekels(s.most) }}</span></td></tr>
-          <tr><th class="py-1 text-start font-normal text-n600">הון עצמי שחסר</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr">{{ s.missing ? formatShekels(s.missing) : "—" }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">הלוואה מרבית (<span class="ltr">{{ ceiling.value }}%</span>)</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr whitespace-nowrap">{{ formatShekels(s.most) }}</span></td></tr>
+          <tr><th class="py-1 text-start font-normal text-n600">הון עצמי שחסר</th><td v-for="s in sides" :key="s.key" class="py-1"><span class="ltr whitespace-nowrap">{{ s.missing ? formatShekels(s.missing) : "—" }}</span></td></tr>
         </tbody>
       </table>
     </div>

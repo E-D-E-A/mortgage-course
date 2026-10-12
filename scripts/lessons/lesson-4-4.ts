@@ -9,6 +9,9 @@
  * not checked against the directive itself. All amounts are invented teaching
  * numbers; no case of the course appears here.
  */
+import Decimal from "decimal.js";
+import { moneyString } from "../../src/lib/calc/money.ts";
+import { percentString } from "../../src/lib/calc/percent.ts";
 import { LTV_CEILINGS, MAX_TERM_YEARS, PTI_CAPITAL_THRESHOLD, PTI_LIMIT, RISK_WEIGHT_ABOVE_THRESHOLD } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import {
@@ -61,12 +64,15 @@ export default function lesson(): LessonData {
 
   // A reduced-price home: measured against the appraisal (no cap reached in this example).
   const rpPrice = add(given("rp.price", "1400000"));
-  add(given("rp.appraisal", "1800000"));
-  add(reducedValue("rp.value", "1400000", "1800000"));
-  const rpMax = add(maxLoan("rp.max_loan", "1800000", "only_home"));
+  add(given("rp.appraisal", "1500000"));
+  add(reducedValue("rp.value", "1400000", "1500000"));
+  const rpMax = add(maxLoan("rp.max_loan", "1500000", "only_home"));
   const rpMaxAtPrice = add(maxLoan("rp.max_loan_at_price", "1400000", "only_home"));
   add(difference("rp.equity", rpPrice, rpMax));
-  add(difference("rp.equity_at_price", rpPrice, rpMaxAtPrice));
+  const rpEqPrice = add(difference("rp.equity_at_price", rpPrice, rpMaxAtPrice));
+  add(difference("rp.equity_gap", rpEqPrice, facts.find((x) => x.id === "rp.equity") as Fact));
+  const rpEquity = facts.find((x) => x.id === "rp.equity") as Fact;
+  add({ id: "rp.equity_share", kind: "ltv_share", inputs: { part: rpEquity.value as string, whole: rpPrice.value as string }, value: percentString(new Decimal(rpEquity.value as string).div(rpPrice.value as string).mul(100)) });
 
   // Lines 2 and 3 — the payment ratio, small numbers.
   add(given("e2.income", "10000"));
@@ -82,6 +88,8 @@ export default function lesson(): LessonData {
   add(given("r.loan", "1000000"));
   add(maxVar("r.max_var", "1000000"));
   add(minFix("r.min_fixed", "1000000"));
+  add({ id: "r.rounded_up", kind: "reg_two_thirds_rounded", inputs: { amount: "1000000" }, value: moneyString(new Decimal("1000000").mul(2).div(3)) });
+  add({ id: "r.cut", kind: "reg_two_thirds_cut", inputs: { amount: "1000000" }, value: new Decimal("1000000").mul(2).div(3).toDecimalPlaces(3, Decimal.ROUND_DOWN).toFixed(3) });
   add(atPercent("r.at_6666", "1000000", "66.66"));
   add(atPercent("r.at_6667", "1000000", "66.67"));
   add(givenNumber("r.p6666", "66.66"));
@@ -151,12 +159,13 @@ export default function lesson(): LessonData {
   add(givenNumber("ex5.ratio", "46"));
 
   const ex6Price = add(given("ex6.price", "1200000"));
-  add(given("ex6.appraisal", "1500000"));
-  const ex6Max = add(maxLoan("ex6.max_loan", "1500000", "only_home"));
+  add(given("ex6.appraisal", "1300000"));
+  const ex6Max = add(maxLoan("ex6.max_loan", "1300000", "only_home"));
   add(difference("ex6.answer", ex6Price, ex6Max));
   const ex6MaxAtPrice = add(maxLoan("ex6.max_loan_at_price", "1200000", "only_home"));
   add(difference("ex6.at_price", ex6Price, ex6MaxAtPrice));
-  add(atPercent("ex6.quarter", "1500000", "25"));
+  add(givenNumber("ex6.quarter_pct", "25"));
+  add(atPercent("ex6.quarter", "1300000", "25"));
 
   add(given("ex7.loan", "1500000"));
   const ex7Prime = add(given("ex7.prime", "700000"));

@@ -44,6 +44,8 @@ export default function lesson42(): LessonData {
   add(placement("rule.loan_19", { kind: "loan", monthly: "1000", monthsLeft: 19 }));
   add(placement("rule.rent_continues", { kind: "rent", monthly: "4000", monthsLeft: 6, rentContinues: true }));
   add(placement("rule.rent_ends", { kind: "rent", monthly: "4000", monthsLeft: 30, rentContinues: false }));
+  add(placement("rule.rent_ends_long", { kind: "rent", monthly: "4000", monthsLeft: 30, rentContinues: false }));
+  add(given("ex1.months", 12));
   add(placement("rule.no_end", { kind: "alimony", monthly: "1500", monthsLeft: null }));
 
   // ── Case B: אבי ומיכל, from 4.1 ──
@@ -111,8 +113,9 @@ export default function lesson42(): LessonData {
   add(disposable("ex2.answer", "16000", ex2));
   add(disposable("ex2.err_both", "16000", ex2.map((o) => ({ ...o, monthsLeft: 40 }))));
   // 3: case A — payments until the car loan stops counting; the "18 or more" mistake.
-  add(untilDrop("ex3.answer", 26));
-  add({ id: "ex3.err_inclusive", kind: "hh_days_left", inputs: { window_days: 26, used_days: 17 }, value: 9 });
+  // The question avoids the edge (exactly 18, an open question): after how many payments are 17 left?
+  add({ id: "ex3.answer", kind: "hh_days_left", inputs: { window_days: 26, used_days: 17 }, value: 9 });
+  add(untilDrop("ex3.err_edge", 26));
   // 4: rent that goes on after the purchase.
   add(given("ex4.rent", "4000"));
   add(given("ex4.months", 6));
@@ -123,14 +126,14 @@ export default function lesson42(): LessonData {
   add(disposable("ex5.err_double", "9100", [{ kind: "loan", monthly: "500", monthsLeft: 30 }]));
   // 6: a mixed list.
   const ex6: Obligation[] = [
-    { kind: "loan", monthly: "1700", monthsLeft: 18 },
+    { kind: "loan", monthly: "1700", monthsLeft: 12 },
     { kind: "leasing", monthly: "2100", monthsLeft: 36 },
     { kind: "alimony", monthly: "1600", monthsLeft: null },
     { kind: "rent", monthly: "5200", monthsLeft: 7, rentContinues: true },
   ];
   add(given("ex6.income", "25000"));
   add(given("ex6.loan", "1700"));
-  add(given("ex6.loan_months", 18));
+  add(given("ex6.loan_months", 12));
   add(given("ex6.leasing", "2100"));
   add(given("ex6.leasing_months", 36));
   add(given("ex6.alimony", "1600"));
@@ -138,7 +141,7 @@ export default function lesson42(): LessonData {
   add(given("ex6.rent_months", 7));
   add(deducted("ex6.deducted", ex6));
   add(disposable("ex6.answer", "25000", ex6));
-  add(disposable("ex6.err_18", "25000", ex6.map((o) => (o.monthsLeft === 18 ? { ...o, monthsLeft: 19 } : o))));
+  add(disposable("ex6.err_loan", "25000", ex6.map((o) => (o.monthsLeft === 12 ? { ...o, monthsLeft: 30 } : o))));
   add(disposable("ex6.err_rent", "25000", ex6.map((o) => (o.kind === "rent" ? { ...o, rentContinues: false } : o))));
   add(disposable("ex6.err_alimony", "25000", ex6.filter((o) => o.kind !== "alimony")));
 

@@ -9,6 +9,7 @@
 // learner asks for it) the same content is a list, region by region, with each
 // card opening under its node.
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import BidiText from "./BidiText.vue";
 import BigPictureCard from "./BigPictureCard.vue";
 import type { MapLink, MapNode, Region } from "./big-picture/types.ts";
 
@@ -200,11 +201,26 @@ function selectFromCard(id: string) {
     const target = listShown ? inList : buttons.get(id);
     if (!target) return;
     target.focus({ preventScroll: true });
-    target.scrollIntoView({ block: listShown ? "start" : "nearest" });
+    // `scroll-mt-24` on the node buttons keeps the node below the sticky header.
+    target.scrollIntoView({ block: listShown ? "start" : "nearest", behavior: "instant" });
   });
 }
-function toggleInList(id: string) {
+/**
+ * The list view: a node opens its card under it and closes the card above it. When that card was higher
+ * on the page the clicked node would jump up by the card's height (and off the screen), so the page is
+ * scrolled by the amount the node moved, which keeps it under the learner's finger; then, if it still
+ * sits under the sticky header or below the screen, it is brought into view (`scroll-mt-24`).
+ */
+function toggleInList(id: string, event: Event) {
+  const button = event.currentTarget as HTMLElement | null;
+  const before = button?.getBoundingClientRect().top ?? 0;
   selected.value = selected.value === id ? "" : id;
+  nextTick(() => {
+    if (!button?.isConnected) return;
+    const moved = button.getBoundingClientRect().top - before;
+    if (Math.abs(moved) > 1) scrollBy({ top: moved, behavior: "instant" });
+    button.scrollIntoView({ block: "nearest", behavior: "instant" });
+  });
 }
 </script>
 
@@ -241,12 +257,12 @@ function toggleInList(id: string) {
                 :key="n.id"
                 :ref="setButton(n.id)"
                 type="button"
-                class="min-h-11 rounded-md border px-3 py-1.5 text-start text-body-m transition-colors duration-fast ease-out"
+                class="min-h-11 scroll-mt-24 rounded-md border px-3 py-1.5 text-start text-body-m transition-colors duration-fast ease-out"
                 :class="nodeClass(n)"
                 :aria-pressed="n.id === selected"
                 @click="select(n.id)"
               >
-                {{ n.label }}
+                <BidiText :text="n.label" />
               </button>
             </div>
             <p v-else class="mt-2 text-caption text-n500">{{ r.empty }}</p>
@@ -279,9 +295,9 @@ function toggleInList(id: string) {
               class="flex min-h-11 w-full scroll-mt-24 items-center justify-between gap-2 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
               :class="nodeClass(n)"
               :aria-expanded="n.id === selected"
-              @click="toggleInList(n.id)"
+              @click="toggleInList(n.id, $event)"
             >
-              <span>{{ n.label }}</span>
+              <span><BidiText :text="n.label" /></span>
               <span aria-hidden="true">{{ n.id === selected ? "−" : "+" }}</span>
             </button>
             <div v-if="n.id === selected" class="mt-2">

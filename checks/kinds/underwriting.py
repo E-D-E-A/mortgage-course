@@ -106,7 +106,22 @@ def scaled_mix_payment(i, _facts=None):
     return str(sum(agorot(level(agorot(p * new / loan), r, n)) for p, r, n in ts))
 
 
+def statement_balance(principal, annual, months, paid):
+    """The statement convention, month by month: payment set once (agorot), interest each month
+    rounded to the agora, the last payment clears the balance."""
+    p = agorot(principal)
+    pay = agorot(level(p, annual, months))
+    rate = Decimal(annual)
+    b = p
+    for k in range(1, min(paid, months) + 1):
+        interest = agorot(b * rate / TWELVE / HUNDRED)
+        paid_principal = b if k == months else pay - interest
+        b -= paid_principal
+    return b
+
+
 def run_balance(principal, annual, months, paid):
+    """The unrounded balance, step by step (not the closed formula the TypeScript uses)."""
     m = Decimal(annual) / TWELVE / HUNDRED
     c = level(principal, annual, months)
     b = Decimal(principal)
@@ -117,6 +132,11 @@ def run_balance(principal, annual, months, paid):
 
 def mix_balance(i, _facts=None):
     k = int(i["paid"])
+    return str(agorot(sum(statement_balance(p, r, n, k) for p, r, n in tracks(i))))
+
+
+def mix_balance_formula(i, _facts=None):
+    k = int(i["paid"])
     return str(agorot(sum(run_balance(p, r, n, k) for p, r, n in tracks(i))))
 
 
@@ -125,7 +145,7 @@ def payments_until_at_most(i, _facts=None):
     limit = Decimal(str(i["threshold"]))
     longest = max(n for _, _, n in ts)
     for k in range(longest + 1):
-        if sum(run_balance(p, r, n, k) for p, r, n in ts) <= limit:
+        if sum(statement_balance(p, r, n, k) for p, r, n in ts) <= limit:
             return k
     return longest
 
@@ -191,11 +211,24 @@ def statement_table(i, _facts=None):
             "michal": str(agorot(michal)),
             "deposits": str(agorot(avi + michal)),
             "debits": str(agorot(debits)),
+            "change": str(agorot(avi + michal - debits)),
             "closing": str(agorot(closing)),
         })
         bal = closing
         n += 1
     return rows
+
+
+def points_gap(i, _facts=None):
+    return plain(Decimal(str(i["a"])) - Decimal(str(i["b"])), i.get("decimals", 1))
+
+
+def per_thousand(i, _facts=None):
+    return plain(Decimal(str(i["payment"])) / Decimal(str(i["loan"])) * 1000, i.get("decimals", 4))
+
+
+def loan_by_payment(i, _facts=None):
+    return str(agorot(Decimal(str(i["allowed"])) * Decimal(str(i["loan"])) / Decimal(str(i["payment"]))))
 
 
 def divide_percent(i, _facts=None):
@@ -208,6 +241,9 @@ def count_difference(i, facts):
 
 KINDS = {
     "uw_count_difference": count_difference,
+    "uw_per_thousand": per_thousand,
+    "uw_points_gap": points_gap,
+    "uw_loan_by_payment": loan_by_payment,
     "uw_statement_table": statement_table,
     "uw_divide_percent": divide_percent,
     "uw_track_payment": track_payment,
@@ -221,6 +257,7 @@ KINDS = {
     "uw_max_loan_at_ratio": max_loan_at_ratio,
     "uw_scaled_mix_payment": scaled_mix_payment,
     "uw_mix_balance": mix_balance,
+    "uw_mix_balance_formula": mix_balance_formula,
     "uw_payments_until_at_most": payments_until_at_most,
     "uw_add_days": add_days,
     "uw_days_between": days_between,

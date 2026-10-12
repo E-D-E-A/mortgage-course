@@ -88,7 +88,7 @@
       window.cues = [
         [1, 5, "שרשרת ההשפעה: מה מזיז את הריבית מחוץ לבנק."],
         [5, 9.5, "שש חוליות, ולכל אחת דוגמה מתוארכת."],
-        [11, 18, `1 בספטמבר 2026: ריבית בנק ישראל ירדה ב־${V.drop} נקודת אחוז.`],
+        [11, 18, `החלטה מ־1.9.2026: ירידה של ${V.drop} נקודת אחוז. לא אומת.`],
         [18, 26, `הפריים ירדה איתה: מ־${D[3].prime}% ל־${D[4].prime}%.`],
         [26, 34, `מסלול של הפריים פחות חצי: מ־${D[3].track}% ל־${D[4].track}%.`],
         [34, 43, `על ${V.loan} ₪ ל־25 שנה: מ־${num(D[3].pay)} ל־${num(D[4].pay)} ₪.`],
@@ -97,7 +97,7 @@
         [63, 70, "אותה שרשרת, חמש החלטות מתוארכות."],
         [70, 79, `ב־2020 הפריים ${D[0].prime}%. ב־2023: ${D[1].prime}%.`],
         [79, 90, `אותה הלוואה: הפרש של ${V.span} ₪ בחודש.`],
-        [90, 101, "התוספת של 1.5 נבדקה להיום בלבד. לא אומת."],
+        [90, 101, "התוספת של 1.5 לא נבדקה מול מקור. לא אומת."],
         [103, 111, "חוליה שנייה: ציפיות אינפלציה."],
         [111, 120, `פברואר 2026: ${V.febN}% בלא צמוד, ${V.febR}% בצמוד.`],
         [120, 129, `הפער, בחילוק: ${V.febGap}% בשנה.`],
@@ -206,14 +206,14 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           const od = after(t, S.chain, 33, o);
           box(400, 430, 480, 70, od * 0.6, C.mint);
           txt(640, 477, `${V.gap} ₪ פחות בחודש`, 34, { w: 700, o: od, ltr: false });
-          txt(640, 540, "הלוואה בדויה, החוב עוד מלא. המרווח בדוי. לא אומת: הריביות מתקציר של מקור רשמי", 16, { fill: C.n600, o: after(t, S.chain, 38, o) });
+          txt(640, 545, "לא אומת: הריביות מתקציר של הודעה רשמית · פריים = ריבית בנק ישראל + 1.5 · הלוואה ומרווח בדויים", 16, { fill: C.n600, o });
         }
         // Scene 3 — five decisions
         if (inScene(t, S.hist)) {
           const o = vis(t, S.hist);
           txt(640, 118, "חמש החלטות, אותה הלוואה", 38, { w: 700, o });
           const maxPay = Math.max(...D.map((d) => Number(d.pay)));
-          const baseY = 480, topY = 275;
+          const baseY = 480, topY = 290;
           D.forEach((d, i) => {
             const x = 1030 - i * 210;
             const oc = after(t, S.hist, 1 + i * 2.5, o);
@@ -224,9 +224,10 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
             txt(x, baseY + 56, `בנק ישראל ${d.rate}%`, 16, { fill: C.n600, o: oc });
             txt(x, baseY + 78, `פריים ${d.prime}%`, 16, { fill: C.n600, o: oc });
           });
-          txt(640, 168, `תשלום חודשי על ${V.loan} ₪, 25 שנה, פריים פחות 0.5`, 18, { fill: C.n600, o });
+          txt(640, 150, "לא אומת · ריביות מתקצירים של הודעות רשמיות · פריים = ריבית בנק ישראל + 1.5", 16, { fill: C.n600, o });
+          txt(640, 176, `תשלום חודשי על ${V.loan} ₪, 25 שנה, פריים פחות 0.5`, 18, { fill: C.n600, o });
           const og = after(t, S.hist, 17, o);
-          eqn(640, 190, `${num(D[1].pay)} − ${num(D[0].pay)} = ${V.span}`, 22, { fill: C.n700, o: og });
+          eqn(640, 212, `${num(D[1].pay)} − ${num(D[0].pay)} = ${V.span}`, 22, { fill: C.n700, o: og });
         }
         // Scene 4 — inflation expectations
         if (inScene(t, S.infl)) {
@@ -244,7 +245,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           txt(400, 232, "יולי 2026 · ציפיות מעקום האג״ח", 17, { fill: C.n600, o: b });
           txt(400, 300, `5 שנים: ${V.e5}%`, 30, { w: 700, o: b });
           txt(400, 344, `10 שנים: ${V.e10}%`, 30, { w: 700, o: b });
-          txt(640, 500, "חודש אחר, אורך אחר, מדד אחר: המספרים לא תואמים. לא אומת", 20, { fill: C.n700, o: after(t, S.infl, 27, o) });
+          txt(640, 500, "חודש אחר, אורך אחר, מדד אחר: המספרים לא תואמים. לא אומת", 20, { fill: C.n700, o });
         }
         // Scene 5 — the yield curve
         if (inScene(t, S.curve)) {
@@ -263,14 +264,14 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
             txt(X(p.y), Y(p.v) - 20, `${two(p.v)}%`, 22, { w: 700, o: op, ltr: true });
           });
           const oi = after(t, S.curve, 20, o);
-          el("line", { x1: X(5), y1: Y(curve[1].v) + 38, x2: X(10), y2: Y(curve[1].v) + 38, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oi });
-          txt((X(5) + X(10)) / 2, Y(curve[1].v) + 70, `משנה 5 עד 10 העקום מגלם ${V.implied}% בשנה`, 20, { w: 700, o: oi });
+          el("line", { x1: X(5), y1: Y(curve[1].v) + 26, x2: X(10), y2: Y(curve[1].v) + 26, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oi });
+          txt((X(5) + X(10)) / 2, Y(curve[1].v) + 54, `משנה 5 עד 10 העקום מגלם ${V.implied}% בשנה`, 20, { w: 700, o: oi });
           txt(640, 172, "מעוגל לשתי ספרות · לפי קריאה של הצוות · לא אומת", 17, { fill: C.n600, o });
         }
         // Scene 6 — housing demand
         if (inScene(t, S.demand)) {
           const o = vis(t, S.demand);
-          txt(640, 118, "ביקוש לדיור ← נפח הבקשות", 38, { w: 700, o });
+          txt(640, 118, "ביקוש לדיור ← נפח המשכנתאות", 38, { w: 700, o });
           const bars = [
             { x: 820, v: V.v25, label: "ממוצע חודשי ב־2025", from: 2 },
             { x: 460, v: V.v26, label: "ינואר–פברואר 2026", from: 6 },
@@ -282,7 +283,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
             txt(b.x, 440 - h - 14, `${b.v} מיליארד ₪`, 22, { w: 700, o: ob });
             txt(b.x, 474, b.label, 18, { fill: C.n600, o: ob });
           });
-          txt(640, 530, `+${V.vchg}% · מנוכה עונתיות · לא אומת. איך הנפח משפיע על המחיר: לא ידוע`, 20, { fill: C.n700, o: after(t, S.demand, 10, o) });
+          txt(640, 530, `+${V.vchg}% · מנוכה עונתיות · לא אומת. איך הנפח משפיע על המחיר: לא ידוע`, 20, { fill: C.n700, o });
         }
         // Scene 7 — events and regulation, dated
         if (inScene(t, S.events)) {
@@ -301,7 +302,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
             txt(1100, it.y, it.d, 22, { anchor: "start", w: 700, fill: C.teal, o: oi });
             txt(820, it.y, it.s, 24, { anchor: "start", o: oi });
           });
-          txt(640, 530, "תקצירים ותעתיקים, לא אומת · אין כלל קבוע לכיוון", 18, { fill: C.n600, o: after(t, S.events, 33, o) });
+          txt(640, 530, "תקצירים ותעתיקים, לא אומת · אין כלל קבוע לכיוון", 18, { fill: C.n600, o });
         }
         // Scene 8 — takeaway
         if (inScene(t, S.end)) {

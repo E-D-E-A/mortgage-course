@@ -25,12 +25,16 @@ import {
   daysBetween,
   difference,
   given,
+  loanByPayment,
   maxLoanRatio,
   mixPay,
+  perThousand,
+  pointsGap,
   ratio,
   scaledPay,
   shortfall,
   sum,
+  timesPercent,
   trackPay,
   verifyTable,
 } from "./_underwriting-facts.ts";
@@ -53,6 +57,9 @@ export default function lesson47(): LessonData {
     given("rule.regulatory_cap", "50"),
     given("demo.cap_high", "40"),
     given("demo.cap_low", "35"),
+    given("rule.financing_ceiling", "75"),
+    // Open question (lesson 4.1): net or net-to-pay. Michal's net to pay, from the 4.1 payslips.
+    given("case.michal_ntp", "7750"),
 
     // Case B: the deal and the incomes.
     given("case.price", PRICE),
@@ -72,15 +79,24 @@ export default function lesson47(): LessonData {
   facts.push(difference("case.avi_gap", "case.avi_declared", "case.avi_recognised", facts));
   facts.push(shortfall("case.avi_shortfall", AVI_DECLARED, AVI_RECOGNISED));
   facts.push(shortfall("case.hh_shortfall", v("case.hh_declared"), v("case.hh_recognised")));
-  facts.push(ratio("case.ratio_declared", v("case.payment"), v("case.hh_declared")));
+  facts.push(ratio("case.ratio_declared", v("case.payment"), v("case.hh_declared"), 1));
   facts.push(ratio("case.ratio_recognised", v("case.payment"), v("case.hh_recognised"), 1));
   facts.push(ratio("case.ltv", LOAN, PRICE, 1));
+  facts.push(pointsGap("case.ratio_gap", v("case.ratio_recognised"), v("case.ratio_declared")));
+  // If the bank counts Michal's net to pay (7,750) instead of her net (8,200).
+  facts.push(sum("case.hh_ntp", [AVI_RECOGNISED, v("case.michal_ntp")]));
+  facts.push(ratio("case.ratio_ntp", v("case.payment"), v("case.hh_ntp"), 1));
+  // The financing ceiling is a separate limit: 75% of the price.
+  facts.push(timesPercent("case.fin_cap", PRICE, "75"));
 
   // What the lower income does to the largest loan, at three demonstration caps.
   for (const [name, cap] of [["regulatory", "50"], ["high", "40"], ["low", "35"]] as const) {
     facts.push(maxLoanRatio(`demo.max_loan_${name}`, AVI, v("case.hh_recognised"), cap));
     facts.push(maxLoanRatio(`demo.max_loan_${name}_declared`, AVI, v("case.hh_declared"), cap));
   }
+  facts.push(timesPercent("demo.allowed_low", v("case.hh_recognised"), "35"));
+  facts.push(perThousand("demo.per_thousand", v("case.payment"), LOAN));
+  facts.push(loanByPayment("demo.loan_unrounded", v("demo.allowed_low"), v("case.payment"), LOAN));
   facts.push(shortfall("demo.loan_shortfall", v("demo.max_loan_high_declared"), v("demo.max_loan_high")));
   facts.push(difference("demo.equity_needed_low", "case.price", "demo.max_loan_low", facts));
   facts.push(difference("demo.equity_short_low", "demo.equity_needed_low", "case.equity", facts));
@@ -105,12 +121,15 @@ export default function lesson47(): LessonData {
   facts.push(difference("ex5.new_loan", "case.price", "ex5.equity_verified", facts));
   facts.push(scaledPay("ex5.answer", AVI, v("ex5.new_loan")));
   facts.push(ratio("ex5.ratio", v("ex5.answer"), v("case.hh_recognised"), 1));
+  facts.push(trackPay("ex5.pay_1", { principal: "585000", ratePercent: "4.60", months: 300 }));
+  facts.push(trackPay("ex5.pay_2", { principal: "585000", ratePercent: "4.10", months: 300 }));
+  facts.push(sum("demo.total_short", [v("demo.equity_short_low"), v("ex5.equity_gap")]));
   facts.push(difference("ex5.pay_gap", "ex5.answer", "case.payment", facts));
 
-  // Exercise 7: the clock. Approval Monday 2 November 2026; the bank asks for one more document on day 18.
-  facts.push(given("ex7.approved", "2026-11-02"));
-  facts.push(addDays("ex7.window_end", "2026-11-02", 24));
-  facts.push(addDays("ex7.asked", "2026-11-02", 18));
+  // Exercise 7: the clock. Approval Wednesday 4 November 2026; the bank asks for one more document on day 18.
+  facts.push(given("ex7.approved", "2026-11-04"));
+  facts.push(addDays("ex7.window_end", "2026-11-04", 24));
+  facts.push(addDays("ex7.asked", "2026-11-04", 18));
   facts.push(given("ex7.reply_days", 5));
   facts.push(given("ex7.review_days", 4));
   facts.push(addDays("ex7.replied", v("ex7.asked"), 5));

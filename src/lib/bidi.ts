@@ -24,3 +24,26 @@ export function numberPieces(text: string): Piece[] {
   if (at < text.length) pieces.push({ text: text.slice(at), ltr: false });
   return pieces;
 }
+
+/** Intl writes a negative number with a hyphen-minus (and a direction mark before it); the course writes "−". */
+export function withMinus(text: string): string {
+  return text.replace(/^‎?-/, "−");
+}
+
+/** The shekel sign is glued to its number with a no-break space, so it never wraps onto a line of its own. */
+export function glueShekelSign(text: string): string {
+  return text.replace(/\s₪/g, " ₪");
+}
+
+const RIGHT_VERDICT = /^(נכון(?![א-ת])[.,:!]?)\s*/;
+const WRONG_VERDICT = /^(לא בדיוק[.,:!]?|לא נכון[.,:!]?|לא בהכרח[.,:!]?|לא[.,:!])\s*/;
+
+/**
+ * The verdict word and the explanation that follow an answer. A feedback that already opens with its own
+ * verdict ("נכון. …", "לא בדיוק. …") keeps it as the lead, so the component does not say it twice.
+ */
+export function splitVerdict(feedback: string, correct: boolean): { lead: string; rest: string } {
+  const own = feedback.match(correct ? RIGHT_VERDICT : WRONG_VERDICT);
+  if (own) return { lead: own[1], rest: feedback.slice(own[0].length) };
+  return { lead: correct ? "נכון." : "לא בדיוק.", rest: feedback };
+}

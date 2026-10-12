@@ -144,6 +144,20 @@
       "value": "none"
     },
     {
+      "id": "rule.rent_ends_long",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "rent,4000,30"
+      },
+      "value": "none"
+    },
+    {
+      "id": "ex1.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
       "id": "rule.no_end",
       "kind": "aff_placement",
       "inputs": {
@@ -485,20 +499,20 @@
     },
     {
       "id": "ex3.answer",
-      "kind": "aff_months_until_drop",
-      "inputs": {
-        "months_left": 26
-      },
-      "value": 8
-    },
-    {
-      "id": "ex3.err_inclusive",
       "kind": "hh_days_left",
       "inputs": {
         "window_days": 26,
         "used_days": 17
       },
       "value": 9
+    },
+    {
+      "id": "ex3.err_edge",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 26
+      },
+      "value": 8
     },
     {
       "id": "ex4.rent",
@@ -558,7 +572,7 @@
       "id": "ex6.loan_months",
       "kind": "given",
       "inputs": {},
-      "value": 18
+      "value": 12
     },
     {
       "id": "ex6.leasing",
@@ -594,7 +608,7 @@
       "id": "ex6.deducted",
       "kind": "aff_deducted",
       "inputs": {
-        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+        "obligations": "loan,1700,12|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
       },
       "value": "8900.00"
     },
@@ -603,16 +617,16 @@
       "kind": "aff_disposable",
       "inputs": {
         "recognised": "25000",
-        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+        "obligations": "loan,1700,12|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
       },
       "value": "16100.00"
     },
     {
-      "id": "ex6.err_18",
+      "id": "ex6.err_loan",
       "kind": "aff_disposable",
       "inputs": {
         "recognised": "25000",
-        "obligations": "loan,1700,19|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+        "obligations": "loan,1700,30|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
       },
       "value": "14400.00"
     },
@@ -621,7 +635,7 @@
       "kind": "aff_disposable",
       "inputs": {
         "recognised": "25000",
-        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7"
+        "obligations": "loan,1700,12|leasing,2100,36|alimony,1600,-|rent,5200,7"
       },
       "value": "21300.00"
     },
@@ -630,7 +644,7 @@
       "kind": "aff_disposable",
       "inputs": {
         "recognised": "25000",
-        "obligations": "loan,1700,18|leasing,2100,36|rent,5200,7,continues"
+        "obligations": "loan,1700,12|leasing,2100,36|rent,5200,7,continues"
       },
       "value": "17700.00"
     }

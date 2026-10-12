@@ -49,40 +49,49 @@
       "value": "90000"
     },
     {
-      "id": "card.loan_amount.cost",
-      "kind": "given",
-      "inputs": {},
-      "value": "2000"
-    },
-    {
-      "id": "card.loan_amount.small",
-      "kind": "given",
-      "inputs": {},
-      "value": "200000"
-    },
-    {
-      "id": "card.loan_amount.big",
+      "id": "card.loan_amount.price",
       "kind": "given",
       "inputs": {},
       "value": "2000000"
     },
     {
-      "id": "card.loan_amount.pts_small",
-      "kind": "fc_ratio",
-      "inputs": {
-        "a": "2000",
-        "b": "200000"
-      },
-      "value": "1"
+      "id": "card.loan_amount.equity_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000"
     },
     {
-      "id": "card.loan_amount.pts_big",
-      "kind": "fc_ratio",
+      "id": "card.loan_amount.equity_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "700000"
+    },
+    {
+      "id": "card.loan_amount.loan_a",
+      "kind": "fc_minus",
       "inputs": {
-        "a": "2000",
-        "b": "2000000"
+        "a": "2000000",
+        "b": "500000"
       },
-      "value": "0.1"
+      "value": "1500000"
+    },
+    {
+      "id": "card.loan_amount.loan_b",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2000000",
+        "b": "700000"
+      },
+      "value": "1300000"
+    },
+    {
+      "id": "card.loan_amount.diff",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1500000",
+        "b": "1300000"
+      },
+      "value": "200000"
     },
     {
       "id": "card.term_age.loan",
@@ -300,14 +309,6 @@
       "kind": "given",
       "inputs": {},
       "value": "3"
-    },
-    {
-      "id": "card.relationship.elsewhere",
-      "kind": "fc_sum",
-      "inputs": {
-        "of": "3|3"
-      },
-      "value": "6"
     },
     {
       "id": "card.mix.loan",
