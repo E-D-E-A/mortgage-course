@@ -167,8 +167,9 @@
           });
           const ot = after(t, S.tower, 50, o);
           el("line", { x1: X(Number(V.spread)), x2: X(Number(V.spread)), y1: 160, y2: 478, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "4 6", opacity: ot });
-          el("rect", { x: 140, y: 492, width: 520, height: 56, rx: 14, fill: C.mint, opacity: ot * 0.8 });
-          txt(400, 529, `מרווח ${V.spread}  ·  ריבית ${V.anchor} + ${V.spread} = ${V.rate}%`, 26, { w: 700, o: ot, ltr: true });
+          el("rect", { x: 140, y: 488, width: 520, height: 78, rx: 14, fill: C.mint, opacity: ot * 0.8 });
+          txt(400, 520, `המרווח: ${V.spread} נקודות אחוז`, 24, { w: 700, o: ot });
+          txt(400, 552, `${V.anchor} + ${V.spread} = ${V.rate}%`, 28, { w: 700, o: ot, ltr: true });
         }
         // 4 — what is known about each layer
         if (inScene(t, S.known)) {
@@ -205,11 +206,12 @@
           bar(860, V.payLow, C.teal, `מרווח ${V.allowed}`, `ריבית ${V.rateLow}%`, 3);
           bar(620, V.payHigh, C.tq2, `מרווח ${V.opened}`, `ריבית ${V.rateHigh}%`, 10);
           const o3 = after(t, S.gap, 18, o);
-          el("rect", { x: 110, y: 220, width: 360, height: 150, rx: 16, fill: C.mint, opacity: o3 * 0.7 });
-          txt(290, 270, "ההפרש בחודש", 24, { o: o3, fill: C.n700 });
-          txt(290, 320, V.monthDiff, 40, { w: 700, o: o3, ltr: true });
+          el("rect", { x: 110, y: 200, width: 360, height: 220, rx: 16, fill: C.mint, opacity: o3 * 0.7 });
+          txt(290, 245, "ההפרש בחודש", 24, { o: o3, fill: C.n700 });
+          txt(290, 292, V.monthDiff, 40, { w: 700, o: o3, ltr: true });
           const o4 = after(t, S.gap, 26, o);
-          txt(290, 360, `×${V.months} חודשים = ${V.totalDiff}`, 24, { w: 700, o: o4, ltr: true });
+          txt(290, 345, `בכל ${V.months} החודשים`, 24, { o: o4, fill: C.n700 });
+          txt(290, 393, V.totalDiff, 40, { w: 700, o: o4, ltr: true });
           txt(640, 548, `${V.loan} ל־25 שנה. היחידה של טובי לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
         }
         // 6 — closing

@@ -30,6 +30,7 @@ export const f = facts("4.10");
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
 export const pct = (id) => `${f.plain(id)}%`;
+export const asOf = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${f.raw("data_date")}T12:00:00Z`));
 export const map = mapUpTo("4.10");
 export const cards = viewCards(cardsFor("4.10"), f.raw);
 export const predictionOptions = [
@@ -108,7 +109,7 @@ export const halfRows = [
   </table>
 </div>
 
-נכון לעכשיו אין בקורס אף כלל רשמי שנקרא במסמך המקורי, כי האתרים הרשמיים חסומים בסביבה שבה נכתב. לכן כל מספר רגולטורי שתראו בכרטיסים הוא ״לא אומת״, ויש לו תאריך.
+נכון ל־{asOf} אין בקורס אף כלל רשמי שנקרא במסמך המקורי, כי האתרים הרשמיים חסומים בסביבה שבה נכתב. לכן כל מספר רגולטורי שתראו בכרטיסים הוא ״לא אומת״, ויש לו תאריך.
 
 ### מספרים קטנים: כרטיס אחד, מראש
 
