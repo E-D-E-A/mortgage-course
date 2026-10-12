@@ -1,0 +1,954 @@
+{
+  "lesson": "4.11",
+  "title": "כרטיסי הגורמים, ב׳: העסקה, הנכס והבנק",
+  "note": "Factor-card examples are facts card.<id>.<name>; loans and households are invented teaching numbers (level payment, annual rate ÷ 12).",
+  "facts": [
+    {
+      "id": "card.ltv.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000"
+    },
+    {
+      "id": "card.ltv.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1170000"
+    },
+    {
+      "id": "card.ltv.ltv",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1170000",
+        "b": "1800000"
+      },
+      "value": "65"
+    },
+    {
+      "id": "card.ltv.step",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "card.ltv.loan_at_step",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "1800000",
+        "percent": "60"
+      },
+      "value": "1080000"
+    },
+    {
+      "id": "card.ltv.more_equity",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1170000",
+        "b": "1080000"
+      },
+      "value": "90000"
+    },
+    {
+      "id": "card.loan_amount.cost",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000"
+    },
+    {
+      "id": "card.loan_amount.small",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000"
+    },
+    {
+      "id": "card.loan_amount.big",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "card.loan_amount.pts_small",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "2000",
+        "b": "200000"
+      },
+      "value": "1"
+    },
+    {
+      "id": "card.loan_amount.pts_big",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "2000",
+        "b": "2000000"
+      },
+      "value": "0.1"
+    },
+    {
+      "id": "card.term_age.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000"
+    },
+    {
+      "id": "card.term_age.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "card.term_age.m20",
+      "kind": "given",
+      "inputs": {},
+      "value": "240"
+    },
+    {
+      "id": "card.term_age.m30",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "card.term_age.pay20",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "1000000",
+        "rate": "5",
+        "months": "240"
+      },
+      "value": "6599.56"
+    },
+    {
+      "id": "card.term_age.pay30",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "1000000",
+        "rate": "5",
+        "months": "360"
+      },
+      "value": "5368.22"
+    },
+    {
+      "id": "card.term_age.drop",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "6599.56",
+        "b": "5368.22"
+      },
+      "value": "1231.34"
+    },
+    {
+      "id": "card.term_age.age",
+      "kind": "given",
+      "inputs": {},
+      "value": "45"
+    },
+    {
+      "id": "card.term_age.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "card.term_age.age_end",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "45|30"
+      },
+      "value": "75"
+    },
+    {
+      "id": "card.property_type.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "card.property_type.p_single",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "card.property_type.p_repl",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "card.property_type.p_more",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "card.property_type.single",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "75"
+      },
+      "value": "1500000"
+    },
+    {
+      "id": "card.property_type.repl",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "70"
+      },
+      "value": "1400000"
+    },
+    {
+      "id": "card.property_type.more",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "50"
+      },
+      "value": "1000000"
+    },
+    {
+      "id": "card.value_appraisal.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "card.value_appraisal.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1900000"
+    },
+    {
+      "id": "card.value_appraisal.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000"
+    },
+    {
+      "id": "card.value_appraisal.on_price",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1500000",
+        "b": "2000000"
+      },
+      "value": "75"
+    },
+    {
+      "id": "card.value_appraisal.on_value",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1500000",
+        "b": "1900000"
+      },
+      "value": "78.95"
+    },
+    {
+      "id": "card.registration.signed",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-01"
+    },
+    {
+      "id": "card.registration.due_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "card.registration.due",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-11-01",
+        "days": "60"
+      },
+      "value": "2026-12-31"
+    },
+    {
+      "id": "card.registration.reg_days",
+      "kind": "given",
+      "inputs": {},
+      "value": "120"
+    },
+    {
+      "id": "card.registration.reg",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-11-01",
+        "days": "120"
+      },
+      "value": "2027-03-01"
+    },
+    {
+      "id": "card.registration.gap",
+      "kind": "fc_daysBetween",
+      "inputs": {
+        "from": "2026-12-31",
+        "to": "2027-03-01"
+      },
+      "value": "60"
+    },
+    {
+      "id": "card.relationship.slips",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "card.relationship.statements",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "card.relationship.elsewhere",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "3|3"
+      },
+      "value": "6"
+    },
+    {
+      "id": "card.mix.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000"
+    },
+    {
+      "id": "card.mix.parts",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "card.mix.min_fixed",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "1200000",
+        "b": "3"
+      },
+      "value": "400000"
+    },
+    {
+      "id": "card.mix.max_variable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1200000",
+        "b": "400000"
+      },
+      "value": "800000"
+    },
+    {
+      "id": "card.timing.offered",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-20"
+    },
+    {
+      "id": "card.timing.valid",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "card.timing.until",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-10-20",
+        "days": "24"
+      },
+      "value": "2026-11-13"
+    },
+    {
+      "id": "card.timing.month_end",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-30"
+    },
+    {
+      "id": "card.timing.left",
+      "kind": "fc_daysBetween",
+      "inputs": {
+        "from": "2026-10-20",
+        "to": "2026-10-30"
+      },
+      "value": "10"
+    },
+    {
+      "id": "card.other_offers.opened",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.8"
+    },
+    {
+      "id": "card.other_offers.allowed",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.5"
+    },
+    {
+      "id": "card.other_offers.room",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "0.8",
+        "b": "0.5"
+      },
+      "value": "0.3"
+    },
+    {
+      "id": "card.other_offers.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000"
+    },
+    {
+      "id": "card.other_offers.year_one",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "1000000",
+        "percent": "0.3"
+      },
+      "value": "3000"
+    },
+    {
+      "id": "card.fees.opening",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "card.fees.appraiser",
+      "kind": "given",
+      "inputs": {},
+      "value": "850"
+    },
+    {
+      "id": "card.fees.total",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "360|850"
+      },
+      "value": "1210"
+    },
+    {
+      "id": "card.fees.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000"
+    },
+    {
+      "id": "card.fees.share",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1210",
+        "b": "1000000",
+        "decimals": 3
+      },
+      "value": "0.121"
+    },
+    {
+      "id": "card.insurance.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000"
+    },
+    {
+      "id": "card.insurance.small",
+      "kind": "given",
+      "inputs": {},
+      "value": "25000"
+    },
+    {
+      "id": "card.insurance.below",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "30000",
+        "b": "25000"
+      },
+      "value": "5000"
+    },
+    {
+      "id": "card.channel.days",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "card.channel.banks",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "card.channel.one_by_one",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "5",
+        "b": "4"
+      },
+      "value": "20"
+    },
+    {
+      "id": "pred.drop",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "6599.56",
+        "b": "5368.22"
+      },
+      "value": "1231.34"
+    },
+    {
+      "id": "pred.drop_percent",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1231.34",
+        "b": "6599.56",
+        "decimals": 2
+      },
+      "value": "18.66"
+    },
+    {
+      "id": "pred.factor",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "360",
+        "b": "240"
+      },
+      "value": "1.5"
+    },
+    {
+      "id": "pred.scaled_total",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "6599.56",
+        "b": "240"
+      },
+      "value": "1583894.4"
+    },
+    {
+      "id": "pred.scaled",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "1583894.4",
+        "b": "360"
+      },
+      "value": "4399.71"
+    },
+    {
+      "id": "pred.half_percent",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "pred.half",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "6599.56",
+        "percent": "50"
+      },
+      "value": "3299.78"
+    },
+    {
+      "id": "w.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2400000"
+    },
+    {
+      "id": "w.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2300000"
+    },
+    {
+      "id": "w.pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "w.max_price",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2400000",
+        "percent": "70"
+      },
+      "value": "1680000"
+    },
+    {
+      "id": "w.max_value",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2300000",
+        "percent": "70"
+      },
+      "value": "1610000"
+    },
+    {
+      "id": "w.gap",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1680000",
+        "b": "1610000"
+      },
+      "value": "70000"
+    },
+    {
+      "id": "w.equity_price",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2400000",
+        "b": "1680000"
+      },
+      "value": "720000"
+    },
+    {
+      "id": "w.equity_value",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2400000",
+        "b": "1610000"
+      },
+      "value": "790000"
+    },
+    {
+      "id": "half.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "half.single.pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "half.single.max",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "75"
+      },
+      "value": "1500000"
+    },
+    {
+      "id": "half.single.equity",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2000000",
+        "b": "1500000"
+      },
+      "value": "500000"
+    },
+    {
+      "id": "half.replacement.pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "half.replacement.max",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "70"
+      },
+      "value": "1400000"
+    },
+    {
+      "id": "half.replacement.equity",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2000000",
+        "b": "1400000"
+      },
+      "value": "600000"
+    },
+    {
+      "id": "half.investment.pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "half.investment.max",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "50"
+      },
+      "value": "1000000"
+    },
+    {
+      "id": "half.investment.equity",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "2000000",
+        "b": "1000000"
+      },
+      "value": "1000000"
+    },
+    {
+      "id": "ex2.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000"
+    },
+    {
+      "id": "ex2.pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "ex2.pct_single",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "1500000",
+        "percent": "50"
+      },
+      "value": "750000"
+    },
+    {
+      "id": "ex2.err_single",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "1500000",
+        "percent": "75"
+      },
+      "value": "1125000"
+    },
+    {
+      "id": "ex3.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000"
+    },
+    {
+      "id": "ex3.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1100000"
+    },
+    {
+      "id": "ex3.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "880000"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "880000",
+        "b": "1100000",
+        "decimals": 2
+      },
+      "value": "80"
+    },
+    {
+      "id": "ex3.err_price",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "880000",
+        "b": "1200000",
+        "decimals": 2
+      },
+      "value": "73.33"
+    },
+    {
+      "id": "ex4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "800000"
+    },
+    {
+      "id": "ex4.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "ex4.m25",
+      "kind": "given",
+      "inputs": {},
+      "value": "300"
+    },
+    {
+      "id": "ex4.m30",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "ex4.pay25",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "800000",
+        "rate": "4.5",
+        "months": "300"
+      },
+      "value": "4446.66"
+    },
+    {
+      "id": "ex4.pay30",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "800000",
+        "rate": "4.5",
+        "months": "360"
+      },
+      "value": "4053.48"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "4446.66",
+        "b": "4053.48"
+      },
+      "value": "393.18"
+    },
+    {
+      "id": "ex4.total25",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "4446.66",
+        "b": "300"
+      },
+      "value": "1333998"
+    },
+    {
+      "id": "ex4.total30",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "4053.48",
+        "b": "360"
+      },
+      "value": "1459252.8"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1459252.8",
+        "b": "1333998"
+      },
+      "value": "125254.8"
+    },
+    {
+      "id": "ex5.offered",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-12-01"
+    },
+    {
+      "id": "ex5.valid",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "ex5.valid_30",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "ex5.valid_31",
+      "kind": "given",
+      "inputs": {},
+      "value": "31"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-12-01",
+        "days": "24"
+      },
+      "value": "2026-12-25"
+    },
+    {
+      "id": "ex5.err_30",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-12-01",
+        "days": "30"
+      },
+      "value": "2026-12-31"
+    },
+    {
+      "id": "ex5.err_31",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-12-01",
+        "days": "31"
+      },
+      "value": "2027-01-01"
+    },
+    {
+      "id": "ex6.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000"
+    },
+    {
+      "id": "ex6.parts",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "1500000",
+        "b": "3"
+      },
+      "value": "500000"
+    },
+    {
+      "id": "ex6.err_variable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1500000",
+        "b": "500000"
+      },
+      "value": "1000000"
+    },
+    {
+      "id": "grid.deal",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "grid.mix",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.bank",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-12"
+    }
+  ]
+}

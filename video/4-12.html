@@ -1,0 +1,228 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.12 — "ממה עשויה הריבית שלך".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/4-12.json. The sizes of the six layers are
+  the course's teaching numbers: nobody gave it the size of any layer, and the
+  scene says so on screen. The only figures a source gave are a banker's 0.5 and
+  0.8 (Tobi Zamir, 2026-08-05; field knowledge, a single source, units not
+  stated, read here as percentage points: an assumption the scene states). The
+  cue lines (window.cues) are the narration script, one line each.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.12 · איך בנק מתמחר</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-12.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shekels = (id) => `${nf2.format(Number(fact(id)))} ₪`;
+      const whole = (id) => `${new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(Number(fact(id)))} ₪`;
+      const sg = (s) => (Number(s) < 0 ? `−${String(s).replace("-", "")}` : `+${s}`);
+
+      const V = {
+        anchor: fact("tower.anchor"), spread: fact("tower.spread"), rate: fact("tower.rate"),
+        allowed: fact("pred.allowed"), opened: fact("pred.opened"), gap: fact("pred.gap"),
+        rateLow: fact("pred.rate_low"), rateHigh: fact("pred.rate_high"),
+        payLow: Number(fact("pred.pay_low")), payHigh: Number(fact("pred.pay_high")),
+        monthDiff: shekels("pred.month_diff"), totalDiff: whole("pred.total_diff"), months: fact("pred.months"), loan: whole("pred.loan"),
+      };
+      const LAYERS = [
+        { id: "cost", name: "עלות המימון", q: "כמה עולה לי הכסף?", who: "טובי זמיר", c: "teal" },
+        { id: "risk", name: "סיכון", q: "ישלמו, או לא?", who: "", c: "tq2" },
+        { id: "capital", name: "דרישות הון", q: "כמה הון להחזיק?", who: "טובי זמיר; לא אומת", c: "tq2" },
+        { id: "competition", name: "תחרות", q: "ואם ילכו לבנק אחר?", who: "טובי זמיר", c: "tq2" },
+        { id: "value", name: "ערך הלקוח", q: "כמה הוא שווה לי?", who: "טובי זמיר", c: "tq2" },
+        { id: "appetite", name: "תיאבון", q: "כמה אני רוצה את זה עכשיו?", who: "טובי זמיר", c: "tq2" },
+      ].map((l) => ({ ...l, v: Number(fact(`tower.${l.id}`)), s: fact(`tower.${l.id}`) }));
+
+      const S = { title: [0, 10], formula: [10, 38], tower: [38, 98], known: [98, 138], gap: [138, 172], end: [172, 184] };
+      window.duration = 184;
+      window.cues = [
+        [1, 5, "הריבית שבנק מציע נראית כמו מספר אחד."],
+        [5, 9.5, "אבל יש בה שכבות. ומה ידוע עליהן?"],
+        [11, 19, "העוגן בא מהשוק: אותו עוגן אצל כולם."],
+        [19, 28, `${V.anchor}% בדוגמה שלנו. מספר להמחשה.`],
+        [28, 37, `המרווח נקבע בהצעה: ${V.spread} נקודות אחוז בדוגמה.`],
+        [39, 47, "בתוך המרווח: שש שאלות של הבנק."],
+        [47, 56, "כמה עולה לי הכסף? זו עלות המימון."],
+        [56, 64, "מה הסיכוי שלא ישלמו? זה הסיכון."],
+        [64, 72, "כמה הון להחזיק נגד ההלוואה?"],
+        [72, 80, "ואם הלקוח ילך לבנק אחר? זו התחרות."],
+        [80, 88, "כמה הלקוח שווה לי מעבר להלוואה?"],
+        [88, 97, "וכמה אני רוצה הלוואה כזאת עכשיו? תיאבון."],
+        [99, 107, "הגדלים בשקף הקודם הם מספרים להמחשה."],
+        [107, 116, "אף מקור לא נתן את הגודל של אף שכבה."],
+        [116, 126, "בנקאי אחד סיפר על חלק מהשכבות, בשיחה אחת."],
+        [126, 137, "ידע מהשטח, ממקור יחיד. ממתין לאישור אילון."],
+        [139, 147, `פקיד פותח ב־${V.opened} כשמותר לו ${V.allowed}. נקרא כנקודות אחוז: הנחה.`],
+        [147, 156, `על ${V.loan} ל־25 שנה: ${V.rateLow}% מול ${V.rateHigh}%.`],
+        [156, 165, `ההפרש בחודש: ${V.monthDiff}.`],
+        [165, 171, `ובכל התקופה: ${V.totalDiff}.`],
+        [173, 179, "אנחנו יודעים את המבנה."],
+        [179, 183, "את הגדלים עוד לא."],
+      ];
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", warn: "var(--mogi-warning-bg)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+
+      const COL = { teal: C.teal, tq2: C.tq2 };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ממה עשויה הריבית שלך", 76, { w: 700, o });
+          txt(640, 360, "מה ידוע, ומה לא, על איך בנק מתמחר", 32, { fill: C.n600, o });
+          const o2 = after(t, S.title, 4, o, 0.8);
+          [C.teal, C.tq2, C.tq2, C.tq2].forEach((c, i) => el("rect", { x: 580, y: 480 - i * 30, width: 120, height: 24, rx: 5, fill: c, opacity: o2 }));
+        }
+        // 2 — rate = anchor + spread
+        if (inScene(t, S.formula)) {
+          const o = vis(t, S.formula);
+          txt(640, 105, "ריבית = עוגן + מרווח", 44, { w: 700, o });
+          const o1 = after(t, S.formula, 2, o);
+          el("rect", { x: 780, y: 250, width: 280, height: 140, rx: 16, fill: C.teal, opacity: o1 });
+          txt(920, 305, "העוגן", 30, { w: 700, o: o1, fill: C.n0 });
+          txt(920, 360, `${V.anchor}%`, 48, { w: 700, o: o1, fill: C.n0, ltr: true });
+          const o2 = after(t, S.formula, 10, o);
+          el("rect", { x: 440, y: 250, width: 280, height: 140, rx: 16, fill: C.tq2, opacity: o2 });
+          txt(580, 305, "המרווח", 30, { w: 700, o: o2 });
+          txt(580, 360, `${V.spread}`, 48, { w: 700, o: o2, ltr: true });
+          txt(750, 340, "+", 56, { w: 700, o: o2, fill: C.n600, ltr: true });
+          const o3 = after(t, S.formula, 18, o);
+          el("rect", { x: 100, y: 250, width: 280, height: 140, rx: 16, fill: C.mint, opacity: o3 * 0.8 });
+          txt(240, 305, "הריבית", 30, { w: 700, o: o3 });
+          txt(240, 360, `${V.rate}%`, 48, { w: 700, o: o3, ltr: true });
+          txt(410, 340, "=", 56, { w: 700, o: o3, fill: C.n600, ltr: true });
+          txt(640, 470, "העוגן מהשוק. המרווח נקבע בהצעה. מספרים להמחשה.", 26, { fill: C.n600, o: after(t, S.formula, 20, o) });
+        }
+        // 3 — the six layers of the spread, as a running total
+        if (inScene(t, S.tower)) {
+          const o = vis(t, S.tower);
+          txt(640, 100, "ששת הרכיבים של המרווח", 40, { w: 700, o });
+          txt(640, 138, "מספרים להמחשה: אף מקור לא נתן גודל של רכיב", 22, { fill: C.n600, o });
+          const X = (c) => 950 - c * 700;
+          let cum = 0;
+          LAYERS.forEach((l, i) => {
+            const from = 1 + i * 8;
+            const oi = after(t, S.tower, from, o);
+            const start = cum;
+            cum += l.v;
+            const y = 170 + i * 56;
+            const k = ease((t - S.tower[0] - from) / 2);
+            const x0 = X(start), x1 = X(start + l.v * k);
+            const left = Math.min(x0, x1), w = Math.abs(x1 - x0);
+            if (l.v < 0) el("rect", { x: left, y, width: Math.max(w, 1), height: 40, rx: 6, fill: "none", stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oi });
+            else el("rect", { x: left, y, width: Math.max(w, 1), height: 40, rx: 6, fill: COL[l.c], opacity: oi });
+            txt(1180, y + 20, l.name, 26, { anchor: "start", w: 700, o: oi });
+            txt(1180, y + 44, l.q, 18, { anchor: "start", fill: C.n600, o: oi });
+            txt(Math.min(x0, X(start + l.v)) - 10, y + 29, sg(l.s), 26, { anchor: "end", w: 700, o: oi, ltr: true });
+          });
+          const ot = after(t, S.tower, 50, o);
+          el("line", { x1: X(Number(V.spread)), x2: X(Number(V.spread)), y1: 160, y2: 520, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "4 6", opacity: ot });
+          el("rect", { x: 140, y: 468, width: 460, height: 64, rx: 14, fill: C.mint, opacity: ot * 0.8 });
+          txt(370, 510, `מרווח ${V.spread}  ·  ריבית ${V.anchor} + ${V.spread} = ${V.rate}%`, 26, { w: 700, o: ot, ltr: true });
+        }
+        // 4 — what is known about each layer
+        if (inScene(t, S.known)) {
+          const o = vis(t, S.known);
+          txt(640, 100, "מה ידוע על כל רכיב", 40, { w: 700, o });
+          el("rect", { x: 820, y: 135, width: 360, height: 36, rx: 8, fill: C.n100, opacity: o });
+          txt(1000, 160, "מי אמר", 22, { w: 700, o, fill: C.n700 });
+          el("rect", { x: 470, y: 135, width: 300, height: 36, rx: 8, fill: C.n100, opacity: o });
+          txt(620, 160, "הגודל", 22, { w: 700, o, fill: C.n700 });
+          LAYERS.forEach((l, i) => {
+            const oi = after(t, S.known, 1 + i * 3, o);
+            const y = 190 + i * 58;
+            txt(1180, y + 28, l.name, 26, { anchor: "start", w: 700, o: oi });
+            const who = l.who || "ידע כללי, בלי מספרים";
+            el("rect", { x: 820, y, width: 270, height: 40, rx: 20, fill: l.who ? C.tq2 : C.n200, opacity: oi });
+            txt(955, y + 28, who, 20, { w: 600, o: oi });
+            el("rect", { x: 520, y, width: 200, height: 40, rx: 20, fill: C.warn, opacity: oi });
+            txt(620, y + 28, "לא ידוע", 22, { w: 700, o: oi });
+          });
+        }
+        // 5 — what a gap of 0.3 points costs
+        if (inScene(t, S.gap)) {
+          const o = vis(t, S.gap);
+          txt(640, 100, "פער של מרווח, במספרים", 40, { w: 700, o });
+          const BASE = 470, UNIT = 0.062;
+          const bar = (x, v, fill, label, sub, from) => {
+            const oi = after(t, S.gap, from, o);
+            const h = v * UNIT * ease((t - S.gap[0] - from) / 2.5);
+            el("rect", { x, y: BASE - h, width: 170, height: h, rx: 8, fill, opacity: oi });
+            txt(x + 85, BASE - h - 14, `${nf2.format(v)} ₪`, 26, { w: 700, o: oi, ltr: true });
+            txt(x + 85, BASE + 32, label, 24, { w: 600, o: oi });
+            txt(x + 85, BASE + 58, sub, 20, { o: oi, fill: C.n600 });
+          };
+          bar(860, V.payLow, C.teal, `מרווח ${V.allowed}`, `ריבית ${V.rateLow}%`, 3);
+          bar(620, V.payHigh, C.tq2, `מרווח ${V.opened}`, `ריבית ${V.rateHigh}%`, 10);
+          const o3 = after(t, S.gap, 18, o);
+          el("rect", { x: 110, y: 220, width: 360, height: 150, rx: 16, fill: C.mint, opacity: o3 * 0.7 });
+          txt(290, 270, "ההפרש בחודש", 24, { o: o3, fill: C.n700 });
+          txt(290, 320, V.monthDiff, 40, { w: 700, o: o3, ltr: true });
+          const o4 = after(t, S.gap, 26, o);
+          txt(290, 360, `×${V.months} חודשים = ${V.totalDiff}`, 24, { w: 700, o: o4, ltr: true });
+          txt(640, 520, `${V.loan} ל־25 שנה. היחידה של טובי לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
+        }
+        // 6 — closing
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 280, "אנחנו יודעים את המבנה", 56, { w: 700, o });
+          txt(640, 360, "את הגדלים עוד לא", 56, { w: 700, o: after(t, S.end, 4, o), fill: C.teal });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

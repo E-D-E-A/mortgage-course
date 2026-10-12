@@ -112,14 +112,23 @@ export default function lesson41(): LessonData {
   add(net("ex1.net", "12000", ["3000"]));
   add(netToPay("ex1.ntp", "9000", ["500"]));
   // 2: net from a payslip's lines.
+  add(given("ex2.gross", "14200"));
+  add(given("ex2.tax", "1850"));
+  add(given("ex2.ni", "1250"));
+  add(given("ex2.pension", "850"));
   add(net("ex2.answer", "14200", ["1850", "1250", "850"]));
   add(net("ex2.err_tax_only", "14200", ["1850"]));
   add(sum("ex2.err_deductions", ["1850", "1250", "850"]));
   // 3: three months' average.
+  add(given("ex3.m1", "9150"));
+  add(given("ex3.m2", "9300"));
+  add(given("ex3.m3", "9600"));
   add(average("ex3.answer", ["9150", "9300", "9600"]));
   add(sum("ex3.err_sum", ["9150", "9300", "9600"]));
   add(average("ex3.err_two", ["9300", "9600"]));
   // 4: a self-employed person's monthly income from one assessment: 130,000 before tax, 28,000 tax.
+  add(given("ex4.before_tax", "130000"));
+  add(given("ex4.tax", "28000"));
   const ex4net = add(net("ex4.annual_net", "130000", ["28000"]));
   add(monthly("ex4.answer", ex4net.value as string));
   add(monthly("ex4.err_before_tax", "130000"));
@@ -133,7 +142,6 @@ export default function lesson41(): LessonData {
   // 7: a company owner's profit and dividend (invented): the same money once.
   add(given("ex7.profit", "200000"));
   add(given("ex7.dividend", "120000"));
-  add(monthly("ex7.dividend_monthly", "120000"));
 
   // ── Prediction ──
   // Options: what he declares; the latest assessment ÷ 12 and the two-year average; nothing.

@@ -1,0 +1,482 @@
+{
+  "lesson": "4.5",
+  "title": "שלושה סוגי מספרים",
+  "note": "The directive numbers are the team's transcription (Brain 7503881), not checked against the directive. Every bank-policy number here is invented for teaching. Amounts invented.",
+  "facts": [
+    {
+      "id": "pti.limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "pti.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "ceiling.only_home",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "ceiling.replacement",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "ceiling.investment",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "half.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "term.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "policy.pti",
+      "kind": "given",
+      "inputs": {},
+      "value": "35"
+    },
+    {
+      "id": "pti.weight",
+      "kind": "given",
+      "inputs": {},
+      "value": "100"
+    },
+    {
+      "id": "form.min_a_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "form.min_b_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "form.min_c_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "pred.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "pred.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7200.00"
+    },
+    {
+      "id": "pred.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "7200",
+        "income": "16000"
+      },
+      "value": "45"
+    },
+    {
+      "id": "l.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "l.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "50"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "l.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "40"
+      },
+      "value": "6400.00"
+    },
+    {
+      "id": "l.max_policy",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "35"
+      },
+      "value": "5600.00"
+    },
+    {
+      "id": "l.gap_threshold",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "l.max_40",
+        "subtrahend": "l.max_policy"
+      },
+      "value": "800.00"
+    },
+    {
+      "id": "l.gap_ban",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "l.max_50",
+        "subtrahend": "l.max_policy"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "l.gap_ban_threshold",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "l.max_50",
+        "subtrahend": "l.max_40"
+      },
+      "value": "1600.00"
+    },
+    {
+      "id": "c.a.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "5000.00"
+    },
+    {
+      "id": "c.a.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "5000",
+        "income": "16000"
+      },
+      "value": "31.25"
+    },
+    {
+      "id": "c.b.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "6000.00"
+    },
+    {
+      "id": "c.b.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "6000",
+        "income": "16000"
+      },
+      "value": "37.5"
+    },
+    {
+      "id": "c.c.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "6800.00"
+    },
+    {
+      "id": "c.c.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "6800",
+        "income": "16000"
+      },
+      "value": "42.5"
+    },
+    {
+      "id": "c.d.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "8400.00"
+    },
+    {
+      "id": "c.d.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "8400",
+        "income": "16000"
+      },
+      "value": "52.5"
+    },
+    {
+      "id": "c.edge40",
+      "kind": "given",
+      "inputs": {},
+      "value": "6400.00"
+    },
+    {
+      "id": "c.edge40.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "6400",
+        "income": "16000"
+      },
+      "value": "40"
+    },
+    {
+      "id": "table.layers",
+      "kind": "reg_payment_table",
+      "inputs": {
+        "income_1": "12000",
+        "income_2": "16000",
+        "income_3": "20000",
+        "percent_1": "50",
+        "percent_2": "40",
+        "percent_3": "35"
+      },
+      "value": [
+        {
+          "period": 1,
+          "income": "12000.00",
+          "at_1": "6000.00",
+          "at_2": "4800.00",
+          "at_3": "4200.00"
+        },
+        {
+          "period": 2,
+          "income": "16000.00",
+          "at_1": "8000.00",
+          "at_2": "6400.00",
+          "at_3": "5600.00"
+        },
+        {
+          "period": 3,
+          "income": "20000.00",
+          "at_1": "10000.00",
+          "at_2": "8000.00",
+          "at_3": "7000.00"
+        }
+      ]
+    },
+    {
+      "id": "half.table",
+      "kind": "reg_payment_table",
+      "inputs": {
+        "income_1": "10000",
+        "income_2": "14000",
+        "income_3": "18000",
+        "percent_1": "50",
+        "percent_2": "40",
+        "percent_3": "30"
+      },
+      "value": [
+        {
+          "period": 1,
+          "income": "10000.00",
+          "at_1": "5000.00",
+          "at_2": "4000.00",
+          "at_3": "3000.00"
+        },
+        {
+          "period": 2,
+          "income": "14000.00",
+          "at_1": "7000.00",
+          "at_2": "5600.00",
+          "at_3": "4200.00"
+        },
+        {
+          "period": 3,
+          "income": "18000.00",
+          "at_1": "9000.00",
+          "at_2": "7200.00",
+          "at_3": "5400.00"
+        }
+      ]
+    },
+    {
+      "id": "f.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000.00"
+    },
+    {
+      "id": "f.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "deal": "only_home"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "f.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "65"
+    },
+    {
+      "id": "f.policy_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "ceiling": "65"
+      },
+      "value": "1300000.00"
+    },
+    {
+      "id": "f.equity_ceiling",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "f.price",
+        "subtrahend": "f.max_loan"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "f.equity_policy",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "f.price",
+        "subtrahend": "f.policy_loan"
+      },
+      "value": "700000.00"
+    },
+    {
+      "id": "f.extra_equity",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "f.equity_policy",
+        "subtrahend": "f.equity_ceiling"
+      },
+      "value": "200000.00"
+    },
+    {
+      "id": "ex2.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "12000.00"
+    },
+    {
+      "id": "ex2.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "ex2.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "12000",
+        "percent": "50"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "ex2.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "12000",
+        "percent": "40"
+      },
+      "value": "4800.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "12000",
+        "percent": "30"
+      },
+      "value": "3600.00"
+    },
+    {
+      "id": "ex2.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.max_50",
+        "subtrahend": "ex2.answer"
+      },
+      "value": "2400.00"
+    },
+    {
+      "id": "ex2.gap_threshold",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.max_40",
+        "subtrahend": "ex2.answer"
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "ex4.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "5100.00"
+    },
+    {
+      "id": "ex4.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "5100",
+        "income": "12000"
+      },
+      "value": "42.5"
+    },
+    {
+      "id": "ex5.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex5.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "ex5.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1500000",
+        "deal": "only_home"
+      },
+      "value": "1125000.00"
+    },
+    {
+      "id": "ex5.policy_loan",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1500000",
+        "ceiling": "60"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "ex5.equity_ceiling",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.price",
+        "subtrahend": "ex5.max_loan"
+      },
+      "value": "375000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.price",
+        "subtrahend": "ex5.policy_loan"
+      },
+      "value": "600000.00"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
  * Not a lesson module: build-data.ts only loads lesson-*.ts and check-*.ts.
  */
 import Decimal from "decimal.js";
-import { paymentToIncome } from "../../src/lib/calc/affordability.ts";
+import { disposableIncome, type Obligation, obligationsToInput, paymentToIncome } from "../../src/lib/calc/affordability.ts";
 import { ltvPercent } from "../../src/lib/calc/ltv.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentString } from "../../src/lib/calc/percent.ts";
@@ -224,4 +224,12 @@ export const livingTable = (id: string, rows: [string, string, number][]): Fact 
     const rest = leftForLiving(net, [out]);
     return { period: n + 1, net: moneyString(net), out: moneyString(out), left: moneyString(rest), people: String(people), per_person: moneyString(perPerson(rest, people)) };
   }),
+});
+
+/** Disposable income as lesson 4.2 counts it (affordability.ts): recognised income minus the obligations that count against it. Checked by affordability.py. */
+export const disposable = (id: string, recognised: string, obligations: Obligation[]): Fact => ({
+  id,
+  kind: "aff_disposable",
+  inputs: { recognised, obligations: obligationsToInput(obligations) },
+  value: moneyString(disposableIncome(recognised, obligations)),
 });

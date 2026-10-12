@@ -209,3 +209,36 @@ export const dividePercent = (id: string, amount: string, percent: string): Fact
   inputs: { amount, percent },
   value: moneyString(new Decimal(amount).mul(100).div(percent)),
 });
+
+/** A household current account over several months: each month's opening balance, deposits by source, debits, closing balance. */
+export const statementTable = (
+  id: string,
+  opening: string,
+  months: { month: string; avi: string; michal: string; debits: string }[],
+): Fact => {
+  let bal = new Decimal(opening);
+  const rows = months.map((m, k) => {
+    const deposits = new Decimal(m.avi).plus(m.michal);
+    const row = {
+      period: k + 1,
+      month: m.month,
+      opening: moneyString(bal),
+      avi: moneyString(m.avi),
+      michal: moneyString(m.michal),
+      deposits: moneyString(deposits),
+      debits: moneyString(m.debits),
+      closing: moneyString(bal.plus(deposits).minus(m.debits)),
+    };
+    bal = bal.plus(deposits).minus(m.debits);
+    return row;
+  });
+  return {
+    id,
+    kind: "uw_statement_table",
+    inputs: {
+      opening,
+      ...Object.fromEntries(months.flatMap((m, k) => [[`month_${k + 1}`, m.month], [`avi_${k + 1}`, m.avi], [`michal_${k + 1}`, m.michal], [`debits_${k + 1}`, m.debits]])),
+    },
+    value: rows,
+  };
+};

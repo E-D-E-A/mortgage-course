@@ -1,0 +1,531 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "4.5"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import ThreeKindsLadder from "../../components/ThreeKindsLadder.vue";
+import CardSort from "../../components/CardSort.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("4.5");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const layers = f.rows("table.layers");
+export const predictionOptions = [
+  `המשפט נכון: מעל ${pct("pti.threshold")} בנק ישראל אוסר לאשר`,
+  `המשפט לא מדויק: ${pct("pti.threshold")} אינו איסור של בנק ישראל; ייתכן שזו מדיניות של הבנק הזה`,
+  `המשפט נכון, אבל האיסור הוא רק מעל ${pct("pti.limit")}`,
+  "בנק לא יכול להחמיר מעבר למה שבנק ישראל קבע, ולכן הבנק טועה",
+];
+export const caseRows = ["a", "b", "c", "d"].map((k) => ({ k, payment: f.raw(`c.${k}.payment`), ratio: f.plain(`c.${k}.ratio`) }));
+export const verdicts = {
+  a: "מתחת לכל הקווים",
+  b: "מעל הקו של בנק א׳ בלבד",
+  c: "מעל הקו של בנק א׳ ומעל סף ההון; בתוך המגבלה",
+  d: "מעל הכול, כולל המגבלה: אסור",
+};
+
+בשיעור 4.4 ראינו חמישה קווים של <Term t="הוראה 329" lesson="4.4">הוראה 329</Term>, ושאחד מהם, <span class="ltr">{pct("pti.threshold")}</span> ביחס ההחזר, אינו איסור. בשיעור הזה נבין למה, ונשים לב שיש עוד מספרים שנשמעים כמו כללים וגם אינם איסור.
+שלושה מספרים שונים יכולים להיראות אותו דבר בשיחה: ״אי אפשר מעל ארבעים אחוז״. הם שונים בשלוש שאלות: מי קבע אותם, מה קורה כשחוצים אותם, והאם הם זהים בכל הבנקים.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="4.5"
+  question={`יחס ההחזר של משפחה הוא ${pct("pred.ratio")}. הבנק מסרב, ואומר: ״בנק ישראל לא מרשה מעל ${pct("pti.threshold")}״. מה נכון, לפי מה שלמדנו בשיעור 4.4?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלוש מדרגות
+
+</Section>
+
+<LessonVideo lesson="4-5" />
+
+<Section kind="ההסבר">
+
+## שלוש שאלות על כל מספר
+
+</Section>
+
+כשאתם שומעים מספר שנשמע כמו כלל, שאלו שלוש שאלות:
+1. **מי קבע אותו?** בנק ישראל, או הבנק עצמו?
+2. **מה קורה כשחוצים אותו?** אסור לאשר? מותר, אבל יקר לבנק? או שזה תלוי בבנק?
+3. **האם הוא זהה בכל הבנקים?** אם כן, אין טעם לעבור בנק כדי לעקוף אותו. אם לא, יש מה להשוות.
+
+התשובות מחלקות את המספרים לשלושה סוגים.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הסוג</th>
+        <th class="py-2 pe-3 text-start font-semibold">מי קבע</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה קורה כשחוצים</th>
+        <th class="py-2 text-start font-semibold">זהה בכל הבנקים?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <th class="py-2 pe-3 text-start font-semibold text-n900"><Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term></th>
+        <td class="py-2 pe-3">בנק ישראל, בהוראה</td>
+        <td class="py-2 pe-3">אסור: הבנק לא מאשר</td>
+        <td class="py-2">כן</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <th class="py-2 pe-3 text-start font-semibold text-n900"><Term t="סף הון" lesson="4.5">סף הון</Term></th>
+        <td class="py-2 pe-3">בנק ישראל, בהוראה</td>
+        <td class="py-2 pe-3">מותר; הבנק מחזיק יותר הון, וזה עולה לו</td>
+        <td class="py-2">הסף כן; מה הבנק עושה בגלל זה — לא ידוע</td>
+      </tr>
+      <tr class="align-top">
+        <th class="py-2 pe-3 text-start font-semibold text-n900"><Term t="מדיניות בנק" lesson="4.5">מדיניות בנק</Term></th>
+        <td class="py-2 pe-3">הבנק עצמו</td>
+        <td class="py-2 pe-3">הבנק הזה לא יאשר, או ידרוש תיקון</td>
+        <td class="py-2">לא</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<Section kind="ההסבר">
+
+## הסוג הראשון: מגבלה רגולטורית
+
+</Section>
+
+<Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term> היא מספר שבנק ישראל קבע בהוראה, והבנק מנוע מלחצות אותו. הלשון, לפי תקצירים של הוראה 329, היא ״לא יאשר ולא יבצע״.
+
+ארבעה מהקווים של שיעור 4.4 הם כאלה: שיעור המימון (<span class="ltr">{pct("ceiling.only_home")}</span> בדירה יחידה), יחס ההחזר עד <span class="ltr">{pct("pti.limit")}</span>, החלק המשתנה עד שני שלישים, והתקופה עד <span class="ltr">{f.plain("term.years")}</span> שנה.
+
+מה שמאפיין אותם: **אין בהם שיקול דעת.** לא משנה כמה הלקוח טוב או כמה הבנק רוצה את העסקה, ואי אפשר לעבור לבנק אחר. מי שמסרב בגללם לא ״מחמיר״; הוא לא יכול לאשר.
+
+<Section kind="ההסבר">
+
+## הסוג השני: סף הון
+
+</Section>
+
+הבנק מלווה בעיקר כסף של מפקידים (שיעור 0.9). כדי שהפסדים בהלוואות לא יפגעו במפקידים, בנק ישראל דורש מהבנק להחזיק גם **הון משלו**: כרית של הבנק עצמו, שבה הוא סופג הפסדים לפני שמגיעים למפקידים. זה כמו שיעור 1.1 על הכרית בשווי הדירה, אבל הפעם הכרית היא של הבנק.
+
+ההוראה לא דורשת אותה כמות הון לכל הלוואה. כל הלוואה נספרת לפי <Term t="סף הון" lesson="4.5">משקל סיכון</Term>: ככל שההלוואה נחשבת מסוכנת יותר, היא נספרת בחלק גדול יותר מהסכום שלה, וצריך יותר הון כנגדה.
+
+**מה ידוע לנו.** לפי התעתיק של הצוות ב־Brain ולפי תקצירים של ההוראה, **מעל {pct("pti.threshold")} יחס החזר** ההלוואה נספרת במשקל סיכון של {pct("pti.weight")}. זה סף הון: **מותר** לאשר הלוואה כזו, והבנק צריך להחזיק יותר הון כנגדה.
+
+**מה לא ידוע לנו.**
+- מה משקל הסיכון **מתחת** לסף. התקצירים לא אומרים, והקורס לא ממציא.
+- כמה זה עולה לבנק, ואיך הוא מתרגם את זה לריבית או לסירוב. הצוות כתב ב־Brain שמעל {pct("pti.threshold")} ״הלקוח לא נדחה אלא מתומחר גרוע יותר״ (מחקר של הצוות, דף 7503881; לא אומת). בנק ספציפי יכול להחליט אחרת.
+- אם יש סף הון גם בשיעור המימון. בנקאי שאינו בצוות סיפר על מדרגות של <span class="ltr">40/60/75</span> שקשורות להקצאת ההון של הבנק (טובי זמיר, 2026-08-05; ידע מהשטח, ממקור יחיד; ממתין לאישור אילון). בנק ישראל מפרסם נתונים לפי רצועות אחרות של שיעור מימון, אבל זו סטטיסטיקה ולא כלל. **שאלה פתוחה לאילון.**
+
+<Callout title="למה ההבדל בין איסור לסף חשוב">
+<p>״אי אפשר מעל {pct("pti.threshold")}״ ו״אי אפשר מעל {pct("pti.limit")}״ נשמעים אותו דבר, והשני הוא איסור והראשון — לא. אם תגידו ללקוח שמעל {pct("pti.threshold")} אסור, תוותרו בטעות על תיקים שאפשר לאשר. אם תגידו שמעל {pct("pti.threshold")} אין שום עניין, תפספסו שההלוואה יקרה יותר לבנק.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## הסוג השלישי: מדיניות בנק
+
+</Section>
+
+<Term t="מדיניות בנק" lesson="4.5">מדיניות בנק</Term> היא קו שהבנק קובע לעצמו. בנק רשאי להלוות פחות ממה שההוראה מרשה, או לדרוש יותר. הוא מלווה כסף שלו, ואף הוראה לא מחייבת אותו לאשר הלוואה שהיא רק עומדת בכללים (ידע כלכלי כללי).
+
+**דוגמה להמחשה: ״בנק א׳״.** בנק בדוי מחליט לאשר רק עד {pct("policy.pti")} יחס החזר, ולממן לא יותר מ־{pct("f.policy")} מהשווי. אלה מספרים שהמצאנו לשיעור. **אנחנו לא יודעים אם יש בנק כזה.**
+
+**מה שכן ידוע לנו על מדיניות בנקים.**
+- **הקו ״הוא ארבעים״.** אילון אמר שבנק ישראל קבע תקרה של {pct("pti.limit")}, ושהבנקים מחמירים בפועל ל־{pct("pti.threshold")} (בניכוי הלוואות קיימות) (ידע מהשטח, אילון, 2026-07-27, וחזר בדיון הצוות ב־2026-08-05; ממתין לאישור אילון). מול התעתיק: {pct("pti.limit")} תואם. {pct("pti.threshold")} — אולי זו מדיניות, ואולי זה סף ההון מההוראה, שנאמר בקיצור. בתמלול אילון עצמו אומר באותו משפט גם ״40% הכנסה פנויה״ וגם ״50%״, ולכן אי אפשר לדעת למה התכוון. **שאלה פתוחה לאילון: בנק שמסרב ביחס החזר גבוה מ־{pct("pti.threshold")} — האם הוא מסרב, או מתמחר? ויש הבדל בין הבנקים?**
+- **טפסים שונים, תקופה מינימלית שונה.** המקסימום, {f.plain("term.years")} שנה, הוא מגבלה רגולטורית. המינימום הוא עניין אחר: לפי קובצי השאלונים הציבוריים שהצוות אסף, טופס מחזור של בנק אחד לא מקבל פחות מ־{f.plain("form.min_a_years")} שנים, טופס רכישה של בנק אחר מקבל {f.plain("form.min_b_years")} שנים, ובטופס של בנק שלישי מסלול יכול להיות קצר עד {f.plain("form.min_c_months")} חודשים. אין כאן מגבלה של בנק ישראל. אלה הגבלות של טפסים, כלומר של בנקים (לא אומת מול הטפסים החיים; שמות הבנקים בשיעור <Later lesson="4.13" quiet>ארבעת הבנקים</Later>).
+
+**מה שאנחנו לא יודעים.** אף קו של מדיניות בנק כמו ״בנק כזה לא מאשר מעל X״ לא נמצא בשום מסמך שקראנו. הוא יכול להיות נכון, והוא יכול להשתנות מחודש לחודש ומיועץ ליועץ. לכן הקורס לא כותב קו כזה כעובדה.
+
+<Section kind="ההסבר">
+
+## שלוש שכבות על אותו מספר: ההחזר
+
+</Section>
+
+נשים את שלושת הסוגים על ציר אחד, יחס ההחזר, עם הכנסה פנויה של {f.shekels("l.income")}. כל קו הוא אותו חשבון, ההכנסה כפול האחוז, חלקי 100 — מה שחישבנו בשיעור 4.4:
+
+- **מגבלה, {pct("pti.limit")}:** <M>{n("l.income")} × {f.plain("pti.limit")} ÷ 100 = {f.shekels("l.max_50")}</M>. מעל זה אסור.
+- **סף הון, {pct("pti.threshold")}:** <M>{n("l.income")} × {f.plain("pti.threshold")} ÷ 100 = {f.shekels("l.max_40")}</M>. מעל זה מותר, אבל יותר הון.
+- **מדיניות בנק א׳ (בדוי), {pct("policy.pti")}:** <M>{n("l.income")} × {f.plain("policy.pti")} ÷ 100 = {f.shekels("l.max_policy")}</M>. מעל זה בנק א׳ לא יאשר.
+
+שלושה קווים באותה הכנסה, ו־{f.shekels("l.gap_threshold")} בין קו המדיניות לסף, ו־{f.shekels("l.gap_ban_threshold")} בין הסף למגבלה. ואותו חשבון על **שיעור המימון**, בדירה יחידה ששוויה {f.shekels("f.price")}:
+- **מגבלה, {pct("ceiling.only_home")}:** הלוואה עד {f.shekels("f.max_loan")}, והון עצמי לפחות {f.shekels("f.equity_ceiling")}.
+- **מדיניות בנק א׳, {pct("f.policy")}:** הלוואה עד {f.shekels("f.policy_loan")}, והון עצמי לפחות {f.shekels("f.equity_policy")}, כלומר עוד <M>{n("f.equity_policy")} − {n("f.equity_ceiling")} = {f.shekels("f.extra_equity")}</M>.
+
+<Callout title="תקרה היא מקסימום, לא הבטחה">
+<p>זה מה ששיעור 1.2 אמר בקיצור: התקרה היא מה שהבנק <em>מותר</em> לו. מה שהוא <em>מוכן</em> לעשות הוא עניין של מדיניות — וגם של שיקולים אחרים, כמו מה שהבנק בודק בחיתום (שיעור <Later lesson="4.7" quiet>חיתום</Later>).</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## סולם ההחזר
+
+</Section>
+
+הפס הכהה הוא יחס ההחזר של התיק. שלושת הקווים המקווקווים הם שלושה סוגי המספרים. הקו של בנק א׳ הוא המצאה; אפשר להזיז אותו.
+
+<ThreeKindsLadder
+  client:visible
+  income={Number(f.raw("l.income"))}
+  payment={Number(f.raw("c.c.payment"))}
+  policy={Number(f.raw("policy.pti"))}
+/>
+
+נסו את שלושת אלה:
+1. בלי לשנות דבר: איזה קווים נחצו, ומה זה אומר על כל אחד?
+2. הורידו את ההחזר עד שהוא ל־{f.shekels("c.a.payment")}. מה נשאר מסומן?
+3. הגדילו את ההחזר מעל {f.shekels("c.d.payment")}. מה משתנה בסוג הקו שנחצה אחרון? ואחר כך החזירו אותו, והזיזו את הקו של בנק א׳ מעל הסף. האם זה הגיוני שבנק יציב קו כזה, ומה זה אומר על סוגי המספרים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>החזר של {f.shekels("c.c.payment")} על הכנסה של {f.shekels("l.income")} הוא {pct("c.c.ratio")}. נחצו שני קווים: הקו של בנק א׳ ({pct("policy.pti")}) וסף ההון ({pct("pti.threshold")}). המגבלה ({pct("pti.limit")}) לא נחצתה. כלומר: מותר לבנק לאשר, אבל בנק א׳ לא יאשר, ובכל בנק זה עולה יותר הון.</li>
+    <li>ב־{f.shekels("c.a.payment")}, כלומר {pct("c.a.ratio")}, אין קו שנחצה.</li>
+    <li>ב־{f.shekels("c.d.payment")} ({pct("c.d.ratio")}) נחצו כל השלושה. מה שמיוחד: רק החציה של {pct("pti.limit")} אוסרת על **כל** הבנקים. הקו של בנק א׳ אפשר להזיז, כי הוא של בנק א׳; את {pct("pti.limit")} ו־{pct("pti.threshold")} אי אפשר, כי בנק ישראל קבע אותם.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## אותה נוסחה, שלוש פעמים
+
+</Section>
+
+**צעד 1.** לכל קו: מה ההחזר החודשי הגבוה ביותר שמתחתיו. הכנסה כפול האחוז, חלקי 100. <M>{n("l.income")} × {f.plain("pti.limit")} ÷ 100 = {n("l.max_50")}</M>.
+
+**צעד 2.** משווים את ההחזר של התיק (שיעור 4.3) לכל אחד מהקווים.
+
+**צעד 3.** קובעים מה הקו הנחצה אומר, לפי הסוג שלו. זה השלב שהשיעור הזה מוסיף.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 mt-2 text-navy">C<sub>max</sub> = הכנסה פנויה × p ÷ 100</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">C<sub>max</sub></dt><dd>ההחזר החודשי הגבוה ביותר מתחת לקו, בשקלים (C כמו בשיעור 4.3; max באנגלית: המרבי)</dd>
+    <dt class="ltr font-semibold text-n900">p</dt><dd>הקו, באחוזים כמספר שלם: {f.plain("pti.limit")}, {f.plain("pti.threshold")}, או קו של בנק (למשל {f.plain("policy.pti")})</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** בכל קו של יחס החזר, מכל סוג. בשני הקווים של בנק ישראל הלשון היא ״עולה על״, ולכן ההחזר המרבי עצמו עוד מותר. בקו של בנק ייתכן שהוא מדבר על ״מעל״ וייתכן על ״מ־״ — צריך לשאול.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> כפל וחילוק, שלוש פעמים: פעם לכל קו.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם ההכנסה הפנויה בתא A1, ובתאים B1 עד D1 הקווים (50, 40, 35), ההחזר המרבי בכל קו הוא <span class="ltr">{"=ROUNDDOWN($A$1*B1/100,2)"}</span>, ומושכים לצדדים.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="4.5"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `מעל ${pct("pti.threshold")} זה סף הון, לא איסור. האיסור הוא מעל ${pct("pti.limit")}.`,
+    "",
+    `${pct("pred.ratio")} הוא מתחת ל־${pct("pti.limit")}, ולכן בנק ישראל לא אוסר. אין עוד איסור על ההלוואה הזו שיחס ההחזר שלה מעל ${pct("pti.threshold")}.`,
+    "בנק רשאי להחמיר, ואף הוראה לא מחייבת אותו לאשר הלוואה. מה שאסור לו הוא לאשר מעבר למגבלות.",
+  ]}
+>
+  יחס ההחזר {pct("pred.ratio")} הוא מתחת ל־{pct("pti.limit")} (מגבלה) ומעל {pct("pti.threshold")} (סף הון). בנק ישראל לא אוסר הלוואה כזו. אם הבנק מסרב, או שזו מדיניות שלו, או שיש סיבה אחרת. השאלה הנכונה היא: ״לפי מי?״.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## ״לפי מי?״
+
+</Section>
+
+כששומעים ״אי אפשר״ או ״בנקים לא נותנים״, שואלים: **לפי מי?** ואחר כך: **מה בדיוק קורה כשחוצים?** ו־**האם זה אצל כולם?**
+- אם התשובה ״לפי בנק ישראל, אצל כולם, אסור״ — מגבלה רגולטורית; אין מה לעקוף.
+- אם ״מותר, אבל יקר לבנק״ — סף הון; אפשר לאשר, ויש מחיר.
+- אם ״אצלנו״ או ״בנקים בדרך כלל״ — מדיניות או הרגל; צריך לבדוק בנק בנק, ולא להניח.
+
+זו שיטת חשיבה, לא נוסחה, והיא לא מחליפה בדיקה של המקור.
+
+<Section kind="דוגמה פתורה">
+
+## ארבעה תיקים על אותה הכנסה
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>משפחה בדויה, וקו בדוי של ״בנק א׳״. הסכומים להמחשה בלבד, ואינם הצעת בנק או נתוני שוק.</p>
+</Callout>
+
+משפחה עם הכנסה פנויה של {f.shekels("l.income")} בוחנת ארבע הלוואות שההחזר החודשי שלהן שונה. הקווים: {pct("policy.pti")} (בנק א׳, בדוי), {pct("pti.threshold")} (סף הון) ו־{pct("pti.limit")} (מגבלה).
+
+**צעד 1 — יחס ההחזר של כל אחת.** הלוואה א׳: <M>{n("c.a.payment")} ÷ {n("l.income")} × 100 = {f.plain("c.a.ratio")}</M>. ב׳: <M>{n("c.b.payment")} ÷ {n("l.income")} × 100 = {f.plain("c.b.ratio")}</M>. ג׳: <M>{n("c.c.payment")} ÷ {n("l.income")} × 100 = {f.plain("c.c.ratio")}</M>. ד׳: <M>{n("c.d.payment")} ÷ {n("l.income")} × 100 = {f.plain("c.d.ratio")}</M>.
+
+**צעד 2 — מול הקווים.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[32rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הלוואה</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס</th>
+        <th class="py-2 text-start font-semibold">מה נחצה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {caseRows.map((r, i) => (
+        <tr class="border-b border-n100 align-top">
+          <th class="py-2 pe-3 text-start font-semibold text-n900">{["א׳", "ב׳", "ג׳", "ד׳"][i]}</th>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(r.payment)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.ratio}%</span></td>
+          <td class="py-2">{verdicts[r.k]}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 3 — מה זה אומר, לפי הסוג.**
+- **א׳:** אין בעיה בשום בנק.
+- **ב׳:** אין מגבלה ואין תוספת הון. אצל בנק א׳ — לא יאושר כך; אצל בנק עם קו אחר, אולי כן.
+- **ג׳:** עדיין מותר לפי בנק ישראל. הבנק מחזיק יותר הון, ובנק א׳ לא יאשר. המשמעות: זו הלוואה שצריך לבדוק איפה היא נכנסת, ואם אפשר להקטין את ההחזר.
+- **ד׳:** אסורה בכל בנק. אין טעם לפנות לבנק אחר; צריך להקטין את ההחזר (הלוואה קטנה יותר או תקופה ארוכה יותר) כדי לרדת מתחת ל־{f.shekels("l.max_50")}.
+
+**צעד 4 — הקצה.** בדיוק על הקו: החזר של {f.shekels("c.edge40")} הוא {f.plain("c.edge40.ratio")}%. ״מעל {pct("pti.threshold")}״ לא כולל אותו, ולכן הוא עוד לא חוצה את סף ההון. בנק מסוים יכול לטפל בקצה אחרת; את הקצה של קו מדיניות צריך לשאול.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+לכל הכנסה פנויה: ההחזר החודשי הגבוה ביותר מתחת למגבלה, מתחת לסף ההון, ומתחת לקו בדוי של בנק ב׳ ({pct("policy.pti")} הוא של בנק א׳; כאן הקו של בנק ב׳ הוא <span class="ltr">{pct("half.policy")}</span>, בדוי). השורה הראשונה מלאה. סכום מרבי מעגלים כלפי מטה לאגורה.
+
+<FillTable
+  client:visible
+  id="4.5-half"
+  columns={[
+    { key: "income", label: "הכנסה פנויה" },
+    { key: "at_1", label: `מגבלה, ${pct("pti.limit")}` },
+    { key: "at_2", label: `סף הון, ${pct("pti.threshold")}` },
+    { key: "at_3", label: `בנק ב׳, ${pct("half.policy")}` },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.at_1", "2.at_2", "2.at_3", "3.at_1", "3.at_2", "3.at_3"]}
+  success="בכל שורה אותה נוסחה: ההכנסה כפול האחוז, חלקי 100. כל קו נותן מספר אחר, וכל מספר אומר משהו אחר."
+  hint="כופלים את ההכנסה באחוז של הקו, ומחלקים ב־100."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים ומיון אחד
+
+</Section>
+
+הסכומים והקווים של בנקים בתרגילים בדויים, והקווים של בנק ישראל לפי התעתיק (לא אומת). התרגילים מסודרים מהקל אל המאתגר. כדאי מחשבון.
+
+**מיון.** שבע טענות; לכל אחת, לאיזה סוג של מספר היא שייכת. הראשונה כבר ממוינת.
+
+<CardSort
+  client:visible
+  id="4.5-sort"
+  given={1}
+  bins={["מגבלה רגולטורית", "סף הון", "מדיניות בנק"]}
+  questions={["בנק ישראל אוסר: אף בנק לא יכול לאשר", "בנק ישראל מתיר, אבל ההלוואה עולה לבנק יותר הון", "הבנק הזה בוחר לעצמו; בנק אחר אולי אחרת"]}
+  cards={[
+    { text: `בנק לא מאשר הלוואה שיחס ההחזר שלה ${pct("c.d.ratio")}`, bin: 0, why: `${pct("c.d.ratio")} עולה על ${pct("pti.limit")}, והמגבלה זהה בכל הבנקים.` },
+    { text: `הלוואה שיחס ההחזר שלה ${pct("c.c.ratio")} נספרת במשקל סיכון של ${pct("pti.weight")}`, bin: 1, why: `מעל ${pct("pti.threshold")} ההלוואה מותרת, אבל הבנק מחזיק יותר הון.` },
+    { text: `בנק א׳ מאשר רק עד ${pct("policy.pti")} יחס החזר`, bin: 2, why: "הקו נקבע בבנק עצמו, ובנק אחר יכול לקבוע אחר. (הקו בדוי.)" },
+    { text: `הלוואה שמממנת יותר מ־${pct("ceiling.only_home")} משווי דירה יחידה לא תאושר`, bin: 0, why: "תקרת שיעור המימון בהוראה 329, לפי התעתיק. זהה בכל הבנקים." },
+    { text: `בנק א׳ לא מממן יותר מ־${pct("f.policy")} מהשווי, גם כשהתקרה ${pct("ceiling.only_home")}`, bin: 2, why: "הקו נמוך מהתקרה, ולכן זו בחירה של הבנק. (הקו בדוי.)" },
+    { text: `טופס מחזור של בנק אחד לא מקבל תקופה קצרה מ־${f.plain("form.min_a_years")} שנים`, bin: 2, why: "המינימום אינו בהוראה 329; בטפסים אחרים הוא אחר. זו הגבלה של הטופס, כלומר של הבנק." },
+    { text: `בנק לא מאשר תקופה של יותר מ־${f.plain("term.years")} שנה לפירעון הסופי`, bin: 0, why: "המקסימום של 30 שנה הוא מגבלה בהוראה 329, לפי התעתיק." },
+  ]}
+  success="שלוש שאלות מספיקות: מי קבע, מה קורה כשחוצים, והאם זה זהה בכל הבנקים."
+/>
+
+<ChoiceExercise
+  client:visible
+  id="4.5-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "סף הון", correct: true, feedback: "נכון. מעל הסף ההלוואה מותרת, והבנק מחזיק כנגדה יותר הון." },
+    { text: "מגבלה רגולטורית", feedback: "במגבלה אסור לאשר. כאן מותר, ולכן זה לא מגבלה." },
+    { text: "מדיניות בנק", feedback: "זה לא הבנק שקבע; בנק ישראל קבע, והוא קבע לכל הבנקים." },
+    { text: "אף אחד מהם", feedback: "זה אחד משלושת הסוגים, והוא נקרא סף הון." },
+  ]}
+>
+  ״מעל {pct("pti.threshold")} יחס החזר ההלוואה מותרת, אבל הבנק צריך להחזיק יותר הון כנגדה״. איזה סוג של מספר זה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.5-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.max_50"), message: `זה ההחזר המרבי לפי המגבלה, ${pct("pti.limit")}. בנק ב׳ בדוי מאשר רק עד ${pct("ex2.policy")}.` },
+    { value: f.raw("ex2.max_40"), message: `זה ההחזר בסף ההון, ${pct("pti.threshold")}. בנק ב׳ בדוי מאשר רק עד ${pct("ex2.policy")}.` },
+  ]}
+>
+  ההכנסה הפנויה של משפחה היא {f.shekels("ex2.income")}. בנק ב׳ (בדוי) מאשר רק עד {pct("ex2.policy")} יחס החזר. מה ההחזר החודשי הגבוה ביותר שבנק ב׳ יאשר?
+</NumericExercise>
+
+<Solution for="4.5-2">
+<M>{n("ex2.income")} × {f.plain("ex2.policy")} ÷ 100 = {f.shekels("ex2.answer")}</M>. ההחזר המרבי לפי המגבלה הוא {f.shekels("ex2.max_50")}: בנק ב׳ מאשר פחות ממה שמותר לו.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.5-3"
+  n={3}
+  level="בינוני"
+  options={[
+    { text: "״לפי מי? בנק ישראל, או המדיניות של הבנק שלך? ומה קורה אם חוצים?״", correct: true, feedback: "נכון. ההבדל בין שלושת הסוגים הוא בדיוק בשאלות האלה." },
+    { text: "״אז נעבור לבנק אחר״", feedback: "אם זו מגבלה של בנק ישראל, בנק אחר לא יעזור. אם זו מדיניות, אולי כן. קודם צריך לדעת איזה סוג זה." },
+    { text: `״אם כך, נקטין את ההחזר ל־${pct("pti.threshold")} מההכנסה״`, feedback: "בלי לדעת אם זה איסור, סף או מדיניות, אפשר להקטין סתם. ואולי ההלוואה כבר מותרת." },
+    { text: "״בנק ישראל כנראה שינה את ההוראה״", feedback: "אין סיבה להניח את זה. קודם שואלים מי קבע." },
+  ]}
+>
+  יועץ אומר: ״בבנק הזה לא נותנים מעל {pct("pti.threshold")} יחס החזר״. מה השאלה הראשונה שכדאי לשאול?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.5-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex2.gap")}
+  errors={[
+    { value: f.raw("ex2.answer"), message: "זה ההחזר שבנק ב׳ מאשר. השאלה היא בכמה הוא נמוך מהמותר לפי המגבלה." },
+    { value: f.raw("ex2.gap_threshold"), message: `זה ההפרש מול סף ההון (${pct("pti.threshold")}). השאלה היא מול המגבלה (${pct("pti.limit")}).` },
+    { value: f.raw("ex2.max_50"), message: "זה ההחזר המרבי לפי המגבלה. מחסרים ממנו את ההחזר של בנק ב׳." },
+  ]}
+>
+  באותה משפחה (הכנסה פנויה {f.shekels("ex2.income")}): בכמה שקלים בחודש ההחזר שבנק ב׳ מאשר נמוך מההחזר המרבי לפי המגבלה הרגולטורית?
+</NumericExercise>
+
+<Solution for="4.5-4">
+לפי המגבלה: {f.shekels("ex2.max_50")}. לפי בנק ב׳: {f.shekels("ex2.answer")}. ההפרש: <M>{n("ex2.max_50")} − {n("ex2.answer")} = {f.shekels("ex2.gap")}</M>. זה המקום ש״מדיניות״ לוקחת מהלקוח: לא מנוע של בנק ישראל, אלא בחירה של הבנק.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.5-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `מדיניות בנק ב׳ (${pct("ex2.policy")}) וסף ההון (${pct("pti.threshold")}); המגבלה (${pct("pti.limit")}) לא נחצתה`, correct: true, feedback: `נכון. ${pct("ex4.ratio")} מעל ${pct("ex2.policy")} ומעל ${pct("pti.threshold")}, ומתחת ל־${pct("pti.limit")}.` },
+    { text: "רק מדיניות בנק ב׳", feedback: `${pct("ex4.ratio")} הם גם מעל סף ההון, ${pct("pti.threshold")}.` },
+    { text: "כל שלושת הקווים", feedback: `${pct("ex4.ratio")} הם מתחת ל־${pct("pti.limit")}, ולכן המגבלה לא נחצתה.` },
+    { text: "אף קו", feedback: `${pct("ex4.ratio")} גבוה מ־${pct("ex2.policy")}, והוא גם מעל ${pct("pti.threshold")}.` },
+  ]}
+>
+  החזר של {f.shekels("ex4.payment")} על הכנסה פנויה של {f.shekels("ex2.income")}: יחס ההחזר הוא {pct("ex4.ratio")}. אילו קווים נחצו, כשבנק ב׳ (בדוי) קובע {pct("ex2.policy")}?
+</ChoiceExercise>
+
+<Solution for="4.5-5">
+<M>{n("ex4.payment")} ÷ {n("ex2.income")} × 100 = {f.plain("ex4.ratio")}</M>. הוא מעל {pct("ex2.policy")} (מדיניות), מעל {pct("pti.threshold")} (סף הון), ומתחת ל־{pct("pti.limit")} (מגבלה).
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.5-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.equity_ceiling"), message: `זה ההון העצמי המינימלי לפי התקרה, ${pct("ceiling.only_home")}. בנק ג׳ בדוי מממן רק ${pct("ex5.policy")}.` },
+    { value: f.raw("ex5.policy_loan"), message: "זו ההלוואה המרבית של בנק ג׳. השאלה היא כמה הון עצמי צריך כדי להשלים את המחיר." },
+    { value: f.raw("ex5.max_loan"), message: "זו ההלוואה המרבית לפי התקרה, ולא לפי הבנק." },
+  ]}
+>
+  אתם קונים דירה יחידה ב־{f.shekels("ex5.price")} (השווי שווה למחיר). בנק ג׳ (בדוי) מממן לכל היותר {pct("ex5.policy")} מהשווי. כמה הון עצמי תצטרכו בבנק ג׳?
+</NumericExercise>
+
+<Solution for="4.5-6">
+ההלוואה המרבית של בנק ג׳: <M>{n("ex5.price")} × {f.plain("ex5.policy")} ÷ 100 = {f.shekels("ex5.policy_loan")}</M>. ההון העצמי: <M>{n("ex5.price")} − {n("ex5.policy_loan")} = {f.shekels("ex5.answer")}</M>. לפי התקרה בלבד היה מספיק {f.shekels("ex5.equity_ceiling")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.5-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "כן: העמידה בכל המגבלות היא תנאי, לא הבטחה לאישור; בנק רשאי לסרב גם מסיבות אחרות", correct: true, feedback: "נכון. הקווים הם מה שאסור לבנק לעבור. מה שהוא מוכן לעשות — עניין שלו, וגם של מה שהוא בודק בחיתום." },
+    { text: "לא: מי שעומד בכל המגבלות זכאי לאישור", feedback: "אין כזו זכאות. המגבלות אוסרות על הבנק; הן לא מחייבות אותו." },
+    { text: "כן, אבל רק אם הלקוח מעל סף ההון", feedback: "סף ההון לא קשור לשאלה. גם מתחתיו בנק יכול לסרב." },
+    { text: "לא: בנק לא רשאי לסרב להלוואה שעומדת במדיניות שלו", feedback: "זו בדיוק השאלה: המדיניות היא של הבנק, והוא יכול לשנות אותה. וזו גם לא הנקודה כאן." },
+  ]}
+>
+  תיק עומד בכל המגבלות הרגולטוריות, ולא חוצה את סף ההון. האם בנק עדיין יכול לסרב?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על שלושה סוגי מספרים">
+<p><strong>מה זה?</strong> שלוש משפחות של מספרים שנשמעים כמו כללים: מגבלה רגולטורית (בנק ישראל אוסר), סף הון (בנק ישראל מתיר, והבנק מחזיק יותר הון) ומדיניות בנק (הבנק קובע לעצמו).</p>
+<p><strong>למה זה קיים?</strong> בנק ישראל אוסר מה שמסוכן מדי למערכת, ומחייב הון כנגד מה שמסוכן יותר. הבנק, שמלווה כסף שלו, מוסיף שיקולים משלו. לכל סוג יש מקור אחר, ולכן גם משמעות אחרת.</p>
+<p><strong>איך זה עובד?</strong> שואלים שלוש שאלות: מי קבע, מה קורה כשחוצים, והאם זה זהה בכל הבנקים. התשובות קובעות את הסוג.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הסוג קובע מה אפשר לעשות: מגבלה — להקטין את ההלוואה; סף הון — לשקול מחיר, ואולי להקטין; מדיניות — לבדוק בנק אחר. טעות בסוג נותנת עצה לא נכונה.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני שמקבלים ״אי אפשר״, שואלים ״לפי מי?״. מה שלא ידוע — כמו קו של מדיניות בנק — לא מניחים; בודקים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שלושה סוגים:** מגבלה רגולטורית, סף הון, ומדיניות בנק. הם נבדלים במי שקבע, במה שקורה כשחוצים, ובזהות בין הבנקים.
+- **מגבלה:** בנק ישראל, אסור לאשר, זהה בכל הבנקים. לפי התעתיק: {pct("pti.limit")} יחס החזר, {f.plain("ceiling.only_home")}/{f.plain("ceiling.replacement")}/{f.plain("ceiling.investment")} מימון, שני שלישים משתנה, {f.plain("term.years")} שנה.
+- **סף הון:** בנק ישראל, מותר, והבנק מחזיק יותר הון. לפי התעתיק: מעל {pct("pti.threshold")} יחס החזר, משקל סיכון {pct("pti.weight")}. כמה זה עולה לבנק ומה הוא עושה בגלל זה — לא ידוע לנו.
+- **מדיניות:** הבנק קובע; בנק אחר אחרת. לא ידוע לנו אף קו כזה שפורסם, והקורס לא ממציא כזה. הדוגמאות של בנק א׳ הן המצאה.
+- **שואלים ״לפי מי?״** לפני שמקבלים ״אי אפשר״.
+- **עמידה בכל המגבלות אינה אישור.** הבנק רשאי לסרב גם מסיבות אחרות.
+
+**בשיעור הבא — 4.6, <Later lesson="4.6" quiet>תקציב מחיה</Later> סביר:** כמה כסף נשאר למשפחה אחרי ההחזר, ולמה זה מספר אחר מיחס ההחזר.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "ההבחנה בין איסור לסף: 50% יחס החזר הוא ״לא יאשר ולא יבצע״; מעל 40% משקל סיכון של 100% (לפי תקצירים, מכוח הוראה 203), ״לא איסור״. לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08), דרך research/notes/brain-calculation.md, ולפי תקצירים של מקורות רשמיים (research/notes/official-sources.md, סעיף 1); לפי תקציר של מקור רשמי, ממתין לבדיקה מול המקור.", date: "2026-10-09" },
+    { kind: "מחקר / הצעה", text: "״40% הוא גבול מחיר, לא גבול סירוב״, והלקוח ב־42% ״מתומחר גרוע יותר״: מחקר של הצוות ב־Brain (דף 7503881; הצעה למנוע, לא כלל רשמי), דרך research/notes/brain-calculation.md. לא אומת." },
+    { kind: "לא אומת", text: "משקל הסיכון מתחת ל־40%, וכמה עולה לבנק משקל של 100%: לא נמצא באף מקור שקראנו. הקורס לא כותב מספר." },
+    { kind: "ידע מהשטח", text: "אילון, 2026-07-27, וחזר בדיון הצוות ב־2026-08-05 (FK-H-012): ״בנק ישראל קבע תקרה של 50% מההכנסה הפנויה; הבנקים מחמירים בפועל ל־40% (בניכוי הלוואות קיימות)״. מול המקור: 50% תואם את התעתיק; 40% סותר בחלקו (בהוראה זה סף הון), ובתמלול אילון אומר באותו משפט גם ״40% הכנסה פנויה״ וגם ״50%״. ממתין לאישור אילון." },
+    { kind: "ידע מהשטח", text: "טובי זמיר, בנקאי שאינו בצוות, 2026-08-05 (FK-H-004), בפרפרזה: מדרגות של שיעור מימון, 40/60/75, קשורות להקצאת ההון של הבנק. ממקור יחיד; הספים לא נבדקו. בנתוני בנק ישראל (BIR_MRTG_99) הרצועות הן 30/45/60/75/90, וזו סטטיסטיקה ולא כלל. ממתין לאישור אילון." },
+    { kind: "לא אומת", text: "תקופה מינימלית בטפסים: 5 שנים (טופס מחזור של בנק אחד), 4 שנים (טופס רכישה של בנק אחר), 12 חודשים למסלול (טופס של בנק שלישי): לפי קובצי השאלונים הציבוריים שהצוות אסף (edea-mortgage, context/inputs), בלי בדיקה מול הטפסים החיים. אילון אמר ״בפועל הבנקים לא נותנים פחות מ־5 שנים״ (FK-H-007; ידע מהשטח, 2026-07-27; לא נבדק; ממתין לאישור אילון)." },
+    { kind: "ידע כלכלי כללי", text: "בנק מלווה כסף של מפקידים וכסף משלו, ורשאי להחמיר מעבר לדרישת הרגולטור או לסרב; הון הוא כרית של הבנק מול הפסדים. בפישוט, בלי מספרים." },
+    { kind: "הנחת חישוב", text: "כל קווי המדיניות של ״בנק א׳״, ״בנק ב׳״ ו״בנק ג׳״ (35%, 30%, 65%, 60%) בדויים, ונועדו להראות מה סוג המספר משנה. אין להם מקור, ואין בנק אמיתי שידוע לנו שמחזיק בהם. כל הסכומים בשיעור בדויים." },
+    { kind: "ידע מתמטי כללי", text: "אחוז מסכום: הכנסה כפול אחוז, חלקי 100; הפרש.", code: ["Cmax = הכנסה פנויה × p ÷ 100"] },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, בסולם ההחזר ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-12" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/regulation.ts and affordability.ts (the ratio) via scripts/lessons/lesson-4-5.ts and regulation-facts.ts, into data/lessons/4-5.json; rechecked by checks/kinds/regulation.py, ltv.py and common.py. Illustration: src/components/ThreeKindsLadder.vue. Video: video/4-5.html. Field knowledge used: FK-H-012, FK-H-004, FK-H-007. */}

@@ -1,8 +1,601 @@
 /**
- * The big-picture map: what stage 4 adds (lessons 4.1–4.13 and 4.15; the market layer of 4.14 is in stage-4-market.ts).
- * Filled by the stage-4 authors.
+ * Stage 4's nodes on the big-picture map: the client as the bank sees him (income,
+ * obligations, the payment-to-income ratio, credit, account conduct, the borrowers),
+ * the rules that bind the bank (Directive 329 and the capital threshold), how the bank
+ * checks (underwriting), the collateral, the deal's own factors (loan amount, term,
+ * property type, registration, insurance, fees, channel), and how a bank prices
+ * (lesson 4.12: the layers of the rate). The market layer of 4.14 is in
+ * stage-4-market.ts. Lessons 4.1–4.13 and the workshop 4.15 add nodes and links here;
+ * 4.14 adds none of these.
+ *
+ * Sources for the cards: the stage-4 lessons as written, and the 22 factor cards
+ * (src/data/factor-cards.ts), which carry every threshold with its label. Cards here
+ * state a number only when the lesson gives it a label ("לא אומת", a Mogi decision, or
+ * field knowledge with its name and date); a rule read through the team's transcription
+ * or a search summary says so. How a bank prices is a real gap in the course's
+ * sources: what Tobi Zamir said (a banker outside the team, 2026-08-05) is field
+ * knowledge awaiting Eylon's approval, and the size of every layer of the rate is
+ * not known.
  */
 import type { MapLink, MapNode } from "./types.ts";
 
-export const nodes: MapNode[] = [];
-export const links: MapLink[] = [];
+export const nodes: MapNode[] = [
+  // ───────────── 4.1–4.3: the client's money, and the ratio ─────────────
+  {
+    id: "recognized_income",
+    label: "הכנסה מוכרת",
+    region: "client",
+    lesson: "4.1",
+    kind: "factor",
+    card: {
+      what: "החלק מההכנסה שהבנק מוכן לספור: נטו, שנמשכת, ושיש לה הוכחה במסמכים. היא יכולה להיות נמוכה ממה שהלווים מצהירים עליו.",
+      role: "היא ההתחלה של כל בדיקת יכולת החזר: ממנה מורידים את ההתחייבויות, והתוצאה היא המכנה של יחס ההחזר. שכיר מוכיח אותה בתלושים, עצמאי בשומה. Mogi שומרת לכל הכנסה את הסכום שהוצהר, את המוכר, ומצב: נכלל, דורש בדיקה או לא נכלל.",
+      note: "שיעור 4.1. השמירה של שלושת הערכים היא החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). איך כל בנק מכיר בהכנסה של עצמאי — שאלה פתוחה לאילון.",
+    },
+  },
+  {
+    id: "obligations",
+    label: "התחייבויות קיימות",
+    region: "client",
+    lesson: "4.2",
+    kind: "factor",
+    card: {
+      what: "תשלומים חודשיים שהלווים כבר חייבים: הלוואות, ליסינג, מזונות, שכר דירה ומשכנתא קיימת.",
+      role: "התחייבות שנשארו לה יותר מ־18 חודשים יורדת מההכנסה המוכרת. כך מסתכל הבנק על כסף שכבר מתחייב בכל חודש.",
+      note: "שיעור 4.2. כלל 18 החודשים לפי תעתיק בצוות של הוראת בנק ישראל, לא אומת; הכלל שמנכים אותן מההכנסה הוא החלטה של Mogi (2026-10-07).",
+    },
+  },
+  {
+    id: "disposable_income",
+    label: "הכנסה פנויה",
+    region: "client",
+    lesson: "4.2",
+    kind: "factor",
+    card: {
+      what: "ההכנסה המוכרת פחות ההתחייבויות שנספרות. מה שנשאר מהכסף שנכנס, בעיני הבנק.",
+      role: "היא המכנה של יחס ההחזר, ולכן ככל שהיא נמוכה, אותו תשלום חודשי מעלה את היחס.",
+      note: "שיעור 4.2, ובלי ספירה כפולה: התחייבות יורדת מההכנסה או נוספת לתשלום, אף פעם לא שתיהן.",
+    },
+  },
+  {
+    id: "pti",
+    label: "יחס החזר",
+    region: "client",
+    lesson: "4.3",
+    kind: "factor",
+    card: {
+      what: "איזה חלק מההכנסה הפנויה הולך לתשלום החודשי: התשלום חלקי ההכנסה הפנויה, באחוזים.",
+      role: "הוא הקו המרכזי שהרגולטור והבנק מסתכלים עליו. מעל התקרה אין אישור; מעל סף ההון הבנק מחזיק יותר הון; ובנק יכול לשים קו משלו.",
+      note: "שיעור 4.3, וכרטיס 1. התקרה וסף ההון לפי תעתיק בצוות ותקצירים של מקור רשמי, לא אומת (ראו הוראה 329).",
+    },
+  },
+  {
+    id: "same_property",
+    label: "כלל אותו נכס",
+    region: "regulation",
+    lesson: "4.3",
+    kind: "factor",
+    card: {
+      what: "כשלוקחים הלוואה חדשה על נכס שכבר משועבדת עליו משכנתא, התשלום על הקיימת נספר ליחס ההחזר, אם נשארו לה יותר מ־18 חודשים.",
+      role: "הוא מעלה את היחס של מי שמוסיף הלוואה על אותו נכס, כמו מחזור עם תוספת.",
+      note: "בתוקף מ־1 באוקטובר 2026, כפי שהצוות תמלל חוזר של בנק ישראל. החוזר לא נפתח, ולכן: לא אומת.",
+    },
+  },
+
+  // ───────────── 4.4–4.5: the rules that bind the bank ─────────────
+  {
+    id: "directive_329",
+    label: "הוראה 329",
+    region: "regulation",
+    lesson: "4.4",
+    kind: "factor",
+    card: {
+      what: "הוראה של הפיקוח על הבנקים בבנק ישראל, שקובעת קווים שאסור לעבור במשכנתא: שיעור מימון, יחס החזר, חלק משתנה ותקופה.",
+      role: "היא נותנת תקרה לכל אחד מהם. הבנק לא יאשר הלוואה שעוברת אותם, בלי קשר למה שהלווים רוצים או לריבית.",
+      note: "שיעור 4.4. בקורס היא לפי תעתיק של הצוות ותקצירים של המקור, ועוד לא אומתה מול המסמך עצמו.",
+    },
+  },
+  {
+    id: "ltv",
+    label: "שיעור מימון",
+    region: "property",
+    lesson: "4.4",
+    kind: "factor",
+    card: {
+      what: "איזה חלק משווי הנכס הבנק מלווה: ההלוואה חלקי השווי, באחוזים.",
+      role: "תקרה שונה לכל סוג עסקה. הוא קובע כמה הון עצמי חייבים להביא. לפי טובי זמיר (ידע מהשטח, מקור יחיד) יש גם מדרגות של שיעור מימון שקשורות להון שהבנק מחזיק.",
+      note: "שיעורים 1.2 ו־4.4, וכרטיס 2. התקרות לפי תעתיק בצוות, לא אומת. כמה שווה כל מדרגה בריבית — לא ידוע.",
+    },
+  },
+  {
+    id: "term",
+    label: "תקופה",
+    region: "property",
+    lesson: "4.4",
+    kind: "factor",
+    card: {
+      what: "בכמה שנים מחזירים את ההלוואה, ובן כמה יהיה כל לווה בתשלום האחרון.",
+      role: "תקופה ארוכה מורידה את התשלום החודשי, ולכן את יחס ההחזר, אבל מוסיפה ריבית לסך התשלומים. לרגולטור יש תקרה לתקופה.",
+      note: "שיעור 4.4, וכרטיס 5. התקרה לפי תעתיק בצוות, לא אומת. גבולות גיל — ידע מהשטח בלי מקור, שאלה פתוחה לאילון.",
+    },
+  },
+  {
+    id: "property_type",
+    label: "סוג הנכס ומטרת ההלוואה",
+    region: "property",
+    lesson: "4.4",
+    kind: "factor",
+    card: {
+      what: "דירה יחידה, דירה חליפית או נוספת; קנייה, מחזור או הלוואה לכל מטרה.",
+      role: "הוא בוחר את התקרה של שיעור המימון. בדירה נוספת היא נמוכה יותר מאשר בדירה יחידה.",
+      note: "שיעורים 1.5 ו־4.4, וכרטיס 10.",
+    },
+  },
+  {
+    id: "capital_threshold",
+    label: "סף הון",
+    region: "regulation",
+    lesson: "4.5",
+    kind: "factor",
+    card: {
+      what: "מספר שמעליו הבנק צריך להחזיק יותר הון עצמו כנגד ההלוואה. בניגוד למגבלה רגולטורית, הוא לא אוסר דבר.",
+      role: "מעל הסף ההלוואה יקרה יותר לבנק להחזיק. אם ואיך זה מגיע לריבית של הלווים — לא פורסם.",
+      note: "שיעור 4.5. סף של 40% ביחס החזר: לפי תעתיק בצוות ותקצירים של מקור רשמי, לא אומת. ״מדרגות״ של שיעור מימון — ידע מהשטח מטובי זמיר, ממתין לאישור אילון.",
+    },
+  },
+  {
+    id: "bank_policy",
+    label: "מדיניות בנק",
+    region: "bank",
+    lesson: "4.5",
+    kind: "factor",
+    card: {
+      what: "קו שבנק קובע לעצמו, ואין בו חובה על אף בנק אחר. בדרך כלל הוא לא מתפרסם.",
+      role: "הוא יכול להיות קשוח מהרגולציה. למשל ״בפועל בנקים מחמירים ל־40%״ (ידע מהשטח של אילון, 2026-07-27; ממתין לאישור אילון).",
+      note: "שיעור 4.5: שלושה סוגי מספרים, מגבלה רגולטורית, סף הון ומדיניות בנק.",
+    },
+  },
+  {
+    id: "living_budget",
+    label: "תקציב מחיה",
+    region: "client",
+    lesson: "4.6",
+    kind: "factor",
+    card: {
+      what: "כמה כסף משפחה צריכה כל חודש כדי לחיות: אוכל, חינוך, תחבורה וכל מה שאינו התחייבות.",
+      role: "הרגולציה בודקת יחס; משפחה בודקת מה נשאר אחרי התשלום. ״סביר״ לא מוגדר בשום מקור שקראנו. ״המשכנתא אמורה להחליף את השכירות — לא את החיים״ (אילון, 2026-07-27; ממתין לאישור אילון).",
+      note: "שיעור 4.6.",
+    },
+  },
+
+  // ───────────── 4.7–4.9: how the bank checks ─────────────
+  {
+    id: "underwriting",
+    label: "חיתום",
+    region: "bank",
+    lesson: "4.7",
+    kind: "factor",
+    card: {
+      what: "הבדיקה שבאה אחרי האישור העקרוני: הבנק משווה את מה שהלווים הצהירו למה שהוא יכול לאמת, בהכנסה, בהון העצמי, באשראי, בחשבון ובנכס.",
+      role: "אישור עקרוני ניתן על מה שהוצהר. בחיתום המוצהר הופך למאומת, או לא.",
+      note: "שיעור 4.7. מה בדיוק כל בנק בודק, ובאיזה אופן, וכמה זמן זה לוקח — לא ידוע; שום הוראה לא קובעת את משך החיתום.",
+    },
+  },
+  {
+    id: "approval",
+    label: "תשובת הבנק בחיתום",
+    region: "result",
+    lesson: "4.7",
+    kind: "factor",
+    card: {
+      what: "אחת מארבע תשובות: הבנק ממשיך, מבקש עוד מסמכים, משנה את התנאים, או מבטל.",
+      role: "היא מה שיוצא מהבדיקה של בנק אחד. מה מכריע ביניהן — שאלה פתוחה.",
+      note: "שיעור 4.7. ארבע התשובות הן מחקר של הצוות, לא אומת.",
+    },
+  },
+  {
+    id: "credit_law",
+    label: "חוק נתוני אשראי",
+    region: "regulation",
+    lesson: "4.8",
+    kind: "factor",
+    card: {
+      what: "חוק שקובע מי יכול לאסוף נתוני אשראי, למי למסור אותם, ולכמה זמן.",
+      role: "הוא מסדיר את הפנייה של הבנק ללשכת אשראי. חיווי אשראי נשמר עד 60 יום, ובהסכמה מפורשת אפשר יותר.",
+      note: "שיעור 4.8. לפי תעתיק בצוות של התקנות מ־2017 (Brain 6455298), לא אומת.",
+    },
+  },
+  {
+    id: "credit_registry",
+    label: "מאגר נתוני אשראי",
+    region: "regulation",
+    lesson: "4.8",
+    kind: "actor",
+    card: {
+      what: "מאגר של נתוני אשראי של אנשים, שבנק ישראל מנהל.",
+      role: "הנתונים עוברים ממנו דרך לשכת אשראי, בהסכמה, כחיווי אשראי או כדוח ריכוז נתונים.",
+      note: "שיעור 4.8. לפי תקצירים של מקור רשמי; לא אומת.",
+    },
+  },
+  {
+    id: "credit_bureau",
+    label: "לשכת אשראי",
+    region: "bank",
+    lesson: "4.8",
+    kind: "actor",
+    card: {
+      what: "גוף שמחזיק את נתוני האשראי של אנשים ומפיק מהם חיווי אשראי, שהבנק מבקש.",
+      role: "הבנק פונה אליה כבר בבקשה לאישור עקרוני, אחרי שהלווים הסכימו.",
+      when: "בשלב האישור העקרוני.",
+      note: "שיעור 4.8. מה בדוח פוסל או מייקר — לא ידוע, שאלה פתוחה לאילון.",
+    },
+  },
+  {
+    id: "credit_data",
+    label: "נתוני אשראי",
+    region: "client",
+    lesson: "4.8",
+    kind: "factor",
+    card: {
+      what: "מה שידוע על הלווים מההלוואות והחשבונות שלהם בעבר: תשלומים בזמן, פיגורים, החזרות חיוב.",
+      role: "הבנק קורא אותם כסימן לשאלה אם ישלמו. מה בדיוק מפיל תיק או מייקר אותו — לא כתוב באף מקור שבידינו.",
+      note: "שיעור 4.8, וכרטיס 8.",
+    },
+  },
+  {
+    id: "account_conduct",
+    label: "התנהלות החשבון",
+    region: "client",
+    lesson: "4.8",
+    kind: "factor",
+    card: {
+      what: "מה שרואים בתדפיסי החשבון בחודשים שלפני הבקשה: משכורת נכנסת, יתרות, מינוס, החזרות חיוב.",
+      role: "התדפיס נבדק מול התלושים (3 תלושים ו־3 חודשי תדפיס: ידע מהשטח מאילון, 2026-07-27; ממתין לאישור אילון).",
+      note: "שיעור 4.8, וכרטיס 9. כמה חודשים אחורה ומה מפיל — לא ידוע, שאלה פתוחה לאילון.",
+    },
+  },
+  {
+    id: "collateral",
+    label: "הבטוחה",
+    region: "property",
+    lesson: "4.9",
+    kind: "factor",
+    card: {
+      what: "הנכס שמשועבד לבנק עד שהחוב נפרע, ומה שהבנק צריך לדעת עליו: כמה הוא שווה, של מי הוא, ואם הוא מבוטח.",
+      role: "שלוש שאלות: שווי (שמאות), בעלות ורישום (טאבו, רמ״י או חברה משכנת), וביטוח. אם אחת לא נענית, הכסף לא עובר.",
+      note: "שיעור 4.9.",
+    },
+  },
+  {
+    id: "rights_registration",
+    label: "רישום הזכויות",
+    region: "property",
+    lesson: "4.9",
+    kind: "factor",
+    card: {
+      what: "איפה רשום מי הבעלים של הנכס: בטאבו, ברמ״י או אצל חברה משכנת, ומה עוד רשום עליו.",
+      role: "לפי טובי זמיר, תיקים נופלים על הבטוחות: הערת אזהרה, או נכס שרשום ברמ״י, שהרישום בו לוקח 3–4 חודשים (ידע מהשטח, מקור יחיד; ממתין לאישור אילון).",
+      note: "שיעור 4.9, וכרטיס 12.",
+    },
+  },
+  {
+    id: "insurances",
+    label: "ביטוח חיים וביטוח מבנה",
+    region: "property",
+    lesson: "4.9",
+    kind: "factor",
+    card: {
+      what: "ביטוח על חיי הלווים וביטוח על מבנה הדירה, שבהם הבנק רשום כמוטב בלתי חוזר.",
+      role: "הם מכסים את החוב אם לווה נפטר או אם הדירה נפגעת. הבנק רשאי לדרוש אותם, ומותר לקנות אותם מחוץ לבנק (לפי תעתיק של ההוראה, לא אומת).",
+      note: "שיעור 4.9, וכרטיס 21.",
+    },
+  },
+
+  // ───────────── 4.10–4.11: the factor cards ─────────────
+  {
+    id: "guarantor",
+    label: "ערב",
+    region: "client",
+    lesson: "4.10",
+    kind: "actor",
+    card: {
+      what: "מי שחתום כדי להבטיח את ההלוואה של אחרים. הוא לא משלם כל חודש, אבל אם הלווים לא משלמים, הבנק יכול לדרוש ממנו.",
+      role: "מוסיף לבנק עוד מישהו לדרוש ממנו את החוב. איך כל בנק סופר הכנסה של ערב — לא ידוע לנו.",
+      note: "שיעור 4.10, וכרטיס 13. לא להתבלבל עם לווה שאינו ממשכן.",
+    },
+  },
+  {
+    id: "borrower_composition",
+    label: "הרכב הלווים",
+    region: "client",
+    lesson: "4.10",
+    kind: "factor",
+    card: {
+      what: "מי חתום על ההלוואה ובאיזה תפקיד: לווים, לווה שאינו ממשכן, וערב.",
+      role: "כל לווה מוסיף הכנסה, וגם התחייבויות, לחישוב של יחס ההחזר.",
+      note: "שיעור 4.10, וכרטיס 13. בשאלון של בנק אחד, לווה שאינו ממשכן הוא קרוב משפחה מדרגה ראשונה שאינו בעל הנכס, ומתחייב לשלם לפחות 20% מההחזר (השאלון הציבורי, 2026-08-25).",
+    },
+  },
+  {
+    id: "family",
+    label: "מצב משפחתי ונפשות תלויות",
+    region: "client",
+    lesson: "4.10",
+    kind: "factor",
+    card: {
+      what: "מצב משפחתי, וכמה ילדים או אחרים תלויים בהכנסה של הלווים.",
+      role: "יותר נפשות — יותר הוצאות מחיה. הבנקים מגדירים ״ילד״ אחרת: עד גיל 18 בשאלונים של שלושה בנקים ועד 21 בשאלון של בנק אחד (השאלונים הציבוריים, 2026-08-25).",
+      note: "שיעור 4.10, וכרטיס 14.",
+    },
+  },
+  {
+    id: "residency",
+    label: "תושבות, מס זר ואיש ציבור",
+    region: "client",
+    lesson: "4.10",
+    kind: "factor",
+    card: {
+      what: "האם הלווים תושבי ישראל, האם הם משלמים מס במדינה אחרת או מחזיקים אזרחות נוספת, והאם אחד מהם (או קרוב שלו) איש ציבור.",
+      role: "תושב חוץ שאינו אזרח ישראלי מקבל תקרת שיעור מימון נמוכה יותר (לפי תקצירים של מקור רשמי, לא אומת). השאר — שאלות שהבנקים חייבים לשאול; למה, לא בדקנו.",
+      note: "שיעור 4.10, וכרטיס 15.",
+    },
+  },
+  {
+    id: "loan_amount",
+    label: "גובה ההלוואה",
+    region: "property",
+    lesson: "4.11",
+    kind: "factor",
+    card: {
+      what: "כמה כסף לווים: מחיר הנכס פחות ההון העצמי.",
+      role: "הוא קובע את שיעור המימון ואת התשלום. לפי טובי זמיר הבנק מעדיף תיקים גדולים (ידע מהשטח, מקור יחיד; ממתין לאישור אילון). סכום שמשנה ריבית — לא ידוע.",
+      note: "שיעור 4.11, וכרטיס 4.",
+    },
+  },
+  {
+    id: "client_relationship",
+    label: "הקשר של הלקוח לבנק",
+    region: "bank",
+    lesson: "4.11",
+    kind: "factor",
+    card: {
+      what: "האם הלווים כבר לקוחות של הבנק: החשבון, המשכורת, חסכונות ומוצרים אחרים.",
+      role: "לפי אילון, כשהחשבון באותו בנק אין צורך בתדפיסים (ידע מהשטח, 2026-07-27; ממתין לאישור אילון). אם לקוח קיים מקבל ריבית טובה יותר — לא מצאנו מקור.",
+      note: "שיעור 4.11, וכרטיס 16.",
+    },
+  },
+  {
+    id: "monthly_targets",
+    label: "יעדים חודשיים",
+    region: "bank",
+    lesson: "4.11",
+    kind: "factor",
+    card: {
+      what: "יעדים שהבנק מנהל לפי חודש ורבעון: כמה הלוואות לסגור, באיזה מרווח.",
+      role: "לפי טובי זמיר המרווח מנוהל כסך חודשי והיעדים רצים מ־1 עד 30 בחודש, אבל ״זה לא מדע מדויק״ (ידע מהשטח, מקור יחיד, נכון לנקודת זמן; ממתין לאישור אילון).",
+      note: "שיעור 4.11, וכרטיס 18. כמה שווה ״סוף החודש״ — לא ידוע.",
+    },
+  },
+  {
+    id: "other_offers",
+    label: "הצעות מבנקים אחרים",
+    region: "bank",
+    lesson: "4.11",
+    kind: "factor",
+    card: {
+      what: "הצעות שהלווים קיבלו מבנקים אחרים על אותו תיק.",
+      role: "לפי טובי זמיר, הפקיד פותח גבוה ממה שמותר לו, ויש רצפה שמתחתיה צריך מנהל (ידע מהשטח, מקור יחיד; ממתין לאישור אילון). כמה מקום יש — לא ידוע.",
+      note: "שיעור 4.11, וכרטיס 19.",
+    },
+  },
+  {
+    id: "channel",
+    label: "ערוץ ההגשה",
+    region: "bank",
+    lesson: "4.11",
+    kind: "factor",
+    card: {
+      what: "דרך מה הבקשה מגיעה לבנק: טופס דיגיטלי שהלקוח ממלא, יועץ שמגיש בשמו, או סניף.",
+      role: "כל דרך מביאה לבנק מידע אחר, בשלב אחר. אם הדרך משנה את הריבית — לא ידוע.",
+      note: "שיעור 4.11, וכרטיס 22.",
+    },
+  },
+
+  // ───────────── 4.12: how a bank prices ─────────────
+  {
+    id: "credit_risk",
+    label: "סיכון האשראי",
+    region: "bank",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "הסיכוי שלווים לא ישלמו, ומה הבנק יפסיד אז, אחרי שימכור את הנכס.",
+      role: "הוא הסיבה שהבנק בודק יחס החזר, שיעור מימון, הכנסה ואשראי. איזה מהם משפיע על הריבית, ובכמה — לא כתוב באף מקור שבידינו.",
+      note: "שיעור 4.12. הסבר כללי של איך בנקים חושבים, לא מספרים של בנק מסוים.",
+    },
+  },
+  {
+    id: "capital_requirements",
+    label: "דרישות הון",
+    region: "bank",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "הכסף של הבנק עצמו (לא של מפקידים) שהוא חייב להחזיק כנגד הלוואות שנתן.",
+      role: "הון יקר לבנק יותר מכסף של מפקידים, ולכן הלוואה שדורשת יותר הון עולה לו יותר. שני הדברים שהקורס מכיר: סף של 40% ביחס החזר (לא אומת) ומדרגות שיעור מימון לפי טובי (ידע מהשטח).",
+      note: "שיעור 4.12. כמה זה מוסיף לריבית — לא ידוע.",
+    },
+  },
+  {
+    id: "competition",
+    label: "תחרות",
+    region: "bank",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "הבנקים האחרים שהלווים יכולים ללכת אליהם.",
+      role: "בנק שרוצה את התיק יודע שאפשר ללכת למקום אחר. לפי טובי זמיר הבנק הזול ביותר מתחלף לפי רבעון (ידע מהשטח, נכון לנקודת זמן; ממתין לאישור אילון).",
+      note: "שיעור 4.12.",
+    },
+  },
+  {
+    id: "customer_value",
+    label: "ערך הלקוח",
+    region: "bank",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "כמה הלקוח שווה לבנק מעבר להלוואה הזאת: גודל התיק, חשבון, עסקים אחרים.",
+      role: "לקוח ששווה יותר מקבל, אולי, יותר גמישות. האם זה קורה, ובכמה — לא ידוע.",
+      note: "שיעור 4.12. מבוסס על הדברים של טובי זמיר על נפח, ועל ידע כללי; מקור יחיד.",
+    },
+  },
+  {
+    id: "risk_appetite",
+    label: "תיאבון סיכון",
+    region: "bank",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "כמה מסוג מסוים של הלוואה הבנק רוצה עכשיו: איזה סיכון, איזה סכום, איזה סוג עסקה.",
+      role: "הוא משתנה עם הזמן. לפי טובי זמיר, ״רכישות זה תמיד טיפה יותר יקר ממחזור״ (ידע מהשטח, מקור יחיד; ממתין לאישור אילון).",
+      note: "שיעור 4.12.",
+    },
+  },
+  {
+    id: "offered_rate",
+    label: "הריבית שהבנק מציע",
+    region: "result",
+    lesson: "4.12",
+    kind: "factor",
+    card: {
+      what: "הריבית שהבנק כותב בהצעה לכל מסלול: העוגן ועוד מרווח.",
+      role: "העוגן בא מהשוק, והמרווח הוא מה שהבנק מחליט עליו לתיק הזה, בהתאם לשכבות של סיכון, הון, תחרות, ערך הלקוח ותיאבון.",
+      note: "שיעור 4.12. הגודל של כל שכבה — לא ידוע. בשלב 8 נראה איך אפשר ללמוד גדלים מנתונים לדוגמה.",
+    },
+  },
+
+  // ───────────── 4.13 and the workshop ─────────────
+  {
+    id: "bank_form",
+    label: "הטופס הציבורי של הבנק",
+    region: "bank",
+    lesson: "4.13",
+    kind: "factor",
+    card: {
+      what: "הטופס שבנק מפרסם באתר שלו לבקשה לאישור עקרוני: מה הוא שואל, ובאיזה סדר.",
+      role: "הוא מראה מה בנק מבקש לדעת. הוא לא מראה מה הבנק עושה עם התשובה, ולא איך הוא מתמחר.",
+      note: "שיעור 4.13. לפי מה שהצוות קרא ב־2026-08-25; לא נבדק מאז.",
+    },
+  },
+  {
+    id: "advisor_channel",
+    label: "ערוץ יועצים",
+    region: "bank",
+    lesson: "4.13",
+    kind: "factor",
+    card: {
+      what: "הדרך הנפרדת שבה בנק מקבל בקשות מיועצים שפועלים בשם לווים. היועץ נכנס עם קוד יועץ ועם כתב הרשאה חתום.",
+      role: "מה שהערוץ שואל יכול להיות שונה ממה שהטופס הציבורי שואל. לפי מחקר של הצוות לכל ארבעת הבנקים יש ערוץ כזה (לא אומת).",
+      note: "שיעור 4.13.",
+    },
+  },
+  {
+    id: "feasibility",
+    label: "דף ההיתכנות",
+    region: "result",
+    lesson: "4.15",
+    kind: "factor",
+    card: {
+      what: "דף אחד על תיק: מה כל קו אומר עליו, ומה הבנק יראה.",
+      role: "אוסף את הקווים של שלב 4 — יחס ההחזר, שיעור המימון, התקופה, כלל 18 החודשים — לבדיקה אחת.",
+      note: "שיעור 4.15, הסדנה.",
+    },
+  },
+];
+
+export const links: MapLink[] = [
+  // 4.2–4.3
+  { from: "recognized_income", to: "disposable_income", label: "מההכנסה המוכרת מורידים את ההתחייבויות", lesson: "4.2" },
+  { from: "obligations", to: "disposable_income", label: "התחייבות שנשארו לה יותר מ־18 חודשים יורדת מההכנסה", lesson: "4.2" },
+  { from: "disposable_income", to: "pti", label: "היא המכנה של היחס", lesson: "4.3" },
+  { from: "first_payment", to: "pti", label: "התשלום החודשי של ההלוואה החדשה הוא המונה", lesson: "4.3" },
+  { from: "same_property", to: "pti", label: "משכנתא קיימת על אותו נכס נוספת לתשלום", lesson: "4.3" },
+  // 4.4
+  { from: "boi", to: "directive_329", label: "מפקח על הבנקים וקובע להם את ההוראה", lesson: "4.4" },
+  { from: "directive_329", to: "ltv", label: "תקרה לפי סוג העסקה", lesson: "4.4" },
+  { from: "directive_329", to: "pti", label: "תקרה ליחס ההחזר", lesson: "4.4" },
+  { from: "directive_329", to: "mix", label: "לפחות שליש מההלוואה בריבית קבועה", lesson: "4.4" },
+  { from: "directive_329", to: "term", label: "תקרה לתקופה", lesson: "4.4" },
+  { from: "property_type", to: "ltv", label: "סוג העסקה קובע איזו תקרה חלה", lesson: "4.4" },
+  { from: "equity", to: "ltv", label: "יותר הון עצמי — הלוואה קטנה יותר, ושיעור מימון נמוך יותר", lesson: "4.4" },
+  { from: "value", to: "ltv", label: "השווי הוא המכנה של שיעור המימון", lesson: "4.4" },
+  { from: "term", to: "monthly_payment", label: "תקופה ארוכה מורידה את התשלום החודשי", lesson: "4.4" },
+  // 4.5
+  { from: "pti", to: "capital_threshold", label: "מעל 40% הבנק מחזיק יותר הון (לא אומת)", lesson: "4.5" },
+  { from: "pti", to: "bank_policy", label: "בנק יכול לקבוע קו משלו", lesson: "4.5" },
+  // 4.6
+  { from: "monthly_payment", to: "living_budget", label: "מה שנשאר למשפחה אחרי התשלום", lesson: "4.6" },
+  // 4.7–4.9
+  { from: "bank", to: "underwriting", label: "בודק את הלווים והנכס", lesson: "4.7" },
+  { from: "recognized_income", to: "underwriting", label: "מוצהר הופך למאומת, מול מסמכים", lesson: "4.7" },
+  { from: "underwriting", to: "approval", label: "הבדיקה מסתיימת באחת מארבע תשובות", lesson: "4.7" },
+  { from: "boi", to: "credit_registry", label: "מנהל אותו", lesson: "4.8" },
+  { from: "credit_registry", to: "credit_bureau", label: "הנתונים עוברים דרך הלשכה, בהסכמה", lesson: "4.8" },
+  { from: "credit_law", to: "credit_bureau", label: "מסדיר מה היא אוספת, ולמי היא מוסרת", lesson: "4.8" },
+  { from: "credit_bureau", to: "credit_data", label: "מפיקה מהנתונים חיווי אשראי", lesson: "4.8" },
+  { from: "borrowers", to: "credit_bureau", label: "מסכימים שהבנק יפנה אליה", lesson: "4.8" },
+  { from: "credit_data", to: "underwriting", label: "הבנק קורא אותם בחיתום", lesson: "4.8" },
+  { from: "account_conduct", to: "underwriting", label: "התדפיס נבדק מול התלושים", lesson: "4.8" },
+  { from: "appraiser", to: "collateral", label: "מעריך כמה הנכס שווה", lesson: "4.9" },
+  { from: "registry", to: "rights_registration", label: "שם רשום מי הבעלים", lesson: "4.9" },
+  { from: "rights_registration", to: "collateral", label: "בלי רישום תקין אין בטוחה", lesson: "4.9" },
+  { from: "insurer", to: "insurances", label: "מוכר אותם", lesson: "4.9" },
+  { from: "insurances", to: "collateral", label: "מכסים את החוב אם משהו קורה", lesson: "4.9" },
+  { from: "collateral", to: "underwriting", label: "הבנק בודק שווי, בעלות וביטוח", lesson: "4.9" },
+  // 4.10
+  { from: "borrowers", to: "borrower_composition", label: "מי חתום, ובאיזה תפקיד", lesson: "4.10" },
+  { from: "guarantor", to: "borrower_composition", label: "חתום כערב: משלם אם הלווים לא משלמים", lesson: "4.10" },
+  { from: "borrower_composition", to: "recognized_income", label: "כל לווה מוסיף את ההכנסה שלו", lesson: "4.10" },
+  { from: "borrower_composition", to: "obligations", label: "וגם את ההתחייבויות שלו", lesson: "4.10" },
+  { from: "family", to: "living_budget", label: "יותר נפשות — יותר הוצאות מחיה", lesson: "4.10" },
+  { from: "residency", to: "ltv", label: "תושב חוץ שאינו אזרח: תקרה נמוכה יותר (לא אומת)", lesson: "4.10" },
+  // 4.11
+  { from: "equity", to: "loan_amount", label: "מחיר הנכס פחות ההון העצמי", lesson: "4.11" },
+  { from: "loan_amount", to: "ltv", label: "ההלוואה היא המונה של שיעור המימון", lesson: "4.11" },
+  { from: "loan_amount", to: "monthly_payment", label: "הלוואה גדולה יותר — תשלום גבוה יותר", lesson: "4.11" },
+  { from: "client_relationship", to: "bank", label: "לקוח קיים: הבנק מכיר אותו", lesson: "4.11" },
+  { from: "monthly_targets", to: "bank", label: "הבנק מנהל יעדים לפי חודש", lesson: "4.11" },
+  { from: "other_offers", to: "bank", label: "בנק שיודע שיש הצעות אחרות", lesson: "4.11" },
+  { from: "advisor", to: "channel", label: "מגיש בקשה בשם הלווים", lesson: "4.11" },
+  { from: "channel", to: "bank", label: "כך הבקשה מגיעה אליו", lesson: "4.11" },
+  // 4.12
+  { from: "cost_of_money", to: "spread", label: "הבנק צריך לכסות אותה (ובמסלולים שהעוגן שלהם זז איתה, היא כבר בעוגן)", lesson: "4.12" },
+  { from: "pti", to: "credit_risk", label: "יחס גבוה — פחות מקום לטעות", lesson: "4.12" },
+  { from: "ltv", to: "credit_risk", label: "שיעור מימון גבוה — פחות כרית אם הנכס יירד בערכו", lesson: "4.12" },
+  { from: "credit_data", to: "credit_risk", label: "מה בדוח משפיע ובכמה — לא ידוע", lesson: "4.12" },
+  { from: "credit_risk", to: "spread", label: "הבנק מוסיף למרווח על סיכון", lesson: "4.12" },
+  { from: "capital_threshold", to: "capital_requirements", label: "מעבר לסף — יותר הון", lesson: "4.12" },
+  { from: "ltv", to: "capital_requirements", label: "מדרגות שיעור המימון קשורות להון (טובי זמיר; ידע מהשטח)", lesson: "4.12" },
+  { from: "capital_requirements", to: "spread", label: "הון עולה כסף, והבנק מוסיף למרווח", lesson: "4.12" },
+  { from: "other_offers", to: "competition", label: "הצעות מבנקים אחרים הן התחרות", lesson: "4.12" },
+  { from: "competition", to: "spread", label: "בנק שמתחרה על התיק מוריד אותו", lesson: "4.12" },
+  { from: "loan_amount", to: "customer_value", label: "הבנק מעדיף תיקים גדולים (טובי זמיר; ידע מהשטח)", lesson: "4.12" },
+  { from: "client_relationship", to: "customer_value", label: "לקוח שמביא עוד עסקים שווה יותר", lesson: "4.12" },
+  { from: "customer_value", to: "spread", label: "לקוח ששווה יותר — אולי מרווח נמוך יותר", lesson: "4.12" },
+  { from: "monthly_targets", to: "risk_appetite", label: "הבנק רחוק או קרוב ליעד של החודש", lesson: "4.12" },
+  { from: "risk_appetite", to: "spread", label: "כמה הוא רוצה סוג כזה של הלוואה עכשיו", lesson: "4.12" },
+  { from: "spread", to: "offered_rate", label: "הריבית = העוגן + המרווח", lesson: "4.12" },
+  { from: "anchor", to: "offered_rate", label: "הריבית = העוגן + המרווח", lesson: "4.12" },
+  // 4.13
+  { from: "bank_form", to: "channel", label: "הדרך הפומבית; ליועצים יש ערוץ משלהם", lesson: "4.13" },
+  { from: "advisor_channel", to: "channel", label: "ערוץ אחר לאותו בנק", lesson: "4.13" },
+  { from: "advisor", to: "advisor_channel", label: "נכנס אליו עם קוד יועץ וכתב הרשאה", lesson: "4.13" },
+  { from: "bank_form", to: "family", label: "הבנקים מגדירים ״ילד״ אחרת", lesson: "4.13" },
+  { from: "bank_form", to: "residency", label: "כולם שואלים על תושבות, מס זר ואיש ציבור", lesson: "4.13" },
+  // 4.15
+  { from: "pti", to: "feasibility", label: "היחס נבדק מול התקרה וסף ההון", lesson: "4.15" },
+  { from: "ltv", to: "feasibility", label: "שיעור המימון נבדק מול התקרה", lesson: "4.15" },
+  { from: "term", to: "feasibility", label: "התקופה נבדקת מול התקרה", lesson: "4.15" },
+  { from: "obligations", to: "feasibility", label: "כלל 18 החודשים על כל התחייבות", lesson: "4.15" },
+];

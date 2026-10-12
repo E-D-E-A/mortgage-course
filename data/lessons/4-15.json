@@ -1,0 +1,565 @@
+{
+  "lesson": "4.15",
+  "title": "סדנה: דף ההיתכנות של התיק המרכזי",
+  "note": "Case A with the course map's numbers only; no track, mix or offer. Rates of 4%, 4.5% and 5% over 360 months are the course's calculation assumption, not offers. Household of the worked example invented.",
+  "facts": [
+    {
+      "id": "a.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "a.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000.00"
+    },
+    {
+      "id": "a.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000.00"
+    },
+    {
+      "id": "a.own",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.equity",
+        "subtrahend": "a.gift"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "a.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.price",
+        "subtrahend": "a.equity"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "a.income_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400.00"
+    },
+    {
+      "id": "a.income_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300.00"
+    },
+    {
+      "id": "a.recognised",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|9300"
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "a.car_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450.00"
+    },
+    {
+      "id": "a.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
+      "id": "a.disposable_now",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700.00",
+        "obligations": "loan,1450,26"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "a.until_drop",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 26
+      },
+      "value": 8
+    },
+    {
+      "id": "a.disposable_after",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700.00",
+        "obligations": ""
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "a.max50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
+        "percent": "50"
+      },
+      "value": "10125.00"
+    },
+    {
+      "id": "a.max40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
+        "percent": "40"
+      },
+      "value": "8100.00"
+    },
+    {
+      "id": "a.max50_after",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "21700.00",
+        "percent": "50"
+      },
+      "value": "10850.00"
+    },
+    {
+      "id": "a.max40_after",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "21700.00",
+        "percent": "40"
+      },
+      "value": "8680.00"
+    },
+    {
+      "id": "a.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000.00"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "a.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2200000.00",
+        "deal": "only_home"
+      },
+      "value": "1650000.00"
+    },
+    {
+      "id": "a.ltv_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.max_loan",
+        "subtrahend": "a.loan"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "a.min_value",
+      "kind": "ltv_min_value",
+      "inputs": {
+        "loan": "1640000.00",
+        "ceiling": "75"
+      },
+      "value": "2186666.67"
+    },
+    {
+      "id": "a.value_slack",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.price",
+        "subtrahend": "a.min_value"
+      },
+      "value": "13333.33"
+    },
+    {
+      "id": "a.low_value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2150000.00"
+    },
+    {
+      "id": "a.ltv_low",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2150000.00"
+      },
+      "value": "76.28"
+    },
+    {
+      "id": "a.max_loan_low",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2150000.00",
+        "deal": "only_home"
+      },
+      "value": "1612500.00"
+    },
+    {
+      "id": "a.low_short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.loan",
+        "subtrahend": "a.max_loan_low"
+      },
+      "value": "27500.00"
+    },
+    {
+      "id": "a.max_variable",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1640000.00"
+      },
+      "value": "1093333.33"
+    },
+    {
+      "id": "a.min_fixed",
+      "kind": "reg_min_fixed",
+      "inputs": {
+        "loan": "1640000.00"
+      },
+      "value": "546666.67"
+    },
+    {
+      "id": "a.max_months",
+      "kind": "reg_months",
+      "inputs": {
+        "years": 30
+      },
+      "value": 360
+    },
+    {
+      "id": "assume.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 360
+    },
+    {
+      "id": "assume.rate_4",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "a.carry40_4",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8100.00",
+        "rate_percent": "4",
+        "months": 360
+      },
+      "value": "1696636.05"
+    },
+    {
+      "id": "a.carry50_4",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "10125.00",
+        "rate_percent": "4",
+        "months": 360
+      },
+      "value": "2120795.06"
+    },
+    {
+      "id": "a.gap40_4",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry40_4",
+        "subtrahend": "a.loan"
+      },
+      "value": "56636.05"
+    },
+    {
+      "id": "a.gap50_4",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry50_4",
+        "subtrahend": "a.loan"
+      },
+      "value": "480795.06"
+    },
+    {
+      "id": "assume.rate_4_5",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "a.carry40_4_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8100.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1598625.39"
+    },
+    {
+      "id": "a.carry50_4_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "10125.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1998281.73"
+    },
+    {
+      "id": "a.gap40_4_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry40_4_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "-41374.61"
+    },
+    {
+      "id": "a.short40_4_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.loan",
+        "subtrahend": "a.carry40_4_5"
+      },
+      "value": "41374.61"
+    },
+    {
+      "id": "a.gap50_4_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry50_4_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "358281.73"
+    },
+    {
+      "id": "assume.rate_5",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "a.carry40_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8100.00",
+        "rate_percent": "5",
+        "months": 360
+      },
+      "value": "1508881.10"
+    },
+    {
+      "id": "a.carry50_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "10125.00",
+        "rate_percent": "5",
+        "months": 360
+      },
+      "value": "1886101.37"
+    },
+    {
+      "id": "a.gap40_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry40_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "-131118.90"
+    },
+    {
+      "id": "a.gap50_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry50_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "246101.37"
+    },
+    {
+      "id": "a.carry40_after_4_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8680.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1713094.86"
+    },
+    {
+      "id": "a.gap40_after_4_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry40_after_4_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "73094.86"
+    },
+    {
+      "id": "a.carry40_after_5",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8680.00",
+        "rate_percent": "5",
+        "months": 360
+      },
+      "value": "1616924.44"
+    },
+    {
+      "id": "a.gap40_after_5",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.carry40_after_5",
+        "subtrahend": "a.loan"
+      },
+      "value": "-23075.56"
+    },
+    {
+      "id": "w.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "w.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "w.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.price",
+        "subtrahend": "w.equity"
+      },
+      "value": "1100000.00"
+    },
+    {
+      "id": "w.recognised",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "9000|7000"
+      },
+      "value": "16000.00"
+    },
+    {
+      "id": "w.car_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "900.00"
+    },
+    {
+      "id": "w.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 10
+    },
+    {
+      "id": "w.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "16000.00",
+        "obligations": "loan,900,10"
+      },
+      "value": "16000.00"
+    },
+    {
+      "id": "w.max50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000.00",
+        "percent": "50"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "w.max40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000.00",
+        "percent": "40"
+      },
+      "value": "6400.00"
+    },
+    {
+      "id": "w.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1100000.00",
+        "value": "1500000.00"
+      },
+      "value": "73.33"
+    },
+    {
+      "id": "w.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1500000.00",
+        "deal": "only_home"
+      },
+      "value": "1125000.00"
+    },
+    {
+      "id": "w.ltv_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.max_loan",
+        "subtrahend": "w.loan"
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "w.carry40",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "6400.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1263111.42"
+    },
+    {
+      "id": "w.carry50",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "8000.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1578889.27"
+    },
+    {
+      "id": "w.gap40",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.carry40",
+        "subtrahend": "w.loan"
+      },
+      "value": "163111.42"
+    },
+    {
+      "id": "ex2.err_added",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "21700|1450"
+      },
+      "value": "23150.00"
+    },
+    {
+      "id": "ex7.err_sum",
+      "kind": "met_times",
+      "inputs": {
+        "of": "a.max40",
+        "count": 360
+      },
+      "value": "2916000.00"
+    }
+  ]
+}

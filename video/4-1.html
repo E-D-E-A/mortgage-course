@@ -1,0 +1,220 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.1 — "הקו שבין ברוטו לנטו" (recognised income).
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/4-1.json (Michal's August payslip, Avi's two
+  tax assessments, the household's declared and recognised income). The scene does
+  no arithmetic; bar lengths are geometry from the data's own amounts. The subtitle
+  cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: the bank counts net income it can prove, not what the client says):
+  1. Title.
+  2. A payslip, line by line: gross, mandatory deductions, net, other deductions,
+     net-to-pay. Which of the last two counts is an open question.
+  3. A self-employed borrower: no payslip, a tax assessment. Two ways to a monthly
+     figure (latest ÷ 12, two-year average), both below what he declares; no agreed rule.
+  4. The household: declared against recognised, and the gap.
+  5. Start from the documents, not the declaration.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.1 · מה בנק מכיר כהכנסה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+      const num = (v) => nf.format(Number(v));
+      const pct = (v) => `${nf.format(Number(v))}%`;
+
+      const V = {
+        gross: fact("slip.gross"), mand: fact("slip.mandatory"), net: fact("slip.net"), other: fact("slip.other"), ntp: fact("slip.ntp"),
+        old: fact("case.assess_old"), latest: fact("case.assess_latest"), mlatest: fact("case.avi_latest"), mavg: fact("case.avi_avg"),
+        decl: fact("case.avi_declared"), hhDecl: fact("hh.declared"), hhRec: fact("hh.rec_avg"), gap: fact("hh.gap"),
+      };
+
+      window.duration = 152;
+      window.cues = [
+        [1, 6, "מה בנק מכיר כהכנסה?"],
+        [6, 9.5, "לא תמיד מה שהלקוח אומר."],
+        [11, 18, "מיכל, שכירה: תלוש אחד משלושה."],
+        [18, 26, `ברוטו: ${shek(V.gross)}. כל מה שהמעסיק משלם.`],
+        [26, 34, `ניכויי חובה: ${shek(V.mand)} — מס ופנסיה.`],
+        [34, 42, `נשאר שכר נטו: ${shek(V.net)}.`],
+        [42, 50, `ניכויים אחרים: ${shek(V.other)} — הלוואה ודמי ועד.`],
+        [50, 57, `נטו לתשלום: ${shek(V.ntp)} — מה שנכנס לחשבון.`],
+        [57, 61.5, "איזה מהשניים נספר? שאלה פתוחה."],
+        [63, 70, "אבי, עצמאי: אין תלוש, יש שומה."],
+        [70, 78, `שומות: ${shek(V.old)} ו־${shek(V.latest)} נטו לשנה.`],
+        [78, 86, `האחרונה ÷ 12: ${shek(V.mlatest)} בחודש.`],
+        [86, 94, `ממוצע שנתיים: ${shek(V.mavg)} בחודש.`],
+        [94, 101, `אבי מצהיר: ${shek(V.decl)} בחודש.`],
+        [101, 107, "אין כלל מוסכם בין שתי השיטות."],
+        [109, 116, `מצהירים יחד: ${shek(V.hhDecl)}.`],
+        [116, 124, `הכנסה מוכרת, לפי הממוצע: ${shek(V.hhRec)}.`],
+        [124, 132, `הפער: ${shek(V.gap)} בחודש, כולו של אבי.`],
+        [132, 139, "החישוב ממשיך מהמספר הנמוך."],
+        [141, 147, "מתחילים מהמסמכים, לא מההצהרה."],
+        [147, 151.5, "בשיעור הבא: ההתחייבויות."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+      const bar = (x, y, w, h, o, fill, opts = {}) =>
+        el("rect", { x, y, width: Math.max(0, w), height: h, rx: opts.rx ?? 6, fill, stroke: opts.stroke ?? "none", "stroke-width": opts.sw ?? 0, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      const S = { title: [0, 10], slip: [10, 62], self: [62, 108], house: [108, 140], end: [140, 152] };
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "הקו שבין", 76, { w: 700, o });
+          txt(640, 360, "ברוטו לנטו", 76, { w: 700, o });
+          txt(640, 430, "איזו הכנסה בנק מכיר", 32, { fill: C.n600, o });
+        }
+
+        // Scene 2 — one payslip, line by line
+        if (inScene(t, S.slip)) {
+          const o = vis(t, S.slip);
+          txt(640, 112, "תלוש של מיכל: משורה לשורה", 38, { w: 700, o });
+          const R = 1030, W = 740, px = (v) => (Number(v) / Number(V.gross)) * W;
+          const row = (y, label, start, parts) => {
+            const oi = at(t, start, o);
+            txt(1200, y + 36, label, 24, { anchor: "start", w: 600, o: oi });
+            for (const p of parts) p(oi, y);
+          };
+          row(160, "ברוטו", 18, [(oi, y) => { bar(R - px(V.gross), y, px(V.gross), 56, oi, C.teal); txt(R - px(V.gross) / 2, y + 37, shek(V.gross), 26, { w: 700, fill: C.n0, o: oi, ltr: true }); }]);
+          row(250, "שכר נטו", 26, [
+            (oi, y) => { bar(R - px(V.net), y, px(V.net), 56, at(t, 34, o), C.mint); txt(R - px(V.net) / 2, y + 37, shek(V.net), 26, { w: 700, o: at(t, 34, o), ltr: true }); },
+            (oi, y) => { bar(R - px(V.net) - px(V.mand), y, px(V.mand), 56, oi, C.n0, { stroke: C.navy, sw: 2.5, dash: "6 4" }); txt(R - px(V.net) - px(V.mand) / 2, y + 37, "−" + num(V.mand), 22, { fill: C.n700, o: oi, ltr: true }); },
+          ]);
+          row(340, "נטו לתשלום", 42, [
+            (oi, y) => { bar(R - px(V.ntp), y, px(V.ntp), 56, at(t, 50, o), C.tq2); txt(R - px(V.ntp) / 2, y + 37, shek(V.ntp), 26, { w: 700, o: at(t, 50, o), ltr: true }); },
+            (oi, y) => { bar(R - px(V.ntp) - px(V.other), y, px(V.other), 56, oi, C.n0, { stroke: C.navy, sw: 2.5, dash: "6 4" }); txt(R - px(V.ntp) - px(V.other) - 12, y + 37, "−" + num(V.other), 22, { anchor: "end", fill: C.n700, o: oi, ltr: true }); },
+          ]);
+          txt(1200, 470, "חובה: מס הכנסה, ביטוח לאומי ומס בריאות, פנסיה", 20, { anchor: "start", fill: C.n600, o: at(t, 26, o) });
+          txt(1200, 500, "אחרות: החזר הלוואה למעסיק, דמי ועד", 20, { anchor: "start", fill: C.n600, o: at(t, 42, o) });
+          if (t >= 57) {
+            const o2 = at(t, 57, o);
+            box(240, 530, 800, 50, o2, { fill: C.navy, stroke: C.navy });
+            txt(640, 563, "שכר נטו או נטו לתשלום? שאלה פתוחה", 24, { w: 700, fill: C.n0, o: o2 });
+          }
+        }
+
+        // Scene 3 — a self-employed borrower
+        if (inScene(t, S.self)) {
+          const o = vis(t, S.self);
+          txt(640, 112, "אבי, עצמאי: מהשומה להכנסה חודשית", 38, { w: 700, o });
+          const R = 1020;
+          const pa = (v) => (Number(v) / Number(V.latest)) * 520;
+          const o1 = at(t, 70, o);
+          txt(1240, 176, "שומה ישנה, לשנה", 22, { anchor: "start", w: 600, o: o1 });
+          bar(R - pa(V.old), 146, pa(V.old), 44, o1, C.n300);
+          txt(R - pa(V.old) / 2, 177, shek(V.old), 22, { w: 700, o: o1, ltr: true });
+          txt(1240, 236, "שומה אחרונה, לשנה", 22, { anchor: "start", w: 600, o: o1 });
+          bar(R - pa(V.latest), 206, pa(V.latest), 44, o1, C.teal);
+          txt(R - pa(V.latest) / 2, 237, shek(V.latest), 22, { w: 700, fill: C.n0, o: o1, ltr: true });
+          const pm = (v) => (Number(v) / Number(V.decl)) * 640;
+          const rows = [
+            ["לפי השומה האחרונה", V.mlatest, 78, C.teal],
+            ["לפי ממוצע שנתיים", V.mavg, 86, C.tq2],
+            ["מה אבי מצהיר", V.decl, 94, C.n0],
+          ];
+          rows.forEach(([label, v, start, fill], i) => {
+            const oi = at(t, start, o);
+            const y = 300 + i * 70;
+            txt(1240, y + 34, label, 22, { anchor: "start", w: 600, o: oi });
+            bar(R - pm(v), y, pm(v), 48, oi, fill, fill === C.n0 ? { stroke: C.navy, sw: 2.5, dash: "8 6" } : {});
+            txt(R - pm(v) / 2, y + 32, shek(v), 24, { w: 700, fill: fill === C.teal ? C.n0 : C.navy, o: oi, ltr: true });
+          });
+          if (t >= 101) {
+            const o2 = at(t, 101, o);
+            txt(640, 548, "שתי שיטות, שני מספרים. אין כלל מוסכם.", 26, { w: 700, o: o2 });
+          }
+        }
+
+        // Scene 4 — the household
+        if (inScene(t, S.house)) {
+          const o = vis(t, S.house);
+          txt(640, 112, "המשפחה: מה הוצהר, ומה הוכר", 38, { w: 700, o });
+          const R = 1000, W = 700, px = (v) => (Number(v) / Number(V.hhDecl)) * W;
+          const o1 = at(t, 109, o);
+          txt(1180, 226, "מוצהר", 26, { anchor: "start", w: 700, o: o1 });
+          bar(R - px(V.hhDecl), 190, px(V.hhDecl), 62, o1, C.n0, { stroke: C.navy, sw: 2.5, dash: "8 6" });
+          txt(R - px(V.hhDecl) / 2, 231, shek(V.hhDecl), 28, { w: 700, o: o1, ltr: true });
+          const o2 = at(t, 116, o);
+          txt(1180, 336, "הכנסה מוכרת", 26, { anchor: "start", w: 700, o: o2 });
+          bar(R - px(V.hhRec), 300, px(V.hhRec), 62, o2, C.mint);
+          txt(R - px(V.hhRec) / 2, 341, shek(V.hhRec), 28, { w: 700, o: o2, ltr: true });
+          const o3 = at(t, 124, o);
+          bar(R - px(V.hhDecl), 300, px(V.hhDecl) - px(V.hhRec), 62, o3, C.n0, { stroke: C.navy, sw: 2.5, dash: "6 4" });
+          txt(R - px(V.hhDecl) + (px(V.hhDecl) - px(V.hhRec)) / 2, 341, num(V.gap), 24, { w: 700, o: o3, ltr: true });
+          txt(640, 440, "הפער הוא כולו של אבי: התלושים של מיכל תואמים להצהרה.", 24, { w: 600, fill: C.n700, o: at(t, 124, o) });
+          txt(640, 490, "ההכנסה המוכרת היא המספר שהחישוב הבא נשען עליו.", 24, { w: 600, o: at(t, 132, o) });
+        }
+
+        // Scene 5 — end
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "מתחילים מהמסמכים,", 56, { w: 700, o });
+          txt(640, 322, "לא מההצהרה", 56, { w: 700, o });
+          txt(640, 400, "נטו, שחוזר כל חודש, ויש לו הוכחה", 28, { fill: C.n700, o: at(t, 143, o) });
+          txt(640, 556, "אבי ומיכל בדויים: דוגמה לימודית, לא נתוני לקוח ולא הצעת בנק.", 18, { fill: C.n600, o });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

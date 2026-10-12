@@ -62,7 +62,7 @@ export default function lesson42(): LessonData {
   const W: { name: string; ob: Obligation }[] = [
     { name: "ליסינג לרכב", ob: { kind: "leasing", monthly: "1900", monthsLeft: 30 } },
     { name: "הלוואה אישית", ob: { kind: "loan", monthly: "700", monthsLeft: 12 } },
-    { name: "מזונות שרוני משלם", ob: { kind: "alimony", monthly: "1800", monthsLeft: 84 } },
+    { name: "מזונות", ob: { kind: "alimony", monthly: "1800", monthsLeft: 84 } },
     { name: "שכר דירה", ob: { kind: "rent", monthly: "4500", monthsLeft: 5, rentContinues: false } },
   ];
   add(given("worked.recognised", "23400"));
@@ -82,11 +82,20 @@ export default function lesson42(): LessonData {
     { name: "הלוואת רכב", ob: { kind: "loan", monthly: "1200", monthsLeft: 40 } },
     { name: "הלוואת לימודים", ob: { kind: "loan", monthly: "300", monthsLeft: 15 } },
     { name: "ליסינג", ob: { kind: "leasing", monthly: "1600", monthsLeft: 19 } },
-    { name: "מזונות (בלי תאריך סיום)", ob: { kind: "alimony", monthly: "1500", monthsLeft: null } },
-    { name: "שכר דירה (עוברים לדירה)", ob: { kind: "rent", monthly: "3800", monthsLeft: 9, rentContinues: false } },
+    { name: "מזונות", ob: { kind: "alimony", monthly: "1500", monthsLeft: null } },
+    { name: "שכר דירה", ob: { kind: "rent", monthly: "3800", monthsLeft: 9, rentContinues: false } },
   ];
   add(obligationTable("half.table", H));
   add(deducted("half.deducted", H.map((x) => x.ob)));
+
+  // ── The illustration's tasks (case A's incomes and car loan, plus one extra obligation each time) ──
+  const totalA = total.value as string;
+  add(disposable("task.leasing19", totalA, [CAR, { kind: "leasing", monthly: "2000", monthsLeft: 19 }]));
+  add(disposable("task.leasing18", totalA, [CAR, { kind: "leasing", monthly: "2000", monthsLeft: 18 }]));
+  add(disposable("task.rent_continues", totalA, [CAR, { kind: "rent", monthly: "4000", monthsLeft: 6, rentContinues: true }]));
+  add(disposable("task.rent_ends", totalA, [CAR, { kind: "rent", monthly: "4000", monthsLeft: 6, rentContinues: false }]));
+  add(disposable("task.alimony_unknown", totalA, [CAR, { kind: "alimony", monthly: "1500", monthsLeft: null }]));
+  add(disposable("task.car_gone", totalA, []));
 
   // ── Exercises ──
   // 2: 16,000 recognised; a loan of 1,100 with 40 left, a loan of 600 with 10 left.
@@ -94,14 +103,23 @@ export default function lesson42(): LessonData {
     { kind: "loan", monthly: "1100", monthsLeft: 40 },
     { kind: "loan", monthly: "600", monthsLeft: 10 },
   ] as Obligation[];
+  add(given("ex2.income", "16000"));
+  add(given("ex2.loan_a", "1100"));
+  add(given("ex2.months_a", 40));
+  add(given("ex2.loan_b", "600"));
+  add(given("ex2.months_b", 10));
   add(disposable("ex2.answer", "16000", ex2));
   add(disposable("ex2.err_both", "16000", ex2.map((o) => ({ ...o, monthsLeft: 40 }))));
   // 3: case A — payments until the car loan stops counting; the "18 or more" mistake.
   add(untilDrop("ex3.answer", 26));
   add({ id: "ex3.err_inclusive", kind: "hh_days_left", inputs: { window_days: 26, used_days: 17 }, value: 9 });
+  // 4: rent that goes on after the purchase.
+  add(given("ex4.rent", "4000"));
+  add(given("ex4.months", 6));
   // 5: net to pay already lower by an employer loan of 500 (30 left).
   add(given("ex5.ntp", "9100"));
   add(given("ex5.loan", "500"));
+  add(disposable("ex5.answer", "9100", []));
   add(disposable("ex5.err_double", "9100", [{ kind: "loan", monthly: "500", monthsLeft: 30 }]));
   // 6: a mixed list.
   const ex6: Obligation[] = [
@@ -110,6 +128,14 @@ export default function lesson42(): LessonData {
     { kind: "alimony", monthly: "1600", monthsLeft: null },
     { kind: "rent", monthly: "5200", monthsLeft: 7, rentContinues: true },
   ];
+  add(given("ex6.income", "25000"));
+  add(given("ex6.loan", "1700"));
+  add(given("ex6.loan_months", 18));
+  add(given("ex6.leasing", "2100"));
+  add(given("ex6.leasing_months", 36));
+  add(given("ex6.alimony", "1600"));
+  add(given("ex6.rent", "5200"));
+  add(given("ex6.rent_months", 7));
   add(deducted("ex6.deducted", ex6));
   add(disposable("ex6.answer", "25000", ex6));
   add(disposable("ex6.err_18", "25000", ex6.map((o) => (o.monthsLeft === 18 ? { ...o, monthsLeft: 19 } : o))));

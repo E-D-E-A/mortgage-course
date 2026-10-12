@@ -26,8 +26,10 @@ const props = withDefaults(
     income?: number;
     variable?: number;
     termYears?: number;
+    /** What the page calls the 40% line. Lesson 4.4 says "קו ההון" (the term "סף הון" comes in 4.5); later lessons pass nothing. */
+    capitalName?: string;
   }>(),
-  { value: 1700000, loan: 1200000, payment: 7000, income: 16000, variable: 840000, termYears: 30 },
+  { value: 1700000, loan: 1200000, payment: 7000, income: 16000, variable: 840000, termYears: 30, capitalName: "סף הון" },
 );
 
 const deal = ref<DealType>(props.deals[0].id);
@@ -67,7 +69,10 @@ const lines = computed<LineResult[]>(() =>
 const ok = computed(() => passesAllLimits(lines.value));
 const crossed = computed(() => lines.value.filter((l) => l.status === "over"));
 const aboveThreshold = computed(() => lines.value.some((l) => l.status === "above"));
-const ruleOf = (l: LineResult) => RULES.find((r) => r.id === l.id)!;
+const ruleOf = (l: LineResult) => {
+  const r = RULES.find((x) => x.id === l.id)!;
+  return l.id === "capital" ? { ...r, label: `יחס החזר — ${props.capitalName}` } : r;
+};
 const dealLabel = computed(() => props.deals.find((d) => d.id === deal.value)?.label ?? "");
 
 const isTerm = (l: LineResult) => l.id === "term";
@@ -82,7 +87,7 @@ function actualText(l: LineResult): string {
 function limitText(l: LineResult): string {
   if (isTerm(l)) return `עד ${fmtYears(l.limit.toNumber())}`;
   if (l.id === "variable") return "עד שני שלישים";
-  if (l.id === "capital") return `סף: ${percentString(l.limit)}%`;
+  if (l.id === "capital") return `קו: ${percentString(l.limit)}%`;
   return `עד ${percentString(l.limit)}%`;
 }
 const roomWhat: Record<string, [string, string]> = {
@@ -107,6 +112,8 @@ function scaleMax(l: LineResult): number {
   return Math.max(l.limit.toNumber() * 1.25, l.actual.toNumber() * 1.05);
 }
 const pos = (l: LineResult, x: number) => `${Math.min(100, (x / scaleMax(l)) * 100)}%`;
+// A label sits beside its line; near the far edge it flips to the other side so it is never cut off.
+const flips = (l: LineResult) => Math.min(100, (l.limit.toNumber() / scaleMax(l)) * 100) > 55;
 </script>
 
 <template>
@@ -175,7 +182,7 @@ const pos = (l: LineResult, x: number) => `${Math.min(100, (x / scaleMax(l)) * 1
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <p class="text-body-m font-semibold text-n900">
             {{ ruleOf(l).label }}
-            <span class="text-caption font-normal text-n600">· {{ l.kind === "capital_threshold" ? "סף הון, לא איסור" : "איסור" }}</span>
+            <span class="text-caption font-normal text-n600">· {{ l.kind === "capital_threshold" ? `${capitalName}, לא איסור` : "איסור" }}</span>
           </p>
           <span class="rounded-pill px-2 py-0.5 text-caption text-n900" :class="statusClass(l)">{{ statusText(l) }}</span>
         </div>
@@ -184,7 +191,7 @@ const pos = (l: LineResult, x: number) => `${Math.min(100, (x / scaleMax(l)) * 1
             <div class="h-full" :style="{ width: pos(l, l.actual.toNumber()), background: 'var(--mogi-teal-deep)' }"></div>
           </div>
           <div class="absolute -top-5 bottom-0 border-s-2 border-dashed border-navy" :style="{ insetInlineStart: pos(l, l.limit.toNumber()) }">
-            <span class="absolute -top-0.5 start-1 whitespace-nowrap text-caption text-n700">{{ limitText(l) }}</span>
+            <span class="absolute -top-0.5 whitespace-nowrap text-caption text-n700" :class="flips(l) ? 'end-1' : 'start-1'">{{ limitText(l) }}</span>
           </div>
         </div>
         <p class="mt-2 text-body-m text-n800">
@@ -196,7 +203,7 @@ const pos = (l: LineResult, x: number) => `${Math.min(100, (x / scaleMax(l)) * 1
 
     <p class="mt-4 rounded-md p-3 text-body-m text-n800" :class="ok ? 'bg-n50' : 'bg-danger-bg'" role="status">
       <template v-if="ok">
-        ההלוואה לא חוצה אף אחד מארבעת האיסורים<template v-if="aboveThreshold">. יחס ההחזר מעל סף ההון: זה מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה</template>.
+        ההלוואה לא חוצה אף אחד מארבעת האיסורים<template v-if="aboveThreshold">. יחס ההחזר מעל {{ capitalName }}: זה מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה</template>.
       </template>
       <template v-else>
         ההלוואה חוצה {{ crossed.length === 1 ? "איסור אחד" : `${crossed.length} איסורים` }}: {{ crossed.map((l) => ruleOf(l).label).join(", ") }}. בנק לא יכול לאשר אותה כך.

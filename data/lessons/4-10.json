@@ -1,0 +1,895 @@
+{
+  "lesson": "4.10",
+  "title": "כרטיסי הגורמים, א׳: הלקוח",
+  "note": "Factor-card examples are facts card.<id>.<name>; households are invented teaching numbers.",
+  "facts": [
+    {
+      "id": "card.pti.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000"
+    },
+    {
+      "id": "card.pti.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "8400"
+    },
+    {
+      "id": "card.pti.ratio",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "8400",
+        "b": "20000",
+        "decimals": 1
+      },
+      "value": "42"
+    },
+    {
+      "id": "card.pti.cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "card.pti.capital",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "card.pti.max_cap",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "20000",
+        "percent": "50"
+      },
+      "value": "10000"
+    },
+    {
+      "id": "card.pti.max_capital",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "20000",
+        "percent": "40"
+      },
+      "value": "8000"
+    },
+    {
+      "id": "card.equity.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000"
+    },
+    {
+      "id": "card.equity.savings",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000"
+    },
+    {
+      "id": "card.equity.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "150000"
+    },
+    {
+      "id": "card.equity.equity",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "300000|150000"
+      },
+      "value": "450000"
+    },
+    {
+      "id": "card.equity.share",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "450000",
+        "b": "1800000"
+      },
+      "value": "25"
+    },
+    {
+      "id": "card.equity.gift_share",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "150000",
+        "b": "450000"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "card.income_source.declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "15000"
+    },
+    {
+      "id": "card.income_source.annual",
+      "kind": "given",
+      "inputs": {},
+      "value": "144000"
+    },
+    {
+      "id": "card.income_source.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "card.income_source.monthly",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "144000",
+        "b": "12"
+      },
+      "value": "12000"
+    },
+    {
+      "id": "card.income_source.gap",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "15000",
+        "b": "12000"
+      },
+      "value": "3000"
+    },
+    {
+      "id": "card.obligations.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000"
+    },
+    {
+      "id": "card.obligations.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200"
+    },
+    {
+      "id": "card.obligations.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "card.obligations.small",
+      "kind": "given",
+      "inputs": {},
+      "value": "600"
+    },
+    {
+      "id": "card.obligations.small_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "card.obligations.disposable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "16000",
+        "b": "1200"
+      },
+      "value": "14800"
+    },
+    {
+      "id": "card.credit_history.pulled",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-11"
+    },
+    {
+      "id": "card.credit_history.days",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "card.credit_history.until",
+      "kind": "fc_addDays",
+      "inputs": {
+        "date": "2026-10-11",
+        "days": "60"
+      },
+      "value": "2026-12-10"
+    },
+    {
+      "id": "card.account_conduct.d1",
+      "kind": "given",
+      "inputs": {},
+      "value": "11800"
+    },
+    {
+      "id": "card.account_conduct.d2",
+      "kind": "given",
+      "inputs": {},
+      "value": "12100"
+    },
+    {
+      "id": "card.account_conduct.d3",
+      "kind": "given",
+      "inputs": {},
+      "value": "11900"
+    },
+    {
+      "id": "card.account_conduct.total",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "11800|12100|11900"
+      },
+      "value": "35800"
+    },
+    {
+      "id": "card.account_conduct.count",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "card.account_conduct.average",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "35800",
+        "b": "3"
+      },
+      "value": "11933.33"
+    },
+    {
+      "id": "card.borrowers.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7000"
+    },
+    {
+      "id": "card.borrowers.min_pct",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "card.borrowers.part",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "7000",
+        "percent": "20"
+      },
+      "value": "1400"
+    },
+    {
+      "id": "card.family.a1",
+      "kind": "given",
+      "inputs": {},
+      "value": "19"
+    },
+    {
+      "id": "card.family.a2",
+      "kind": "given",
+      "inputs": {},
+      "value": "16"
+    },
+    {
+      "id": "card.family.a3",
+      "kind": "given",
+      "inputs": {},
+      "value": "11"
+    },
+    {
+      "id": "card.family.l1",
+      "kind": "given",
+      "inputs": {},
+      "value": "18"
+    },
+    {
+      "id": "card.family.l2",
+      "kind": "given",
+      "inputs": {},
+      "value": "21"
+    },
+    {
+      "id": "card.family.c1",
+      "kind": "fc_countUpTo",
+      "inputs": {
+        "of": "19|16|11",
+        "limit": "18"
+      },
+      "value": "2"
+    },
+    {
+      "id": "card.family.c2",
+      "kind": "fc_countUpTo",
+      "inputs": {
+        "of": "19|16|11",
+        "limit": "21"
+      },
+      "value": "3"
+    },
+    {
+      "id": "card.residency.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "card.residency.foreign",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "card.residency.single",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "card.residency.max_foreign",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "50"
+      },
+      "value": "1000000"
+    },
+    {
+      "id": "card.residency.max_single",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "2000000",
+        "percent": "75"
+      },
+      "value": "1500000"
+    },
+    {
+      "id": "card.residency.gap",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1500000",
+        "b": "1000000"
+      },
+      "value": "500000"
+    },
+    {
+      "id": "w.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "21000"
+    },
+    {
+      "id": "w.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200"
+    },
+    {
+      "id": "w.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "w.small",
+      "kind": "given",
+      "inputs": {},
+      "value": "500"
+    },
+    {
+      "id": "w.small_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "w.disposable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "21000",
+        "b": "1200"
+      },
+      "value": "19800"
+    },
+    {
+      "id": "w.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "8712"
+    },
+    {
+      "id": "w.ratio",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "8712",
+        "b": "19800",
+        "decimals": 2
+      },
+      "value": "44"
+    },
+    {
+      "id": "w.cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "w.at_cap",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "19800",
+        "percent": "40"
+      },
+      "value": "7920"
+    },
+    {
+      "id": "w.gap",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "8712",
+        "b": "7920"
+      },
+      "value": "792"
+    },
+    {
+      "id": "w.ceiling",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "w.at_ceiling",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "19800",
+        "percent": "50"
+      },
+      "value": "9900"
+    },
+    {
+      "id": "half.a.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000"
+    },
+    {
+      "id": "half.a.counted",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000"
+    },
+    {
+      "id": "half.a.disposable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "16000",
+        "b": "1000"
+      },
+      "value": "15000"
+    },
+    {
+      "id": "half.a.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "6000"
+    },
+    {
+      "id": "half.a.ratio",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "6000",
+        "b": "15000",
+        "decimals": 2
+      },
+      "value": "40"
+    },
+    {
+      "id": "half.b.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "18000"
+    },
+    {
+      "id": "half.b.counted",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000"
+    },
+    {
+      "id": "half.b.disposable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "18000",
+        "b": "2000"
+      },
+      "value": "16000"
+    },
+    {
+      "id": "half.b.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7200"
+    },
+    {
+      "id": "half.b.ratio",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "7200",
+        "b": "16000",
+        "decimals": 2
+      },
+      "value": "45"
+    },
+    {
+      "id": "half.c.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "24000"
+    },
+    {
+      "id": "half.c.counted",
+      "kind": "given",
+      "inputs": {},
+      "value": "4000"
+    },
+    {
+      "id": "half.c.disposable",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "24000",
+        "b": "4000"
+      },
+      "value": "20000"
+    },
+    {
+      "id": "half.c.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7000"
+    },
+    {
+      "id": "half.c.ratio",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "7000",
+        "b": "20000",
+        "decimals": 2
+      },
+      "value": "35"
+    },
+    {
+      "id": "ex2.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7200"
+    },
+    {
+      "id": "ex2.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "18000"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "7200",
+        "b": "18000",
+        "decimals": 2
+      },
+      "value": "40"
+    },
+    {
+      "id": "ex2.err_inverse",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "18000",
+        "b": "7200",
+        "decimals": 2
+      },
+      "value": "250"
+    },
+    {
+      "id": "ex3.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "22000"
+    },
+    {
+      "id": "ex3.ceiling",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "ex3.capital",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "22000",
+        "percent": "50"
+      },
+      "value": "11000"
+    },
+    {
+      "id": "ex3.err_capital",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "22000",
+        "percent": "40"
+      },
+      "value": "8800"
+    },
+    {
+      "id": "ex4.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "17500"
+    },
+    {
+      "id": "ex4.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1300"
+    },
+    {
+      "id": "ex4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "700"
+    },
+    {
+      "id": "ex4.leasing",
+      "kind": "given",
+      "inputs": {},
+      "value": "900"
+    },
+    {
+      "id": "ex4.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "28"
+    },
+    {
+      "id": "ex4.loan_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "ex4.leasing_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "ex4.after_car",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "17500",
+        "b": "1300"
+      },
+      "value": "16200"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "16200",
+        "b": "900"
+      },
+      "value": "15300"
+    },
+    {
+      "id": "ex4.err_all",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "15300",
+        "b": "700"
+      },
+      "value": "14600"
+    },
+    {
+      "id": "ex5.age_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "ex5.age_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "17"
+    },
+    {
+      "id": "ex5.age_3",
+      "kind": "given",
+      "inputs": {},
+      "value": "9"
+    },
+    {
+      "id": "ex5.age_4",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "ex5.limit_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "18"
+    },
+    {
+      "id": "ex5.limit_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "21"
+    },
+    {
+      "id": "ex5.count_a",
+      "kind": "fc_countUpTo",
+      "inputs": {
+        "of": "20|17|9|3",
+        "limit": "18"
+      },
+      "value": "3"
+    },
+    {
+      "id": "ex5.count_b",
+      "kind": "fc_countUpTo",
+      "inputs": {
+        "of": "20|17|9|3",
+        "limit": "21"
+      },
+      "value": "4"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "4",
+        "b": "3",
+        "decimals": 0
+      },
+      "value": "1"
+    },
+    {
+      "id": "ex7.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000"
+    },
+    {
+      "id": "ex7.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "450000"
+    },
+    {
+      "id": "ex7.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "150000"
+    },
+    {
+      "id": "ex7.equity_without",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "450000",
+        "b": "150000"
+      },
+      "value": "300000"
+    },
+    {
+      "id": "ex7.loan_with",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1800000",
+        "b": "450000"
+      },
+      "value": "1350000"
+    },
+    {
+      "id": "ex7.loan_without",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "1800000",
+        "b": "300000"
+      },
+      "value": "1500000"
+    },
+    {
+      "id": "ex7.ltv_with",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1350000",
+        "b": "1800000",
+        "decimals": 2
+      },
+      "value": "75"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "1500000",
+        "b": "1800000",
+        "decimals": 2
+      },
+      "value": "83.33"
+    },
+    {
+      "id": "ex7.err_share",
+      "kind": "fc_ratio",
+      "inputs": {
+        "a": "300000",
+        "b": "1800000",
+        "decimals": 2
+      },
+      "value": "16.67"
+    },
+    {
+      "id": "grid.pti.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.equity.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.income_source.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.obligations.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "0"
+    },
+    {
+      "id": "grid.credit_history.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.account_conduct.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.borrowers.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.family.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "grid.residency.open",
+      "kind": "given",
+      "inputs": {},
+      "value": "1"
+    },
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-12"
+    }
+  ]
+}

@@ -52,6 +52,20 @@ export default function lesson43(): LessonData {
   add(ratio("b.ratio_ntp", P, "15250"));
   add({ ...difference("b.ratio_gap", rRec, rDecl) });
 
+  // The checker's tasks, on case B (income lines 7,500 + 8,200; מיכל's loan of 400 with 10 payments left does not count).
+  const BLOAN: Obligation = { kind: "loan", monthly: "400", monthsLeft: 10 };
+  add(given("t.income_avi_latest", "8000"));
+  add(given("t.income_avi_declared", "11000"));
+  add(given("t.income_michal", "8200"));
+  add(ratioFromParts("t.same", "15700", [BLOAN, { kind: "mortgage", monthly: "1000", monthsLeft: 120, mortgage: "same_property" }], P));
+  add(ratioFromParts("t.other", "15700", [BLOAN, { kind: "mortgage", monthly: "1000", monthsLeft: 120, mortgage: "other_property" }], P));
+  add(ratioFromParts("t.short", "15700", [BLOAN, { kind: "mortgage", monthly: "1000", monthsLeft: 15, mortgage: "same_property" }], P));
+  add(given("t.mortgage", "1000"));
+  const tb1 = add(qualifying("t.bullet1", { amount: "565000", ratePercent: "4.6", months: 300, bullet: true }));
+  const tb2 = add(qualifying("t.bullet2", { amount: "565000", ratePercent: "4.1", months: 300, bullet: true }));
+  const tbPay = add(sum("t.bullet_pay", [tb1.value as string, tb2.value as string]));
+  add(ratio("t.bullet_ratio", tbPay.value as string, "15700"));
+
   // ── The same-property rule: גלעד ונוי (invented) ──
   const SAME: Obligation = { kind: "mortgage", monthly: "2100", monthsLeft: 140, mortgage: "same_property" };
   const CAR: Obligation = { kind: "loan", monthly: "1200", monthsLeft: 24 };
@@ -75,7 +89,7 @@ export default function lesson43(): LessonData {
   add(
     ratioTable("half.table", [
       { name: "1", recognised: "20000", obligations: [{ kind: "loan", monthly: "1000", monthsLeft: 30 }], newPayment: "5700" },
-      { name: "2", recognised: "15000", obligations: [{ kind: "loan", monthly: "800", monthsLeft: 12 }], newPayment: "4500" },
+      { name: "2", recognised: "15000", obligations: [{ kind: "loan", monthly: "800", monthsLeft: 12 }], newPayment: "4800" },
       {
         name: "3",
         recognised: "24000",
@@ -85,22 +99,32 @@ export default function lesson43(): LessonData {
         ],
         newPayment: "4000",
       },
-      { name: "4", recognised: "12500", obligations: [{ kind: "rent", monthly: "3000", monthsLeft: 6, rentContinues: true }], newPayment: "4750" },
+      { name: "4", recognised: "12500", obligations: [{ kind: "rent", monthly: "3000", monthsLeft: 6, rentContinues: true }], newPayment: "4000" },
     ]),
   );
 
   // ── Exercises ──
+  add(given("ex1.payment", "4200"));
+  add(given("ex1.disposable", "14000"));
   add(ratio("ex1.answer", "4200", "14000"));
   add(ratio("ex1.err_inverse", "14000", "4200"));
+  add(given("ex3.amount", "400000"));
   add(qualifying("ex3.answer", { amount: "400000", ratePercent: "5", months: 120, bullet: true }));
   add(qualifying("ex3.err_principal", { amount: "400000", ratePercent: "0", months: 120 }));
   add(given("ex3.err_annual", "20000"));
   const ex4: Obligation[] = [{ kind: "loan", monthly: "1500", monthsLeft: 30 }];
+  add(given("ex4.income", "20000"));
+  add(given("ex4.loan", "1500"));
+  add(given("ex4.new", "5000"));
   add(ratioFromParts("ex4.answer", "20000", ex4, "5000"));
   add(ratio("ex4.err_numerator", "6500", "20000"));
   add(ratio("ex4.err_ignored", "5000", "20000"));
   add(disposable("ex4.disposable", "20000", ex4));
   // 6: moving a mortgage (גרירה): 2,400 a month, 200 left, onto the new home; a new payment of 3,000; 18,000 disposable before it.
+  add(given("ex6.new", "3000"));
+  add(given("ex6.existing", "2400"));
+  add(given("ex6.months", 200));
+  add(given("ex6.disposable", "18000"));
   const DRAG: Obligation = { kind: "mortgage", monthly: "2400", monthsLeft: 200, mortgage: "same_property" };
   const dragPay = add(payment("ex6.payment", "3000", [DRAG]));
   add(ratio("ex6.answer", dragPay.value as string, "18000"));

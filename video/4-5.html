@@ -1,0 +1,189 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.5 — "שלוש מדרגות".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/4-5.json. The directive numbers (50 and 40) are the team's Brain transcription, not checked against the directive. Bank A's line is invented for teaching and is marked as such in the scene.
+  The subtitle cues (window.cues) carry the explanatory sentences — the narration script.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.5 · שלושה סוגי מספרים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-5.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf0 = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf0.format(Number(v))} ₪`;
+      const num = (v) => nf0.format(Number(v));
+
+      const V = {
+        income: fact("l.income"), lim: fact("pti.limit"), thr: fact("pti.threshold"), pol: fact("policy.pti"),
+        a: [fact("c.a.payment"), fact("c.a.ratio")], b: [fact("c.b.payment"), fact("c.b.ratio")],
+        c: [fact("c.c.payment"), fact("c.c.ratio")], d: [fact("c.d.payment"), fact("c.d.ratio")],
+      };
+
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+
+      const S = { title: [0, 10], ladder: [10, 100], cards: [100, 140], end: [140, 152] };
+      window.duration = 152;
+      window.cues = [
+        [1, 6, "אותו מספר בשיחה, שלושה דברים שונים."],
+        [6, 9.5, "נעלה משפחה אחת על סולם."],
+        [11, 19, `הכנסה פנויה ${shek(V.income)}. החזר ${shek(V.a[0])}: ${V.a[1]}%.`],
+        [19, 28, "מתחת לכל הקווים. אין בעיה בשום בנק."],
+        [29, 38, `החזר ${shek(V.b[0])}: ${V.b[1]}%. עבר את הקו של בנק א׳.`],
+        [38, 47, "זו מדיניות של בנק א׳ (בדוי). בנק אחר, אולי אחרת."],
+        [48, 57, `החזר ${shek(V.c[0])}: ${V.c[1]}%. עבר ${V.thr}%: סף הון.`],
+        [57, 67, "מותר. הבנק מחזיק יותר הון כנגד ההלוואה."],
+        [68, 77, `החזר ${shek(V.d[0])}: ${V.d[1]}%. עבר ${V.lim}%: מגבלה.`],
+        [77, 88, "אסור בכל בנק. אין טעם לעבור לבנק אחר."],
+        [88, 99, "הקו של בנק א׳ בדוי; קו אמיתי של בנק לא ידוע לנו."],
+        [101, 110, "מגבלה רגולטורית: בנק ישראל. אסור. זהה בכל הבנקים."],
+        [110, 119, "סף הון: בנק ישראל. מותר, והבנק מחזיק יותר הון."],
+        [119, 128, "מדיניות בנק: הבנק קובע. בנק אחר אולי אחרת."],
+        [129, 139, "שלוש שאלות: מי קבע? מה קורה כשחוצים? זהה בכל הבנקים?"],
+        [141, 149, "לפני שמאמינים ל״אי אפשר״ — שואלים: לפי מי?"],
+        [149, 151.5, "הקווים לפי תעתיק של הצוות; לא אומת."],
+      ];
+
+      // The ladder: ratio 0..60% across x 170..1110.
+      const X0 = 170, X1 = 1110, MAX = 60, Y = 360;
+      const xr = (p) => X0 + (Number(p) / MAX) * (X1 - X0);
+      const MARKS = [
+        { p: V.pol, name: "מדיניות בנק", sub: "בנק א׳ (בדוי)", color: C.teal, bg: C.n0 },
+        { p: V.thr, name: "סף הון", sub: "מותר · יותר הון", color: C.warning, bg: C.warningBg },
+        { p: V.lim, name: "מגבלה רגולטורית", sub: "אסור · בכל בנק", color: C.danger, bg: C.dangerBg },
+      ];
+      const BOXX = [300, 640, 980];
+      // Stops of the dot: [start second inside the ladder scene, case, verdict lines].
+      const STOPS = [
+        { at: 1, c: V.a, lines: ["מתחת לכל הקווים"] },
+        { at: 19, c: V.b, lines: ["מעל הקו של בנק א׳ בלבד"] },
+        { at: 38, c: V.c, lines: ["מעל בנק א׳ ומעל סף ההון", "מותר לפי בנק ישראל"] },
+        { at: 58, c: V.d, lines: ["מעל הכול, כולל המגבלה", "אסור בכל בנק"] },
+      ];
+      const stopIndex = (t) => { let k = -1; STOPS.forEach((s, i) => { if (t >= S.ladder[0] + s.at) k = i; }); return k; };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שלוש מדרגות", 84, { w: 700, o });
+          txt(640, 365, "מי קבע את המספר?", 38, { fill: C.n600, o });
+          txt(640, 440, "יחס ההחזר, ושלושה קווים שנשמעים אותו דבר", 26, { fill: C.n500, o: after(t, S.title, 5, o, 0.8) });
+        }
+        if (inScene(t, S.ladder)) {
+          const o = vis(t, S.ladder);
+          txt(640, 96, `הכנסה פנויה ${shek(V.income)}`, 38, { w: 700, o });
+          el("rect", { x: X0, y: Y - 14, width: X1 - X0, height: 28, rx: 8, fill: C.n300, opacity: o * 0.45 });
+          const k = stopIndex(t);
+          const cur = Math.max(0, k);
+          const prev = Math.max(0, k - 1);
+          // the dot glides from the previous stop's ratio to the current one over 3 seconds
+          const startT = S.ladder[0] + STOPS[cur].at;
+          const g = ease((t - startT) / 3);
+          const from = k <= 0 ? Number(STOPS[0].c[1]) : Number(STOPS[prev].c[1]);
+          const to = Number(STOPS[cur].c[1]);
+          const p = from + (to - from) * g;
+          el("rect", { x: X0, y: Y - 14, width: xr(p) - X0, height: 28, rx: 8, fill: C.navy, opacity: o });
+          MARKS.forEach((m, i) => {
+            const x = xr(m.p);
+            const reveal = after(t, S.ladder, [0.5, 3, 5.5][i], o);
+            el("line", { x1: x, x2: x, y1: Y - 70, y2: Y + 40, stroke: m.color, "stroke-width": 5, "stroke-dasharray": "9 6", opacity: reveal });
+            el("line", { x1: BOXX[i], x2: x, y1: 232, y2: Y - 70, stroke: m.color, "stroke-width": 3, opacity: reveal });
+            el("rect", { x: BOXX[i] - 150, y: 140, width: 300, height: 92, rx: 12, fill: m.bg, stroke: m.color, "stroke-width": 2, opacity: reveal });
+            txt(BOXX[i], 180, m.name, 26, { w: 700, o: reveal });
+            txt(BOXX[i], 212, m.sub, 20, { fill: C.n700, o: reveal });
+            txt(x, Y + 74, `${m.p}%`, 26, { w: 700, o: reveal, ltr: true });
+          });
+          el("circle", { cx: xr(p), cy: Y, r: 20, fill: C.tq2, stroke: C.navy, "stroke-width": 4, opacity: o });
+          if (k >= 0) {
+            const s = STOPS[k];
+            const oi = Math.min(o, clamp((t - startT - 1.5) / 0.8));
+            el("rect", { x: 330, y: 460, width: 620, height: 100, rx: 14, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(640, 500, `החזר ${shek(s.c[0])} · יחס ${s.c[1]}%`, 30, { w: 700, o: oi });
+            txt(640, 540, s.lines.join(" · "), 24, { fill: C.n700, o: oi });
+          }
+        }
+        if (inScene(t, S.cards)) {
+          const o = vis(t, S.cards);
+          txt(640, 96, "שלושה סוגי מספרים", 40, { w: 700, o });
+          const cards = [
+            { x: 1000, name: "מגבלה רגולטורית", who: "בנק ישראל", what: "אסור לאשר", same: "זהה בכל הבנקים", col: C.dangerBg },
+            { x: 640, name: "סף הון", who: "בנק ישראל", what: "מותר; הבנק מחזיק יותר הון", same: "הסף זהה", col: C.warningBg },
+            { x: 280, name: "מדיניות בנק", who: "הבנק עצמו", what: "הבנק הזה לא יאשר", same: "משתנה בין בנקים", col: C.n0 },
+          ];
+          cards.forEach((c, i) => {
+            const oi = after(t, S.cards, 1 + i * 9, o);
+            el("rect", { x: c.x - 160, y: 160, width: 320, height: 330, rx: 16, fill: c.col, stroke: C.n200, opacity: oi });
+            txt(c.x, 215, c.name, 30, { w: 700, o: oi });
+            txt(c.x, 275, "מי קבע?", 20, { fill: C.n600, o: oi });
+            txt(c.x, 308, c.who, 26, { w: 600, o: oi });
+            txt(c.x, 366, "מה קורה כשחוצים?", 20, { fill: C.n600, o: oi });
+            txt(c.x, 399, c.what, 22, { w: 600, o: oi });
+            txt(c.x, 445, c.same, 22, { fill: C.n700, o: oi });
+          });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 260, "לפי מי?", 96, { w: 700, o });
+          txt(640, 350, "השאלה לפני כל ״אי אפשר״", 36, { fill: C.n700, o: after(t, S.end, 1, o) });
+          txt(640, 470, "הקווים של בנק ישראל לפי תעתיק של הצוות להוראה 329, 2026-10-09 · לא אומת", 22, { fill: C.n500, o: after(t, S.end, 5, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

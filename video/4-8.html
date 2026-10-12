@@ -1,0 +1,244 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.8 — "מה רשום עליכם".
+  Rendered frame by frame by scripts/render-video.mjs: window.render(t) is a pure
+  function of t. Every number comes from data/lessons/4-8.json (the 60-day rule as the
+  team summarised it, the invented dates of case B, the invented three-month account of
+  אבי and מיכל, the averages of different windows). The scene does no arithmetic. The
+  subtitle cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: what the bank can see about you outside your documents, and what we
+  do not know about how it reads it):
+  1. Title.
+  2. The chain: reporters -> the Bank of Israel register -> a credit bureau -> the bank
+     (an indication) and the customer (a report); consent at every handover.
+  3. A report goes stale after 60 days (invented dates).
+  4. An account read for one, two or three months tells a different story.
+  5. What nobody can tell yet: what disqualifies, how many months are read, differences
+     between banks. Questions for Eylon.
+  Claim labels: everything about the register is a summary of official sources and the
+  team's research, "לא אומת"; the account and the dates are invented.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.8 · נתוני אשראי והתנהלות החשבון</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-8.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const at12 = (iso) => new Date(`${iso}T12:00:00Z`);
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(at12(iso));
+      const V = {
+        stale: fact("rule.stale_days"), pulled: fact("clock.pulled"), staleDate: fact("clock.stale"), signing: fact("clock.signing"), signingDay: fact("clock.signing_day"),
+        a1: fact("stmt.avi_1"), a2: fact("stmt.avi_2"), a3: fact("stmt.avi_3"),
+        avg3: fact("window.avg_3"), avg2: fact("window.avg_2"), declared: fact("case.avi_declared"), recognised: fact("case.avi_recognised"),
+      };
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+      const num = (v) => new Intl.NumberFormat("he-IL").format(Number(v));
+      const shekel = (v) => `${num(v)} ₪`;
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", warn: "var(--mogi-warning)", warnBg: "var(--mogi-warning-bg)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      
+      const arrow = (x1, y1, x2, y2, o, colour = C.n600) => {
+        el("line", { x1, y1, x2, y2, stroke: colour, "stroke-width": 3, opacity: o });
+        const a = Math.atan2(y2 - y1, x2 - x1), s = 11;
+        const p = (da) => `${x2 - s * Math.cos(a + da)},${y2 - s * Math.sin(a + da)}`;
+        el("polygon", { points: `${x2},${y2} ${p(0.45)} ${p(-0.45)}`, fill: colour, opacity: o });
+      };
+      const S = { title: [0, 10], chain: [10, 60], stale: [60, 85], months: [85, 126], unknown: [126, 155] };
+      window.duration = 155;
+      window.cues = [
+        [1, 5, "בבקשה לאישור עקרוני הבנק מסתכל גם על האשראי."],
+        [5, 9.5, "ועל החשבון בחודשים שלפני הבקשה."],
+        [11, 19, "בנק ישראל מנהל מאגר של נתוני אשראי."],
+        [19, 28, "בנקים, חברות אשראי ורשויות מדווחים אליו."],
+        [28, 37, "לשכת אשראי מעבירה נתונים, בהסכמת הלקוח."],
+        [37, 46, "הבנק מקבל חיווי: תמצית קצרה."],
+        [46, 55, "הלקוח מקבל דוח ריכוז נתונים, חינם פעם בשנה."],
+        [55, 59.5, "הכול לפי תקצירים של מקורות רשמיים; לא אומת."],
+        [61, 69, `חיווי או דוח אינם עדכניים אחרי ${V.stale} יום.`],
+        [69, 77, `נמשך ב־${dm(V.pulled)}: עדכני עד ${dm(V.staleDate)}.`],
+        [77, 84.5, `חתימה ביום ${V.signingDay}? כבר לא עדכני.`],
+        [86, 94, "התנהלות חשבון: מה נכנס, מה יוצא, ומה היתרה."],
+        [94, 103, `ההפקדות של אבי: ${num(V.a1)}, ${num(V.a2)}, ${num(V.a3)} ₪.`],
+        [103, 112, `חודש אחד: ${num(V.a3)} ₪. חודשיים: ${num(V.avg2)} ₪.`],
+        [112, 125, `שלושה חודשים: ${num(V.avg3)} ₪, כמו ההכנסה המוכרת.`],
+        [127, 135, "כמה חודשים בנק קורא באמת? אין לנו מקור."],
+        [135, 143, "מה בדוח פוסל או מייקר? אין לנו מקור."],
+        [143, 150, "יש הבדלים בין בנקים? שאלות לאילון."],
+        [150, 154.5, "לא מבטיחים שהתנהלות טובה תשפר הצעה."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "מה רשום עליכם", 68, { w: 700, o });
+          txt(640, 360, "נתוני אשראי והתנהלות החשבון", 36, { fill: C.n600, o });
+        }
+
+        // Scene 2 — the chain
+        if (inScene(t, S.chain)) {
+          const o = vis(t, S.chain);
+          txt(640, 112, "מהמאגר אל הבנק", 40, { w: 700, o });
+          const node = (x, y, w, h, title, sub, start, stroke = C.teal) => {
+            const oi = at(t, start, o);
+            box(x, y, w, h, oi, { stroke, sw: 2.5 });
+            txt(x + w / 2, y + 44, title, 25, { w: 700, o: oi });
+            if (sub) txt(x + w / 2, y + 78, sub, 19, { fill: C.n700, o: oi });
+            return oi;
+          };
+          node(900, 170, 300, 120, "מדווחים", "בנקים, חברות אשראי, מלווים, רשויות", 19);
+          node(520, 170, 300, 120, "מאגר נתוני אשראי", "בנק ישראל", 11);
+          node(140, 170, 300, 120, "לשכת אשראי", "חברה פרטית ברישיון", 28);
+          arrow(900, 230, 826, 230, at(t, 19, o));
+          arrow(520, 230, 446, 230, at(t, 28, o));
+          txt(483, 205, "בהסכמה", 18, { fill: C.n600, o: at(t, 28, o) });
+          node(140, 380, 300, 110, "הבנק", "נותן אשראי", 37, C.navy);
+          arrow(290, 292, 290, 376, at(t, 37, o));
+          txt(305, 340, "חיווי", 20, { w: 700, anchor: "end", o: at(t, 37, o) });
+          node(520, 380, 300, 110, "הלקוח", "בלי תשלום פעם בשנה", 46, C.navy);
+          arrow(440, 262, 524, 376, at(t, 46, o));
+          txt(545, 345, "דוח ריכוז נתונים", 20, { w: 700, anchor: "end", o: at(t, 46, o) });
+          txt(640, 560, "לפי תקצירי החוק ומחקר הצוות; לא אומת. הבנק פונה ללשכה בבקשה לאישור עקרוני.", 18, { fill: C.n600, o: at(t, 55, o) });
+        }
+
+        // Scene 3 — a report goes stale
+        if (inScene(t, S.stale)) {
+          const o = vis(t, S.stale);
+          txt(640, 112, `${V.stale} יום`, 52, { w: 700, o });
+          txt(640, 158, "חיווי או דוח נחשבים לא עדכניים (לפי תקציר החוק; לא אומת)", 22, { fill: C.n600, o });
+          const right = 1100, unit = 12, y = 330;
+          const X = (d) => right - d * unit;
+          el("line", { x1: X(66), x2: right + 20, y1: y, y2: y, stroke: C.n300, "stroke-width": 3, opacity: o });
+          const oW = at(t, 62, o);
+          box(X(V.stale), y - 24, X(0) - X(V.stale), 48, oW * 0.45, { rx: 8, fill: C.tq2, stroke: C.tq2 });
+          txt((X(0) + X(V.stale)) / 2, y + 8, "עדכני", 24, { w: 700, o: oW });
+          const mark = (d, top, label, sub, start, colour = C.navy) => {
+            const om = at(t, start, o);
+            el("line", { x1: X(d), x2: X(d), y1: y - 40, y2: y + 40, stroke: colour, "stroke-width": 3, opacity: om });
+            const ty = top ? y - 100 : y + 76;
+            txt(X(d), ty, `יום ${d}`, 22, { w: 700, fill: colour, o: om });
+            txt(X(d), ty + 28, label, 20, { w: 600, o: om });
+            if (sub) txt(X(d), ty + 54, sub, 18, { fill: C.n700, o: om });
+          };
+          mark(0, false, "הבנק מושך", dm(V.pulled), 69);
+          mark(V.stale, true, "כבר לא עדכני", dm(V.staleDate), 70, C.teal);
+          mark(V.signingDay, false, "החתימה", dm(V.signing), 77, C.warn);
+          txt(640, 540, "התאריכים בדויים: דוגמה לימודית. מה הבנק עושה כשהחיווי ישן — לא ידוע.", 19, { fill: C.n600, o: at(t, 77, o) });
+        }
+
+        // Scene 4 — one, two or three months
+        if (inScene(t, S.months)) {
+          const o = vis(t, S.months);
+          txt(640, 112, "כמה חודשים קוראים?", 40, { w: 700, o });
+          const base = 470, scale = 0.026; // px per shekel
+          const bars = [
+            ["יולי", V.a1, 94, 1060],
+            ["אוגוסט", V.a2, 97, 900],
+            ["ספטמבר", V.a3, 100, 740],
+          ];
+          el("line", { x1: 640, x2: 1180, y1: base, y2: base, stroke: C.n300, "stroke-width": 3, opacity: o });
+          bars.forEach(([m, v, start, x]) => {
+            const oi = at(t, start, o);
+            const h = Number(v) * scale;
+            el("rect", { x: x - 55, y: base - h, width: 110, height: h, rx: 8, fill: C.teal, opacity: oi });
+            txt(x, base - h + 36, num(v), 24, { w: 700, ltr: true, fill: C.n0, o: oi });
+            txt(x, base + 30, m, 22, { fill: C.n700, o: oi });
+          });
+          const line = (v, label, colour, start) => {
+            const oi = at(t, start, o);
+            const yy = base - Number(v) * scale;
+            el("line", { x1: 640, x2: 1180, y1: yy, y2: yy, stroke: colour, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: oi });
+            txt(630, yy + 7, `${label}: ${num(v)}`, 20, { w: 600, anchor: "start", fill: colour, o: oi });
+          };
+          line(V.declared, "הצהרה", C.navy, 103);
+          line(V.recognised, "הכנסה מוכרת", C.teal, 103);
+          const rows = [["חודש אחד, האחרון", V.a3, 105], ["חודשיים אחרונים", V.avg2, 108], ["שלושה חודשים", V.avg3, 112]];
+          rows.forEach(([label, v, start], i) => {
+            const oi = at(t, start, o);
+            box(40, 200 + i * 90, 370, 70, oi, { rx: 12, stroke: C.teal, sw: 2 });
+            txt(395, 243 + i * 90, label, 22, { w: 600, anchor: "start", o: oi });
+            txt(70, 243 + i * 90, num(v), 28, { w: 700, anchor: "start", ltr: true, o: oi });
+          });
+          txt(640, 560, "ממוצע ההפקדות של אבי. חשבון בדוי. כמה חודשים בנק קורא — לא ידוע.", 19, { fill: C.n600, o: at(t, 112, o) });
+        }
+
+        // Scene 5 — what nobody can tell yet
+        if (inScene(t, S.unknown)) {
+          const o = vis(t, S.unknown);
+          txt(640, 112, "מה אין לנו", 40, { w: 700, o });
+          const qs = [
+            ["כמה חודשים נקראים?", 127],
+            ["מה בדוח פוסל, ומה מייקר?", 135],
+            ["יש הבדלים בין בנקים?", 143],
+          ];
+          qs.forEach(([q, start], i) => {
+            const oi = at(t, start, o);
+            const x = 1000 - i * 360;
+            box(x - 165, 190, 330, 190, oi, { fill: C.n100, stroke: C.n300, sw: 2, dash: "8 6" });
+            txt(x, 270, "?", 72, { w: 700, fill: C.n600, o: oi });
+            txt(x, 330, q, 22, { w: 700, o: oi });
+            txt(x, 362, "שאלה פתוחה לאילון", 18, { fill: C.n600, o: oi });
+          });
+          const oN = at(t, 150, o);
+          box(190, 430, 900, 70, oN, { fill: C.mint, stroke: C.mint });
+          txt(640, 475, "לא מבטיחים ללקוח שהתנהלות טובה תשפר את ההצעה", 26, { w: 700, o: oN });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

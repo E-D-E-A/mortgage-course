@@ -1,0 +1,575 @@
+{
+  "lesson": "4.7",
+  "title": "חיתום: איך הבנק בודק",
+  "note": "Case B (אבי ומיכל): incomes from lesson 4.1, mix from the case sketch; caps of 40% and 35% are demonstration numbers, not rules or policy. Dates invented. The 50% limit and the 24 days are the team's Brain transcription, not verified.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-12"
+    },
+    {
+      "id": "rule.window",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "rule.regulatory_cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "demo.cap_high",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "demo.cap_low",
+      "kind": "given",
+      "inputs": {},
+      "value": "35"
+    },
+    {
+      "id": "case.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1650000"
+    },
+    {
+      "id": "case.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "520000"
+    },
+    {
+      "id": "case.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1130000"
+    },
+    {
+      "id": "case.avi_declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "11000"
+    },
+    {
+      "id": "case.avi_recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "7500"
+    },
+    {
+      "id": "case.michal",
+      "kind": "given",
+      "inputs": {},
+      "value": "8200"
+    },
+    {
+      "id": "case.hh_declared",
+      "kind": "uw_total",
+      "inputs": {
+        "amount_1": "11000",
+        "amount_2": "8200"
+      },
+      "value": "19200.00"
+    },
+    {
+      "id": "case.hh_recognised",
+      "kind": "uw_total",
+      "inputs": {
+        "amount_1": "7500",
+        "amount_2": "8200"
+      },
+      "value": "15700.00"
+    },
+    {
+      "id": "case.pay_1",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "565000",
+        "rate_percent": "4.60",
+        "months": 300
+      },
+      "value": "3172.61"
+    },
+    {
+      "id": "case.pay_2",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "565000",
+        "rate_percent": "4.10",
+        "months": 300
+      },
+      "value": "3013.56"
+    },
+    {
+      "id": "case.payment",
+      "kind": "uw_mix_payment",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300
+      },
+      "value": "6186.17"
+    },
+    {
+      "id": "case.hh_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.hh_declared",
+        "subtrahend": "case.hh_recognised"
+      },
+      "value": "3500.00"
+    },
+    {
+      "id": "case.avi_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.avi_declared",
+        "subtrahend": "case.avi_recognised"
+      },
+      "value": "3500.00"
+    },
+    {
+      "id": "case.avi_shortfall",
+      "kind": "uw_shortfall",
+      "inputs": {
+        "declared": "11000",
+        "verified": "7500",
+        "decimals": 2
+      },
+      "value": "31.82"
+    },
+    {
+      "id": "case.hh_shortfall",
+      "kind": "uw_shortfall",
+      "inputs": {
+        "declared": "19200.00",
+        "verified": "15700.00",
+        "decimals": 2
+      },
+      "value": "18.23"
+    },
+    {
+      "id": "case.ratio_declared",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "6186.17",
+        "whole": "19200.00",
+        "decimals": 2
+      },
+      "value": "32.22"
+    },
+    {
+      "id": "case.ratio_recognised",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "6186.17",
+        "whole": "15700.00",
+        "decimals": 1
+      },
+      "value": "39.4"
+    },
+    {
+      "id": "case.ltv",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1650000",
+        "decimals": 1
+      },
+      "value": "68.5"
+    },
+    {
+      "id": "demo.max_loan_regulatory",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "15700.00",
+        "cap": "50",
+        "step": 1000
+      },
+      "value": "1433000.00"
+    },
+    {
+      "id": "demo.max_loan_regulatory_declared",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "19200.00",
+        "cap": "50",
+        "step": 1000
+      },
+      "value": "1753000.00"
+    },
+    {
+      "id": "demo.max_loan_high",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "15700.00",
+        "cap": "40",
+        "step": 1000
+      },
+      "value": "1147000.00"
+    },
+    {
+      "id": "demo.max_loan_high_declared",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "19200.00",
+        "cap": "40",
+        "step": 1000
+      },
+      "value": "1402000.00"
+    },
+    {
+      "id": "demo.max_loan_low",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "15700.00",
+        "cap": "35",
+        "step": 1000
+      },
+      "value": "1003000.00"
+    },
+    {
+      "id": "demo.max_loan_low_declared",
+      "kind": "uw_max_loan_at_ratio",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "income": "19200.00",
+        "cap": "35",
+        "step": 1000
+      },
+      "value": "1227000.00"
+    },
+    {
+      "id": "demo.loan_shortfall",
+      "kind": "uw_shortfall",
+      "inputs": {
+        "declared": "1402000.00",
+        "verified": "1147000.00",
+        "decimals": 2
+      },
+      "value": "18.19"
+    },
+    {
+      "id": "demo.equity_needed_low",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "demo.max_loan_low"
+      },
+      "value": "647000.00"
+    },
+    {
+      "id": "demo.equity_short_low",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "demo.equity_needed_low",
+        "subtrahend": "case.equity"
+      },
+      "value": "127000.00"
+    },
+    {
+      "id": "demo.loan_drop_low",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.loan",
+        "subtrahend": "demo.max_loan_low"
+      },
+      "value": "127000.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "uw_verify_table",
+      "inputs": {
+        "line_1": "הכנסת אבי (חודשית)",
+        "declared_1": "11000",
+        "verified_1": "7500",
+        "line_2": "הכנסת מיכל (חודשית)",
+        "declared_2": "8200",
+        "verified_2": "8200",
+        "line_3": "ההכנסה של שניהם",
+        "declared_3": "19200.00",
+        "verified_3": "15700.00"
+      },
+      "value": [
+        {
+          "period": 1,
+          "line": "הכנסת אבי (חודשית)",
+          "declared": "11000.00",
+          "verified": "7500.00",
+          "gap": "3500.00"
+        },
+        {
+          "period": 2,
+          "line": "הכנסת מיכל (חודשית)",
+          "declared": "8200.00",
+          "verified": "8200.00",
+          "gap": "0.00"
+        },
+        {
+          "period": 3,
+          "line": "ההכנסה של שניהם",
+          "declared": "19200.00",
+          "verified": "15700.00",
+          "gap": "3500.00"
+        }
+      ]
+    },
+    {
+      "id": "ex3.err_over_verified",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "3500.00",
+        "whole": "7500",
+        "decimals": 2
+      },
+      "value": "46.67"
+    },
+    {
+      "id": "ex3.err_share",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "7500",
+        "whole": "11000",
+        "decimals": 2
+      },
+      "value": "68.18"
+    },
+    {
+      "id": "ex5.equity_verified",
+      "kind": "given",
+      "inputs": {},
+      "value": "480000"
+    },
+    {
+      "id": "ex5.equity_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.equity",
+        "subtrahend": "ex5.equity_verified"
+      },
+      "value": "40000.00"
+    },
+    {
+      "id": "ex5.new_loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "ex5.equity_verified"
+      },
+      "value": "1170000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "uw_scaled_mix_payment",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "new_loan": "1170000.00"
+      },
+      "value": "6405.15"
+    },
+    {
+      "id": "ex5.ratio",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "6405.15",
+        "whole": "15700.00",
+        "decimals": 1
+      },
+      "value": "40.8"
+    },
+    {
+      "id": "ex5.pay_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.answer",
+        "subtrahend": "case.payment"
+      },
+      "value": "218.98"
+    },
+    {
+      "id": "ex7.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-02"
+    },
+    {
+      "id": "ex7.window_end",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 24
+      },
+      "value": "2026-11-26"
+    },
+    {
+      "id": "ex7.asked",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 18
+      },
+      "value": "2026-11-20"
+    },
+    {
+      "id": "ex7.reply_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "ex7.review_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 4
+    },
+    {
+      "id": "ex7.replied",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-11-20",
+        "days": 5
+      },
+      "value": "2026-11-25"
+    },
+    {
+      "id": "ex7.finished",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-11-25",
+        "days": 4
+      },
+      "value": "2026-11-29"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "uw_days_between",
+      "inputs": {
+        "from": "2026-11-26",
+        "to": "2026-11-29"
+      },
+      "value": 3
+    },
+    {
+      "id": "ex7.err_from_ask",
+      "kind": "uw_days_between",
+      "inputs": {
+        "from": "2026-11-20",
+        "to": "2026-11-29"
+      },
+      "value": 9
+    },
+    {
+      "id": "ex7.err_from_approval",
+      "kind": "uw_days_between",
+      "inputs": {
+        "from": "2026-11-02",
+        "to": "2026-11-29"
+      },
+      "value": 27
+    },
+    {
+      "id": "worked.approved",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-26"
+    },
+    {
+      "id": "worked.window_end",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-10-26",
+        "days": 24
+      },
+      "value": "2026-11-19"
+    },
+    {
+      "id": "worked.docs_sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-04"
+    },
+    {
+      "id": "worked.docs_day",
+      "kind": "uw_days_between",
+      "inputs": {
+        "from": "2026-10-26",
+        "to": "2026-11-04"
+      },
+      "value": 9
+    },
+    {
+      "id": "worked.finished",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-17"
+    },
+    {
+      "id": "worked.finished_day",
+      "kind": "uw_days_between",
+      "inputs": {
+        "from": "2026-10-26",
+        "to": "2026-11-17"
+      },
+      "value": 22
+    },
+    {
+      "id": "worked.left",
+      "kind": "uw_count_difference",
+      "inputs": {
+        "minuend": "rule.window",
+        "subtrahend": "worked.finished_day"
+      },
+      "value": 2
+    }
+  ]
+}

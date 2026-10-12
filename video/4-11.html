@@ -1,0 +1,215 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.11 — "שלושה עשר כרטיסים: העסקה, הנכס והבנק".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/4-11.json (the term card's two payments,
+  the appraisal card's two measures, and the number of cards per group). The 75%
+  ceiling is the team's transcription of Directive 329, not read in the source,
+  and the "lower of price and appraisal" rule is a search summary of 2026-10-10,
+  so the scene marks both "לא אומת". The cue lines (window.cues) are the
+  narration script, one line each.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.11 · כרטיסי הגורמים, ב׳: העסקה, הנכס והבנק</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-11.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shekels = (id) => `${nf.format(Number(fact(id)))} ₪`;
+      const V = {
+        loan: shekels("card.term_age.loan"), rate: fact("card.term_age.rate"),
+        pay20: Number(fact("card.term_age.pay20")), pay30: Number(fact("card.term_age.pay30")), scaled: Number(fact("pred.scaled")),
+        drop: shekels("pred.drop"), dropPct: fact("pred.drop_percent"), factor: fact("pred.factor"),
+        price: Number(fact("card.value_appraisal.price")), appraisal: Number(fact("card.value_appraisal.appraisal")), vloan: Number(fact("card.value_appraisal.loan")),
+        onPrice: Number(fact("card.value_appraisal.on_price")), onValue: Number(fact("card.value_appraisal.on_value")),
+        deal: fact("grid.deal"), mix: fact("grid.mix"), bank: fact("grid.bank"),
+      };
+      const pay = (x) => `${nf.format(x)} ₪`;
+      const money = (x) => `${nf.format(x)} ₪`;
+
+      const S = { title: [0, 10], groups: [10, 40], term: [40, 92], ltv: [92, 138], open: [138, 168], end: [168, 180] };
+      window.duration = 180;
+      window.cues = [
+        [1, 5, "עוד שלושה עשר כרטיסים: העסקה, הנכס והבנק."],
+        [5, 9.5, "ובכולם: מה ידוע, ומה לא."],
+        [11, 19, `${V.deal} כרטיסים על העסקה והנכס. שם יש הרבה גבולות.`],
+        [19, 27, `כרטיס אחד על התמהיל: עד שני שלישים משתנה.`],
+        [27, 40, `${V.bank} על הבנק והתהליך. רובם מבנקאי אחד.`],
+        [41, 49, `${V.loan} ב־${V.rate}% לשנה, בשפיצר.`],
+        [49, 59, `ל־20 שנה: ${pay(V.pay20)} בחודש.`],
+        [59, 69, `ל־30 שנה: ${pay(V.pay30)} בחודש.`],
+        [69, 79, `30 שנה הן פי ${V.factor} מ־20. התשלום לא קטן פי ${V.factor}.`],
+        [79, 91, `הוא קטן ב־${V.dropPct}%. רוב התשלום הראשון הוא ריבית.`],
+        [93, 102, `קניתם ב־${money(V.price)}. השמאי העריך ${money(V.appraisal)}.`],
+        [102, 111, `ההלוואה ${money(V.vloan)}. מול המחיר: ${V.onPrice}%.`],
+        [111, 122, `מול השמאות: ${V.onValue}%, מעל התקרה של 75%.`],
+        [122, 137, "הכלל ״הנמוך מבין השניים״: לפי תקציר, לא אומת."],
+        [139, 147, "בכל כרטיס יש שורות שאנחנו לא יודעים."],
+        [147, 155, "כמה שווה מדרגה של שיעור מימון?"],
+        [155, 162, "כמה מקום יש לפקיד, ואם לקוח קיים מקבל הנחה?"],
+        [162, 167, "אלה שאלות פתוחות, ולא ממציאים להן מספר."],
+        [169, 174, "גבול, מחיר או תהליך: שלושה צבעים לכל מספר."],
+        [174, 179, "תקרה היא גבול. מדרגה היא אולי מחיר."],
+      ];
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", warn: "var(--mogi-warning-bg)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+
+      const GROUPS = [
+        { name: "העסקה והנכס", n: V.deal, items: ["שיעור מימון", "גובה ההלוואה", "תקופה וגיל", "סוג הנכס ומטרה", "שווי ושמאות", "רישום הזכויות"] },
+        { name: "התמהיל", n: V.mix, items: ["הרכב התמהיל"] },
+        { name: "הבנק והתהליך", n: V.bank, items: ["הקשר לבנק", "עיתוי", "הצעות מבנקים אחרים", "עמלות", "ביטוחים", "ערוץ ההגשה"] },
+      ];
+      const OPEN = ["כמה שווה מדרגה של שיעור מימון?", "כמה מקום יש לפקיד?", "האם לקוח קיים מקבל הנחה?", "מה בדיוק בודקים ברישום?", "מקור לגבולות גיל?"];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שלושה עשר כרטיסים", 76, { w: 700, o });
+          txt(640, 360, "העסקה, הנכס והבנק", 36, { fill: C.n600, o });
+          const o2 = after(t, S.title, 4, o, 0.8);
+          [C.teal, C.tq2, C.n300].forEach((c, i) => el("rect", { x: 580, y: 440 - i * 34, width: 120, height: 28, rx: 6, fill: c, opacity: o2 }));
+        }
+        // 2 — the three groups
+        if (inScene(t, S.groups)) {
+          const o = vis(t, S.groups);
+          txt(640, 100, "שלוש קבוצות", 40, { w: 700, o });
+          GROUPS.forEach((g, i) => {
+            const oi = after(t, S.groups, 1 + i * 8, o);
+            const x = 930 - i * 340, w = 320;
+            el("rect", { x, y: 140, width: w, height: 400, rx: 16, fill: C.n0, stroke: C.n200, opacity: oi });
+            txt(x + w / 2, 190, g.name, 30, { w: 700, o: oi });
+            el("circle", { cx: x + w / 2, cy: 240, r: 26, fill: i === 1 ? C.tq2 : C.teal, opacity: oi });
+            txt(x + w / 2, 250, g.n, 30, { w: 700, o: oi, fill: i === 1 ? C.navy : C.n0, ltr: true });
+            g.items.forEach((it, k) => txt(x + w - 28, 310 + k * 34, it, 22, { anchor: "start", o: after(t, S.groups, 2 + i * 8 + k * 0.5, oi), fill: C.n700 }));
+          });
+        }
+        // 3 — term: two payments and the proportional guess
+        if (inScene(t, S.term)) {
+          const o = vis(t, S.term);
+          txt(640, 100, "כרטיס התקופה: 20 שנה או 30", 40, { w: 700, o });
+          const BASE = 520, UNIT = 0.052;
+          const bar = (x, v, fill, o2, label, sub, dashed = false) => {
+            const h = v * UNIT * ease((t - S.term[0] - 8) / 3);
+            if (dashed) el("rect", { x, y: BASE - v * UNIT, width: 140, height: v * UNIT, rx: 8, fill: "none", stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: o2 });
+            else el("rect", { x, y: BASE - h, width: 140, height: h, rx: 8, fill, opacity: o2 });
+            txt(x + 70, BASE - Math.max(h, dashed ? v * UNIT : 0) - 14, pay(v), 26, { w: 700, o: o2, ltr: true });
+            txt(x + 70, BASE + 34, label, 24, { o: o2 });
+            if (sub) txt(x + 70, BASE + 62, sub, 20, { o: o2, fill: C.n600 });
+          };
+          const o1 = after(t, S.term, 8, o);
+          bar(900, V.pay20, C.teal, o1, "20 שנה", "");
+          const o2 = after(t, S.term, 18, o);
+          bar(660, V.pay30, C.tq2, o2, "30 שנה", "");
+          const o3 = after(t, S.term, 28, o);
+          bar(420, V.scaled, C.n300, o3, `אילו קטן פי ${V.factor}`, "ניחוש, לא נכון", true);
+          const o4 = after(t, S.term, 36, o);
+          el("rect", { x: 130, y: 190, width: 250, height: 110, rx: 14, fill: C.mint, opacity: o4 * 0.7 });
+          txt(255, 235, "ההפרש", 24, { o: o4, fill: C.n700 });
+          txt(255, 280, `${V.dropPct}%`, 40, { w: 700, o: o4, ltr: true });
+        }
+        // 4 — the loan-to-value ratio against price and against appraisal
+        if (inScene(t, S.ltv)) {
+          const o = vis(t, S.ltv);
+          txt(640, 100, "שיעור מימון: מול מה מודדים?", 40, { w: 700, o });
+          const X = (p) => 1100 - p * 9;
+          const rows = [
+            { y: 200, name: "מול המחיר", sub: `${money(V.vloan)} ÷ ${money(V.price)}`, v: V.onPrice, from: 8 },
+            { y: 330, name: "מול השמאות", sub: `${money(V.vloan)} ÷ ${money(V.appraisal)}`, v: V.onValue, from: 18 },
+          ];
+          // ceiling line
+          const oc = after(t, S.ltv, 3, o);
+          el("line", { x1: X(75), x2: X(75), y1: 160, y2: 430, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: oc });
+          txt(X(75), 148, "תקרה 75% (לא אומת)", 24, { w: 700, o: oc });
+          rows.forEach((r) => {
+            const or = after(t, S.ltv, r.from, o);
+            const w = (X(0) - X(r.v)) * ease((t - S.ltv[0] - r.from) / 3);
+            el("rect", { x: X(0) - w, y: r.y, width: w, height: 60, rx: 8, fill: r.v > 75 ? C.tq2 : C.teal, opacity: or });
+            txt(1180, r.y + 25, r.name, 26, { anchor: "start", w: 700, o: or });
+            txt(1180, r.y + 54, r.sub, 18, { anchor: "start", o: or, fill: C.n600, ltr: true });
+            txt(X(r.v) - 12, r.y + 42, `${r.v}%`, 30, { anchor: "end", w: 700, o: or, ltr: true });
+          });
+          const o3 = after(t, S.ltv, 30, o);
+          el("rect", { x: 260, y: 460, width: 760, height: 64, rx: 14, fill: C.warn, opacity: o3 });
+          txt(640, 503, "״הנמוך מבין המחיר לשמאות״: לפי תקציר, לא אומת", 28, { w: 700, o: o3 });
+        }
+        // 5 — what we do not know
+        if (inScene(t, S.open)) {
+          const o = vis(t, S.open);
+          txt(640, 100, "שאלות פתוחות בכרטיסים", 40, { w: 700, o });
+          OPEN.forEach((q, i) => {
+            const oi = after(t, S.open, 1 + i * 5, o);
+            const y = 165 + i * 72;
+            el("rect", { x: 280, y, width: 720, height: 56, rx: 14, fill: C.warn, opacity: oi });
+            el("circle", { cx: 960, cy: y + 28, r: 18, fill: C.n0, opacity: oi });
+            txt(960, y + 37, "?", 26, { w: 700, o: oi });
+            txt(925, y + 38, q, 28, { anchor: "start", o: oi });
+          });
+        }
+        // 6 — closing
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 150, "שלושה צבעים לכל מספר", 52, { w: 700, o });
+          [["גבול", C.teal, "מישהו אסר לעבור אותו"], ["מחיר", C.tq2, "משפיע על הריבית, אם בכלל"], ["תהליך", C.n300, "משפיע על הזמן או על העלות"]].forEach(([name, c, d], i) => {
+            const oi = after(t, S.end, 1 + i * 2, o);
+            const y = 230 + i * 90;
+            el("rect", { x: 930, y, width: 120, height: 56, rx: 12, fill: c, opacity: oi });
+            txt(990, y + 39, name, 30, { w: 700, o: oi, fill: i === 0 ? C.n0 : C.navy });
+            txt(900, y + 39, d, 30, { anchor: "start", o: oi, fill: C.n700 });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

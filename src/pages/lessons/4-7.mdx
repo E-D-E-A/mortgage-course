@@ -1,0 +1,502 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "4.7"
+minutes: 35
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import VerifiedGap from "../../components/VerifiedGap.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("4.7");
+export const p = (id) => f.plain(id);
+export const at = (id) => new Date(`${f.raw(id)}T12:00:00Z`);
+export const d = (id) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(at(id));
+export const dw = (id) => new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" }).format(at(id));
+export const dm = (id) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(at(id));
+export const half = f.rows("half.table");
+export const W = f.plain("rule.window");
+export const CAP = f.plain("rule.regulatory_cap");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const predictionOptions = [
+  "האישור נשאר כמו שהוא: אישור עקרוני מחייב את הבנק, ופער קטן לא משנה",
+  "האישור מתבטל מעצמו, כי יש פער בין ההצהרה למסמכים",
+  "הבנק יכול להמשיך, לבקש עוד מסמכים, לשנות את התנאים או לבטל. מה מהם — זו החלטה שלו, ואין לנו מקור שאומר מה מכריע",
+  `הבנק חייב להלוות את אותו סכום, כי לא עברו ${W} יום מהאישור`,
+];
+
+בשיעור 1.8 ראינו ש<Term t="אישור עקרוני" lesson="4.7">אישור עקרוני</Term> הוא מחיר שניתן על נתונים שעוד לא נבדקו, ושהבדיקה באה אחר כך, ב<Term t="חיתום" lesson="4.7">חיתום</Term>. בשיעור 4.1 ראינו ש<Term t="הכנסה מוכרת" lesson="4.1">הכנסה מוכרת</Term> יכולה להיות נמוכה ממה שהלקוח מצהיר עליו.
+בשיעור הזה נחבר ביניהם: מה הבנק בודק בחיתום, מה קורה כשהוא מוצא פער, ואילו תשובות יש לו.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="4.7"
+  question={`אבי ומיכל קיבלו אישור עקרוני על הכנסה מוצהרת של ${f.shekels("case.hh_declared")} בחודש לשניהם. בחיתום הבנק מוצא שההכנסה שאפשר להכיר בה היא ${f.shekels("case.hh_recognised")}. מה אפשר לומר על מה שיקרה לאישור?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## הבנק פותח את התיק
+
+</Section>
+
+<LessonVideo lesson="4-7" />
+
+<Section kind="ההסבר">
+
+## מה הבנק בודק, ולמה
+
+</Section>
+
+חיתום הוא הרגע שבו הבנק קורא, לראשונה, את מה שנמסר לו. עד אז הוא ענה על מה שהלווים סיפרו. עכשיו הוא רוצה לדעת אם זה נכון, כי הוא עומד להלוות סכום גדול לשנים רבות, והוא צריך להיות בטוח שיש מי שיחזיר אותו.
+
+מה הוא בודק? כמעט כל דבר שנמסר בבקשה, מול מסמך או מרשם שמישהו אחר כתב:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">מה נמסר בבקשה</th>
+        <th class="py-2 text-start font-semibold">מול מה אפשר לבדוק</th>
+        <th class="py-2 text-start font-semibold">איפה הקורס מלמד</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההכנסה</td><td class="py-2">תלושי שכר (שכיר); שומות מס ותזרים החשבון (עצמאי)</td><td class="py-2">שיעור 4.1</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההון העצמי</td><td class="py-2">היתרות בדפי החשבון</td><td class="py-2">שיעור 4.7 (כאן)</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההתחייבויות וההיסטוריה</td><td class="py-2">נתוני אשראי, שהבנק מושך בעצמו</td><td class="py-2">שיעור 4.8</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900"><Later lesson="4.8" quiet>התנהלות החשבון</Later></td><td class="py-2">דפי חשבון של כמה חודשים</td><td class="py-2">שיעור 4.8</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">הנכס</td><td class="py-2">החוזה, נסח הרישום, ודוח השמאי</td><td class="py-2">שיעור 4.9</td></tr>
+      <tr><td class="py-2 font-semibold text-n900">הזהות</td><td class="py-2">תעודת זהות עם ספח</td><td class="py-2">שיעור 1.10</td></tr>
+    </tbody>
+  </table>
+</div>
+
+**מה זה, ומה זה לא.** הטבלה היא התיאור של הצוות לבדיקה שהוא עושה בעצמו לפני שהבנק בודק (Brain, דפים 5832771 ו־9863169, J-040 ו־J-150, אוגוסט–ספטמבר 2026), וליועץ שהוא מתכוון להיות לפחות מחמיר כמו הבנק. זו לא רשימה שבנק מפרסם: מה כל בנק בודק באמת, ובאיזה אופן, אין לנו (מחקר הצוות; לא אומת). בנק אחד מפרסם רשימת מסמכים לפתיחת תיק: חוזה הרכישה, הוכחת בעלות, תעודת זהות וספח, ודוח מס על העסקה, וכאן אין בה מסמכי הכנסה (לא אומת; לפי תעתיק של הצוות מאוגוסט 2026). מה שהצוות אוסף מראש הוא שלושה תלושים ושלושה חודשי תנועות בחשבון (עדן, 2026-08-04; ידע מהשטח). אילון אמר שאין צורך בדפי החשבון אם החשבון באותו בנק (2026-07-27, ממתין לאישור אילון).
+
+<Section kind="ההסבר">
+
+## מוצהר ומאומת
+
+</Section>
+
+ההבדל שכל החיתום בנוי עליו:
+
+- <Term t="מוצהר" lesson="4.7">**מוצהר**</Term> הוא מה שהלקוח אמר, בבקשה או ליועץ, בלי שמישהו בדק אותו מול מסמך.
+- <Term t="מאומת" lesson="4.7">**מאומת**</Term> הוא מה שנבדק מול מסמך או מרשם ונמצא נכון. הכנסה מאומתת היא, בדרך כלל, הכנסה שאפשר להכיר בה (שיעור 4.1).
+
+אישור עקרוני ניתן על מוצהר. כך אמר אילון: ״עד השלב שקיבלתי את האישור העקרוני, אף אחד לא מאמת אותך. בגלל זה הוא עקרוני״ (ידע מהשטח, 2026-08-26, ממתין לאישור אילון). זה מתאים לתעתיק של הצוות להוראה של בנק ישראל, שלפיו היא לא דורשת מסמכים בבקשה הראשונה (לא אומת). אבל זה לא נכון בכל ערוץ: אילון סיפר שפורטל היועצים של בנק אחד מבקש כבר בבקשה ת״ז, תלושים ודפי חשבון (ידע מהשטח, 2026-08-26, ממתין לאישור אילון). לכן הקורס אומר: זה תלוי בערוץ ובבנק.
+
+ב־Mogi הוחלט להפריד בין השניים גם בנתונים: לכל הכנסה נשמרים הסכום שהוצהר, הסכום שהוכר ומצב, והמערכת מבחינה בין הערכה מוצהרת לסכום מאומת (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש עוד לא הושלם).
+
+<Section kind="ההסבר">
+
+## מי בודק
+
+</Section>
+
+בחלק מהמקרים בדיקות אוטומטיות עונות מיד. באחרים התיק עובר ל<Term t="רפרנט" lesson="4.7">רפרנט</Term>: עובד של הבנק שקורא את התיק בעצמו. כך תיאר הצוות (Brain, J-060, אוגוסט 2026; בלי מקור, לא אומת). מה בדיוק מעביר תיק לרפרנט, וכמה זמן לוקחת הבדיקה שלו — אין לנו. שום הוראה לא קובעת כמה זמן מותר לבנק לעשות חיתום (לפי מחקר הצוות, 2026-08-04; לא אומת). טובי זמיר, בנקאי מחוץ לצוות, אמר שהעיתוי של החיתום שונה בין הבנקים: חלקם שולחים מסמכים לחיתום מוקדם, ואחד, לדבריו, רק בסוף (ידע מהשטח, 2026-08-05, מקור יחיד, ממתין לאישור אילון).
+
+<Section kind="ההסבר">
+
+## כשיש פער: אבי ומיכל
+
+</Section>
+
+אבי הוא עצמאי, ומיכל, אשתו, שכירה (התיק המשלים של הקורס). אבי הצהיר על {f.shekels("case.avi_declared")} בחודש. מהשומות שלו, כפי שראינו בשיעור 4.1, אפשר להכיר ב־{f.shekels("case.avi_recognised")}. הכנסתה של מיכל, {f.shekels("case.michal")}, נמצאת בתלושים כמו שהוצהרה.
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+**ההכנסה של שניהם.** מוצהר: <M>{f.shekels("case.avi_declared")} + {f.shekels("case.michal")} = {f.shekels("case.hh_declared")}</M>. מאומת: <M>{f.shekels("case.avi_recognised")} + {f.shekels("case.michal")} = {f.shekels("case.hh_recognised")}</M>. ההכנסה המאומתת נמוכה ב־{f.shekels("case.hh_gap")}: {p("case.hh_shortfall")}% מההכנסה המוצהרת של שניהם, ו־{p("case.avi_shortfall")}% מההכנסה המוצהרת של אבי לבדו.
+
+**ההחזר.** בתיק של אבי ההלוואה {f.shekels("case.loan")}, בשני מסלולים (הנחת חישוב של התיק, לא הצעה): ההחזר החודשי הוא <M>{f.shekels("case.pay_1")} + {f.shekels("case.pay_2")} = {f.shekels("case.payment")}</M>. <Term t="יחס החזר" lesson="4.7">יחס ההחזר</Term> (שיעור 4.3) הוא ההחזר חלקי ההכנסה, כפול 100:
+- על ההכנסה המוצהרת: <M>{f.shekels("case.payment")} ÷ {f.shekels("case.hh_declared")} × 100 = {p("case.ratio_declared")}%</M>.
+- על ההכנסה המאומתת: <M>{f.shekels("case.payment")} ÷ {f.shekels("case.hh_recognised")} × 100 = {p("case.ratio_recognised")}%</M>.
+
+אותה הלוואה, אותו החזר, ויחס ההחזר עלה בכמה נקודות אחוז, רק בגלל הכנסה אחרת.
+
+**כמה זה משנה את ההלוואה?** נניח תקרה ליחס ההחזר, ונבדוק מה ההלוואה הגדולה ביותר שנכנסת בה, באותה חלוקה למסלולים ובאותן תקופות (מעוגל כלפי מטה לאלף שקל). ההחזר גדל ביחס ישר להלוואה, ולכן ההלוואה המרבית היא ההחזר המותר חלקי ההחזר לכל שקל הלוואה. שלוש תקרות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">התקרה ליחס ההחזר</th>
+        <th class="py-2 text-start font-semibold">על ההכנסה המוצהרת</th>
+        <th class="py-2 text-start font-semibold">על ההכנסה המאומתת</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{CAP}%</span> — המגבלה של בנק ישראל (כפי שהצוות העתיק; שיעור 4.4)</td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_regulatory_declared"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_regulatory"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_high")}%</span> — לדוגמה בלבד</td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_high_declared"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_high"))}</span></td></tr>
+      <tr><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_low")}%</span> — לדוגמה בלבד</td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_low_declared"))}</span></td><td class="py-2"><span class="ltr">{formatShekels(f.raw("demo.max_loan_low"))}</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<Callout title="שלושה סוגי מספרים, לא לערבב" tone="warning">
+<p><strong>{CAP}%</strong> הוא מגבלה רגולטורית: בנק ישראל קבע אותה, בנק לא רשאי לעבור אותה (לפי תעתיק של הצוות; לא אומת; שיעורים 4.4 ו־4.5).</p>
+<p><strong>{p("demo.cap_high")}% ו־{p("demo.cap_low")}%</strong> הם מספרים להמחשה. הם לא מגבלה, לא סף הון ולא מדיניות של בנק כלשהו. אילון אמר ש״הבנקים מחמירים בפועל ל־40%״ (ידע מהשטח, 2026-07-27), אבל באותו משפט הוא אמר גם ״50%״, וההסבר ב־Brain הוא ש־40% הוא ״גבול מחיר, לא גבול סירוב״ (מחקר הצוות). מה בנק מסוים עושה בפועל — שאלה פתוחה לאילון.</p>
+</Callout>
+
+מה רואים בטבלה? מול ההכנסה המאומתת ההלוואה המרבית נמוכה בכל אחת מהתקרות, כי ההכנסה נמוכה. בתקרה של {p("demo.cap_low")}% (להמחשה) היא {f.shekels("demo.max_loan_low")}, כלומר {f.shekels("demo.loan_drop_low")} פחות ממה שאבי ביקש. את ההפרש צריך להביא מהכסף שלו: ההון העצמי הנדרש הוא <M>{f.shekels("case.price")} − {f.shekels("demo.max_loan_low")} = {f.shekels("demo.equity_needed_low")}</M>, ויש לו {f.shekels("case.equity")}. חסרים {f.shekels("demo.equity_short_low")}.
+
+זה מה שהצוות כתב ב־Brain על בדיקה שנכשלת: ״בדיקה שנכשלה לא מסיימת בדרך כלל את המסע; היא משנה את הצורה של ההצעה. הכנסה מאומתת נמוכה יותר פירושה הלוואה קטנה יותר, לא שלום״ (מחקר הצוות; לא אומת).
+
+<Section kind="ההסבר">
+
+## ארבע התשובות של הבנק
+
+</Section>
+
+לפי מחקר הצוות (Brain, J-150, 2026-08-04; לא אומת), בסוף הבדיקה הבנק נותן אחת מארבע תשובות. בשיעור 1.8 ראינו אותן בקצרה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 text-start font-semibold">התשובה</th>
+        <th class="py-2 text-start font-semibold">מה זה אומר</th>
+        <th class="py-2 text-start font-semibold">איך זה נראה אצל אבי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ממשיך</td><td class="py-2">מה שנמסר נמצא נכון, והבנק ממשיך לפי תנאי האישור.</td><td class="py-2">ההכנסה המאומתת הייתה שווה למוצהרת.</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">מבקש עוד מסמכים</td><td class="py-2">חסר לו משהו כדי להחליט. זה לא סירוב: הבנק קובע מה הרשימה (J-070).</td><td class="py-2">למשל מסמך שמסביר מאיפה הגיעה הפקדה, או שומה נוספת.</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">משנה את התנאים</td><td class="py-2">הוא מוכן להלוות, אבל לא באותם תנאים.</td><td class="py-2">למשל הלוואה קטנה יותר, כמו בטבלה למעלה. מה עוד יכול להשתנות — אין לנו פירוט.</td></tr>
+      <tr><td class="py-2 font-semibold text-n900">מבטל את האישור</td><td class="py-2">האישור העקרוני כבר לא מחייב אותו.</td><td class="py-2">פער שהבנק לא מוכן לבנות עליו.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+**מה מכריע בין התשובות? לא ידוע.** ההוראה, כפי שהצוות העתיק אותה, לא אומרת. הצוות כתב ב־J-150 שהשאלה כמה בנקים נשארים בתמונה בשלב הזה, וכמה פערים בנקים באמת מוצאים וכמה פעמים, לא נמדדו. לכן הקורס לא מלמד כלל מהסוג ״פער של X% גורם לביטול״. הוא מלמד איך לראות את ההשלכות במספרים (כמו בטבלה), ולא איך הבנק יחליט. השאלה מה גורם לכל תשובה ברשימה לאילון.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מוצהר מול מאומת
+
+</Section>
+
+הזיזו את ההכנסה של אבי כפי שאומתה, ואת ההון העצמי כפי שהתברר מדפי החשבון. כל שינוי מוצג מול מה שהוצהר.
+
+<VerifiedGap
+  client:visible
+  tracks={[
+    { principal: "565000", ratePercent: "4.60", months: 300 },
+    { principal: "565000", ratePercent: "4.10", months: 300 },
+  ]}
+  price={Number(f.raw("case.price"))}
+  equity={Number(f.raw("case.equity"))}
+  aviDeclared={Number(f.raw("case.avi_declared"))}
+  aviVerified={Number(f.raw("case.avi_recognised"))}
+  michal={Number(f.raw("case.michal"))}
+  caps={[
+    { value: CAP, label: "המגבלה של בנק ישראל (לא אומת)" },
+    { value: p("demo.cap_high"), label: "לדוגמה בלבד" },
+    { value: p("demo.cap_low"), label: "לדוגמה בלבד" },
+  ]}
+  source={`המסלולים (4.60% ו־4.10%, 25 שנה) הם הנחת חישוב של התיק. התקרות ${p("demo.cap_high")}% ו־${p("demo.cap_low")}% אינן מדיניות של בנק. נכון ל־${d("data_date")}.`}
+/>
+
+נסו את שלושת אלה:
+1. השאירו את הנתונים כמו שהם, ובחרו תקרה של {p("demo.cap_high")}%. באיזו מסגרת יחס ההחזר גבוה יותר, ובכמה?
+2. החזירו את ההכנסה ל־{f.shekels("case.avi_declared")} והורידו את ההון העצמי ל־{f.shekels("ex5.equity_verified")}. מה קרה להלוואה ולהחזר?
+3. שלבו את שניהם, ובחרו תקרה של {p("demo.cap_low")}%. כמה הון עצמי חסר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>במסגרת של המאומת: {p("case.ratio_recognised")}%, מול {p("case.ratio_declared")}% במוצהר. שניהם מתחת ל־{p("demo.cap_high")}%, אבל המרווח קטן.</li>
+    <li>ההלוואה גדלה ל־{f.shekels("ex5.new_loan")}, כי המחיר למוכר לא השתנה והון עצמי נמוך יותר פירושו הלוואה גדולה יותר. ההחזר עולה ל־{f.shekels("ex5.answer")}, ויחס ההחזר על ההכנסה המאומתת ל־{p("ex5.ratio")}%, כבר מעל {p("demo.cap_high")}%.</li>
+    <li>בשתי המסגרות ההלוואה המרבית קטנה, והמסגרת של המאומת מראה את החסר בהון: בהכנסה המאומתת לבדה, {f.shekels("demo.equity_short_low")}.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="4.7"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "אישור עקרוני מחייב את הבנק רק בתנאי: שמה שנמסר נמצא נכון (שיעור 1.8). פער בחיתום הוא בדיוק המקרה שבו הבנק רשאי לשנות או לבטל.",
+    "אין לנו מקור שאומר שפער מבטל מעצמו. לבנק יש ארבע תשובות, והוא בוחר בין ארבעתן.",
+    "",
+    `החלון של ${W} יום הוא לפחות, והוא מחייב רק בתנאי שמה שנמסר נכון. פער בחיתום מאפשר לבנק לשנות או לבטל גם בתוכו.`,
+  ]}
+>
+  ארבע התשובות האפשריות הן: להמשיך, לבקש עוד מסמכים, לשנות את התנאים או לבטל (מחקר הצוות; לא אומת). מה מכריע ביניהן — לא ידוע.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## פער בהכנסה הוא פער בהלוואה
+
+</Section>
+
+כשהתקרה ליחס ההחזר, הריבית והתקופות לא משתנות, ההחזר גדל ביחס ישר להלוואה. לכן ההלוואה המרבית גדלה ביחס ישר להכנסה: הכנסה נמוכה ב־{p("case.hh_shortfall")}% פירושה, בערך, הלוואה מרבית נמוכה באותו אחוז. בתקרה של {p("demo.cap_high")}%: מ־{f.shekels("demo.max_loan_high_declared")} ל־{f.shekels("demo.max_loan_high")}, ירידה של {p("demo.loan_shortfall")}% (ההפרש הקטן נובע מהעיגול כלפי מטה לאלף).
+
+זה קירוב, ונכון רק כשהחלוקה למסלולים, הריביות והתקופות נשארות. הוא טוב לבדיקת היגיון מהירה: אם ההכנסה יורדת בחמישית, ההלוואה המרבית יורדת בערך בחמישית.
+
+<Section kind="דוגמה פתורה">
+
+## אבי מול השעון של החיתום
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK} התאריכים בדויים.</p>
+</Callout>
+
+האישור העקרוני של אבי ומיכל מבנק א׳ ניתן ב{dw("worked.approved")}. זה יום 0 (כמו בשיעור 1.7).
+
+**צעד 1 — החלון.** לפחות {W} יום, ימים רגילים. הוא נגמר ב{dw("worked.window_end")}.
+
+**צעד 2 — המסמכים.** אבי ומיכל שולחים את המסמכים ב{dw("worked.docs_sent")}: יום {p("worked.docs_day")}.
+
+**צעד 3 — החיתום.** הבנק מסיים לקרוא ב{dw("worked.finished")}: יום {p("worked.finished_day")}. נשארו <M>{W} − {p("worked.finished_day")} = {p("worked.left")}</M> ימים.
+
+**צעד 4 — מה הבנק מצא.** ההכנסה המאומתת של אבי היא {f.shekels("case.avi_recognised")}, לא {f.shekels("case.avi_declared")}. ההכנסה של שניהם: {f.shekels("case.hh_recognised")}, במקום {f.shekels("case.hh_declared")}.
+
+**צעד 5 — המספרים.** יחס ההחזר על ההכנסה המאומתת הוא {p("case.ratio_recognised")}%, ולא {p("case.ratio_declared")}%. הוא מתחת למגבלה של {CAP}% (כפי שהצוות העתיק אותה). בתקרה של {p("demo.cap_low")}% להמחשה, ההלוואה המרבית היא {f.shekels("demo.max_loan_low")}.
+
+**צעד 6 — מה אפשר לדעת על התשובה?** כלום, לפי המקורות שלנו. הבנק יכול להמשיך, לבקש עוד מסמכים, לשנות את התנאים או לבטל. מה שאפשר לעשות הוא להגיע מוכנים: בשיעור 4.1 ראינו שהפער הזה נראה כבר בשומות, לפני שהבנק פתח תיק.
+
+<Callout title="בלי להסתיר, בלי לנפח" tone="warning">
+<p>הדרך להתמודד עם פער כזה היא לגלות אותו מוקדם ולהציג בבקשה את הנתונים האמיתיים, במלואם ובצורה הברורה ביותר. לא להסתיר התחייבות, לא לנפח הכנסה ולא להגיש מסמך לא נכון. זו מרמה, והבנק מגלה אותה בדיוק בחיתום, שבו נמצאים שני הצדדים של ההשוואה.</p>
+<p>לפי מחקר הצוות (J-030, J-040), זו הסיבה שהצוות אוסף מסמכים מראש ובודק בעצמו לפני הבנק: כדי לתת הצעה על נתונים נכונים. אישור עקרוני שנקבע על שכר לא נכון, כתב הצוות, ״יתאדה אחר כך״. הבדיקה המוקדמת נועדה לגלות את הפער לפני הבנק, כדי שהבקשה תציג את המספרים האמיתיים.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+הכנסה מוצהרת מול מאומתת, שורה אחר שורה, בחודש. השורה הראשונה מלאה. בכל שורה: ההפרש הוא המוצהר פחות המאומת.
+
+<FillTable
+  client:visible
+  id="4.7-half"
+  rowKey="line"
+  periodLabel="השורה"
+  columns={[
+    { key: "declared", label: "מוצהר" },
+    { key: "verified", label: "מאומת" },
+    { key: "gap", label: "ההפרש" },
+  ]}
+  rows={half}
+  blanks={[`${half[1].line}.gap`, `${half[2].line}.declared`, `${half[2].line}.verified`, `${half[2].line}.gap`]}
+  success="ההפרש של שני האנשים הוא ההפרש של אבי, כי הכנסתה של מיכל נמצאה כמו שהוצהרה."
+  hint="הסכום של שני האנשים הוא הסכום של השורות שמעליו, בכל עמודה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים והתאריכים בתרגילים בדויים. התקרות {p("demo.cap_high")}% ו־{p("demo.cap_low")}% הן מספרים להמחשה, לא מדיניות של בנק. בתרגילים 4 עד 7 תצטרכו מחשבון או גיליון, וחלק מהמספרים אפשר לקחת מהדוגמה.
+
+<ChoiceExercise
+  client:visible
+  id="4.7-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ההכנסה שאבי אמר ליועץ בשיחה הראשונה", feedback: "זה מוצהר: הוא אמר, ועוד אף אחד לא בדק." },
+    { text: "ההכנסה שאבי רשם בבקשה לאישור עקרוני", feedback: "גם זה מוצהר. אישור עקרוני ניתן עליו, בלי שמישהו בדק." },
+    { text: "ההכנסה שמופיעה בשומות המס של אבי", correct: true, feedback: "נכון. השומה נכתבה על ידי מי שאינו אבי, והבנק יכול לבדוק אותה מול מסמך. זה מה שהופך את הנתון למאומת." },
+    { text: "ההכנסה שהיועץ מעריך שהבנק יכיר בה", feedback: "זו הערכה של היועץ, לא בדיקה מול מסמך." },
+  ]}
+>
+  איזו מההכנסות האלה היא <Term t="מאומת" lesson="4.7">מאומתת</Term>?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="4.7-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "הבנק משנה את התנאים", feedback: "זו אחת מארבע התשובות (לפי מחקר הצוות)." },
+    { text: "הבנק מבקש עוד מסמכים", feedback: "זו אחת מארבע התשובות. היא אינה סירוב." },
+    { text: "הבנק מעביר את הכסף למוכר מיד, בלי לחכות לחתימה", correct: true, feedback: "נכון. זו לא תשובה של החיתום. הכסף עובר רק אחרי החתימה, אחרי שנרשמה הערת אזהרה ואחרי שהביטוחים אושרו (שיעור 1.8)." },
+    { text: "הבנק מבטל את האישור", feedback: "זו אחת מארבע התשובות." },
+  ]}
+>
+  מה מהבאים <strong>אינו</strong> אחת מארבע התשובות האפשריות של הבנק בסוף החיתום?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.7-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("case.avi_shortfall")}
+  errors={[
+    { value: f.raw("ex3.err_over_verified"), tolerance: 0.05, message: "חילקתם את ההפרש בהכנסה המאומתת. כשמודדים כמה פחות המאומת מהמוצהר, מחלקים בהכנסה המוצהרת: זה הבסיס להשוואה." },
+    { value: f.raw("ex3.err_share"), tolerance: 0.05, message: "זה חלק ההכנסה המאומתת מתוך המוצהרת. השאלה היא כמה היא נמוכה: מה שחסר להשלמה ל־100%." },
+    { value: f.raw("case.avi_gap"), message: "זה ההפרש בשקלים. השאלה מבקשת אחוזים." },
+  ]}
+>
+  אבי הצהיר על {f.shekels("case.avi_declared")} בחודש, והכנסתו המאומתת היא {f.shekels("case.avi_recognised")}. בכמה אחוזים ההכנסה המאומתת נמוכה מהמוצהרת? (שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="4.7-3">
+<M>({f.shekels("case.avi_declared")} − {f.shekels("case.avi_recognised")}) ÷ {f.shekels("case.avi_declared")} × 100 = {p("case.avi_shortfall")}%</M>. הבסיס להשוואה הוא ההכנסה שהוצהרה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.7-4"
+  n={4}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("case.ratio_recognised")}
+  errors={[
+    { value: f.raw("case.ratio_declared"), tolerance: 0.05, message: `זה יחס ההחזר על ההכנסה המוצהרת, ${f.shekels("case.hh_declared")}. השאלה על ההכנסה שהבנק מכיר בה.` },
+    { value: f.raw("case.hh_recognised"), message: "זו ההכנסה של שניהם. מחלקים בה את ההחזר, ומכפילים ב־100." },
+  ]}
+>
+  ההחזר החודשי של אבי ומיכל הוא {f.shekels("case.payment")}, והכנסתם המאומתת יחד {f.shekels("case.hh_recognised")}. מה יחס ההחזר? (ספרה אחת אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="4.7-4">
+<M>{f.shekels("case.payment")} ÷ {f.shekels("case.hh_recognised")} × 100 = {p("case.ratio_recognised")}%</M>. על המוצהר הוא היה {p("case.ratio_declared")}%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.7-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("case.payment"), message: "זה ההחזר על ההלוואה המקורית. עם הון עצמי נמוך יותר ההלוואה גדולה יותר, וההחזר איתה." },
+    { value: f.raw("ex5.pay_gap"), message: "זה ההפרש בהחזר, לא ההחזר החדש. הוסיפו אותו להחזר שהיה." },
+  ]}
+>
+  בדפי החשבון מתברר שההון העצמי של אבי הוא {f.shekels("ex5.equity_verified")} ולא {f.shekels("case.equity")}. המחיר למוכר לא משתנה, ולכן ההלוואה גדלה. ההלוואה החדשה נחלקת בין שני המסלולים באותה יחס, באותן ריביות ובאותן תקופות, וההחזר החדש הוא סכום ההחזרים של שני המסלולים, כל אחד מעוגל לאגורה. מה ההחזר החודשי החדש?
+</NumericExercise>
+
+<Solution for="4.7-5">
+ההלוואה: <M>{f.shekels("case.price")} − {f.shekels("ex5.equity_verified")} = {f.shekels("ex5.new_loan")}</M>. ההחזר החדש, בגיליון או במחשבון של הקורס: {f.shekels("ex5.answer")}, כלומר {f.shekels("ex5.pay_gap")} יותר מ־{f.shekels("case.payment")}. יחס ההחזר על ההכנסה המאומתת: {p("ex5.ratio")}%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.7-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("demo.max_loan_low")}
+  near={1000}
+  errors={[
+    { value: f.raw("demo.max_loan_low_declared"), message: "חישבתם על ההכנסה המוצהרת. הבנק, אחרי החיתום, מחשב על ההכנסה שאומתה." },
+    { value: f.raw("demo.max_loan_regulatory"), message: `חישבתם על תקרה של ${CAP}%. השאלה מניחה ${p("demo.cap_low")}%.` },
+    { value: f.raw("case.loan"), message: "זו ההלוואה שאבי ביקש. השאלה היא מה ההלוואה הגדולה ביותר שנכנסת בתקרה." },
+  ]}
+>
+  נניח (להמחשה) שבנק מחשב עד {p("demo.cap_low")}% מההכנסה המאומתת של שניהם, {f.shekels("case.hh_recognised")}. מה ההלוואה הגדולה ביותר, באותה חלוקה למסלולים, בשני המסלולים של אבי, שנכנסת בתקרה? (מעוגל כלפי מטה לאלף שקל.)
+</NumericExercise>
+
+<Solution for="4.7-6">
+ההחזר המותר: {p("demo.cap_low")}% מ־{f.shekels("case.hh_recognised")}. ההחזר לכל שקל הלוואה, בשני המסלולים יחד, ידוע מההחזר של {f.shekels("case.payment")} על {f.shekels("case.loan")}. ההלוואה שההחזר שלה עומד בתקרה, מעוגלת כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. פחות מההלוואה המבוקשת ב־{f.shekels("demo.loan_drop_low")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.7-7"
+  n={7}
+  level="מאתגר"
+  unit="ימים"
+  tolerance={0}
+  near={0}
+  answer={String(f.raw("ex7.answer"))}
+  errors={[
+    { value: String(f.raw("ex7.err_from_ask")), tolerance: 0, message: "ספרתם מהיום שבו הבנק ביקש את המסמך עד שסיים. השאלה היא כמה ימים עברו מסוף החלון, שנספר מיום האישור." },
+    { value: String(f.raw("ex7.err_from_approval")), tolerance: 0, message: "ספרתם מיום האישור עד שהבנק סיים. השאלה היא כמה ימים אחרי סוף החלון." },
+  ]}
+>
+  אישור עקרוני ניתן ב{dw("ex7.approved")}, לפחות {W} יום (ימים רגילים). ביום ה־18 מהאישור, {dw("ex7.asked")}, הבנק ביקש מסמך נוסף. הלווים שלחו אותו אחרי {p("ex7.reply_days")} ימים, ולבנק לקח עוד {p("ex7.review_days")} ימים לסיים. כמה ימים אחרי סוף החלון הבנק סיים?
+</NumericExercise>
+
+<Solution for="4.7-7">
+סוף החלון: {dw("ex7.window_end")}. הלווים ענו ב{dw("ex7.replied")}, והבנק סיים ב{dw("ex7.finished")}: {p("ex7.answer")} ימים אחרי סוף החלון. מה קורה בתנאים של האישור אחרי שהחלון נגמר — שאלה פתוחה שגם הצוות לא פתר (J-070): מחדשים? מתמחרים מחדש? מתחילים מחדש? (לא אומת).
+</Solution>
+
+<Callout title="חמש שאלות על חיתום">
+<p><strong>מה זה?</strong> הרגע שבו הבנק בודק, מול מסמכים ומרשמים, את מה שנמסר לו בבקשה. מה שנמסר הוא מוצהר, מה שנבדק ונמצא נכון הוא מאומת, ובסוף הבדיקה הבנק נותן אחת מארבע תשובות: להמשיך, לבקש עוד מסמכים, לשנות את התנאים או לבטל (מחקר הצוות; לא אומת).</p>
+<p><strong>למה זה קיים?</strong> הבנק מלווה סכום גדול לשנים רבות ונשען על מה שנמסר לו. אישור עקרוני ניתן בלי בדיקה, ולכן צריך מקום שבו מה שנאמר פוגש מה שנכתב. (ההסבר שלנו; ידע כלכלי כללי.)</p>
+<p><strong>איך זה עובד?</strong> הבנק מקבל מסמכים ושמאות, מושך נתוני אשראי, בודק את הרישום, ומשווה הכול למה שנמסר. פער בהכנסה או בהון משנה את המספרים שבהם הוא מחשב: יחס ההחזר, ההלוואה המרבית והון עצמי נדרש. כמה זמן זה לוקח ומה מכריע בין התשובות — אין לנו מקור.</p>
+<p><strong>איך זה משפיע עליכם?</strong> פער שנמצא בחיתום יכול לשנות את ההלוואה או את התנאים, והשעון של האישור רץ בינתיים. אצל אבי, הכנסה מאומתת נמוכה ב־{p("case.hh_shortfall")}% מהמוצהרת פירושה הלוואה מרבית נמוכה בערך באותו אחוז.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> בודקים את הנתונים מוקדם, מול אותם מסמכים, ומציגים בבקשה את המספרים שיתבררו. מחשבים מראש את התוצאה על ההכנסה ועל ההון המאומתים, ולא על ההצהרה, כדי לדעת איזו הלוואה באמת עומדת על הפרק.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **חיתום** הוא הבדיקה שבאה אחרי האישור העקרוני: הבנק משווה את **המוצהר** למה שהוא יכול **לאמת** (הכנסה, הון עצמי, אשראי, חשבון, נכס).
+- **אישור עקרוני ניתן על מוצהר**; מה בדיוק כל בנק בודק, ובאיזה אופן — לא ידוע.
+- **ארבע תשובות** (מחקר הצוות; לא אומת): ממשיך, מבקש עוד מסמכים, משנה את התנאים, מבטל. מה מכריע ביניהן — שאלה פתוחה.
+- **פער בהכנסה** מזיז יחס החזר והלוואה מרבית. אצל אבי: {p("case.ratio_declared")}% ב־{p("case.ratio_recognised")}%. הלוואה מרבית גדלה בערך ביחס ישר להכנסה, באותם תנאים.
+- **שלושה סוגי מספרים:** {CAP}% הוא מגבלה רגולטורית (לא אומת); {p("demo.cap_high")}% ו־{p("demo.cap_low")}% בשיעור הם הדגמה, לא מדיניות של בנק.
+- **החלון של {W} יום** (לא אומת) רץ גם בזמן החיתום, ושום הוראה לא קובעת כמה זמן הבנק רשאי לקחת.
+- **בלי להסתיר ובלי לנפח:** מגלים את הפער לפני הבנק, ומציגים את הנתונים האמיתיים.
+
+**בשיעור הבא — 4.8, נתוני אשראי ו<Later lesson="4.8" quiet>התנהלות החשבון</Later>:** שני דברים שהבנק בודק שלא מופיעים בתלוש ובשומה: מה רשום עליכם במאגר נתוני האשראי, ואיך נראה החשבון שלכם בחודשים שלפני הבקשה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "מחקר / הצעה", text: "החיתום כפי שהצוות מתאר אותו: הבנק קורא את המסמכים בפעם הראשונה, מושך נתוני אשראי, בודק את דוח השמאי ואת הרישום, ונותן אחת מארבע תשובות — ממשיך, מבקש עוד מסמכים, משנה את התנאים או מבטל את האישור; שום הוראה לא קובעת כמה זמן הוא רשאי לקחת. Brain, דף 9863169 (J-150, 2026-08-04); דף 8290315 (מה הבנקים צריכים לפני שהם מלווים, 2026-08-17). מחקר של הצוות, לא בדיקה מול המקור.", date: "2026-08-04" },
+    { kind: "מחקר / הצעה", text: "בדיקת הצוות לפני הבנק: זיהוי המסמכים, קריאת העובדות מהם, והשוואה — תלוש מול ההכנסה שנמסרה, הפקדות מול תלוש, הון עצמי מול יתרות; ״בדיקה שנכשלה לא מסיימת בדרך כלל את המסע, היא משנה את הצורה של ההצעה״. הצוות מתכוון להיות לפחות מחמיר כמו הבנק. Brain, דף 5832771 (J-040), דף 5636146 (J-030), עודכנו 2026-09-14." },
+    { kind: "החלטה של Mogi", text: "לכל הכנסה נשמרים הסכום שהוצהר, הסכום שהוכר ומצב (נכלל, דורש בדיקה, לא נכלל), והמערכת מבחינה בין הערכה מוצהרת לסכום מאומת. אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם. Brain, דף 67436545.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "אישור עקרוני אינו דורש מסמכים (הוראת בנק ישראל 451, סעיף 4ג), ותנאיו תקפים לפחות 24 יום (סעיף 4ג(א)(4)). לפי תעתיק בצוות ב־Brain (דפים 5898285, 5931054 ו־8290315, 2026-08-17), ממתין לבדיקה מול המקור.", date: "2026-08-17" },
+    { kind: "ידע מהשטח", text: "אילון, 2026-08-26: ״עד השלב שקיבלתי את האישור העקרוני, אף אחד לא מאמת אותך. בגלל זה הוא עקרוני״ (FK-H-029); ובפורטל היועצים של בנק אחד מבקשים כבר בבקשה כתב הרשאה, ת״ז, תלושים ועו״ש (FK-H-030, פרפרזה). ממתין לאישור אילון.", date: "2026-08-26" },
+    { kind: "ידע מהשטח", text: "אילון, 2026-07-27: באימות הנתונים בסניף מבקשים שלושה תלושים ושלושה חודשי תנועות, ואין צורך בתנועות אם החשבון באותו בנק (FK-H-033, פרפרזה); עדן, 2026-08-04 ו־2026-09-06. ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: "אילון, 2026-08-26: הבנקים מבקשים תלושים גם מלקוחות שלהם כדי לראות ממה ההכנסה מורכבת (FK-H-034, פרפרזה). ממתין לאישור אילון.", date: "2026-08-26" },
+    { kind: "ידע מהשטח", text: "טובי זמיר, בנקאי מחוץ לצוות, 2026-08-05: העיתוי של החיתום שונה בין הבנקים; חלקם שולחים מסמכים לחיתום מוקדם, ואחד רק בסוף (FK-H-045, פרפרזה, מקור יחיד). ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "מחקר / הצעה", text: "חלק מהבנקים עונים מיד על אישור עקרוני וחלק מעבירים לרפרנט, ״עובד בנק שקורא את התיק בעצמו״. תיאור של הצוות בלי מקור (Brain, דף 5931054, J-060, 2026-08-03). לא אומת.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "רשימת מסמכים לפתיחת תיק שבנק אחד מפרסם (חוזה, הוכחת בעלות, ת״ז וספח, דוח מס על העסקה); ללא מסמכי הכנסה. לפי תעתיק בצוות ב־Brain (דף 8716289, J-130, 2026-08-13), ממתין לבדיקה.", date: "2026-08-13" },
+    { kind: "לא אומת", text: "מגבלת יחס ההחזר של 50% (הוראת בנק ישראל 329, נספח א׳) — לפי תעתיק בצוות ב־Brain (דף 67436545, 2026-10-08), ממתין לבדיקה מול המקור. שיעורים 4.3 ו־4.4.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "אילון, 2026-07-27: ״בנק ישראל קבע תקרה של 50%; הבנקים מחמירים בפועל ל־40%״ (FK-H-012); סותר בחלקו את התעתיק של ההוראה (מעל 40% הבנק מחזיק יותר הון, אך זה אינו איסור). ב־Brain: 40% ״גבול מחיר, לא גבול סירוב״ (מחקר). ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "הנחת חישוב", text: "התקרות 40% ו־35% בשיעור הן הדגמה בלבד: לא מגבלה, לא סף הון ולא מדיניות של בנק, ולא החלטה של Mogi. ההלוואה המרבית היא ההחזר המותר חלקי ההחזר לכל שקל הלוואה, באותה חלוקה, באותן ריביות ובאותן תקופות, מעוגלת כלפי מטה לאלף." },
+    { kind: "הנחת חישוב", text: "התיק של אבי ומיכל: המחיר, ההון העצמי והמסלולים (4.60% ו־4.10%, 300 חודשים) לפי מפת הקורס; הכנסות לפי שיעור 4.1; התאריכים בדויים. ההחזר של כל מסלול מעוגל לאגורה לפני הסכום." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-12" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/underwriting.ts via scripts/lessons/lesson-4-7.ts and data/lessons/4-7.json, rechecked by checks/kinds/underwriting.py. Illustration: src/components/VerifiedGap.vue. Video: video/4-7.html. */}

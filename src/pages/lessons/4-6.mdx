@@ -1,0 +1,440 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "4.6"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FamilyBudget from "../../components/FamilyBudget.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("4.6");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const predictionOptions = [
+  f.shekels("w.left_after"),
+  f.shekels("w.sixty_amount"),
+  f.shekels("w.left"),
+  f.shekels("w.before_mortgage"),
+];
+
+בשיעור 4.3 חישבנו את <Term t="יחס החזר" lesson="4.3">יחס ההחזר</Term>: איזה חלק מההכנסה הפנויה הולך להחזר החודשי של המשכנתא, ובשיעור 4.4 ראינו איזה יחס מותר. אבל משפחה לא חיה על יחס. היא חיה על שקלים: כמה נשאר בסוף החודש לאוכל, לחשבונות ולילדים.
+בשיעור הזה נבדוק כמה נשאר, ונראה למה אפשר לעמוד בכל הקווים ועדיין לא להסתדר.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="4.6"
+  question={`משפחה בדויה מרוויחה ${f.shekels("w.net")} נטו בחודש. ההחזר החדש של המשכנתא יהיה ${f.shekels("w.payment")}. היא משלמת גם הלוואת רכב של ${f.shekels("w.car")} בחודש, ונשארו לה ${f.plain("w.car_months")} תשלומים. כמה כסף נשאר לה בחודש לכל השאר?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מה נשאר בסוף החודש
+
+</Section>
+
+<LessonVideo lesson="4-6" />
+
+<Section kind="ההסבר">
+
+## מה נשאר: נטו פחות כל התשלומים
+
+</Section>
+
+נתחיל במספרים קטנים. משפחה עם {f.shekels("e1.net")} נטו בחודש. המשכנתא החדשה {f.shekels("e1.mortgage")}, ועוד הלוואה אחרת של {f.shekels("e1.other")}.
+
+מה נשאר לה לחיות? <M>{n("e1.net")} − {n("e1.mortgage")} − {n("e1.other")} = {f.shekels("e1.left")}</M>.
+
+זה כל העניין: **מה שנשאר הוא ההכנסה נטו פחות כל התשלומים שהמשפחה משלמת בפועל**. זו שאלה אחרת מיחס ההחזר, שמשווה רק את המשכנתא להכנסה.
+
+הסכום הזה מכסה את מה שנקרא כאן <Term t="תקציב מחיה" lesson="4.6">תקציב מחיה</Term>: מזון, חשבונות, תחבורה, בריאות, חינוך ופנאי. שימו לב שזה לא ״הוצאות קבועות״ כמו בטפסים של הבנקים. שם הכוונה להתחייבויות, כמו הלוואה שממשיכה עוד שנה וחצי (שיעור 4.2).
+
+<Section kind="ההסבר">
+
+## אותו יחס, משפחות שונות
+
+</Section>
+
+יחס החזר הוא אחוז, ושני משקי בית עם אותו אחוז יכולים לחיות אחרת לגמרי. הכנסה פנויה של {f.shekels("e2.income")}, בשני משקי בית. ההחזר בשניהם בדיוק בסף ההון, {pct("pti.threshold")}: <M>{n("e2.income")} × {f.plain("pti.threshold")} ÷ 100 = {f.shekels("e2.payment")}</M>. נשאר לכל אחד <M>{n("e2.income")} − {n("e2.payment")} = {f.shekels("e2.left")}</M>.
+
+אבל בבית אחד {f.plain("e2.people_a")} נפשות, ובשני {f.plain("e2.people_b")}. לנפש: <M>{n("e2.left")} ÷ {f.plain("e2.people_a")} = {f.shekels("e2.each_a")}</M>, ומול <M>{n("e2.left")} ÷ {f.plain("e2.people_b")} = {f.shekels("e2.each_b")}</M>.
+
+אותו יחס, אותו סכום שנשאר, ושני חיים שונים. יחס ההחזר לא רואה את זה.
+
+<Section kind="ההסבר">
+
+## מה שיחס ההחזר לא רואה: הלוואה שעומדת להסתיים
+
+</Section>
+
+בשיעור 4.2 ראינו שהתחייבות מנוכה מההכנסה רק אם נשארו לה **יותר מ־{f.plain("months.line")} חודשים**. הלוואה שנשארו לה פחות לא נספרת ביחס ההחזר.
+
+אבל המשפחה משלמת אותה, עד התשלום האחרון. נחזור לשאלת החיזוי. ההלוואה של {f.shekels("w.car")} נשארו לה {f.plain("w.car_months")} תשלומים, ולכן היא **לא** מנוכה:
+- ההכנסה הפנויה, כמו בשיעור 4.2, היא {f.shekels("w.disposable")}.
+- יחס ההחזר: <M>{n("w.payment")} ÷ {n("w.disposable")} × 100 = {f.plain("w.ratio")}</M>, כלומר {pct("w.ratio")}: מתחת ל־{pct("pti.threshold")}, ובוודאי מתחת ל־{pct("pti.limit")}.
+
+היחס יפה. אבל בחודש הקרוב המשפחה משלמת גם את המשכנתא וגם את ההלוואה: <M>{n("w.net")} − {n("w.payment")} − {n("w.car")} = {f.shekels("w.left")}</M>. זה ההפרש בין ״מה שהיחס רואה״ ל״מה שהמשפחה חווה״.
+
+<Section kind="ההסבר">
+
+## ומה זה ״סביר״?
+
+</Section>
+
+כמה תקציב מחיה ״סביר״ למשפחה? **אין לנו תשובה, ואנחנו לא ממציאים אותה.** זה מה שידוע:
+
+- **ברגולציה.** במקורות שקראנו, התעתיק של הצוות ותקצירים של הוראה 329, לא מופיע תקציב מחיה כמבחן. ההוראה מודדת את יחס ההחזר. לא קראנו את ההוראה עצמה, ולכן לא נאמר שאין בה שום דבר כזה (לא אומת).
+- **בטפסי הבנקים.** הטפסים הציבוריים שואלים כמה ילדים יש במשפחה. לפי קובצי השאלונים של הצוות, בשניים מהם ילד נספר עד גיל {f.plain("kids.low")}, ובאחד עד גיל {f.plain("kids.high")} (וילדים נשאלים גם בנפרד על גיל וחזקה). מה הבנק עושה עם התשובה — לא ידוע לנו. זה לא אומר שהוא מחשב תקציב מחיה, ולא אומר שלא (לא אומת; שמות הבנקים בשיעור <Later lesson="4.13" quiet>ארבעת הבנקים</Later>).
+- **בשטח.** אילון אמר: ״המשכנתא אמורה להחליף את השכירות — לא את החיים״ (ידע מהשטח, אילון, 2026-07-27; ממתין לאישור אילון). הוא הוסיף שהבנקים מחמירים בפועל ל־{pct("pti.threshold")}, כך שנשאר לפחות {pct("w.sixty")} מההכנסה הפנויה למחיה; את החלק הזה כבר פגשנו בשיעור 4.5, והוא בבדיקה.
+- **במחקר סטטיסטי.** סקרי הוצאות משק בית קיימים, אבל אתרי הלמ״ס חסומים בסביבה שבה נכתב הקורס, ולא קראנו אותם. כל סכום תקציב מחיה בקורס הוא הנחה של הלימוד.
+
+מה כן עושים? **שואלים את המשפחה, ומתייחסים לתשובה כאל הנחה.** ״כמה אתם צריכים בחודש לחיות, אחרי ההלוואות?״ זו שאלה שיועץ שואל כבר בפגישת ההיכרות (שיעורים 1.9 ו־1.10). וצריך לבדוק אותה: משפחה יכולה להעריך נמוך מדי, בכוונה או בלי כוונה.
+
+<Section kind="ההסבר">
+
+## שלושה קווים על ההחזר, והנמוך מנצח
+
+</Section>
+
+עכשיו יש לנו שלושה מספרים שמגבילים את ההחזר:
+1. **המגבלה הרגולטורית:** ההכנסה הפנויה כפול {pct("pti.limit")}. אסור לעבור.
+2. **מדיניות הבנק:** אם יש (שיעור 4.5). לא ידועה.
+3. **התקציב של המשפחה:** ההכנסה נטו, פחות ההלוואות האחרות, פחות תקציב המחיה. זה הקו שהמשפחה קובעת לעצמה.
+
+המשפחה שלנו: תקציב המחיה שהיא הערכה הוא {f.shekels("w.budget")}. ההחזר הגבוה ביותר שהתקציב הזה מאפשר: <M>{n("w.net")} − {n("w.car")} − {n("w.budget")} = {f.shekels("w.max_for_budget")}</M>. מול זה, המגבלה: <M>{n("w.disposable")} × {f.plain("pti.limit")} ÷ 100 = {f.shekels("w.max_50")}</M>.
+
+הקו של המשפחה נמוך בהרבה מהמגבלה. **מי שמחפש את ההחזר הגבוה ביותר שהבנק מאשר, יכול להכניס משפחה לחודשים קשים.**
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## התקציב המשפחתי
+
+</Section>
+
+הפס הוא ההכנסה נטו של חודש אחד: המשכנתא, ההלוואה הקיימת, ומה שנשאר. הקו המקווקו הוא תקציב המחיה שהמשפחה צריכה. כשהוא מימין למה שנשאר — חסר כסף.
+
+<FamilyBudget
+  client:visible
+  net={Number(f.raw("w.net"))}
+  other={Number(f.raw("w.car"))}
+  months={Number(f.raw("w.car_months"))}
+  people={Number(f.raw("w.people"))}
+  budget={Number(f.raw("w.budget"))}
+  payment={Number(f.raw("w.payment"))}
+/>
+
+נסו את שלושת אלה:
+1. בלי לשנות דבר: כמה נשאר לחיים, ומה זה מול התקציב? מה יחס ההחזר?
+2. העבירו את מספר החודשים של ההלוואה הקיימת ל־{f.plain("w.months_over")}. מה קורה ליחס ההחזר ולהחזר המרבי לפי המגבלה? ומה קורה למה שנשאר?
+3. החזירו, ואז הקטינו את ההחזר החדש עד שהמשפחה מכסה את התקציב. כמה זה? ואחר כך הוסיפו שני נפשות. מה משתנה ומה לא?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>נשאר {f.shekels("w.left")}, כלומר {f.shekels("w.each")} לנפש. התקציב {f.shekels("w.budget")}, ולכן חסרים {f.shekels("w.shortfall")} בחודש. היחס הוא {pct("w.ratio")}, בתוך המגבלה. המשפחה עומדת בכל הקווים ועדיין חסר לה כסף.</li>
+    <li>כשההלוואה מעל {f.plain("months.line")} חודשים היא מנוכה: ההכנסה הפנויה יורדת, והיחס עולה. ההחזר המרבי לפי המגבלה יורד גם הוא. מה שנשאר לחיים לא משתנה: המשפחה משלמת את ההלוואה בכל מקרה.</li>
+    <li>ההחזר שמכסה את התקציב הוא {f.shekels("w.max_for_budget")}, כלומר {f.shekels("w.over")} פחות מההחזר המקורי. תוספת נפשות לא משנה את מה שנשאר; היא משנה רק את החלק לנפש, ואולי מגדילה את התקציב שהמשפחה צריכה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## ארבע נוסחאות קטנות
+
+</Section>
+
+**צעד 1 — מה נשאר.** הכנסה נטו פחות המשכנתא, פחות כל שאר התשלומים. <M>{n("w.net")} − {n("w.payment")} − {n("w.car")} = {n("w.left")}</M>.
+
+**צעד 2 — לנפש.** מחלקים במספר הנפשות. <M>{n("w.left")} ÷ {f.plain("w.people")} = {n("w.each")}</M>.
+
+**צעד 3 — מול התקציב.** מה שנשאר פחות התקציב. אם התוצאה שלילית, זה מה שחסר: <M>{n("w.budget")} − {n("w.left")} = {n("w.shortfall")}</M>.
+
+**צעד 4 — ההחזר שהתקציב מאפשר.** הכנסה נטו, פחות שאר התשלומים, פחות התקציב: <M>{n("w.net")} − {n("w.car")} − {n("w.budget")} = {n("w.max_for_budget")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">L = N − C − O</p>
+  <p class="ltr text-h3 mt-2 text-navy">C<sub>max</sub> = N − O − T</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">L</dt><dd>מה שנשאר לחיים בחודש, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">N</dt><dd>ההכנסה נטו של המשפחה בחודש, בשקלים (שיעור 4.1)</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>ההחזר החודשי של המשכנתא, בשקלים (כמו בשיעור 4.3)</dd>
+    <dt class="ltr font-semibold text-n900">O</dt><dd>כל שאר התשלומים החודשיים בפועל, גם הלוואות שנשארו להן 18 חודשים או פחות</dd>
+    <dt class="ltr font-semibold text-n900">T</dt><dd>תקציב המחיה, בשקלים לחודש: הנחה</dd>
+    <dt class="ltr font-semibold text-n900">C<sub>max</sub></dt><dd>ההחזר הגבוה ביותר שהתקציב מאפשר</dd>
+  </dl>
+</div>
+
+**מתי הנוסחאות נכונות?**
+1. N היא ההכנסה נטו שהמשפחה באמת מקבלת בחודש, לא ההכנסה המוכרת לבנק (שיעור 4.1). אצל עצמאי עם הכנסה משתנה, שני המספרים יכולים להיות שונים מאוד.
+2. O כוללת כל תשלום קבוע: גם הלוואה שנשארו לה 10 חודשים, ושכר דירה אם ממשיכים לשלם אותו.
+3. T הוא הנחה. נוסחה שמבוססת על הנחה נותנת תוצאה שטובה כמו ההנחה.
+4. זה חודש אחד. כשתשלום של O מסתיים, L גדל.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> שלושה חיסורים ברצף, ואז חילוק במספר הנפשות.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם ההכנסה נטו בתא A1, המשכנתא ב־B1 ושאר התשלומים ב־C1: מה שנשאר הוא <span class="ltr">{"=A1-B1-C1"}</span>, ולנפש (מספר הנפשות ב־D1) <span class="ltr">{"=(A1-B1-C1)/D1"}</span>.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="4.6"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `${f.shekels("w.left_after")} הוא מה שנשאר אחרי המשכנתא בלבד. שכחתם את הלוואת הרכב, ואפשר להבין למה: היא לא נספרת ביחס ההחזר. אבל המשפחה משלמת אותה.`,
+    `${f.shekels("w.sixty_amount")} הם ${pct("w.sixty")} מההכנסה. זו תשובה שנשמעת סבירה מ״נשאר לפחות 60%״, אבל המשכנתא והלוואה לא מייצרות בדיוק 40%: ההחזר הוא ${pct("w.ratio")} מההכנסה הפנויה, ויש גם את ההלוואה.`,
+    "",
+    `${f.shekels("w.before_mortgage")} הם מה שנשאר אחרי ההלוואה בלבד. שכחתם את המשכנתא החדשה.`,
+  ]}
+>
+  <M>{n("w.net")} − {n("w.payment")} − {n("w.car")} = {f.shekels("w.left")}</M>. הלוואת הרכב נשארת, גם אם יחס ההחזר לא רואה אותה.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## ״לכל תיק שלושה קווים״
+
+</Section>
+
+לפני שמחפשים את ההחזר הגבוה ביותר שמאושר, מחשבים שלושה מספרים: מה מותר (המגבלה), מה הבנק עושה (מדיניות; לרוב לא ידוע), ומה המשפחה יכולה (התקציב). **ההחזר הראוי נמצא מתחת לנמוך שבהם, ולא בהכרח בגובהו.** זו שיטת חשיבה: היא לא אומרת איזה תקציב לבחור.
+
+<Section kind="דוגמה פתורה">
+
+## הלוואת רכב שמסתיימת
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>משפחה בדויה; כל הסכומים להמחשה, ותקציב המחיה הוא הנחה. אינם נתוני שוק.</p>
+</Callout>
+
+משפחה של {f.plain("w.people")} נפשות, הכנסה נטו {f.shekels("w.net")}. היא רוצה משכנתא עם החזר של {f.shekels("w.payment")}, ומשלמת הלוואת רכב של {f.shekels("w.car")} ({f.plain("w.car_months")} תשלומים נשארו). היא מעריכה שהיא צריכה {f.shekels("w.budget")} בחודש לחיים.
+
+**צעד 1 — ההכנסה הפנויה, כמו בבנק.** ההלוואה נשארו לה {f.plain("w.car_months")} חודשים, פחות מ־{f.plain("months.line")}. היא לא מנוכה: {f.shekels("w.disposable")}.
+
+**צעד 2 — יחס החזר.** <M>{n("w.payment")} ÷ {n("w.disposable")} × 100 = {f.plain("w.ratio")}</M>. מתחת ל־{pct("pti.threshold")} וגם מתחת ל־{pct("pti.limit")}: ההחזר המרבי לפי המגבלה {f.shekels("w.max_50")}, ובסף ההון {f.shekels("w.max_40")}. לפי הבנק — הכול בסדר.
+
+**צעד 3 — מה נשאר.** <M>{n("w.net")} − {n("w.payment")} − {n("w.car")} = {f.shekels("w.left")}</M>, כלומר {f.shekels("w.each")} לנפש.
+
+**צעד 4 — מול התקציב.** <M>{n("w.budget")} − {n("w.left")} = {f.shekels("w.shortfall")}</M> חסרים בחודש.
+
+**צעד 5 — ההחזר שהתקציב מאפשר.** <M>{n("w.net")} − {n("w.car")} − {n("w.budget")} = {f.shekels("w.max_for_budget")}</M>. ההחזר המבוקש גבוה ממנו ב־<M>{n("w.payment")} − {n("w.max_for_budget")} = {f.shekels("w.over")}</M>.
+
+**צעד 6 — מה משתנה כשההלוואה נגמרת.** אחרי {f.plain("w.car_months")} חודשים נשאר לה <M>{n("w.net")} − {n("w.payment")} = {f.shekels("w.left_after")}</M>, כלומר <M>{n("w.left_after")} − {n("w.budget")} = {f.shekels("w.margin_after")}</M> מעל התקציב. המצוקה היא של {f.plain("w.car_months")} חודשים, לא קבועה. זה לא פותר אותה: צריך לדעת אם יש חיסכון שמכסה אותם, או להקטין את ההחזר בינתיים. ויש גם אפשרות לדבר עם הבנק על תקופה, שמקטינה את ההחזר (שיעור 3.1: ההחזר תלוי גם בתקופה).
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+שלושה משקי בית בדויים. בכל אחד: ההכנסה נטו, כל התשלומים החודשיים (משכנתא והלוואות יחד), ומספר הנפשות. השלימו מה שנשאר, וכמה זה לנפש. השורה הראשונה מלאה.
+
+<FillTable
+  client:visible
+  id="4.6-half"
+  columns={[
+    { key: "net", label: "הכנסה נטו" },
+    { key: "out", label: "כל התשלומים" },
+    { key: "left", label: "נשאר לחיים" },
+    { key: "people", label: "נפשות", format: "plain" },
+    { key: "per_person", label: "לנפש" },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.left", "2.per_person", "3.left", "3.per_person"]}
+  success="בכל שורה: מה שנשאר הוא ההכנסה נטו פחות כל התשלומים, ולנפש מחלקים במספר הנפשות."
+  hint="קודם מחסרים את התשלומים מההכנסה, ואחר כך מחלקים במספר הנפשות."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+כל הסכומים בדויים, ותקציבי המחיה הם הנחות. התרגילים מסודרים מהקל אל המאתגר. כדאי מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="4.6-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "מה שהמשפחה צריכה בחודש למזון, חשבונות, תחבורה, בריאות, חינוך ופנאי, אחרי ההחזרים", correct: true, feedback: "נכון. זה מה שנשאר לחיות ממנו, בלי ההחזרים." },
+    { text: "ההחזר החודשי של המשכנתא", feedback: "המשכנתא היא תשלום, לא תקציב מחיה. תקציב המחיה הוא מה שנשאר אחריה." },
+    { text: "סכום רשמי שבנק ישראל קבע לכל משפחה", feedback: "במקורות שקראנו אין סכום כזה. הקורס לא ממציא אותו; זו הנחה." },
+    { text: "הוצאות קבועות כמו בטפסי הבנקים", feedback: "בטפסים ״הוצאות קבועות״ הן התחייבויות, למשל הלוואה שממשיכה עוד שנה וחצי. תקציב מחיה הוא משהו אחר." },
+  ]}
+>
+  מה זה תקציב מחיה, בקורס?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.6-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.forgot_loans"), message: "חישבתם את מה שנשאר אחרי המשכנתא בלבד. המשפחה משלמת גם את ההלוואות האחרות." },
+    { value: f.raw("ex2.forgot_mortgage"), message: "חישבתם את מה שנשאר אחרי ההלוואות בלבד. שכחתם את המשכנתא." },
+    { value: f.raw("ex2.mortgage"), message: "זה ההחזר של המשכנתא. השאלה היא כמה נשאר אחרי כל התשלומים." },
+  ]}
+>
+  משפחה מרוויחה {f.shekels("ex2.net")} נטו בחודש. היא תשלם {f.shekels("ex2.mortgage")} על המשכנתא, ומשלמת {f.shekels("ex2.loans")} על הלוואות אחרות. כמה נשאר לה בחודש?
+</NumericExercise>
+
+<Solution for="4.6-2">
+<M>{n("ex2.net")} − {n("ex2.mortgage")} − {n("ex2.loans")} = {f.shekels("ex2.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.6-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.adults_only"), message: "חילקתם בשניים, כאילו רק ההורים נספרים. הילדים גם צריכים לחיות מהכסף: מחלקים בכל הנפשות." },
+    { value: f.raw("ex3.left"), message: "זה מה שנשאר לכל המשפחה. השאלה היא לנפש." },
+  ]}
+>
+  אחרי כל התשלומים נשארו למשפחה {f.shekels("ex3.left")} בחודש, ובה {f.plain("ex3.people")} נפשות. כמה נשאר לנפש?
+</NumericExercise>
+
+<Solution for="4.6-3">
+<M>{n("ex3.left")} ÷ {f.plain("ex3.people")} = {f.shekels("ex3.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.6-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.left"), message: "זה מה שנשאר. השאלה היא כמה חסר מול התקציב." },
+    { value: f.raw("ex4.budget"), message: "זה התקציב עצמו. מחסרים ממנו את מה שנשאר." },
+  ]}
+>
+  למשפחה נשארו {f.shekels("ex4.left")} בחודש אחרי כל התשלומים, והיא מעריכה שהיא צריכה {f.shekels("ex4.budget")} לחיים. כמה חסר לה בחודש?
+</NumericExercise>
+
+<Solution for="4.6-4">
+<M>{n("ex4.budget")} − {n("ex4.left")} = {f.shekels("ex4.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.6-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "ביחס ההחזר לא; בתקציב המשפחה כן, כל עוד היא משלמת", correct: true, feedback: `נכון. כלל ${f.plain("months.line")} החודשים קובע מה בנק מנכה מההכנסה. המשפחה משלמת עד התשלום האחרון.` },
+    { text: "ביחס ההחזר כן, ובתקציב המשפחה לא", feedback: `הפוך. מעל ${f.plain("months.line")} חודשים ההלוואה מנוכה; מתחת לא. ובתקציב המשפחה כל תשלום קיים נספר.` },
+    { text: "לא ביחס ההחזר ולא בתקציב", feedback: "בתקציב היא נספרת: המשפחה מעבירה את הכסף כל חודש." },
+    { text: "גם ביחס ההחזר וגם בתקציב", feedback: `בשיעור 4.2: הלוואה שנשארו לה ${f.plain("months.line")} חודשים או פחות לא מנוכה, ולכן היא לא נספרת ביחס.` },
+  ]}
+>
+  לאחת ההלוואות של משפחה נשארו {f.plain("ex5.months")} תשלומים. האם היא נספרת ביחס ההחזר, ובתקציב המשפחתי?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.6-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.forgot_other"), message: "לא הורדתם את ההלוואה הקיימת. היא משלמת אותה בכל חודש." },
+    { value: f.raw("ex5.forgot_budget"), message: "לא שמרתם את תקציב המחיה. מה שנשאר אחרי ההלוואה כולו אינו פנוי להחזר." },
+  ]}
+>
+  משפחה מרוויחה {f.shekels("ex5.net")} נטו, ומשלמת הלוואה קיימת של {f.shekels("ex5.other")} ({f.plain("ex5.months")} תשלומים נשארו). היא צריכה {f.shekels("ex5.budget")} בחודש לחיים. מה ההחזר הגבוה ביותר של משכנתא שתוכל לשלם, לפי התקציב שלה?
+</NumericExercise>
+
+<Solution for="4.6-6">
+<M>{n("ex5.net")} − {n("ex5.other")} − {n("ex5.budget")} = {f.shekels("ex5.answer")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.6-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: `של המשפחה: ${f.shekels("ex5.answer")}, נמוך מההחזר שהמגבלה מאפשרת`, correct: true, feedback: `נכון. ההלוואה הקיימת לא מנוכה (נשארו ${f.plain("ex5.months")} חודשים), ולכן ההכנסה הפנויה ${f.shekels("ex6.income")} וההחזר המרבי לפי המגבלה ${f.shekels("ex6.max_50")}. הקו של המשפחה נמוך ממנו.` },
+    { text: `של בנק ישראל: ${f.shekels("ex6.max_50")}`, feedback: "זה קו גבוה יותר. מי שמחליט לפיו עובר את התקציב של המשפחה." },
+    { text: `סף ההון: ${f.shekels("ex6.max_40")}`, feedback: "סף ההון הוא עניין של הבנק, לא של המשפחה, והוא גבוה מהתקציב." },
+    { text: "אי אפשר לדעת בלי הקו של הבנק", feedback: "קו של בנק יכול רק להנמיך עוד. הקו של המשפחה כבר נמוך מהמגבלה." },
+  ]}
+>
+  באותה משפחה (הכנסה נטו {f.shekels("ex6.income")}, ההלוואה הקיימת לא מנוכה כי נשארו לה {f.plain("ex5.months")} תשלומים). איזה קו מגביל את ההחזר בפועל?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על תקציב מחיה">
+<p><strong>מה זה?</strong> מה שמשפחה צריכה בחודש כדי לחיות, אחרי תשלומי ההלוואות. בקורס הוא הנחה של המשפחה והיועץ, כי לא מצאנו הגדרה רשמית.</p>
+<p><strong>למה זה קיים?</strong> יחס ההחזר הוא אחוז מההכנסה. הוא לא מראה כמה שקלים נשארים, ולא כמה נפשות צריכות לחיות מהם.</p>
+<p><strong>איך זה עובד?</strong> מחסרים מההכנסה נטו את המשכנתא ואת כל שאר התשלומים, ומשווים למה שהמשפחה צריכה. אפשר גם לחשב את ההחזר הגבוה ביותר שהתקציב מאפשר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> משפחה יכולה לעמוד בכל מגבלות בנק ישראל ועדיין לא להסתדר, למשל כשהלוואה שעומדת להסתיים לא נספרת ביחס אבל נשארת בחשבון הבנק.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים את המשפחה כמה היא צריכה, בודקים שהתשובה מציאותית, ובוחרים החזר מתחת לנמוך משלושת הקווים: המגבלה, מדיניות הבנק ותקציב המשפחה. מה שבנק עושה עם גודל המשפחה — לא ידוע, ונשאל.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **מה שנשאר** = הכנסה נטו פחות המשכנתא ופחות כל שאר התשלומים. זה מספר בשקלים, ויחס ההחזר הוא אחוז.
+- **אותו יחס, חיים שונים:** הכנסה זהה ויחס זהה, אבל מספר נפשות שונה.
+- **הלוואה עם {f.plain("months.line")} חודשים או פחות** לא מנוכה ביחס ההחזר, ובכל זאת מצטמצם ממה שנשאר.
+- **״סביר״ לא מוגדר** בשום מקור שקראנו. תקציב המחיה הוא הנחה, ושואלים עליו את המשפחה ובודקים אותו.
+- **שלושה קווים על ההחזר:** המגבלה, מדיניות הבנק (לרוב לא ידועה) ותקציב המשפחה. הנמוך מביניהם הוא התקרה בפועל.
+- **לא ידוע לנו** מה בנקים עושים עם גודל המשפחה. שאלה פתוחה לאילון.
+
+**בשיעור הבא — 4.7, חיתום: איך הבנק בודק:** מה הבנק עושה עם מה שמסרתם, ומה ההבדל בין <Later lesson="4.7" quiet>מוצהר</Later> ל<Later lesson="4.7" quiet>מאומת</Later>.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "חיסור וחילוק: מה שנשאר, החלק לנפש, והפרש מול תקציב.", code: ["L = N − C − O", "Cmax = N − O − T"] },
+    { kind: "החלטה של Mogi", text: "כלל 18 החודשים והכנסה פנויה: לפי דף ההחלטה ב־Brain 67436545 (אילון אישר 2026-10-07; עדן קיבל 2026-10-08), דרך research/notes/brain-calculation.md. בקורס — שיעור 4.2." },
+    { kind: "לא אומת", text: "50% ו־40% יחס החזר: לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08), ממתין לבדיקה מול המקור. תקצירים של הוראה 329 מתארים אותו דבר; לפי תקציר של מקור רשמי, לא אומת מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "בתעתיק של הצוות ובתקצירים של הוראה 329 לא מופיע תקציב מחיה כמבחן. לא נקראה ההוראה עצמה; לכן אין מכאן ראיה שאין בה מבחן כזה." },
+    { kind: "לא אומת", text: "הטפסים הציבוריים של ארבעת הבנקים שואלים על ילדים: שניים מגדירים ילד עד גיל 18, אחד עד גיל 21 (עם גיל וחזקה), ואחד שואל מספר ילדים: לפי קובצי השאלונים של הצוות (edea-mortgage, context/inputs), בלי בדיקה מול הטפסים החיים. מה הבנק עושה עם התשובה — לא ידוע. גם אילון וגם עדן אמרו שהגדרות הילד שונות (FK-H-018; ידע מהשטח; אילון, 2026-08-26; עדן, 2026-09-06; ממתין לאישור אילון)." },
+    { kind: "ידע מהשטח", text: "אילון, 2026-07-27, וחזר בדיון הצוות ב־2026-08-05 (FK-H-012): ״בנק ישראל קבע תקרה של 50% מההכנסה הפנויה; הבנקים מחמירים בפועל ל־40% (בניכוי הלוואות קיימות)״, כך שנשארת לפחות 60% הכנסה פנויה למחיה. ״המשכנתא אמורה להחליף את השכירות — לא את החיים״. מול המקור: 50% תואם; 40% סותר בחלקו (בהוראה זה סף הון, לא איסור). ממתין לאישור אילון." },
+    { kind: "לא אומת", text: "סקרי הוצאות משק בית של הלמ״ס: לא נקראו; אתר הלמ״ס חסום בסביבה. כל סכום של תקציב מחיה בקורס הוא הנחה, ולא נתון סטטיסטי." },
+    { kind: "הנחת חישוב", text: "המשפחה (4 נפשות, הכנסה נטו 19,000 ₪, הלוואת רכב) ותקציב המחיה שלה, 11,800 ₪, בדויים ונבחרו כדי להראות מקרה שבו כל הקווים מתקיימים ועדיין חסר כסף. כל שאר הסכומים בדויים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, בתקציב המשפחתי ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-12" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/regulation.ts (leftForLiving, perPerson, budgetMargin, largestPaymentForBudget) and affordability.ts (disposable income, the ratio) via scripts/lessons/lesson-4-6.ts and regulation-facts.ts, into data/lessons/4-6.json; rechecked by checks/kinds/regulation.py, affordability.py and common.py. Illustration: src/components/FamilyBudget.vue. Video: video/4-6.html. Field knowledge used: FK-H-012, FK-H-018. */}

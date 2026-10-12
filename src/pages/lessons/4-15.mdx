@@ -1,0 +1,487 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "4.15"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FeasibilitySheet from "../../components/FeasibilitySheet.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("4.15");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const predictionOptions = [
+  `${f.whole("a.max50_after")}: חצי מההכנסה כולה`,
+  `${f.whole("a.max50")}`,
+  `${f.whole("a.max40")}`,
+  "אין גבול כזה: הבנק מחליט לבד לגבי כל תיק",
+];
+export const halfRows = [
+  { label: "4%", c40: f.raw("a.carry40_4"), c50: f.raw("a.carry50_4") },
+  { label: "4.5%", c40: f.raw("a.carry40_4_5"), c50: f.raw("a.carry50_4_5") },
+  { label: "5%", c40: f.raw("a.carry40_5"), c50: f.raw("a.carry50_5") },
+];
+
+בשלב הזה עברנו מהכנסה <Term t="הכנסה מוכרת" lesson="4.1">מוכרת</Term> (שיעור 4.1) דרך <Term t="התחייבות קבועה" lesson="4.2">התחייבויות</Term> ו<Term t="יחס החזר" lesson="4.3">יחס החזר</Term> (4.2–4.3), אל הגבולות של <Term t="הוראה 329" lesson="4.4">הוראה 329</Term> (4.4–4.5), ומשם אל החיתום, הבטוחה, הבנקים והשוק (4.7–4.14).
+בסדנה אנחנו מחברים הכול לדף אחד: **דף היתכנות** לתיק המרכזי של הקורס, נועם ושירה. הדף בודק את התיק מול הגבולות, ורק אותם.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="4.15"
+  question={`נועם ושירה מרוויחים נטו ${f.whole("a.income_1")} ו־${f.whole("a.income_2")} בחודש, ויש להם הלוואת רכב של ${f.whole("a.car_payment")} בחודש, עוד ${f.plain("a.car_months")} חודשים. אין עדיין מסלולים או הצעה. מה ההחזר החודשי הגבוה ביותר שהכללים של בנק ישראל מתירים להם, כשהלוואת הרכב עוד נספרת?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## דף של שבע שורות
+
+</Section>
+
+<LessonVideo lesson="4-15" />
+
+<Section kind="הסדנה">
+
+## מה תצאו איתו
+
+</Section>
+
+התוצר של שלב 4: **דף בדיקת היתכנות לתיק.** בסדנה הזו תמלאו אותו לנועם ושירה, שורה אחר שורה, ואז תזיזו ארבעה דברים שהתיק משאיר פתוחים ותראו מה קורה לדף. אין כאן מושג חדש. תצטרכו מחשבון או גיליון, והדף ושבעת התרגילים מתבססים על מה שלמדתם בשלב.
+
+<Callout title="מה הדף בודק, ומה לא">
+<p><strong>{MARK}</strong></p>
+<p>לנועם ושירה אין עדיין <Term t="מסלול" lesson="1.4">מסלולים</Term>, <Term t="תמהיל" lesson="1.4">תמהיל</Term> או הצעה של בנק: את אלה בונים בשלב 5 ומציגים לבנקים בשלב 6. לכן הדף **בודק את התיק מול הגבולות בלבד**: מה ההחזר הגבוה ביותר שהכללים מתירים, מה קורה להלוואת הרכב לפי כלל 18 החודשים, ואיפה עומד שיעור המימון. איפה כל בנק ״מחמיר״ מעבר לגבולות — הקורס לא יודע (<Term t="מדיניות בנק" lesson="4.5">מדיניות בנק</Term>, שיעור 4.5), ולכן הדף לא כולל את זה, אלא כשורה שאומרת ״לא אומת״.</p>
+</Callout>
+
+### מה ידוע על נועם ושירה
+
+אלה כל המספרים שהמפה נותנת, והדף נשען רק עליהם:
+
+- **העסקה:** דירה יד שנייה ב־{f.shekels("a.price")}, דירה יחידה.
+- **ההון העצמי:** {f.shekels("a.equity")}: מתנה מההורים, {f.shekels("a.gift")}, והשאר, {f.shekels("a.own")}, חיסכון וקרן השתלמות.
+- **ההלוואה:** המחיר פחות ההון העצמי, <M>{n("a.price")} − {n("a.equity")} = {n("a.loan")}</M> ₪.
+- **ההכנסות:** נטו {f.shekels("a.income_1")} ו־{f.shekels("a.income_2")} בחודש; שניהם שכירים.
+- **הלוואת רכב:** {f.shekels("a.car_payment")} בחודש, עוד {f.plain("a.car_months")} חודשים.
+
+**שתי הנחות של הסדנה.** (1) ההכנסות נטו שבתיק הן גם ההכנסות **המוכרות**; בפועל הבנק יבדוק אותן בתלושים (ממוצע של 3 חודשים, שיעור 4.1). (2) שיעור המימון נמדד מול המחיר, אלא אם נאמר אחרת. זו שאלה פתוחה: ההוראה מדברת על המחיר, ואילון אמר שמדדים מול השווי של השמאי (FK-H-005, ממתין לאישור אילון); בחלק 3 נראה מה ההבדל.
+
+### שבע שורות בדף
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[520px] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השורה</th>
+        <th class="py-2 pe-3 text-start font-semibold">איזה סוג מספר</th>
+        <th class="py-2 pe-3 text-start font-semibold">שיעור</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">הכנסה פנויה והלוואת הרכב</td><td class="py-2 pe-3 text-n700">כלל של הוראה 329 (תעתיק בצוות)</td><td class="py-2 pe-3 text-n700">4.2</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">ההחזר הגבוה ביותר: התקרה</td><td class="py-2 pe-3 text-n700"><Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term></td><td class="py-2 pe-3 text-n700">4.4</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">ההחזר הגבוה ביותר: סף ההון</td><td class="py-2 pe-3 text-n700"><Term t="סף הון" lesson="4.5">סף הון</Term>, לא איסור</td><td class="py-2 pe-3 text-n700">4.5</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">שיעור מימון</td><td class="py-2 pe-3 text-n700">מגבלה רגולטורית</td><td class="py-2 pe-3 text-n700">4.4</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">החלק בריבית משתנה</td><td class="py-2 pe-3 text-n700">מגבלה רגולטורית</td><td class="py-2 pe-3 text-n700">4.4</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">תקופה</td><td class="py-2 pe-3 text-n700">מגבלה רגולטורית</td><td class="py-2 pe-3 text-n700">4.4</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">מדיניות כל בנק</td><td class="py-2 pe-3 text-n700">מדיניות בנק: לא אומת</td><td class="py-2 pe-3 text-n700">4.5, 4.13</td></tr>
+    </tbody>
+  </table>
+</div>
+
+הגבולות עצמם, כפי שהצוות תעתק אותם (לא אומת, ממתין לבדיקה מול ההוראה): שיעור מימון עד 75% לדירה יחידה; יחס החזר שלא עולה על 50%, ומעל 40% הבנק מחזיק יותר הון; לכל היותר שני שלישים מההלוואה בריבית שיכולה להשתנות; ולכל היותר 30 שנה.
+
+<Section kind="דוגמה פתורה">
+
+## רונית ואלון: דף היתכנות, שורה אחר שורה
+
+</Section>
+
+לפני שממלאים את הדף של נועם ושירה, נמלא אחד פשוט יותר. רונית ואלון, זוג בדוי (תרגיל נפרד, לא התיק של נועם ושירה): דירה יד שנייה ב־{f.shekels("w.price")}, הון עצמי {f.shekels("w.equity")}, הכנסות נטו {f.shekels("w.recognised")} ביחד (שתי הכנסות של {nv(9000)} ו־{nv(7000)}), והלוואת רכב של {f.shekels("w.car_payment")} בחודש, עוד {f.plain("w.car_months")} חודשים.
+
+**צעד 1 — ההלוואה.** <M>{n("w.price")} − {n("w.equity")} = {n("w.loan")}</M> ₪.
+
+**צעד 2 — הכנסה פנויה.** הלוואת הרכב נשארו לה {f.plain("w.car_months")} חודשים — לא יותר מ־18. לפי כלל 18 החודשים (שיעור 4.2) היא לא נספרת, ולכן ההכנסה הפנויה היא כל ההכנסה, {f.shekels("w.disposable")}. (הם עדיין משלמים אותה בכל חודש; זה עניין של תקציב המחיה, שיעור 4.6.)
+
+**צעד 3 — ההחזר הגבוה ביותר.** בתקרה של 50%: <M>{n("w.disposable")} × 50 ÷ 100 = {n("w.max50")}</M> ₪. בסף של 40%: <M>{n("w.disposable")} × 40 ÷ 100 = {n("w.max40")}</M> ₪.
+
+**צעד 4 — שיעור המימון.** <M>{n("w.loan")} ÷ {n("w.price")} × 100 = {f.plain("w.ltv")}%</M> (בעיגול), מתחת לתקרה של 75%. ההלוואה המרבית היא <M>{n("w.price")} × 75 ÷ 100 = {n("w.max_loan")}</M> ₪, ולכן יש מקום של {f.shekels("w.ltv_room")} להלוואה גדולה יותר.
+
+**צעד 5 — מההחזר להלוואה.** איזו הלוואה נושא ההחזר של {f.shekels("w.max40")}? תלוי בריבית ובתקופה, ואין לנו הצעה. לכן ניקח **הנחה של הקורס**: 4.5% לשנה ל־30 שנה (360 חודשים), ונשתמש בנוסחה של שיעור 3.1 בכיוון ההפוך, הסכום של התשלומים מוחזר להיום: {f.shekels("w.carry40")}. בגיליון: <span class="ltr">{`=PV(4.5%/12, 360, -${f.raw("w.max40")})`}</span>.
+
+**צעד 6 — מסקנה, בגבולות הדף.** ההלוואה {f.shekels("w.loan")} קטנה מ־{f.shekels("w.carry40")} ב־<M>{n("w.carry40")} − {n("w.loan")} = {n("w.gap40")}</M> ₪, ולכן בהנחה הזו היא מתחת לסף של 40%. זה לא אישור של בנק ולא הצעה. זו הדרך שבה הדף עונה על ״האם זה בכלל בגבולות?״
+
+<Section kind="חלק 1">
+
+## הכנסה פנויה והלוואת הרכב
+
+</Section>
+
+עכשיו נועם ושירה. אנחנו מתחילים מההכנסה.
+
+<NumericExercise
+  client:visible
+  id="4.15-1"
+  n={1}
+  level="קל"
+  answer={f.raw("a.recognised")}
+  errors={[
+    { value: f.raw("a.income_1"), message: "זו ההכנסה של אחד משניהם. הדף בודק את משק הבית כולו." },
+  ]}
+>
+  מה סך ההכנסה החודשית נטו של נועם ושירה, {f.shekels("a.income_1")} ו־{f.shekels("a.income_2")}? (לפי ההנחה של הסדנה, זו ההכנסה המוכרת.)
+</NumericExercise>
+
+<Solution for="4.15-1">
+<M>{n("a.income_1")} + {n("a.income_2")} = {n("a.recognised")}</M> ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.15-2"
+  n={2}
+  level="קל"
+  answer={f.raw("a.disposable_now")}
+  errors={[
+    { value: f.raw("a.recognised"), message: "זו ההכנסה כולה, בלי להוריד את הלוואת הרכב. נשארו עליה יותר מ־18 חודשים, ולכן היא נספרת." },
+    { value: f.raw("ex2.err_added"), message: "הוספתם את הלוואת הרכב להכנסה. התחייבות מורידים מההכנסה, לא מוסיפים לה." },
+  ]}
+>
+  נשארו להם {f.plain("a.car_months")} תשלומים על הלוואת הרכב של {f.shekels("a.car_payment")}. מה ההכנסה הפנויה, לפי כלל 18 החודשים?
+</NumericExercise>
+
+<Solution for="4.15-2">
+{f.plain("a.car_months")} תשלומים נשארו, יותר מ־18, ולכן ההלוואה נספרת: <M>{n("a.recognised")} − {n("a.car_payment")} = {n("a.disposable_now")}</M> ₪. זה המספר שהדף ישתמש בו לכל החישובים שלהלן, כל עוד ההלוואה נספרת.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.15-3"
+  n={3}
+  level="בינוני"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={f.raw("a.until_drop")}
+  errors={[
+    { value: f.raw("a.car_months"), message: "זה מספר התשלומים שנשארו בסך הכול. ההלוואה מפסיקה להיספר כשנשארים לה 18 תשלומים, לא כשהיא נגמרת." },
+  ]}
+>
+  כמה תשלומים עוד צריכים לשלם נועם ושירה על הלוואת הרכב, עד שהיא מפסיקה להיספר בהכנסה הפנויה?
+</NumericExercise>
+
+<Solution for="4.15-3">
+היא נספרת כל עוד נשארו לה **יותר** מ־18 תשלומים. {f.plain("a.car_months")} פחות 18: <M>{f.plain("a.car_months")} − 18 = {f.plain("a.until_drop")}</M>. אחרי {f.plain("a.until_drop")} תשלומים נשארים 18, והיא לא נספרת; ההכנסה הפנויה עולה ל־{f.shekels("a.disposable_after")}. **על הקצה:** בדיוק 18 לא נספר לפי התעתיק, אבל טופס אחד של בנק כותב ״שנה וחצי ומעלה״ — שאלה פתוחה לאילון, והיא לא משנה את התשובה כאן אלא תזיז אותה בתשלום אחד.
+</Solution>
+
+<Section kind="חלק 2">
+
+## ההחזר הגבוה ביותר: תקרה וסף
+
+</Section>
+
+מהכנסה פנויה של {f.shekels("a.disposable_now")} אפשר לחשב שני מספרים, ולכל אחד סוג אחר (שיעור 4.5):
+
+- **התקרה של 50%** היא <Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term>: הבנק לא מאשר יחס החזר מעליה. <M>{n("a.disposable_now")} × 50 ÷ 100 = {n("a.max50")}</M> ₪.
+- **הסף של 40%** הוא <Term t="סף הון" lesson="4.5">סף הון</Term>: מעליו מותר, אבל הבנק מחזיק יותר הון. <M>{n("a.disposable_now")} × 40 ÷ 100 = {n("a.max40")}</M> ₪.
+
+**ומה ביניהם?** ההחזרים שבין {f.shekels("a.max40")} ל־{f.shekels("a.max50")} מותרים, אבל יקרים לבנק. לפי אילון (FK-H-012, 2026-07-27) בנקים ״מחמירים בפועל ל־40%״; לפי הצוות זה גבול של מחיר ולא של סירוב. זו בדיוק **מדיניות בנק**, והקורס לא יודע אם זה נכון בכל בנק (ממתין לאישור אילון).
+
+<NumericExercise
+  client:visible
+  id="4.15-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("a.max40")}
+  errors={[
+    { value: f.raw("a.max50"), message: "זה החצי, 50%: התקרה. השאלה היא על הסף של 40%." },
+    { value: f.raw("a.max40_after"), message: `זה 40% מההכנסה אחרי שהלוואת הרכב מפסיקה להיספר (${eq(f.plain("a.disposable_after"))}). כרגע היא עוד נספרת.` },
+  ]}
+>
+  מה ההחזר החודשי הגבוה ביותר שנועם ושירה יכולים לקבל בלי לעבור את סף ההון של 40%, כשהלוואת הרכב עוד נספרת?
+</NumericExercise>
+
+<Solution for="4.15-4">
+<M>{n("a.disposable_now")} × 40 ÷ 100 = {n("a.max40")}</M> ₪. בגיליון: <span class="ltr">=A1*40%</span>, כש־A1 היא ההכנסה הפנויה. כשהלוואת הרכב תפסיק להיספר, אחרי {f.plain("a.until_drop")} תשלומים, אותו סף יעלה ל־{f.shekels("a.max40_after")} (ומהתקרה של 50%: {f.shekels("a.max50_after")}).
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.15-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "ההלוואה אסורה: היחס מעל 40%", feedback: "40% הוא סף הון, לא איסור. האיסור הוא מעל 50%." },
+    { text: "ההלוואה מותרת לפי הכללים של בנק ישראל. הבנק מחזיק מולה יותר הון, וכמה זה משפיע על ההצעה — לא ידוע", correct: true, feedback: "נכון. מעל הסף מותר. מה הבנק עושה בפועל, מבנק לבנק, זו מדיניות בנק ולא כלל, והקורס לא יודע." },
+    { text: "ההלוואה מותרת, ואין לה שום משמעות", feedback: "יש לה משמעות לבנק: הוא מחזיק יותר הון כנגדה. מה זה אומר למחיר — לא ידוע, אבל לא ״אין משמעות״." },
+    { text: "ההלוואה מאושרת, כי היחס מתחת ל־50%", feedback: "הכללים מתירים, אבל הבנק מאשר או לא בחיתום, ועם מדיניות משלו. הדף לא מבטיח אישור." },
+  ]}
+>
+  דף ההיתכנות מראה שהלוואה של לקוח מסוים עוברת את סף ההון של 40%, אבל מתחת לתקרה של 50%. מה נכון?
+</ChoiceExercise>
+
+<Section kind="חלק 3">
+
+## שיעור המימון: סנטימטר מתחת לקו
+
+</Section>
+
+שיעור המימון של נועם ושירה: <M>{n("a.loan")} ÷ {n("a.price")} × 100 = {f.plain("a.ltv")}%</M> (בעיגול). התקרה לדירה יחידה היא 75%, ולכן ההלוואה המרבית היא <M>{n("a.price")} × 75 ÷ 100 = {n("a.max_loan")}</M> ₪. נשארו {f.shekels("a.ltv_room")} של מקום.
+
+עד כאן המחיר. **ומה אם הבנק מודד מול השווי של השמאי?** אם השווי נמוך מהמחיר, אותה הלוואה היא חלק גדול יותר ממנו. הצד השני של אותו חשבון: ההלוואה {f.shekels("a.loan")} עומדת ב־75% רק אם השווי לפחות <M>{n("a.loan")} × 100 ÷ 75 = {n("a.min_value")}</M> ₪, כלומר השמאי יכול לרדת מהמחיר ב־{f.shekels("a.value_slack")} לכל היותר.
+
+<NumericExercise
+  client:visible
+  id="4.15-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.01}
+  near={0.02}
+  answer={f.raw("a.ltv_low")}
+  errors={[
+    { value: f.raw("a.ltv"), message: "זה שיעור המימון מול המחיר. כאן הבנק מודד מול שווי השמאי, שהוא נמוך יותר." },
+  ]}
+>
+  השמאי העריך את הדירה ב־{f.shekels("a.low_value")}, והבנק מודד מולו. מה שיעור המימון של ההלוואה {f.shekels("a.loan")}? (ספרה שנייה אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="4.15-6">
+<M>{n("a.loan")} ÷ {n("a.low_value")} × 100 = {f.plain("a.ltv_low")}%</M> (בעיגול), מעל התקרה של 75%. ההלוואה המרבית היא עכשיו {f.shekels("a.max_loan_low")}, ולכן חסרים {f.shekels("a.low_short")}: הון עצמי גדול יותר או הלוואה קטנה יותר. **שימו לב:** זה הבדל של {f.shekels("a.value_slack")} בלבד בין ״הכול בסדר״ ל״חוצים את הקו״ — ולמי שמודד, מחיר או שווי, יש משמעות. שאלה פתוחה (FK-H-005).
+</Solution>
+
+<Section kind="חלק 4">
+
+## מה שהמבנה חייב לכלול, ומההחזר להלוואה
+
+</Section>
+
+שני גבולות נוספים של ההוראה לא תלויים בהכנסה אלא במבנה של ההלוואה, ולכן הם חלים על כל תמהיל שיבנו לנועם ושירה בשלב 5:
+
+- **החלק המשתנה:** לכל היותר שני שלישים. בהלוואה של {f.shekels("a.loan")}: <M>{n("a.loan")} × 2 ÷ 3 = {n("a.max_variable")}</M> ₪ (מעוגל כלפי מטה), ולכן לפחות {f.shekels("a.min_fixed")} חייבים להיות בריבית קבועה.
+- **התקופה:** לכל היותר 30 שנה, {f.plain("a.max_months")} חודשים.
+
+עוד שאלה: **מה ההחזר הגבוה ביותר אומר על גודל ההלוואה?** התשובה תלויה בריבית ובתקופה, שאין לנו. לכן הדף משתמש בהנחה של הקורס: **{f.plain("assume.months")} חודשים, ושלוש ריביות — 4%, 4.5% ו־5% לשנה.** אלה לא ריביות של בנק ולא תחזית. אצלנו הן רק כלי: איזו הלוואה נושא ההחזר, בכל אחת מהן. הנוסחה היא C × S של שיעור 3.1: ההחזר כפול סכום גורמי ההיוון.
+
+<NumericExercise
+  client:visible
+  id="4.15-7"
+  n={7}
+  level="מאתגר"
+  answer={f.raw("a.carry40_4_5")}
+  errors={[
+    { value: f.raw("ex7.err_sum"), message: `חיברתם את כל ${f.plain("assume.months")} התשלומים בלי להוון: ${eq(`${n("a.max40")} × ${f.plain("assume.months")}`)}. תשלום שנה עשרים שווה היום פחות, וההלוואה היא הערך של כולם היום (שיעור 3.1).` },
+  ]}
+>
+  איזו הלוואה נושא החזר חודשי של {f.shekels("a.max40")}, בהנחה של ריבית 4.5% לשנה ל־{f.plain("assume.months")} חודשים (שפיצר, ריבית חודשית של 4.5 חלקי 12)? אפשר להשתמש בגיליון.
+</NumericExercise>
+
+<Solution for="4.15-7">
+זה הערך היום של {f.plain("assume.months")} תשלומים של {f.shekels("a.max40")}: התשלום כפול סכום גורמי ההיוון. בגיליון: <span class="ltr">{`=PV(4.5%/12, 360, -${f.raw("a.max40")})`}</span>, כלומר {f.shekels("a.carry40_4_5")}. ההלוואה של נועם ושירה, {f.shekels("a.loan")}, גדולה ממנה ב־<M>{n("a.loan")} − {n("a.carry40_4_5")} = {n("a.short40_4_5")}</M> ₪. כלומר בהנחה הזו ההחזר שהיא דורשת עובר את סף ההון של 40%.
+</Solution>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> <span class="ltr">=PV(rate/12, months, -payment)</span> נותן את ההלוואה שהחזר חודשי נושא; המינוס לפני התשלום הוא מוסכמת הסימן של הגיליון, כמו בשיעור 3.12. <strong>במחשבון:</strong> ההחזר כפול <span class="ltr">(1 − (1 + r)<sup>−n</sup>) ÷ r</span>, עם r הריבית השנתית חלקי 12 כמספר עשרוני.</p>
+</Callout>
+
+<Section kind="דוגמה חצי פתורה">
+
+## כמה הלוואה נושא כל החזר, בכל הנחה
+
+</Section>
+
+הטבלה מראה את ההחזר הגבוה ביותר בסף של 40% ({f.shekels("a.max40")}) ובתקרה של 50% ({f.shekels("a.max50")}), ואת ההלוואה שהוא נושא ב־{f.plain("assume.months")} חודשים, בכל אחת משלוש ההנחות. השורה הראשונה מלאה. השלימו את שתי השורות האחרות.
+
+<FillTable
+  client:visible
+  id="4.15-half"
+  rowKey="label"
+  periodLabel="ריבית בהנחה"
+  columns={[
+    { key: "c40", label: "ההלוואה שהחזר בסף 40% נושא" },
+    { key: "c50", label: "ההלוואה שהחזר בתקרה 50% נושא" },
+  ]}
+  rows={halfRows}
+  blanks={["4.5%.c40", "4.5%.c50", "5%.c40", "5%.c50"]}
+  success={`בכל ריבית ההלוואה שהחזר בתקרה נושא גדולה מ־${f.whole("a.loan")}. בסף של 40%: בריבית 4% ההלוואה נכנסת (עודף של ${f.whole("a.gap40_4")}), ובשתי האחרות לא. ככל שהריבית גבוהה יותר, אותו החזר נושא פחות.`}
+  hint="הלוואה = החזר × סכום גורמי ההיוון. בגיליון: =PV(ריבית/12, 360, -החזר). ריבית גבוהה יותר: הלוואה קטנה יותר."
+/>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הדף של נועם ושירה
+
+</Section>
+
+זה הדף עצמו. שבע שורות; ארבעה דברים שהתיק משאיר פתוחים, ואתם קובעים אותם במחוונים: השווי שמודדים מולו, כמה תשלומים נשארו על הלוואת הרכב, והריבית והתקופה של הקורס. כל שורה אומרת באיזה סוג מספר מדובר.
+
+<FeasibilitySheet client:visible />
+
+נסו את שלושת אלה:
+1. השאירו את המחוונים כמו שהם. אילו שורות מראות ״מעל״? ואילו מהן איסור?
+2. הורידו את השווי ל־{f.whole("a.low_value")}. מה קורה לשורה הראשונה?
+3. הורידו את תשלומי הרכב ל־18. מה קורה לשורת סף ההון? ועכשיו העלו את הריבית ל־5%.
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>רק שורת סף ההון מראה ״מעל הסף״, והיא לא איסור: ההחזר של {f.shekels("a.max40")} נושא {f.shekels("a.carry40_4_5")}, פחות מ־{f.shekels("a.loan")}. שיעור המימון ({f.plain("a.ltv")}%) ושורת התקרה בתוך הגבולות.</li>
+    <li>שיעור המימון עולה ל־{f.plain("a.ltv_low")}% והשורה מראה ״מעל התקרה: אסור״. חסרים {f.shekels("a.low_short")} של הלוואה.</li>
+    <li>ב־18 תשלומים הלוואת הרכב לא נספרת, ההכנסה הפנויה {f.shekels("a.disposable_after")}, וסף ההון עולה ל־{f.shekels("a.max40_after")}. בריבית 4.5% הוא נושא {f.shekels("a.carry40_after_4_5")}, יותר מההלוואה, ושורת הסף חוזרת להיות ״מתחת לסף״. בריבית 5% הוא נושא {f.shekels("a.carry40_after_5")}, פחות מההלוואה, והשורה שוב ״מעל הסף״. אותו תיק, והמסקנה זזה עם ההנחה.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="4.15"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `זה חצי מההכנסה כולה. הלוואת הרכב נספרת עוד, כי נשארו לה יותר מ־18 תשלומים, ולכן ההכנסה הפנויה קטנה יותר.`,
+    "",
+    "זה הסף של 40%: סף הון, לא איסור. התקרה היא 50%.",
+    "יש גבול כזה: מגבלה רגולטורית שהיא לא עניין של בנק מסוים. מה שלא ידוע הוא איפה כל בנק מחמיר מתחתיה.",
+  ]}
+>
+  התקרה היא 50% מההכנסה הפנויה, ולא מההכנסה כולה: {f.shekels("a.disposable_now")} אחרי שמורידים את הלוואת הרכב, כי היא נספרת. <M>{n("a.disposable_now")} × 50 ÷ 100 = {n("a.max50")}</M> ₪. {f.whole("a.max40")} הוא סף ההון (40%), לא איסור.
+</PredictionReveal>
+
+<Section kind="הדף המלא">
+
+## מה הדף אומר על נועם ושירה, ומה הוא לא אומר
+
+</Section>
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[560px] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השורה</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבול</th>
+        <th class="py-2 pe-3 text-start font-semibold">התיק</th>
+        <th class="py-2 pe-3 text-start font-semibold">איפה עומדים</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">הכנסה פנויה</td>
+        <td class="py-2 pe-3 text-n700">הלוואה עם יותר מ־18 תשלומים נספרת</td>
+        <td class="py-2 pe-3"><span class="ltr">{n("a.disposable_now")} ₪</span></td>
+        <td class="py-2 pe-3 text-n700">הלוואת הרכב נספרת; תפסיק אחרי <span class="ltr">{f.plain("a.until_drop")}</span> תשלומים</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">החזר: התקרה</td>
+        <td class="py-2 pe-3 text-n700">50%: איסור</td>
+        <td class="py-2 pe-3"><span class="ltr">{n("a.max50")} ₪</span> לכל היותר</td>
+        <td class="py-2 pe-3 text-n700">בכל שלוש ההנחות ההלוואה נכנסת</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">החזר: סף ההון</td>
+        <td class="py-2 pe-3 text-n700">40%: יקר לבנק, לא איסור</td>
+        <td class="py-2 pe-3"><span class="ltr">{n("a.max40")} ₪</span> לכל היותר</td>
+        <td class="py-2 pe-3 text-n700">בהנחה של 4% בפנים; ב־4.5% וב־5% מעל</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">שיעור מימון</td>
+        <td class="py-2 pe-3 text-n700">75%: איסור</td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("a.ltv")}%</span></td>
+        <td class="py-2 pe-3 text-n700">בפנים, עם מקום של <span class="ltr">{n("a.ltv_room")} ₪</span> של הלוואה; תלוי מול מה מודדים</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">החלק המשתנה</td>
+        <td class="py-2 pe-3 text-n700">שני שלישים: איסור</td>
+        <td class="py-2 pe-3">לפחות <span class="ltr">{n("a.min_fixed")} ₪</span> קבוע</td>
+        <td class="py-2 pe-3 text-n700">גבול למבנה; נבנה בשלב 5</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">תקופה</td>
+        <td class="py-2 pe-3 text-n700">30 שנה: איסור</td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("a.max_months")}</span> חודשים לכל היותר</td>
+        <td class="py-2 pe-3 text-n700">גבול למבנה</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 text-n900">מדיניות כל בנק</td>
+        <td class="py-2 pe-3 text-n700">לא ידוע</td>
+        <td class="py-2 pe-3 text-n700">—</td>
+        <td class="py-2 pe-3 text-n700">לא אומת</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+**מה הדף אומר:** נועם ושירה בגבולות של ההוראה, בשני תנאים: שמודדים את שיעור המימון מול המחיר, ושההכנסות המוכרות הן ההכנסות שבתיק. ההחזר שההלוואה דורשת קרוב לסף ההון: בריבית בהנחה גבוהה מספיק הוא מעליו.
+
+**מה הדף לא אומר:**
+- שבנק יאשר, ובאיזו ריבית. זה החיתום (שיעור 4.7) וההצעה (שלב 5).
+- מה ההכנסה **המוכרת**: זה תלוי בתלושים (שיעור 4.1) והבנק בודק אותם.
+- אם ההון העצמי {f.shekels("a.equity")} מאומת: המתנה, {f.shekels("a.gift")}, צריכה מסמכים, והבנק בודק אותם (שיעור 4.7).
+- מה הבנקים עושים מעל הגבולות: מדיניות בנק, לא אומת.
+- גבולות גיל בסוף התקופה: הוזכרו בצוות ולא נמצא להם מקור; הדף לא בודק אותם.
+
+**מה אפשר לשנות, ומה שלב 6 יעשה עם זה.** שיעור המימון קרוב לתקרה, וההחזר קרוב לסף ההון, ושני המספרים נמשכים לכיוונים שונים: מה שסוגרים כדי להקטין את ההחזר, יוצא מההון העצמי ומקרב את שיעור המימון לתקרה. זה בדיוק התרגיל של שלב 6, ולא נפתור אותו כאן.
+
+<Callout title="חמש שאלות על דף ההיתכנות">
+<p><strong>מה זה?</strong> דף שבודק תיק מול הגבולות של בנק ישראל: ההחזר הגבוה ביותר, שיעור המימון, החלק המשתנה והתקופה, ושורה אחת לדברים שלא ידועים.</p>
+<p><strong>למה זה קיים?</strong> לפני שבונים תמהיל ופונים לבנקים צריך לדעת אם התיק בכלל בגבולות, ואיפה הוא קרוב לקו. כך לא מבזבזים הצעה על תיק שאסור לאשר.</p>
+<p><strong>איך זה עובד?</strong> מהכנסה פנויה (אחרי כלל 18 החודשים) מחשבים את ההחזר הגבוה ביותר בתקרה ובסף; משווים הלוואה לשווי; מגבילים את המבנה; ובהנחה של ריבית ותקופה, שהיא לא הצעה, הופכים החזר להלוואה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הדף אומר איפה יש מרווח ואיפה אין. מרווח קטן, כמו {f.shekels("a.ltv_room")} בשיעור המימון, פירושו שקל לחצות את הקו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מתחילים בדף, ורק אחריו בונים תמהיל. אם שורה קרובה לקו, בודקים מה תלוי בה (מחיר מול שווי, הנחת ריבית), ומה אפשר לשנות. ואם שורה אומרת ״לא אומת״, שואלים — ולא מנחשים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהסדנה
+
+</Section>
+
+- **הדף בודק גבולות בלבד.** לנועם ושירה אין עדיין תמהיל או הצעה, והדף לא מבטיח אישור.
+- **הכנסה פנויה:** {f.shekels("a.recognised")} פחות הלוואת הרכב ({f.shekels("a.car_payment")}, נספרת כל עוד נשארו יותר מ־18 תשלומים) = {f.shekels("a.disposable_now")}; אחרי {f.plain("a.until_drop")} תשלומים — {f.shekels("a.disposable_after")}.
+- **ההחזר הגבוה ביותר:** {f.shekels("a.max50")} בתקרה של 50% (איסור) ו־{f.shekels("a.max40")} בסף ההון של 40% (לא איסור). שלושה סוגי מספרים: מגבלה, סף, ומדיניות בנק שלא ידועה.
+- **שיעור המימון:** {f.plain("a.ltv")}%, עם מקום של {f.shekels("a.ltv_room")}; מול שווי שמאי נמוך ב־{f.shekels("a.value_slack")} הוא חוצה את התקרה.
+- **מההחזר להלוואה:** תלוי בהנחה של ריבית ותקופה. בהנחות של הקורס (4%, 4.5%, 5% ל־30 שנה) המסקנה על סף ההון משתנה.
+- **המבנה:** לפחות {f.shekels("a.min_fixed")} בריבית קבועה, ולכל היותר 30 שנה.
+
+**ומכאן — בדיקת הסיום של שלב 4.** היא כוללת שאלות על כל השלב, וגם שאלות משלבים קודמים. מי שעובר אותה פותח את שלב 5, שבו נבנה לנועם ושירה תמהיל.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "תיק א׳ (נועם ושירה) לפי מפת הקורס, סעיף 8: דירה יד שנייה ב־2,200,000 ₪, הון עצמי 560,000 ₪ (מתוכו מתנה של 200,000 ₪), הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ לעוד 26 חודשים. מספרי לימוד: דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. רונית ואלון בדויים. בסדנה אין לתיק מסלולים, תמהיל או הצעה." },
+    { kind: "לא אומת", text: "גבולות הוראה 329: שיעור מימון עד 75% (דירה יחידה), יחס החזר שלא עולה על 50%, מעל 40% — משקל סיכון של 100% (סף הון, לא איסור), לכל היותר שני שלישים בריבית משתנה, לכל היותר 30 שנה. לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08, דרך research/notes/brain-calculation.md), ועם אותם מספרים בתקצירי חיפוש של גרסאות 11 ו־12 (research/notes/official-sources.md סעיף 1, 2026-10-09). ממתין לבדיקה מול ההוראה.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "כלל 18 החודשים: התחייבות שנשארו לה יותר מ־18 חודשים מנוכה מההכנסה. נספח א׳ של הוראה 329, לפי תעתיק בצוות ב־Brain (דף 67436545, אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). בדיוק 18 חודשים לא נספר בקורס (״מעל״); טופס של בנק אחד כותב ״שנה וחצי ומעלה״. שאלה פתוחה לאילון. ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "יחס ההחזר = ההחזר חלקי ההכנסה הפנויה המוכרת, והתחייבויות מנוכות מההכנסה. Brain, דף 67436545 (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם).", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "״בנק ישראל קבע תקרה של 50% מההכנסה הפנויה; הבנקים מחמירים בפועל ל־40%״ (FK-H-012). אילון, 2026-07-27. 50% תואם את התעתיק; ה־40% סותר בחלקו (בהוראה זה סף הון, לא איסור). ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: "שיעור המימון נמדד מול שווי השמאי (FK-H-005). אילון. מהתעתיק של הוראה 329 עולה שברירת המחדל היא המחיר, ואין תשובה למקרה שהשווי גבוה מהמחיר. שאלה פתוחה לאילון, והסדנה מציגה את שני הצדדים. ממתין לאישור אילון." },
+    { kind: "הנחת חישוב", text: "ההכנסות נטו שבתיק הן ההכנסות המוכרות; שיעור המימון נמדד מול המחיר, אלא אם נאמר אחרת. הריביות 4%, 4.5% ו־5% לשנה ל־360 חודשים הן הנחה של הקורס להפיכת החזר להלוואה (שפיצר, ריבית חודשית שהיא הריבית השנתית חלקי 12; ההלוואה היא ההחזר כפול סכום גורמי ההיוון, שיעור 3.1): לא הצעת בנק ולא נתוני שוק. מעוגל כלפי מטה לאגורה בכל מקסימום." },
+    { kind: "לא אומת", text: "איפה כל אחד מארבעת הבנקים מחמיר מעל המגבלות (מדיניות בנק) — אין מקור שנבדק. שאלה פתוחה לאילון (source-map, שאלות 4–6 ו־11). הדף מסמן אותה ״לא אומת״. גבולות גיל (״70 לנטילה, 80 לסיום״, FK-H-006): לא נמצא מקור; הדף לא בודק אותם." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו פעם נוספת בחישוב עצמאי.", date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/affordability.ts (4.1–4.3) and regulation.ts (4.4–4.6) through scripts/lessons/affordability-facts.ts and regulation-facts.ts, via scripts/lessons/lesson-4-15.ts and data/lessons/4-15.json; rechecked by checks/kinds/{affordability,regulation,ltv,amortization,household,metrics}.py. The loan a payment carries uses amortization.ts paymentsValueToday (C × S, lesson 3.1). Interactive: src/components/FeasibilitySheet.vue (same modules). Case A: map numbers only; the 40.4% of stage 5's first mix does not appear. Field knowledge used: FK-H-005, FK-H-006 (not used, noted), FK-H-012. Video: video/4-15.html. */}

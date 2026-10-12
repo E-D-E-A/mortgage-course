@@ -1,0 +1,319 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.14 — "שרשרת ההשפעה".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/4-14.json. The subtitle cues (window.cues)
+  are the narration script. The dated market data are quotations marked "לא אומת".
+
+  Script (one idea: what moves the rate from outside the bank is a chain, each link a
+  mechanism with a dated example, none of them a forecast):
+  1. Title.
+  2. Link 1: the Bank of Israel's rate (3.5% → 3.25%, 2026-09-01) → the prime (5% → 4.75%)
+     → a prime-minus-0.5 track (4.5% → 4.25%) → the payment on an invented 500,000 ₪
+     25-year loan (2,779.16 → 2,708.69, 70.47 less).
+  3. Five dated decisions on the same loan: April 2020, May 2023, January 2024, July 2026,
+     September 2026.
+  4. Link 2: inflation expectations — the gap between an unindexed and an indexed rate
+     (February 2026 averages, 1.44%) against the curve's expectations of July 2026.
+  5. Link 3: bond yields and fixed rates — the July 2026 curve and the 5-to-10-year rate it implies.
+  6. Link 4: housing demand — mortgage volume, 2025 average against January–February 2026.
+  7. Links 5 and 6: security events, crises and regulation, with dated examples.
+  8. Takeaway: every example dated, none a forecast.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.14 · שרשרת ההשפעה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-14.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      const two = (v) => Number(v).toFixed(2);
+      const D = ["d2020", "d2023", "d2024", "d2026a", "d2026b"].map((k, i) => ({
+        k,
+        day: ["04.2020", "05.2023", "01.2024", "07.2026", "09.2026"][i],
+        rate: pl(fact(`${k}.rate`)),
+        prime: pl(fact(`${k}.prime`)),
+        track: pl(fact(`${k}.track`)),
+        pay: fact(`${k}.payment`),
+      }));
+      const V = {
+        loan: num(fact("loan.amount")),
+        drop: pl(fact("cut.drop")),
+        gap: num(fact("cut.payment_gap")),
+        span: num(fact("span.payment_gap")),
+        febN: pl(fact("feb.nominal")),
+        febR: pl(fact("feb.real")),
+        febGap: pl(fact("feb.gap")),
+        e5: pl(fact("exp.five")),
+        e10: pl(fact("exp.ten")),
+        implied: pl(fact("curve.implied")),
+        v25: pl(fact("vol.y2025")),
+        v26: pl(fact("vol.early2026")),
+        vchg: pl(fact("vol.change")),
+      };
+      const curve = [
+        { y: 1, v: fact("curve.y1") },
+        { y: 5, v: fact("curve.y5") },
+        { y: 10, v: fact("curve.y10") },
+        { y: 15, v: fact("curve.y15") },
+      ];
+
+      const S = { title: [0, 10], chain: [10, 62], hist: [62, 102], infl: [102, 140], curve: [140, 176], demand: [176, 194], events: [194, 232], end: [232, 244] };
+      window.duration = 244;
+      window.cues = [
+        [1, 5, "שרשרת ההשפעה: מה מזיז את הריבית מחוץ לבנק."],
+        [5, 9.5, "שש חוליות, ולכל אחת דוגמה מתוארכת."],
+        [11, 18, `1 בספטמבר 2026: ריבית בנק ישראל ירדה ב־${V.drop} נקודת אחוז.`],
+        [18, 26, `הפריים ירדה איתה: מ־${D[3].prime}% ל־${D[4].prime}%.`],
+        [26, 34, `מסלול של הפריים פחות חצי: מ־${D[3].track}% ל־${D[4].track}%.`],
+        [34, 43, `על ${V.loan} ₪ ל־25 שנה: מ־${num(D[3].pay)} ל־${num(D[4].pay)} ₪.`],
+        [43, 52, `ירידה של ${V.gap} ₪ בחודש.`],
+        [52, 61, "זו חוליה אחת: ריבית בנק ישראל ← פריים ← תשלום."],
+        [63, 70, "אותה שרשרת, חמש החלטות מתוארכות."],
+        [70, 79, `ב־2020 הפריים ${D[0].prime}%. ב־2023: ${D[1].prime}%.`],
+        [79, 90, `אותה הלוואה: הפרש של ${V.span} ₪ בחודש.`],
+        [90, 101, "התוספת של 1.5 נבדקה להיום בלבד. לא אומת."],
+        [103, 111, "חוליה שנייה: ציפיות אינפלציה."],
+        [111, 120, `פברואר 2026: ${V.febN}% בלא צמוד, ${V.febR}% בצמוד.`],
+        [120, 129, `הפער, בחילוק: ${V.febGap}% בשנה.`],
+        [129, 139, `ביולי 2026 הציפיות מהעקום: ${V.e5}% ו־${V.e10}%. לא תואם.`],
+        [141, 149, "חוליה שלישית: תשואות אג״ח וריבית קבועה."],
+        [149, 158, "יולי 2026: עקום עולה. כסף ארוך עולה יותר."],
+        [158, 168, `בין שנה 5 לשנה 10 העקום מגלם ${V.implied}% בשנה.`],
+        [168, 175, "ריבית קבועה נשענת על העקום, לא על החלטה אחת."],
+        [177, 185, "חוליה רביעית: ביקוש לדיור."],
+        [185, 193, `נפח משכנתאות: ${V.v25} ל־${V.v26} מיליארד ₪ בחודש.`],
+        [195, 203, "חוליה חמישית: ביטחון ומשברים."],
+        [203, 212, "אפריל 2020 וינואר 2024: הריבית ירדה."],
+        [212, 221, "מרץ 2026: הוראת שעה של הרגולטור."],
+        [221, 231, "חוליה שישית: רגולציה משנה מה מותר."],
+        [233, 238, "כל דוגמה מתוארכת, ואף אחת אינה תחזית."],
+        [238, 243, "מספר בלי תאריך הוא לא מידע."],
+      ];
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "שרשרת ההשפעה", 76, { w: 700, o });
+          txt(640, 360, "ריבית בנק ישראל · אינפלציה · אג״ח · ביקוש · משברים · רגולציה", 26, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — link 1: the Bank of Israel's rate → prime → track → payment
+        if (inScene(t, S.chain)) {
+          const o = vis(t, S.chain);
+          txt(640, 120, "1 בספטמבר 2026: ריבית בנק ישראל ירדה", 36, { w: 700, o });
+          const steps = [
+            { x: 960, a: "ריבית בנק ישראל", b: [`לפני ${D[3].rate}%`, `אחרי ${D[4].rate}%`], from: 2 },
+            { x: 670, a: "הפריים", b: [`לפני ${D[3].prime}%`, `אחרי ${D[4].prime}%`], from: 9 },
+            { x: 380, a: "מסלול: פריים פחות 0.5", b: [`לפני ${D[3].track}%`, `אחרי ${D[4].track}%`], from: 17 },
+            { x: 90, a: `תשלום · ${V.loan} ₪ · 25 שנה`, b: [`לפני ${num(D[3].pay)}`, `אחרי ${num(D[4].pay)}`], from: 26 },
+          ];
+          steps.forEach((s2, i) => {
+            const os = after(t, S.chain, s2.from, o);
+            box(s2.x, 200, 240, 190, os);
+            txt(s2.x + 120, 245, s2.a, 18, { w: 700, fill: C.n700, o: os });
+            if (Array.isArray(s2.b)) {
+              txt(s2.x + 120, 305, s2.b[0], 26, { w: 700, fill: C.n700, o: os, ltr: true });
+              txt(s2.x + 120, 355, s2.b[1], 26, { w: 700, fill: C.teal, o: os, ltr: true });
+            } else {
+              txt(s2.x + 120, 320, s2.b, 30, { w: 700, fill: C.teal, o: os, ltr: true });
+            }
+            if (i > 0) txt(s2.x + 265, 305, "←", 32, { fill: C.n600, o: os });
+          });
+          const od = after(t, S.chain, 33, o);
+          box(400, 430, 480, 70, od * 0.6, C.mint);
+          txt(640, 477, `${V.gap} ₪ פחות בחודש`, 34, { w: 700, o: od, ltr: false });
+          txt(640, 540, "הלוואה בדויה, החוב עוד מלא. המרווח בדוי. לא אומת: הריביות מתקציר של מקור רשמי", 16, { fill: C.n600, o: after(t, S.chain, 38, o) });
+        }
+        // Scene 3 — five decisions
+        if (inScene(t, S.hist)) {
+          const o = vis(t, S.hist);
+          txt(640, 118, "חמש החלטות, אותה הלוואה", 38, { w: 700, o });
+          const maxPay = Math.max(...D.map((d) => Number(d.pay)));
+          const baseY = 480, topY = 275;
+          D.forEach((d, i) => {
+            const x = 1030 - i * 210;
+            const oc = after(t, S.hist, 1 + i * 2.5, o);
+            const h = (Number(d.pay) / maxPay) * (baseY - topY);
+            el("rect", { x: x - 55, y: baseY - h, width: 110, height: h, rx: 8, fill: i === 4 ? C.teal : C.tq2, opacity: oc });
+            txt(x, baseY - h - 14, num(d.pay), 22, { w: 700, o: oc, ltr: true });
+            txt(x, baseY + 30, d.day, 20, { fill: C.n700, o: oc, ltr: true });
+            txt(x, baseY + 56, `בנק ישראל ${d.rate}%`, 16, { fill: C.n600, o: oc });
+            txt(x, baseY + 78, `פריים ${d.prime}%`, 16, { fill: C.n600, o: oc });
+          });
+          txt(640, 168, `תשלום חודשי על ${V.loan} ₪, 25 שנה, פריים פחות 0.5`, 18, { fill: C.n600, o });
+          const og = after(t, S.hist, 17, o);
+          eqn(640, 190, `${num(D[1].pay)} − ${num(D[0].pay)} = ${V.span}`, 22, { fill: C.n700, o: og });
+        }
+        // Scene 4 — inflation expectations
+        if (inScene(t, S.infl)) {
+          const o = vis(t, S.infl);
+          txt(640, 120, "ציפיות אינפלציה ← צמוד מול לא צמוד", 38, { w: 700, o });
+          const a = after(t, S.infl, 2, o);
+          box(660, 190, 440, 250, a);
+          txt(880, 232, "פברואר 2026 · ממוצעי ריבית על הלוואות חדשות", 17, { fill: C.n600, o: a });
+          txt(880, 290, `לא צמוד ${V.febN}%`, 30, { w: 700, o: a, ltr: false });
+          txt(880, 334, `צמוד ${V.febR}%`, 30, { w: 700, o: a });
+          const a2 = after(t, S.infl, 9, o);
+          eqn(880, 400, `(1.0474) ÷ (1.0325) − 1 = ${V.febGap}%`, 22, { fill: C.teal, o: a2 });
+          const b = after(t, S.infl, 19, o);
+          box(180, 190, 440, 250, b);
+          txt(400, 232, "יולי 2026 · ציפיות מעקום האג״ח", 17, { fill: C.n600, o: b });
+          txt(400, 300, `5 שנים: ${V.e5}%`, 30, { w: 700, o: b });
+          txt(400, 344, `10 שנים: ${V.e10}%`, 30, { w: 700, o: b });
+          txt(640, 500, "חודש אחר, אורך אחר, מדד אחר: המספרים לא תואמים. לא אומת", 20, { fill: C.n700, o: after(t, S.infl, 27, o) });
+        }
+        // Scene 5 — the yield curve
+        if (inScene(t, S.curve)) {
+          const o = vis(t, S.curve);
+          txt(640, 118, "תשואות אג״ח ← ריבית קבועה · יולי 2026", 38, { w: 700, o });
+          const G = { left: 200, right: 1060, base: 470, top: 210, lo: 3.3, hi: 4.3 };
+          const X = (y) => G.right - ((y - 1) / 14) * (G.right - G.left);
+          const Y = (v) => G.base - ((Number(v) - G.lo) / (G.hi - G.lo)) * (G.base - G.top);
+          el("line", { x1: G.left, x2: G.right, y1: G.base + 14, y2: G.base + 14, stroke: C.n300, "stroke-width": 1, opacity: o });
+          curve.forEach((p) => txt(X(p.y), G.base + 42, `${p.y}`, 18, { fill: C.n600, o, ltr: true }));
+          txt(640, G.base + 70, "שנים (מימין לשמאל) · הציר האנכי לא מתחיל באפס", 16, { fill: C.n600, o });
+          curve.forEach((p, i) => {
+            const op = after(t, S.curve, 2 + i * 2.5, o);
+            if (i > 0) el("line", { x1: X(curve[i - 1].y), y1: Y(curve[i - 1].v), x2: X(p.y), y2: Y(p.v), stroke: C.teal, "stroke-width": 4, opacity: op });
+            el("circle", { cx: X(p.y), cy: Y(p.v), r: 9, fill: C.teal, opacity: op });
+            txt(X(p.y), Y(p.v) - 20, `${two(p.v)}%`, 22, { w: 700, o: op, ltr: true });
+          });
+          const oi = after(t, S.curve, 20, o);
+          el("line", { x1: X(5), y1: Y(curve[1].v) + 38, x2: X(10), y2: Y(curve[1].v) + 38, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oi });
+          txt((X(5) + X(10)) / 2, Y(curve[1].v) + 70, `משנה 5 עד 10 העקום מגלם ${V.implied}% בשנה`, 20, { w: 700, o: oi });
+          txt(640, 172, "מעוגל לשתי ספרות · לפי קריאה של הצוות · לא אומת", 17, { fill: C.n600, o });
+        }
+        // Scene 6 — housing demand
+        if (inScene(t, S.demand)) {
+          const o = vis(t, S.demand);
+          txt(640, 118, "ביקוש לדיור ← נפח הבקשות", 38, { w: 700, o });
+          const bars = [
+            { x: 820, v: V.v25, label: "ממוצע חודשי ב־2025", from: 2 },
+            { x: 460, v: V.v26, label: "ינואר–פברואר 2026", from: 6 },
+          ];
+          bars.forEach((b) => {
+            const ob = after(t, S.demand, b.from, o);
+            const h = (Number(b.v) / 10) * 220;
+            el("rect", { x: b.x - 60, y: 440 - h, width: 120, height: h, rx: 8, fill: C.tq2, opacity: ob });
+            txt(b.x, 440 - h - 14, `${b.v} מיליארד ₪`, 22, { w: 700, o: ob });
+            txt(b.x, 474, b.label, 18, { fill: C.n600, o: ob });
+          });
+          txt(640, 530, `+${V.vchg}% · מנוכה עונתיות · לא אומת. איך הנפח משפיע על המחיר: לא ידוע`, 20, { fill: C.n700, o: after(t, S.demand, 10, o) });
+        }
+        // Scene 7 — events and regulation, dated
+        if (inScene(t, S.events)) {
+          const o = vis(t, S.events);
+          txt(640, 118, "ביטחון, משברים ורגולציה: דוגמאות מתוארכות", 36, { w: 700, o });
+          const items = [
+            { y: 190, d: "6 באפריל 2020", s: `קורונה: הריבית ל־${D[0].rate}%`, from: 1 },
+            { y: 244, d: "1 בינואר 2024", s: `מלחמה: הריבית ל־${D[2].rate}%`, from: 6 },
+            { y: 298, d: "28 בפברואר 2026", s: "מבצע ״שאגת הארי״: הוראת שעה של הרגולטור", from: 12 },
+            { y: 362, d: "דצמבר 2020", s: "בוטלה מגבלת הפריים (שליש)", from: 19 },
+            { y: 416, d: "16 בדצמבר 2025", s: "צעדי הפיקוח בשוק האשראי לדיור", from: 24 },
+            { y: 470, d: "1 באוקטובר 2026", s: "כלל ״אותו נכס״ (לפי תעתיק)", from: 29 },
+          ];
+          items.forEach((it) => {
+            const oi = after(t, S.events, it.from, o);
+            txt(1100, it.y, it.d, 22, { anchor: "start", w: 700, fill: C.teal, o: oi });
+            txt(820, it.y, it.s, 24, { anchor: "start", o: oi });
+          });
+          txt(640, 530, "תקצירים ותעתיקים, לא אומת · אין כלל קבוע לכיוון", 18, { fill: C.n600, o: after(t, S.events, 33, o) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 300, "כל דוגמה מתוארכת", 52, { w: 700, o });
+          txt(640, 372, "ואף אחת אינה תחזית", 40, { w: 700, fill: C.teal, o: after(t, S.end, 3, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

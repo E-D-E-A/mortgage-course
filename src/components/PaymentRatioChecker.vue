@@ -35,9 +35,14 @@ interface ObligationIn {
   rentContinues?: boolean;
   mortgage?: MortgagePosition;
 }
-interface LoanIn {
+interface TrackIn {
+  label: string;
   amount: number;
   rate: number;
+}
+interface LoanIn {
+  /** One or more tracks; they share the term and the structure. */
+  tracks: TrackIn[];
   years: number;
   structure?: "regular" | "grace" | "bullet";
   graceMonths?: number;
@@ -55,14 +60,14 @@ const props = withDefaults(
     /** Reference lines on the ratio bar (percent), for lessons that have taught them. None by default. */
     marks?: Mark[];
   }>(),
-  { mode: "ratio", loan: () => ({ amount: 1000000, rate: 4.5, years: 25, structure: "regular", graceMonths: 12 }), marks: () => [] },
+  { mode: "ratio", loan: () => ({ tracks: [{ label: "הלוואה", amount: 1000000, rate: 4.5 }], years: 25, structure: "regular", graceMonths: 12 }), marks: () => [] },
 );
 
 const incomes = reactive(props.incomes.map((i) => ({ ...i })));
 const obligations = reactive(
   props.obligations.map((o) => ({ ...o, unknown: o.monthsLeft === null, months: o.monthsLeft ?? 24 })),
 );
-const loan = reactive({ structure: "regular", graceMonths: 12, ...props.loan });
+const loan = reactive({ structure: "regular", graceMonths: 12, ...props.loan, tracks: props.loan.tracks.map((t) => ({ ...t })) });
 const showTable = ref(false);
 
 const asObligation = (o: (typeof obligations)[number]): Obligation => ({
@@ -81,13 +86,20 @@ const disposable = computed(() => recognised.value.minus(deducted.value));
 const newPayment = computed(() => {
   const months = loan.years * 12;
   const grace = loan.structure === "grace" ? Math.min(loan.graceMonths, months - 1) : 0;
-  return qualifyingPayment({
-    amount: String(loan.amount),
-    ratePercent: String(loan.rate),
-    months,
-    graceMonths: grace,
-    bullet: loan.structure === "bullet",
-  }).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+  // Each track's payment is rounded to the agora, then added (as the course's tables do).
+  return loan.tracks.reduce(
+    (sum, t) =>
+      sum.plus(
+        qualifyingPayment({
+          amount: String(t.amount),
+          ratePercent: String(t.rate),
+          months,
+          graceMonths: grace,
+          bullet: loan.structure === "bullet",
+        }).toDecimalPlaces(2, Decimal.ROUND_HALF_UP),
+      ),
+    new Decimal(0),
+  );
 });
 const added = computed(() => addedToPayment(list.value));
 const payment = computed(() => newPayment.value.plus(added.value));
@@ -166,20 +178,20 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
     <!-- 3. The new loan (ratio mode) -->
     <template v-if="mode === 'ratio'">
       <h3 class="mt-5 text-body-l font-semibold text-n900">3. ההלוואה החדשה</h3>
-      <div class="mt-2 grid gap-3 sm:grid-cols-3">
+      <div v-for="(t, k) in loan.tracks" :key="k" class="mt-2 grid gap-3 sm:grid-cols-2">
         <label class="flex flex-col gap-1">
-          <span class="text-body-m text-n800">סכום: <span class="ltr font-semibold">{{ formatWholeShekels(loan.amount) }}</span></span>
-          <input v-model.number="loan.amount" type="range" min="100000" max="2500000" step="10000" aria-label="סכום ההלוואה" />
+          <span class="text-body-m text-n800">{{ t.label }} · סכום: <span class="ltr font-semibold">{{ formatWholeShekels(t.amount) }}</span></span>
+          <input v-model.number="t.amount" type="range" min="0" max="2500000" step="5000" :aria-label="`סכום: ${t.label}`" />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-body-m text-n800">אחוז ריבית לשנה: <span class="ltr font-semibold">{{ loan.rate }}%</span></span>
-          <input v-model.number="loan.rate" type="range" min="1" max="9" step="0.05" aria-label="אחוז הריבית לשנה" />
-        </label>
-        <label class="flex flex-col gap-1">
-          <span class="text-body-m text-n800">תקופה: <span class="font-semibold">{{ loan.years }} שנים</span></span>
-          <input v-model.number="loan.years" type="range" min="4" max="30" step="1" aria-label="תקופת ההלוואה בשנים" />
+          <span class="text-body-m text-n800">{{ t.label }} · אחוז ריבית לשנה: <span class="ltr font-semibold">{{ t.rate }}%</span></span>
+          <input v-model.number="t.rate" type="range" min="1" max="9" step="0.05" :aria-label="`אחוז הריבית לשנה: ${t.label}`" />
         </label>
       </div>
+      <label class="mt-3 flex flex-col gap-1">
+        <span class="text-body-m text-n800">תקופה (לכל המסלולים): <span class="font-semibold">{{ loan.years }} שנים</span></span>
+        <input v-model.number="loan.years" type="range" min="4" max="30" step="1" aria-label="תקופת ההלוואה בשנים" />
+      </label>
       <div class="mt-3 inline-flex flex-wrap rounded-md border border-n200 p-1" role="group" aria-label="מבנה ההלוואה">
         <button type="button" class="min-h-11 rounded-sm px-3 text-body-m" :class="loan.structure === 'regular' ? 'bg-navy text-n0' : 'text-n700 hover:bg-n50'" :aria-pressed="loan.structure === 'regular'" @click="loan.structure = 'regular'">שפיצר רגיל</button>
         <button type="button" class="min-h-11 rounded-sm px-3 text-body-m" :class="loan.structure === 'grace' ? 'bg-navy text-n0' : 'text-n700 hover:bg-n50'" :aria-pressed="loan.structure === 'grace'" @click="loan.structure = 'grace'">עם {{ loan.graceMonths }} חודשי גרייס חלקי</button>

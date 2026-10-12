@@ -1,0 +1,209 @@
+<!doctype html>
+<!--
+  Video scene for lesson 4.2 — "התשלום שיוצא, והתשלום שנספר" (obligations and
+  disposable income). Rendered frame by frame by scripts/render-video.mjs.
+  Every number comes from data/lessons/4-2.json: case A's car loan (1,450 a month,
+  26 payments left), the incomes' total, the disposable income before and after the
+  loan stops counting, and the rent example. No arithmetic in the scene; block
+  counts and widths are geometry from the data's own numbers.
+
+  Script (one idea: a payment counts against income only while more than 18 payments
+  are left; rent that goes on counts regardless; nothing is counted twice):
+  1. Title.
+  2. 26 payments of the car loan: while more than 18 are left it counts and the
+     disposable income is 20,250; after 8 payments 18 are left, it stops counting
+     and the disposable income is 21,700. The payments themselves go on.
+  3. Rent: if it ends when they move in, not counted; if it goes on, counted.
+  4. Never twice: net-to-pay already lacks the employer loan; an existing mortgage
+     on the same property goes to the payment, not the income.
+  5. Closing; two open questions (exactly 18; the date they are counted).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 4.2 · התחייבויות והכנסה פנויה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/4-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+      const num = (v) => nf.format(Number(v));
+      const pct = (v) => `${nf.format(Number(v))}%`;
+
+      const V = {
+        car: fact("case.car"), months: fact("case.car_months"), total: fact("case.total"), free: fact("case.disposable"),
+        gone: fact("task.car_gone"), drop: fact("case.until_drop"), line: fact("case.line"), wait: fact("pred.wait"), then: fact("pred.left_then"),
+        rent: fact("ex4.rent"), rentMonths: fact("ex4.months"),
+      };
+
+      window.duration = 140;
+      window.cues = [
+        [1, 6, "הכנסה פנויה: מה כבר יוצא מההכנסה?"],
+        [6, 9.5, "ואיזה תשלום הבנק סופר."],
+        [11, 18, `הלוואת הרכב: ${shek(V.car)} בחודש, עוד ${V.months} תשלומים.`],
+        [18, 27, "כלל 18 החודשים: נספרת רק אם נשארו מעל 18."],
+        [27, 34, `נשארו ${V.months}: נספרת. הכנסה פנויה: ${shek(V.free)}.`],
+        [34, 44, "כל תשלום מקטין את מספר התשלומים שנשארו."],
+        [44, 52, `אחרי ${V.drop} תשלומים נשארו ${V.line}: כבר לא מעל ${V.line}.`],
+        [52, 59, `ההכנסה הפנויה בעיני הבנק: ${shek(V.gone)}.`],
+        [59, 64.5, "ההלוואה לא נעלמה. הם עדיין משלמים אותה."],
+        [66, 73, "שכר דירה: חריג, שנספר לפי מה שיקרה אחרי הקנייה."],
+        [73, 82, `עוברים לדירה הנקנית: שכר הדירה נגמר, לא נספר.`],
+        [82, 91, "ממשיכים לשלם אחרי הקנייה: נספר, בלי קשר למשך."],
+        [97, 104, "כלל אחד: אותו תשלום נספר פעם אחת בלבד."],
+        [104, 111, "נטו לתשלום כבר בלי ההלוואה למעסיק."],
+        [111, 119, "משכנתא על אותו נכס: עוברת לתשלום, לא להכנסה."],
+        [119, 125, "פעם בהכנסה או פעם בתשלום, אף פעם לא בשניהם."],
+        [127, 133, `שאלות פתוחות: ${V.line} בדיוק, ובאיזה תאריך סופרים.`],
+        [133, 139, "בשיעור הבא: יחס ההחזר."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      // Opacity of something that appears at absolute time `start`, inside a scene of opacity o.
+      const at = (t, start, o, d = 0.6) => Math.min(o, clamp((t - start) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: "start" puts the text's right edge at x. LTR runs (numbers, equations, no
+      // Hebrew) use ltr: true, laid out strictly left to right so "2 × 2 = 4" never flips.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": opts.ltr ? "bidi-override" : "isolate" }, s);
+      const box = (x, y, w, h, o, opts = {}) =>
+        el("rect", { x, y, width: w, height: h, rx: opts.rx ?? 14, fill: opts.fill ?? C.n0, stroke: opts.stroke ?? C.n200, "stroke-width": opts.sw ?? 1.5, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+      const bar = (x, y, w, h, o, fill, opts = {}) =>
+        el("rect", { x, y, width: Math.max(0, w), height: h, rx: opts.rx ?? 6, fill, stroke: opts.stroke ?? "none", "stroke-width": opts.sw ?? 0, "stroke-dasharray": opts.dash ?? "none", opacity: o });
+
+      const S = { title: [0, 10], loan: [10, 65], rent: [65, 95], once: [95, 126], end: [126, 140] };
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "התשלום שיוצא,", 76, { w: 700, o });
+          txt(640, 360, "והתשלום שנספר", 76, { w: 700, o });
+          txt(640, 430, "התחייבויות והכנסה פנויה", 32, { fill: C.n600, o });
+        }
+
+        // Scene 2 — the 18-payment line
+        if (inScene(t, S.loan)) {
+          const o = vis(t, S.loan);
+          txt(640, 112, "הלוואת הרכב של נועם ושירה", 38, { w: 700, o });
+          const n = Number(V.months), line = Number(V.line), drop = Number(V.drop);
+          const R = 1130, bw = 30, gap = 4;
+          // How many payments have been made at time t: none until 34, one every 0.65 s up to the drop.
+          const made = t < 34 ? 0 : Math.min(drop, Math.floor((t - 34) / 1.2) + 1);
+          const o1 = at(t, 11, o);
+          for (let i = 0; i < n; i++) {
+            const x = R - (i + 1) * (bw + gap);
+            const paid = i < made;
+            bar(x, 160, bw, 70, o1, paid ? C.n300 : (n - made > line ? C.teal : C.tq2), { rx: 4 });
+          }
+          // The line: between the paid ones and the 18 that are left (once 8 are paid).
+          const left = n - made;
+          const counted = left > line;
+          const xl = R - (made) * (bw + gap) + 2;
+          txt(640, 280, `נשארו ${left} תשלומים`, 34, { w: 700, o: o1, ltr: false });
+          const o2 = at(t, 18, o);
+          el("line", { x1: R - drop * (bw + gap) + 2, x2: R - drop * (bw + gap) + 2, y1: 148, y2: 242, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "6 4", opacity: o2 });
+          txt(R - drop * (bw + gap) - 6, 142, `מכאן: ${line} נשארו`, 20, { anchor: "start", fill: C.n700, o: o2 });
+          const box1 = counted ? C.mint : C.n0;
+          box(240, 320, 380, 150, o1, { fill: box1, stroke: C.teal, sw: 2.5 });
+          txt(430, 366, counted ? "נספרת" : "לא נספרת", 34, { w: 700, o: o1 });
+          txt(430, 408, `${shek(V.car)} בחודש`, 26, { fill: C.n700, o: o1 });
+          txt(430, 448, counted ? "יורדת מההכנסה" : "עדיין משלמים, אבל לא נספרת", 20, { fill: C.n600, o: o1 });
+          box(660, 320, 380, 150, o1, { stroke: C.navy, sw: 2.5 });
+          txt(850, 366, "ההכנסה הפנויה", 26, { fill: C.n700, o: o1 });
+          txt(850, 418, shek(counted ? V.free : V.gone), 44, { w: 700, o: o1, ltr: true });
+          txt(850, 452, counted ? `${num(V.total)} − ${num(V.car)}` : `${num(V.total)} − 0`, 22, { fill: C.n600, o: o1, ltr: true });
+          if (t >= 59) txt(640, 540, "ההלוואה לא נעלמה: הם עדיין משלמים אותה.", 26, { w: 600, o: at(t, 59, o) });
+        }
+
+        // Scene 3 — rent
+        if (inScene(t, S.rent)) {
+          const o = vis(t, S.rent);
+          txt(640, 112, "שכר דירה: החריג", 38, { w: 700, o });
+          const o0 = at(t, 66, o);
+          txt(640, 190, `שכר דירה ${shek(V.rent)} בחודש, עוד ${V.rentMonths} חודשים בחוזה`, 28, { fill: C.n700, o: o0 });
+          const o1 = at(t, 73, o);
+          box(700, 240, 400, 190, o1, { stroke: C.teal, sw: 2.5 });
+          txt(900, 296, "עוברים לדירה הנקנית", 26, { w: 700, o: o1 });
+          txt(900, 346, "השכירות נגמרת", 24, { fill: C.n700, o: o1 });
+          txt(900, 396, "לא נספר", 34, { w: 700, fill: C.teal, o: o1 });
+          const o2 = at(t, 82, o);
+          box(180, 240, 400, 190, o2, { stroke: C.navy, sw: 2.5, fill: C.mint });
+          txt(380, 296, "ממשיכים לשלם", 26, { w: 700, o: o2 });
+          txt(380, 346, "אחרי הקנייה", 24, { fill: C.n700, o: o2 });
+          txt(380, 396, "נספר, בלי קשר למשך", 30, { w: 700, o: o2 });
+        }
+
+        // Scene 4 — never twice
+        if (inScene(t, S.once)) {
+          const o = vis(t, S.once);
+          txt(640, 112, "אותו תשלום, פעם אחת", 38, { w: 700, o });
+          const items = [
+            [104, "נטו לתשלום", "כבר בלי ההלוואה למעסיק", "לא מורידים אותה שוב"],
+            [111, "משכנתא על אותו נכס", "עוברת לתשלום החדש", "לא יורדת מההכנסה"],
+          ];
+          items.forEach(([start, head, line1, line2], i) => {
+            const oi = at(t, start, o);
+            const x = i === 0 ? 700 : 180;
+            box(x, 190, 400, 210, oi, { stroke: C.teal, sw: 2.5 });
+            txt(x + 200, 246, head, 28, { w: 700, o: oi });
+            txt(x + 200, 300, line1, 24, { fill: C.n700, o: oi });
+            txt(x + 200, 346, line2, 26, { w: 700, fill: C.teal, o: oi });
+          });
+          txt(640, 480, "פעם בהכנסה או פעם בתשלום: אף פעם לא בשניהם.", 28, { w: 700, o: at(t, 119, o) });
+        }
+
+        // Scene 5 — end
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 230, "נספר רק מה שימשיך", 56, { w: 700, o });
+          txt(640, 302, "ורק פעם אחת", 56, { w: 700, o });
+          txt(640, 400, `שני דברים עוד פתוחים: ${V.line} בדיוק, ותאריך הספירה`, 26, { fill: C.n700, o: at(t, 127, o) });
+          txt(640, 556, "נועם ושירה בדויים: דוגמה לימודית, לא נתוני לקוח ולא הצעת בנק.", 18, { fill: C.n600, o });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

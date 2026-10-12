@@ -1,0 +1,509 @@
+{
+  "lesson": "4.6",
+  "title": "תקציב מחיה סביר",
+  "note": "The family and every living-budget figure are invented for teaching; the course has no source for a reasonable living budget. 50% and 40% are the team's transcription of Directive 329. Amounts invented.",
+  "facts": [
+    {
+      "id": "pti.limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "pti.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "months.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "18"
+    },
+    {
+      "id": "kids.low",
+      "kind": "given",
+      "inputs": {},
+      "value": "18"
+    },
+    {
+      "id": "kids.high",
+      "kind": "given",
+      "inputs": {},
+      "value": "21"
+    },
+    {
+      "id": "e1.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "e1.mortgage",
+      "kind": "given",
+      "inputs": {},
+      "value": "4000.00"
+    },
+    {
+      "id": "e1.other",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "e1.left",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "10000",
+        "out_1": "4000",
+        "out_2": "1000"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "e1.before_other",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "e1.net",
+        "subtrahend": "e1.mortgage"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "e2.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "e2.payment",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "40"
+      },
+      "value": "6400.00"
+    },
+    {
+      "id": "e2.left",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "16000",
+        "out_1": "6400.00"
+      },
+      "value": "9600.00"
+    },
+    {
+      "id": "e2.people_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "e2.people_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "e2.each_a",
+      "kind": "reg_per_person",
+      "inputs": {
+        "amount": "9600.00",
+        "people": 2
+      },
+      "value": "4800.00"
+    },
+    {
+      "id": "e2.each_b",
+      "kind": "reg_per_person",
+      "inputs": {
+        "amount": "9600.00",
+        "people": 5
+      },
+      "value": "1920.00"
+    },
+    {
+      "id": "w.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "19000.00"
+    },
+    {
+      "id": "w.people",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "w.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200.00"
+    },
+    {
+      "id": "w.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "w.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "6600.00"
+    },
+    {
+      "id": "w.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "11800.00"
+    },
+    {
+      "id": "w.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "19000",
+        "obligations": "loan,1200,10"
+      },
+      "value": "19000.00"
+    },
+    {
+      "id": "w.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "6600",
+        "income": "19000"
+      },
+      "value": "34.74"
+    },
+    {
+      "id": "w.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "19000",
+        "percent": "50"
+      },
+      "value": "9500.00"
+    },
+    {
+      "id": "w.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "19000",
+        "percent": "40"
+      },
+      "value": "7600.00"
+    },
+    {
+      "id": "w.left",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "19000",
+        "out_1": "6600",
+        "out_2": "1200"
+      },
+      "value": "11200.00"
+    },
+    {
+      "id": "w.each",
+      "kind": "reg_per_person",
+      "inputs": {
+        "amount": "11200.00",
+        "people": 4
+      },
+      "value": "2800.00"
+    },
+    {
+      "id": "w.shortfall",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.budget",
+        "subtrahend": "w.left"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "w.max_for_budget",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "19000",
+        "out_1": "1200",
+        "budget": "11800"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "w.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.payment",
+        "subtrahend": "w.max_for_budget"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "w.left_after",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "19000",
+        "out_1": "6600"
+      },
+      "value": "12400.00"
+    },
+    {
+      "id": "w.margin_after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.left_after",
+        "subtrahend": "w.budget"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "w.before_mortgage",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.net",
+        "subtrahend": "w.car"
+      },
+      "value": "17800.00"
+    },
+    {
+      "id": "w.sixty",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "w.months_over",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "w.sixty_amount",
+      "kind": "reg_weighted",
+      "inputs": {
+        "amount": "19000",
+        "weight": "60"
+      },
+      "value": "11400.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "reg_living_table",
+      "inputs": {
+        "net_1": "15000",
+        "out_1": "6000",
+        "people_1": 3,
+        "net_2": "18000",
+        "out_2": "8000",
+        "people_2": 4,
+        "net_3": "24000",
+        "out_3": "12000",
+        "people_3": 3
+      },
+      "value": [
+        {
+          "period": 1,
+          "net": "15000.00",
+          "out": "6000.00",
+          "left": "9000.00",
+          "people": "3",
+          "per_person": "3000.00"
+        },
+        {
+          "period": 2,
+          "net": "18000.00",
+          "out": "8000.00",
+          "left": "10000.00",
+          "people": "4",
+          "per_person": "2500.00"
+        },
+        {
+          "period": 3,
+          "net": "24000.00",
+          "out": "12000.00",
+          "left": "12000.00",
+          "people": "3",
+          "per_person": "4000.00"
+        }
+      ]
+    },
+    {
+      "id": "ex2.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "14000.00"
+    },
+    {
+      "id": "ex2.mortgage",
+      "kind": "given",
+      "inputs": {},
+      "value": "5000.00"
+    },
+    {
+      "id": "ex2.loans",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "14000",
+        "out_1": "5000",
+        "out_2": "1000"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "ex2.forgot_loans",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.net",
+        "subtrahend": "ex2.mortgage"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "ex2.forgot_mortgage",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.net",
+        "subtrahend": "ex2.loans"
+      },
+      "value": "13000.00"
+    },
+    {
+      "id": "ex3.left",
+      "kind": "given",
+      "inputs": {},
+      "value": "9000.00"
+    },
+    {
+      "id": "ex3.people",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "reg_per_person",
+      "inputs": {
+        "amount": "9000",
+        "people": 3
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "ex3.adults_only",
+      "kind": "reg_per_person",
+      "inputs": {
+        "amount": "9000",
+        "people": 2
+      },
+      "value": "4500.00"
+    },
+    {
+      "id": "ex4.left",
+      "kind": "given",
+      "inputs": {},
+      "value": "8000.00"
+    },
+    {
+      "id": "ex4.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "8600.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.budget",
+        "subtrahend": "ex4.left"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "ex5.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "ex5.other",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500.00"
+    },
+    {
+      "id": "ex5.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "12000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "20000",
+        "out_1": "1500",
+        "budget": "12000"
+      },
+      "value": "6500.00"
+    },
+    {
+      "id": "ex5.forgot_other",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.net",
+        "subtrahend": "ex5.budget"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "ex5.forgot_budget",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex5.net",
+        "subtrahend": "ex5.other"
+      },
+      "value": "18500.00"
+    },
+    {
+      "id": "ex5.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "ex6.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "ex6.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20000",
+        "percent": "50"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "ex6.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20000",
+        "percent": "40"
+      },
+      "value": "8000.00"
+    }
+  ]
+}

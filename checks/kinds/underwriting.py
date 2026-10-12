@@ -176,6 +176,28 @@ def appraisal_table(i, _facts=None):
     return rows
 
 
+def statement_table(i, _facts=None):
+    """Month by month: opening, deposits by source, debits; closing = opening + deposits − debits; the next opening is that closing."""
+    bal = Decimal(str(i["opening"]))
+    rows, n = [], 1
+    while f"month_{n}" in i:
+        avi, michal, debits = Decimal(str(i[f"avi_{n}"])), Decimal(str(i[f"michal_{n}"])), Decimal(str(i[f"debits_{n}"]))
+        closing = bal + avi + michal - debits
+        rows.append({
+            "period": n,
+            "month": i[f"month_{n}"],
+            "opening": str(agorot(bal)),
+            "avi": str(agorot(avi)),
+            "michal": str(agorot(michal)),
+            "deposits": str(agorot(avi + michal)),
+            "debits": str(agorot(debits)),
+            "closing": str(agorot(closing)),
+        })
+        bal = closing
+        n += 1
+    return rows
+
+
 def divide_percent(i, _facts=None):
     return str(agorot(Decimal(str(i["amount"])) * HUNDRED / Decimal(str(i["percent"]))))
 
@@ -186,6 +208,7 @@ def count_difference(i, facts):
 
 KINDS = {
     "uw_count_difference": count_difference,
+    "uw_statement_table": statement_table,
     "uw_divide_percent": divide_percent,
     "uw_track_payment": track_payment,
     "uw_mix_payment": mix_payment,
