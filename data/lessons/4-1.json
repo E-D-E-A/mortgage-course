@@ -1,0 +1,660 @@
+{
+  "lesson": "4.1",
+  "title": "הכנסה מוכרת",
+  "note": "Case B (אבי ומיכל) is synthetic; assessments, payslips and every other person and amount are invented teaching numbers.",
+  "facts": [
+    {
+      "id": "case.avi_declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "11000"
+    },
+    {
+      "id": "case.michal_declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "8200"
+    },
+    {
+      "id": "case.assess_old",
+      "kind": "given",
+      "inputs": {},
+      "value": "84000"
+    },
+    {
+      "id": "case.assess_latest",
+      "kind": "given",
+      "inputs": {},
+      "value": "96000"
+    },
+    {
+      "id": "case.avi_latest",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "84000|96000",
+        "method": "latest"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "case.avi_avg",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "84000|96000",
+        "method": "average"
+      },
+      "value": "7500.00"
+    },
+    {
+      "id": "case.assess_total",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "84000|96000"
+      },
+      "value": "180000.00"
+    },
+    {
+      "id": "case.avi_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.avi_declared",
+        "subtrahend": "case.avi_avg"
+      },
+      "value": "3500.00"
+    },
+    {
+      "id": "case.avi_gap_latest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.avi_declared",
+        "subtrahend": "case.avi_latest"
+      },
+      "value": "3000.00"
+    },
+    {
+      "id": "case.avi_share",
+      "kind": "share_percent",
+      "inputs": {
+        "part": "7500.00",
+        "whole": "11000"
+      },
+      "value": "68.18"
+    },
+    {
+      "id": "slip.table",
+      "kind": "aff_payslip_table",
+      "inputs": {
+        "name_1": "יולי",
+        "gross_1": "10650",
+        "mandatory_1": "900|950|650",
+        "other_1": "400|50",
+        "name_2": "אוגוסט",
+        "gross_2": "10700",
+        "mandatory_2": "900|950|650",
+        "other_2": "400|50",
+        "name_3": "ספטמבר",
+        "gross_3": "10750",
+        "mandatory_3": "900|950|650",
+        "other_3": "400|50"
+      },
+      "value": [
+        {
+          "period": "יולי",
+          "gross": "10650.00",
+          "mandatory": "2500.00",
+          "net": "8150.00",
+          "other": "450.00",
+          "net_to_pay": "7700.00"
+        },
+        {
+          "period": "אוגוסט",
+          "gross": "10700.00",
+          "mandatory": "2500.00",
+          "net": "8200.00",
+          "other": "450.00",
+          "net_to_pay": "7750.00"
+        },
+        {
+          "period": "ספטמבר",
+          "gross": "10750.00",
+          "mandatory": "2500.00",
+          "net": "8250.00",
+          "other": "450.00",
+          "net_to_pay": "7800.00"
+        }
+      ]
+    },
+    {
+      "id": "slip.months",
+      "kind": "given",
+      "inputs": {},
+      "value": [
+        {
+          "name": "יולי",
+          "pay": [
+            {
+              "label": "שכר יסוד",
+              "amount": "10000"
+            },
+            {
+              "label": "שעות נוספות",
+              "amount": "650"
+            }
+          ],
+          "mandatory": [
+            {
+              "label": "מס הכנסה",
+              "amount": "900"
+            },
+            {
+              "label": "ביטוח לאומי ומס בריאות",
+              "amount": "950"
+            },
+            {
+              "label": "פנסיה — חלק העובד",
+              "amount": "650"
+            }
+          ],
+          "other": [
+            {
+              "label": "החזר הלוואה ממעביד",
+              "amount": "400"
+            },
+            {
+              "label": "דמי ועד",
+              "amount": "50"
+            }
+          ]
+        },
+        {
+          "name": "אוגוסט",
+          "pay": [
+            {
+              "label": "שכר יסוד",
+              "amount": "10000"
+            },
+            {
+              "label": "שעות נוספות",
+              "amount": "700"
+            }
+          ],
+          "mandatory": [
+            {
+              "label": "מס הכנסה",
+              "amount": "900"
+            },
+            {
+              "label": "ביטוח לאומי ומס בריאות",
+              "amount": "950"
+            },
+            {
+              "label": "פנסיה — חלק העובד",
+              "amount": "650"
+            }
+          ],
+          "other": [
+            {
+              "label": "החזר הלוואה ממעביד",
+              "amount": "400"
+            },
+            {
+              "label": "דמי ועד",
+              "amount": "50"
+            }
+          ]
+        },
+        {
+          "name": "ספטמבר",
+          "pay": [
+            {
+              "label": "שכר יסוד",
+              "amount": "10000"
+            },
+            {
+              "label": "שעות נוספות",
+              "amount": "750"
+            }
+          ],
+          "mandatory": [
+            {
+              "label": "מס הכנסה",
+              "amount": "900"
+            },
+            {
+              "label": "ביטוח לאומי ומס בריאות",
+              "amount": "950"
+            },
+            {
+              "label": "פנסיה — חלק העובד",
+              "amount": "650"
+            }
+          ],
+          "other": [
+            {
+              "label": "החזר הלוואה ממעביד",
+              "amount": "400"
+            },
+            {
+              "label": "דמי ועד",
+              "amount": "50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slip.basic",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000"
+    },
+    {
+      "id": "slip.overtime",
+      "kind": "given",
+      "inputs": {},
+      "value": "700"
+    },
+    {
+      "id": "slip.gross",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "10000|700"
+      },
+      "value": "10700.00"
+    },
+    {
+      "id": "slip.tax",
+      "kind": "given",
+      "inputs": {},
+      "value": "900"
+    },
+    {
+      "id": "slip.ni",
+      "kind": "given",
+      "inputs": {},
+      "value": "950"
+    },
+    {
+      "id": "slip.pension",
+      "kind": "given",
+      "inputs": {},
+      "value": "650"
+    },
+    {
+      "id": "slip.mandatory",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "900|950|650"
+      },
+      "value": "2500.00"
+    },
+    {
+      "id": "slip.net",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "10700",
+        "mandatory": "900|950|650"
+      },
+      "value": "8200.00"
+    },
+    {
+      "id": "slip.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400"
+    },
+    {
+      "id": "slip.dues",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "slip.other",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "400|50"
+      },
+      "value": "450.00"
+    },
+    {
+      "id": "slip.ntp",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "8200",
+        "other": "400|50"
+      },
+      "value": "7750.00"
+    },
+    {
+      "id": "michal.avg_net",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "8150.00|8200.00|8250.00"
+      },
+      "value": "8200.00"
+    },
+    {
+      "id": "michal.avg_ntp",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "7700.00|7750.00|7800.00"
+      },
+      "value": "7750.00"
+    },
+    {
+      "id": "michal.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "michal.avg_net",
+        "subtrahend": "michal.avg_ntp"
+      },
+      "value": "450.00"
+    },
+    {
+      "id": "michal.net_sum",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "8150.00|8200.00|8250.00"
+      },
+      "value": "24600.00"
+    },
+    {
+      "id": "hh.declared",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "11000|8200"
+      },
+      "value": "19200.00"
+    },
+    {
+      "id": "hh.rec_avg",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "7500.00|8200.00"
+      },
+      "value": "15700.00"
+    },
+    {
+      "id": "hh.rec_latest",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "8000.00|8200.00"
+      },
+      "value": "16200.00"
+    },
+    {
+      "id": "hh.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "hh.declared",
+        "subtrahend": "hh.rec_avg"
+      },
+      "value": "3500.00"
+    },
+    {
+      "id": "hh.rec_ntp",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "7500.00|7750.00"
+      },
+      "value": "15250.00"
+    },
+    {
+      "id": "half.table",
+      "kind": "aff_payslip_table",
+      "inputs": {
+        "name_1": "יולי",
+        "gross_1": "9800",
+        "mandatory_1": "2150",
+        "other_1": "",
+        "name_2": "אוגוסט",
+        "gross_2": "9950",
+        "mandatory_2": "2200",
+        "other_2": "",
+        "name_3": "ספטמבר",
+        "gross_3": "10100",
+        "mandatory_3": "2250",
+        "other_3": ""
+      },
+      "value": [
+        {
+          "period": "יולי",
+          "gross": "9800.00",
+          "mandatory": "2150.00",
+          "net": "7650.00",
+          "other": "0.00",
+          "net_to_pay": "7650.00"
+        },
+        {
+          "period": "אוגוסט",
+          "gross": "9950.00",
+          "mandatory": "2200.00",
+          "net": "7750.00",
+          "other": "0.00",
+          "net_to_pay": "7750.00"
+        },
+        {
+          "period": "ספטמבר",
+          "gross": "10100.00",
+          "mandatory": "2250.00",
+          "net": "7850.00",
+          "other": "0.00",
+          "net_to_pay": "7850.00"
+        }
+      ]
+    },
+    {
+      "id": "half.avg",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "7650.00|7750.00|7850.00"
+      },
+      "value": "7750.00"
+    },
+    {
+      "id": "ex1.gross",
+      "kind": "given",
+      "inputs": {},
+      "value": "12000"
+    },
+    {
+      "id": "ex1.mandatory",
+      "kind": "given",
+      "inputs": {},
+      "value": "3000"
+    },
+    {
+      "id": "ex1.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "500"
+    },
+    {
+      "id": "ex1.net",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "12000",
+        "mandatory": "3000"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "ex1.ntp",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "9000",
+        "other": "500"
+      },
+      "value": "8500.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "14200",
+        "mandatory": "1850|1250|850"
+      },
+      "value": "10250.00"
+    },
+    {
+      "id": "ex2.err_tax_only",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "14200",
+        "mandatory": "1850"
+      },
+      "value": "12350.00"
+    },
+    {
+      "id": "ex2.err_deductions",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "1850|1250|850"
+      },
+      "value": "3950.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "9150|9300|9600"
+      },
+      "value": "9350.00"
+    },
+    {
+      "id": "ex3.err_sum",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "9150|9300|9600"
+      },
+      "value": "28050.00"
+    },
+    {
+      "id": "ex3.err_two",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "9300|9600"
+      },
+      "value": "9450.00"
+    },
+    {
+      "id": "ex4.annual_net",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "130000",
+        "mandatory": "28000"
+      },
+      "value": "102000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "aff_annual_to_monthly",
+      "inputs": {
+        "annual": "102000.00"
+      },
+      "value": "8500.00"
+    },
+    {
+      "id": "ex4.err_before_tax",
+      "kind": "aff_annual_to_monthly",
+      "inputs": {
+        "annual": "130000"
+      },
+      "value": "10833.33"
+    },
+    {
+      "id": "ex4.err_tax",
+      "kind": "aff_annual_to_monthly",
+      "inputs": {
+        "annual": "28000"
+      },
+      "value": "2333.33"
+    },
+    {
+      "id": "ex6.latest",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "78000|102000",
+        "method": "latest"
+      },
+      "value": "8500.00"
+    },
+    {
+      "id": "ex6.avg",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "78000|102000",
+        "method": "average"
+      },
+      "value": "7500.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.latest",
+        "subtrahend": "ex6.avg"
+      },
+      "value": "1000.00"
+    },
+    {
+      "id": "ex6.older_monthly",
+      "kind": "aff_annual_to_monthly",
+      "inputs": {
+        "annual": "78000"
+      },
+      "value": "6500.00"
+    },
+    {
+      "id": "ex6.err_years",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.latest",
+        "subtrahend": "ex6.older_monthly"
+      },
+      "value": "2000.00"
+    },
+    {
+      "id": "ex6.latest_annual",
+      "kind": "given",
+      "inputs": {},
+      "value": "102000"
+    },
+    {
+      "id": "ex6.older_annual",
+      "kind": "given",
+      "inputs": {},
+      "value": "78000"
+    },
+    {
+      "id": "ex6.err_annual",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.latest_annual",
+        "subtrahend": "ex6.older_annual"
+      },
+      "value": "24000.00"
+    },
+    {
+      "id": "ex7.profit",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000"
+    },
+    {
+      "id": "ex7.dividend",
+      "kind": "given",
+      "inputs": {},
+      "value": "120000"
+    },
+    {
+      "id": "ex7.dividend_monthly",
+      "kind": "aff_annual_to_monthly",
+      "inputs": {
+        "annual": "120000"
+      },
+      "value": "10000.00"
+    }
+  ]
+}

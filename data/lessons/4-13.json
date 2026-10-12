@@ -1,0 +1,237 @@
+{
+  "lesson": "4.13",
+  "title": "ארבעת הבנקים",
+  "note": "Forms as recorded on 2026-08-25 (edea-mortgage context/inputs). Case A: map numbers only. Everything else is invented for teaching.",
+  "facts": [
+    {
+      "id": "pred.children",
+      "kind": "given",
+      "inputs": {},
+      "value": 3
+    },
+    {
+      "id": "pred.leumi",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "4|19|20",
+        "limit_age": 18
+      },
+      "value": 1
+    },
+    {
+      "id": "pred.poalim",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "4|19|20",
+        "limit_age": 21
+      },
+      "value": 3
+    },
+    {
+      "id": "caseA.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "caseA.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000.00"
+    },
+    {
+      "id": "caseA.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.price",
+        "subtrahend": "caseA.equity"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "caseA.gift",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000.00"
+    },
+    {
+      "id": "caseA.own_savings",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.equity",
+        "subtrahend": "caseA.gift"
+      },
+      "value": "360000.00"
+    },
+    {
+      "id": "caseA.income_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400.00"
+    },
+    {
+      "id": "caseA.income_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300.00"
+    },
+    {
+      "id": "caseA.car_payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450.00"
+    },
+    {
+      "id": "caseA.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
+      "id": "leumi.max_request",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "caseA.over_leumi",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "caseA.loan",
+        "subtrahend": "leumi.max_request"
+      },
+      "value": "140000.00"
+    },
+    {
+      "id": "half.leumi",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "2|16|19|20",
+        "limit_age": 18
+      },
+      "value": 2
+    },
+    {
+      "id": "half.mizrahi",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "2|16|19|20",
+        "limit_age": 18
+      },
+      "value": 2
+    },
+    {
+      "id": "half.poalim",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "2|16|19|20",
+        "limit_age": 21
+      },
+      "value": 4
+    },
+    {
+      "id": "half.discount",
+      "kind": "forms_household_size",
+      "inputs": {
+        "adults": 2,
+        "ages": "2|16|19|20"
+      },
+      "value": 6
+    },
+    {
+      "id": "ex3.yearly",
+      "kind": "given",
+      "inputs": {},
+      "value": "210000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "forms_monthly_from_yearly",
+      "inputs": {
+        "yearly": "210000"
+      },
+      "value": "17500.00"
+    },
+    {
+      "id": "ex3.err_two_years",
+      "kind": "forms_monthly_from_yearly",
+      "inputs": {
+        "yearly": "105000"
+      },
+      "value": "8750.00"
+    },
+    {
+      "id": "ex4.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "50"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "ex4.err_70",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "70"
+      },
+      "value": "1260000.00"
+    },
+    {
+      "id": "ex4.err_75",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "ceiling": "75"
+      },
+      "value": "1350000.00"
+    },
+    {
+      "id": "ex5.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "1000000",
+        "rate_percent": "5.5",
+        "months": 360
+      },
+      "value": "5677.89"
+    },
+    {
+      "id": "ex5.err_25y",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "1000000",
+        "rate_percent": "5.5",
+        "months": 300
+      },
+      "value": "6140.87"
+    },
+    {
+      "id": "ex5.interest_year",
+      "kind": "given",
+      "inputs": {},
+      "value": "55000.00"
+    },
+    {
+      "id": "ex5.err_interest_only",
+      "kind": "forms_monthly_from_yearly",
+      "inputs": {
+        "yearly": "55000"
+      },
+      "value": "4583.33"
+    }
+  ]
+}

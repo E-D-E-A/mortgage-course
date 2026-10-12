@@ -1,0 +1,485 @@
+{
+  "lesson": "4.2",
+  "title": "התחייבויות והכנסה פנויה",
+  "note": "Case A uses only the course map's numbers; case B continues from 4.1; every other household is invented.",
+  "facts": [
+    {
+      "id": "pred.left_now",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
+      "id": "pred.wait",
+      "kind": "given",
+      "inputs": {},
+      "value": 9
+    },
+    {
+      "id": "pred.left_then",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 26,
+        "used_days": 9
+      },
+      "value": 17
+    },
+    {
+      "id": "pred.placement_then",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1450,17"
+      },
+      "value": "none"
+    },
+    {
+      "id": "case.noam",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400"
+    },
+    {
+      "id": "case.shira",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300"
+    },
+    {
+      "id": "case.total",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "12400|9300"
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "case.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450"
+    },
+    {
+      "id": "case.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
+      "id": "case.car_placement",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1450,26"
+      },
+      "value": "income"
+    },
+    {
+      "id": "case.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700.00",
+        "obligations": "loan,1450,26"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "case.until_drop",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 26
+      },
+      "value": 8
+    },
+    {
+      "id": "case.line",
+      "kind": "given",
+      "inputs": {},
+      "value": 18
+    },
+    {
+      "id": "rule.loan_30",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1000,30"
+      },
+      "value": "income"
+    },
+    {
+      "id": "rule.loan_12",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1000,12"
+      },
+      "value": "none"
+    },
+    {
+      "id": "rule.loan_18",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1000,18"
+      },
+      "value": "none"
+    },
+    {
+      "id": "rule.loan_19",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,1000,19"
+      },
+      "value": "income"
+    },
+    {
+      "id": "rule.rent_continues",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "rent,4000,6,continues"
+      },
+      "value": "income"
+    },
+    {
+      "id": "rule.rent_ends",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "rent,4000,30"
+      },
+      "value": "none"
+    },
+    {
+      "id": "rule.no_end",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "alimony,1500,-"
+      },
+      "value": "income"
+    },
+    {
+      "id": "b.recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "15700"
+    },
+    {
+      "id": "b.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "400"
+    },
+    {
+      "id": "b.loan_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 10
+    },
+    {
+      "id": "b.loan_placement",
+      "kind": "aff_placement",
+      "inputs": {
+        "obligation": "loan,400,10"
+      },
+      "value": "none"
+    },
+    {
+      "id": "b.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "15700",
+        "obligations": "loan,400,10"
+      },
+      "value": "15700.00"
+    },
+    {
+      "id": "b.rec_ntp",
+      "kind": "given",
+      "inputs": {},
+      "value": "15250"
+    },
+    {
+      "id": "b.disposable_net",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "15700",
+        "obligations": "loan,400,10"
+      },
+      "value": "15700.00"
+    },
+    {
+      "id": "b.disposable_ntp",
+      "kind": "given",
+      "inputs": {},
+      "value": "15250"
+    },
+    {
+      "id": "b.basis_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.disposable_net",
+        "subtrahend": "b.disposable_ntp"
+      },
+      "value": "450.00"
+    },
+    {
+      "id": "worked.recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "23400"
+    },
+    {
+      "id": "worked.table",
+      "kind": "aff_obligation_table",
+      "inputs": {
+        "obligations": "leasing,1900,30|loan,700,12|alimony,1800,84|rent,4500,5",
+        "name_1": "ליסינג לרכב",
+        "name_2": "הלוואה אישית",
+        "name_3": "מזונות שרוני משלם",
+        "name_4": "שכר דירה"
+      },
+      "value": [
+        {
+          "period": "ליסינג לרכב",
+          "monthly": "1900.00",
+          "months": 30,
+          "counted": "1900.00",
+          "placement": "income"
+        },
+        {
+          "period": "הלוואה אישית",
+          "monthly": "700.00",
+          "months": 12,
+          "counted": "0.00",
+          "placement": "none"
+        },
+        {
+          "period": "מזונות שרוני משלם",
+          "monthly": "1800.00",
+          "months": 84,
+          "counted": "1800.00",
+          "placement": "income"
+        },
+        {
+          "period": "שכר דירה",
+          "monthly": "4500.00",
+          "months": 5,
+          "counted": "0.00",
+          "placement": "none"
+        }
+      ]
+    },
+    {
+      "id": "worked.deducted",
+      "kind": "aff_deducted",
+      "inputs": {
+        "obligations": "leasing,1900,30|loan,700,12|alimony,1800,84|rent,4500,5"
+      },
+      "value": "3700.00"
+    },
+    {
+      "id": "worked.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "23400",
+        "obligations": "leasing,1900,30|loan,700,12|alimony,1800,84|rent,4500,5"
+      },
+      "value": "19700.00"
+    },
+    {
+      "id": "worked.deducted_invest",
+      "kind": "aff_deducted",
+      "inputs": {
+        "obligations": "leasing,1900,30|loan,700,12|alimony,1800,84|rent,4500,5,continues"
+      },
+      "value": "8200.00"
+    },
+    {
+      "id": "worked.disposable_invest",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "23400",
+        "obligations": "leasing,1900,30|loan,700,12|alimony,1800,84|rent,4500,5,continues"
+      },
+      "value": "15200.00"
+    },
+    {
+      "id": "worked.rent_effect",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "worked.deducted_invest",
+        "subtrahend": "worked.deducted"
+      },
+      "value": "4500.00"
+    },
+    {
+      "id": "worked.leasing",
+      "kind": "given",
+      "inputs": {},
+      "value": "1900"
+    },
+    {
+      "id": "worked.alimony",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800"
+    },
+    {
+      "id": "worked.rent",
+      "kind": "given",
+      "inputs": {},
+      "value": "4500"
+    },
+    {
+      "id": "half.table",
+      "kind": "aff_obligation_table",
+      "inputs": {
+        "obligations": "loan,1200,40|loan,300,15|leasing,1600,19|alimony,1500,-|rent,3800,9",
+        "name_1": "הלוואת רכב",
+        "name_2": "הלוואת לימודים",
+        "name_3": "ליסינג",
+        "name_4": "מזונות (בלי תאריך סיום)",
+        "name_5": "שכר דירה (עוברים לדירה)"
+      },
+      "value": [
+        {
+          "period": "הלוואת רכב",
+          "monthly": "1200.00",
+          "months": 40,
+          "counted": "1200.00",
+          "placement": "income"
+        },
+        {
+          "period": "הלוואת לימודים",
+          "monthly": "300.00",
+          "months": 15,
+          "counted": "0.00",
+          "placement": "none"
+        },
+        {
+          "period": "ליסינג",
+          "monthly": "1600.00",
+          "months": 19,
+          "counted": "1600.00",
+          "placement": "income"
+        },
+        {
+          "period": "מזונות (בלי תאריך סיום)",
+          "monthly": "1500.00",
+          "months": "-",
+          "counted": "1500.00",
+          "placement": "income"
+        },
+        {
+          "period": "שכר דירה (עוברים לדירה)",
+          "monthly": "3800.00",
+          "months": 9,
+          "counted": "0.00",
+          "placement": "none"
+        }
+      ]
+    },
+    {
+      "id": "half.deducted",
+      "kind": "aff_deducted",
+      "inputs": {
+        "obligations": "loan,1200,40|loan,300,15|leasing,1600,19|alimony,1500,-|rent,3800,9"
+      },
+      "value": "4300.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "16000",
+        "obligations": "loan,1100,40|loan,600,10"
+      },
+      "value": "14900.00"
+    },
+    {
+      "id": "ex2.err_both",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "16000",
+        "obligations": "loan,1100,40|loan,600,40"
+      },
+      "value": "14300.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 26
+      },
+      "value": 8
+    },
+    {
+      "id": "ex3.err_inclusive",
+      "kind": "hh_days_left",
+      "inputs": {
+        "window_days": 26,
+        "used_days": 17
+      },
+      "value": 9
+    },
+    {
+      "id": "ex5.ntp",
+      "kind": "given",
+      "inputs": {},
+      "value": "9100"
+    },
+    {
+      "id": "ex5.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "500"
+    },
+    {
+      "id": "ex5.err_double",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "9100",
+        "obligations": "loan,500,30"
+      },
+      "value": "8600.00"
+    },
+    {
+      "id": "ex6.deducted",
+      "kind": "aff_deducted",
+      "inputs": {
+        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+      },
+      "value": "8900.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "25000",
+        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+      },
+      "value": "16100.00"
+    },
+    {
+      "id": "ex6.err_18",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "25000",
+        "obligations": "loan,1700,19|leasing,2100,36|alimony,1600,-|rent,5200,7,continues"
+      },
+      "value": "14400.00"
+    },
+    {
+      "id": "ex6.err_rent",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "25000",
+        "obligations": "loan,1700,18|leasing,2100,36|alimony,1600,-|rent,5200,7"
+      },
+      "value": "21300.00"
+    },
+    {
+      "id": "ex6.err_alimony",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "25000",
+        "obligations": "loan,1700,18|leasing,2100,36|rent,5200,7,continues"
+      },
+      "value": "17700.00"
+    }
+  ]
+}

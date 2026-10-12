@@ -1,0 +1,908 @@
+{
+  "lesson": "4.4",
+  "title": "הוראה 329",
+  "note": "Directive 329's limits as the team transcribed them (Brain 7503881, 2026-10-08), not checked against the directive. Amounts invented for teaching.",
+  "facts": [
+    {
+      "id": "ceiling.only_home",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "ceiling.replacement",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "ceiling.investment",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "ceiling.any_purpose",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "pti.limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "pti.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "pti.weight",
+      "kind": "given",
+      "inputs": {},
+      "value": "100"
+    },
+    {
+      "id": "term.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "term.months",
+      "kind": "reg_months",
+      "inputs": {
+        "years": 30
+      },
+      "value": 360
+    },
+    {
+      "id": "history.prime_cap_year",
+      "kind": "given",
+      "inputs": {},
+      "value": "2020"
+    },
+    {
+      "id": "pred.prime",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "pred.fixed",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "pred.half",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "e1.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "e1.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "deal": "only_home"
+      },
+      "value": "750000.00"
+    },
+    {
+      "id": "e1.max_loan_any",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "deal": "any_purpose"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "rp.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1400000.00"
+    },
+    {
+      "id": "rp.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "rp.value",
+      "kind": "reg_reduced_value",
+      "inputs": {
+        "price": "1400000",
+        "appraisal": "1800000"
+      },
+      "value": "1800000.00"
+    },
+    {
+      "id": "rp.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1800000",
+        "deal": "only_home"
+      },
+      "value": "1350000.00"
+    },
+    {
+      "id": "rp.max_loan_at_price",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1400000",
+        "deal": "only_home"
+      },
+      "value": "1050000.00"
+    },
+    {
+      "id": "rp.equity",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rp.price",
+        "subtrahend": "rp.max_loan"
+      },
+      "value": "50000.00"
+    },
+    {
+      "id": "rp.equity_at_price",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rp.price",
+        "subtrahend": "rp.max_loan_at_price"
+      },
+      "value": "350000.00"
+    },
+    {
+      "id": "e2.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "e2.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "10000",
+        "percent": "50"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "e2.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "10000",
+        "percent": "40"
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "e3.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "900000.00"
+    },
+    {
+      "id": "e3.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "900000"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "e3.min_fixed",
+      "kind": "reg_min_fixed",
+      "inputs": {
+        "loan": "900000"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "r.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "r.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1000000"
+      },
+      "value": "666666.66"
+    },
+    {
+      "id": "r.min_fixed",
+      "kind": "reg_min_fixed",
+      "inputs": {
+        "loan": "1000000"
+      },
+      "value": "333333.34"
+    },
+    {
+      "id": "r.at_6666",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "ceiling": "66.66"
+      },
+      "value": "666600.00"
+    },
+    {
+      "id": "r.at_6667",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "ceiling": "66.67"
+      },
+      "value": "666700.00"
+    },
+    {
+      "id": "r.p6666",
+      "kind": "given",
+      "inputs": {},
+      "value": "66.66"
+    },
+    {
+      "id": "r.p6667",
+      "kind": "given",
+      "inputs": {},
+      "value": "66.67"
+    },
+    {
+      "id": "ch.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1700000.00"
+    },
+    {
+      "id": "ch.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "ch.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "7000.00"
+    },
+    {
+      "id": "ch.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "ch.variable",
+      "kind": "given",
+      "inputs": {},
+      "value": "840000.00"
+    },
+    {
+      "id": "ch.term_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "ch.check",
+      "kind": "reg_check",
+      "inputs": {
+        "deal": "only_home",
+        "value": "1700000",
+        "loan": "1200000",
+        "payment": "7000",
+        "income": "16000",
+        "variable": "840000",
+        "term_months": 360
+      },
+      "value": [
+        {
+          "id": "ltv",
+          "kind": "regulatory_limit",
+          "limit": "75",
+          "actual": "70.59",
+          "status": "within",
+          "room": "75000.00"
+        },
+        {
+          "id": "pti",
+          "kind": "regulatory_limit",
+          "limit": "50",
+          "actual": "43.75",
+          "status": "within",
+          "room": "1000.00"
+        },
+        {
+          "id": "capital",
+          "kind": "capital_threshold",
+          "limit": "40",
+          "actual": "43.75",
+          "status": "above",
+          "room": "-600.00"
+        },
+        {
+          "id": "variable",
+          "kind": "regulatory_limit",
+          "limit": "66.67",
+          "actual": "70",
+          "status": "over",
+          "room": "-40000.00"
+        },
+        {
+          "id": "term",
+          "kind": "regulatory_limit",
+          "limit": "360",
+          "actual": "360",
+          "status": "within",
+          "room": "0"
+        }
+      ]
+    },
+    {
+      "id": "ch.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1200000",
+        "value": "1700000"
+      },
+      "value": "70.59"
+    },
+    {
+      "id": "ch.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "7000",
+        "income": "16000"
+      },
+      "value": "43.75"
+    },
+    {
+      "id": "ch.var_share",
+      "kind": "reg_variable_share",
+      "inputs": {
+        "variable": "840000",
+        "loan": "1200000"
+      },
+      "value": "70"
+    },
+    {
+      "id": "ch.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1200000"
+      },
+      "value": "800000.00"
+    },
+    {
+      "id": "ch.var_over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ch.variable",
+        "subtrahend": "ch.max_var"
+      },
+      "value": "40000.00"
+    },
+    {
+      "id": "ch.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "40"
+      },
+      "value": "6400.00"
+    },
+    {
+      "id": "ch.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "50"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "ch.max_loan_70",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1700000",
+        "deal": "replacement"
+      },
+      "value": "1190000.00"
+    },
+    {
+      "id": "ch.loan_over_70",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ch.loan",
+        "subtrahend": "ch.max_loan_70"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "ch.long_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "32"
+    },
+    {
+      "id": "ch.long_months",
+      "kind": "reg_months",
+      "inputs": {
+        "years": 32
+      },
+      "value": 384
+    },
+    {
+      "id": "w.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000.00"
+    },
+    {
+      "id": "w.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450000.00"
+    },
+    {
+      "id": "w.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "8600.00"
+    },
+    {
+      "id": "w.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000.00"
+    },
+    {
+      "id": "w.variable",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "w.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1450000",
+        "value": "2000000"
+      },
+      "value": "72.5"
+    },
+    {
+      "id": "w.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "deal": "replacement"
+      },
+      "value": "1400000.00"
+    },
+    {
+      "id": "w.loan_over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.loan",
+        "subtrahend": "w.max_loan"
+      },
+      "value": "50000.00"
+    },
+    {
+      "id": "w.ratio",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "8600",
+        "income": "20000"
+      },
+      "value": "43"
+    },
+    {
+      "id": "w.max_50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20000",
+        "percent": "50"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "w.max_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20000",
+        "percent": "40"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "w.above_40",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.payment",
+        "subtrahend": "w.max_40"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "w.var_share",
+      "kind": "reg_variable_share",
+      "inputs": {
+        "variable": "1000000",
+        "loan": "1450000"
+      },
+      "value": "68.97"
+    },
+    {
+      "id": "w.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1450000"
+      },
+      "value": "966666.66"
+    },
+    {
+      "id": "w.var_over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.variable",
+        "subtrahend": "w.max_var"
+      },
+      "value": "33333.34"
+    },
+    {
+      "id": "w.check",
+      "kind": "reg_check",
+      "inputs": {
+        "deal": "replacement",
+        "value": "2000000",
+        "loan": "1450000",
+        "payment": "8600",
+        "income": "20000",
+        "variable": "1000000",
+        "term_months": 360
+      },
+      "value": [
+        {
+          "id": "ltv",
+          "kind": "regulatory_limit",
+          "limit": "70",
+          "actual": "72.5",
+          "status": "over",
+          "room": "-50000.00"
+        },
+        {
+          "id": "pti",
+          "kind": "regulatory_limit",
+          "limit": "50",
+          "actual": "43",
+          "status": "within",
+          "room": "1400.00"
+        },
+        {
+          "id": "capital",
+          "kind": "capital_threshold",
+          "limit": "40",
+          "actual": "43",
+          "status": "above",
+          "room": "-600.00"
+        },
+        {
+          "id": "variable",
+          "kind": "regulatory_limit",
+          "limit": "66.67",
+          "actual": "68.97",
+          "status": "over",
+          "room": "-33333.34"
+        },
+        {
+          "id": "term",
+          "kind": "regulatory_limit",
+          "limit": "360",
+          "actual": "360",
+          "status": "within",
+          "room": "0"
+        }
+      ]
+    },
+    {
+      "id": "w.max_var_after",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1400000"
+      },
+      "value": "933333.33"
+    },
+    {
+      "id": "w.var_over_after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.variable",
+        "subtrahend": "w.max_var_after"
+      },
+      "value": "66666.67"
+    },
+    {
+      "id": "half.table",
+      "kind": "reg_variable_table",
+      "inputs": {
+        "loan_1": "900000",
+        "loan_2": "1050000",
+        "loan_3": "1000000"
+      },
+      "value": [
+        {
+          "period": 1,
+          "loan": "900000.00",
+          "max_variable": "600000.00",
+          "min_fixed": "300000.00"
+        },
+        {
+          "period": 2,
+          "loan": "1050000.00",
+          "max_variable": "700000.00",
+          "min_fixed": "350000.00"
+        },
+        {
+          "period": 3,
+          "loan": "1000000.00",
+          "max_variable": "666666.66",
+          "min_fixed": "333333.34"
+        }
+      ]
+    },
+    {
+      "id": "ex2.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1600000.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1600000",
+        "deal": "only_home"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "ex2.at_70",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1600000",
+        "deal": "replacement"
+      },
+      "value": "1120000.00"
+    },
+    {
+      "id": "ex2.at_50",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1600000",
+        "deal": "investment"
+      },
+      "value": "800000.00"
+    },
+    {
+      "id": "ex2.equity",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex2.value",
+        "subtrahend": "ex2.answer"
+      },
+      "value": "400000.00"
+    },
+    {
+      "id": "ex3.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "14500.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "14500",
+        "percent": "50"
+      },
+      "value": "7250.00"
+    },
+    {
+      "id": "ex3.at_40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "14500",
+        "percent": "40"
+      },
+      "value": "5800.00"
+    },
+    {
+      "id": "ex3.double",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "14500",
+        "percent": "200"
+      },
+      "value": "29000.00"
+    },
+    {
+      "id": "ex4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1350000.00"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1350000"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "ex4.at_6666",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1350000",
+        "ceiling": "66.66"
+      },
+      "value": "899910.00"
+    },
+    {
+      "id": "ex4.third",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex4.loan",
+        "subtrahend": "ex4.answer"
+      },
+      "value": "450000.00"
+    },
+    {
+      "id": "ex5.ratio",
+      "kind": "given",
+      "inputs": {},
+      "value": "46"
+    },
+    {
+      "id": "ex6.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "ex6.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex6.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1500000",
+        "deal": "only_home"
+      },
+      "value": "1125000.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.price",
+        "subtrahend": "ex6.max_loan"
+      },
+      "value": "75000.00"
+    },
+    {
+      "id": "ex6.max_loan_at_price",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1200000",
+        "deal": "only_home"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "ex6.at_price",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.price",
+        "subtrahend": "ex6.max_loan_at_price"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "ex6.quarter",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1500000",
+        "ceiling": "25"
+      },
+      "value": "375000.00"
+    },
+    {
+      "id": "ex7.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex7.prime",
+      "kind": "given",
+      "inputs": {},
+      "value": "700000.00"
+    },
+    {
+      "id": "ex7.five_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "350000.00"
+    },
+    {
+      "id": "ex7.fixed",
+      "kind": "given",
+      "inputs": {},
+      "value": "450000.00"
+    },
+    {
+      "id": "ex7.changing",
+      "kind": "reg_total",
+      "inputs": {
+        "amount_1": "700000",
+        "amount_2": "350000"
+      },
+      "value": "1050000.00"
+    },
+    {
+      "id": "ex7.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1500000"
+      },
+      "value": "1000000.00"
+    },
+    {
+      "id": "ex7.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex7.changing",
+        "subtrahend": "ex7.max_var"
+      },
+      "value": "50000.00"
+    },
+    {
+      "id": "ex7.min_fixed",
+      "kind": "reg_min_fixed",
+      "inputs": {
+        "loan": "1500000"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "ex7.prime_only",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex7.prime",
+        "subtrahend": "ex7.min_fixed"
+      },
+      "value": "200000.00"
+    }
+  ]
+}

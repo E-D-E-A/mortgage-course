@@ -1,0 +1,516 @@
+{
+  "lesson": "4.9",
+  "title": "הבטוחה: הנכס, השמאות, רישום הזכויות וביטוחי חיים ומבנה",
+  "note": "Case B (אבי) from the course map; appraisals and dates are teaching assumptions. Rules from the team's Brain transcription of Directive 451 §9, §11 and a search summary of the financing-ratio value; not verified.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-10"
+    },
+    {
+      "id": "rule.ceiling_single",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "rule.appraisal_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 90
+    },
+    {
+      "id": "rule.policy_answer_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 14
+    },
+    {
+      "id": "rule.renewal_warning_days",
+      "kind": "given",
+      "inputs": {},
+      "value": 30
+    },
+    {
+      "id": "rule.no_insurance_below",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000"
+    },
+    {
+      "id": "rule.structure_extra_percent",
+      "kind": "given",
+      "inputs": {},
+      "value": 20
+    },
+    {
+      "id": "case.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1650000"
+    },
+    {
+      "id": "case.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "520000"
+    },
+    {
+      "id": "case.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1130000"
+    },
+    {
+      "id": "case.pay_1",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "565000",
+        "rate_percent": "4.60",
+        "months": 300
+      },
+      "value": "3172.61"
+    },
+    {
+      "id": "case.pay_2",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "565000",
+        "rate_percent": "4.10",
+        "months": 300
+      },
+      "value": "3013.56"
+    },
+    {
+      "id": "case.payment",
+      "kind": "uw_mix_payment",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300
+      },
+      "value": "6186.17"
+    },
+    {
+      "id": "case.ltv_price",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1650000",
+        "decimals": 1
+      },
+      "value": "68.5"
+    },
+    {
+      "id": "case.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1560000"
+    },
+    {
+      "id": "case.value_used",
+      "kind": "uw_lower",
+      "inputs": {
+        "a": "1560000",
+        "b": "1650000"
+      },
+      "value": "1560000.00"
+    },
+    {
+      "id": "case.ltv_appraisal",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1560000",
+        "decimals": 1
+      },
+      "value": "72.4"
+    },
+    {
+      "id": "case.max_loan_price",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "1650000",
+        "percent": "75"
+      },
+      "value": "1237500.00"
+    },
+    {
+      "id": "case.max_loan_appraisal",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "1560000",
+        "percent": "75"
+      },
+      "value": "1170000.00"
+    },
+    {
+      "id": "case.price_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "case.appraisal"
+      },
+      "value": "90000.00"
+    },
+    {
+      "id": "case.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.max_loan_appraisal",
+        "subtrahend": "case.loan"
+      },
+      "value": "40000.00"
+    },
+    {
+      "id": "prediction.ltv_up",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1560000",
+        "decimals": 1
+      },
+      "value": "72.4"
+    },
+    {
+      "id": "prediction.ltv_price",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1650000",
+        "decimals": 1
+      },
+      "value": "68.5"
+    },
+    {
+      "id": "life.after_60",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "paid": 60
+      },
+      "value": "990233.65"
+    },
+    {
+      "id": "life.after_120",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "paid": 120
+      },
+      "value": "816629.29"
+    },
+    {
+      "id": "life.after_240",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "paid": 240
+      },
+      "value": "332995.79"
+    },
+    {
+      "id": "life.months_to_30k",
+      "kind": "uw_payments_until_at_most",
+      "inputs": {
+        "principal_1": "565000",
+        "rate_1": "4.60",
+        "months_1": 300,
+        "principal_2": "565000",
+        "rate_2": "4.10",
+        "months_2": 300,
+        "threshold": "30000"
+      },
+      "value": 296
+    },
+    {
+      "id": "life.months_total",
+      "kind": "given",
+      "inputs": {},
+      "value": 300
+    },
+    {
+      "id": "life.months_left_30k",
+      "kind": "uw_count_difference",
+      "inputs": {
+        "minuend": "life.months_total",
+        "subtrahend": "life.months_to_30k"
+      },
+      "value": 4
+    },
+    {
+      "id": "half.table",
+      "kind": "uw_appraisal_table",
+      "inputs": {
+        "price": "1650000",
+        "loan": "1130000",
+        "ceiling": "75",
+        "appraisal_1": "1700000",
+        "appraisal_2": "1600000",
+        "appraisal_3": "1520000",
+        "appraisal_4": "1480000"
+      },
+      "value": [
+        {
+          "period": 1,
+          "appraisal": "1700000.00",
+          "used": "1650000.00",
+          "ltv": "68.48",
+          "max_loan": "1237500.00"
+        },
+        {
+          "period": 2,
+          "appraisal": "1600000.00",
+          "used": "1600000.00",
+          "ltv": "70.63",
+          "max_loan": "1200000.00"
+        },
+        {
+          "period": 3,
+          "appraisal": "1520000.00",
+          "used": "1520000.00",
+          "ltv": "74.34",
+          "max_loan": "1140000.00"
+        },
+        {
+          "period": 4,
+          "appraisal": "1480000.00",
+          "used": "1480000.00",
+          "ltv": "76.35",
+          "max_loan": "1110000.00"
+        }
+      ]
+    },
+    {
+      "id": "worked.appraisal_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-20"
+    },
+    {
+      "id": "worked.appraisal_last",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-10-20",
+        "days": 90
+      },
+      "value": "2027-01-18"
+    },
+    {
+      "id": "worked.policy_sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-02"
+    },
+    {
+      "id": "worked.policy_answer_by",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-11-02",
+        "days": 14
+      },
+      "value": "2026-11-16"
+    },
+    {
+      "id": "ex2.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1480000"
+    },
+    {
+      "id": "ex2.max_loan",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "1480000",
+        "percent": "75"
+      },
+      "value": "1110000.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.loan",
+        "subtrahend": "ex2.max_loan"
+      },
+      "value": "20000.00"
+    },
+    {
+      "id": "ex2.err_price",
+      "kind": "uw_times_percent",
+      "inputs": {
+        "amount": "1650000",
+        "percent": "75"
+      },
+      "value": "1237500.00"
+    },
+    {
+      "id": "ex2.err_price_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "case.price",
+        "subtrahend": "ex2.appraisal"
+      },
+      "value": "170000.00"
+    },
+    {
+      "id": "ex3.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "1520000"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1520000",
+        "decimals": 1
+      },
+      "value": "74.3"
+    },
+    {
+      "id": "ex3.err_price",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1130000",
+        "whole": "1650000",
+        "decimals": 1
+      },
+      "value": "68.5"
+    },
+    {
+      "id": "ex3.err_inverse",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "1520000",
+        "whole": "1130000",
+        "decimals": 1
+      },
+      "value": "134.5"
+    },
+    {
+      "id": "ex4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1130000"
+    },
+    {
+      "id": "ex4.paid",
+      "kind": "given",
+      "inputs": {},
+      "value": 120
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "uw_payments_until_at_most",
+      "inputs": {
+        "principal_1": "200000",
+        "rate_1": "5",
+        "months_1": 120,
+        "threshold": "30000"
+      },
+      "value": 106
+    },
+    {
+      "id": "ex5.balance_at",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "200000",
+        "rate_1": "5",
+        "months_1": 120,
+        "paid": 106
+      },
+      "value": "28790.54"
+    },
+    {
+      "id": "ex5.balance_before",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "200000",
+        "rate_1": "5",
+        "months_1": 120,
+        "paid": 105
+      },
+      "value": "30783.58"
+    },
+    {
+      "id": "ex5.months_left",
+      "kind": "uw_count_difference",
+      "inputs": {
+        "minuend": "ex5.months",
+        "subtrahend": "ex5.answer"
+      },
+      "value": 14
+    },
+    {
+      "id": "ex5.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 120
+    },
+    {
+      "id": "ex5.payment",
+      "kind": "uw_track_payment",
+      "inputs": {
+        "principal": "200000",
+        "rate_percent": "5",
+        "months": 120
+      },
+      "value": "2121.31"
+    },
+    {
+      "id": "ex6.sent",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-12-03"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-12-03",
+        "days": 14
+      },
+      "value": "2026-12-17"
+    },
+    {
+      "id": "ex6.err_day_one",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-12-03",
+        "days": 13
+      },
+      "value": "2026-12-16"
+    },
+    {
+      "id": "ex6.err_thirty",
+      "kind": "uw_add_days",
+      "inputs": {
+        "start": "2026-12-03",
+        "days": 30
+      },
+      "value": "2027-01-02"
+    }
+  ]
+}

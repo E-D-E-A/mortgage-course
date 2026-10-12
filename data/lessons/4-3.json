@@ -1,0 +1,495 @@
+{
+  "lesson": "4.3",
+  "title": "יחס החזר",
+  "note": "Case B's payment is the course's calculation assumption (case_sketch.py); every other household and loan is invented.",
+  "facts": [
+    {
+      "id": "small.ratio",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "3000",
+        "disposable": "10000"
+      },
+      "value": "30"
+    },
+    {
+      "id": "small.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "3000"
+    },
+    {
+      "id": "small.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000"
+    },
+    {
+      "id": "small.disp_after",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "10000",
+        "obligations": "loan,1000,30"
+      },
+      "value": "9000.00"
+    },
+    {
+      "id": "small.ratio_denominator",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "3000",
+        "disposable": "9000.00"
+      },
+      "value": "33.33"
+    },
+    {
+      "id": "small.numerator",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "3000|1000"
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "small.ratio_numerator",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "4000.00",
+        "disposable": "10000"
+      },
+      "value": "40"
+    },
+    {
+      "id": "grace.after",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate_percent": "4.5",
+        "months": 300,
+        "method": "spitzer",
+        "grace_months": 12
+      },
+      "value": "5684.25"
+    },
+    {
+      "id": "grace.during",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate_percent": "4.5",
+        "months": 300,
+        "method": "spitzer",
+        "bullet": "yes"
+      },
+      "value": "3750.00"
+    },
+    {
+      "id": "bullet.interest",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "5",
+        "months": 120,
+        "method": "spitzer",
+        "bullet": "yes"
+      },
+      "value": "1666.67"
+    },
+    {
+      "id": "b.track1",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "565000",
+        "rate_percent": "4.6",
+        "months": 300,
+        "method": "spitzer"
+      },
+      "value": "3172.61"
+    },
+    {
+      "id": "b.track2",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "565000",
+        "rate_percent": "4.1",
+        "months": 300,
+        "method": "spitzer"
+      },
+      "value": "3013.56"
+    },
+    {
+      "id": "b.payment",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "3172.61|3013.56"
+      },
+      "value": "6186.17"
+    },
+    {
+      "id": "b.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1130000"
+    },
+    {
+      "id": "b.half",
+      "kind": "given",
+      "inputs": {},
+      "value": "565000"
+    },
+    {
+      "id": "b.declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "19200"
+    },
+    {
+      "id": "b.recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "15700"
+    },
+    {
+      "id": "b.recognised_latest",
+      "kind": "given",
+      "inputs": {},
+      "value": "16200"
+    },
+    {
+      "id": "b.recognised_ntp",
+      "kind": "given",
+      "inputs": {},
+      "value": "15250"
+    },
+    {
+      "id": "b.ratio_declared",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6186.17",
+        "disposable": "19200"
+      },
+      "value": "32.22"
+    },
+    {
+      "id": "b.ratio_recognised",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6186.17",
+        "disposable": "15700"
+      },
+      "value": "39.4"
+    },
+    {
+      "id": "b.ratio_latest",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6186.17",
+        "disposable": "16200"
+      },
+      "value": "38.19"
+    },
+    {
+      "id": "b.ratio_ntp",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6186.17",
+        "disposable": "15250"
+      },
+      "value": "40.57"
+    },
+    {
+      "id": "b.ratio_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.ratio_recognised",
+        "subtrahend": "b.ratio_declared"
+      },
+      "value": "7.18"
+    },
+    {
+      "id": "same.recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "15200"
+    },
+    {
+      "id": "same.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200"
+    },
+    {
+      "id": "same.existing",
+      "kind": "given",
+      "inputs": {},
+      "value": "2100"
+    },
+    {
+      "id": "same.existing_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 140
+    },
+    {
+      "id": "same.new",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "200000",
+        "rate_percent": "5",
+        "months": 180,
+        "method": "spitzer"
+      },
+      "value": "1581.59"
+    },
+    {
+      "id": "same.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "15200",
+        "obligations": "loan,1200,24|mortgage,2100,140,same_property"
+      },
+      "value": "14000.00"
+    },
+    {
+      "id": "same.added",
+      "kind": "aff_added",
+      "inputs": {
+        "obligations": "loan,1200,24|mortgage,2100,140,same_property"
+      },
+      "value": "2100.00"
+    },
+    {
+      "id": "same.payment",
+      "kind": "aff_ratio_payment",
+      "inputs": {
+        "new_payment": "1581.59",
+        "obligations": "loan,1200,24|mortgage,2100,140,same_property"
+      },
+      "value": "3681.59"
+    },
+    {
+      "id": "same.ratio_new_only",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "1581.59",
+        "disposable": "14000.00"
+      },
+      "value": "11.3"
+    },
+    {
+      "id": "same.ratio",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "3681.59",
+        "disposable": "14000.00"
+      },
+      "value": "26.3"
+    },
+    {
+      "id": "same.ratio_other_property",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "15200",
+        "obligations": "loan,1200,24|mortgage,2100,140,other_property",
+        "new_payment": "1581.59"
+      },
+      "value": "13.29"
+    },
+    {
+      "id": "same.disposable_other_property",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "15200",
+        "obligations": "loan,1200,24|mortgage,2100,140,other_property"
+      },
+      "value": "11900.00"
+    },
+    {
+      "id": "same.ratio_short",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "15200",
+        "obligations": "loan,1200,24|mortgage,2100,15,same_property",
+        "new_payment": "1581.59"
+      },
+      "value": "11.3"
+    },
+    {
+      "id": "half.table",
+      "kind": "aff_ratio_table",
+      "inputs": {
+        "name_1": "1",
+        "recognised_1": "20000",
+        "obligations_1": "loan,1000,30",
+        "new_payment_1": "5700",
+        "name_2": "2",
+        "recognised_2": "15000",
+        "obligations_2": "loan,800,12",
+        "new_payment_2": "4500",
+        "name_3": "3",
+        "recognised_3": "24000",
+        "obligations_3": "alimony,2000,-|mortgage,1800,60,same_property",
+        "new_payment_3": "4000",
+        "name_4": "4",
+        "recognised_4": "12500",
+        "obligations_4": "rent,3000,6,continues",
+        "new_payment_4": "4750"
+      },
+      "value": [
+        {
+          "period": "1",
+          "recognised": "20000.00",
+          "deducted": "1000.00",
+          "disposable": "19000.00",
+          "payment": "5700.00",
+          "ratio": "30"
+        },
+        {
+          "period": "2",
+          "recognised": "15000.00",
+          "deducted": "0.00",
+          "disposable": "15000.00",
+          "payment": "4500.00",
+          "ratio": "30"
+        },
+        {
+          "period": "3",
+          "recognised": "24000.00",
+          "deducted": "2000.00",
+          "disposable": "22000.00",
+          "payment": "5800.00",
+          "ratio": "26.36"
+        },
+        {
+          "period": "4",
+          "recognised": "12500.00",
+          "deducted": "3000.00",
+          "disposable": "9500.00",
+          "payment": "4750.00",
+          "ratio": "50"
+        }
+      ]
+    },
+    {
+      "id": "ex1.answer",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "4200",
+        "disposable": "14000"
+      },
+      "value": "30"
+    },
+    {
+      "id": "ex1.err_inverse",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "14000",
+        "disposable": "4200"
+      },
+      "value": "333.33"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "5",
+        "months": 120,
+        "method": "spitzer",
+        "bullet": "yes"
+      },
+      "value": "1666.67"
+    },
+    {
+      "id": "ex3.err_principal",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "400000",
+        "rate_percent": "0",
+        "months": 120,
+        "method": "spitzer"
+      },
+      "value": "3333.33"
+    },
+    {
+      "id": "ex3.err_annual",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "20000",
+        "obligations": "loan,1500,30",
+        "new_payment": "5000"
+      },
+      "value": "27.03"
+    },
+    {
+      "id": "ex4.err_numerator",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6500",
+        "disposable": "20000"
+      },
+      "value": "32.5"
+    },
+    {
+      "id": "ex4.err_ignored",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "5000",
+        "disposable": "20000"
+      },
+      "value": "25"
+    },
+    {
+      "id": "ex4.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "20000",
+        "obligations": "loan,1500,30"
+      },
+      "value": "18500.00"
+    },
+    {
+      "id": "ex6.payment",
+      "kind": "aff_ratio_payment",
+      "inputs": {
+        "new_payment": "3000",
+        "obligations": "mortgage,2400,200,same_property"
+      },
+      "value": "5400.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "5400.00",
+        "disposable": "18000"
+      },
+      "value": "30"
+    },
+    {
+      "id": "ex6.err_new_only",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "3000",
+        "disposable": "18000"
+      },
+      "value": "16.67"
+    },
+    {
+      "id": "ex6.err_income",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "18000",
+        "obligations": "mortgage,2400,200,other_property",
+        "new_payment": "3000"
+      },
+      "value": "19.23"
+    }
+  ]
+}

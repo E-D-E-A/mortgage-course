@@ -1,0 +1,481 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "4.4"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RegulationChecker from "../../components/RegulationChecker.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("4.4");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const source = "הקווים לפי תעתיק של הצוות ותקצירים של ההוראה, נכון ל־2026-10-09; לא אומתו מול המסמך עצמו.";
+export const deals = [
+  { id: "only_home", label: "אין לכם דירה אחרת" },
+  { id: "replacement", label: "מחליפים דירה" },
+  { id: "investment", label: "יש לכם דירה ומשאירים אותה" },
+  { id: "any_purpose", label: "הלוואה לכל מטרה" },
+];
+export const predictionOptions = [
+  `מותר: לפחות שליש מההלוואה בריבית קבועה, ו־${pct("pred.fixed")} זה יותר משליש`,
+  `אסור: בפריים מותר לכל היותר שליש מההלוואה`,
+  `אסור: לפחות ${pct("pred.half")} מההלוואה צריכים להיות בריבית קבועה`,
+  `מותר רק אם יחס ההחזר נמוך מ־${pct("pti.threshold")}`,
+];
+export const line = (id) => f.rows(id);
+export const wc = f.rows("w.check");
+
+בשיעור הקודם חישבנו <Term t="יחס החזר" lesson="4.4">יחס החזר</Term>: איזה חלק מה<Term t="הכנסה פנויה" lesson="4.4">הכנסה הפנויה</Term> הולך להחזר החודשי. בשיעור 1.2 ראינו תקרה ל<Term t="שיעור מימון" lesson="4.4">שיעור המימון</Term>.
+שני הקווים האלה באים מאותו מקום: הוראה אחת של בנק ישראל, שקובעת לבנקים מה אסור במשכנתא. בשיעור הזה נאסוף את כל הקווים שלה למקום אחד, ונבדוק תיק מולם.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="4.4"
+  question={`משפחה מבקשת משכנתא: ${pct("pred.prime")} מההלוואה ב<Term>מסלול פריים</Term>, ו־${pct("pred.fixed")} בריבית קבועה. לפי הכללים של בנק ישראל, האם מותר?`.replace("<Term>", "").replace("</Term>", "")}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## חמשת הקווים האדומים
+
+</Section>
+
+<LessonVideo lesson="4-4" />
+
+<Section kind="ההסבר">
+
+## הוראה אחת, כמה קווים
+
+</Section>
+
+ה<Term t="בנק ישראל" lesson="4.4">בנק ישראל</Term> מפקח על הבנקים. אחד הכלים שלו הוא הוראות: כללים כתובים שכל בנק חייב לקיים. ההוראה על משכנתאות נקראת ״מגבלות למתן הלוואות לדיור״, ומספרה 329. מכאן נקרא לה <Term t="הוראה 329" lesson="4.4">הוראה 329</Term>.
+
+**למי היא פונה?** לבנקים. לפי תקצירים של ההוראה, הלשון היא ״תאגיד בנקאי לא יאשר ולא יבצע הלוואה לדיור...״ כלומר: הבנק הוא שמנוע מלתת. אתם לא ״עוברים על ההוראה״; הבנק פשוט לא יכול לאשר.
+
+**למה היא קיימת?** בפישוט: משכנתא היא הלוואה גדולה וארוכה, ורוב הכסף שהבנק מלווה הוא כסף של מפקידים (שיעור 0.9). קווים כאלה שומרים שלכל משכנתא תהיה כרית בשווי הדירה (שיעור 1.1), ושההחזר לא יבלע את כל ההכנסה.
+
+**כמה זה ודאי?** אתרי בנק ישראל חסומים בסביבה שבה נכתב הקורס. כל מה שבשיעור הזה בא מתעתיק של הצוות ב־Brain ומתקצירים של ההוראה, ועוד לא נבדק מול המסמך עצמו. לפי התקצירים, הגרסה האחרונה שנמצאה היא גרסה 12, מפברואר 2026. בכל מקום נכתוב ״לפי התעתיק״, ובסוף השיעור — מה בדיוק לא אומת.
+
+<Section kind="ההסבר">
+
+## הקו הראשון: שיעור המימון
+
+</Section>
+
+את הקו הזה כבר פגשנו בשיעור 1.2. ההלוואה, חלקי שווי הנכס, לא עוברת תקרה שתלויה בסוג העסקה:
+
+- **{pct("ceiling.only_home")}** כשאין לכם דירה אחרת (<Term t="דירה יחידה" lesson="4.4">דירה יחידה</Term>). על דירה של {f.shekels("e1.value")}: הלוואה של עד {f.shekels("e1.max_loan")}.
+- **{pct("ceiling.replacement")}** כש<Term t="דירה חליפית" lesson="4.4">מחליפים דירה</Term>.
+- **{pct("ceiling.investment")}** כשיש לכם דירה ומשאירים אותה (<Term t="דירה נוספת" lesson="4.4">דירה נוספת</Term>).
+- **{pct("ceiling.any_purpose")}** ב<Term t="הלוואה לכל מטרה" lesson="4.4">הלוואה לכל מטרה</Term>: על אותה דירה, עד {f.shekels("e1.max_loan_any")}. לפי תקצירים, בדצמבר 2025 הוחלט על הקלה שמאפשרת יותר מזה בתנאים מסוימים; אבל שני תקצירים קוראים אותה אחרת, ולכן הקורס לא משתמש בה עד שהמסמך ייפתח.
+
+לפי תקציר אחד של ההוראה, התקרה חלה על כל האשראי שהנכס הזה מבטיח, גם מבנקים אחרים (לא אומת).
+
+**מקרה מיוחד: <Term t="דירה במחיר מופחת" lesson="4.4">דירה במחיר מופחת</Term>.** בתוכניות כמו <Term t="מחיר למשתכן" lesson="4.4">מחיר למשתכן</Term> המדינה מוכרת דירות בהנחה. לפי תקצירים של ההוראה, בדירה כזו הבנק רשאי לחשב את שיעור המימון מול השווי שקבע <Term t="שמאי" lesson="4.4">שמאי</Term>, ולא מול המחיר המוזל — עד תקרת שווי שקבועה בהוראה. גובה התקרה הזו לא אומת.
+
+דוגמה, בהנחה שהתקרה לא עוצרת כאן: דירה במחיר {f.shekels("rp.price")}, ששמאי העריך ב־{f.shekels("rp.appraisal")}.
+- מול השווי: <M>{n("rp.appraisal")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("rp.max_loan")}</M>, והחלק שלכם <M>{n("rp.price")} − {n("rp.max_loan")} = {f.shekels("rp.equity")}</M>.
+- מול המחיר: <M>{n("rp.price")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("rp.max_loan_at_price")}</M>, והחלק שלכם {f.shekels("rp.equity_at_price")}.
+
+ההבדל גדול. אבל שימו לב לשלושה תנאים: הבנק **רשאי**, לא חייב; יש תקרת שווי שלא בדקנו; ושני הקווים של ההחזר עדיין חלים.
+
+<Section kind="ההסבר">
+
+## הקו השני והשלישי: יחס ההחזר
+
+</Section>
+
+**הקו השני: עד {pct("pti.limit")}.** לפי התעתיק, בנק לא מאשר הלוואה שיחס ההחזר שלה **עולה על** {pct("pti.limit")}. ״עולה על״ אומר שבדיוק {pct("pti.limit")} עוד מותר. בהכנסה פנויה של {f.shekels("e2.income")}: <M>{n("e2.income")} × {f.plain("pti.limit")} ÷ 100 = {f.shekels("e2.max_50")}</M> — זה ההחזר הגבוה ביותר שמותר.
+
+**הקו השלישי: {pct("pti.threshold")}. והוא שונה מכל האחרים.** לפי התעתיק, מעל {pct("pti.threshold")} מותר לתת את ההלוואה. מה שמשתנה הוא החשבון הפנימי של הבנק: הבנק צריך להחזיק יותר הון משלו כנגד ההלוואה. בהכנסה של {f.shekels("e2.income")}, הקו הזה עובר ב־<M>{n("e2.income")} × {f.plain("pti.threshold")} ÷ 100 = {f.shekels("e2.max_40")}</M>.
+
+כלומר, החזר של {f.shekels("e2.max_40")} ומטה — מתחת לשני הקווים. בין {f.shekels("e2.max_40")} ל־{f.shekels("e2.max_50")} — מותר, אבל מעל קו ההון. מעל {f.shekels("e2.max_50")} — אסור. למה קו של הון חשוב ללווה, ואיך מבדילים בינו לבין איסור — זה כל השיעור הבא, על <Later lesson="4.5">סף הון</Later>.
+
+<Callout title="איזה החזר, ואיזו הכנסה">
+<p>החזר והכנסה פנויה — בדיוק כמו בשיעורים 4.2 ו־4.3: ההחזר הראשון על כל הסכום (או אחרי הגרייס), וההכנסה אחרי ההתחייבויות שנשארו להן יותר מ־18 חודשים. כאן לא מחשבים אותם מחדש; מקבלים אותם מוכנים ובודקים מול הקווים.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## הקו הרביעי: לפחות שליש בריבית קבועה
+
+</Section>
+
+לפי התעתיק, לכל היותר **שני שלישים** מההלוואה יכולים להיות ב<Term t="ריבית משתנה" lesson="4.4">ריבית משתנה</Term>. במילים אחרות: לפחות שליש ב<Term t="ריבית קבועה" lesson="4.4">ריבית קבועה</Term>.
+
+בהלוואה של {f.shekels("e3.loan")}: שליש הוא {f.shekels("e3.min_fixed")}, ולכן לפחות {f.shekels("e3.min_fixed")} בריבית קבועה, ולכל היותר {f.shekels("e3.max_var")} בריבית שיכולה להשתנות.
+
+**מה נחשב ״משתנה״?** כל ריבית שיכולה להשתנות במהלך חיי ההלוואה. לא רק <Term t="פריים" lesson="4.4">פריים</Term>: גם מסלול שהריבית שלו מתעדכנת פעם בחמש שנים נספר בצד המשתנה (לפי התעתיק, ולפי תקצירים של ההוראה).
+
+**ומה לא?** פעם היה כלל נוסף: לכל היותר שליש מההלוואה בפריים. לפי תקצירים של חוזר של בנק ישראל, הכלל הזה בוטל בדצמבר {f.plain("history.prime_cap_year")}. נשאר רק הכלל של שני השלישים — והוא חל על כל המשתנים יחד.
+
+**ומסלול קבוע צמוד?** הריבית בו לא משתנה; המדד משנה את היתרה, לא את הריבית (שיעור 2.3). לכן, לפי ההגדרה ״ריבית שיכולה להשתנות״, הוא בצד הקבוע. את הנוסח המדויק של ההוראה בנקודה הזו לא בדקנו, והשאלה רשומה.
+
+<Section kind="ההסבר">
+
+## הקו החמישי: עד {f.plain("term.years")} שנה
+
+</Section>
+
+לפי התעתיק ולפי תקצירים של ההוראה, בנק לא מאשר הלוואה לדיור ש״התקופה לפירעון סופי״ שלה עולה על {f.plain("term.years")} שנה: {f.plain("term.months")} חודשים.
+
+<Term t="מסלול" lesson="4.4">למסלול</Term> יכולה להיות תקופה משלו (החלטה של Mogi, לפי אילון, 2026-08-03). לכן הקו נבדק על **המסלול הארוך ביותר**: התשלום האחרון של ההלוואה כולה.
+
+<Callout title="חמישה קווים, שניים נוגעים בחלוקה">
+<p>מבין חמשת הקווים, רק שניים נוגעים באיך מחלקים את ההלוואה ל<Term t="תמהיל" lesson="4.4">תמהיל</Term>: יחס ההחזר (כל מסלול משנה את ההחזר) והחלק המשתנה. שיעור המימון והתקופה הם תכונות של ההלוואה כולה. כך כתב הצוות במחקר על בניית תמהיל (Brain, דף 7634954; מחקר, לא כלל רשמי). נחזור לזה בשלב 5.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## בודק העמידה ברגולציה
+
+</Section>
+
+הבודק מקבל הלוואה אחת ומראה את חמשת הקווים. לכל קו: המספר של התיק, הקו עצמו, וכמה מקום נשאר — בשקלים או בחודשים. ירוק: בתוך הקו. אדום: חוצה איסור. כתום: מעל קו ההון — מותר.
+
+<RegulationChecker
+  client:visible
+  deals={deals}
+  source={source}
+  value={Number(f.raw("ch.value"))}
+  loan={Number(f.raw("ch.loan"))}
+  payment={Number(f.raw("ch.payment"))}
+  income={Number(f.raw("ch.income"))}
+  variable={Number(f.raw("ch.variable"))}
+  termYears={Number(f.raw("ch.term_years"))}
+/>
+
+נסו את שלושת אלה:
+1. בלי לשנות דבר: איזה קו נחצה, ובכמה? ואיזה קו מסומן כתום?
+2. החזירו את החלק המשתנה לקו, ואז בחרו ״מחליפים דירה״. מה קורה לשיעור המימון?
+3. חזרו ל״אין לכם דירה אחרת״, והאריכו את המסלול הארוך ל־{f.plain("ch.long_years")} שנה. מה הבודק אומר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>החלק המשתנה: {f.shekels("ch.variable")} מתוך {f.shekels("ch.loan")}, כלומר {pct("ch.var_share")} — מעל שני שלישים. המותר הוא {f.shekels("ch.max_var")}, ויש עודף של {f.shekels("ch.var_over")}. יחס ההחזר הוא {pct("ch.ratio")}: מתחת ל־{pct("pti.limit")}, אבל מעל {pct("pti.threshold")} — לכן כתום.</li>
+    <li>כשמחליפים דירה התקרה יורדת ל־{pct("ceiling.replacement")}. ההלוואה המרבית: {f.shekels("ch.max_loan_70")}. ההלוואה גדולה ממנה ב־{f.shekels("ch.loan_over_70")}, והקו נחצה — אותה הלוואה, אותה דירה, רק סוג עסקה אחר.</li>
+    <li>{f.plain("ch.long_years")} שנה הם {f.plain("ch.long_months")} חודשים, יותר מ־{f.plain("term.months")}. הקו נחצה, גם אם כל השאר בסדר.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## ארבעה איסורים וקו אחד, בנוסחאות
+
+</Section>
+
+**צעד 1 — שיעור המימון.** כמו בשיעור 1.2: ההלוואה המרבית היא השווי כפול התקרה, חלקי 100. <M>{n("e1.value")} × {f.plain("ceiling.only_home")} ÷ 100 = {n("e1.max_loan")}</M>.
+
+**צעד 2 — יחס ההחזר.** ההחזר המרבי הוא ההכנסה הפנויה כפול {f.plain("pti.limit")}, חלקי 100; קו ההון — אותו דבר עם {f.plain("pti.threshold")}. <M>{n("e2.income")} × {f.plain("pti.limit")} ÷ 100 = {n("e2.max_50")}</M>.
+
+**צעד 3 — החלק המשתנה.** ההלוואה כפול 2, חלקי 3. <M>{n("e3.loan")} × 2 ÷ 3 = {n("e3.max_var")}</M>.
+
+**צעד 4 — התקופה.** סופרים בחודשים, עד המסלול הארוך: <M>{f.plain("term.years")} × 12 = {f.plain("term.months")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">P ≤ V × c ÷ 100</p>
+  <p class="text-h3 mt-2 text-navy"><span class="ltr">C</span> ≤ ההכנסה הפנויה × {f.plain("pti.limit")} ÷ 100</p>
+  <p class="text-h3 mt-2 text-navy">החלק המשתנה ≤ <span class="ltr">P × 2 ÷ 3</span></p>
+  <p class="ltr text-h3 mt-2 text-navy">n ≤ {f.plain("term.months")}</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">P</dt><dd>ההלוואה כולה, בשקלים (כמו בשיעור 1.2)</dd>
+    <dt class="ltr font-semibold text-n900">V</dt><dd>שווי הנכס, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">c</dt><dd>התקרה של סוג העסקה, באחוזים כמספר שלם: {f.plain("ceiling.only_home")}, {f.plain("ceiling.replacement")} או {f.plain("ceiling.investment")}. אות שאינה בטבלת האותיות של הקורס, כדי לא לבלבל עם C</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>ההחזר החודשי שנכנס ליחס, בשקלים (שיעור 4.3)</dd>
+    <dt class="font-semibold text-n900">ההכנסה הפנויה</dt><dd>כמו בשיעור 4.2, בשקלים לחודש</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר החודשים עד התשלום האחרון של המסלול הארוך</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">קו ההון: אותה נוסחה כמו ל־<span class="ltr">C</span>, עם {f.plain("pti.threshold")} במקום {f.plain("pti.limit")}. מעליו מותר.</p>
+</div>
+
+**מתי הנוסחאות נכונות?**
+1. כל הקווים לפי התעתיק, נכון ל־2026-10-09. הוראה מתעדכנת; גרסה חדשה יכולה לשנות מספר.
+2. V הוא השווי שמולו מחשבים את שיעור המימון. בשיעור 1.2 ראינו שזו שאלה פתוחה כשהשווי שונה מהמחיר; בדירה במחיר מופחת — השווי של השמאי, עד תקרה.
+3. ״≤״ כי הלשון היא ״עולה על״: בדיוק על הקו מותר.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> כפל וחילוק בלבד. את שני השלישים — כפל ב־2 וחילוק ב־3, לא כפל ב־0.67.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם ההלוואה בתא A1, החלק המשתנה המרבי הוא <span class="ltr">{"=ROUNDDOWN(A1*2/3,2)"}</span>. אם ההכנסה הפנויה ב־B1, ההחזר המרבי הוא <span class="ltr">{"=ROUNDDOWN(B1*50/100,2)"}</span>.</p>
+</Callout>
+
+<Callout title="ליד קו, מעגלים כלפי מטה" tone="warning">
+<p>שני שלישים מ־{f.shekels("r.loan")} הם <M>{n("r.loan")} × 2 ÷ 3</M> = 666,666.666… — שלוש ספרות שחוזרות בלי סוף. בעיגול רגיל לאגורה יוצא 666,666.67, וזה <strong>יותר</strong> משני שלישים. לכן בקורס, סכום מרבי מעוגל תמיד כלפי מטה: {f.shekels("r.max_var")}, והחלק הקבוע {f.shekels("r.min_fixed")}. זו הנחת חישוב של הקורס; בנק יכול לעגל לשקלים שלמים או לסכומים עגולים.</p>
+<p>ומה עם ״{pct("r.p6666")}״, שכתוב לפעמים במקום שני שלישים? <M>{n("r.loan")} × {f.plain("r.p6666")} ÷ 100 = {n("r.at_6666")}</M> — מתחת לקו, ולא מנצל את כולו. ו־{pct("r.p6667")} נותנים {f.shekels("r.at_6667")} — מעל הקו. שני השלישים הם שבר, לא אחוז מעוגל.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="4.4"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    `זה הכלל הישן. לפי תקצירים של חוזר של בנק ישראל, מגבלת השליש על פריים בוטלה בדצמבר ${f.plain("history.prime_cap_year")}. נשאר רק: לכל היותר שני שלישים בריבית שיכולה להשתנות.`,
+    `ההוראה דורשת שליש, לא ${pct("pred.half")}. ${pct("pred.fixed")} בריבית קבועה עומדים בכלל.`,
+    `יחס ההחזר הוא קו אחר לגמרי. החלק המשתנה נבדק לבד, בלי קשר להכנסה.`,
+  ]}
+>
+  בריבית שיכולה להשתנות יש {pct("pred.prime")} מההלוואה — פחות משני שלישים. בריבית קבועה יש {pct("pred.fixed")} — יותר משליש. הכלל נשמר, ובפריים אין היום מגבלה נפרדת.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## חמשה מספרים לזכור
+
+</Section>
+
+**{f.plain("ceiling.only_home")}/{f.plain("ceiling.replacement")}/{f.plain("ceiling.investment")} · {f.plain("pti.limit")} · {f.plain("pti.threshold")} · שני שלישים · {f.plain("term.years")}.** ארבעה איסורים וקו הון אחד. ואחרי כל מספר — שאלה אחת: ״מול מה הוא נמדד?״ שיעור המימון מול השווי; ההחזר מול ההכנסה הפנויה; החלק המשתנה מול ההלוואה כולה; התקופה מול התשלום האחרון.
+
+<Section kind="דוגמה פתורה">
+
+## משפחה שמחליפה דירה
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>משפחה בדויה; הסכומים להמחשה בלבד, ואינם הצעת בנק או נתוני שוק.</p>
+</Callout>
+
+משפחה מוכרת את הדירה שלה וקונה דירה ששוויה {f.shekels("w.value")}. היא מבקשת הלוואה של {f.shekels("w.loan")}, ל־{f.plain("term.years")} שנה. ההחזר שנכנס ליחס: {f.shekels("w.payment")}. ההכנסה הפנויה: {f.shekels("w.income")}. מתוך ההלוואה, {f.shekels("w.variable")} בפריים ובמסלול שמתעדכן כל חמש שנים; השאר בריבית קבועה.
+
+**צעד 1 — שיעור המימון.** <M>{n("w.loan")} ÷ {n("w.value")} × 100 = {f.plain("w.ltv")}</M>. מחליפים דירה, ולכן התקרה {pct("ceiling.replacement")}: ההלוואה המרבית <M>{n("w.value")} × {f.plain("ceiling.replacement")} ÷ 100 = {f.shekels("w.max_loan")}</M>. **נחצה**: יותר מדי ב־<M>{n("w.loan")} − {n("w.max_loan")} = {f.shekels("w.loan_over")}</M>.
+
+**צעד 2 — יחס ההחזר.** <M>{n("w.payment")} ÷ {n("w.income")} × 100 = {f.plain("w.ratio")}</M>. מתחת ל־{pct("pti.limit")} (ההחזר המרבי {f.shekels("w.max_50")}) — **בתוך הקו**.
+
+**צעד 3 — קו ההון.** בהכנסה הזו הקו עובר ב־{f.shekels("w.max_40")}. ההחזר גבוה ממנו ב־<M>{n("w.payment")} − {n("w.max_40")} = {f.shekels("w.above_40")}</M>: **מעל הסף, מותר**.
+
+**צעד 4 — החלק המשתנה.** <M>{n("w.loan")} × 2 ÷ 3 = {n("w.max_var")}</M> (מעוגל כלפי מטה). במשתנה יש {f.shekels("w.variable")} — {pct("w.var_share")} מההלוואה. **נחצה**: עודף של <M>{n("w.variable")} − {n("w.max_var")} = {f.shekels("w.var_over")}</M>.
+
+**צעד 5 — התקופה.** {f.plain("term.years")} שנה, {f.plain("term.months")} חודשים — בדיוק על הקו, **מותר**.
+
+**צעד 6 — מה עושים.** שני איסורים נחצו, וכל אחד צריך תיקון משלו:
+- **שיעור המימון:** עוד {f.shekels("w.loan_over")} הון עצמי, כדי שההלוואה תרד ל־{f.shekels("w.max_loan")}.
+- **החלק המשתנה:** להעביר כסף ממשתנה לקבועה. אבל שימו לב: השליש נמדד מול ההלוואה. אם ההלוואה יורדת ל־{f.shekels("w.max_loan")} ואת ההפרש לוקחים מהחלק הקבוע, המותר במשתנה יורד ל־{f.shekels("w.max_var_after")}, והעודף גדל ל־{f.shekels("w.var_over_after")}. מתקנים קו אחד — ובודקים שוב את כולם.
+- **ואחרי כל שינוי** — מחשבים את ההחזר מחדש (שלב 3), כי הוא תלוי בסכום ובמסלולים.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+לכל הלוואה: כמה לכל היותר בריבית שיכולה להשתנות, וכמה לפחות בריבית קבועה. השורה הראשונה מלאה. מעגלים את המשתנה המרבי כלפי מטה לאגורה, והקבוע הוא מה שנשאר.
+
+<FillTable
+  client:visible
+  id="4.4-half"
+  columns={[
+    { key: "loan", label: "ההלוואה" },
+    { key: "max_variable", label: "משתנה, לכל היותר" },
+    { key: "min_fixed", label: "קבועה, לפחות" },
+  ]}
+  rows={f.rows("half.table")}
+  blanks={["2.max_variable", "2.min_fixed", "3.max_variable", "3.min_fixed"]}
+  success="בכל שורה: המשתנה המרבי הוא ההלוואה כפול 2 חלקי 3, והקבוע הוא כל השאר. שני החלקים יחד הם ההלוואה."
+  hint="כופלים ב־2 ומחלקים ב־3, לא כופלים ב־0.67. ובשורה האחרונה — מעגלים כלפי מטה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים בתרגילים להמחשה, והקווים לפי התעתיק (לא אומת). התרגילים מסודרים מהקל אל המאתגר. כדאי מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="4.4-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "לפחות שליש מההלוואה בריבית קבועה; פריים ומסלול שמתעדכן כל חמש שנים נספרים יחד בצד המשתנה", correct: true, feedback: "נכון. הקו נמדד על כל ריבית שיכולה להשתנות במהלך ההלוואה." },
+    { text: "לכל היותר שליש מההלוואה בפריים; שאר המסלולים חופשיים", feedback: `זה הכלל הישן, שבוטל לפי התקצירים ב־${f.plain("history.prime_cap_year")}. היום נבדקים כל המשתנים יחד.` },
+    { text: "מסלול שמתעדכן כל חמש שנים נחשב קבוע, כי הריבית בו לא זזה בכל חודש", feedback: "הריבית בו יכולה להשתנות במהלך ההלוואה, ולכן הוא בצד המשתנה." },
+    { text: "הקו נמדד מול ההכנסה הפנויה", feedback: "מול ההלוואה כולה. ההכנסה הפנויה שייכת ליחס ההחזר." },
+  ]}
+>
+  מה נכון לגבי הקו של הריבית המשתנה, לפי התעתיק של הוראה 329?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.4-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.at_70"), message: `זו התקרה של מחליפים דירה, ${pct("ceiling.replacement")}. כשאין דירה אחרת, ${pct("ceiling.only_home")}.` },
+    { value: f.raw("ex2.at_50"), message: `זו התקרה של ${pct("ceiling.investment")}. כשאין דירה אחרת, ${pct("ceiling.only_home")}.` },
+    { value: f.raw("ex2.equity"), message: "זה ההון העצמי המינימלי. השאלה היא על ההלוואה." },
+  ]}
+>
+  זוג קונה דירה ששוויה {f.shekels("ex2.value")}, ואין לו דירה אחרת. מה ההלוואה הגדולה ביותר שהקו הראשון מאפשר?
+</NumericExercise>
+
+<Solution for="4.4-2">
+<M>{n("ex2.value")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("ex2.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.4-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.at_40"), message: `זה קו ההון, ${pct("pti.threshold")}. השאלה היא על האיסור — ${pct("pti.limit")}.` },
+    { value: f.raw("ex3.double"), message: `כפלתם ב־2. ${pct("pti.limit")} הם חצי: מחלקים ב־2.` },
+  ]}
+>
+  ההכנסה הפנויה של משפחה היא {f.shekels("ex3.income")}. מה ההחזר החודשי הגבוה ביותר שהוראה 329 מאפשרת, לפי התעתיק?
+</NumericExercise>
+
+<Solution for="4.4-3">
+<M>{n("ex3.income")} × {f.plain("pti.limit")} ÷ 100 = {f.shekels("ex3.answer")}</M>. ״עולה על״ — ולכן בדיוק {f.shekels("ex3.answer")} עוד מותר.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.4-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.third"), message: "זה שליש — החלק הקבוע המינימלי. השאלה היא על המשתנה: שני שלישים." },
+    { value: f.raw("ex4.at_6666"), message: `כפלתם ב־${f.plain("r.p6666")}%. זה פחות משני שלישים; כופלים ב־2 ומחלקים ב־3.` },
+  ]}
+>
+  הלוואה של {f.shekels("ex4.loan")}. כמה ממנה לכל היותר יכולים להיות בריבית שיכולה להשתנות?
+</NumericExercise>
+
+<Solution for="4.4-4">
+<M>{n("ex4.loan")} × 2 ÷ 3 = {f.shekels("ex4.answer")}</M>. השאר, {f.shekels("ex4.third")}, בריבית קבועה.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="4.4-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `מותר לפי ההוראה: ${pct("ex5.ratio")} לא עולה על ${pct("pti.limit")}. אבל זה מעל ${pct("pti.threshold")}, והבנק יחזיק יותר הון כנגד ההלוואה`, correct: true, feedback: "נכון. זה מעל קו ההון, לא מעל איסור. מה זה אומר עבורכם — בשיעור הבא." },
+    { text: `אסור: מעל ${pct("pti.threshold")} בנק לא מאשר`, feedback: `${pct("pti.threshold")} הוא קו של הון, לא איסור. האיסור הוא מעל ${pct("pti.limit")}.` },
+    { text: "מותר, ואין לזה שום משמעות", feedback: "יש משמעות: מעל הקו הזה ההלוואה ״יקרה״ יותר לבנק מבחינת ההון שלו." },
+    { text: "אסור, כי ההחזר הוא כמעט חצי מההכנסה", feedback: `״כמעט חצי״ עוד לא ״עולה על ${pct("pti.limit")}״.` },
+  ]}
+>
+  יחס ההחזר של משפחה הוא {pct("ex5.ratio")}. מה אומרת הוראה 329, לפי התעתיק?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="4.4-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.at_price"), message: "חישבתם את התקרה מול המחיר המוזל. בדירה במחיר מופחת הבנק רשאי לחשב מול השווי של השמאי." },
+    { value: f.raw("ex6.quarter"), message: `זה ${f.plain("ex6.quarter") ? "רבע" : ""} מהשווי. אבל למוכר משלמים את המחיר: ההון העצמי הוא המחיר פחות ההלוואה המרבית.` },
+    { value: f.raw("ex6.max_loan"), message: "זו ההלוואה המרבית. השאלה היא כמה מכספכם צריך כדי להשלים את המחיר." },
+  ]}
+>
+  זוג קונה דירה במחיר מופחת ב־{f.shekels("ex6.price")}, ואין לו דירה אחרת. שמאי העריך אותה ב־{f.shekels("ex6.appraisal")}, והבנק מחשב את שיעור המימון מול השווי הזה (נניח שתקרת השווי לא עוצרת כאן). מה ההון העצמי המינימלי?
+</NumericExercise>
+
+<Solution for="4.4-6">
+ההלוואה המרבית: <M>{n("ex6.appraisal")} × {f.plain("ceiling.only_home")} ÷ 100 = {f.shekels("ex6.max_loan")}</M>. למוכר משלמים את המחיר: <M>{n("ex6.price")} − {n("ex6.max_loan")} = {f.shekels("ex6.answer")}</M>. מול המחיר היו צריכים {f.shekels("ex6.at_price")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="4.4-7"
+  n={7}
+  level="מאתגר"
+  answer={f.raw("ex7.answer")}
+  errors={[
+    { value: f.raw("ex7.prime_only"), message: "בדקתם רק את הפריים, מול שליש. זה הכלל הישן. היום סופרים יחד את כל מה שיכול להשתנות, מול שני שלישים." },
+    { value: f.raw("ex7.changing"), message: "זה כל החלק המשתנה. השאלה היא כמה ממנו עודף מעל הקו." },
+    { value: f.raw("ex7.max_var"), message: "זה המותר במשתנה. העודף הוא מה שמעליו." },
+  ]}
+>
+  משפחה מבקשת הלוואה של {f.shekels("ex7.loan")}: {f.shekels("ex7.prime")} בפריים, {f.shekels("ex7.five_years")} במסלול שהריבית בו מתעדכנת כל חמש שנים, ו־{f.shekels("ex7.fixed")} בריבית קבועה. כמה כסף, לפחות, צריך לעבור ממסלולים משתנים לריבית קבועה?
+</NumericExercise>
+
+<Solution for="4.4-7">
+החלק שיכול להשתנות: <M>{n("ex7.prime")} + {n("ex7.five_years")} = {f.shekels("ex7.changing")}</M>. המותר: <M>{n("ex7.loan")} × 2 ÷ 3 = {f.shekels("ex7.max_var")}</M>. העודף: <M>{n("ex7.changing")} − {n("ex7.max_var")} = {f.shekels("ex7.answer")}</M>.
+</Solution>
+
+<Callout title="חמש שאלות על הוראה 329">
+<p><strong>מה זה?</strong> הוראה של בנק ישראל לבנקים, ״מגבלות למתן הלוואות לדיור״. היא קובעת ארבעה איסורים במשכנתא — שיעור מימון, יחס החזר, החלק המשתנה והתקופה — וקו אחד של הון ביחס ההחזר.</p>
+<p><strong>למה זה קיים?</strong> בפישוט: כדי שלכל משכנתא תהיה כרית בשווי הדירה, שההחזר לא יבלע את ההכנסה, ושחלק מההלוואה יהיה בריבית שלא זזה. כך נשמרים גם הבנקים וגם הכסף של המפקידים.</p>
+<p><strong>איך זה עובד?</strong> לכל קו יש מספר ויש מול מה הוא נמדד: השווי, ההכנסה הפנויה, ההלוואה כולה, או התשלום האחרון. הבנק לא יכול לאשר הלוואה שחוצה איסור. מעל קו ההון הוא יכול — אבל זה עולה לו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הקווים קובעים כמה אפשר ללוות, כמה הון עצמי צריך, כמה מההכנסה יכול ללכת להחזר, ואיך מותר לחלק את ההלוואה. הם זהים בכל הבנקים — ולכן פנייה לבנק אחר לא תעקוף אותם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני שמבקשים — בודקים את התיק מול חמשת הקווים, ומחשבים כמה מקום נשאר בכל אחד. כשקו נחצה, מתקנים את התיק (הון עצמי, סכום, תקופה, חלוקה), ואחרי כל תיקון בודקים שוב את כל החמישה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הוראה 329** היא ההוראה של בנק ישראל על משכנתאות. היא פונה לבנקים. בקורס — לפי תעתיק ותקצירים, נכון ל־2026-10-09, לא אומת.
+- **ארבעה איסורים:** שיעור מימון עד {pct("ceiling.only_home")}/{pct("ceiling.replacement")}/{pct("ceiling.investment")} (ובהלוואה לכל מטרה {pct("ceiling.any_purpose")}); יחס החזר שלא עולה על {pct("pti.limit")}; לכל היותר שני שלישים בריבית שיכולה להשתנות; עד {f.plain("term.years")} שנה לתשלום האחרון.
+- **קו אחד אינו איסור:** מעל {pct("pti.threshold")} יחס החזר מותר, אבל הבנק מחזיק יותר הון.
+- **דירה במחיר מופחת:** הבנק רשאי למדוד מול שווי השמאי, עד תקרה שלא אומתה.
+- **שני שלישים הם שבר:** כופלים ב־2 ומחלקים ב־3, ומעגלים את המרבי כלפי מטה.
+- **מתקנים קו — בודקים את כולם.** תיקון של קו אחד יכול להזיז אחר.
+
+**בשיעור הבא — 4.5, שלושה סוגי מספרים:** <Later lesson="4.5" quiet>מגבלה רגולטורית</Later>, <Later lesson="4.5" quiet>סף הון</Later> ו<Later lesson="4.5" quiet>מדיניות בנק</Later> — ולמה צריך לדעת לאיזה סוג שייך כל מספר ששומעים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "הקווים של הוראה 329 (שיעור מימון 75/70/50; יחס החזר עד 50%; מעל 40% משקל סיכון של 100%; לכל היותר שני שלישים בריבית משתנה; עד 30 שנה): לפי תעתיק בצוות ב־Brain (דף 7503881, J-090, עודכן 2026-10-08), דרך research/notes/brain-calculation.md, ממתין לבדיקה מול המקור. אותם מספרים בתקצירי חיפוש של גרסאות 11 ו־12 של ההוראה ושל הגרסה האנגלית; לפי תקציר של מקור רשמי, לא אומת מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "״עולה על״ — ולכן בדיוק 50.00% מותר: לפי המחקר של הצוות ב־Brain (ENG-223, הערה מ־2026-10-04), דרך research/notes/brain-calculation.md. ממתין לבדיקה מול נוסח ההוראה." },
+    { kind: "לא אומת", text: "הלשון ״תאגיד בנקאי לא יאשר ולא יבצע הלוואה לדיור...״, הגרסה האחרונה שנמצאה (12, מפברואר 2026), החלת התקרה על אשראי מבנקים אחרים על אותו נכס, וביטול מגבלת השליש על פריים בדצמבר 2020 (חוזר 2647): לפי תקצירים של מקורות רשמיים (research/notes/official-sources.md, סעיף 1). לפי תקציר של מקור רשמי, לא אומת מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "דירה במחיר מופחת: הבנק רשאי לבסס את השווי על שומת שמאי, עד תקרת שווי שבסעיף 4א(2), שמאז דצמבר 2025 צמודה למדד. גובה התקרה לא נמצא. לפי תקציר של מקור רשמי, לא אומת מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "הלוואה לכל מטרה: 50% הוא כלל הבסיס. הקלה מדצמבר 2025 מתוארת בשני תקצירים בשתי דרכים שונות, ולכן הקורס לא משתמש בה. לפי תקציר של מקור רשמי, לא אומת מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "מסלול קבוע צמוד בצד הקבוע: מסקנה של הקורס מההגדרה ״ריבית שיכולה להשתנות״ (Brain 7503881). הנוסח המדויק של ההוראה בנקודה הזו לא נבדק." },
+    { kind: "החלטה של Mogi", text: "לכל מסלול תקופה משלו (אילון, 2026-08-03; Brain 16646263), ולכן הקו של התקופה נבדק על המסלול הארוך." },
+    { kind: "מחקר / הצעה", text: "רק שני קווים נוגעים בחלוקת ההלוואה למסלולים — יחס ההחזר והחלק המשתנה: מחקר של הצוות ב־Brain (דף 7634954, J-090, ״Choices and costs״), דרך research/notes/brain-calculation.md." },
+    { kind: "ידע כלכלי כללי", text: "בפישוט: למה יש קווים כאלה — כרית בשווי, החזר שלא בולע את ההכנסה, וכסף של מפקידים." },
+    { kind: "הנחת חישוב", text: "סכום מרבי מעוגל כלפי מטה לאגורה, כדי לא לחצות את הקו. בנק יכול לעגל אחרת." },
+    { kind: "ידע מתמטי כללי", text: "כפל וחילוק; שני שלישים כשבר.", code: ["P ≤ V × c ÷ 100", "C ≤ הכנסה פנויה × 50 ÷ 100", "משתנה ≤ P × 2 ÷ 3", "n ≤ 360"] },
+    { kind: "הנחת חישוב", text: "כל הסכומים בשיעור בדויים; אף תיק של הקורס לא מופיע כאן." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, בבודק ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-10" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/regulation.ts (and affordability.ts for the ratio) via scripts/lessons/lesson-4-4.ts and scripts/lessons/regulation-facts.ts, into data/lessons/4-4.json; rechecked by checks/kinds/regulation.py, ltv.py and common.py. Illustration: src/components/RegulationChecker.vue. Video: video/4-4.html. Field knowledge used: none (DEC-2 is a Mogi decision). */}
