@@ -18,7 +18,7 @@ const readOn = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long",
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      מה שואל הטופס הציבורי של כל בנק, לפי הרישום שהצוות עשה ב־{{ readOn }}. במירכאות — הנוסח של הטופס. טופס יכול להשתנות אחרי היום שבו נקרא.
+      מה שואל הטופס הציבורי של כל בנק, כפי שתועד בריפו של הצוות ב־{{ readOn }}; לא נבדק מחדש מול האתר של הבנק. במירכאות — הנוסח של הטופס. טופס יכול להשתנות.
     </p>
 
     <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="בחרו נושא">
