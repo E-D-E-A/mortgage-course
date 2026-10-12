@@ -1,0 +1,1370 @@
+{
+  "lesson": "check-4",
+  "title": "בדיקת סיום שלב 4",
+  "note": "Teaching numbers only, new inputs. Each fact reuses a lesson's kind. Monthly rate = annual ÷ 12. The limits are the team's transcription of Directive 329 (unverified); no case A or B numbers.",
+  "facts": [
+    {
+      "id": "rule.pti_limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "rule.capital",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "rule.ceiling_replacement",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "rule.months_line",
+      "kind": "given",
+      "inputs": {},
+      "value": 18
+    },
+    {
+      "id": "rule.prime_addition",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.5"
+    },
+    {
+      "id": "r1.before",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.8"
+    },
+    {
+      "id": "r1.after",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "r1.points",
+      "kind": "lend_rate_drop",
+      "inputs": {
+        "before": "4.8",
+        "after": "4.2"
+      },
+      "value": "0.6"
+    },
+    {
+      "id": "r1.answer",
+      "kind": "lend_relative_drop",
+      "inputs": {
+        "before": "4.8",
+        "after": "4.2"
+      },
+      "value": "12.5"
+    },
+    {
+      "id": "r1.on_new",
+      "kind": "lend_relative_drop_on_new",
+      "inputs": {
+        "before": "4.8",
+        "after": "4.2"
+      },
+      "value": "14.29"
+    },
+    {
+      "id": "r2.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000"
+    },
+    {
+      "id": "r2.first",
+      "kind": "given",
+      "inputs": {},
+      "value": "640000"
+    },
+    {
+      "id": "r2.second",
+      "kind": "given",
+      "inputs": {},
+      "value": "410000"
+    },
+    {
+      "id": "r2.rest",
+      "kind": "mix_remainder",
+      "inputs": {
+        "loan": "1500000",
+        "amount_1": "640000",
+        "amount_2": "410000"
+      },
+      "value": "450000.00"
+    },
+    {
+      "id": "r2.answer",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "450000.00",
+        "loan": "1500000"
+      },
+      "value": "30"
+    },
+    {
+      "id": "r2.two",
+      "kind": "mix_amount_sum",
+      "inputs": {
+        "amount_1": "640000",
+        "amount_2": "410000"
+      },
+      "value": "1050000.00"
+    },
+    {
+      "id": "r2.two_share",
+      "kind": "mix_share",
+      "inputs": {
+        "amount": "1050000.00",
+        "loan": "1500000"
+      },
+      "value": "70"
+    },
+    {
+      "id": "r3.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.1"
+    },
+    {
+      "id": "r4.amount_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "380000"
+    },
+    {
+      "id": "r4.amount_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "220000"
+    },
+    {
+      "id": "r4.t1",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "380000",
+        "rate_percent": "5",
+        "months": 240
+      },
+      "value": "2507.83"
+    },
+    {
+      "id": "r4.t2",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "220000",
+        "rate_percent": "4.1",
+        "months": 120
+      },
+      "value": "2237.86"
+    },
+    {
+      "id": "r4.answer",
+      "kind": "sch_mix_payment",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "380000",
+        "t1_rate": "5",
+        "t1_months": 240,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "220000",
+        "t2_rate": "4.1",
+        "t2_months": 120,
+        "t2_method": "spitzer",
+        "month": 150
+      },
+      "value": "2507.83"
+    },
+    {
+      "id": "r4.month1",
+      "kind": "sch_mix_payment",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "380000",
+        "t1_rate": "5",
+        "t1_months": 240,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "220000",
+        "t2_rate": "4.1",
+        "t2_months": 120,
+        "t2_method": "spitzer",
+        "month": 1
+      },
+      "value": "4745.70"
+    },
+    {
+      "id": "q1.gross_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "13600"
+    },
+    {
+      "id": "q1.mand_1",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "1420|1090|816"
+      },
+      "value": "3326.00"
+    },
+    {
+      "id": "q1.net_1",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "13600",
+        "mandatory": "3326.00"
+      },
+      "value": "10274.00"
+    },
+    {
+      "id": "q1.ntp_1",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "10274.00",
+        "other": "650|120"
+      },
+      "value": "9504.00"
+    },
+    {
+      "id": "q1.gross_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "14900"
+    },
+    {
+      "id": "q1.mand_2",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "1780|1200|894"
+      },
+      "value": "3874.00"
+    },
+    {
+      "id": "q1.net_2",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "14900",
+        "mandatory": "3874.00"
+      },
+      "value": "11026.00"
+    },
+    {
+      "id": "q1.ntp_2",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "11026.00",
+        "other": "650|120"
+      },
+      "value": "10256.00"
+    },
+    {
+      "id": "q1.gross_3",
+      "kind": "given",
+      "inputs": {},
+      "value": "13900"
+    },
+    {
+      "id": "q1.mand_3",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "1480|1110|834"
+      },
+      "value": "3424.00"
+    },
+    {
+      "id": "q1.net_3",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "13900",
+        "mandatory": "3424.00"
+      },
+      "value": "10476.00"
+    },
+    {
+      "id": "q1.ntp_3",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "10476.00",
+        "other": "650|120"
+      },
+      "value": "9706.00"
+    },
+    {
+      "id": "q1.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "650"
+    },
+    {
+      "id": "q1.dues",
+      "kind": "given",
+      "inputs": {},
+      "value": "120"
+    },
+    {
+      "id": "q1.other",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "650|120"
+      },
+      "value": "770.00"
+    },
+    {
+      "id": "q1.answer",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "10274.00|11026.00|10476.00"
+      },
+      "value": "10592.00"
+    },
+    {
+      "id": "q1.avg_gross",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "13600|14900|13900"
+      },
+      "value": "14133.33"
+    },
+    {
+      "id": "q1.avg_ntp",
+      "kind": "aff_average",
+      "inputs": {
+        "amounts": "9504.00|10256.00|9706.00"
+      },
+      "value": "9822.00"
+    },
+    {
+      "id": "q1.sum_net",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "10274.00|11026.00|10476.00"
+      },
+      "value": "31776.00"
+    },
+    {
+      "id": "q2.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "19400"
+    },
+    {
+      "id": "q2.loan_long",
+      "kind": "given",
+      "inputs": {},
+      "value": "1150"
+    },
+    {
+      "id": "q2.loan_short",
+      "kind": "given",
+      "inputs": {},
+      "value": "870"
+    },
+    {
+      "id": "q2.rent",
+      "kind": "given",
+      "inputs": {},
+      "value": "3300"
+    },
+    {
+      "id": "q2.answer",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "19400",
+        "obligations": "loan,1150,19|loan,870,17|rent,3300,5,continues"
+      },
+      "value": "14950.00"
+    },
+    {
+      "id": "q2.err_short",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "19400",
+        "obligations": "loan,1150,19|loan,870,30|rent,3300,5,continues"
+      },
+      "value": "14080.00"
+    },
+    {
+      "id": "q2.err_rent",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "19400",
+        "obligations": "loan,1150,19|loan,870,17|rent,3300,5"
+      },
+      "value": "18250.00"
+    },
+    {
+      "id": "q2.err_long",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "19400",
+        "obligations": "loan,1150,12|loan,870,17|rent,3300,5,continues"
+      },
+      "value": "16100.00"
+    },
+    {
+      "id": "q3.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "21500"
+    },
+    {
+      "id": "q3.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000"
+    },
+    {
+      "id": "q3.mortgage",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800"
+    },
+    {
+      "id": "q3.new",
+      "kind": "given",
+      "inputs": {},
+      "value": "5200"
+    },
+    {
+      "id": "q3.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21500",
+        "obligations": "loan,1000,30|mortgage,1800,84,same_property"
+      },
+      "value": "20500.00"
+    },
+    {
+      "id": "q3.payment",
+      "kind": "aff_ratio_payment",
+      "inputs": {
+        "new_payment": "5200",
+        "obligations": "loan,1000,30|mortgage,1800,84,same_property"
+      },
+      "value": "7000.00"
+    },
+    {
+      "id": "q3.answer",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "21500",
+        "obligations": "loan,1000,30|mortgage,1800,84,same_property",
+        "new_payment": "5200"
+      },
+      "value": "34.15"
+    },
+    {
+      "id": "q3.err_other",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "21500",
+        "obligations": "loan,1000,30|mortgage,1800,84,other_property",
+        "new_payment": "5200"
+      },
+      "value": "27.81"
+    },
+    {
+      "id": "q3.err_ignored",
+      "kind": "aff_ratio_from_parts",
+      "inputs": {
+        "recognised": "21500",
+        "obligations": "loan,1000,30",
+        "new_payment": "5200"
+      },
+      "value": "25.37"
+    },
+    {
+      "id": "q3.err_income",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "7000",
+        "disposable": "21500"
+      },
+      "value": "32.56"
+    },
+    {
+      "id": "q4.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "720000"
+    },
+    {
+      "id": "q4.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.8"
+    },
+    {
+      "id": "q4.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 300
+    },
+    {
+      "id": "q4.grace",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "q4.answer",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "720000",
+        "rate_percent": "4.8",
+        "months": 300,
+        "method": "spitzer",
+        "grace_months": 24,
+        "grace": "partial"
+      },
+      "value": "4313.14"
+    },
+    {
+      "id": "q4.err_during",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "720000",
+        "rate_percent": "4.8",
+        "months": 300,
+        "method": "spitzer",
+        "bullet": "yes"
+      },
+      "value": "2880.00"
+    },
+    {
+      "id": "q4.err_no_grace",
+      "kind": "aff_qualifying_payment",
+      "inputs": {
+        "amount": "720000",
+        "rate_percent": "4.8",
+        "months": 300,
+        "method": "spitzer"
+      },
+      "value": "4125.58"
+    },
+    {
+      "id": "q5.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2350000.00"
+    },
+    {
+      "id": "q5.answer",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2350000",
+        "deal": "replacement"
+      },
+      "value": "1645000.00"
+    },
+    {
+      "id": "q5.err_single",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2350000",
+        "deal": "only_home"
+      },
+      "value": "1762500.00"
+    },
+    {
+      "id": "q5.err_investment",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2350000",
+        "deal": "investment"
+      },
+      "value": "1175000.00"
+    },
+    {
+      "id": "q5.equity",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q5.value",
+        "subtrahend": "q5.answer"
+      },
+      "value": "705000.00"
+    },
+    {
+      "id": "q6.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "q6.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "8000.40"
+    },
+    {
+      "id": "q6.shown",
+      "kind": "reg_ratio",
+      "inputs": {
+        "payment": "8000.40",
+        "income": "16000"
+      },
+      "value": "50"
+    },
+    {
+      "id": "q6.max",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16000",
+        "percent": "50"
+      },
+      "value": "8000.00"
+    },
+    {
+      "id": "q6.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q6.payment",
+        "subtrahend": "q6.max"
+      },
+      "value": "0.40"
+    },
+    {
+      "id": "q7.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "36"
+    },
+    {
+      "id": "q8.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "18600.00"
+    },
+    {
+      "id": "q8.policy",
+      "kind": "given",
+      "inputs": {},
+      "value": "35"
+    },
+    {
+      "id": "q8.max50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "18600",
+        "percent": "50"
+      },
+      "value": "9300.00"
+    },
+    {
+      "id": "q8.max40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "18600",
+        "percent": "40"
+      },
+      "value": "7440.00"
+    },
+    {
+      "id": "q8.max35",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "18600",
+        "percent": "35"
+      },
+      "value": "6510.00"
+    },
+    {
+      "id": "q8.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q8.max50",
+        "subtrahend": "q8.max40"
+      },
+      "value": "1860.00"
+    },
+    {
+      "id": "q8.err_policy",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q8.max50",
+        "subtrahend": "q8.max35"
+      },
+      "value": "2790.00"
+    },
+    {
+      "id": "q9.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "16800.00"
+    },
+    {
+      "id": "q9.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1250.00"
+    },
+    {
+      "id": "q9.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "q9.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "10200.00"
+    },
+    {
+      "id": "q9.answer",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "16800",
+        "out_1": "1250",
+        "budget": "10200"
+      },
+      "value": "5350.00"
+    },
+    {
+      "id": "q9.err_forgot",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "16800",
+        "budget": "10200"
+      },
+      "value": "6600.00"
+    },
+    {
+      "id": "q9.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "16800",
+        "obligations": "loan,1250,12"
+      },
+      "value": "16800.00"
+    },
+    {
+      "id": "q9.err_limit",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16800.00",
+        "percent": "50"
+      },
+      "value": "8400.00"
+    },
+    {
+      "id": "q10.declared",
+      "kind": "given",
+      "inputs": {},
+      "value": "13500"
+    },
+    {
+      "id": "q10.assess_old",
+      "kind": "given",
+      "inputs": {},
+      "value": "118800"
+    },
+    {
+      "id": "q10.assess_latest",
+      "kind": "given",
+      "inputs": {},
+      "value": "141600"
+    },
+    {
+      "id": "q10.verified",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "118800|141600",
+        "method": "average"
+      },
+      "value": "10850.00"
+    },
+    {
+      "id": "q10.latest",
+      "kind": "aff_assessment_monthly",
+      "inputs": {
+        "annuals": "118800|141600",
+        "method": "latest"
+      },
+      "value": "11800.00"
+    },
+    {
+      "id": "q10.answer",
+      "kind": "uw_shortfall",
+      "inputs": {
+        "declared": "13500",
+        "verified": "10850.00",
+        "decimals": 2
+      },
+      "value": "19.63"
+    },
+    {
+      "id": "q10.err_latest",
+      "kind": "uw_shortfall",
+      "inputs": {
+        "declared": "13500",
+        "verified": "11800.00",
+        "decimals": 2
+      },
+      "value": "12.59"
+    },
+    {
+      "id": "q10.err_over_verified",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "2650.00",
+        "whole": "10850.00",
+        "decimals": 2
+      },
+      "value": "24.42"
+    },
+    {
+      "id": "q10.err_share",
+      "kind": "uw_ratio",
+      "inputs": {
+        "part": "10850.00",
+        "whole": "13500",
+        "decimals": 2
+      },
+      "value": "80.37"
+    },
+    {
+      "id": "q13.principal_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "430000"
+    },
+    {
+      "id": "q13.principal_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "310000"
+    },
+    {
+      "id": "q13.paid",
+      "kind": "given",
+      "inputs": {},
+      "value": 96
+    },
+    {
+      "id": "q13.loan",
+      "kind": "uw_total",
+      "inputs": {
+        "amount_1": "430000",
+        "amount_2": "310000"
+      },
+      "value": "740000.00"
+    },
+    {
+      "id": "q13.answer",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "430000",
+        "rate_1": "4.4",
+        "months_1": 300,
+        "principal_2": "310000",
+        "rate_2": "3.8",
+        "months_2": 240,
+        "paid": 96
+      },
+      "value": "552606.10"
+    },
+    {
+      "id": "q13.err_one",
+      "kind": "uw_mix_balance",
+      "inputs": {
+        "principal_1": "430000",
+        "rate_1": "4.4",
+        "months_1": 300,
+        "paid": 96
+      },
+      "value": "339401.63"
+    },
+    {
+      "id": "q18.limit_a",
+      "kind": "given",
+      "inputs": {},
+      "value": 18
+    },
+    {
+      "id": "q18.limit_b",
+      "kind": "given",
+      "inputs": {},
+      "value": 21
+    },
+    {
+      "id": "q18.answer",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "3|11|19|20|22",
+        "limit_age": 21
+      },
+      "value": 4
+    },
+    {
+      "id": "q18.err_eighteen",
+      "kind": "forms_children_under",
+      "inputs": {
+        "ages": "3|11|19|20|22",
+        "limit_age": 18
+      },
+      "value": 2
+    },
+    {
+      "id": "q18.err_household",
+      "kind": "forms_household_size",
+      "inputs": {
+        "adults": 2,
+        "ages": "3|11|19|20|22"
+      },
+      "value": 7
+    },
+    {
+      "id": "q19.before",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "q19.after",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.5"
+    },
+    {
+      "id": "q19.margin",
+      "kind": "given",
+      "inputs": {},
+      "value": "-0.4"
+    },
+    {
+      "id": "q19.balance",
+      "kind": "given",
+      "inputs": {},
+      "value": "540000"
+    },
+    {
+      "id": "q19.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 190
+    },
+    {
+      "id": "q19.prime_before",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "4",
+        "addition": "1.5"
+      },
+      "value": "5.5"
+    },
+    {
+      "id": "q19.prime_after",
+      "kind": "lend_prime",
+      "inputs": {
+        "policy_rate": "3.5",
+        "addition": "1.5"
+      },
+      "value": "5"
+    },
+    {
+      "id": "q19.rate_before",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5.5",
+        "margin": "-0.4"
+      },
+      "value": "5.1"
+    },
+    {
+      "id": "q19.rate_after",
+      "kind": "amort_prime_track_rate",
+      "inputs": {
+        "prime": "5",
+        "margin": "-0.4"
+      },
+      "value": "4.6"
+    },
+    {
+      "id": "q19.pay_before",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "540000",
+        "rate_percent": "5.1",
+        "months": 190
+      },
+      "value": "4148.11"
+    },
+    {
+      "id": "q19.pay_after",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "540000",
+        "rate_percent": "4.6",
+        "months": 190
+      },
+      "value": "4006.86"
+    },
+    {
+      "id": "q19.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q19.pay_before",
+        "subtrahend": "q19.pay_after"
+      },
+      "value": "141.25"
+    },
+    {
+      "id": "q19.nomargin_before",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "540000",
+        "rate_percent": "5.5",
+        "months": 190
+      },
+      "value": "4263.10"
+    },
+    {
+      "id": "q19.nomargin_after",
+      "kind": "amort_payment",
+      "inputs": {
+        "principal": "540000",
+        "rate_percent": "5",
+        "months": 190
+      },
+      "value": "4119.63"
+    },
+    {
+      "id": "q19.err_nomargin",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q19.nomargin_before",
+        "subtrahend": "q19.nomargin_after"
+      },
+      "value": "143.47"
+    },
+    {
+      "id": "q20.income_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "8900"
+    },
+    {
+      "id": "q20.income_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "7600"
+    },
+    {
+      "id": "q20.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1150"
+    },
+    {
+      "id": "q20.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 22
+    },
+    {
+      "id": "q20.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "q20.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 360
+    },
+    {
+      "id": "q20.recognised",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "8900|7600"
+      },
+      "value": "16500.00"
+    },
+    {
+      "id": "q20.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "16500.00",
+        "obligations": "loan,1150,22"
+      },
+      "value": "15350.00"
+    },
+    {
+      "id": "q20.max40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "15350.00",
+        "percent": "40"
+      },
+      "value": "6140.00"
+    },
+    {
+      "id": "q20.max50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "15350.00",
+        "percent": "50"
+      },
+      "value": "7675.00"
+    },
+    {
+      "id": "q20.max40_recognised",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "16500.00",
+        "percent": "40"
+      },
+      "value": "6600.00"
+    },
+    {
+      "id": "q20.answer",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "6140.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1211797.52"
+    },
+    {
+      "id": "q20.err_fifty",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "7675.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1514746.90"
+    },
+    {
+      "id": "q20.err_car",
+      "kind": "amort_payments_value_today",
+      "inputs": {
+        "payment": "6600.00",
+        "rate_percent": "4.5",
+        "months": 360
+      },
+      "value": "1302583.65"
+    },
+    {
+      "id": "q20.err_sum",
+      "kind": "met_times",
+      "inputs": {
+        "of": "q20.max40",
+        "count": 360
+      },
+      "value": "2210400.00"
+    },
+    {
+      "id": "q15.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "900000"
+    },
+    {
+      "id": "q15.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "q15.m20",
+      "kind": "given",
+      "inputs": {},
+      "value": "240"
+    },
+    {
+      "id": "q15.m30",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "q15.pay20",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "900000",
+        "rate": "4.2",
+        "months": "240"
+      },
+      "value": "5549.14"
+    },
+    {
+      "id": "q15.answer",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "900000",
+        "rate": "4.2",
+        "months": "360"
+      },
+      "value": "4401.15"
+    },
+    {
+      "id": "q15.total20",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "5549.14",
+        "b": "240"
+      },
+      "value": "1331793.6"
+    },
+    {
+      "id": "q15.err_scaled",
+      "kind": "fc_divide",
+      "inputs": {
+        "a": "1331793.6",
+        "b": "360"
+      },
+      "value": "3699.43"
+    },
+    {
+      "id": "q16.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "750000"
+    },
+    {
+      "id": "q16.anchor",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.9"
+    },
+    {
+      "id": "q16.low",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.45"
+    },
+    {
+      "id": "q16.high",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.8"
+    },
+    {
+      "id": "q16.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "300"
+    },
+    {
+      "id": "q16.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
+      "id": "q16.gap",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "0.8",
+        "b": "0.45"
+      },
+      "value": "0.35"
+    },
+    {
+      "id": "q16.rate_low",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "3.9|0.45"
+      },
+      "value": "4.35"
+    },
+    {
+      "id": "q16.rate_high",
+      "kind": "fc_sum",
+      "inputs": {
+        "of": "3.9|0.8"
+      },
+      "value": "4.7"
+    },
+    {
+      "id": "q16.pay_low",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "750000",
+        "rate": "4.35",
+        "months": "300"
+      },
+      "value": "4105.15"
+    },
+    {
+      "id": "q16.pay_high",
+      "kind": "fc_payment",
+      "inputs": {
+        "principal": "750000",
+        "rate": "4.7",
+        "months": "300"
+      },
+      "value": "4254.34"
+    },
+    {
+      "id": "q16.month_diff",
+      "kind": "fc_minus",
+      "inputs": {
+        "a": "4254.34",
+        "b": "4105.15"
+      },
+      "value": "149.19"
+    },
+    {
+      "id": "q16.answer",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "149.19",
+        "b": "300"
+      },
+      "value": "44757"
+    },
+    {
+      "id": "q16.year_one",
+      "kind": "fc_share",
+      "inputs": {
+        "amount": "750000",
+        "percent": "0.35"
+      },
+      "value": "2625"
+    },
+    {
+      "id": "q16.err_naive",
+      "kind": "fc_times",
+      "inputs": {
+        "a": "2625",
+        "b": "25"
+      },
+      "value": "65625"
+    },
+    {
+      "id": "q14.share",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "q17.discount",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.2"
+    },
+    {
+      "id": "q17.equity_share",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    }
+  ]
+}
