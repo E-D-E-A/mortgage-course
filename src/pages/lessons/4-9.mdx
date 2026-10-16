@@ -29,7 +29,7 @@ export const d = (id) => new Intl.DateTimeFormat("he-IL", { day: "numeric", mont
 export const dw = (id) => new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" }).format(at(id));
 export const day = (id) => String(Number(String(f.raw(id)).slice(8, 10)));
 export const half = f.rows("half.table");
-export const halfRows = half.map((r) => ({ ...r, case: formatWholeShekels(r.appraisal) }));
+export const halfRows = half.map((r) => ({ ...r, case: formatWholeShekels(r.appraisal).replace(" ₪", "") }));
 export const CEIL = f.plain("rule.ceiling_single");
 export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
 export const predictionOptions = [
@@ -273,7 +273,7 @@ export const predictionOptions = [
   client:visible
   id="4.9-half"
   rowKey="case"
-  periodLabel="שמאות"
+  periodLabel="שמאות (₪)"
   columns={[
     { key: "used", label: "השווי לחישוב" },
     { key: "ltv", label: "שיעור המימון", format: "percent" },
