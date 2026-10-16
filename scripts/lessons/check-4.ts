@@ -192,21 +192,14 @@ export default function check4(): LessonData {
     { gross: "13900", parts: ["1480", "1110", "834"] },
   ];
   const nets: Fact[] = [];
-  const ntps: Fact[] = [];
   slips.forEach((s, k) => {
     const n = k + 1;
     add(g(`q1.gross_${n}`, s.gross));
     const mand = add(aff.sum(`q1.mand_${n}`, s.parts));
-    const net = add(aff.net(`q1.net_${n}`, s.gross, [v(mand)]));
-    nets.push(net);
-    ntps.push(add(aff.netToPay(`q1.ntp_${n}`, v(net), ["650", "120"])));
+    nets.push(add(aff.net(`q1.net_${n}`, s.gross, [v(mand)])));
   });
-  add(g("q1.loan", "650"));
-  add(g("q1.dues", "120"));
-  add(aff.sum("q1.other", ["650", "120"]));
   add(aff.average("q1.answer", nets.map(v)));
   add(aff.average("q1.avg_gross", slips.map((s) => s.gross)));
-  add(aff.average("q1.avg_ntp", ntps.map(v)));
   add(aff.sum("q1.sum_net", nets.map(v)));
 
   // q2 (4.2): the 18-month rule — 19 payments left counts, 17 does not; rent that goes on counts whatever is left.
@@ -299,6 +292,14 @@ export default function check4(): LessonData {
   add(uw.ratio("q10.err_over_verified", "2650.00", v(q10Verified)));
   add(uw.ratio("q10.err_share", v(q10Verified), "13500"));
 
+  // q11 (4.7): the loan is the lower of two ceilings — the ratio's (on the recognised income) and the financing ratio's.
+  const q11Price = "1480000";
+  add(reg.given("q11.price", q11Price));
+  add(reg.given("q11.pti_loan", "1036000"));
+  add(reg.given("q11.declared_loan", "1190000"));
+  const q11Cap = add(reg.maxLoan("q11.fin_cap", q11Price, "only_home"));
+  add(uw.lower("q11.answer", "1036000", v(q11Cap)));
+
   // q13 (4.9): the debt the life insurance has to cover after 96 payments, on two tracks.
   const tr1 = { principal: "430000", ratePercent: "4.4", months: 300 };
   const tr2 = { principal: "310000", ratePercent: "3.8", months: 240 };
@@ -380,10 +381,8 @@ export default function check4(): LessonData {
   b.calc("q16.answer", { op: "times", a: "q16.month_diff", b: "q16.months" });
   b.calc("q16.year_one", { op: "share", amount: "q16.loan", percent: "q16.gap" });
   b.calc("q16.err_naive", { op: "times", a: "q16.year_one", b: "q16.years" });
-  // q14, q17: numbers in the text of the choice questions.
+  // q14: a number in the text of the choice questions.
   b.given("q14.share", "20");
-  b.given("q17.discount", "0.2");
-  b.given("q17.equity_share", "35");
   facts.push(...b.facts);
 
   return {
