@@ -102,8 +102,8 @@ export default function lesson78(): LessonData {
   );
   const financed = money("old.financed");
   const withTop = (extra: string) => moneyString(new Decimal(financed).plus(extra));
-  const offer = (id: "b" | "c" | "d", amount: string, rate?: string, months?: number) =>
-    fixedOffer({ name: bank(id).name, amount, months: months ?? bank(id).months, rate: rate ?? bank(id).rate, upfront: NEW_LOAN_COSTS }, REFINANCE_FORECAST);
+  const offer = (id: "b" | "c" | "d", amount: string, rate?: string, months?: number, upfront: string = NEW_LOAN_COSTS) =>
+    fixedOffer({ name: bank(id).name, amount, months: months ?? bank(id).months, rate: rate ?? bank(id).rate, upfront }, REFINANCE_FORECAST);
   const swc = (id: string, o: ReturnType<typeof offer>, m: Parameters<typeof sw>[5], opts: { decimals?: number } = {}) => sw(id, S, "whole", o, F, m, { cash: NEW_LOAN_COSTS, decimals: opts.decimals });
 
   for (const b of OFFER_BANKS) {
@@ -127,6 +127,30 @@ export default function lesson78(): LessonData {
   for (const [tag, rate] of [["t.pass", "5.6"], ["t.fail", "5.7"]] as const) {
     const o = offer("b", financed, rate);
     push(given(`${tag}.rate`, rate), swc(`${tag}.margin`, o, "margin", { decimals: 2 }), swc(`${tag}.worth`, o, "worthwhile"));
+  }
+  // The entry costs ARE in the rate of the test: bank ב׳ without them, with them, and with double.
+  const oNo = offer("b", financed, undefined, undefined, "0");
+  const oDouble = offer("b", financed, undefined, undefined, moneyString(new Decimal(NEW_LOAN_COSTS).mul(2)));
+  push(
+    given("cost.double", moneyString(new Decimal(NEW_LOAN_COSTS).mul(2))),
+    sw("b.rate_nocost", S, "whole", oNo, F, "new_rate", { cash: "0", decimals: 2 }),
+    sw("b.rate_double", S, "whole", oDouble, F, "new_rate", { cash: moneyString(new Decimal(NEW_LOAN_COSTS).mul(2)), decimals: 2 }),
+    sw("b.margin_double", S, "whole", oDouble, F, "margin", { cash: moneyString(new Decimal(NEW_LOAN_COSTS).mul(2)), decimals: 2 }),
+    sw("b.saving_double", S, "whole", oDouble, F, "total_saving", { cash: moneyString(new Decimal(NEW_LOAN_COSTS).mul(2)), decimals: 2 }),
+  );
+  // Bank ב׳ at other rates (same 203 months): the sample recommendation's ceiling, and the learner's own check at 5.5%.
+  for (const [tag, rate] of [["t53", "5.3"], ["t55", "5.5"], ["t56", "5.6"], ["t57", "5.7"]] as const) {
+    const o = offer("b", financed, rate);
+    push(
+      given(`${tag}.rate`, rate),
+      swc(`${tag}.first`, o, "new_first"),
+      swc(`${tag}.gap`, o, "monthly_gap"),
+      swc(`${tag}.total`, o, "switch_total"),
+      swc(`${tag}.saving`, o, "total_saving"),
+      swc(`${tag}.new_rate`, o, "new_rate", { decimals: 2 }),
+      swc(`${tag}.margin`, o, "margin", { decimals: 2 }),
+      swc(`${tag}.worth`, o, "worthwhile"),
+    );
   }
   // A lower payment is not a total saving: what the longer terms add over staying.
   push(
@@ -157,10 +181,13 @@ export default function lesson78(): LessonData {
     total("sep.total", [SEPARATE_TOP_UP]),
   );
   push(difference("sep.interest", byId("sep.total"), byId("case.top_up")));
+  // The top-up question alone: inside bank ב׳'s new loan against a loan of its own.
+  push(difference("b.top_vs_sep", byId("sep.total"), byId("b.top_add_total")));
 
   // ── Step 4: the two ways to get both, in shekels (staying and a loan of its own, or one new loan) ──
   push(sumOf("keep.total", [byId("old.total"), byId("sep.total")]), sumOf("keep.first", [byId("old.first"), byId("sep.first")]));
   push(
+    sumOf("b.parts", [byId("b.saving"), byId("b.top_vs_sep")]),
     difference("b.top_saving", byId("keep.total"), byId("b.top_switch_total")),
     difference("c.top_worse", byId("c.top_switch_total"), byId("keep.total")),
     difference("d.top_worse", byId("d.top_switch_total"), byId("keep.total")),
