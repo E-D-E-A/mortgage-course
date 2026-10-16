@@ -314,6 +314,8 @@ export default function check7(): LessonData {
   add(stay("c.financed", SC, "whole", "financed"));
   add(stay("c.first", SC, "whole", "first"));
   add(M.given("c.top_up", moneyString(TOP_UP)));
+  add(M.given("c.new_costs", moneyString(NEW_LOAN_COSTS)));
+  add(F.num("c.contract", FEE_CASE.rate));
   add(F.num("c.rate", bank("b").rate));
   add(F.num("c.term", String(bank("b").months)));
   const cFinanced = v("c.financed");
