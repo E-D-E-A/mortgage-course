@@ -1,0 +1,155 @@
+{
+  "lesson": "7.6",
+  "title": "עסקאות מורכבות, א׳: משפרי דיור, גישור, משיכות לשיעורין ומימון קבלן",
+  "note": "Introduction only. The numbers are two teaching examples: an upgrader's purchase (the ceilings of directive 329 as the team transcribed them, lesson 4.4, not verified, on an invented price) and a loan taken in four equal parts. Nothing is a rule, a price or a procedure of a bridge loan or of builder financing: the course does not know them.",
+  "facts": [
+    {
+      "id": "u.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2400000.00"
+    },
+    {
+      "id": "u.pct_rep",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "u.pct_only",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "u.max_rep",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2400000",
+        "deal": "replacement"
+      },
+      "value": "1680000.00"
+    },
+    {
+      "id": "u.max_only",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2400000",
+        "deal": "only_home"
+      },
+      "value": "1800000.00"
+    },
+    {
+      "id": "u.equity_rep",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "u.price",
+        "subtrahend": "u.max_rep"
+      },
+      "value": "720000.00"
+    },
+    {
+      "id": "u.equity_only",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "u.price",
+        "subtrahend": "u.max_only"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "u.equity_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "u.equity_rep",
+        "subtrahend": "u.equity_only"
+      },
+      "value": "120000.00"
+    },
+    {
+      "id": "u.sale",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "u.old_loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "u.left",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "u.sale",
+        "subtrahend": "u.old_loan"
+      },
+      "value": "1300000.00"
+    },
+    {
+      "id": "u.spare",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "u.left",
+        "subtrahend": "u.equity_rep"
+      },
+      "value": "580000.00"
+    },
+    {
+      "id": "d.total",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000.00"
+    },
+    {
+      "id": "d.part",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "d.after2",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "300000|300000"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "d.after3",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "300000|300000|300000"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "d.rest1",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.total",
+        "subtrahend": "d.part"
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "d.rest2",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.total",
+        "subtrahend": "d.after2"
+      },
+      "value": "600000.00"
+    },
+    {
+      "id": "d.rest3",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.total",
+        "subtrahend": "d.after3"
+      },
+      "value": "300000.00"
+    }
+  ]
+}
