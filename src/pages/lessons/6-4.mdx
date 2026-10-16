@@ -1,0 +1,553 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "6.4"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import LeverPrice from "../../components/LeverPrice.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { CASE_A_POSITION, CAR_PAYOFF } from "../../data/case-a-levers.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("6.4");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const sh = (id) => f.shekelsExact(id);
+export const money = (id) => eq(f.shekels(id));
+// A change with its sign, for a table: a rise is "+", a fall already carries the real minus (formatting only; the sign is the fact's).
+export const sg = (id) => { const v = Number(f.raw(id)); return v === 0 ? "בלי שינוי" : v > 0 ? `+${f.whole(id)}` : f.whole(id); };
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const WALL = { none: "אין", ltv: "שיעור המימון מעל התקרה", variable: "החלק המשתנה מעל שני שלישים", term: "תקופה מעל 30 שנה" };
+export const wall = (k) => WALL[f.raw(`l.${k}.bans`)];
+export const predictionOptions = [
+  "(א): הוא מוריד את היחס יותר, ולכן הוא עדיף",
+  `(ב): הוא מוריד את היחס מתחת ל־${pct("in.target")}, ו־(א) מעלה את שיעור המימון ל־${pct("l.carE.ltv")}, מעל התקרה של ${f.plain("in.ltv_ceiling")}%`,
+  "שניהם שווים: שניהם מורידים את היחס, וזה כל מה שחשוב",
+  "אי אפשר להשוות ביניהם, כי אחד מהם הוא הוספת כסף והשני סגירת הלוואה",
+];
+// The seven levers of case A, in the order of the table. Every cell is a fact.
+export const rows = [
+  { key: "eq", name: "עוד הון עצמי מהחסכונות", cash: f.whole("l.eq.cash") },
+  { key: "carR", name: "סגירת הלוואת הרכב מהחסכונות", cash: f.whole("l.carR.cash") },
+  { key: "carE", name: "סגירת הלוואת הרכב מההון העצמי", cash: f.whole("l.carE.cash") },
+  { key: "wait", name: `המתנה של ${f.plain("in.wait")} חודשים`, cash: f.whole("l.wait.cash") },
+  { key: "bor", name: "לווה נוסף: הורה", cash: f.whole("l.bor.cash") },
+  { key: "term", name: `הארכת התקופה ב־${f.plain("in.term_years")} שנים`, cash: f.whole("l.term.cash") },
+  { key: "mix", name: `${f.plain("in.mix_points")} נקודות מהקבועה אל המשתנה`, cash: f.whole("l.mix.cash") },
+].map((r) => ({
+  ...r,
+  after: pct(`l.${r.key}.ratio`),
+  gain: f.plain(`l.${r.key}.gain_ratio`),
+  total: sg(`l.${r.key}.extra`),
+  stress: sg(`l.${r.key}.stress_rise`),
+  wall: wall(r.key),
+}));
+export const halfRows = [
+  { period: "עוד הון עצמי", after: f.raw("l.eq.ratio"), gain: f.raw("l.eq.gain_ratio") },
+  { period: "סגירה מהחסכונות", after: f.raw("l.carR.ratio"), gain: f.raw("l.carR.gain_ratio") },
+  { period: "לווה נוסף", after: f.raw("l.bor.ratio"), gain: f.raw("l.bor.gain_ratio") },
+];
+
+בשיעור 6.3 מיפיתם את <Term t="מנוף" lesson="6.3">המנופים</Term>: כל מה שהלקוח יכול לשנות באמת לפני שהבקשה יוצאת לבנק. בשיעור 6.2 למדתם לזהות <Term t="סף" lesson="6.2">סף</Term> בתיק, ולבדוק כמה עולה להתרחק ממנו. עכשיו השאלה היא כמה כל מנוף **עולה**, ומה המשפחה מקבלת תמורתו. כאן, כמו ב־6.2, הקו של 40% הוא סף של דוגמה: בשיעור 4.5 הוא <Term t="סף הון" lesson="4.5">סף הון</Term>, לפי תיעוד הצוות (לא אומת), ואיך בנק מתייחס אליו בפועל הקורס לא יודע. מה שנבדק פה הוא <Term t="יחס החזר" lesson="4.3">יחס ההחזר</Term> של נועם ושירה, התיק המרכזי של הקורס, שעומד קצת מעליו.
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+<p>החסכונות שנשארים מחוץ להון העצמי ({f.shekels("a.reserve")}), הסכום שהמלווה היה מבקש כדי לסגור את הלוואת הרכב ({f.shekels("in.payoff")}) וההכנסה של הורה שיכול להצטרף ({f.shekels("in.borrower")} נטו בחודש) הם **הנחות של הקורס**, לא נתונים על משפחה אמיתית. הריביות הן רשימת המחירים של הקורס (שיעור 5.6).</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="6.4"
+  question={`נועם ושירה עומדים ביחס החזר של ${pct("a.ratio")}, קצת מעל הקו של ${pct("in.target")}. שני מהלכים אפשריים. (א): לסגור את הלוואת הרכב מההון העצמי שהיה מיועד לדירה, ואז היחס יורד ל־${pct("l.carE.ratio")}. (ב): להוסיף ${f.shekels("l.eq.cash")} מהחסכונות להון העצמי, ואז היחס יורד ל־${pct("l.eq.ratio")}. איזה מהם עדיף?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מה מרוויחים ומה משלמים
+
+</Section>
+
+<LessonVideo lesson="6-4" />
+
+<Section kind="ההסבר">
+
+## מנוף הוא זוג: רווח ומחיר
+
+</Section>
+
+נתחיל בדוגמה קטנה, עם מספרים עגולים. משפחה לוקחת הלוואה של {f.shekels("m.loan")} במסלול אחד, בריבית של {f.plain("m.rate")}% לשנה, והיא מביאה {f.shekels("m.income")} נטו בחודש. אם התקופה היא {f.plain("m.years_a")} שנים, ההחזר החודשי הוא {f.shekels("m.a.first")}. אם היא תבקש {f.plain("m.years_b")} שנים, ההחזר יהיה {f.shekels("m.b.first")}.
+
+- **הרווח:** ההחזר יורד ב־<M>{n("m.a.first")} − {n("m.b.first")} = {f.shekels("m.gain_pay")}</M> בחודש. יחס ההחזר יורד מ־{pct("m.a.ratio")} ל־{pct("m.b.ratio")}: <M>{f.plain("m.a.ratio")} − {f.plain("m.b.ratio")} = {f.plain("m.gain_ratio")}</M> נקודות אחוז.
+- **המחיר:** הסך של כל התשלומים עולה מ־{f.shekels("m.a.total")} ל־{f.shekels("m.b.total")}: עוד <M>{n("m.b.total")} − {n("m.a.total")} = {f.shekels("m.extra")}</M>.
+
+זה כל העניין. **מנוף הוא זוג**: משהו משתפר, ומשהו אחר משלם עליו. מנוף שרואים רק את חציו הוא מנוף שאפשר לטעות בו.
+
+המחיר מגיע בארבעה מטבעות, ואי אפשר לחבר ביניהם:
+
+1. **מזומן עכשיו.** כסף שיוצא מהכיס: הון עצמי נוסף, סגירת הלוואה. הכסף לא נעלם, הוא נהיה חלק מהדירה, אבל הוא כבר לא בחשבון.
+2. **שקלים לאורך ההלוואה.** ריבית שמשלמים יותר, או פחות: תקופה ארוכה יותר, הלוואה גדולה יותר.
+3. **חשיפה.** מה קורה להחזר הגבוה ביותר אם הריבית עולה. בקורס זה נבדק בתרחיש מחמיר של הקורס, שהוא תרחיש לימודי ולא תחזית.
+4. **זמן.** חודשים של המתנה.
+
+ולפעמים יש גם **חומה**: מנוף שחוצה איסור. ארבעת המגבלות שמעניינות כאן הן מהוראה 329, כפי שלמדתם בשיעורים 4.4 ו־4.5 (לפי תעתיק של הצוות; לא אומת מול ההוראה): תקרת <Term t="שיעור מימון" lesson="1.2">שיעור המימון</Term>, תקרת יחס ההחזר, לא יותר משני שלישים בריבית שיכולה להשתנות, ולא יותר מ־30 שנה.
+
+כדי להשוות בין מנופים שמשלמים באותו מטבע, מחלקים את המחיר ברווח. **מחיר נקודה** הוא כמה שקלים עולה נקודת אחוז אחת של יחס החזר. בדוגמה הקטנה: <M>{n("m.extra")} ÷ {f.plain("m.gain_ratio")} = {f.shekels("m.pp")}</M> של ריבית נוספת לכל נקודה (מחולק במספרים כפי שהם כתובים).
+
+<Section kind="ההסבר">
+
+## המנופים של נועם ושירה
+
+</Section>
+
+נועם ושירה קונים דירה ב־{f.shekels("a.price")}, עם הון עצמי של {f.shekels("a.equity")}. ההלוואה היא {f.shekels("a.loan")}, שיעור המימון {pct("a.ltv")}. בתמהיל הראשוני שלהם (שיעור 5.6), ההחזר שנכנס ליחס הוא {f.shekels("a.qual")}. הם מקבלים {f.shekels("a.recognised")} נטו בחודש, והלוואת רכב של {f.shekels("a.car_monthly")} בחודש, עם עוד {f.plain("a.car_months")} תשלומים, יורדת מההכנסה כי נשארו יותר מ־18 (שיעור 4.2). <Term t="הכנסה פנויה" lesson="1.9">ההכנסה הפנויה</Term> היא {f.shekels("a.disp")}, והיחס: <M>{n("a.qual")} ÷ {n("a.disp")} = {pct("a.ratio")}</M>.
+
+תשלום שמגיע בדיוק לקו של 40% הוא {f.shekels("a.max40")}. התשלום שלהם גבוה ממנו ב־<M>{n("a.qual")} − {n("a.max40")} = {f.shekels("a.over40")}</M> בחודש. זה גודל הבעיה: **{f.shekels("a.over40")} בחודש**, לא יותר. השאלה היא בכמה ובאיזה מטבע אפשר להוריד אותם.
+
+### 1. עוד הון עצמי
+
+כל שקל של הון עצמי נוסף מקטין את ההלוואה. כמה צריך כדי לרדת עד הקו? מחפשים בצעדים של {f.shekels("in.step")}: עם {f.shekels("a.eq_short.add")} היחס עדיין {pct("a.eq_short.ratio")}, מעל הקו. עם {f.shekels("a.step")} הוא {pct("l.eq.ratio")}.
+
+- **רווח:** היחס יורד ב־<M>{f.plain("a.ratio")} − {f.plain("l.eq.ratio")} = {f.plain("l.eq.gain_ratio")}</M> נקודות אחוז, והתשלום שנכנס ליחס יורד ב־{f.shekels("l.eq.gain_pay")}.
+- **מחיר:** {f.shekels("l.eq.cash")} במזומן. מהחסכונות נשארים {f.shekels("l.eq.reserve")}. מחיר נקודה: <M>{n("l.eq.cash")} ÷ {f.plain("l.eq.gain_ratio")} = {f.shekels("l.eq.pp")}</M> במזומן.
+- **בונוס:** סך התשלומים יורד ב־{f.shekels("l.eq.saving")}, וההחזר הגבוה ביותר בתרחיש המחמיר יורד ב־{f.shekels("l.eq.stress_drop")}. זה המנוף היחיד כאן שמשלם גם בשקלים של ריבית. הכסף לא אבד, הוא בדירה; מה שאבד הוא הכרית.
+
+**מתי לא כדאי:** כשהחסכונות שנשארים קטנים ממה שהמשפחה צריכה בחודשים הראשונים בדירה. כמה זה, הקורס לא יודע: זו שאלה למשפחה.
+
+### 2. סגירת הלוואת הרכב
+
+כשסוגרים הלוואה, היא יורדת מהחישוב: ההכנסה הפנויה עולה ל־{f.shekels("l.carR.disposable")}. יש שתי דרכים לשלם:
+
+- **מהחסכונות** ({f.shekels("in.payoff")}). היחס יורד ל־{pct("l.carR.ratio")}: הרווח הוא <M>{f.plain("a.ratio")} − {f.plain("l.carR.ratio")} = {f.plain("l.carR.gain_ratio")}</M> נקודות אחוז, הרבה יותר ממה שצריך. המחיר: {f.shekels("l.carR.cash")} במזומן, ומהחסכונות נשארים רק {f.shekels("l.carR.reserve")}. מחיר נקודה: <M>{n("l.carR.cash")} ÷ {f.plain("l.carR.gain_ratio")} = {f.shekels("l.carR.pp")}</M>, זול יותר לנקודה מההון העצמי, אבל סכום גדול בהרבה בסך הכול. ויש בונוס אמיתי: כל חודש נשארים {f.shekels("l.carR.left_gain")} יותר, כי ההלוואה כבר לא נגבית.
+- **מההון העצמי.** ההון העצמי הוא כסף שהיה מיועד לדירה. אם {f.shekels("in.payoff")} ממנו הולכים לסגירה, ההלוואה צריכה לגדול ל־{f.shekels("l.carE.loan")}, ושיעור המימון עולה ל־{pct("l.carE.ltv")}, מעל התקרה של {f.plain("in.ltv_ceiling")}%, ב־<M>{f.plain("l.carE.ltv")} − {f.plain("in.ltv_ceiling")} = {f.plain("l.carE.ltv_over")}</M> נקודות אחוז. היחס אמנם יורד ל־{pct("l.carE.ratio")}, אבל זו **חומה**: המנוף הזה לא אפשרי. (הוא גם היה מעלה את סך התשלומים ב־{f.shekels("l.carE.extra")}.)
+
+**מתי לא כדאי:** כשהחסכונות שנשארים קטנים ממה שהמשפחה צריכה, או כשהסגירה היא מההון העצמי ודוחפת את שיעור המימון מעל התקרה.
+
+### 3. המתנה
+
+ההלוואה נספרת בהכנסה הפנויה רק כל עוד נשארו מעל 18 תשלומים. נשארו {f.plain("a.car_months")}. אחרי 7 חודשים נשארים {f.plain("l.wait7.left")}, וההלוואה עדיין נספרת (יחס {pct("l.wait7.ratio")}). אחרי 8 חודשים נשארים {f.plain("l.wait8.left")} בדיוק, ובשיעור 4.2 ראיתם שב־18 בדיוק זו שאלה פתוחה, שרשומה לאילון. אחרי {f.plain("in.wait")} חודשים נשארים {f.plain("l.wait.months_left")}, ושם הכלל ברור: היחס {pct("l.wait.ratio")}, בלי לשלם שקל.
+
+- **רווח:** אותם <M>{f.plain("a.ratio")} − {f.plain("l.wait.ratio")} = {f.plain("l.wait.gain_ratio")}</M> נקודות אחוז כמו בסגירה מהחסכונות.
+- **מחיר:** {f.plain("in.wait")} חודשים. בשקלים הוא אפס; בזמן הוא עולה כמה שהעסקה מחכה. מה יקרה בינתיים לדירה או לריבית, הקורס לא יודע.
+
+**מתי לא כדאי:** כשהעסקה לא מחכה, או כשמה שעלול לקרות בינתיים לדירה ולריבית גדול ממה שההמתנה חוסכת. מה יקרה, לא ידוע.
+
+### 4. לווה נוסף
+
+הורה עם {f.shekels("in.borrower")} נטו בחודש מצטרף להכנסה: הכנסה פנויה של {f.shekels("l.bor.disposable")}, ויחס של {pct("l.bor.ratio")}. הרווח הגדול ביותר בטבלה: <M>{f.plain("a.ratio")} − {f.plain("l.bor.ratio")} = {f.plain("l.bor.gain_ratio")}</M> נקודות אחוז.
+
+המחיר כאן **אינו בשקלים**, ולכן הקורס לא מחשב אותו: ההורה נכנס כלווה, וחותם על כל ההלוואה. מה זה אומר עליו ועל המשפחה, ומה קורה אם משהו משתבש, הם שאלות אחרות (שיעור 4.10 עסק בערב ובלווה שאינו ממשכן).
+
+**מתי לא כדאי:** כשההורה לא יכול או לא רוצה לשאת בהלוואה: הוא אחראי עליה כמו כולם.
+
+### 5. התקופה
+
+נועם ושירה כבר על {f.plain("in.max_months")} חודשים, 30 שנה: המקסימום. הארכה ב־{f.plain("in.term_years")} שנים הייתה מורידה את היחס ל־{pct("l.term.ratio")}, וחוצה את תקרת התקופה: **חומה**. אותו מנוף לכיוון השני כן אפשרי: תקופה קצרה ב־{f.plain("in.term_years")} שנים מעלה את היחס ל־{pct("l.short.ratio")} (עוד <M>{f.plain("l.short.ratio")} − {f.plain("a.ratio")} = {f.plain("l.short.rise")}</M> נקודות אחוז), וחוסכת {f.shekels("l.short.saving")} בסך התשלומים. אותו מנוף, אותו זוג, מהצד השני.
+
+**מתי לא כדאי:** כשהסך הנוסף שהמשפחה משלמת גדול ממה שהחזר נמוך שווה לה. ומעל 30 שנה אסור.
+
+### 6. החלוקה בין המסלולים
+
+הזזת {f.plain("in.mix_points")} נקודות אחוז מהקבועה אל המשתנה ({f.shekels("l.mix.moved")}) מורידה את היחס ב־{f.plain("l.mix.gain_ratio")} נקודות בלבד, ומעלה את ההחזר הגבוה ביותר בתרחיש המחמיר ב־{f.shekels("l.mix.stress_rise")}. ועוד: החלק בריבית שיכולה להשתנות עולה ל־{f.shekels("l.mix.variable")}, מעל הקו של שני שלישים ({f.shekels("a.maxvar")}), ב־{f.shekels("l.mix.over")}. בתמהיל הראשוני נשאר מתחת לקו מקום של {f.shekels("a.var_room")} בלבד: **חומה**, כמעט מההתחלה.
+
+**מתי לא כדאי:** כשהחשיפה לריבית שעולה גדולה ממה שהמשפחה יכולה לשאת. ומעל שני שלישים בריבית שיכולה להשתנות אסור.
+
+<Section kind="ההסבר">
+
+## טבלת המחירים
+
+</Section>
+
+אותם שבעה מנופים בטבלה אחת. יחס ההחזר היום הוא {pct("a.ratio")}. **הרווח** הוא כמה נקודות אחוז היחס יורד; **המחיר** בשלושה מטבעות נפרדים, והחומה אם יש.
+
+<div class="my-4 hidden overflow-x-auto sm:block">
+  <table class="w-full min-w-[40rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המנוף</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס אחרי (רווח, נקודות)</th>
+        <th class="py-2 pe-3 text-start font-semibold">מזומן עכשיו</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך התשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר בתרחיש מחמיר</th>
+        <th class="py-2 text-start font-semibold">חומה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr class="border-b border-n100 align-top">
+          <th class="py-2 pe-3 text-start font-semibold text-n900">{r.name}</th>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{r.after}</span> <span class="text-n600">(<span class="ltr">{r.gain}</span>)</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{r.cash}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{r.total}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{r.stress}</span></td>
+          <td class="py-2">{r.wall}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<ul class="list-reset my-4 space-y-3 sm:hidden">
+  {rows.map((r) => (
+    <li class="rounded-md border border-n200 p-3">
+      <p class="font-semibold text-n900">{r.name}</p>
+      <dl class="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-body-m text-n800">
+        <dt class="text-caption text-n600">יחס אחרי (רווח)</dt><dd><span class="ltr">{r.after}</span> (<span class="ltr">{r.gain}</span>)</dd>
+        <dt class="text-caption text-n600">מזומן עכשיו</dt><dd><span class="ltr">{r.cash}</span></dd>
+        <dt class="text-caption text-n600">סך התשלומים</dt><dd><span class="ltr">{r.total}</span></dd>
+        <dt class="text-caption text-n600">הגבוה ביותר בתרחיש מחמיר</dt><dd><span class="ltr">{r.stress}</span></dd>
+        <dt class="text-caption text-n600">חומה</dt><dd>{r.wall}</dd>
+      </dl>
+    </li>
+  ))}
+</ul>
+
+הסימן + הוא עלייה, והסימן − הוא ירידה. שלושה מנופים חוצים חומה, ולכן אין בהם מה לבחור, גם אם הם מוכרים כמנופים. ארבעה אפשריים, ובכל אחד המחיר במטבע אחר: כסף מהחסכונות, זמן, או התחייבות של הורה.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מחשבון המחיר
+
+</Section>
+
+אותו תיק, שישה מנופים. בחרו מנוף, הזיזו, וקראו שני צדדים: מה מרוויחים ומה משלמים. אם המנוף חוצה מגבלה, תופיע הודעה, והמנוף לא אפשרי.
+
+<LeverPrice
+  client:visible
+  base={CASE_A_POSITION}
+  payoff={CAR_PAYOFF}
+  note={`${MARK} החסכונות, סכום הסגירה וההכנסה של הלווה הנוסף הם הנחות של הקורס. הקווים על הסרגל הם קווים לדוגמה: 30% ו־35% השערות מהשטח (לבדיקה), 40% סף הון ו־50% מגבלה, לפי תעתיק הצוות, לא אומתו.`}
+/>
+
+נסו את שלושת אלה:
+1. ב״עוד הון עצמי״: מה הסכום הקטן ביותר, בצעדים של {f.shekels("in.step")}, שמוריד את היחס מתחת ל־40%? מה קורה לסך התשלומים?
+2. ב״סגירת הלוואה״: סגרו מהחסכונות, ואחר כך מההון העצמי. מה משתנה בצד של המחיר, ומה מופיע בהודעה?
+3. ב״תקופה״: הזיזו ל״פחות 5 שנים״. אילו מהרווחים והמחירים התהפכו?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.shekels("a.step")}. עם {f.shekels("a.eq_short.add")} היחס הוא {pct("a.eq_short.ratio")}, עדיין מעל. סך התשלומים יורד ב־{f.shekels("l.eq.saving")}: המנוף הזה גם חוסך ריבית.</li>
+    <li>מהחסכונות: מזומן {f.shekels("l.carR.cash")}, ונשארים {f.shekels("l.carR.reserve")}. מההון העצמי: שיעור המימון {pct("l.carE.ltv")}, והודעה אדומה על חצייה של התקרה, כי ההלוואה גדלה ל־{f.shekels("l.carE.loan")}.</li>
+    <li>היחס עולה ל־{pct("l.short.ratio")} (בדיוק ההפך מהרווח), אבל סך התשלומים יורד ב־{f.shekels("l.short.saving")}: מה שהיה מחיר נהיה רווח, ומה שהיה רווח נהיה מחיר.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## מחיר נקודה, בצעדים
+
+</Section>
+
+**צעד 1 — בוחרים יעד.** יחס החזר שנמצא מתחת לקו, או כל יעד אחר שמדדים אותו בנקודות אחוז.
+
+**צעד 2 — מחשבים את המצב אחרי המנוף.** באותה שיטה כמו בשיעור 4.3: הכנסה פנויה, תשלום, יחס.
+
+**צעד 3 — הרווח.** יחס לפני פחות יחס אחרי, בנקודות אחוז.
+
+**צעד 4 — המחיר, במטבע שלו.** מזומן, ריבית נוספת, חשיפה או זמן. לא מחברים בין מטבעות.
+
+**צעד 5 — מחיר נקודה.** מחלקים מחיר ברווח, באותו מטבע.
+
+**צעד 6 — בודקים חומות ואת מה שנשאר למשפחה.** מנוף חוצה מגבלה אינו אפשרי, ומנוף ששוחק את החסכונות או את התקציב החודשי (שיעור 4.6) לא עובר בדיקה גם אם הוא חוקי.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy">מחיר נקודה = מחיר ÷ רווח</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="font-semibold text-n900">מחיר</dt><dd>שקלים, במטבע אחד: מזומן, או ריבית נוספת. מה שאינו בשקלים (זמן, התחייבות) אין לו מחיר נקודה</dd>
+    <dt class="font-semibold text-n900">רווח</dt><dd>נקודות אחוז של יחס החזר שהמנוף הוריד, כמספר חיובי</dd>
+    <dt class="font-semibold text-n900">מחיר נקודה</dt><dd>שקלים לנקודת אחוז אחת של יחס</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?**
+1. רק כשהמנוף הוריד את היחס. אם הוא לא הוריד, אין נקודה לתמחר.
+2. רק בין מנופים שמשלמים באותו מטבע: מזומן מול מזומן, ריבית מול ריבית.
+3. זהו מחיר **ממוצע** על הצעד שנבדק, לא מחיר של השקל הבא. מי ששואל על צעד אחר מחשב אותו מחדש.
+4. המחיר מחולק ברווח כפי שהוא כתוב. אם מחלקים ביחס לא מעוגל, תצא תוצאה שונה בכמה שקלים.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> מחלקים את המחיר ברווח, כפי שהוא כתוב.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם המחיר בתא B1 והרווח בתא B2: <span class="ltr inline-block whitespace-nowrap">{"=B1/B2"}</span>. הרווח עצמו: <span class="ltr inline-block whitespace-nowrap">{"=C1-C2"}</span>, כשהיחס לפני בתא C1 והיחס אחרי בתא C2.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="6.4"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `זו הטעות הנפוצה: להסתכל רק על הרווח. (א) אכן מוריד את היחס ל־${pct("l.carE.ratio")}, אבל ההלוואה גדלה, ושיעור המימון עובר את התקרה (${pct("l.carE.ltv")} מול ${f.plain("in.ltv_ceiling")}%). רווח גדול יותר אינו עדיף כשהוא חוצה חומה.`,
+    "",
+    "שניהם מורידים את היחס, אבל אחד מהם אסור. מנוף שחוצה מגבלה לא נמצא ברשימת האפשרויות בכלל.",
+    "אפשר להשוות, בשקלים. מזומן שיוצא עכשיו, מזומן שנשאר בחסכונות, וסך התשלומים כולם מספרים. מה שאי אפשר הוא לחבר ביניהם למספר אחד.",
+  ]}
+>
+  מנוף הוא זוג של רווח ומחיר, והמחיר הוא לא רק שקלים: הוא גם חומה. מנוף שנראה הכי חזק בעמודה אחת יכול להיות אסור בעמודה אחרת. לכן קוראים את כל השורה, ולא עמודה אחת.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## שלוש שאלות לפני שמושכים מנוף
+
+</Section>
+
+**באיזה מטבע משלמים?** (מזומן, ריבית, חשיפה, זמן.) **האם יש חומה?** (מגבלה של הוראה 329 שהמנוף חוצה.) **מה נשאר למשפחה?** (מה שנשאר בחסכונות, ומה שנשאר בכל חודש). זו רשימת בדיקה, לא נוסחה, וגם לא מבטיחה שהמנוף כדאי: היא רק מונעת לשכוח צד.
+
+<Section kind="דוגמה פתורה">
+
+## איזה מנוף מושכים ראשון?
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+נועם ושירה צריכים להוריד את התשלום ב־{f.shekels("a.over40")} בחודש, כדי להגיע לקו של 40%. אילו מנופים נשארים, ומה מהם עולה פחות?
+
+**צעד 1 — מוציאים את החומות.** סגירה מההון העצמי (שיעור המימון {pct("l.carE.ltv")}), תקופה ארוכה יותר (מעל 30 שנה) והזזה למשתנה ({f.shekels("l.mix.variable")} בריבית שיכולה להשתנות, מעל {f.shekels("a.maxvar")}) אינם אפשריים.
+
+**צעד 2 — מה נשאר.** עוד הון עצמי ({f.shekels("l.eq.cash")}, יחס {pct("l.eq.ratio")}); סגירה מהחסכונות ({f.shekels("l.carR.cash")}, יחס {pct("l.carR.ratio")}); המתנה של {f.plain("in.wait")} חודשים (יחס {pct("l.wait.ratio")}); לווה נוסף (יחס {pct("l.bor.ratio")}).
+
+**צעד 3 — מחיר נקודה, למי שמשלם במזומן.** הון עצמי: {f.shekels("l.eq.pp")} לנקודה. סגירה מהחסכונות: {f.shekels("l.carR.pp")} לנקודה. הסגירה זולה יותר לנקודה, אבל היא קונה {f.plain("l.carR.gain_ratio")} נקודות כשהצורך הוא פחות מנקודה, ומשאירה {f.shekels("l.carR.reserve")} בחסכונות.
+
+**צעד 4 — קוראים מה נשאר.** הון עצמי נוסף משאיר {f.shekels("l.eq.reserve")} בחסכונות, וגם חוסך {f.shekels("l.eq.saving")} בריבית. המתנה לא עולה כסף, אבל עולה {f.plain("in.wait")} חודשים. הלווה הנוסף לא עולה בשקלים, והוא מחייב אדם נוסף.
+
+**צעד 5 — מכריעים ואומרים מה החיסרון.** אם החסכונות שנשארים ({f.shekels("l.eq.reserve")}) מספיקים למשפחה, מוסיפים את ההון העצמי: הוא קונה בדיוק את מה שצריך, ועוד חוסך ריבית. אם הם לא מספיקים, ממתינים {f.plain("in.wait")} חודשים, בתנאי שהעסקה מחכה. החיסרון של ההמלצה: היא נשענת על כך שהקו של 40% חשוב לבנק, ואת זה הקורס לא יודע, והיא לא נבדקה מול שום בנק.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את טבלת הרווחים
+
+</Section>
+
+לכל מנוף: יחס ההחזר אחריו, והרווח בנקודות אחוז (יחס היום פחות יחס אחרי). השורה הראשונה מלאה, והיחס היום הוא {pct("a.ratio")}. מעגלים לשתי ספרות אחרי הנקודה.
+
+<FillTable
+  client:visible
+  id="6.4-half"
+  periodLabel="המנוף"
+  columns={[
+    { key: "after", label: "יחס אחרי", format: "percent" },
+    { key: "gain", label: "רווח, נקודות אחוז", format: "points" },
+  ]}
+  rows={halfRows}
+  blanks={["סגירה מהחסכונות.after", "סגירה מהחסכונות.gain", "לווה נוסף.after", "לווה נוסף.gain"]}
+  success="בכל שורה, הרווח הוא היחס היום פחות היחס אחרי. סגירה מהחסכונות והמתנה נותנות אותו רווח, אבל במטבעות שונים: מזומן מול זמן."
+  hint={`הסגירה מהחסכונות מעלה את ההכנסה הפנויה ל־${f.shekels("l.carR.disposable")}, והלווה הנוסף ל־${f.shekels("l.bor.disposable")}. היחס הוא התשלום שנכנס ליחס חלקי ההכנסה הפנויה (שיעור 4.3), והרווח הוא ${f.plain("a.ratio")} פחות היחס החדש.`}
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+המספרים להמחשה: הריביות הן של הקורס, והסכומים בדויים. התרגילים מסודרים מהקל אל המאתגר. כדאי מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="6.4-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ההחזר החודשי עולה", feedback: "זה ההפך: הארכה מורידה את ההחזר. זה הרווח, לא המחיר." },
+    { text: "ההלוואה עצמה גדלה", feedback: "הסכום שלוקחים לא משתנה. משתנה הזמן שלוקח להחזיר אותו." },
+    { text: "הסך של כל התשלומים עולה", correct: true, feedback: "נכון. תקופה ארוכה יותר מורידה את ההחזר החודשי, והמחיר הוא ריבית על יותר חודשים." },
+    { text: "אין מחיר, כי ההחזר יורד", feedback: "לכל מנוף יש מחיר. כאן הוא מופיע בסך התשלומים." },
+  ]}
+>
+  משפחה מאריכה את התקופה של הלוואה. מה המחיר של המנוף הזה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="6.4-2"
+  n={2}
+  level="קל"
+  answer={f.raw("m.gain_pay")}
+  errors={[
+    { value: f.raw("m.extra"), message: "זה הסך הנוסף שמשלמים לאורך כל ההלוואה. השאלה היא על ההחזר החודשי." },
+    { value: f.raw("m.b.first"), message: "זה ההחזר ל־30 שנה עצמו. השאלה היא בכמה הוא נמוך מההחזר ל־25 שנה." },
+  ]}
+>
+  ההחזר החודשי על {f.shekels("m.loan")} בריבית של {f.plain("m.rate")}% הוא {f.shekels("m.a.first")} ל־{f.plain("m.years_a")} שנים, ו־{f.shekels("m.b.first")} ל־{f.plain("m.years_b")} שנים. בכמה ההחזר החודשי יורד כשמאריכים?
+</NumericExercise>
+
+<Solution for="6.4-2">
+<M>{n("m.a.first")} − {n("m.b.first")} = {f.shekels("m.gain_pay")}</M>. זה הרווח החודשי. המחיר הוא הסך: עוד {f.shekels("m.extra")} לאורך כל ההלוואה.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.4-3"
+  n={3}
+  level="בינוני"
+  unit="נקודות אחוז"
+  tolerance={0.005}
+  answer={f.raw("m.gain_ratio")}
+  errors={[
+    { value: f.raw("m.a.ratio"), message: "זה יחס ההחזר לפני ההארכה. השאלה היא בכמה הוא יורד.", tolerance: 0.005 },
+  ]}
+>
+  הכנסה של {f.shekels("m.income")}. יחס ההחזר ל־{f.plain("m.years_a")} שנים הוא {pct("m.a.ratio")}, ול־{f.plain("m.years_b")} שנים {pct("m.b.ratio")}. בכמה נקודות אחוז הוא יורד?
+</NumericExercise>
+
+<Solution for="6.4-3">
+<M>{f.plain("m.a.ratio")} − {f.plain("m.b.ratio")} = {f.plain("m.gain_ratio")}</M> נקודות אחוז. שימו לב: נקודות אחוז, לא אחוזים. ירידה מ־{pct("m.a.ratio")} ל־{pct("m.b.ratio")} היא ירידה של {f.plain("m.gain_ratio")} נקודות.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.4-4"
+  n={4}
+  level="בינוני"
+  tolerance={1}
+  near={100}
+  answer={f.raw("m.pp")}
+  errors={[
+    { value: f.raw("m.extra"), message: "זה המחיר הכולל (הריבית הנוספת). מחיר נקודה הוא המחיר מחולק ברווח, בנקודות." },
+  ]}
+>
+  הארכת התקופה בדוגמה הקטנה עלתה {f.shekels("m.extra")} בריבית נוספת, והורידה את יחס ההחזר ב־{f.plain("m.gain_ratio")} נקודות אחוז. מה מחיר נקודה אחת, בשקלים? חלקו את המספרים כפי שהם כתובים.
+</NumericExercise>
+
+<Solution for="6.4-4">
+<M>{n("m.extra")} ÷ {f.plain("m.gain_ratio")} = {f.shekels("m.pp")}</M>. אם חילקתם ביחס לא מעוגל, יצא מספר קרוב: ההבדל הוא עיגול.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.4-5"
+  n={5}
+  level="בינוני"
+  tolerance={1}
+  near={50}
+  answer={f.raw("l.carR.pp")}
+  errors={[
+    { value: f.raw("l.carR.cash"), message: "זה הסכום ששולמו במזומן. מחיר נקודה הוא הסכום מחולק בנקודות שהוא קנה." },
+    { value: f.raw("l.eq.pp"), message: "זה מחיר הנקודה של ההון העצמי הנוסף, לא של הסגירה מהחסכונות." },
+  ]}
+>
+  נועם ושירה סוגרים את הלוואת הרכב מהחסכונות ב־{f.shekels("l.carR.cash")}, והיחס יורד ב־{f.plain("l.carR.gain_ratio")} נקודות אחוז. מה מחיר נקודה, במזומן?
+</NumericExercise>
+
+<Solution for="6.4-5">
+<M>{n("l.carR.cash")} ÷ {f.plain("l.carR.gain_ratio")} = {f.shekels("l.carR.pp")}</M>. זה זול מההון העצמי הנוסף ({f.shekels("l.eq.pp")} לנקודה), אבל הסגירה לוקחת כמעט את כל החסכונות: נשארים {f.shekels("l.carR.reserve")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.4-6"
+  n={6}
+  level="בינוני"
+  unit="חודשים"
+  tolerance={0}
+  near={0}
+  answer={f.plain("in.wait")}
+  errors={[
+    { value: f.plain("a.car_months"), message: "זה מספר התשלומים שנשארו היום. השאלה היא כמה חודשים מחכים." },
+    { value: f.plain("a.wait"), message: "אחרי 8 חודשים נשארים 18 תשלומים בדיוק, ושם הכלל פתוח (שיעור 4.2). כדי שיהיה ברור צריך עוד חודש." },
+  ]}
+>
+  על הלוואת הרכב נשארו {f.plain("a.car_months")} תשלומים. כמה חודשים צריך להמתין כדי שיישארו עליה {f.plain("l.wait.months_left")} תשלומים, ושהכלל של 18 יהיה ברור?
+</NumericExercise>
+
+<Solution for="6.4-6">
+מ־{f.plain("a.car_months")} תשלומים יורדים תשלום בכל חודש: אחרי {f.plain("in.wait")} חודשים נשארים {f.plain("l.wait.months_left")}. אחרי 8 נשארים {f.plain("l.wait8.left")}, ושם הכלל פתוח.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="6.4-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "עוד הון עצמי מהחסכונות: הוא מקטין את ההכנסה הפנויה", feedback: "ההפך: הוא מקטין את ההלוואה ואת התשלום, וההכנסה הפנויה לא משתנה." },
+    { text: "סגירת הלוואת הרכב מההון העצמי: שיעור המימון עובר את התקרה", correct: true, feedback: "נכון. היחס יורד, אבל ההלוואה גדלה ושיעור המימון עובר את התקרה. זו חומה." },
+    { text: "המתנה: היא חוצה את תקרת התקופה", feedback: "המתנה לא נוגעת בתקופה. מה שהיא עולה הוא זמן." },
+    { text: "לווה נוסף: הוא מעלה את שיעור המימון", feedback: "שיעור המימון תלוי בהלוואה ובמחיר, לא בהכנסה. לווה נוסף לא משנה אותו." },
+  ]}
+>
+  איזה מהמנופים של נועם ושירה אינו אפשרי, ולמה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="6.4-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: "כן, כי הרווח הוא הגדול ביותר", feedback: "רווח גדול הוא רק צד אחד של הזוג. המחיר הוא שהחסכונות כמעט נגמרים." },
+    { text: "לא, כי יש כלל קבוע שאסור להשאיר חסכונות מתחת לסכום מסוים", feedback: "אין כלל כזה בקורס. כמה חסכונות צריך להשאיר היא שאלה למשפחה, לא כלל." },
+    { text: "אי אפשר לדעת רק מהיחס. צריך לדעת מה המשפחה צריכה בחסכונות, ואם יש חלופה כמו להמתין", correct: true, feedback: `נכון. ${f.shekels("l.carR.reserve")} בחסכונות יכולים להספיק למשפחה אחת ולא לאחרת. זו שאלה למשפחה, ולקורס אין מספר.` },
+    { text: "כן, כי ההלוואה כבר לא נגבית וזה מכסה הכול", feedback: "היא אכן משחררת כסף בכל חודש, אבל זה לא מחליף כרית לחודשים הראשונים בדירה." },
+  ]}
+>
+  אחרי סגירת הלוואת הרכב מהחסכונות נשארים לנועם ושירה {f.shekels("l.carR.reserve")} בחסכונות. האם כדאי לסגור?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על מחיר מנוף">
+<p><strong>מה זה?</strong> השוואה בשקלים בין מה שמנוף מרוויח (הורדת יחס ההחזר והתשלום) לבין מה שהוא עולה: מזומן, ריבית נוספת, חשיפה, זמן, ולפעמים חומה.</p>
+<p><strong>למה זה קיים?</strong> כי מנוף שרואים רק את הרווח שלו נראה חינם, והוא אף פעם לא חינם. מנוף אחד מוריד את היחס ופוגע בכרית, ואחר עובר את הבנק ונתקל בתקרה.</p>
+<p><strong>איך זה עובד?</strong> בונים את התיק פעמיים, לפני המנוף ואחריו, באותה שיטה, וקוראים את ההפרש: נקודות אחוז, שקלים של החזר, ושקלים של מחיר בכל מטבע. מחיר נקודה הוא המחיר מחולק ברווח.</p>
+<p><strong>איך זה משפיע עליכם?</strong> על מה ששומעים כ״אפשר להוריד לכם את היחס״. כל משפט כזה מתחבא מאחוריו מחיר: מי משלם, ובאיזה מטבע.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שלוש שאלות לפני שמושכים: באיזה מטבע משלמים, האם יש חומה, ומה נשאר למשפחה. ואם יש יותר ממנוף אחד אפשרי, משווים מחיר נקודה רק בתוך אותו מטבע.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **מנוף הוא זוג:** רווח (נקודות יחס, שקלים של החזר) ומחיר.
+- **המחיר מגיע בארבעה מטבעות שלא מחברים:** מזומן עכשיו, שקלים לאורך ההלוואה, חשיפה לתרחיש מחמיר, וזמן.
+- **חומה:** מנוף שחוצה מגבלה אינו אפשרי, גם אם הוא מוריד את היחס יותר מכולם (לפי תעתיק הצוות להוראה 329, לא אומת).
+- **מחיר נקודה = מחיר ÷ רווח**, באותו מטבע, על הצעד שנבדק.
+- **אותו מנוף לשני הכיוונים:** מה שהיה רווח הופך למחיר ולהפך.
+- **אין מנוף חינם.** גם המתנה עולה זמן, וגם לווה נוסף עולה אחריות.
+- **מה שהקורס לא יודע:** אם הקו של 40% חשוב לבנק מסוים, ומה קורה לריבית שלו מעליו ומתחתיו.
+
+**בשיעור הבא — 6.5, הקו האדום: <Later lesson="6.5" quiet>מיצוב</Later> מול <Later lesson="6.5" quiet>מידע לא נכון</Later>.** כל מה שראיתם כאן משנה את העסקה. מה שלא עושים הוא לשנות את מה שנאמר עליה, ולמה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: `נועם ושירה (המחיר, ההון העצמי, ההלוואה, ההכנסות, הלוואת הרכב, התמהיל הראשוני והריביות) הם התיק המרכזי של הקורס מ־5.6: הנחות לימוד, לא נתוני שוק ולא הצעת בנק. ההנחות המיוחדות לשיעור הזה: חסכונות של ${f.shekels("a.reserve")} מחוץ להון העצמי, סכום סגירה של ${f.shekels("in.payoff")} להלוואת הרכב, והכנסה של ${f.shekels("in.borrower")} נטו בחודש להורה שמצטרף.` },
+    { kind: "הנחת חישוב", text: "התרחיש הבסיסי והתרחיש המחמיר הם תרחישים לימודיים (שיעור 5.6), לא תחזיות. הדוגמה הקטנה היא תרגיל נפרד, לא התיק של נועם ושירה." },
+    { kind: "הנחת חישוב", text: "הקו של 40% הוא סף של דוגמה (שיעור 6.2). כמה חסכונות משפחה צריכה להשאיר, הקורס לא יודע." },
+    { kind: "לא אומת", text: "המגבלות של הוראה 329 שהמנופים נבחנים מולן (שיעור מימון, יחס החזר עד 50%, סף הון ב־40%, לא יותר משני שלישים בריבית משתנה, עד 30 שנה): לפי תעתיק של הצוות ב־Brain (דף 7503881, עודכן 2026-10-08), ממתין לבדיקה מול המקור. כלל 18 החודשים: לפי תעתיק נספח א׳ (שיעור 4.2); ב־18 תשלומים בדיוק זו שאלה פתוחה, ורשומה לאילון." },
+    { kind: "ידע מתמטי כללי", text: "מחיר נקודה כמנה, יחס ההחזר כתשלום חלקי הכנסה פנויה (שיעור 4.3), והפרש בנקודות אחוז.", code: ["מחיר נקודה = מחיר ÷ רווח", "רווח = יחס לפני − יחס אחרי"] },
+    { kind: "ידע כלכלי כללי", text: "הון עצמי נוסף מקטין את ההלוואה ואת הריבית עליה, אבל מקטין את הכסף הנזיל; הארכת תקופה מקטינה את ההחזר החודשי ומגדילה את הריבית הכוללת. בלי מספרים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, במחשבון ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/levers.ts (on sensitivity.ts, schedule.ts, affordability.ts, regulation.ts; the step search is positioning.ts's loanCut) and src/data/case-a-levers.ts (on case-a-mix.ts) via scripts/lessons/_lever-facts.ts and lesson-6-4.ts, into data/lessons/6-4.json; rechecked by checks/kinds/levers.py (with schedule.py, sensitivity.py, common.py), affordability.py and regulation.py. Component: src/components/LeverPrice.vue (props: the case). Video: video/6-4.html. Field knowledge: none used; the 40% line is the 6.2 example threshold. Open for Eylon: research/stage-6-raw/eylon-6-B.md. */}

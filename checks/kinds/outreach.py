@@ -23,7 +23,9 @@ from the rules:
   out_effect        a mix's first payment or total paid before / after an edit that adds
                     edit_points percentage points to the rate of the tracks that edit_target names
                     ("all", a kind, or a track number from 1): measure first_before, first_after,
-                    first_delta, total_before, total_after, total_delta. Statement rounding.
+                    first_delta, total_before, total_after, total_delta (after - before), and
+                    first_gain, total_gain (before - after: what a LOWER rate saves, positive).
+                    Statement rounding.
   out_simple_monthly amount x points / 100 / 12, to the agora.
   out_stop          "time" when fits = "no", "small_gain" when last_gain < threshold, else "continue".
   out_margin        sum of amount x (rate - cost of its kind) / 100 over a mix's tracks (cost_<kind>
@@ -162,6 +164,8 @@ def effect(i, _facts=None):
         "total_before": str(agorot(total_before)),
         "total_after": str(agorot(total_after)),
         "total_delta": str(agorot(total_after - total_before)),
+        "first_gain": str(agorot(first_before - first_after)),
+        "total_gain": str(agorot(total_before - total_after)),
     }[i["measure"]]
 
 

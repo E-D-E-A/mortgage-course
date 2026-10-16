@@ -8,12 +8,13 @@
 // box, a toy: what the two mixes would be worth to a bank under INVENTED costs of funds. Every
 // number comes from outreach.ts / sensitivity.ts through case-a-offers.ts; the component does none.
 import { computed, ref } from "vue";
-import { BANK_NAME, bankMargin, better, COUNTERS, counterTracks, EXERCISE_COST_OF_FUNDS, LOWER_IS_BETTER, PTI_CAPITAL_THRESHOLD, priced, readMix, REQUESTED, type ReadKey } from "../data/case-a-offers.ts";
+import { BANK_NAME, bankMargin, better, COUNTERS, counterTracks, EXERCISE_COST_OF_FUNDS, LOWER_IS_BETTER, priced, readMix, REQUESTED, type ReadKey } from "../data/case-a-offers.ts";
 import { formatShekelsText } from "../lib/calc/money.ts";
 import { shareOf } from "../lib/calc/mix.ts";
 import { KIND_NAME_HE as KIND_HE } from "../data/case-a-mix.ts";
 import type { TrackKind, TrackSpec } from "../lib/calc/schedule.ts";
 import { loanOf } from "../lib/calc/sensitivity.ts";
+import { PTI_CAPITAL_THRESHOLD } from "../lib/calc/regulation.ts";
 
 defineProps<{ note: string }>();
 

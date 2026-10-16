@@ -9,7 +9,7 @@
 // regulation.ts); the lines drawn on the ratio bar are positioning.ts's example thresholds, each with its kind.
 // The case is a prop (case A on the page): nothing about a family is typed here.
 import { computed, reactive, ref } from "vue";
-import { type LeverMove, type PositionCase, pull } from "../lib/calc/levers.ts";
+import { type LeverMove, type PositionCase, perPoint, pull } from "../lib/calc/levers.ts";
 import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
 import { percentString } from "../lib/calc/percent.ts";
 import { KIND_INFO, thresholdsOf } from "../lib/calc/positioning.ts";
@@ -113,9 +113,12 @@ const sh = (x: Decimal.Value) => formatShekels(String(x));
 const whole = (x: Decimal.Value) => formatWholeShekels(String(x));
 const pct = (x: Decimal.Value) => `${percentString(x)}%`;
 const signed = (x: Decimal, f: (d: Decimal) => string) => (x.isZero() ? f(x) : x.isPos() ? `+${f(x)}` : f(x));
+// The gain is shown as the difference of the two ratios as printed (to two decimals), so what the learner reads adds up.
+const shownRatio = (x: Decimal.Value) => new Decimal(percentString(x));
+const gainShown = computed(() => shownRatio(p.value.before.ratio).minus(shownRatio(p.value.after.ratio)));
 const points = (x: Decimal) => percentString(x.abs());
 
-const marks = thresholdsOf("pti").map((t) => ({ at: Number(t.percent), label: `${t.percent}%`, kind: KIND_INFO[t.kind].name }));
+const marks = thresholdsOf("pti").map((t) => ({ at: Number(t.percent), label: t.kind === "field_hypothesis" ? "" : `${t.percent}%`, kind: KIND_INFO[t.kind].name }));
 const SCALE = 60;
 const bar = (x: Decimal) => `${Math.min(100, (x.toNumber() / SCALE) * 100)}%`;
 
@@ -128,8 +131,9 @@ const wallText = computed(() =>
       return `${rule?.label}: ${value}`;
     }),
 );
-const perPointCash = computed(() => (p.value.gain.ratioPoints.gt(0) && p.value.cost.cashNow.gt(0) ? p.value.cost.cashNow.div(p.value.gain.ratioPoints) : null));
-const perPointExtra = computed(() => (p.value.gain.ratioPoints.gt(0) && p.value.cost.extraTotal.gt(0) ? p.value.cost.extraTotal.div(p.value.gain.ratioPoints) : null));
+// The price of one point is the price divided by the points as printed; a lever that crosses a ban has no price per point (it cannot be pulled).
+const perPointCash = computed(() => (p.value.allowed && gainShown.value.gt(0) && p.value.cost.cashNow.gt(0) ? perPoint(p.value.cost.cashNow, gainShown.value) : null));
+const perPointExtra = computed(() => (p.value.allowed && gainShown.value.gt(0) && p.value.cost.extraTotal.gt(0) ? perPoint(p.value.cost.extraTotal, gainShown.value) : null));
 
 function reset() {
   Object.assign(v, { equity: 0, close: false, closeFrom: "reserve", wait: 0, borrower: 0, term: 0, mix: 0 });
@@ -228,18 +232,18 @@ function reset() {
         <ul class="list-reset mt-2 grid gap-2 text-body-m text-n800">
           <li>
             יחס ההחזר:
-            <span class="ltr font-semibold">{{ pct(p.before.ratio) }} ← {{ pct(p.after.ratio) }}</span>
-            <span v-if="!p.gain.ratioPoints.isZero()" class="block text-caption text-n600">{{ p.gain.ratioPoints.isPos() ? "נמוך יותר" : "גבוה יותר" }} ב־<span class="ltr">{{ points(p.gain.ratioPoints) }}</span> נקודות אחוז</span>
+            <span class="font-semibold"><span class="ltr">{{ pct(p.before.ratio) }}</span> ← <span class="ltr">{{ pct(p.after.ratio) }}</span></span>
+            <span v-if="!gainShown.isZero()" class="block text-caption text-n600">{{ gainShown.isPos() ? "נמוך יותר" : "גבוה יותר" }} ב־<span class="ltr">{{ points(gainShown) }}</span> נקודות אחוז</span>
           </li>
           <li>
             התשלום שנכנס ליחס:
-            <span class="ltr font-semibold">{{ sh(p.before.qualifying) }} ← {{ sh(p.after.qualifying) }}</span>
+            <span class="font-semibold"><span class="ltr">{{ sh(p.before.qualifying) }}</span> ← <span class="ltr">{{ sh(p.after.qualifying) }}</span></span>
           </li>
           <li>
             שיעור המימון:
-            <span class="ltr font-semibold">{{ pct(p.before.ltv) }} ← {{ pct(p.after.ltv) }}</span>
+            <span class="font-semibold"><span class="ltr">{{ pct(p.before.ltv) }}</span> ← <span class="ltr">{{ pct(p.after.ltv) }}</span></span>
           </li>
-          <li>
+          <li v-if="!(chosen === 'borrower' && outcome.moved)">
             מה נשאר לחיים בחודש הראשון:
             <span class="ltr font-semibold">{{ sh(p.after.leftFirst) }}</span>
             <span v-if="!p.after.leftFirst.eq(p.before.leftFirst)" class="block text-caption text-n600">היום: <span class="ltr">{{ sh(p.before.leftFirst) }}</span></span>

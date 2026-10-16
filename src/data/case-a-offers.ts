@@ -24,7 +24,7 @@ import type { MixEdit } from "../lib/calc/outreach.ts";
 import { firstYearMargin } from "../lib/calc/outreach.ts";
 import type { TrackKind, TrackSpec } from "../lib/calc/schedule.ts";
 import { loanOf, measuresOf, scenarioFrom, stressRise, variableAmount, type GoalContext } from "../lib/calc/sensitivity.ts";
-import { CASE_A, GOAL_CONTEXT, INITIAL_MIX, SCENARIOS, caseALimits, caseAPasses, caseARatio } from "./case-a-mix.ts";
+import { GOAL_CONTEXT, INITIAL_MIX, SCENARIOS, caseAPasses, caseARatio } from "./case-a-mix.ts";
 import { PTI_CAPITAL_THRESHOLD } from "../lib/calc/regulation.ts";
 import Decimal from "decimal.js";
 
@@ -165,8 +165,6 @@ export function better(a: MixReading, b: MixReading, key: ReadKey): "requested" 
   return x.eq(y) ? "same" : x.lt(y) ? "requested" : "counter";
 }
 
-export { caseALimits, CASE_A };
-
 // ── A bank's view: INVENTED cost of funds by kind of track (percent a year) ───────────────────────────────
 
 /** Invented. The mechanism (income = rate − cost of the money) is general; the numbers are the exercise's. */
@@ -200,5 +198,3 @@ export const NEGOTIATION = {
   threshold: "10000",
 };
 
-export { CASE_A as CASE };
-export { PTI_CAPITAL_THRESHOLD };

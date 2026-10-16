@@ -1,0 +1,467 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "6.9"
+minutes: 60
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import UnderwriterDay from "../../components/UnderwriterDay.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { BANKS, bank } from "../../data/case-a-positioning.ts";
+import { DAY_BANK, DAY_FILES } from "../../data/underwriter-day.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("6.9");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const pc = (id) => `${f.plain(id)}%`;
+export const A = bank(DAY_BANK);
+export const banksList = BANKS;
+export const predictionOptions = [
+  "כמה מאות שקלים בסך הכול: הנחה כל כך קטנה היא כמעט כלום",
+  `בערך ${f.whole("pred.first_diff")} בכל חודש, כלומר בערך ${f.whole("pred.diff")} על פני ההלוואה כולה`,
+  `בערך ${f.whole("pred.first_diff")} בסך הכול: זה ההפרש של חודש אחד`,
+  "אין הבדל: הבנק מתמחר לפי הכנסה ולא לפי יחס החזר",
+];
+export const halfRows = [
+  { track: "פריים", list: f.raw("a.list_prime"), relief: f.raw("d2.relief"), final: f.raw("d2.rate_1") },
+  { track: "משתנה לא צמודה", list: f.raw("a.list_variable_unlinked"), relief: f.raw("d2.relief"), final: f.raw("d2.rate_2") },
+  { track: "קבועה לא צמודה", list: f.raw("a.list_fixed_unlinked"), relief: f.raw("d2.relief"), final: f.raw("d2.rate_3") },
+];
+export const rowOf = (b) => ({
+  name: b.name,
+  ratio: f.plain(`b.${b.id}.ratio`),
+  decision: f.plain(`b.${b.id}.decision`),
+  relief: f.plain(`b.${b.id}.relief`),
+});
+
+עד עכשיו ראיתם את התיק מהצד של המשפחה ושל היועץ: אילו <Term t="מנוף" lesson="6.3">מנופים</Term> יש, כמה כל אחד עולה, למי פונים ומה אפשר להשיג במשא ומתן. היום עוברים לצד השני של השולחן. תשבו כמה דקות בתפקיד של חתם האשראי בבנק, האדם שעושה את <Term t="חיתום" lesson="1.7">החיתום</Term>, תקראו חמישה תיקים לפי כללים, ותראו מה נקבע ומה נשאר מחוץ לתיק. מי שיודע איך נראה תיק מהצד של מי שמחליט, יודע אילו נתונים אמיתיים כדאי לשים לו מול העיניים.
+
+<Callout title="מה התרגיל הזה לא אומר" tone="warning">
+<p><strong>{MARK}</strong></p>
+<p>הבנקים בתרגיל בדויים, והכללים שלהם בדויים לגמרי: אלה <strong>הכללים של התרגיל</strong>, לא הדרך שבה בנק אמיתי מחליט או מתמחר. הקורס לא יודע איפה בנקים שמים את הקווים שלהם, ואם בכלל. ידע מהשטח (FK-H-050, FK-H-052, FK-H-071; טובי זמיר, 2026-08-05; ממתין לאישור אילון) מתאר רק כיוון: לבנק יש מרווח יעד שמנוהל כסך חודשי, הפקיד מוכר בתוך טווח שמותר לו, ובקשה שיוצאת מהטווח עולה למנהל. הקורס לא יודע כמה, ואם זה מתבטא בקווים כאלה. את הכללים כאן בנינו כדי לתרגל חשיבה, לא כדי ללמד מספרים.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="6.9"
+  question={`בבנק א׳ שבתרגיל יש כלל: תיק שיחס ההחזר שלו הוא ${A.ratioReliefLine}% או פחות מקבל הנחה של ${f.plain("pred.relief")} נקודת אחוז בריבית של כל מסלול. נועם ושירה מבקשים הלוואה של ${f.whole("a.loan")} בתמהיל הראשוני, ל־30 שנה, ויחס ההחזר שלהם ${f.plain("b.a.ratio")}%: מעל הקו במעט. בכמה בערך ההנחה הייתה מקטינה את סך התשלומים שלהם, אילו היו מתחת לקו?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## יום אחד אצל החתם
+
+</Section>
+
+<LessonVideo lesson="6-9" />
+
+<Section kind="ההסבר">
+
+## מה החתם רואה
+
+</Section>
+
+תיק שמגיע לחתם הוא רשימה של מספרים ומסמכים. החתם לא פגש את המשפחה. מה שהוא רואה, בערך:
+
+- **הנכס וההלוואה:** שווי הנכס, והסכום והמסלולים שביקשו. מהם יוצא <Term t="שיעור מימון" lesson="1.2">שיעור המימון</Term>.
+- **ההכנסה וההתחייבויות:** <Term t="הכנסה מוכרת" lesson="4.1">הכנסה מוכרת</Term>, ואילו התחייבויות נספרות מולה לפי הכלל של <Term t="״מעל 18 חודשים״" lesson="4.2">״מעל 18 חודשים״</Term>. מהן יוצאת ההכנסה שנשארת לחישוב, וממנה <Term t="יחס החזר" lesson="4.3">יחס ההחזר</Term>.
+- **מה שמאומת:** החתם בודק <Term t="מוצהר" lesson="4.7">מה שהוצהר</Term> מול <Term t="מאומת" lesson="4.7">מה שמאומת</Term>. מה שלא כתוב ולא מתועד לא קיים מבחינתו.
+
+מהמספרים האלה הוא מחליט לפי קווים. כדי לראות איך זה נראה, נשתמש בדוגמה קטנה שאפשר לעשות בראש: הכנסה פנויה של {f.shekels("m.disposable")} בחודש, וקו של {pc("m.line")}. התשלום שנמצא בדיוק על הקו הוא <M>{n("m.disposable")} × {f.plain("m.line")} ÷ 100 = {n("m.max")}</M> ₪. תיק עם תשלום של {f.shekels("m.pay_over")} נמצא {f.shekels("m.over")} מעל הקו, ותיק עם תשלום של {f.shekels("m.pay_under")} נמצא {f.shekels("m.room")} מתחתיו. החתם לא שואל כמה חסר, אלא רק באיזה צד של הקו התיק נמצא. זו הנוסחה מ־4.4: התשלום המרבי בקו הוא ההכנסה הפנויה כפול אחוז הקו, חלקי 100.
+
+### הכללים של התרגיל
+
+כל בנק בתרגיל מתחיל ממחירון: ריבית אחת לכל סוג מסלול. אלה המחירונים של ארבעת הבנקים משיעורים 6.6–6.8, והם המחיר שכל בנק נתן לבקשה של נועם ושירה. על המחירון יושבים שני סוגי כללים, ושניהם קווים של <Term t="מדיניות בנק" lesson="4.5">מדיניות בנק</Term>, ולא <Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term>:
+
+1. **קו סירוב.** מעליו הבנק לא מאשר. ״מעל״ הוא מעל ממש: בדיוק על הקו אינו מעליו (כמו בהוראה 329).
+2. **קו הנחה.** על הקו או מתחתיו הבנק מוריד כמה נקודות אחוז מהריבית של **כל** מסלול.
+
+קו הנחה הוא <Term t="מדרגה" lesson="6.2">מדרגה</Term> כלפי מטה, בדיוק כמו המדרגות משיעור 6.2: משני צדי הקו מחיר אחר. וכל בנק מפעיל את הקווים על שני מספרים בלבד, יחס ההחזר ושיעור המימון. עוד כלל של התרגיל: יחס ההחזר נמדד לפי המחירון של אותו בנק, לפני ההנחות. הבנק בודק את ההחזר הראשון של כל מסלול על הסכום המלא, כמו בשיעור 4.3.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">סירוב: יחס החזר מעל</th>
+        <th class="py-2 pe-3 text-start font-semibold">הנחה ביחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">סירוב: שיעור מימון מעל</th>
+        <th class="py-2 pe-3 text-start font-semibold">הנחה בשיעור מימון</th>
+      </tr>
+    </thead>
+    <tbody>
+      {banksList.map((b) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{b.name}</td>
+          <td class="py-2 pe-3"><span class="ltr">{b.ratioMax}%</span></td>
+          <td class="py-2 pe-3">{b.ratioReliefLine === null ? "אין" : <span>עד <span class="ltr">{b.ratioReliefLine}%</span>: <span class="ltr">{b.ratioReliefPoints}</span> נקודת אחוז</span>}</td>
+          <td class="py-2 pe-3"><span class="ltr">{b.ltvMax}%</span></td>
+          <td class="py-2 pe-3">{b.ltvReliefLine === null ? "אין" : <span>עד <span class="ltr">{b.ltvReliefLine}%</span>: <span class="ltr">{b.ltvReliefPoints}</span> נקודת אחוז</span>}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הכללים בדויים, והקורס לא יודע את הקווים של בנק אמיתי. הקווים של הרגולציה (שיעור מימון עד 75%, יחס החזר עד 50%) הם תעתיק הצוות של הוראה 329, לא אומת (שיעור 4.4).</p>
+</div>
+
+היום אתם בתפקיד החתם של {A.name}. שימו לב לשני דברים בטבלה. הראשון: בנק ד׳ מסרב לכל תיק שיושב מעל שיעור מימון של {bank("d").ltvMax}%, מה שיהיה היחס שלו. השני: הקווים של כל בנק יושבים במקום אחר, ולכן אותו תיק יכול לקבל מבנק אחד הנחה ומבנק אחר מחירון.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## יום אחד בתור חתם
+
+</Section>
+
+חמישה תיקים על השולחן. בכל אחד המערכת של הבנק כבר חישבה את שיעור המימון ואת יחס ההחזר (לפי המחירון). אתם מחליטים: מאשרים או מסרבים, ואם מאשרים, כמה נקודות אחוז הנחה. אחרי הבדיקה תראו איזה כלל קבע, ומה התיק לא אמר לכם. הטבלה בתחתית מראה את התוצאה של כל תיק, אחרי שבדקתם אותו.
+
+<UnderwriterDay client:visible id="6.9-day" policy={A} files={DAY_FILES} />
+
+נסו שלוש משימות:
+1. **עברו על חמשת התיקים.** אחרי כל אחד קראו את שורות הכללים, ובדקו מי מהן קבעה את התשובה.
+2. **תיק 2: מה קרה פה?** יחס ההחזר שלו {pc("d2.ratio")}, כשהלוואת הרכב נספרת (נשארו בה {f.plain("d2.months_left")} תשלומים). חשבו בראש: מה היה היחס אילו נשארו {f.plain("d2w.months_left")} תשלומים? (התשובה בחלק "הקו ומה שמעליו".)
+3. **תיק 5: זה התיק של נועם ושירה.** איזה מחיר הוא מקבל, ובכמה שקלים בחודש הוא מעל קו ההנחה של יחס ההחזר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>תיק 1: שיעור מימון {pc("d1.ltv")}, יחס החזר {pc("d1.ratio")}: שתי הנחות, {f.plain("d1.relief")} נקודת אחוז בסך הכול. תיק 2: יחס החזר {pc("d2.ratio")}, שיעור מימון {pc("d2.ltv")}: רק הנחת שיעור המימון, {f.plain("d2.relief")}. תיק 3: שיעור מימון {pc("d3.ltv")} (מעל קו ההנחה), יחס החזר {pc("d3.ratio")}: רק הנחת היחס, {f.plain("d3.relief")}. תיק 4: יחס החזר {pc("d4.ratio")}, מעל קו הסירוב של {A.ratioMax}%: סירוב. תיק 5: {pc("d5.ltv")} ו־{pc("d5.ratio")}: מעל שני קווי ההנחה, ולכן המחירון, בלי הנחה.</li>
+    <li>בתיק 2 יחס ההחזר היה {pc("d2w.ratio")} אילו נשארו {f.plain("d2w.months_left")} תשלומים, כי ההלוואה כבר לא נספרת. אז הוא מקבל גם את הנחת היחס: {f.plain("d2w.relief")} נקודת אחוז בסך הכול.</li>
+    <li>נועם ושירה מקבלים את המחירון, {f.plain("d5.rate_1")}% בפריים, {f.plain("d5.rate_2")}% במשתנה ו־{f.plain("d5.rate_3")}% בקבועה. זה בדיוק המחיר של בנק א׳ בשיעורים 6.6–6.8. ההחזר שלהם נמצא {f.shekels("b.a.over")} בחודש מעל קו ההנחה של יחס ההחזר.</li>
+  </ol>
+</details>
+
+<Section kind="חלק 1">
+
+## הקו ומה שמעליו
+
+</Section>
+
+שני דברים קורים סביב קו, ושניהם חשובים לכם כיועצים.
+
+**אחד: הפער הקטן והמחיר הגדול.** הנה שתי השוואות מהיום:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">אותו תיק, מצד אחד של הקו ומצד שני</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">הנחה, נקודות אחוז</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">תיק 2, {f.plain("d2.months_left")} תשלומים נשארו</td>
+        <td class="py-2 pe-3"><span class="ltr">{pc("d2.ratio")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("d2.relief")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw("d2.total"))}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">תיק 2, {f.plain("d2w.months_left")} תשלומים נשארו</td>
+        <td class="py-2 pe-3"><span class="ltr">{pc("d2w.ratio")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("d2w.relief")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw("d2w.total"))}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">נועם ושירה, בבקשה שלהם</td>
+        <td class="py-2 pe-3"><span class="ltr">{pc("b.a.ratio")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("b.a.relief")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw("b.a.total"))}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">נועם ושירה, עם {f.shekels("plan.equity")} נוספים מהחסכונות</td>
+        <td class="py-2 pe-3"><span class="ltr">{pc("pa.ratio")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("pa.relief")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw("pa.total"))}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} בנק א׳ בכללי התרגיל. תרחיש בסיס: המדד עולה 2% בשנה והפריים לא זז.</p>
+</div>
+
+תיק 2 עם {f.plain("d2.months_left")} תשלומים נשארים בהלוואת הרכב משלם {f.shekels("d2.later_gain")} יותר על פני ההלוואה מאותו תיק עם {f.plain("d2w.months_left")}, אף על פי שהכול זהה חוץ מתשלום אחד. כי ההלוואה מפסיקה להיספר (שיעור 4.2), יחס ההחזר יורד מתחת לקו, וההנחה קופצת. ונועם ושירה: אם יוסיפו {f.shekels("plan.equity")} מהחסכונות להון העצמי, ההלוואה קטנה ויחס ההחזר יורד מ־{pc("b.a.ratio")} ל־{pc("pa.ratio")}, מתחת לקו. ההנחה לבדה שווה להם {f.shekels("pa.relief_gain")} על פני ההלוואה (הסך באותה הלוואה בלי ההנחה: {f.shekels("pa.list_total")}, ועם ההנחה: {f.shekels("pa.total")}). את המחיר של ההון הנוסף עצמו, מזומן שיוצא מהחסכונות, מחשבים בשיעורים 6.4 ו־6.11.
+
+**שניים: אותו תיק, בנקים שונים, סיבות שונות.** נועם ושירה בבקשה הראשונית, כפי שכל אחד מארבעת הבנקים קורא אותה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר, לפי המחירון שלו</th>
+        <th class="py-2 pe-3 text-start font-semibold">הקו שלו</th>
+        <th class="py-2 pe-3 text-start font-semibold">מעל הקו, ₪ בחודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">החלטה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {banksList.map((b) => {
+        const r = rowOf(b);
+        return (
+          <tr class="border-b border-n100 align-top">
+            <td class="py-2 pe-3 font-semibold text-n900">{b.name}</td>
+            <td class="py-2 pe-3"><span class="ltr">{r.ratio}%</span></td>
+            <td class="py-2 pe-3">{b.ratioReliefLine === null ? "אין" : <span class="ltr">{b.ratioReliefLine}%</span>}</td>
+            <td class="py-2 pe-3">{b.ratioReliefLine === null ? "—" : <span class="ltr whitespace-nowrap">{nv(f.raw(`b.${b.id}.over`))}</span>}</td>
+            <td class="py-2 pe-3">{r.decision === "refuse" ? "סירוב: שיעור מימון מעל " + b.ltvMax + "%" : "אישור, במחירון"}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} שיעור המימון של התיק {pc("a.ltv")} בכל הבנקים. מעל הקו: ההחזר שהבנק בודק פחות ההחזר שנמצא על קו ההנחה שלו, על ההכנסה הפנויה של {f.shekels("a.disposable")}.</p>
+</div>
+
+בשלושה בנקים מאשרים במחירון, כל אחד בגלל קו אחר שהתיק לא הגיע אליו. בבנק ד׳ מסרבים, ולא בגלל היחס: שיעור המימון של {pc("a.ltv")} מעל התקרה שלו, {bank("d").ltvMax}%. לשלם את ההפרש אפשר רק בהון עצמי: ההלוואה הגדולה ביותר שהקו מאפשר היא {f.shekels("d.max_loan")}, כלומר {f.shekels("d.short")} פחות מההלוואה. לנועם ושירה יש {f.shekels("a.reserve")} חסכונות מחוץ להון העצמי (הנחה של שיעור 6.4), ועדיין חסרים {f.shekels("d.short_after_reserve")}. **אין מנוף שמגיע לשם**, ולכן הפנייה לבנק ד׳ היא פנייה לבנק שאי אפשר לשכנע. זה מה שהתוכנית של שיעור 6.11 תעשה בנתון הזה.
+
+<Section kind="חלק 2">
+
+## מה החתם לא רואה
+
+</Section>
+
+בכל תיק יש דבר שהמשפחה יודעת והתיק לא אומר. בתיק 2: עוד תשלום והלוואת הרכב מפסיקה להיספר. בתיק 4: משרה חדשה שעדיין לא נחתמה. בתיק 5: הלוואת הרכב נגמרת בעוד {f.plain("a.car_months")} חודשים. החתם לא מנחש. זה לא עניין של רוע: מה שלא מתועד אינו בתיק.
+
+וזה הלקח של התרגיל ליועצים: **מה שנכון, וחשוב, ויכול להיות מתועד, צריך להיכנס לתיק בצורה שהחתם מכיר.** זה <Term t="מיצוב" lesson="6.5">מיצוב</Term>: בחירה בין נתונים אמיתיים והצגתם במלואם. מה שלא נכון, כלומר הכנסה שלא קיימת, הלוואה שלא כתובה או מסמך שלא אמיתי, הוא <Term t="מידע לא נכון" lesson="6.5">מידע לא נכון</Term>, והקו האדום של שיעור 6.5. בתרגיל אין פתרון כזה: כל המספרים בתיק אמיתיים, והשאלה היא רק איזה צד של הקו הם נמצאים.
+
+ומה שהקורס לא יודע, וצריך לשאול: איפה הקווים של כל בנק אמיתי, ואם הם קווים או טווחים. אלה שאלות פתוחות לאילון: הקווים בכל בנק, גודל ההנחה או המדרגה, והאם הם מתחלפים לפי החודש. עד שיש תשובה, הקורס מלמד את החשיבה ולא את המספרים.
+
+<PredictionReveal
+  client:visible
+  id="6.9"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `לא: ההנחה של ${f.plain("pred.relief")} נקודת אחוז בכל מסלול, על הלוואה של ${f.whole("a.loan")} ל־30 שנה, שווה ${f.whole("pred.diff")}. קו הוא מקום שבו מחיר קופץ, ולכן מרחק קטן ממנו יכול להסתיר הפרש גדול.`,
+    "",
+    `לא: ${f.whole("pred.first_diff")} הוא ההפרש בחודש אחד. סך התשלומים הוא סכום של כל 360 התשלומים.`,
+    "לא: בכללי התרגיל הקו הוא על יחס ההחזר, כמו בשיעור 4.3. ההכנסה נכנסת רק דרכו.",
+  ]}
+>
+  ההחזר החודשי הראשון היה נמוך ב־{f.shekels("pred.first_diff")}, ועל פני 360 תשלומים הסך נמוך ב־{f.shekels("pred.diff")} ({f.shekels("pred.total_0")} מול {f.shekels("pred.total_15")}). מי שחושב ש״קצת מעל הקו זה כלום״ מסתכל על המרחק מהקו ולא על המחיר של הצד השני שלו. בכללי התרגיל זה כל הסיפור: הקו הוא מדרגה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## תיק 2, שורה אחר שורה
+
+</Section>
+
+נעבור על תיק 2 כמו שהחתם עושה. הנכס שווה {f.shekels("d2.value")}, הלוואה של {f.shekels("d2.loan")} בשלושה מסלולים שווים, והכנסה מוכרת של {f.shekels("d2.income")}. יש הלוואת רכב של {f.shekels("d2.car")} בחודש, ונשארו בה {f.plain("d2.months_left")} תשלומים.
+
+**צעד 1 — ההכנסה הפנויה.** נשארו יותר מ־18 תשלומים, ולכן ההלוואה נספרת ויורדת מההכנסה: <M>{n("d2.income")} − {n("d2.car")} = {n("d2.disposable")}</M> ₪.
+
+**צעד 2 — שיעור המימון.** {pc("d2.ltv")}. הוא מתחת לקו הסירוב של {A.ltvMax}% ומתחת לקו ההנחה של {A.ltvReliefLine}%: הנחה של {A.ltvReliefPoints} נקודת אחוז.
+
+**צעד 3 — יחס ההחזר.** ההחזר הראשון לפי מחירון {A.name}, על כל הסכום, מחולק בהכנסה הפנויה: {pc("d2.ratio")}. הוא מתחת לקו הסירוב של {A.ratioMax}%, אבל מעל קו ההנחה של {A.ratioReliefLine}%: בלי הנחה על היחס.
+
+**צעד 4 — המחיר.** הנחה אחת, של {f.plain("d2.relief")} נקודת אחוז, מכל מסלול. הריביות: פריים {f.plain("d2.rate_1")}%, משתנה {f.plain("d2.rate_2")}%, קבועה {f.plain("d2.rate_3")}%. אילו נשארו {f.plain("d2w.months_left")} תשלומים, ההלוואה לא נספרת, ההכנסה הפנויה היא {f.shekels("d2w.disposable")}, ויחס ההחזר {pc("d2w.ratio")}: שתי הנחות, {f.plain("d2w.relief")} נקודת אחוז.
+
+<Section kind="דוגמה חצי פתורה">
+
+## הריביות של תיק 2
+
+</Section>
+
+תיק 2 אצל {A.name}: המחירון, ההנחה והריבית הסופית בכל מסלול. השורה הראשונה כבר מלאה. השלימו את שתי האחרות: הריבית הסופית היא המחירון פחות ההנחה.
+
+<FillTable
+  client:visible
+  id="6.9-half"
+  rowKey="track"
+  periodLabel="מסלול"
+  columns={[
+    { key: "list", label: "מחירון", format: "percent" },
+    { key: "relief", label: "הנחה, נקודות אחוז", format: "number" },
+    { key: "final", label: "ריבית סופית", format: "percent" },
+  ]}
+  rows={halfRows}
+  blanks={["משתנה לא צמודה.final", "קבועה לא צמודה.final"]}
+  success={`נכון. ההנחה של ${f.plain("d2.relief")} נקודת אחוז יורדת מכל מסלול, ולכן הריבית הסופית היא ${f.plain("d2.rate_1")}%, ${f.plain("d2.rate_2")}% ו־${f.plain("d2.rate_3")}%. בנק א׳ הוריד אותה בכל המסלולים, לא רק באחד.`}
+  hint="הריבית הסופית היא ריבית המחירון פחות ההנחה, בכל מסלול."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים, הכללים והבנקים בתרגילים בדויים (הכללים של התרגיל, לא של בנק אמיתי). התרגילים מסודרים מהקל אל המאתגר, ושלושה מהם צריכים מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="6.9-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "מספרים ומסמכים: שווי, הכנסה, התחייבויות והמסלולים שביקשו", correct: true, feedback: "נכון. החתם לא פגש את המשפחה. מה שאינו בתיק, ומה שאינו מתועד, לא קיים מבחינתו." },
+    { text: "את התוכניות של המשפחה לשנים הקרובות", feedback: "אלה אינן בתיק. לכן כדאי להכניס לתיק מה שנכון ואפשר לתעד, כמו תאריך הסיום של התחייבות." },
+    { text: "את כל ההיסטוריה של הלקוחות מול כל הבנקים", feedback: "הקורס לא יודע מה בנק רואה ומה לא מעבר לתיק; מה שידוע הוא המספרים והמסמכים שבו." },
+    { text: "רק את יחס ההחזר, לא את שיעור המימון", feedback: "בכללי התרגיל יש קו על כל אחד משני המספרים." },
+  ]}
+>
+  מה החתם רואה כשתיק מגיע אליו?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="6.9-2"
+  n={2}
+  level="קל"
+  answer={f.raw("d2.disposable")}
+  errors={[
+    { value: f.raw("d2.income"), message: "זו ההכנסה בלי להוריד את הלוואת הרכב. נשארו יותר מ־18 תשלומים, ולכן היא נספרת." },
+    { value: f.raw("ex2.err_added"), message: "חיברתם את הלוואת הרכב להכנסה. התחייבות מורידים מההכנסה." },
+  ]}
+>
+  בתיק 2 ההכנסה המוכרת היא {f.shekels("d2.income")} בחודש, והלוואת הרכב, {f.shekels("d2.car")} בחודש, נספרת (נשארו בה {f.plain("d2.months_left")} תשלומים). מה ההכנסה הפנויה לחישוב היחס?
+</NumericExercise>
+
+<Solution for="6.9-2">
+<M>{n("d2.income")} − {n("d2.car")} = {n("d2.disposable")}</M> ₪. אילו נשארו {f.plain("d2w.months_left")} תשלומים, ההלוואה לא הייתה נספרת וההכנסה הפנויה הייתה {f.shekels("d2w.disposable")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.9-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("a.line_payment")}
+  errors={[
+    { value: f.raw("ex3.err50"), message: "זה 50% מההכנסה הפנויה. קו ההנחה של בנק א׳ הוא 40%." },
+    { value: f.raw("ex3.err_rec"), message: "הכפלתם את ההכנסה המוכרת, לפני הורדת הלוואת הרכב. הקו נמדד על ההכנסה הפנויה." },
+  ]}
+>
+  ההכנסה הפנויה של נועם ושירה היא {f.shekels("a.disposable")}. מה ההחזר החודשי הגבוה ביותר שנמצא על קו ההנחה של בנק א׳ ({A.ratioReliefLine}% מההכנסה הפנויה)?
+</NumericExercise>
+
+<Solution for="6.9-3">
+<M>{n("a.disposable")} × {f.plain("a.line")} ÷ 100 = {n("a.line_payment")}</M> ₪. ההחזר של בנק א׳ בבקשה הראשונית הוא {f.shekels("b.a.qualifying")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.9-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.over")}
+  errors={[
+    { value: f.raw("b.a.qualifying"), message: "זה ההחזר עצמו. השאלה כמה הוא מעל הקו, כלומר ההחזר פחות ההחזר שנמצא על הקו." },
+  ]}
+>
+  ההחזר שבנק א׳ בודק בבקשה של נועם ושירה הוא {f.shekels("b.a.qualifying")}, ובקו ההנחה, {f.plain("a.line")}%, ההחזר הוא {f.shekels("a.line_payment")}. בכמה שקלים בחודש הם מעל הקו?
+</NumericExercise>
+
+<Solution for="6.9-4">
+<M>{n("b.a.qualifying")} − {n("a.line_payment")} = {n("ex4.over")}</M> ₪ בחודש. זה המרחק מהמדרגה: מעט, וביחד עם המדרגה עצמה שווה {f.shekels("pred.diff")} על פני ההלוואה (ההנחה של {f.plain("pred.relief")} נקודת אחוז בכל מסלול).
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="6.9-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `ההלוואה מפסיקה להיספר, יחס ההחזר יורד ל־${f.plain("d2w.ratio")}%, והתיק מקבל גם את הנחת היחס`, correct: true, feedback: `נכון. ביחס ל־${f.plain("d2.ratio")}% שהיה, ההנחה עולה מ־${f.plain("d2.relief")} ל־${f.plain("d2w.relief")} נקודת אחוז.` },
+    { text: "כלום: ההלוואה עדיין קיימת, ולכן היחס לא משתנה", feedback: "הכלל של 4.2 הוא על חודשים שנשארו: ב־18 או פחות ההלוואה לא נספרת, והיחס יורד." },
+    { text: "היחס עולה, כי יש פחות תשלומים", feedback: "ההלוואה שלא נספרת מגדילה את ההכנסה הפנויה, ולכן היחס יורד." },
+    { text: "הבנק מסרב, כי התיק השתנה", feedback: "שום קו סירוב לא נחצה. מה שהשתנה הוא שהלוואת הרכב יצאה מהחישוב." },
+  ]}
+>
+  בתיק 2 עוברים חודש, ונשארים {f.plain("d2w.months_left")} תשלומים בהלוואת הרכב במקום {f.plain("d2.months_left")}. מה קורה לתיק אצל החתם?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="6.9-6"
+  n={6}
+  level="בינוני"
+  answer={f.raw("d2.later_gain")}
+  errors={[
+    { value: f.raw("pred.diff"), message: "זה ההפרש של נועם ושירה בהנחה של 0.15 נקודת אחוז, בלי קשר לתיק 2. כאן ההפרש הוא בין הסך של תיק 2 עם 19 תשלומים לסך שלו עם 18." },
+  ]}
+>
+  הסך של תיק 2 עם {f.plain("d2.months_left")} תשלומים נשארים הוא {f.shekels("d2.total")}, ועם {f.plain("d2w.months_left")} תשלומים נשארים הוא {f.shekels("d2w.total")}. בכמה שקלים הסך הראשון גבוה יותר?
+</NumericExercise>
+
+<Solution for="6.9-6">
+<M>{n("d2.total")} − {n("d2w.total")} = {n("d2.later_gain")}</M> ₪, בגלל תשלום אחד של הלוואת הרכב. זה מה שעלה למשפחה להגיש חודש מוקדם מדי, בכללי התרגיל. בחיים מי שחושב להמתין צריך לשאול גם מה קורה למחירון ולתוקף בינתיים.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="6.9-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: `לשאול את הבנק איפה הקו ומה ההחזר שנמצא עליו, ולבדוק אם שינוי אמיתי בבקשה או בתיק מוריד את התיק מתחתיו, כמו הון עצמי נוסף או המתנה לתאריך שבו ההלוואה לא נספרת`, correct: true, feedback: "נכון. מבררים את הקו, ואז מזיזים דבר אמיתי ומחשבים את המחיר. כל המנופים האלה הם מיצוב, ולכל אחד מחיר (שיעור 6.4)." },
+    { text: "להסיר את הלוואת הרכב מהטופס, כי היא ממילא נגמרת", feedback: "זה מידע לא נכון: הסתרת התחייבות. זה הקו האדום של שיעור 6.5, ובנק שמגלה פער בין מה שהוצהר למה שמאומת יכול לסרב או לבטל." },
+    { text: "להגדיל את ההכנסה בטופס בכמה מאות שקלים, כדי לרדת מתחת לקו", feedback: "ניפוח הכנסה הוא מידע לא נכון. הוא נחשף כשהבנק בודק מסמכים, ומחירו גבוה בהרבה מהנחה של בנק." },
+    { text: "להגיש שוב את אותו תיק לאותו בנק עוד כמה פעמים, אולי יענו אחרת", feedback: "אותו תיק, אותו מחירון ואותם קווים: אין סיבה שהתשובה תשתנה. ומה בנק עושה עם הגשות חוזרות, הקורס לא יודע." },
+  ]}
+>
+  בנק ג׳ שבתרגיל לא נותן הנחה לתיק שיחס ההחזר שלו מעל {bank("c").ratioReliefLine}%. נועם ושירה יושבים על {f.plain("b.c.ratio")}%. איזו מהפעולות היא מיצוב ולא מידע לא נכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על יום אחד בתור חתם">
+<p><strong>מה זה?</strong> תיק מהצד של מי שמחליט: מספרים ומסמכים, שני קווים, והחלטה אחת, אישור או סירוב, במחיר מסוים.</p>
+<p><strong>למה זה קיים?</strong> כי כדי להביא תיק במצב חזק צריך לדעת מה הצד השני רואה, ואילו נתונים אמיתיים אינם מגיעים אליו אם לא שמים אותם בתיק.</p>
+<p><strong>איך זה עובד?</strong> הבנק קורא את שיעור המימון ואת יחס ההחזר, מפעיל קווי סירוב וקווי הנחה, ויוצא ממחירון. בתרגיל הכללים בדויים. בשוק איש לא פרסם את הקווים; ידע מהשטח מדבר על מרווח יעד ועל טווח שמותר לפקיד (FK-H-050, FK-H-052, FK-H-071; ממתין לאישור אילון).</p>
+<p><strong>איך זה משפיע עליכם?</strong> תיק שיושב מעט מעל קו יכול לשלם הרבה יותר מתיק שיושב מעט מתחתיו. ותיק שהבנק מסרב לו בגלל קו שאי אפשר להגיע אליו, כמו תקרת שיעור המימון של בנק ד׳, הוא תיק שלא שולחים אליו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים כל בנק איפה הקווים שלו, בודקים באיזה צד של כל קו התיק יושב, ומחשבים את המחיר של ההזזה. בשיעור 6.10 תנהלו שיחות עם בנקים לאורך התהליך, ובשיעור 6.11 תכתבו תוכנית.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהיום
+
+</Section>
+
+- **החתם קורא מספרים ומסמכים** ומחליט לפי קווים: שיעור מימון ויחס החזר. מה שאינו בתיק אינו קיים מבחינתו.
+- **קו הוא מדרגה.** תשלום אחד של הלוואה או כמה אלפי שקלים של הון עצמי יכולים להעביר תיק מצד לצד, ובין הצדדים הפרש של {f.shekels("pred.diff")} על פני הלוואה אחת.
+- **אותו תיק, ארבעה בנקים, ארבע תשובות,** כי הקווים יושבים במקומות שונים. ויש קו, כמו התקרה של בנק ד׳ בשיעור המימון, שאף מנוף של התיק לא מגיע אליו.
+- **מה שנכון ואפשר לתעד, מכניסים לתיק.** מה שלא נכון, גם אם זה יוריד את הריבית, הוא מידע לא נכון.
+- **הכללים בתרגיל בדויים.** הקווים של בנקים אמיתיים אינם ידועים לקורס, ושואלים עליהם.
+
+**בשיעור הבא — 6.10, <Later lesson="6.10" quiet>סימולציות תיק</Later>:** תנהלו חמש שיחות לאורך התהליך: היכרות, הצעה שמגיעה, בנק שמסרב, ריבית שזזה, והצעה מתחרה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "ארבעת הבנקים הבדויים: המחירונים הם של שיעורים 6.6–6.8 (לא הצעת בנק ולא נתוני שוק). הכללים של התרגיל, כלומר קווי הסירוב, קווי ההנחה וגודל ההנחה, בדויים לגמרי: אין לקורס מידע על הקווים של בנק אמיתי. חמשת התיקים של היום הם משפחות בדויות, התיק החמישי הוא תיק א׳ (נועם ושירה). הריבית החודשית היא אחוז הריבית לשנה חלקי 12, ויחס ההחזר נמדד לפי המחירון, לפני ההנחות." },
+    { kind: "ידע מהשטח", text: "לבנק יש מרווח יעד שמנוהל כסך חודשי, לבנק חשובים נפח ונתח שוק, והפקיד מוכר בתוך טווח שמותר לו ומעבר לו הבקשה עולה למנהל (FK-H-050, FK-H-051, FK-H-052, FK-H-071). טובי זמיר, 2026-08-05. ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "לא אומת", text: "מגבלות הוראה 329: שיעור מימון עד 75% לדירה יחידה, יחס החזר עד 50%, והכלל ״מעל 18 חודשים״ (נספח א׳). לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "מה חתם אמיתי רואה ואיך הוא מחליט: לא ידוע לקורס. שאלה פתוחה לאילון, בקובץ השאלות של שלב 6." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/bankpolicy.ts (the invented rules) on sensitivity.ts, affordability.ts and regulation.ts, with src/data/case-a-positioning.ts, src/data/case-a-offers.ts (the banks' price lists) and src/data/underwriter-day.ts, via scripts/lessons/lesson-6-9.ts and data/lessons/6-9.json, rechecked by checks/kinds/bankpolicy.py (with sensitivity.py, ltv.py, regulation.py, affordability.py). Simulation: src/components/UnderwriterDay.vue. Field knowledge: FK-H-050, 051, 052, 071 (awaiting Eylon). Video: video/6-9.html. */}

@@ -1727,7 +1727,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "loan"
       },
       "value": "1640000.00"
@@ -1753,7 +1753,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "ltv"
       },
       "value": "74.55"
@@ -1779,7 +1779,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "qualifying"
       },
       "value": "8181.30"
@@ -1805,7 +1805,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "disposable"
       },
       "value": "21700.00"
@@ -1831,7 +1831,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "ratio"
       },
       "value": "37.7"
@@ -1857,7 +1857,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "total"
       },
       "value": "2945264.34"
@@ -1883,7 +1883,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "stress_max"
       },
       "value": "9435.33"
@@ -1909,7 +1909,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "reserve"
       },
       "value": "40000.00"
@@ -1935,7 +1935,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "variable"
       },
       "value": "1093000.00"
@@ -1961,7 +1961,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "bans"
       },
       "value": "none"
@@ -1987,7 +1987,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "left_first"
       },
       "value": "12068.70"
@@ -2035,6 +2035,12 @@
         "minuend": "a.total",
         "subtrahend": "l.wait.total"
       },
+      "value": "0.00"
+    },
+    {
+      "id": "l.wait.cash",
+      "kind": "given",
+      "inputs": {},
       "value": "0.00"
     },
     {
@@ -2369,6 +2375,12 @@
       "value": "0.00"
     },
     {
+      "id": "l.bor.cash",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
       "id": "l.term.loan",
       "kind": "lev_measure",
       "inputs": {
@@ -2698,6 +2710,12 @@
         "subtrahend": "l.term.total"
       },
       "value": "-258385.69"
+    },
+    {
+      "id": "l.term.cash",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
     },
     {
       "id": "l.mix.loan",
@@ -3053,6 +3071,21 @@
       "value": "10365.83"
     },
     {
+      "id": "l.mix.cash",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "l.eq.stress_drop",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.stress",
+        "subtrahend": "l.eq.stress_max"
+      },
+      "value": "100.92"
+    },
+    {
       "id": "l.eq.pp",
       "kind": "lev_div",
       "inputs": {
@@ -3194,6 +3227,64 @@
       "value": "247391.11"
     },
     {
+      "id": "in.wait",
+      "kind": "given",
+      "inputs": {},
+      "value": 9
+    },
+    {
+      "id": "l.wait.months_left",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 9,
+        "measure": "months_left"
+      },
+      "value": 17
+    },
+    {
+      "id": "l.wait7.left",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 7,
+        "measure": "months_left"
+      },
+      "value": 19
+    },
+    {
       "id": "l.wait7.disposable",
       "kind": "lev_measure",
       "inputs": {
@@ -3244,6 +3335,84 @@
         "measure": "ratio"
       },
       "value": "40.4"
+    },
+    {
+      "id": "l.wait8.left",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 8,
+        "measure": "months_left"
+      },
+      "value": 18
+    },
+    {
+      "id": "l.wait8.disposable",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 8,
+        "measure": "disposable"
+      },
+      "value": "21700.00"
+    },
+    {
+      "id": "l.wait8.ratio",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 8,
+        "measure": "ratio"
+      },
+      "value": "37.7"
     },
     {
       "id": "l.carR.left_gain",

@@ -139,7 +139,7 @@ export function evaluate(policy: BankPolicy, file: LoanFile): Verdict {
   ];
   const decision = lines.some((l) => l.outcome === "refuse") ? "refuse" : "approve";
   const relief = decision === "refuse" ? new Decimal(0) : lines.filter((l) => l.outcome === "relief").reduce((s, l) => s.plus(l.reliefPoints), new Decimal(0));
-  const finalTracks = listed.map((t) => ({ ...t, rate: new Decimal(t.rate).minus(relief).toString() }));
+  const finalTracks = listed.map((t) => ({ ...t, rate: new Decimal(t.rate).minus(relief).toFixed(2) }));
   return { loan, ltv, disposable, listPayment, ratio, lines, decision, relief, listTracks: listed, finalTracks };
 }
 

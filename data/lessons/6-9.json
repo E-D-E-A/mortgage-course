@@ -1,8 +1,65 @@
 {
   "lesson": "6.9",
   "title": "סימולציה: יום אחד בתור חתם אשראי בבנק",
-  "note": "Four fictional banks (src/data/case-a-positioning.ts) with INVENTED rules (src/lib/calc/bankpolicy.ts): refuse above a line, add percentage points to every track above a step. Nothing here is how a real bank decides or prices. The ratio is measured at the bank's own list rates, before any step. The files of the day are invented households (src/data/underwriter-day.ts); the fifth is case A. Base scenario: the index rises 2% a year, prime does not move. Rates are the course's teaching rates, not market data and not an offer.",
+  "note": "Four fictional banks (src/data/case-a-positioning.ts) with the price lists of lessons 6.6–6.8 and INVENTED rules (src/lib/calc/bankpolicy.ts): refuse above a line, take relief off the list at or below another. Nothing here is how a real bank decides or prices. The ratio is measured at the bank's own list rates, before any relief. The files of the day are invented households (src/data/underwriter-day.ts); the fifth is case A. Base scenario: the index rises 2% a year, prime does not move. Rates are the course's teaching rates, not market data and not an offer.",
   "facts": [
+    {
+      "id": "m.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "m.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "m.max",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "10000",
+        "percent": "40"
+      },
+      "value": "4000.00"
+    },
+    {
+      "id": "m.pay_over",
+      "kind": "given",
+      "inputs": {},
+      "value": "4200.00"
+    },
+    {
+      "id": "m.pay_under",
+      "kind": "given",
+      "inputs": {},
+      "value": "3900.00"
+    },
+    {
+      "id": "m.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "m.pay_over",
+        "subtrahend": "m.max"
+      },
+      "value": "200.00"
+    },
+    {
+      "id": "m.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "m.max",
+        "subtrahend": "m.pay_under"
+      },
+      "value": "100.00"
+    },
+    {
+      "id": "pred.relief",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.15"
+    },
     {
       "id": "pred.total_0",
       "kind": "sens_mix",
@@ -16,13 +73,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -32,7 +89,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "2945176.99"
+      "value": "2945264.34"
     },
     {
       "id": "pred.total_15",
@@ -42,18 +99,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "546000.00",
-        "t1_rate": "4.75",
+        "t1_rate": "4.45",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.3",
+        "t2_rate": "3.95",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.5",
+        "t3_rate": "4.25",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -63,16 +120,16 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "2997615.67"
+      "value": "2893298.10"
     },
     {
       "id": "pred.diff",
       "kind": "difference",
       "inputs": {
-        "minuend": "pred.total_15",
-        "subtrahend": "pred.total_0"
+        "minuend": "pred.total_0",
+        "subtrahend": "pred.total_15"
       },
-      "value": "52438.68"
+      "value": "51966.24"
     },
     {
       "id": "pred.first_0",
@@ -87,13 +144,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -103,7 +160,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "8181.06"
+      "value": "8181.30"
     },
     {
       "id": "pred.first_15",
@@ -113,18 +170,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "546000.00",
-        "t1_rate": "4.75",
+        "t1_rate": "4.45",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.3",
+        "t2_rate": "3.95",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.5",
+        "t3_rate": "4.25",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -134,22 +191,16 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "8326.71"
+      "value": "8036.93"
     },
     {
       "id": "pred.first_diff",
       "kind": "difference",
       "inputs": {
-        "minuend": "pred.first_15",
-        "subtrahend": "pred.first_0"
+        "minuend": "pred.first_0",
+        "subtrahend": "pred.first_15"
       },
-      "value": "145.65"
-    },
-    {
-      "id": "pred.step",
-      "kind": "given",
-      "inputs": {},
-      "value": "0.15"
+      "value": "144.37"
     },
     {
       "id": "d1.loan",
@@ -164,13 +215,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -204,13 +255,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -237,46 +288,46 @@
       "value": "approve"
     },
     {
-      "id": "d1.points",
-      "kind": "bp_points",
+      "id": "d1.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "18.71",
         "ltv": "50",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
-      "value": "0"
+      "value": "0.25"
     },
     {
       "id": "d1.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.60",
-        "points": "0"
+        "relief": "0.25"
       },
-      "value": "4.60"
+      "value": "4.35"
     },
     {
       "id": "d1.rate_2",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.15",
-        "points": "0"
+        "list_rate": "4.10",
+        "relief": "0.25"
       },
-      "value": "4.15"
+      "value": "3.85"
     },
     {
       "id": "d1.rate_3",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.35",
-        "points": "0"
+        "list_rate": "4.40",
+        "relief": "0.25"
       },
-      "value": "4.35"
+      "value": "4.15"
     },
     {
       "id": "d1.first",
@@ -286,18 +337,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "300000.00",
-        "t1_rate": "4.6",
+        "t1_rate": "4.35",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "3.85",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.15",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -307,7 +358,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "4489.68"
+      "value": "4358.17"
     },
     {
       "id": "d1.total",
@@ -317,18 +368,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "300000.00",
-        "t1_rate": "4.6",
+        "t1_rate": "4.35",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "3.85",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.15",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -338,7 +389,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "1616284.04"
+      "value": "1568941.17"
     },
     {
       "id": "d1.value",
@@ -362,6 +413,37 @@
       "value": "24000.00"
     },
     {
+      "id": "d1.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "300000.00",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "300000.00",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "300000.00",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "1616332.77"
+    },
+    {
       "id": "d2.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -374,13 +456,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -414,13 +496,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -447,46 +529,46 @@
       "value": "approve"
     },
     {
-      "id": "d2.points",
-      "kind": "bp_points",
+      "id": "d2.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "40.55",
         "ltv": "63",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
-      "value": "0.15"
+      "value": "0.1"
     },
     {
       "id": "d2.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.60",
-        "points": "0.15"
+        "relief": "0.1"
       },
-      "value": "4.75"
+      "value": "4.50"
     },
     {
       "id": "d2.rate_2",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.15",
-        "points": "0.15"
+        "list_rate": "4.10",
+        "relief": "0.1"
       },
-      "value": "4.30"
+      "value": "4.00"
     },
     {
       "id": "d2.rate_3",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.35",
-        "points": "0.15"
+        "list_rate": "4.40",
+        "relief": "0.1"
       },
-      "value": "4.50"
+      "value": "4.30"
     },
     {
       "id": "d2.first",
@@ -496,18 +578,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "420000.00",
-        "t1_rate": "4.75",
+        "t1_rate": "4.50",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.3",
+        "t2_rate": "4.00",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.5",
+        "t3_rate": "4.30",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -517,7 +599,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "6397.46"
+      "value": "6211.68"
     },
     {
       "id": "d2.total",
@@ -527,18 +609,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "420000.00",
-        "t1_rate": "4.75",
+        "t1_rate": "4.50",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.3",
+        "t2_rate": "4.00",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.5",
+        "t3_rate": "4.30",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -548,7 +630,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "2303083.47"
+      "value": "2236206.63"
     },
     {
       "id": "d2.value",
@@ -572,6 +654,37 @@
       "value": "15500.00"
     },
     {
+      "id": "d2.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "420000.00",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "420000.00",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "420000.00",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2262862.78"
+    },
+    {
       "id": "d3.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -584,13 +697,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -624,13 +737,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -657,46 +770,46 @@
       "value": "approve"
     },
     {
-      "id": "d3.points",
-      "kind": "bp_points",
+      "id": "d3.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "24.94",
         "ltv": "72",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
-      "value": "0.1"
+      "value": "0.15"
     },
     {
       "id": "d3.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.60",
-        "points": "0.1"
+        "relief": "0.15"
       },
-      "value": "4.70"
+      "value": "4.45"
     },
     {
       "id": "d3.rate_2",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.15",
-        "points": "0.1"
+        "list_rate": "4.10",
+        "relief": "0.15"
       },
-      "value": "4.25"
+      "value": "3.95"
     },
     {
       "id": "d3.rate_3",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.35",
-        "points": "0.1"
+        "list_rate": "4.40",
+        "relief": "0.15"
       },
-      "value": "4.45"
+      "value": "4.25"
     },
     {
       "id": "d3.first",
@@ -706,18 +819,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "300000.00",
-        "t1_rate": "4.7",
+        "t1_rate": "4.45",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.25",
+        "t2_rate": "3.95",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.45",
+        "t3_rate": "4.25",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -727,7 +840,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "4542.89"
+      "value": "4410.59"
     },
     {
       "id": "d3.total",
@@ -737,18 +850,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "300000.00",
-        "t1_rate": "4.7",
+        "t1_rate": "4.45",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "300000.00",
-        "t2_rate": "4.25",
+        "t2_rate": "3.95",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "300000.00",
-        "t3_rate": "4.45",
+        "t3_rate": "4.25",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -758,7 +871,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "1635440.26"
+      "value": "1587810.78"
     },
     {
       "id": "d3.value",
@@ -782,6 +895,37 @@
       "value": "18000.00"
     },
     {
+      "id": "d3.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "300000.00",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "300000.00",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "300000.00",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "1616332.77"
+    },
+    {
       "id": "d4.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -794,13 +938,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "400000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "400000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -834,13 +978,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "400000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "400000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -867,17 +1011,17 @@
       "value": "refuse"
     },
     {
-      "id": "d4.points",
-      "kind": "bp_points",
+      "id": "d4.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "46.05",
         "ltv": "70.59",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
       "value": "0"
     },
@@ -903,6 +1047,37 @@
       "value": "13000.00"
     },
     {
+      "id": "d4.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "400000.00",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "400000.00",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "400000.00",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2155110.69"
+    },
+    {
       "id": "d5.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -915,13 +1090,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -955,13 +1130,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -988,46 +1163,46 @@
       "value": "approve"
     },
     {
-      "id": "d5.points",
-      "kind": "bp_points",
+      "id": "d5.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "40.4",
         "ltv": "74.55",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
-      "value": "0.25"
+      "value": "0"
     },
     {
       "id": "d5.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.60",
-        "points": "0.25"
+        "relief": "0"
       },
-      "value": "4.85"
+      "value": "4.60"
     },
     {
       "id": "d5.rate_2",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.15",
-        "points": "0.25"
+        "list_rate": "4.10",
+        "relief": "0"
       },
-      "value": "4.40"
+      "value": "4.10"
     },
     {
       "id": "d5.rate_3",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.35",
-        "points": "0.25"
+        "list_rate": "4.40",
+        "relief": "0"
       },
-      "value": "4.60"
+      "value": "4.40"
     },
     {
       "id": "d5.first",
@@ -1037,18 +1212,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "546000.00",
-        "t1_rate": "4.85",
+        "t1_rate": "4.60",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.4",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.6",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1058,7 +1233,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "8424.52"
+      "value": "8181.30"
     },
     {
       "id": "d5.total",
@@ -1068,18 +1243,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "546000.00",
-        "t1_rate": "4.85",
+        "t1_rate": "4.60",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.4",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.6",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1089,7 +1264,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "3032829.90"
+      "value": "2945264.34"
     },
     {
       "id": "d5.value",
@@ -1113,6 +1288,37 @@
       "value": "20250.00"
     },
     {
+      "id": "d5.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2945264.34"
+    },
+    {
       "id": "d2w.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -1125,13 +1331,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1165,13 +1371,13 @@
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1198,46 +1404,46 @@
       "value": "approve"
     },
     {
-      "id": "d2w.points",
-      "kind": "bp_points",
+      "id": "d2w.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "36.97",
         "ltv": "63",
         "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
-      "value": "0"
+      "value": "0.25"
     },
     {
       "id": "d2w.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.60",
-        "points": "0"
+        "relief": "0.25"
       },
-      "value": "4.60"
+      "value": "4.35"
     },
     {
       "id": "d2w.rate_2",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.15",
-        "points": "0"
+        "list_rate": "4.10",
+        "relief": "0.25"
       },
-      "value": "4.15"
+      "value": "3.85"
     },
     {
       "id": "d2w.rate_3",
       "kind": "bp_rate",
       "inputs": {
-        "list_rate": "4.35",
-        "points": "0"
+        "list_rate": "4.40",
+        "relief": "0.25"
       },
-      "value": "4.35"
+      "value": "4.15"
     },
     {
       "id": "d2w.first",
@@ -1247,18 +1453,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "420000.00",
-        "t1_rate": "4.6",
+        "t1_rate": "4.35",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "3.85",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.15",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1268,7 +1474,7 @@
         "anchor_shift_1": "0",
         "measure": "first"
       },
-      "value": "6285.55"
+      "value": "6101.43"
     },
     {
       "id": "d2w.total",
@@ -1278,18 +1484,18 @@
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "420000.00",
-        "t1_rate": "4.6",
+        "t1_rate": "4.35",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "420000.00",
-        "t2_rate": "4.15",
+        "t2_rate": "3.85",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "420000.00",
-        "t3_rate": "4.35",
+        "t3_rate": "4.15",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -1299,7 +1505,7 @@
         "anchor_shift_1": "0",
         "measure": "total"
       },
-      "value": "2262797.19"
+      "value": "2196519.86"
     },
     {
       "id": "d2w.disposable",
@@ -1323,6 +1529,12 @@
       "value": 18
     },
     {
+      "id": "d2.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500.00"
+    },
+    {
       "id": "ex2.err_added",
       "kind": "hh_sum",
       "inputs": {
@@ -1331,22 +1543,25 @@
       "value": "18500.00"
     },
     {
-      "id": "d2.car",
-      "kind": "given",
-      "inputs": {},
-      "value": "1500.00"
-    },
-    {
-      "id": "a.income",
-      "kind": "given",
-      "inputs": {},
-      "value": "21700.00"
+      "id": "d2.later_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d2.total",
+        "subtrahend": "d2w.total"
+      },
+      "value": "39686.77"
     },
     {
       "id": "a.price",
       "kind": "given",
       "inputs": {},
       "value": "2200000.00"
+    },
+    {
+      "id": "a.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "21700.00"
     },
     {
       "id": "a.disposable",
@@ -1358,1047 +1573,40 @@
       "value": "20250.00"
     },
     {
-      "id": "b.a.initial.loan",
-      "kind": "sens_mix",
+      "id": "a.line_payment",
+      "kind": "reg_max_payment",
       "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.60",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.35",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
+        "income": "20250.00",
+        "percent": "40"
       },
-      "value": "1640000.00"
+      "value": "8100.00"
     },
     {
-      "id": "b.a.initial.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
+      "id": "a.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
     },
     {
-      "id": "b.a.initial.ratio",
-      "kind": "sens_mix",
+      "id": "ex3.err50",
+      "kind": "reg_max_payment",
       "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.60",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.35",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
+        "income": "20250.00",
+        "percent": "50"
+      },
+      "value": "10125.00"
+    },
+    {
+      "id": "ex3.err_rec",
+      "kind": "reg_max_payment",
+      "inputs": {
         "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
+        "percent": "40"
       },
-      "value": "40.4"
+      "value": "8680.00"
     },
     {
-      "id": "b.a.initial.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "40.4",
-        "ltv": "74.55",
-        "ratio_max": "45",
-        "ltv_max": "75"
-      },
-      "value": "approve"
-    },
-    {
-      "id": "b.a.initial.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "40.4",
-        "ltv": "74.55",
-        "ratio_max": "45",
-        "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
-      },
-      "value": "0.25"
-    },
-    {
-      "id": "b.a.initial.rate_1",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.60",
-        "points": "0.25"
-      },
-      "value": "4.85"
-    },
-    {
-      "id": "b.a.initial.rate_2",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.15",
-        "points": "0.25"
-      },
-      "value": "4.40"
-    },
-    {
-      "id": "b.a.initial.rate_3",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.35",
-        "points": "0.25"
-      },
-      "value": "4.60"
-    },
-    {
-      "id": "b.a.initial.first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.85",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.4",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.6",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8424.52"
-    },
-    {
-      "id": "b.a.initial.total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.85",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.4",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.6",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "3032829.90"
-    },
-    {
-      "id": "b.a.initial.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.60",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.35",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "8181.05"
-    },
-    {
-      "id": "b.a.initial.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.60",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.35",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2945176.99"
-    },
-    {
-      "id": "b.a.initial.list_first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.60",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.35",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8181.06"
-    },
-    {
-      "id": "b.a.half.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.35",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.a.half.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.a.half.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.35",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "39.84"
-    },
-    {
-      "id": "b.a.half.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "39.84",
-        "ltv": "74.55",
-        "ratio_max": "45",
-        "ltv_max": "75"
-      },
-      "value": "approve"
-    },
-    {
-      "id": "b.a.half.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "39.84",
-        "ltv": "74.55",
-        "ratio_max": "45",
-        "ltv_max": "75",
-        "ratio_step": "40",
-        "ratio_step_points": "0.15",
-        "ltv_step": "70",
-        "ltv_step_points": "0.10"
-      },
-      "value": "0.1"
-    },
-    {
-      "id": "b.a.half.rate_1",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.35",
-        "points": "0.1"
-      },
-      "value": "4.45"
-    },
-    {
-      "id": "b.a.half.rate_2",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.15",
-        "points": "0.1"
-      },
-      "value": "4.25"
-    },
-    {
-      "id": "b.a.half.first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.25",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8164.40"
-    },
-    {
-      "id": "b.a.half.total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.25",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2939185.07"
-    },
-    {
-      "id": "b.a.half.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.35",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "8068.10"
-    },
-    {
-      "id": "b.a.half.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.35",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2904515.13"
-    },
-    {
-      "id": "b.a.half.list_first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.35",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8068.11"
-    },
-    {
-      "id": "b.b.initial.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.30",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.b.initial.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.b.initial.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.30",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "40.08"
-    },
-    {
-      "id": "b.b.initial.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "40.08",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "75"
-      },
-      "value": "approve"
-    },
-    {
-      "id": "b.b.initial.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "40.08",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "75",
-        "ratio_step": "35",
-        "ratio_step_points": "0.25",
-        "ltv_step": "none",
-        "ltv_step_points": "0"
-      },
-      "value": "0.25"
-    },
-    {
-      "id": "b.b.initial.rate_1",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.55",
-        "points": "0.25"
-      },
-      "value": "4.80"
-    },
-    {
-      "id": "b.b.initial.rate_2",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.05",
-        "points": "0.25"
-      },
-      "value": "4.30"
-    },
-    {
-      "id": "b.b.initial.rate_3",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.30",
-        "points": "0.25"
-      },
-      "value": "4.55"
-    },
-    {
-      "id": "b.b.initial.first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.8",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.55",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8359.46"
-    },
-    {
-      "id": "b.b.initial.total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.8",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.55",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "3009407.86"
-    },
-    {
-      "id": "b.b.initial.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.30",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "8116.95"
-    },
-    {
-      "id": "b.b.initial.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.30",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2922099.66"
-    },
-    {
-      "id": "b.b.initial.list_first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.30",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8116.95"
-    },
-    {
-      "id": "b.b.half.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.b.half.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.b.half.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "39.49"
-    },
-    {
-      "id": "b.b.half.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "39.49",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "75"
-      },
-      "value": "approve"
-    },
-    {
-      "id": "b.b.half.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "39.49",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "75",
-        "ratio_step": "35",
-        "ratio_step_points": "0.25",
-        "ltv_step": "none",
-        "ltv_step_points": "0"
-      },
-      "value": "0.25"
-    },
-    {
-      "id": "b.b.half.rate_1",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.30",
-        "points": "0.25"
-      },
-      "value": "4.55"
-    },
-    {
-      "id": "b.b.half.rate_2",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.05",
-        "points": "0.25"
-      },
-      "value": "4.30"
-    },
-    {
-      "id": "b.b.half.first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8237.17"
-    },
-    {
-      "id": "b.b.half.total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.55",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2965375.46"
-    },
-    {
-      "id": "b.b.half.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "7996.43"
-    },
-    {
-      "id": "b.b.half.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2878711.26"
-    },
-    {
-      "id": "b.b.half.list_first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.05",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "7996.43"
-    },
-    {
-      "id": "b.c.initial.loan",
+      "id": "b.a.loan",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2429,7 +1637,7 @@
       "value": "1640000.00"
     },
     {
-      "id": "b.c.initial.ltv",
+      "id": "b.a.ltv",
       "kind": "ltv_percent",
       "inputs": {
         "loan": "1640000.00",
@@ -2438,7 +1646,7 @@
       "value": "74.55"
     },
     {
-      "id": "b.c.initial.ratio",
+      "id": "b.a.ratio",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2472,33 +1680,60 @@
       "value": "40.4"
     },
     {
-      "id": "b.c.initial.decision",
+      "id": "b.a.decision",
       "kind": "bp_decision",
       "inputs": {
         "ratio": "40.4",
         "ltv": "74.55",
-        "ratio_max": "40",
+        "ratio_max": "45",
         "ltv_max": "75"
       },
-      "value": "refuse"
+      "value": "approve"
     },
     {
-      "id": "b.c.initial.points",
-      "kind": "bp_points",
+      "id": "b.a.relief",
+      "kind": "bp_relief",
       "inputs": {
         "ratio": "40.4",
         "ltv": "74.55",
-        "ratio_max": "40",
+        "ratio_max": "45",
         "ltv_max": "75",
-        "ratio_step": "none",
-        "ratio_step_points": "0",
-        "ltv_step": "72",
-        "ltv_step_points": "0.20"
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
       },
       "value": "0"
     },
     {
-      "id": "b.c.initial.qualifying",
+      "id": "b.a.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.60",
+        "relief": "0"
+      },
+      "value": "4.60"
+    },
+    {
+      "id": "b.a.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.10",
+        "relief": "0"
+      },
+      "value": "4.10"
+    },
+    {
+      "id": "b.a.rate_3",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.40",
+        "relief": "0"
+      },
+      "value": "4.40"
+    },
+    {
+      "id": "b.a.first",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2524,12 +1759,12 @@
         "prime_shift_1": "0",
         "prime_shift_2": "0",
         "anchor_shift_1": "0",
-        "measure": "qualifying"
+        "measure": "first"
       },
       "value": "8181.30"
     },
     {
-      "id": "b.c.initial.list_total",
+      "id": "b.a.total",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2560,363 +1795,25 @@
       "value": "2945264.34"
     },
     {
-      "id": "b.c.half.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.40",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.10",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.c.half.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.c.half.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.40",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.10",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "39.84"
-    },
-    {
-      "id": "b.c.half.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "39.84",
-        "ltv": "74.55",
-        "ratio_max": "40",
-        "ltv_max": "75"
-      },
-      "value": "approve"
-    },
-    {
-      "id": "b.c.half.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "39.84",
-        "ltv": "74.55",
-        "ratio_max": "40",
-        "ltv_max": "75",
-        "ratio_step": "none",
-        "ratio_step_points": "0",
-        "ltv_step": "72",
-        "ltv_step_points": "0.20"
-      },
-      "value": "0.2"
-    },
-    {
-      "id": "b.c.half.rate_1",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.40",
-        "points": "0.2"
-      },
-      "value": "4.60"
-    },
-    {
-      "id": "b.c.half.rate_2",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.10",
-        "points": "0.2"
-      },
-      "value": "4.30"
-    },
-    {
-      "id": "b.c.half.first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.6",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8261.63"
-    },
-    {
-      "id": "b.c.half.total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.6",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.3",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2974186.97"
-    },
-    {
-      "id": "b.c.half.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.40",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.10",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "8068.47"
-    },
-    {
-      "id": "b.c.half.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.40",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.10",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2904646.23"
-    },
-    {
-      "id": "b.c.half.list_first",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.40",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.10",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "first"
-      },
-      "value": "8068.47"
-    },
-    {
-      "id": "b.d.initial.loan",
+      "id": "b.a.qualifying",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
         "block_months": 12,
         "t1_kind": "prime",
         "t1_amount": "546000.00",
-        "t1_rate": "4.65",
+        "t1_rate": "4.60",
         "t1_months": 360,
         "t1_method": "spitzer",
         "t2_kind": "variable_unlinked",
         "t2_amount": "547000.00",
-        "t2_rate": "4.20",
+        "t2_rate": "4.10",
         "t2_months": 360,
         "t2_method": "spitzer",
         "t2_reset": 60,
         "t3_kind": "fixed_unlinked",
         "t3_amount": "547000.00",
-        "t3_rate": "4.45",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.d.initial.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.d.initial.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.65",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.45",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "40.72"
-    },
-    {
-      "id": "b.d.initial.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "40.72",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "70"
-      },
-      "value": "refuse"
-    },
-    {
-      "id": "b.d.initial.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "40.72",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "70",
-        "ratio_step": "40",
-        "ratio_step_points": "0.10",
-        "ltv_step": "none",
-        "ltv_step_points": "0"
-      },
-      "value": "0"
-    },
-    {
-      "id": "b.d.initial.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.65",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.45",
+        "t3_rate": "4.40",
         "t3_months": 360,
         "t3_method": "spitzer",
         "rounding": "statement",
@@ -2926,219 +1823,10 @@
         "anchor_shift_1": "0",
         "measure": "qualifying"
       },
-      "value": "8245.64"
+      "value": "8181.30"
     },
     {
-      "id": "b.d.initial.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "546000.00",
-        "t1_rate": "4.65",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "547000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "547000.00",
-        "t3_rate": "4.45",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2968432.16"
-    },
-    {
-      "id": "b.d.half.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1640000.00"
-    },
-    {
-      "id": "b.d.half.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1640000.00",
-        "value": "2200000"
-      },
-      "value": "74.55"
-    },
-    {
-      "id": "b.d.half.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "21700",
-        "obligation_monthly": "1450",
-        "obligation_months": 26
-      },
-      "value": "40.2"
-    },
-    {
-      "id": "b.d.half.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "40.2",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "70"
-      },
-      "value": "refuse"
-    },
-    {
-      "id": "b.d.half.points",
-      "kind": "bp_points",
-      "inputs": {
-        "ratio": "40.2",
-        "ltv": "74.55",
-        "ratio_max": "50",
-        "ltv_max": "70",
-        "ratio_step": "40",
-        "ratio_step_points": "0.10",
-        "ltv_step": "none",
-        "ltv_step_points": "0"
-      },
-      "value": "0"
-    },
-    {
-      "id": "b.d.half.qualifying",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "qualifying"
-      },
-      "value": "8140.43"
-    },
-    {
-      "id": "b.d.half.list_total",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 2,
-        "block_months": 12,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "820000.00",
-        "t1_rate": "4.45",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "820000.00",
-        "t2_rate": "4.20",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "total"
-      },
-      "value": "2930558.26"
-    },
-    {
-      "id": "b.a.initial.steps_total",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "b.a.initial.total",
-        "subtrahend": "b.a.initial.list_total"
-      },
-      "value": "87652.91"
-    },
-    {
-      "id": "b.a.half.steps_total",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "b.a.half.total",
-        "subtrahend": "b.a.half.list_total"
-      },
-      "value": "34669.94"
-    },
-    {
-      "id": "a.half_vs_initial_total",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "b.a.half.total",
-        "subtrahend": "b.a.initial.total"
-      },
-      "value": "-93644.83"
-    },
-    {
-      "id": "a.half_vs_initial_first",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "b.a.half.first",
-        "subtrahend": "b.a.initial.first"
-      },
-      "value": "-260.12"
-    },
-    {
-      "id": "c.line_payment",
+      "id": "b.a.line_payment",
       "kind": "reg_max_payment",
       "inputs": {
         "income": "20250.00",
@@ -3147,46 +1835,915 @@
       "value": "8100.00"
     },
     {
-      "id": "c.initial.over",
+      "id": "b.a.over",
       "kind": "difference",
       "inputs": {
-        "minuend": "b.c.initial.qualifying",
-        "subtrahend": "c.line_payment"
+        "minuend": "b.a.qualifying",
+        "subtrahend": "b.a.line_payment"
       },
       "value": "81.30"
     },
     {
-      "id": "c.half.room",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "c.line_payment",
-        "subtrahend": "b.c.half.qualifying"
-      },
-      "value": "31.53"
-    },
-    {
-      "id": "c.line",
+      "id": "b.a.line",
       "kind": "given",
       "inputs": {},
       "value": "40"
     },
     {
-      "id": "ex3.err50",
+      "id": "b.b.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "b.b.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "b.b.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.25"
+    },
+    {
+      "id": "b.b.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "40.25",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "b.b.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "40.25",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "35",
+        "ratio_relief_points": "0.25",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "b.b.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.70",
+        "relief": "0"
+      },
+      "value": "4.70"
+    },
+    {
+      "id": "b.b.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.00",
+        "relief": "0"
+      },
+      "value": "4.00"
+    },
+    {
+      "id": "b.b.rate_3",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.30",
+        "relief": "0"
+      },
+      "value": "4.30"
+    },
+    {
+      "id": "b.b.first",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8150.17"
+    },
+    {
+      "id": "b.b.total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2934061.70"
+    },
+    {
+      "id": "b.b.qualifying",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "qualifying"
+      },
+      "value": "8150.17"
+    },
+    {
+      "id": "b.b.line_payment",
       "kind": "reg_max_payment",
       "inputs": {
         "income": "20250.00",
-        "percent": "50"
+        "percent": "35"
       },
-      "value": "10125.00"
+      "value": "7087.50"
     },
     {
-      "id": "ex3.err_rec",
+      "id": "b.b.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.b.qualifying",
+        "subtrahend": "b.b.line_payment"
+      },
+      "value": "1062.67"
+    },
+    {
+      "id": "b.b.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "35"
+    },
+    {
+      "id": "b.c.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.20",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.35",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "b.c.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "b.c.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.20",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.35",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.4"
+    },
+    {
+      "id": "b.c.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "40.4",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "b.c.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "40.4",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "38",
+        "ratio_relief_points": "0.20",
+        "ltv_relief_line": "72",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0"
+    },
+    {
+      "id": "b.c.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.55",
+        "relief": "0"
+      },
+      "value": "4.55"
+    },
+    {
+      "id": "b.c.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.20",
+        "relief": "0"
+      },
+      "value": "4.20"
+    },
+    {
+      "id": "b.c.rate_3",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.35",
+        "relief": "0"
+      },
+      "value": "4.35"
+    },
+    {
+      "id": "b.c.first",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.20",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.35",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8180.70"
+    },
+    {
+      "id": "b.c.total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.20",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.35",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2945052.53"
+    },
+    {
+      "id": "b.c.qualifying",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.20",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.35",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "qualifying"
+      },
+      "value": "8180.70"
+    },
+    {
+      "id": "b.c.line_payment",
       "kind": "reg_max_payment",
       "inputs": {
+        "income": "20250.00",
+        "percent": "38"
+      },
+      "value": "7695.00"
+    },
+    {
+      "id": "b.c.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.c.qualifying",
+        "subtrahend": "b.c.line_payment"
+      },
+      "value": "485.70"
+    },
+    {
+      "id": "b.c.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "38"
+    },
+    {
+      "id": "b.d.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.15",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.45",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "b.d.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "b.d.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.15",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.45",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
         "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.64"
+    },
+    {
+      "id": "b.d.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "40.64",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "70"
+      },
+      "value": "refuse"
+    },
+    {
+      "id": "b.d.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "40.64",
+        "ltv": "74.55",
+        "ratio_max": "50",
+        "ltv_max": "70",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.10",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "b.d.qualifying",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000.00",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000.00",
+        "t2_rate": "4.15",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000.00",
+        "t3_rate": "4.45",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "qualifying"
+      },
+      "value": "8229.70"
+    },
+    {
+      "id": "b.d.line_payment",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
         "percent": "40"
       },
-      "value": "8680.00"
+      "value": "8100.00"
+    },
+    {
+      "id": "b.d.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.d.qualifying",
+        "subtrahend": "b.d.line_payment"
+      },
+      "value": "129.70"
+    },
+    {
+      "id": "b.d.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "ex4.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.a.qualifying",
+        "subtrahend": "a.line_payment"
+      },
+      "value": "81.30"
+    },
+    {
+      "id": "plan.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "21000.00"
+    },
+    {
+      "id": "pa.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "pa.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "pa.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.88"
+    },
+    {
+      "id": "pa.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "39.88",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "pa.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "39.88",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0.15"
+    },
+    {
+      "id": "pa.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.60",
+        "relief": "0.15"
+      },
+      "value": "4.45"
+    },
+    {
+      "id": "pa.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.10",
+        "relief": "0.15"
+      },
+      "value": "3.95"
+    },
+    {
+      "id": "pa.rate_3",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.40",
+        "relief": "0.15"
+      },
+      "value": "4.25"
+    },
+    {
+      "id": "pa.first",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "3.95",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.25",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "7934.02"
+    },
+    {
+      "id": "pa.total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "3.95",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.25",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2856248.78"
+    },
+    {
+      "id": "pa.list_total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2907550.95"
+    },
+    {
+      "id": "pa.relief_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pa.list_total",
+        "subtrahend": "pa.total"
+      },
+      "value": "51302.17"
+    },
+    {
+      "id": "pa.vs_base",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.a.total",
+        "subtrahend": "pa.total"
+      },
+      "value": "89015.56"
     },
     {
       "id": "a.loan",
@@ -3213,6 +2770,21 @@
       "value": "100000.00"
     },
     {
+      "id": "a.reserve",
+      "kind": "given",
+      "inputs": {},
+      "value": "40000.00"
+    },
+    {
+      "id": "d.short_after_reserve",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.short",
+        "subtrahend": "a.reserve"
+      },
+      "value": "60000.00"
+    },
+    {
       "id": "a.ltv",
       "kind": "ltv_percent",
       "inputs": {
@@ -3231,13 +2803,13 @@
       "id": "a.list_variable_unlinked",
       "kind": "given",
       "inputs": {},
-      "value": "4.15"
+      "value": "4.10"
     },
     {
       "id": "a.list_fixed_unlinked",
       "kind": "given",
       "inputs": {},
-      "value": "4.35"
+      "value": "4.40"
     }
   ]
 }

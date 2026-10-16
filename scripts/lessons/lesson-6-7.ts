@@ -46,6 +46,7 @@ export default function lesson67(): LessonData {
     given("clock.window", WINDOW_DAYS),
     given("threshold", NEGOTIATION.threshold),
     given("case.loan", "1640000"),
+    given("calendar.closed_2026", cal.closed.join(",")),
   ];
 
   // ── The state of the example: the same four requests as lesson 6.6, bank א׳'s clock ───────────────────
@@ -75,6 +76,7 @@ export default function lesson67(): LessonData {
     given("price.b.prime", BANK_PRICES.b.prime),
     given("price.b.variable", BANK_PRICES.b.variable_unlinked),
     given("price.b.fixed", BANK_PRICES.b.fixed_unlinked),
+    given("price.c.prime", BANK_PRICES.c.prime),
   );
 
   // ── What a notch is worth, on bank א׳'s offer: 0.10 point off one track, and off all three ────────────
@@ -82,27 +84,24 @@ export default function lesson67(): LessonData {
   facts.push(given("notch.points", "0.10"), given("notch.half", "0.05"));
   [1, 2, 3].forEach((k) => {
     facts.push(
-      effectFact(`notch.t${k}.first`, mixA, scenario, { target: k, points: notch }, "first_delta"),
-      effectFact(`notch.t${k}.total`, mixA, scenario, { target: k, points: notch }, "total_delta"),
+      effectFact(`notch.t${k}.first`, mixA, scenario, { target: k, points: notch }, "first_gain"),
+      effectFact(`notch.t${k}.total`, mixA, scenario, { target: k, points: notch }, "total_gain"),
       given(`notch.t${k}.amount`, mixA[k - 1].amount),
       given(`notch.t${k}.rate`, mixA[k - 1].rate),
     );
   });
   facts.push(
-    effectFact("notch.all.first", mixA, scenario, { target: "all", points: notch }, "first_delta"),
-    effectFact("notch.all.total", mixA, scenario, { target: "all", points: notch }, "total_delta"),
-    effectFact("notch.half.first", mixA, scenario, { target: 3, points: "-0.05" }, "first_delta"),
-    effectFact("notch.half.total", mixA, scenario, { target: 3, points: "-0.05" }, "total_delta"),
+    effectFact("notch.all.first", mixA, scenario, { target: "all", points: notch }, "first_gain"),
+    effectFact("notch.all.total", mixA, scenario, { target: "all", points: notch }, "total_gain"),
+    effectFact("notch.half.first", mixA, scenario, { target: 3, points: "-0.05" }, "first_gain"),
+    effectFact("notch.half.total", mixA, scenario, { target: 3, points: "-0.05" }, "total_gain"),
   );
 
   // ── Rounds: each bank answer arrives, the next round starts, and the clock runs ────────────────────────
   const [edit1, edit2] = NEGOTIATION.rounds;
   const mix1 = applyEdit(mixA, edit1);
-  const mix2 = applyEdit(mix1, edit2);
   let at = today;
-  const starts: string[] = [];
   for (let k = 1; k <= 3; k++) {
-    starts.push(at);
     facts.push(roundFitsFact(`round_${k}.fits`, at, validUntil, roundDays, reserve, cal), roundAnswerFact(`round_${k}.answer`, at, roundDays, cal));
     at = roundAnswer(at, roundDays, cal);
   }
@@ -139,12 +138,6 @@ export default function lesson67(): LessonData {
     addDays("slack.reserve_end", facts.find((f) => f.id === "round_2.answer")?.value as string, reserve),
   );
   facts.push(daysUntilFact("slack.answer", facts.find((f) => f.id === "slack.reserve_end")?.value as string, validUntil));
-
-  // ── Exercises ─────────────────────────────────────────────────────────────────────────────────────────
-  // Exercise 3: the fixed track down by 0.10 over the life of the loan (and the wrong answers: all tracks, and one month).
-  void mix2;
-  // Exercise 6: a round whose answer would arrive too late.
-  facts.push(given("ex6.start", starts[2]));
 
   return {
     lesson: "6.7",

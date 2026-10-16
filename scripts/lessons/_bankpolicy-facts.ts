@@ -2,9 +2,9 @@
  * Fact builders for lessons 6.9–6.11 (stage-6 author D): one file read by one bank's invented policy
  * (src/lib/calc/bankpolicy.ts). Each fact names a kind that a checks/kinds/ module recomputes on its own:
  * sens_mix (the ratio, the first payment, the total: sensitivity.py), ltv_percent (ltv.py) and bp_decision,
- * bp_points, bp_rate (bankpolicy.py). Not a lesson module: build-data.ts loads only lesson-*.ts and check-*.ts.
+ * bp_relief, bp_rate (bankpolicy.py). Not a lesson module: build-data.ts loads only lesson-*.ts and check-*.ts.
  *
- * A fact about a file is `<prefix>.<what>`: loan, ltv, ratio, decision, points; and, when the bank approves,
+ * A fact about a file is `<prefix>.<what>`: loan, ltv, ratio, decision, relief; and, when the bank approves,
  * rate_1…rate_n (the final rate of each track), first and total (the final tracks under the base scenario).
  */
 import Decimal from "decimal.js";
@@ -33,9 +33,9 @@ const obligationInputs = (file: LoanFile): Record<string, string | number> => {
 export function verdictFacts(add: <T extends Fact>(f: T) => T, p: string, policy: BankPolicy, file: LoanFile, opts: FileFactsOptions): Verdict {
   const v = evaluate(policy, file);
   const sc = scenarioFrom(opts.scenario);
-  // A refusal or a step that depends on a number within a hundredth of its line cannot be rechecked on the two-decimal value: never build one.
+  // A refusal or a relief that depends on a number within a hundredth of its line cannot be rechecked on the two-decimal value: never build one.
   for (const l of v.lines) {
-    for (const line of [l.max, l.step]) if (line !== null && l.actual.minus(line).abs().lt("0.01")) throw new Error(`${p}: ${l.id} ${l.actual.toString()} is within a hundredth of the line ${line}`);
+    for (const line of [l.max, l.reliefLine]) if (line !== null && l.actual.minus(line).abs().lt("0.01")) throw new Error(`${p}: ${l.id} ${l.actual.toString()} is within a hundredth of the line ${line}`);
   }
   add({ id: `${p}.loan`, kind: "sens_mix", inputs: { ...mixInputs(v.listTracks, sc), measure: "loan" }, value: moneyString(v.loan) });
   add({ id: `${p}.ltv`, kind: "ltv_percent", inputs: { loan: moneyString(v.loan), value: new Decimal(file.value).toString() }, value: percentString(v.ltv) });
@@ -49,23 +49,23 @@ export function verdictFacts(add: <T extends Fact>(f: T) => T, p: string, policy
   const ltv = percentString(v.ltv);
   add({ id: `${p}.decision`, kind: "bp_decision", inputs: { ratio, ltv, ratio_max: policy.ratioMax, ltv_max: policy.ltvMax }, value: v.decision });
   add({
-    id: `${p}.points`,
-    kind: "bp_points",
+    id: `${p}.relief`,
+    kind: "bp_relief",
     inputs: {
       ratio,
       ltv,
       ratio_max: policy.ratioMax,
       ltv_max: policy.ltvMax,
-      ratio_step: policy.ratioStep ?? "none",
-      ratio_step_points: policy.ratioStepPoints,
-      ltv_step: policy.ltvStep ?? "none",
-      ltv_step_points: policy.ltvStepPoints,
+      ratio_relief_line: policy.ratioReliefLine ?? "none",
+      ratio_relief_points: policy.ratioReliefPoints,
+      ltv_relief_line: policy.ltvReliefLine ?? "none",
+      ltv_relief_points: policy.ltvReliefPoints,
     },
-    value: v.points.toString(),
+    value: v.relief.toString(),
   });
   if (v.decision === "approve") {
     v.finalTracks.forEach((t, k) =>
-      add({ id: `${p}.rate_${k + 1}`, kind: "bp_rate", inputs: { list_rate: policy.prices[file.tracks[k].kind], points: v.points.toString() }, value: new Decimal(t.rate).toFixed(2) }),
+      add({ id: `${p}.rate_${k + 1}`, kind: "bp_rate", inputs: { list_rate: policy.prices[file.tracks[k].kind], relief: v.relief.toString() }, value: new Decimal(t.rate).toFixed(2) }),
     );
     if (opts.priced !== false) {
       const m = measuresOf(v.finalTracks, sc);

@@ -67,7 +67,8 @@ export default function lesson(): LessonData {
   add(points("s.points", v(sRatio), PTI_CAPITAL_THRESHOLD));
   add(maxPayment("s.max", v(sIncome), PTI_CAPITAL_THRESHOLD));
   add(paymentCutFact("s.cut", v(sIncome), v(sPay), PTI_CAPITAL_THRESHOLD));
-  add(incomeRoomFact("s.need", v(sIncome), v(sPay), PTI_CAPITAL_THRESHOLD));
+  const sNeed = add(incomeRoomFact("s.need", v(sIncome), v(sPay), PTI_CAPITAL_THRESHOLD));
+  add(sumOf("s.total_income", [sIncome, sNeed]));
   const sPayIn = add(givenMoney("s2.pay", "3800"));
   const s2Ratio = add(affRatio("s2.ratio", v(sPayIn), v(sIncome)));
   add(points("s2.points", v(s2Ratio), PTI_CAPITAL_THRESHOLD));
@@ -80,6 +81,7 @@ export default function lesson(): LessonData {
   const pay = add(mixFact("a.pay", MIX_A, "qualifying"));
   const ratio0 = add(mixFact("a.ratio", MIX_A, "ratio"));
   const ltv0 = add(ltv("a.ltv", v(loan), CASE_A.price));
+  add(points("a.pts40", v(ratio0), PTI_CAPITAL_THRESHOLD));
   add(standingTableFact("a.pti_table", v(ratio0), [PTI_LIMIT, PTI_CAPITAL_THRESHOLD, "35", "30"].sort((x, y) => Number(x) - Number(y))));
   add(standingTableFact("a.ltv_table", v(ltv0), ["40", "60", LTV_CEILINGS.only_home]));
   add(maxLoan("a.max_loan", CASE_A.price, "only_home"));
@@ -91,7 +93,8 @@ export default function lesson(): LessonData {
   for (const L of [PTI_CAPITAL_THRESHOLD, "35", "30"]) {
     add(maxPayment(`a.max.${L}`, v(disp), L));
     add(paymentCutFact(`a.paycut.${L}`, v(disp), v(pay), L));
-    add(incomeRoomFact(`a.income.${L}`, v(disp), v(pay), L));
+    const need = add(incomeRoomFact(`a.income.${L}`, v(disp), v(pay), L));
+    add(sumOf(`a.income_total.${L}`, [disp, need]));
     const cut = add(loanCutFact(`a.loancut.${L}`, MIX_A.tracks, v(disp), L));
     cuts[L] = cut;
     const lever = { lever: "amount", change: `-${v(cut)}` } as const;
@@ -99,6 +102,9 @@ export default function lesson(): LessonData {
     add(leverFact(`a.ratio_after.${L}`, MIX_A, lever, "ratio"));
     add(ltv(`a.ltv_after.${L}`, v(after), CASE_A.price));
   }
+  // One step short: 16,000 off the loan is not enough for the 40% line.
+  add(givenMoney("a.short_cut", "16000"));
+  add(leverFact("a.ratio_16", MIX_A, { lever: "amount", change: "-16000" }, "ratio"));
   // The price of each next step down: every five points costs about the same, and the step's worth is unknown.
   add(difference("a.step_35", cuts["35"], cuts["40"]));
   add(difference("a.step_30", cuts["30"], cuts["35"]));

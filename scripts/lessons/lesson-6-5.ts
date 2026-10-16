@@ -22,7 +22,7 @@ import { CASE_A, SCENARIOS } from "../../src/data/case-a-mix.ts";
 import type { PositionCase } from "../../src/lib/calc/levers.ts";
 import type { TrackSpec } from "../../src/lib/calc/schedule.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { assessment, untilDrop } from "./affordability-facts.ts";
+import { assessment } from "./affordability-facts.ts";
 import { difference, divFact, given, givenMoney, levFact, type LevMeasure } from "./_lever-facts.ts";
 import { share } from "./lesson-3-8.ts";
 import { budgetMax, left, margin, maxPayment } from "./regulation-facts.ts";
@@ -76,16 +76,17 @@ export default function lesson(): LessonData {
   add(difference("t.gap", get("a.ratio"), get("t.ratio")));
   add(difference("t.left_gain", get("t.left"), get("a.left")));
   add(divFact("t.pp", get("a.payoff"), get("t.gap")));
-  add(untilDrop("t.wait", CASE_A.car.monthsLeft as number));
-  lev("t.wait_ratio", A, "ratio", { lever: "wait", months: 8 });
+  add(given("t.wait", 9));
+  lev("t.wait_ratio", A, "ratio", { lever: "wait", months: 9 });
+  lev("t.wait_left", A, "months_left", { lever: "wait", months: 9 });
 
   // The equity: 200,000 ₪ of the 560,000 are a gift from the parents. The ratio and the financing ratio do not change with the label.
   add(givenMoney("g.gift", "200000"));
   add(share("g.share", get("g.gift"), get("a.equity"), 2));
 
   // ── Case B: two assessments; the average, the latest year, and a figure no document shows ──
-  add(given("b.assess_old", B_ASSESSMENTS[0]));
-  add(given("b.assess_new", B_ASSESSMENTS[1]));
+  add(givenMoney("b.assess_old", B_ASSESSMENTS[0]));
+  add(givenMoney("b.assess_new", B_ASSESSMENTS[1]));
   add(givenMoney("b.michal", B_MICHAL));
   add(givenMoney("b.declared", B_DECLARED));
   const avg = add(assessment("b.avg", B_ASSESSMENTS, "average"));
@@ -95,6 +96,7 @@ export default function lesson(): LessonData {
   lev("b.ratio_form", caseB(B_DECLARED), "ratio");
   add(difference("b.gap", get("b.ratio_avg"), get("b.ratio_form")));
   add(difference("b.rise", latest, avg));
+  add(difference("b.gain_latest", get("b.ratio_avg"), get("b.ratio_latest")));
 
   // ── דנה ויואב: the bank's line allows more than the family's budget does ──
   add(givenMoney("d.net", D_NET));
@@ -104,6 +106,12 @@ export default function lesson(): LessonData {
   add(margin("d.margin", get("d.left").value as string, D_BUDGET));
   add(budgetMax("d.family_max", D_NET, [], D_BUDGET));
   add(difference("d.over", get("d.bank_max"), get("d.family_max")));
+  // The same family at the payment its own budget allows, and at a payment in between.
+  add(left("d.left_family", D_NET, [get("d.family_max").value as string]));
+  add(margin("d.margin_family", get("d.left_family").value as string, D_BUDGET));
+  add(givenMoney("d.mid", "7500"));
+  add(left("d.left_mid", D_NET, [get("d.mid").value as string]));
+  add(margin("d.margin_mid", get("d.left_mid").value as string, D_BUDGET));
   add(difference("d.short", get("d.budget"), get("d.left")));
 
   // ── A document and what the client said (Mogi's rule): a payslip that says 12,400 and a client who says 13,000 ──

@@ -1,20 +1,20 @@
-"""Independent checks for the invented bank policy of lessons 6.9 and 6.11 (fact kinds start
-with bp_).
+"""Independent checks for the invented bank policy of lessons 6.9–6.11 (fact kinds start with bp_).
 
 Plain Python Decimal; nothing is imported from src/. The RULES are the exercise's, invented for
 fictional banks, and are written out again here on purpose:
 
-  a line (the payment-to-income ratio, the financing ratio) has a refusal point and, maybe, a step
-  point. Actual ABOVE the refusal point: the bank refuses. Actual above the step point (and not
-  above the refusal point): the bank approves and adds the step's percentage points to the rate of
-  every track. Exactly on a line is not above it. A refusing bank prices nothing: 0 points.
+  a line (the payment-to-income ratio, the financing ratio) has a refusal point and, maybe, a relief
+  point. Actual ABOVE the refusal point: the bank refuses. Actual NOT ABOVE the relief point (and not
+  refused): the bank takes the line's relief, in percentage points, off the rate of every track.
+  Exactly on a line has not crossed it, so a file exactly on a relief line gets the relief. A
+  refusing bank prices nothing: 0 points of relief.
 
-  bp_decision  "approve" or "refuse" from the ratio, the financing ratio and the two refusal points
-  bp_points    the percentage points the steps add (inputs: the two actuals, the two refusal points,
-               the two step points and their sizes; a step point "none" means no step)
-  bp_rate      a track's final rate: its list rate plus the points, two decimals
-  bp_max_loan  the largest loan a financing ceiling allows on a value: value × percent ÷ 100, cut
-               down to the agora (a maximum is never rounded up)
+  bp_decision   "approve" or "refuse" from the ratio, the financing ratio and the two refusal points
+  bp_relief     the percentage points the relief takes off (inputs: the two actuals, the two refusal
+                points, the two relief lines — "none" for no relief — and their sizes)
+  bp_rate       a track's final rate: its list rate minus the relief, two decimals
+  bp_max_loan   the largest loan a financing ceiling allows on a value: value × percent ÷ 100, cut
+                down to the agora (a maximum is never rounded up)
 
 The ratio and the financing ratio themselves are not recomputed here: a fact of kind sens_mix
 (measure "ratio", checks/kinds/sensitivity.py) and ltv_percent (ltv.py) carry them. The decision
@@ -28,8 +28,8 @@ from kinds.common import agorot
 HUNDREDTH = Decimal("0.01")
 
 
-def _step(i, name):
-    return None if str(i[f"{name}_step"]) == "none" else Decimal(str(i[f"{name}_step"]))
+def _line(i, name):
+    return None if str(i[f"{name}_relief_line"]) == "none" else Decimal(str(i[f"{name}_relief_line"]))
 
 
 def bp_decision(i, _facts=None):
@@ -37,19 +37,19 @@ def bp_decision(i, _facts=None):
     return "refuse" if refused else "approve"
 
 
-def bp_points(i, _facts=None):
+def bp_relief(i, _facts=None):
     if bp_decision(i) == "refuse":
         return "0"
     total = Decimal(0)
     for name, actual in (("ratio", i["ratio"]), ("ltv", i["ltv"])):
-        step = _step(i, name)
-        if step is not None and Decimal(str(actual)) > step:
-            total += Decimal(str(i[f"{name}_step_points"]))
+        line = _line(i, name)
+        if line is not None and Decimal(str(actual)) <= line:
+            total += Decimal(str(i[f"{name}_relief_points"]))
     return format(total.normalize(), "f") if total else "0"
 
 
 def bp_rate(i, _facts=None):
-    return format((Decimal(str(i["list_rate"])) + Decimal(str(i["points"]))).quantize(HUNDREDTH), "f")
+    return format((Decimal(str(i["list_rate"])) - Decimal(str(i["relief"]))).quantize(HUNDREDTH), "f")
 
 
 def bp_max_loan(i, _facts=None):
@@ -59,7 +59,7 @@ def bp_max_loan(i, _facts=None):
 
 KINDS = {
     "bp_decision": bp_decision,
-    "bp_points": bp_points,
+    "bp_relief": bp_relief,
     "bp_rate": bp_rate,
     "bp_max_loan": bp_max_loan,
 }

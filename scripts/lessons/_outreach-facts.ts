@@ -94,7 +94,7 @@ export const eventsInsideFact = (id: string, dates: string[], from: string, to: 
   value: eventsInside(dates, from, to).length,
 });
 
-export type EffectMeasure = "first_before" | "first_after" | "first_delta" | "total_before" | "total_after" | "total_delta";
+export type EffectMeasure = "first_before" | "first_after" | "first_delta" | "total_before" | "total_after" | "total_delta" | "first_gain" | "total_gain";
 
 /** A mix's first payment or total before / after an edit to some rates (kind out_effect). */
 export const effectFact = (id: string, tracks: TrackSpec[], scenario: ScenarioSpec, edit: MixEdit, measure: EffectMeasure): Fact => {
@@ -107,6 +107,8 @@ export const effectFact = (id: string, tracks: TrackSpec[], scenario: ScenarioSp
     total_before: e.before.total,
     total_after: e.after.total,
     total_delta: e.deltaTotal,
+    first_gain: e.deltaFirst.neg(),
+    total_gain: e.deltaTotal.neg(),
   }[measure];
   return { id, kind: "out_effect", inputs: { ...mixInputs(tracks, sc), edit_target: String(edit.target), edit_points: String(edit.points), measure }, value: moneyString(value) };
 };

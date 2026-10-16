@@ -71,6 +71,6 @@ export const DAY_FILES: DayFile[] = [
     title: "תיק 5",
     about: "זוג שכירים עם ילד ועם הלוואת רכב. קונים דירה יד שנייה.",
     unseen: "הלוואת הרכב נגמרת בעוד 26 חודשים, ויש לזוג עוד הוצאות שהקובץ לא מראה.",
-    file: caseAFile("initial"),
+    file: caseAFile(),
   },
 ];

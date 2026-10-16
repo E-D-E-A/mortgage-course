@@ -3,7 +3,7 @@
 // FICTIONAL bank, whose rules are the exercise's invented rules (shown on the card, never presented
 // as how a real bank works). Five files arrive. For each, the system shows the financing ratio and
 // the payment-to-income ratio (at the bank's list rates); the learner decides — approve or refuse —
-// and, when approving, how many percentage points the rules add to every track. Checking shows the
+// and, when approving, how many percentage points of relief the rules take off the bank's price list for every track. Checking shows the
 // rule that decided, line by line, and what the file did not say. The decision's arithmetic is
 // src/lib/calc/bankpolicy.ts; this component computes nothing itself.
 import { computed, ref } from "vue";
@@ -33,10 +33,10 @@ const LINE_HE = { ratio: "יחס ההחזר", ltv: "שיעור המימון" } a
 
 const verdicts = computed<Verdict[]>(() => props.files.map((f) => evaluate(props.policy, f.file)));
 
-/** The step sizes a decision can carry: every sum of the policy's steps, smallest first. */
+/** The relief a decision can carry: every sum of the policy's reliefs, smallest first. */
 const pointChoices = computed(() => {
-  const a = Number(props.policy.ratioStep === null ? 0 : props.policy.ratioStepPoints);
-  const b = Number(props.policy.ltvStep === null ? 0 : props.policy.ltvStepPoints);
+  const a = Number(props.policy.ratioReliefLine === null ? 0 : props.policy.ratioReliefPoints);
+  const b = Number(props.policy.ltvReliefLine === null ? 0 : props.policy.ltvReliefPoints);
   const sums = new Set([0, a, b, +(a + b).toFixed(2)]);
   return [...sums].sort((x, y) => x - y);
 });
@@ -59,7 +59,7 @@ const isRight = (i: number): boolean => {
   const a = answers.value[i];
   const v = verdicts.value[i];
   if (a.decision !== v.decision) return false;
-  return v.decision === "refuse" || a.points === Number(v.points.toString());
+  return v.decision === "refuse" || a.points === Number(v.relief.toString());
 };
 const readyToCheck = computed(() => answer.value.decision === "refuse" || (answer.value.decision === "approve" && answer.value.points !== null));
 const doneCount = computed(() => answers.value.filter((a) => a.checked).length);
@@ -96,8 +96,8 @@ function lineText(l: Verdict["lines"][number]): string {
   const name = LINE_HE[l.id];
   const actual = pct(l.actual);
   if (l.outcome === "refuse") return `${name} ${actual}% — מעל ${l.max}%: סירוב.`;
-  if (l.outcome === "step") return `${name} ${actual}% — מעל ${l.step}% ועד ${l.max}%: תוספת של ${pts(l.stepPoints)} נקודות אחוז לכל מסלול.`;
-  return l.step === null ? `${name} ${actual}% — עד ${l.max}%: בלי תוספת (אין כלל תוספת).` : `${name} ${actual}% — עד ${l.step}%: בלי תוספת.`;
+  if (l.outcome === "relief") return `${name} ${actual}% — לא מעל ${l.reliefLine}%: הנחה של ${pts(l.reliefPoints)} נקודות אחוז לכל מסלול.`;
+  return l.reliefLine === null ? `${name} ${actual}% — לא מעל ${l.max}%: מחירון, ואין כלל הנחה בקו הזה.` : `${name} ${actual}% — מעל ${l.reliefLine}%: בלי הנחה, מחירון.`;
 }
 </script>
 
@@ -108,15 +108,16 @@ function lineText(l: Verdict["lines"][number]): string {
       <p class="text-body-m font-semibold text-n900">כללי התרגיל של {{ policy.name }}</p>
       <p class="mt-1 text-caption text-n700">בנק בדוי, וכללים בדויים. כך מחליט בנק בתרגיל הזה, לא בנק אמיתי.</p>
       <ul class="mt-3 grid list-none gap-1 ps-0 text-body-m text-n800">
+        <li>המחיר הרגיל הוא מחירון הבנק: ריבית אחת לכל סוג מסלול.</li>
         <li>יחס החזר מעל <span dir="ltr">{{ policy.ratioMax }}%</span>: סירוב.</li>
-        <li v-if="policy.ratioStep !== null">
-          יחס החזר מעל <span dir="ltr">{{ policy.ratioStep }}%</span> (ועד <span dir="ltr">{{ policy.ratioMax }}%</span>): אישור, ועוד {{ pts(policy.ratioStepPoints) }} נקודות אחוז לריבית של כל מסלול.
+        <li v-if="policy.ratioReliefLine !== null">
+          יחס החזר <span dir="ltr">{{ policy.ratioReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ratioReliefPoints) }} נקודות אחוז מהריבית של כל מסלול.
         </li>
         <li>שיעור מימון מעל <span dir="ltr">{{ policy.ltvMax }}%</span>: סירוב.</li>
-        <li v-if="policy.ltvStep !== null">
-          שיעור מימון מעל <span dir="ltr">{{ policy.ltvStep }}%</span> (ועד <span dir="ltr">{{ policy.ltvMax }}%</span>): אישור, ועוד {{ pts(policy.ltvStepPoints) }} נקודות אחוז לריבית של כל מסלול.
+        <li v-if="policy.ltvReliefLine !== null">
+          שיעור מימון <span dir="ltr">{{ policy.ltvReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ltvReliefPoints) }} נקודות אחוז מהריבית של כל מסלול.
         </li>
-        <li class="text-n700">שתי התוספות מצטברות. ״מעל״ הוא מעל ממש: בדיוק על הקו אינו מעליו. יחס ההחזר נמדד לפי מחירון הבנק, לפני התוספות.</li>
+        <li class="text-n700">שתי ההנחות מצטברות. ״מעל״ הוא מעל ממש: בדיוק על הקו אינו מעליו, ולכן מקבל את ההנחה. יחס ההחזר נמדד לפי המחירון, לפני ההנחות.</li>
       </ul>
     </div>
 
@@ -185,8 +186,8 @@ function lineText(l: Verdict["lines"][number]): string {
         </button>
       </div>
       <div v-if="answer.decision === 'approve'" class="mt-3">
-        <p class="text-body-m text-n800">כמה נקודות אחוז מוסיפים לריבית של כל מסלול?</p>
-        <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="תוספת לריבית">
+        <p class="text-body-m text-n800">כמה נקודות אחוז של הנחה נותנים לריבית של כל מסלול?</p>
+        <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="הנחה בריבית">
           <button
             v-for="p in pointChoices"
             :key="p"
@@ -197,7 +198,7 @@ function lineText(l: Verdict["lines"][number]): string {
             :disabled="answer.checked"
             @click="answer.points = p"
           >
-            <span dir="ltr">{{ p === 0 ? "0" : `+${pts(p)}` }}</span>
+            <span dir="ltr">{{ p === 0 ? "0" : `−${pts(p)}` }}</span>
           </button>
         </div>
       </div>
@@ -215,7 +216,7 @@ function lineText(l: Verdict["lines"][number]): string {
       <div v-if="answer.checked" class="mt-4 rounded-md border-s-4 p-4" :class="isRight(current) ? 'border-success bg-success-bg' : 'border-warning bg-warning-bg'" aria-live="polite">
         <p class="text-body-m font-semibold text-n900">
           {{ isRight(current) ? "נכון." : "לא מדויק." }}
-          {{ verdict.decision === "refuse" ? "לפי הכללים הבנק מסרב." : verdict.points.isZero() ? "לפי הכללים הבנק מאשר, בלי תוספת." : `לפי הכללים הבנק מאשר, עם תוספת של ${pts(verdict.points.toString())} נקודות אחוז לכל מסלול.` }}
+          {{ verdict.decision === "refuse" ? "לפי הכללים הבנק מסרב." : verdict.relief.isZero() ? "לפי הכללים הבנק מאשר, במחירון." : `לפי הכללים הבנק מאשר, עם הנחה של ${pts(verdict.relief.toString())} נקודות אחוז לכל מסלול.` }}
         </p>
         <ul class="mt-2 grid list-none gap-1 ps-0 text-body-m text-n800">
           <li v-for="l in verdict.lines" :key="l.id">{{ lineText(l) }}</li>
@@ -253,7 +254,7 @@ function lineText(l: Verdict["lines"][number]): string {
             <td class="py-1 pe-3 font-semibold text-n900">{{ f.title }}</td>
             <td class="py-1 pe-3"><span dir="ltr">{{ pct(verdicts[i].ltv) }}%</span></td>
             <td class="py-1 pe-3"><span dir="ltr">{{ pct(verdicts[i].ratio) }}%</span></td>
-            <td class="py-1 pe-3">{{ !answers[i].checked ? "עוד לא נבדק" : verdicts[i].decision === "refuse" ? `סירוב (${reasonLines(verdicts[i]).map((l) => LINE_HE[l.id]).join(", ")})` : verdicts[i].points.isZero() ? "אישור, בלי תוספת" : `אישור, ${pts(verdicts[i].points.toString())} נקודות אחוז` }}</td>
+            <td class="py-1 pe-3">{{ !answers[i].checked ? "עוד לא נבדק" : verdicts[i].decision === "refuse" ? `סירוב (${reasonLines(verdicts[i]).map((l) => LINE_HE[l.id]).join(", ")})` : verdicts[i].relief.isZero() ? "אישור, במחירון" : `אישור, הנחה של ${pts(verdicts[i].relief.toString())} נקודות אחוז` }}</td>
           </tr>
         </tbody>
       </table>

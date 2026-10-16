@@ -278,11 +278,9 @@
     },
     {
       "id": "t.wait",
-      "kind": "aff_months_until_drop",
-      "inputs": {
-        "months_left": 26
-      },
-      "value": 8
+      "kind": "given",
+      "inputs": {},
+      "value": 9
     },
     {
       "id": "t.wait_ratio",
@@ -305,10 +303,36 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "ratio"
       },
       "value": "37.7"
+    },
+    {
+      "id": "t.wait_left",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "2200000",
+        "equity": "560000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "12400|9300",
+        "obligation_monthly": "1450",
+        "obligation_months": 26,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "prime|546000|4.60|360;variable_unlinked|547000|4.10|360;fixed_unlinked|547000|4.40|360",
+        "base_inflation": "2",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "lever": "wait",
+        "lever_months": 9,
+        "measure": "months_left"
+      },
+      "value": 17
     },
     {
       "id": "g.gift",
@@ -330,13 +354,13 @@
       "id": "b.assess_old",
       "kind": "given",
       "inputs": {},
-      "value": "84000"
+      "value": "84000.00"
     },
     {
       "id": "b.assess_new",
       "kind": "given",
       "inputs": {},
-      "value": "96000"
+      "value": "96000.00"
     },
     {
       "id": "b.michal",
@@ -459,6 +483,15 @@
       "value": "500.00"
     },
     {
+      "id": "b.gain_latest",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.ratio_avg",
+        "subtrahend": "b.ratio_latest"
+      },
+      "value": "1.21"
+    },
+    {
       "id": "d.net",
       "kind": "given",
       "inputs": {},
@@ -514,6 +547,48 @@
         "subtrahend": "d.family_max"
       },
       "value": "800.00"
+    },
+    {
+      "id": "d.left_family",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "22000",
+        "out_1": "8000.00"
+      },
+      "value": "14000.00"
+    },
+    {
+      "id": "d.margin_family",
+      "kind": "reg_margin",
+      "inputs": {
+        "left": "14000.00",
+        "budget": "14000"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "d.mid",
+      "kind": "given",
+      "inputs": {},
+      "value": "7500.00"
+    },
+    {
+      "id": "d.left_mid",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "22000",
+        "out_1": "7500.00"
+      },
+      "value": "14500.00"
+    },
+    {
+      "id": "d.margin_mid",
+      "kind": "reg_margin",
+      "inputs": {
+        "left": "14500.00",
+        "budget": "14000"
+      },
+      "value": "500.00"
     },
     {
       "id": "d.short",

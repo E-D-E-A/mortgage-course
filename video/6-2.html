@@ -1,0 +1,168 @@
+<!doctype html>
+<!--
+  Video scene for lesson 6.2 — "ספים ומדרגות".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t (seconds); render(t) depends only on t.
+  Every number comes from data/lessons/6-2.json. 50% and 40% are the team's transcription of directive 329 (not checked); 35% and 30% are the course brief's example (to be checked); the ladder is drawn right to left, as the page is.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 6.2 · ספים ומדרגות</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/6-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf0 = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf0.format(Number(v))} ₪`;
+      const num = (v) => nf0.format(Number(v));
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      const V = {
+        ratio0: fact("a.ratio"), cut40: fact("a.loancut.40"), r40: fact("a.ratio_after.40"), cut35: fact("a.loancut.35"), r35: fact("a.ratio_after.35"),
+        cut30: fact("a.loancut.30"), r30: fact("a.ratio_after.30"), short: fact("a.short_cut"), r16: fact("a.ratio_16"),
+        step: fact("a.step_35"), limit: fact("l.limit"), cap: fact("l.capital"), h35: fact("l.h35"), h30: fact("l.h30"),
+      };
+      const S = { title: [0, 8], ladder: [8, 96], kinds: [96, 128], end: [128, 142] };
+      window.duration = 142;
+      window.cues = [
+        [1, 7, "יחס ההחזר של נועם ושירה, מול קווים."],
+        [9, 18, `יחס ההחזר ${V.ratio0}%. הקו של סף ההון: ${V.cap}%.`],
+        [18, 28, "קו הוא מספר שבו משהו משתנה. זה סף."],
+        [28, 38, "מה שמשתנה שם הוא המדרגה."],
+        [39, 49, `בין ${V.ratio0}% ל־${V.cap}%: ${shek(V.cut40)} הון עצמי נוסף.`],
+        [49, 58, `ב־${shek(V.short)} היחס עדיין ${V.r16}%: עדיין מעל.`],
+        [59, 70, `לרדת ל־${V.h35}%: ${shek(V.cut35)}.`],
+        [70, 82, `ל־${V.h30}%: ${shek(V.cut30)}. כל חמש נקודות: אותו סכום.`],
+        [82, 95, "קרוב לקו זול. רחוק יקר. והרווח הוא מדרגה."],
+        [97, 106, "ארבעה סוגי קווים. מגבלה: אסור."],
+        [106, 115, "סף הון: מותר, והבנק מחזיק יותר הון."],
+        [115, 122, "מדיניות בנק: בנק אחד קובע. בדוי כאן."],
+        [122, 127, "השערה מהשטח: לא נבדקה."],
+        [129, 137, "אפשר לחשב מה עולה להגיע לקו."],
+        [137, 141, "כמה שווה להגיע אליו — לא תמיד ידוע."],
+      ];
+      const X0 = 150, X1 = 1130, MAX = 60, Y = 330;
+      const xr = (p) => X1 - (Number(p) / MAX) * (X1 - X0); // RTL: zero on the right
+      const MARKS = [
+        { p: V.h30, name: "השערה", color: C.n500, dash: "2 6", bg: C.n0, sub: "לבדיקה" },
+        { p: V.h35, name: "השערה", color: C.n500, dash: "2 6", bg: C.n0, sub: "לבדיקה" },
+        { p: V.cap, name: "סף הון", color: C.warning, dash: "10 6", bg: C.warningBg, sub: "מותר · יותר הון" },
+        { p: V.limit, name: "מגבלה", color: C.danger, dash: "0", bg: C.dangerBg, sub: "אסור" },
+      ];
+      const STOPS = [
+        { at: 0, v: V.ratio0, lines: [`יחס ${V.ratio0}%`, "מעל שלושה קווים"] },
+        { at: 31, v: V.r40, lines: [`${shek(V.cut40)} הון נוסף`, `יחס ${V.r40}%`] },
+        { at: 51, v: V.r35, lines: [`${shek(V.cut35)} הון נוסף`, `יחס ${V.r35}%`] },
+        { at: 62, v: V.r30, lines: [`${shek(V.cut30)} הון נוסף`, `יחס ${V.r30}%`] },
+      ];
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ספים ומדרגות", 76, { w: 700, o });
+          txt(640, 365, "כמה רחוק מהקו, וכמה עולה להתרחק", 38, { fill: C.n600, o });
+        }
+        if (inScene(t, S.ladder)) {
+          const o = vis(t, S.ladder);
+          const rel = t - S.ladder[0];
+          let k = 0;
+          STOPS.forEach((s, i) => { if (rel >= s.at) k = i; });
+          const prev = Math.max(0, k - 1);
+          const g = k === 0 ? 1 : ease((rel - STOPS[k].at) / 3);
+          const val = k === 0 ? Number(STOPS[0].v) : Number(STOPS[prev].v) + (Number(STOPS[k].v) - Number(STOPS[prev].v)) * g;
+          txt(640, 96, "יחס החזר, נועם ושירה", 38, { w: 700, o });
+          el("rect", { x: X0, y: Y - 14, width: X1 - X0, height: 28, rx: 8, fill: C.n300, opacity: o * 0.45 });
+          el("rect", { x: xr(val), y: Y - 14, width: X1 - xr(val), height: 28, rx: 8, fill: C.navy, opacity: o });
+          MARKS.forEach((m, i) => {
+            const x = xr(m.p);
+            const reveal = after(t, S.ladder, 0.5 + i * 1.2, o);
+            el("line", { x1: x, x2: x, y1: Y - 70, y2: Y + 40, stroke: m.color, "stroke-width": 5, "stroke-dasharray": m.dash === "0" ? "none" : m.dash, opacity: reveal });
+            txt(x, Y + 74, `${m.p}%`, 26, { w: 700, o: reveal, ltr: true });
+            txt(x, Y - 82, m.name, 20, { fill: C.n700, o: reveal });
+          });
+          el("circle", { cx: xr(val), cy: Y, r: 20, fill: C.tq2, stroke: C.navy, "stroke-width": 4, opacity: o });
+          const s = STOPS[k];
+          const oi = Math.min(o, clamp((rel - s.at - 1) / 0.8));
+          el("rect", { x: 330, y: 470, width: 620, height: 100, rx: 14, fill: C.n0, stroke: C.n200, opacity: oi });
+          txt(640, 510, s.lines[0], 30, { w: 700, o: oi });
+          txt(640, 550, s.lines[1], 24, { fill: C.n700, o: oi });
+          if (rel > 74) txt(640, 620, `הפער בין כל חמש נקודות: ${shek(V.step)}`, 26, { fill: C.n700, o: Math.min(o, clamp((rel - 74) / 0.8)) });
+        }
+        if (inScene(t, S.kinds)) {
+          const o = vis(t, S.kinds);
+          txt(640, 96, "ארבעה סוגי קווים", 40, { w: 700, o });
+          const cards = [
+            { x: 1030, name: "מגבלה רגולטורית", a: "בנק ישראל", b: "אסור", col: C.dangerBg },
+            { x: 780, name: "סף הון", a: "בנק ישראל", b: "מותר, יותר הון", col: C.warningBg },
+            { x: 530, name: "מדיניות בנק", a: "הבנק עצמו", b: "בדוי כאן", col: C.n0 },
+            { x: 280, name: "השערה מהשטח", a: "אף אחד", b: "לא נבדק", col: C.n0 },
+          ];
+          cards.forEach((c, i) => {
+            const oi = after(t, S.kinds, 1 + i * 8, o);
+            el("rect", { x: c.x - 115, y: 170, width: 230, height: 280, rx: 16, fill: c.col, stroke: C.n200, opacity: oi });
+            txt(c.x, 225, c.name, 25, { w: 700, o: oi });
+            txt(c.x, 290, "מי קבע", 18, { fill: C.n600, o: oi });
+            txt(c.x, 322, c.a, 24, { w: 600, o: oi });
+            txt(c.x, 380, "מה קורה בחציה", 18, { fill: C.n600, o: oi });
+            txt(c.x, 412, c.b, 22, { w: 600, o: oi });
+          });
+          txt(640, 540, "המספרים לבדיקה", 26, { fill: C.n700, o: after(t, S.kinds, 12, o) });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "קרוב זול, רחוק יקר", 70, { w: 700, o });
+          txt(640, 340, "המחיר מחושב. הערך של המדרגה — לא תמיד", 34, { fill: C.n700, o: after(t, S.end, 1, o) });
+          txt(640, 470, "50%, 40%: תעתיק הצוות, לא אומת. 35%, 30%: דוגמה, לבדיקה", 22, { fill: C.n500, o: after(t, S.end, 4, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

@@ -134,7 +134,7 @@ const mark = (ok: boolean) => (ok ? "כן" : "לא");
             <tbody>
               <tr v-for="(q, k) in questions" :key="k" class="border-b border-n100 align-top">
                 <th class="py-1 pe-2 text-start font-normal text-n800">{{ q }}</th>
-                <td class="py-1 font-semibold" :class="s.passes[k] ? 'text-n900' : 'text-n900'">
+                <td class="py-1 font-semibold">
                   <span class="rounded-pill px-2 py-0.5 text-caption" :class="s.passes[k] ? 'bg-success-bg' : 'bg-danger-bg'">{{ mark(s.passes[k]) }}</span>
                 </td>
               </tr>

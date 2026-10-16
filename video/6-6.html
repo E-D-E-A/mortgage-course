@@ -1,0 +1,281 @@
+<!doctype html>
+<!--
+  Video scene for lesson 6.6 — "ארבעה שעונים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number and date comes from data/lessons/6-6.json (and 6-6's exercise 3 facts for the
+  no-new-lien scene). The subtitle cues (window.cues) carry the explanatory sentences — the
+  script for narration, if it is ever added.
+
+  Script (one idea: going to four banks starts four clocks, and none of them starts when you
+  decide. The answer and validity rules are the team's transcription of Directive 451, not
+  checked against it; the round clock is the exercise's own rule; the banks are invented):
+  1. Title.
+  2. Four requests on one day; each bank answers after its own business days (dashed), and its
+     terms hold 24 days from ITS answer (solid).
+  3. Today: every bank has answered. The governing clock is the one that ends first (bank א׳).
+  4. The market clock: a Bank of Israel decision inside the window; what a quarter point does to
+     the prime track's first payment (a teaching scenario, not a forecast).
+  5. The round clock (the exercise's rule): three rounds fit; the fourth would leave too few days.
+  6. A refinance with no new lien: 12 days, and the governing bank changes.
+  7. Takeaway: count before you ask.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 6.6 · אסטרטגיית הפנייה לבנקים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/6-6.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Math.abs(Number(v))).replace(/\.00$/, "");
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+      const dn = (iso) => `${Number(iso.slice(8, 10))}.${Number(iso.slice(5, 7))}`;
+      const days = (a, b) => Math.round((Date.parse(`${b}T12:00:00Z`) - Date.parse(`${a}T12:00:00Z`)) / 86400000);
+      const addDays = (iso, k) => new Date(Date.parse(`${iso}T12:00:00Z`) + k * 86400000).toISOString().slice(0, 10);
+
+      const request = fact("worked.request"), today = fact("worked.today");
+      const B = ["a", "b", "c", "d"].map((k, i) => ({
+        k, name: `בנק ${["א׳", "ב׳", "ג׳", "ד׳"][i]}`, after: fact(`worked.${k}.after`), approved: fact(`worked.${k}.approved`), until: fact(`worked.${k}.valid_until`), left: fact(`worked.${k}.left`),
+      }));
+      const W = String(fact("clock.window")), W12 = String(fact("clock.window_no_lien")), A5 = String(fact("clock.answer")), A7 = String(fact("clock.answer_extended"));
+      const R = String(fact("round.days")), RES = String(fact("round.reserve"));
+      const dec = fact("decision.2");
+      const V = {
+        up: num(fact("rate.up.first")), down: num(fact("rate.down.first")),
+        rounds: String(fact("worked.rounds_count")),
+        r1: fact("worked.round_1.answer"), r2: fact("worked.round_2.answer"), r3: fact("worked.round_3.answer"), r4: fact("worked.round_4.answer"),
+      };
+      // The no-new-lien scene (exercise 3's three banks).
+      const L = ["a", "b", "c"].map((k, i) => ({ name: `בנק ${["א׳", "ב׳", "ג׳"][i]}`, approved: fact(`ex3.${k}.approved`), until: fact(`ex3.${k}.valid_until`) }));
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 8], lanes: [8, 62], gov: [62, 92], rate: [92, 122], rounds: [122, 165], lien: [165, 190], end: [190, 202] };
+      window.duration = 202;
+      window.cues = [
+        [1, 7, "ארבעה שעונים: מי רץ, ממתי, ומי קובע"],
+        [9, 16, `ארבע בקשות יוצאות באותו יום: ${dm(request)}.`],
+        [16, 24, `כל בנק עונה בזמן משלו: ${B.map((b) => b.after).join(", ")} ימי עסקים.`],
+        [24, 32, `הקו המקווקו הוא שעון התשובה: ${A5} ימי עסקים, ${A7} לסוג מסוים.`],
+        [32, 41, `הפס המלא הוא שעון התוקף: ${W} יום מהאישור של אותו בנק.`],
+        [41, 51, `בנק א׳ ענה ראשון, והתנאים שלו נגמרים ב־${dm(B[0].until)}.`],
+        [51, 61, `בנק ד׳ ענה אחרון, והתנאים שלו נמשכים עד ${dm(B[3].until)}.`],
+        [63, 72, `היום ${dm(today)}: כל הבנקים כבר ענו.`],
+        [72, 82, `הקובע הוא בנק א׳: נשארו ${B[0].left} ימים.`],
+        [82, 91, "מי שרוצה את כל האישורים בחיים מתכנן מולו."],
+        [93, 102, `שעון השוק: החלטת הריבית של בנק ישראל ב־${dm(dec)}.`],
+        [102, 111, `הפריים עולה רבע נקודה: ההחזר הראשון עולה ב־${V.up} ₪.`],
+        [111, 121, `הפריים יורד רבע נקודה: ההחזר יורד ב־${V.down} ₪.`],
+        [123, 131, "שעון הסבבים: אין כלל ידוע. זה כלל של התרגיל."],
+        [131, 140, `סבב לוקח ${R} ימי עסקים, ונשארים ${RES} ימים אחרי התשובה.`],
+        [140, 151, `${V.rounds} סבבים נכנסים: תשובות ב־${dn(V.r1)}, ${dn(V.r2)} ו־${dn(V.r3)}.`],
+        [151, 164, `סבב רביעי היה נענה ב־${dm(V.r4)}, ולא נכנס.`],
+        [166, 175, `בלי שעבוד חדש התוקף הוא ${W12} יום בלבד.`],
+        [175, 189, `מחזור בבנק ב׳ נגמר ב־${dm(L[1].until)}, לפני בנק א׳.`],
+        [191, 196, "סופרים לפני שמבקשים:"],
+        [196, 201, "איזה שעון קובע, וכמה סבבים נכנסים."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // A bar that grows from its right edge (time runs leftward) between two moments of a scene.
+      const grow = (t, sc, s, e) => clamp((t - sc[0] - s) / (e - s));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", warn: "var(--mogi-warning)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      // The time axis: the request is at the right edge (x = 1140), later days to the left, 34 days across 1000px.
+      const X0 = 1140, PX = 1000 / 34;
+      const X = (iso) => X0 - days(request, iso) * PX;
+      const bar = (from, to, y, h, o, opts = {}) => {
+        const x1 = X(from), x2 = X(to);
+        if (opts.dashed) el("rect", { x: x2, y, width: x1 - x2, height: h, rx: 6, fill: "none", stroke: opts.stroke ?? C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
+        else el("rect", { x: x2, y, width: x1 - x2, height: h, rx: 6, fill: opts.fill ?? C.teal, opacity: o, stroke: opts.stroke ?? "none", "stroke-width": opts.stroke ? 4 : 0 });
+      };
+      const axis = (o) => {
+        el("line", { x1: 140, y1: 150, x2: X0, y2: 150, stroke: C.n300, "stroke-width": 2, opacity: o });
+        for (let k = 0; k <= 33; k += 7) {
+          const iso = addDays(request, k);
+          el("line", { x1: X(iso), y1: 144, x2: X(iso), y2: 156, stroke: C.n600, "stroke-width": 2, opacity: o });
+          txt(X(iso), 134, dn(iso), 18, { fill: C.n600, ltr: true, o });
+        }
+      };
+      const lane = (b, i, o, partial = 1, extra = {}) => {
+        const y = 196 + i * 78;
+        txt(X0, y - 8, b.name, 22, { anchor: "start", w: 600, o });
+        if (extra.note) txt(140 + 0, y - 8, extra.note, 18, { anchor: "end", fill: C.n700, o });
+        el("rect", { x: 140, y, width: X0 - 140, height: 30, rx: 6, fill: C.n100, opacity: o });
+        const approvedX = X(b.approved), untilX = X(b.until);
+        // The answer clock (dashed) grows first, then the validity (solid).
+        const p1 = clamp(partial * 2), p2 = clamp(partial * 2 - 1);
+        const mid = X0 - (X0 - approvedX) * p1;
+        if (p1 > 0) el("rect", { x: mid, y, width: X0 - mid, height: 30, rx: 6, fill: "none", stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
+        if (p2 > 0) {
+          const end = approvedX - (approvedX - untilX) * p2;
+          el("rect", { x: end, y, width: approvedX - end, height: 30, rx: 6, fill: C.teal, opacity: o, stroke: extra.outline ? C.navy : "none", "stroke-width": extra.outline ? 4 : 0 });
+        }
+        return y;
+      };
+      const todayLine = (o, y2 = 556) => {
+        el("line", { x1: X(today), y1: 120, x2: X(today), y2, stroke: C.warn, "stroke-width": 5, opacity: o });
+        txt(X(today), 108, `היום: ${dn(today)}`, 18, { w: 600, o });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "ארבעה שעונים", 76, { w: 700, o });
+          txt(640, 360, "מי רץ, ממתי, ומי קובע", 40, { w: 600, fill: C.teal, o: after(t, S.title, 2, o) });
+          txt(640, 430, "דוגמה לימודית: ארבעה בנקים בדויים", 24, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — four lanes, one by one
+        if (inScene(t, S.lanes)) {
+          const o = vis(t, S.lanes);
+          const at = (s) => after(t, S.lanes, s, o);
+          axis(o);
+          txt(X0, 112, `הבקשות נשלחו ב־${dm(request)}`, 20, { anchor: "start", fill: C.n700, o });
+          const starts = [2, 8, 14, 20];
+          B.forEach((b, i) => lane(b, i, at(starts[i]), grow(t, S.lanes, starts[i] + 1, starts[i] + 11)));
+          // Legend.
+          const lo = at(26);
+          el("rect", { x: 920, y: 520, width: 60, height: 18, rx: 4, fill: "none", stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: lo });
+          txt(910, 535, "שעון התשובה", 20, { anchor: "start", fill: C.n700, o: lo });
+          el("rect", { x: 620, y: 520, width: 60, height: 18, rx: 4, fill: C.teal, opacity: at(30) });
+          txt(610, 535, "שעון התוקף", 20, { anchor: "start", fill: C.n700, o: at(30) });
+          const ends = [["a", 38], ["d", 46]];
+          for (const [k, s] of ends) {
+            const b = B.find((x) => x.k === k);
+            const i = B.indexOf(b);
+            txt(X(b.until) - 6, 196 + i * 78 + 22, dn(b.until), 20, { anchor: "end", w: 700, fill: C.n0, ltr: true, o: at(s) });
+          }
+        }
+        // Scene 3 — today, and the clock that governs
+        if (inScene(t, S.gov)) {
+          const o = vis(t, S.gov);
+          const at = (s) => after(t, S.gov, s, o);
+          axis(o);
+          B.forEach((b, i) => lane(b, i, o, 1, { outline: i === 0 && t > S.gov[0] + 12 }));
+          todayLine(at(1), 466);
+          const g = at(10);
+          box(160, 496, 420, 56, g * 0.8, C.mint);
+          txt(370, 532, `הקובע: ${B[0].name}, נשארו ${B[0].left} ימים`, 22, { w: 700, o: g });
+          txt(900, 532, `בנק ד׳: ${B[3].left} ימים`, 22, { fill: C.n700, o: at(18) });
+        }
+        // Scene 4 — the market clock
+        if (inScene(t, S.rate)) {
+          const o = vis(t, S.rate);
+          const at = (s) => after(t, S.rate, s, o);
+          axis(o);
+          B.forEach((b, i) => lane(b, i, o, 1));
+          todayLine(o, 466);
+          el("line", { x1: X(dec), y1: 120, x2: X(dec), y2: 466, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "10 8", opacity: at(1) });
+          txt(X(dec), 108, `החלטת ריבית: ${dn(dec)}`, 18, { w: 600, o: at(1), ltr: false });
+          const c = at(8);
+          box(120, 474, 470, 86, c * 0.95, C.n0);
+          txt(355, 500, "הפריים עולה רבע נקודה", 22, { w: 600, o: c });
+          txt(355, 530, `+${V.up} ₪`, 30, { w: 700, fill: C.teal, o: c, ltr: true });
+          txt(355, 551, "בחודש, בהחזר הראשון של מסלול הפריים (תרחיש, לא תחזית)", 15, { fill: C.n700, o: c });
+          const d2 = at(17);
+          box(640, 474, 470, 86, d2 * 0.95, C.n0);
+          txt(875, 500, "הפריים יורד רבע נקודה", 22, { w: 600, o: d2 });
+          txt(875, 530, `−${V.down} ₪`, 30, { w: 700, fill: C.teal, o: d2, ltr: true });
+          txt(875, 551, "בחודש, בהחזר הראשון של מסלול הפריים (תרחיש, לא תחזית)", 15, { fill: C.n700, o: d2 });
+        }
+        // Scene 5 — the round clock (the exercise's rule)
+        if (inScene(t, S.rounds)) {
+          const o = vis(t, S.rounds);
+          const at = (s) => after(t, S.rounds, s, o);
+          axis(o);
+          lane(B[0], 0, o, 1, { outline: true });
+          todayLine(o, 424);
+          txt(X0, 308, "סבבי מיקוח מול בנק א׳", 22, { anchor: "start", w: 600, o: at(1) });
+          txt(860, 308, "(כללים של התרגיל, לא של בנק)", 18, { anchor: "start", fill: C.n700, o: at(1) });
+          el("rect", { x: 140, y: 318, width: X0 - 140, height: 30, rx: 6, fill: C.n100, opacity: o });
+          const rounds = [[today, V.r1, 12], [V.r1, V.r2, 20], [V.r2, V.r3, 28]];
+          rounds.forEach(([a, b], k) => {
+            const p = at(rounds[k][2] - 8);
+            bar(a, b, 318, 30, p, { fill: C.tq2 });
+            const rb = addDays(b, Number(RES));
+            bar(b, rb, 324, 18, p * 0.9, { fill: C.n300 });
+          });
+          // The fourth, on its own row: answered on r4, with the reserve running past the end of the terms.
+          const p4 = at(34);
+          txt(X0, 376, "סבב 4: לא נכנס", 20, { anchor: "start", w: 600, fill: C.n700, o: p4 });
+          el("rect", { x: 140, y: 386, width: X0 - 140, height: 30, rx: 6, fill: C.n100, opacity: p4 });
+          bar(V.r3, V.r4, 386, 30, p4, { dashed: true, stroke: C.warn });
+          bar(V.r4, addDays(V.r4, Number(RES)), 392, 18, p4, { dashed: true, stroke: C.warn });
+          const untilA = B[0].until;
+          el("line", { x1: X(untilA), y1: 300, x2: X(untilA), y2: 424, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "10 8", opacity: at(2) });
+          txt(X(untilA), 292, `סוף התנאים: ${dn(untilA)}`, 18, { w: 600, o: at(2) });
+          const ob = at(10);
+          txt(640, 462, `סבב: ${R} ימי עסקים · אחרי התשובה: ${RES} ימים`, 24, { w: 600, o: ob });
+          txt(640, 508, `${V.rounds} סבבים נכנסים`, 38, { w: 700, fill: C.teal, o: at(24) });
+          txt(640, 546, `הרביעי נענה ב־${dm(V.r4)}: לא נשארים ${RES} ימים`, 22, { fill: C.n700, o: at(34) });
+          txt(640, 574, "סבב שלא נכנס אולי לא יביא הצעה בכלל (לפי הצוות)", 18, { fill: C.n600, o: at(38) });
+        }
+        // Scene 6 — a refinance with no new lien
+        if (inScene(t, S.lien)) {
+          const o = vis(t, S.lien);
+          const at = (s) => after(t, S.lien, s, o);
+          axis(o);
+          L.forEach((b, i) => lane(b, i, o, 1, { note: i === 1 ? `בלי שעבוד חדש: ${W12} יום` : "", outline: i === 1 && t > S.lien[0] + 10 }));
+          const g = at(10);
+          box(240, 440, 800, 70, g * 0.8, C.mint);
+          txt(640, 486, `הראשון שענה אינו הראשון שנגמר: בנק ב׳ קובע`, 26, { w: 700, o: g });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "סופרים לפני שמבקשים", 56, { w: 700, o });
+          txt(640, 330, "איזה שעון קובע?", 40, { w: 600, fill: C.teal, o: after(t, S.end, 2, o) });
+          txt(640, 390, "כמה סבבים נכנסים?", 40, { w: 600, fill: C.teal, o: after(t, S.end, 4, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

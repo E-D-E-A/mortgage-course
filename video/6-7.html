@@ -1,0 +1,216 @@
+<!doctype html>
+<!--
+  Video scene for lesson 6.7 — "מה שווה צעד, ומתי עוצרים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/6-7.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: a notch of negotiation is worth tens of shekels a month and thousands in all,
+  a competing offer must be whole, real and on the same basis, and each round costs time, so the
+  exercise's rule says when to stop. What a bank moves in a round, the 3-day round, the 7 spare
+  days and the family's 10,000 line are the exercise's rules; the banks are invented):
+  1. Title.
+  2. Two whole offers for the same mix: the gap in the first payment and in the total.
+  3. What a 0.10-point notch is worth: per track, and on all three: per month and in all.
+  4. Round after round: what each saved against the family's line, and the rule's advice.
+  5. The clock: round 2's answer, the end of the terms, the 7 spare days, the slack.
+  6. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 6.7 · משא ומתן</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/6-7.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Math.abs(Number(v))).replace(/\.00$/, "");
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+      const R = String(fact("round.days")), RES = String(fact("round.reserve"));
+      const V = {
+        aFirst: num(fact("offer.a.first")), bFirst: num(fact("offer.b.first")), aTotal: num(fact("offer.a.total")), bTotal: num(fact("offer.b.total")),
+        gapFirst: num(fact("gap.first")), gapTotal: num(fact("gap.total")),
+        n: [1, 2, 3].map((k) => ({ first: num(fact(`notch.t${k}.first`)), total: num(fact(`notch.t${k}.total`)), total0: Number(fact(`notch.t${k}.total`)) })),
+        allFirst: num(fact("notch.all.first")), allTotal: num(fact("notch.all.total")), pts: fact("notch.points"),
+        r1: num(fact("round_1.gain")), r1n: Number(fact("round_1.gain")), r1vs: num(fact("round_1.vs_b")),
+        r2: num(fact("round_2.gain")), r2n: Number(fact("round_2.gain")), r2vs: num(fact("round_2.vs_b")),
+        thr: num(fact("threshold")), thrn: Number(fact("threshold")),
+        ans1: dm(fact("round_1.answer")), ans2: dm(fact("round_2.answer")), end: dm(fact("state.valid_until")), slackLeft: String(fact("slack.left")), slack: String(fact("slack.answer")), ans4: dm(fact("round_4.answer")),
+      };
+      const S = { title: [0, 8], offers: [8, 48], notch: [48, 92], rounds: [92, 150], clock: [150, 178], end: [178, 190] };
+      window.duration = 190;
+      window.cues = [
+        [1, 7, "מה שווה צעד, ומתי עוצרים"],
+        [9, 17, "שתי הצעות שלמות על אותו תמהיל, סכום ותאריך."],
+        [17, 28, `הפרש בהחזר הראשון: ${V.gapFirst} ₪ בחודש.`],
+        [28, 40, `הפרש בסך התשלומים: ${V.gapTotal} ₪.`],
+        [40, 47, "רק הצעה שלמה, אמיתית ועל אותו בסיס היא מתחרה."],
+        [49, 58, `צעד: ${V.pts} נקודת אחוז פחות בריבית.`],
+        [58, 70, `על המסלול הקבוע: ${V.n[2].first} ₪ בחודש, ${V.n[2].total} ₪ בסך הכול.`],
+        [70, 83, `על כל המסלולים: ${V.allFirst} ₪ בחודש, ${V.allTotal} ₪ בסך הכול.`],
+        [83, 91, "בחודש כמה עשרות שקלים. בסך הכול, אלפים."],
+        [93, 102, "סבב מיקוח: בקשה ותשובה. הבנק זז כפי שהתרגיל קובע."],
+        [102, 114, `סבב 1 חסך ${V.r1} ₪, והבנק כבר זול מבנק ב׳ ב־${V.r1vs} ₪.`],
+        [114, 126, `הקו של המשפחה: ${V.thr} ₪. סבב 1 מעליו, אז ממשיכים.`],
+        [126, 140, `סבב 2 חסך ${V.r2} ₪. הוא מתחת לקו, ולכן עוצרים.`],
+        [140, 149, "אם בנק מזיז בסבב שני, ואם בכלל: לא ידוע."],
+        [151, 160, `סבב 2 נענה ב־${V.ans2}. התנאים נמשכים עד ${V.end}.`],
+        [160, 170, `נשארו ${V.slackLeft} ימים. ${RES} מהם שמורים לפני החתימה.`],
+        [170, 177, `ימי הרווח: ${V.slack}. סבב רביעי לא היה נכנס.`],
+        [179, 184, "הצעה אמיתית, על אותו בסיס, סבב אחרי סבב."],
+        [184, 189, "ועוצרים לפי הכלל. המשפחה מחליטה."],
+      ];
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // A bar that grows from its right edge (time runs leftward) between two moments of a scene.
+      const grow = (t, sc, s, e) => clamp((t - sc[0] - s) / (e - s));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", warn: "var(--mogi-warning)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מה שווה צעד", 76, { w: 700, o });
+          txt(640, 360, "ומתי עוצרים", 56, { w: 700, fill: C.teal, o: after(t, S.title, 2, o) });
+          txt(640, 430, "דוגמה לימודית: בנקים בדויים, והזזות של התרגיל", 24, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — two whole offers
+        if (inScene(t, S.offers)) {
+          const o = vis(t, S.offers);
+          const at = (s) => after(t, S.offers, s, o);
+          txt(640, 120, "אותו תמהיל, אותו סכום, אותו תאריך", 36, { w: 700, o });
+          const card = (x, name, first, total, from) => {
+            const oc = at(from);
+            box(x, 170, 400, 250, oc);
+            txt(x + 200, 214, name, 28, { w: 700, o: oc });
+            txt(x + 200, 256, "החזר ראשון", 18, { fill: C.n600, o: oc });
+            txt(x + 200, 298, `${first} ₪`, 38, { w: 700, o: oc, ltr: true });
+            txt(x + 200, 340, "סך התשלומים", 18, { fill: C.n600, o: oc });
+            txt(x + 200, 384, `${total} ₪`, 34, { w: 700, fill: C.teal, o: oc, ltr: true });
+          };
+          card(740, "בנק א׳", V.aFirst, V.aTotal, 1);
+          card(140, "בנק ב׳", V.bFirst, V.bTotal, 5);
+          const g = at(18);
+          box(290, 450, 700, 80, g * 0.9, C.mint);
+          txt(640, 486, `בנק ב׳ זול יותר ב־${V.gapFirst} ₪ בחודש`, 24, { w: 700, o: g, ltr: false });
+          txt(640, 518, `וב־${V.gapTotal} ₪ בסך הכול`, 24, { w: 700, o: at(26) });
+        }
+        // Scene 3 — what a notch is worth
+        if (inScene(t, S.notch)) {
+          const o = vis(t, S.notch);
+          const at = (s) => after(t, S.notch, s, o);
+          txt(640, 120, `צעד של ${V.pts} נקודת אחוז פחות`, 38, { w: 700, o });
+          const names = ["פריים", "משתנה לא צמודה", "קבועה לא צמודה"];
+          const maxTotal = V.n.reduce((m, x) => Math.max(m, x.total0), 0);
+          names.forEach((nm, i) => {
+            const y = 190 + i * 72;
+            const oc = at(2 + i * 6);
+            txt(1140, y + 32, nm, 24, { anchor: "start", w: 600, o: oc });
+            const w = 560 * (V.n[i].total0 / maxTotal);
+            el("rect", { x: 1140 - 230 - w, y: y + 6, width: w, height: 36, rx: 6, fill: C.teal, opacity: oc });
+            txt(1140 - 230 - w - 14, y + 34, `${V.n[i].total} ₪`, 24, { anchor: "end", w: 700, o: oc, ltr: true });
+          });
+          const ob = at(26);
+          box(220, 410, 840, 130, ob * 0.9, C.mint);
+          txt(640, 444, "על כל המסלולים יחד", 24, { w: 600, o: ob });
+          txt(870, 500, `${V.allFirst} ₪`, 36, { w: 700, o: ob, ltr: true });
+          txt(870, 526, "בחודש", 18, { fill: C.n700, o: ob });
+          txt(410, 500, `${V.allTotal} ₪`, 36, { w: 700, o: ob, ltr: true });
+          txt(410, 526, "בסך התשלומים", 18, { fill: C.n700, o: ob });
+          txt(640, 568, "הסכום בסך התשלומים נמדד על כל 30 השנים", 18, { fill: C.n600, o: at(32) });
+        }
+        // Scene 4 — rounds against the family's line
+        if (inScene(t, S.rounds)) {
+          const o = vis(t, S.rounds);
+          const at = (s) => after(t, S.rounds, s, o);
+          txt(640, 110, "כמה חסך כל סבב, מול הקו של המשפחה", 34, { w: 700, o });
+          const X0 = 1140, scale = 640 / 36000; // shekels to pixels (geometry only)
+          const bars = [["סבב 1", V.r1, V.r1n, 4, C.teal, "מעל הקו: ממשיכים"], ["סבב 2", V.r2, V.r2n, 24, C.tq2, "מתחת לקו: עוצרים"]];
+          bars.forEach(([nm, label, v, from, col, verdict], i) => {
+            const y = 190 + i * 110;
+            const oc = at(from);
+            txt(X0, y + 22, nm, 26, { anchor: "start", w: 700, o: oc });
+            txt(X0, y + 58, `${label} ₪`, 24, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
+            const w = v * scale * Math.min(1, clamp((t - S.rounds[0] - from) / 3));
+            el("rect", { x: X0 - 200 - w, y: y + 8, width: w, height: 40, rx: 6, fill: col, opacity: oc });
+            txt(X0 - 200, y + 76, verdict, 20, { anchor: "start", fill: C.n700, o: at(from + 4) });
+          });
+          const lx = X0 - 200 - V.thrn * scale;
+          el("line", { x1: lx, y1: 160, x2: lx, y2: 400, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "10 8", opacity: at(14) });
+          txt(lx, 148, `הקו: ${V.thr} ₪`, 22, { w: 700, o: at(14), ltr: false });
+          const a2 = at(36);
+          box(220, 440, 840, 90, a2 * 0.9, C.mint);
+          txt(640, 476, "הסבב האחרון חסך פחות מהקו: עוצרים", 28, { w: 700, o: a2 });
+          txt(640, 514, `בנק א׳ זול מבנק ב׳ ב־${V.r2vs} ₪`, 22, { o: at(40), ltr: false });
+        }
+        // Scene 5 — the clock
+        if (inScene(t, S.clock)) {
+          const o = vis(t, S.clock);
+          const at = (s) => after(t, S.clock, s, o);
+          txt(640, 130, "ומה עם הזמן?", 42, { w: 700, o });
+          const rows = [["סבב 2 נענה", V.ans2], ["התנאים נמשכים עד", V.end], ["ימים שנשארו", V.slackLeft], ["שמורים לפני החתימה", `${RES}`], ["ימי רווח", V.slack]];
+          rows.forEach(([a, b], i) => {
+            const y = 210 + i * 62;
+            const oc = at(2 + i * 4);
+            box(300, y, 680, 48, oc * 0.95);
+            txt(960, y + 33, a, 24, { anchor: "start", o: oc });
+            txt(520, y + 33, b, 26, { anchor: i >= 2 ? "end" : "start", w: 700, fill: i === 4 ? C.teal : C.navy, o: oc, ltr: i >= 2 });
+          });
+          txt(640, 540, `סבב רביעי היה נענה ב־${V.ans4}, ולא נכנס`, 20, { fill: C.n700, o: at(24) });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 240, "הצעה אמיתית, על אותו בסיס", 50, { w: 700, o });
+          txt(640, 316, "סבב אחרי סבב", 40, { w: 600, fill: C.teal, o: after(t, S.end, 2, o) });
+          txt(640, 390, "ועוצרים לפי הכלל: המשפחה מחליטה", 36, { w: 600, fill: C.n700, o: after(t, S.end, 4, o) });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

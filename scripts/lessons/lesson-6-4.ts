@@ -20,7 +20,7 @@
  */
 import { BORROWER_INCOME, CAR_PAYOFF, CASE_A_POSITION as A, EQUITY_STEP, RESERVE, TARGET_RATIO } from "../../src/data/case-a-levers.ts";
 import { CASE_A } from "../../src/data/case-a-mix.ts";
-import type { LeverMove, PositionCase } from "../../src/lib/calc/levers.ts";
+import { type LeverMove, type PositionCase, pull } from "../../src/lib/calc/levers.ts";
 import type { TrackSpec } from "../../src/lib/calc/schedule.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { untilDrop } from "./affordability-facts.ts";
@@ -50,7 +50,7 @@ export interface Pulled {
 export const MORTGAGE_TRACK = { fixed: 3, variable: 2 } as const;
 const MINI_TERM = 60;
 const MIX_POINTS = "10";
-const WAIT = 8; // monthsUntilDrop(26), checked by a fact below
+const WAIT = 9; // 17 payments left: the rule is clear (at exactly 18 the transcription leaves it open, lesson 4.2)
 
 export function pulled(equityStep: string): Pulled[] {
   return [
@@ -142,9 +142,11 @@ export default function lesson(): LessonData {
     add(difference(p("extra"), get(p("total")), get("a.total")));
     add(difference(p("stress_rise"), get(p("stress_max")), get("a.stress")));
     add(difference(p("saving"), get("a.total"), get(p("total"))));
-    if (move.lever === "equity") add(givenMoney(p("cash"), String(move.add)));
-    if (move.lever === "close_loan") add(givenMoney(p("cash"), String(move.payoff)));
+    // The cash the lever takes out of the family's pocket (levers.ts: pull().cost.cashNow): the equity added, the loan closed, or nothing.
+    add(givenMoney(p("cash"), pull(A, move).cost.cashNow.toString()));
   }
+  // More equity also lowers the harshest payment: by how much.
+  add(difference("l.eq.stress_drop", get("a.stress"), get("l.eq.stress_max")));
   // The price of one percentage point, for the two levers that cost cash and pass.
   add(divFact("l.eq.pp", get("l.eq.cash"), get("l.eq.gain_ratio")));
   add(divFact("l.carR.pp", get("l.carR.cash"), get("l.carR.gain_ratio")));
@@ -160,9 +162,14 @@ export default function lesson(): LessonData {
   lev("l.short.qualifying", A, "qualifying", shorter);
   add(difference("l.short.rise", get("l.short.ratio"), get("a.ratio")));
   add(difference("l.short.saving", get("a.total"), get("l.short.total")));
-  // The wait costs no shekels: after 7 months the loan still counts.
-  lev("l.wait7.disposable", A, "disposable", { lever: "wait", months: WAIT - 1 });
-  lev("l.wait7.ratio", A, "ratio", { lever: "wait", months: WAIT - 1 });
+  // The wait costs no shekels. After 7 months 19 payments are left and the loan still counts; after 8, exactly 18 (open in lesson 4.2); after 9, 17.
+  add(given("in.wait", WAIT));
+  lev("l.wait.months_left", A, "months_left", { lever: "wait", months: WAIT });
+  for (const months of [7, 8]) {
+    lev(`l.wait${months}.left`, A, "months_left", { lever: "wait", months });
+    lev(`l.wait${months}.disposable`, A, "disposable", { lever: "wait", months });
+    lev(`l.wait${months}.ratio`, A, "ratio", { lever: "wait", months });
+  }
 
   // ── The family left with what, after the two ways of closing the loan ──
   add(difference("l.carR.left_gain", get("l.carR.left_first"), get("a.left")));

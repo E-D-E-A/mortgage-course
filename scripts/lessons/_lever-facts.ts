@@ -45,6 +45,7 @@ export type LevMeasure =
   | "equity"
   | "variable"
   | "months"
+  | "months_left"
   | "bans"
   | "above_capital";
 
@@ -93,7 +94,7 @@ function leverInputs(m: LeverMove): Record<string, string | number> {
   }
 }
 
-function valueOf(p: Position, measure: LevMeasure): string | number {
+function valueOf(p: Position, measure: LevMeasure, c: PositionCase): string | number {
   const budgetOnly = (v: Decimal | null) => {
     if (v === null) throw new RangeError("the case has no living budget");
     return moneyString(v);
@@ -133,6 +134,8 @@ function valueOf(p: Position, measure: LevMeasure): string | number {
       return moneyString(p.variable);
     case "months":
       return p.months;
+    case "months_left":
+      return c.obligations[0]?.monthsLeft ?? 99999;
     case "bans":
       return p.bans.length ? p.bans.join("|") : "none";
     case "above_capital":
@@ -145,7 +148,10 @@ export const levFact = (id: string, c: PositionCase, measure: LevMeasure, move?:
   id,
   kind: "lev_measure",
   inputs: { ...caseInputs(c), ...(move ? leverInputs(move) : {}), measure },
-  value: valueOf(positionOf(move ? applyMove(c, move) : c), measure),
+  value: (() => {
+    const after = move ? applyMove(c, move) : c;
+    return valueOf(positionOf(after), measure, after);
+  })(),
 });
 
 /** The smallest whole step of extra equity that brings the ratio to the target (kind lev_step). */

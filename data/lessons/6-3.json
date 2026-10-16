@@ -1,0 +1,709 @@
+{
+  "lesson": "6.3",
+  "title": "מפת המנופים",
+  "note": "Case A is stage 5's; 75%, 40% and the 18-month rule are the team's transcription of directive 329 (not checked); the car-loan payoff of 35,000 is a calculation assumption; the 'half' mix uses the course's one-rate-per-track price list; the second family is invented.",
+  "facts": [
+    {
+      "id": "c.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "c.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "c.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "c.ceiling",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "c.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2200000",
+        "deal": "only_home"
+      },
+      "value": "1650000.00"
+    },
+    {
+      "id": "c.room",
+      "kind": "pos_loan_room",
+      "inputs": {
+        "value": "2200000",
+        "loan": "1640000.00",
+        "percent": "75"
+      },
+      "value": "10000.00"
+    },
+    {
+      "id": "c.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1640000.00",
+        "value": "2200000.00"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "c.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "21700.00"
+    },
+    {
+      "id": "c.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450.00"
+    },
+    {
+      "id": "c.car_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
+      "id": "c.disp",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700",
+        "obligations": "loan,1450,26"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "c.pay",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "qualifying"
+      },
+      "value": "8181.30"
+    },
+    {
+      "id": "c.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.4"
+    },
+    {
+      "id": "c.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.ratio",
+        "subtrahend": "c.line"
+      },
+      "value": "0.40"
+    },
+    {
+      "id": "c.months",
+      "kind": "given",
+      "inputs": {},
+      "value": 360
+    },
+    {
+      "id": "c.max_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 360
+    },
+    {
+      "id": "l1.cut",
+      "kind": "pos_loan_cut",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "0",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "disposable": "20250.00",
+        "percent": "40",
+        "step": "1000"
+      },
+      "value": "17000.00"
+    },
+    {
+      "id": "l1.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "amount",
+        "lever_change": "-17000.00",
+        "measure": "loan"
+      },
+      "value": "1623000.00"
+    },
+    {
+      "id": "l1.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "amount",
+        "lever_change": "-17000.00",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.98"
+    },
+    {
+      "id": "l1.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1623000.00",
+        "value": "2200000.00"
+      },
+      "value": "73.77"
+    },
+    {
+      "id": "l1.paycut",
+      "kind": "pos_payment_cut",
+      "inputs": {
+        "disposable": "20250.00",
+        "payment": "8181.30",
+        "percent": "40"
+      },
+      "value": "81.30"
+    },
+    {
+      "id": "l2.ratio_25",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "term",
+        "lever_track": "all",
+        "lever_months": -60,
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "44.41"
+    },
+    {
+      "id": "l3.payoff",
+      "kind": "given",
+      "inputs": {},
+      "value": "35000.00"
+    },
+    {
+      "id": "l3.sum_left",
+      "kind": "met_times",
+      "inputs": {
+        "of": "c.car",
+        "count": 26
+      },
+      "value": "37700.00"
+    },
+    {
+      "id": "l3.loan_closed",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "c.loan|l3.payoff"
+      },
+      "value": "1675000.00"
+    },
+    {
+      "id": "l3.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1675000.00",
+        "value": "2200000.00"
+      },
+      "value": "76.14"
+    },
+    {
+      "id": "l3.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "l3.ltv",
+        "subtrahend": "c.ceiling"
+      },
+      "value": "1.14"
+    },
+    {
+      "id": "l3.pay",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "amount",
+        "lever_change": "35000.00",
+        "measure": "qualifying"
+      },
+      "value": "8355.90"
+    },
+    {
+      "id": "l3.ratio",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "8355.90",
+        "disposable": "21700.00"
+      },
+      "value": "38.51"
+    },
+    {
+      "id": "l3.equity_back",
+      "kind": "pos_equity_needed",
+      "inputs": {
+        "value": "2200000",
+        "loan": "1675000.00",
+        "percent": "75"
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "l5.need40",
+      "kind": "pos_income_room",
+      "inputs": {
+        "disposable": "20250.00",
+        "payment": "8181.30",
+        "percent": "40"
+      },
+      "value": "203.25"
+    },
+    {
+      "id": "l5.need35",
+      "kind": "pos_income_room",
+      "inputs": {
+        "disposable": "20250.00",
+        "payment": "8181.30",
+        "percent": "35"
+      },
+      "value": "3125.15"
+    },
+    {
+      "id": "l7.pay",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "820000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "qualifying"
+      },
+      "value": "8068.47"
+    },
+    {
+      "id": "l7.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "820000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.84"
+    },
+    {
+      "id": "l7.gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.pay",
+        "subtrahend": "l7.pay"
+      },
+      "value": "112.83"
+    },
+    {
+      "id": "l7.total_init",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2945264.34"
+    },
+    {
+      "id": "l7.total_half",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "820000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2904646.23"
+    },
+    {
+      "id": "l7.total_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "l7.total_init",
+        "subtrahend": "l7.total_half"
+      },
+      "value": "40618.11"
+    },
+    {
+      "id": "l9.months",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 26
+      },
+      "value": 8
+    },
+    {
+      "id": "l9.paid",
+      "kind": "met_times",
+      "inputs": {
+        "of": "c.car",
+        "count": 8
+      },
+      "value": "11600.00"
+    },
+    {
+      "id": "l9.ratio",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "8181.30",
+        "disposable": "21700.00"
+      },
+      "value": "37.7"
+    },
+    {
+      "id": "e2.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "16000.00"
+    },
+    {
+      "id": "e2.pay",
+      "kind": "given",
+      "inputs": {},
+      "value": "7000.00"
+    },
+    {
+      "id": "e2.paycut",
+      "kind": "pos_payment_cut",
+      "inputs": {
+        "disposable": "16000.00",
+        "payment": "7000.00",
+        "percent": "40"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "e2.need",
+      "kind": "pos_income_room",
+      "inputs": {
+        "disposable": "16000.00",
+        "payment": "7000.00",
+        "percent": "40"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "e2.total",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "e2.income|e2.need"
+      },
+      "value": "17500.00"
+    },
+    {
+      "id": "e3.left",
+      "kind": "given",
+      "inputs": {},
+      "value": 30
+    },
+    {
+      "id": "e3.months",
+      "kind": "aff_months_until_drop",
+      "inputs": {
+        "months_left": 30
+      },
+      "value": 12
+    },
+    {
+      "id": "e4.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000.00"
+    },
+    {
+      "id": "e4.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1300000.00"
+    },
+    {
+      "id": "e4.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "1800000.00",
+        "deal": "only_home"
+      },
+      "value": "1350000.00"
+    },
+    {
+      "id": "e4.room",
+      "kind": "pos_loan_room",
+      "inputs": {
+        "value": "1800000.00",
+        "loan": "1300000.00",
+        "percent": "75"
+      },
+      "value": "50000.00"
+    }
+  ]
+}

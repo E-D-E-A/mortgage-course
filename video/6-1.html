@@ -1,0 +1,139 @@
+<!doctype html>
+<!--
+  Video scene for lesson 6.1 — "הכול מחובר".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t (seconds); render(t) depends only on t.
+  Every number comes from data/lessons/6-1.json. The 75% ceiling and the 40% threshold are the team's transcription of directive 329 (not checked against the directive); the car-loan payoff is a calculation assumption.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 6.1 · התמונה הכוללת</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/6-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf0 = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
+      const shek = (v) => `${nf0.format(Number(v))} ₪`;
+      const num = (v) => nf0.format(Number(v));
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      const V = {
+        ltv0: fact("c.ltv"), ratio0: fact("c.ratio"), ceil: fact("c.ceiling"), line: fact("c.line"),
+        ltv2: fact("a2.ltv"), ratio2: fact("a2.ratio"), cut2: fact("a2.cut"),
+        ltv3: fact("c.ltv_closed"), ratio3: fact("c.ratio_closed"), payoff: fact("c.payoff"), room: fact("c.room"),
+      };
+      const S = { title: [0, 8], gauges: [8, 78], end: [78, 90] };
+      window.duration = 90;
+      window.cues = [
+        [1, 7, "בשלב הזה מסתכלים על הכול יחד."],
+        [9, 17, `נועם ושירה: מימון ${V.ltv0}%, מול תקרה של ${V.ceil}%.`],
+        [17, 26, `יחס ההחזר ${V.ratio0}%, מעל הקו של ${V.line}%.`],
+        [27, 37, `פעולה א׳: עוד ${shek(V.cut2)} הון עצמי.`],
+        [37, 47, `שני היחסים יורדים: ${V.ltv2}% ו־${V.ratio2}%.`],
+        [48, 58, `פעולה ב׳: סוגרים את הרכב ב־${shek(V.payoff)} מההון.`],
+        [58, 68, `היחס יורד ל־${V.ratio3}%, אבל המימון עולה ל־${V.ltv3}%.`],
+        [68, 77, "מעל התקרה: אסור. פעולה אחת, כיוונים הפוכים."],
+        [79, 85, "בודקים את שני היחסים יחד."],
+        [85, 89, "הסכום לסגירה הוא הנחת חישוב."],
+      ];
+      const X0 = 190, X1 = 1090;
+      const gauge = (y, label, value, scale, lineAt, lineName, color, o, over) => {
+        txt(640, y - 44, label, 28, { w: 700, o });
+        const x = (p) => X0 + (Number(p) / scale) * (X1 - X0);
+        el("rect", { x: X0, y: y - 14, width: X1 - X0, height: 28, rx: 8, fill: C.n300, opacity: o * 0.45 });
+        el("rect", { x: X0, y: y - 14, width: Math.max(0, x(value) - X0), height: 28, rx: 8, fill: over ? C.danger : C.navy, opacity: o });
+        el("line", { x1: x(lineAt), x2: x(lineAt), y1: y - 40, y2: y + 40, stroke: color, "stroke-width": 5, "stroke-dasharray": "9 6", opacity: o });
+        txt(x(lineAt), y + 72, `${lineName} ${lineAt}%`, 22, { fill: C.n700, o, ltr: false });
+        el("circle", { cx: x(value), cy: y, r: 18, fill: C.tq2, stroke: C.navy, "stroke-width": 4, opacity: o });
+        txt(x(value), y - 56, `${Number(value).toFixed(2).replace(/\.?0+$/, "")}%`, 24, { w: 700, o, ltr: true, fill: over ? C.danger : C.navy });
+      };
+      // Stops: 0 the start, 1 more equity, 2 closing the car loan. The values glide over 3 seconds.
+      const STOPS = [
+        { at: 0, ltv: V.ltv0, pti: V.ratio0, note: "נקודת הפתיחה" },
+        { at: 26, ltv: V.ltv2, pti: V.ratio2, note: `עוד ${shek(V.cut2)} הון עצמי` },
+        { at: 47, ltv: V.ltv3, pti: V.ratio3, note: `סגירת הרכב ב־${shek(V.payoff)}` },
+      ];
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "הכול מחובר", 76, { w: 700, o });
+          txt(640, 365, "פעולה אחת, כמה חצים", 38, { fill: C.n600, o });
+        }
+        if (inScene(t, S.gauges)) {
+          const o = vis(t, S.gauges);
+          const rel = t - S.gauges[0];
+          let k = 0;
+          STOPS.forEach((s, i) => { if (rel >= s.at) k = i; });
+          const prev = Math.max(0, k - 1);
+          const g = k === 0 ? 1 : ease((rel - STOPS[k].at) / 3);
+          const lerp = (a, b) => Number(a) + (Number(b) - Number(a)) * g;
+          const ltv = k === 0 ? Number(STOPS[0].ltv) : lerp(STOPS[prev].ltv, STOPS[k].ltv);
+          const pti = k === 0 ? Number(STOPS[0].pti) : lerp(STOPS[prev].pti, STOPS[k].pti);
+          txt(640, 96, STOPS[k].note, 36, { w: 700, o });
+          gauge(250, "שיעור מימון", ltv, 100, Number(V.ceil), "תקרה", C.danger, o, ltv > Number(V.ceil) + 0.001);
+          gauge(450, "יחס החזר", pti, 60, Number(V.line), "סף הון", C.warning, o, false);
+          if (k === 2 && g > 0.9) {
+            const oi = Math.min(o, clamp((rel - STOPS[2].at - 3.5) / 0.8));
+            el("rect", { x: 330, y: 540, width: 620, height: 60, rx: 14, fill: C.dangerBg, stroke: C.danger, opacity: oi });
+            txt(640, 580, "שיעור המימון מעל התקרה: אסור", 28, { w: 700, o: oi, fill: C.danger });
+          }
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 260, "שני יחסים, תמיד יחד", 66, { w: 700, o });
+          txt(640, 350, "ומה שאין לו מספר, כותבים ״לא ידוע״", 34, { fill: C.n700, o: after(t, S.end, 1, o) });
+          txt(640, 470, "סכום הסגירה: הנחת חישוב. התקרה והסף: תעתיק הצוות, לא אומת", 22, { fill: C.n500, o: after(t, S.end, 5, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

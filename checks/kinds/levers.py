@@ -22,7 +22,7 @@ from checks/kinds/schedule.py and the lever moves on a mix from checks/kinds/sen
                amount, added), variable (the part of the loan not fixed for its whole term), disposable (incomes − the obligation when MORE than 18 payments are
                left), ratio (percent), first, total (base scenario), stress_max, stress_month,
                left_first (month 1, base), left_stress (the stress scenario's highest month),
-               margin_first, margin_stress (left − living_budget), reserve, equity, months, bans
+               margin_first, margin_stress (left − living_budget), reserve, equity, months, months_left (payments left on the obligation after the lever), bans
                (the bans of Directive 329 crossed, "ltv|pti|variable|term" in that order, or "none"),
                above_capital ("yes" when the ratio is above 40%).
   lev_step     the smallest whole `step` of extra equity (up to the reserve) that brings the ratio to
@@ -131,6 +131,8 @@ def lev_measure(i, _facts=None):
         return money(reserve)
     if measure == "equity":
         return money(equity)
+    if measure == "months_left":
+        return months_left
     if measure == "variable":
         return money(sensitivity._variable(base))
     if measure == "above_capital":

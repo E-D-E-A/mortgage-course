@@ -77,6 +77,7 @@ const span = computed(() => Math.max(1, calendarDaysBetween(request.value, axisE
 const at = (iso: string) => (calendarDaysBetween(request.value, iso) / span.value) * 100;
 const seg = (from: string, to: string) => ({ insetInlineStart: `${Math.max(0, at(from))}%`, width: `${Math.max(0.8, at(to) - at(from))}%` });
 const mark = (iso: string) => ({ insetInlineStart: `${at(iso)}%` });
+const marks = computed(() => props.decisions.filter((x) => at(x) >= 0 && at(x) <= 100));
 
 const dateLong = new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" });
 const dateShort = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "numeric" });
@@ -122,14 +123,14 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
       </label>
     </div>
 
-    <div class="mt-4 grid gap-3 sm:grid-cols-2">
-      <div v-for="b in banks" :key="b.id" class="rounded-md border border-n200 p-3">
+    <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div v-for="b in banks" :key="b.id" class="rounded-md border border-n200 p-2">
         <p class="text-body-m font-semibold text-n900">{{ b.name }}</p>
         <label class="mt-1 flex flex-col gap-1">
-          <span class="text-caption text-n700">ענה אחרי {{ answered[b.id] }} ימי עסקים<span v-if="answered[b.id] > ANSWER_DAYS"> (מעל {{ ANSWER_DAYS }}: רק לסוג הלוואה שהבנק הגדיר מראש)</span></span>
+          <span class="text-caption text-n700">ענה אחרי {{ answered[b.id] }} ימי עסקים<span v-if="answered[b.id] > ANSWER_DAYS">: סוג הלוואה שהבנק הגדיר מראש</span></span>
           <input v-model.number="answered[b.id]" type="range" min="1" :max="ANSWER_DAYS_EXTENDED" step="1" :aria-label="`${b.name}: ימי עסקים עד התשובה, עד ${limit(b.id)}`" />
         </label>
-        <label class="flex min-h-11 items-center gap-2 text-body-m text-n800"><input v-model="lien[b.id]" type="checkbox" class="h-5 w-5" /> נרשם שעבוד חדש על הנכס</label>
+        <label class="flex min-h-11 items-center gap-2 text-caption text-n800"><input v-model="lien[b.id]" type="checkbox" class="h-5 w-5 shrink-0" /> נרשם שעבוד חדש</label>
       </div>
     </div>
 
@@ -150,6 +151,8 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
               <div class="relative h-6 rounded-sm bg-n100">
                 <span class="absolute inset-y-0 rounded-sm border-2 border-dashed border-n600" :style="seg(request, c.approved)"></span>
                 <span class="absolute inset-y-0 rounded-sm bg-teal-deep" :class="k === governing ? 'outline outline-2 outline-offset-1 outline-navy' : ''" :style="seg(c.approved, c.validUntil)"></span>
+                <span v-for="d in marks" :key="d" class="pointer-events-none absolute -inset-y-1 w-0 border-s-2 border-dashed border-navy" :style="mark(d)" aria-hidden="true"></span>
+                <span class="pointer-events-none absolute -inset-y-1 w-0 border-s-4 border-warning" :style="mark(today)" aria-hidden="true"></span>
               </div>
             </div>
             <div>
@@ -162,16 +165,15 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
                   <span class="absolute inset-y-0 rounded-sm bg-turquoise-2" :style="seg(r.start, r.answer)"></span>
                   <span class="absolute inset-y-1 rounded-sm bg-n300" :style="seg(r.answer, addCalendarDays(r.answer, reserve))"></span>
                 </template>
+                <span v-for="d in marks" :key="d" class="pointer-events-none absolute -inset-y-1 w-0 border-s-2 border-dashed border-navy" :style="mark(d)" aria-hidden="true"></span>
+                <span class="pointer-events-none absolute -inset-y-1 w-0 border-s-4 border-warning" :style="mark(today)" aria-hidden="true"></span>
               </div>
             </div>
           </div>
-          <!-- The market clock and today: lines over every lane. -->
-          <span v-for="d in decisions.filter((x) => at(x) >= 0 && at(x) <= 100)" :key="d" class="pointer-events-none absolute inset-y-0 w-0 border-s-2 border-dashed border-navy" :style="mark(d)" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute inset-y-0 w-0 border-s-4 border-warning" :style="mark(today)" aria-hidden="true"></span>
         </div>
         <div class="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-caption text-n700" aria-hidden="true">
           <span>{{ short(request) }}: הבקשות</span>
-          <span v-for="d in decisions.filter((x) => at(x) >= 0 && at(x) <= 100)" :key="d">החלטת ריבית: {{ short(d) }}</span>
+          <span v-for="d in marks" :key="d">החלטת ריבית: {{ short(d) }}</span>
           <span class="font-semibold text-n900">קו כתום: היום ({{ short(today) }})</span>
         </div>
       </div>
@@ -180,7 +182,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
         <div class="rounded-md border border-n200 p-3">
           <dt class="text-caption font-semibold text-n600">השעון שקובע: כל עוד רוצים את כל האישורים בחיים</dt>
           <dd class="text-body-l font-semibold text-navy">{{ clocks[governing].name }}, עד {{ long(clocks[governing].validUntil) }}</dd>
-          <dd class="text-caption text-n700">{{ leftText(left(clocks[governing])) }}. האישור שהגיע ראשון נגמר ראשון רק כשלכולם אותו סוג של חלון.</dd>
+          <dd class="text-caption text-n700">{{ leftText(left(clocks[governing])) }}. הקובע הוא מי שהתנאים שלו נגמרים ראשונים, לא בהכרח מי שענה ראשון.</dd>
         </div>
         <div class="rounded-md border border-n200 p-3">
           <dt class="text-caption font-semibold text-n600">מול איזה בנק מנהלים סבבים</dt>

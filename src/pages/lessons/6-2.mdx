@@ -1,0 +1,511 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "6.2"
+minutes: 40
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import PositioningCalculator from "../../components/PositioningCalculator.vue";
+import CardSort from "../../components/CardSort.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { CASE_A, INITIAL_MIX } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("6.2");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+export const pts = (id) => eq(f.plain(id).replace("-", "−"));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const predictionOptions = [
+  f.shekels("a.loancut.40"),
+  `${f.shekels("a.paycut.40")}: זה ההחזר שצריך להוריד`,
+  f.shekels("e7.cut"),
+  f.shekels("a.loancut.35"),
+];
+export const lineRows = ["40", "35", "30"].map((L) => ({ period: Number(L), max: f.raw(`a.max.${L}`), cut: f.raw(`a.paycut.${L}`), income: f.raw(`a.income.${L}`), equity: f.raw(`a.loancut.${L}`) }));
+export const calcSource = "מספרים להמחשה, והמספרים לבדיקה. 50%, 40% ו־75% לפי תעתיק הצוות להוראה 329, לא אומת. 35% ו־30% דוגמה של הקורס, ו־40% ו־60% מימון הם השערה מהשטח (FK-H-004). הקווים האלה אינם קווים של בנק מסוים.";
+
+בשיעור 6.1 ראינו שנועם ושירה עומדים בקצה של שני קווים: שיעור מימון קרוב לתקרה, ויחס החזר קצת מעל <Term t="סף הון" lesson="4.5">סף ההון</Term>. בשיעור הזה נלמד למדוד את המרחק לכל קו, לחשב כמה עולה להתרחק ממנו, ולשאול אם זה שווה.
+הלשון של שיעור 4.5 מחולקת לשלושה סוגי מספרים. כאן נוסיף סוג רביעי, שהקורס מסמן בזהירות: השערה מהשטח.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="6.2"
+  question={`יחס ההחזר של נועם ושירה הוא ${pct("a.ratio")}, ו־${pct("l.capital")} הוא סף ההון. ההלוואה שלהם ${f.shekels("a.loan")}. כמה הון עצמי נוסף צריך להביא (ולקחת הלוואה קטנה בהתאם), לפי צעדים של 1,000 ₪, כדי שיחס ההחזר יהיה לא יותר מ־${pct("l.capital")}?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## ספים ומדרגות
+
+</Section>
+
+<LessonVideo lesson="6-2" />
+
+<Section kind="ההסבר">
+
+## קו, מרחק ומחיר
+
+</Section>
+
+נתחיל במספרים קטנים. משפחה בדויה, הכנסה פנויה {f.shekels("s.income")}, קו של {pct("l.capital")}. ההחזר שהיא שוקלת הוא {f.shekels("s.pay")}: <M>{n("s.pay")} ÷ {n("s.income")} × 100 = {f.plain("s.ratio")}</M>.
+
+המרחק לקו אפשר למדוד בכמה דרכים, וכל אחת עונה על שאלה אחרת:
+
+- **בנקודות אחוז.** הקו פחות היחס: {pct("l.capital")} פחות {pct("s.ratio")} הם {pts("s.points")} נקודות אחוז. מינוס אומר שהיחס **מעל** הקו; פלוס אומר שיש מקום. משפחה שההחזר שלה {f.shekels("s2.pay")} (יחס {pct("s2.ratio")}) נמצאת ב־{pts("s2.points")}.
+- **בשקלים של ההחזר, בחודש.** ההחזר הגבוה ביותר שמתחת לקו הוא <M>{n("s.income")} × {f.plain("l.capital")} ÷ 100 = {n("s.max")}</M>, ולכן ההחזר צריך לרדת ב־<M>{n("s.pay")} − {n("s.max")} = {n("s.cut")}</M> בחודש. למשפחה השנייה יש מקום של {f.shekels("s2.room")} בחודש.
+- **בשקלים של ההכנסה, בחודש.** כדי ש־{f.shekels("s.pay")} יהיו בדיוק {pct("l.capital")} מההכנסה הפנויה, ההכנסה צריכה להיות <M>{n("s.pay")} × 100 ÷ {f.plain("l.capital")} = {n("s.total_income")}</M>, כלומר עוד <M>{n("s.total_income")} − {n("s.income")} = {n("s.need")}</M> בחודש.
+- **בשקלים של ההלוואה.** כמה צריך להוריד מההלוואה (כלומר להביא עוד הון עצמי) כדי שההחזר ירד אל הקו. זה המחיר שנחשב ברוב השיעור.
+
+זה אותו מרחק במטבעות שונים. ההחלטה איזה מטבע הלקוח יכול לשלם בו היא החלטה על **מחיר**.
+
+<Section kind="ההסבר">
+
+## ארבעה סוגים של קווים
+
+</Section>
+
+קו הוא לא תמיד איסור. לפי שיעור 4.5, שלושה סוגים של מספרים נראים אותו דבר בשיחה. בשלב הזה יש סוג רביעי:
+
+<div class="my-6 grid gap-3 sm:grid-cols-2">
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="text-body-l font-semibold text-n900"><Term t="מגבלה רגולטורית" lesson="4.5">מגבלה רגולטורית</Term></p>
+    <p class="mt-1 text-body-m text-n800">בנק ישראל. חציה: אסור. זהה בכל הבנקים. הדוגמה: {pct("l.limit")} יחס החזר, ו־{pct("l.ceiling")} מימון בדירה יחידה (תעתיק הצוות, לא אומת).</p>
+  </div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="text-body-l font-semibold text-n900">סף הון</p>
+    <p class="mt-1 text-body-m text-n800">בנק ישראל. חציה: מותר, והבנק מחזיק יותר הון. כמה זה עולה לו, ומה הוא עושה בגלל זה, לא ידוע. הדוגמה: {pct("l.capital")} יחס החזר (תיעוד הצוות, לא אומת).</p>
+  </div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="text-body-l font-semibold text-n900"><Term t="מדיניות בנק" lesson="4.5">מדיניות בנק</Term></p>
+    <p class="mt-1 text-body-m text-n800">הבנק עצמו. חציה: הוא לא יאשר, או ידרוש תיקון. בנק אחר אולי אחרת. הקורס לא מכיר קו מפורסם של בנק, ולכן כל קו כזה בקורס בדוי ומסומן.</p>
+  </div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="text-body-l font-semibold text-n900">השערה מהשטח</p>
+    <p class="mt-1 text-body-m text-n800">אף אחד לא קבע. טענה של איש מקצוע שקו מסוים חשוב, בלי מספר למה שקורה כשחוצים אותו. הדוגמות: {pct("l.h35")} או {pct("l.h30")} יחס החזר (דוגמה מהבריף של הקורס, והמספרים לבדיקה); {pct("l.ltv60")} ו־{pct("l.ltv40")} מימון (טובי זמיר, 2026-08-05, FK-H-004, מקור יחיד). ממתין לאישור אילון.</p>
+  </div>
+</div>
+
+הטענה שקורס כזה שומע הכי הרבה היא ש״תיק שמגיע עם {pct("l.h30")} עד {pct("l.h35")} יחס החזר נראה לבנק בטוח יותר, ומשאיר ללקוח כוח מיקוח״. זו **השערה לבדיקה**. הקורס לא מצא לה מקור: לא שורה של ידע מהשטח שאומרת את המספרים האלה, ולא כלל כתוב. ״40%״ כקו של בנקים נאמר על ידי אילון (FK-H-012), ובשיעור 4.5 ראינו שלא ברור אם הכוונה למדיניות או לסף ההון. כל המספרים כאן הם מספרי הדגמה, ואל תציגו אותם ללקוח כמו עובדה.
+
+<Section kind="ההסבר">
+
+## סף ומדרגה
+
+</Section>
+
+<Term t="סף" lesson="6.2">סף</Term> הוא מספר שבו משהו משתנה. <Term t="מדרגה" lesson="6.2">מדרגה</Term> היא מה שמשתנה שם: הקפיצה. מי שהולך על מדרגות רואה: בין שתי מדרגות הקרקע שטוחה, ורק בקצה מגיעה קפיצה. אותו דבר ביחס ההחזר: בין שני קווים הגורל של התיק דומה, ובקו עצמו משהו קופץ.
+
+זה משנה את ההחלטה. אם הקפיצה היא כל מה שמעניין, אין טעם לרדת **הרבה** מתחת לקו: מי שהגיע בדיוק לקו קיבל את אותו דבר כמו מי שירד עמוק. ומצד שני, מי ש**קרוב** לקו, פשוט כמה נקודות מעליו, יכול להימצא מתחת לו בהשקעה קטנה. לכן הדבר הראשון שבודקים הוא המרחק: קרוב זול, ורחוק יקר.
+
+אבל כאן יש מלכודת, והקורס אומר אותה בלי להתחמק: **גודל המדרגה לא ידוע לנו.**
+
+- במגבלה רגולטורית המדרגה היא איסור: אין ויכוח.
+- בסף ההון היא עולה לבנק הון, אבל כמה ומה הוא עושה בגלל זה, לא ידוע (שיעור 4.5). לפי מחקר של הצוות, הלקוח ״מתומחר גרוע יותר״ ולא נדחה (לא אומת).
+- במדיניות בנק היא תלויה בבנק.
+- בהשערה מהשטח אין מספר בכלל.
+
+אפשר לחשב **כמה עולה להגיע לקו**. אי אפשר לחשב **כמה שווה להגיע אליו**, חוץ ממגבלה. ההחלטה נשענת על מחיר שמחושב ועל ערך שנשאר שאלה, ולכן בשיעור הבא נראה מה עוד יש בכל פעולה, ובשיעור 6.4 נשים לה מחיר מול רווח.
+
+<Section kind="ההסבר">
+
+## כמה עולה להתרחק מהקו: נועם ושירה
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+נועם ושירה: החזר {f.shekels("a.pay")} על הכנסה פנויה של {f.shekels("a.disp")}, יחס {pct("a.ratio")}, שיעור מימון {pct("a.ltv")}. לפי נקודות האחוז, ביחס ההחזר הם מעל שלושה קווים: {pct("l.h30")}, {pct("l.h35")} ו־{pct("l.capital")}, ומתחת ל־{pct("l.limit")}. בשיעור המימון הם מעל {pct("l.ltv40")} ו־{pct("l.ltv60")} (השערות), ומתחת לתקרה של {pct("l.ceiling")} ב־{pct("a.ltv_gap")} נקודות אחוז בלבד.
+
+מה עולה להגיע לכל קו של יחס ההחזר, בשלוש דרכים (ההלוואה לפי צעדים של 1,000 ₪, בתמהיל הראשוני):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הקו</th>
+        <th class="py-2 pe-3 text-start font-semibold">להקטין את ההחזר ב־</th>
+        <th class="py-2 pe-3 text-start font-semibold">או להגדיל הכנסה ב־</th>
+        <th class="py-2 pe-3 text-start font-semibold">או להביא הון עצמי</th>
+        <th class="py-2 text-start font-semibold">ואז שיעור המימון</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["40", "35", "30"].map((L) => (
+        <tr class="border-b border-n100 align-top">
+          <th class="py-2 pe-3 text-start font-semibold text-n900"><span class="ltr">{L}%</span></th>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`a.paycut.${L}`)}</span> בחודש</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`a.income.${L}`)}</span> בחודש</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`a.loancut.${L}`)}</span></td>
+          <td class="py-2"><span class="ltr">{f.plain(`a.ltv_after.${L}`)}%</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+הדבר הבולט הוא הפער בין הקווים. ל־{pct("l.capital")} מספיקים {f.shekels("a.loancut.40")} (בערך אחוז אחד מההלוואה) או {f.shekels("a.income.40")} הכנסה מוכרת בחודש. ל־{pct("l.h35")} צריך {f.shekels("a.loancut.35")}, ול־{pct("l.h30")} {f.shekels("a.loancut.30")}. כל חמש נקודות אחוז נוספות עולות אותו דבר: <M>{n("a.loancut.35")} − {n("a.loancut.40")} = {n("a.step_35")}</M>, ו־<M>{n("a.loancut.30")} − {n("a.loancut.35")} = {n("a.step_30")}</M>.
+
+כלומר **המחיר עולה בקו ישר, והרווח (אם יש) הוא מדרגה.** קרוב לקו, ההשקעה קטנה והרווח אולי גדול. רחוק מהקו, ההשקעה גדולה, ומה שהיא קונה הוא שאלה פתוחה.
+
+ואותו חשבון על שיעור המימון: כדי לרדת ל־{pct("l.ltv60")} צריך להחליף {f.shekels("a.eq60")} מההלוואה בהון עצמי, ולרדת ל־{pct("l.ltv40")} {f.shekels("a.eq40")}. אלה הקווים של השערה מקור יחיד, והמחיר שלהם גדול ביחס להון של המשפחה.
+
+<Callout title="הון עצמי הוא מחיר, לא הפסד" tone="warning">
+<p>הכסף שמביאים להון עצמי לא נעלם: הוא מקטין את ההלוואה, ולכן את הריבית. מה שהוא עולה הוא ה**כרית**: חיסכון שכבר אי אפשר לגעת בו אם יש תיקון, חופשה בלי הכנסה, או הוצאה לא צפויה. בשיעור 6.4 נשים לזה מספרים; כאן חשוב לזכור שהסכום שמחושב הוא מחיר, ולא עלות מושלמת ולא חינם.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## כשהתקופה פתוחה: דנה ורועי
+
+</Section>
+
+לנועם ושירה אין דרך נוספת בתקופה: התקופה שלהם כבר 30 שנה, המרבית לפי תעתיק הצוות להוראה 329 (לא אומת). נראה משפחה בדויה אחרת, **לא התיק של נועם ושירה**, שהתקופה שלה קצרה מהמקסימום: דנה ורועי, הלוואה של {f.shekels("t.principal")} בריבית של {f.plain("t.rate")}% לשנה, הכנסה פנויה {f.shekels("t.disp")}, ל־{f.plain("t.from_years")} שנה.
+
+- ל־{f.plain("t.from_years")} שנה ההחזר {f.shekels("t.pay_from")}, ויחס ההחזר {pct("t.ratio_from")}: מעל {pct("l.capital")}.
+- הקו מאפשר החזר של עד <M>{n("t.disp")} × {f.plain("l.capital")} ÷ 100 = {n("t.max")}</M>. התקופה הקצרה ביותר שמגיעה אליו, בשנים שלמות: {f.plain("t.years40")} שנה. ההחזר שם {f.shekels("t.pay_to.40")} ({pct("t.ratio_to.40")}), כלומר {f.shekels("t.drop.40")} פחות בחודש.
+- אבל הסך הכול גדל: מ־{f.shekels("t.total_from")} ל־{f.shekels("t.total_to.40")}, ועוד <M>{n("t.total_to.40")} − {n("t.total_from")} = {n("t.extra.40")}</M> במשך ההלוואה.
+- לקו של {pct("l.h35")} ההחזר צריך להיות {f.shekels("t.max35")} לכל היותר. התקופה הקצרה ביותר היא {f.plain("t.years35")} שנה, והסך הכול גדל ב־{f.shekels("t.extra.35")}.
+
+גם כאן המחיר מחושב. הדרך הזו לא מוציאה כסף מהחיסכון, אבל היא גובה אותו לאורך ההלוואה. (סך התשלומים כאן הוא החזר חודשי כפול מספר החודשים, ללא הצמדה ובלי שינוי ריבית: מספרים להמחשה.)
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מחשבון הספים
+
+</Section>
+
+זה התיק של נועם ושירה, עם הקווים של השיעור. הזיזו את ההון העצמי, את ההכנסה המוכרת ואת התקופה, וראו איזה קו נחצה ומה עולה להגיע אליו. ההלוואה קטנה לפי היחס בין המסלולים.
+
+<PositioningCalculator
+  client:visible
+  price={CASE_A.price}
+  tracks={INITIAL_MIX}
+  recognised={CASE_A.recognisedIncome}
+  car={{ monthly: CASE_A.car.monthly, monthsLeft: CASE_A.car.monthsLeft }}
+  source={calcSource}
+/>
+
+נסו את שלושת אלה:
+1. בלי להזיז דבר: אילו קווים נחצו ביחס ההחזר, ואילו בשיעור המימון? מה סוג כל אחד?
+2. הזיזו את ההון העצמי הנוסף עד שהקו של {pct("l.capital")} נחצה לכיוון הנכון. מה הצעד הקטן ביותר, ומה קרה לשיעור המימון?
+3. המשיכו עד {pct("l.h35")}. כמה הון עצמי נוסף צריך, ומה נשאר מהכרית, ככל שאתם יודעים? ואז נסו להגדיל את ההכנסה המוכרת במקום: כמה צריך?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ביחס ההחזר ({pct("a.ratio")}) נחצו שלושה קווים: {pct("l.h30")} ו־{pct("l.h35")} (השערות לבדיקה) ו־{pct("l.capital")} (סף הון); המגבלה {pct("l.limit")} לא נחצתה. בשיעור המימון ({pct("a.ltv")}) נחצו {pct("l.ltv40")} ו־{pct("l.ltv60")} (השערות); התקרה {pct("l.ceiling")} לא.</li>
+    <li>בהון עצמי נוסף של {f.shekels("a.loancut.40")} יחס ההחזר הוא {pct("a.ratio_after.40")}, ושיעור המימון {pct("a.ltv_after.40")}. ב־{f.shekels("a.short_cut")} עדיין {pct("a.ratio_16")}, עדיין מעל. לכן הצעד הוא {f.shekels("a.loancut.40")}.</li>
+    <li>ל־{pct("l.h35")} צריך {f.shekels("a.loancut.35")} הון עצמי נוסף, או {f.shekels("a.income.35")} הכנסה מוכרת נוספת בחודש. זה הרבה יותר מהצעד אל {pct("l.capital")}. מה נשאר מהכרית — המחשבון לא יודע, כי לא ידוע כמה חיסכון נוסף יש למשפחה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## ארבע שאלות על מרחק
+
+</Section>
+
+**צעד 1.** היחס: <M>C ÷ הכנסה פנויה × 100</M> (זו הנוסחה מ־4.3, כש־C הוא ההחזר).
+
+**צעד 2.** המרחק בנקודות: <M>הקו − היחס</M>. חיובי הוא מקום, ושלילי הוא מעל הקו.
+
+**צעד 3.** המרחק בשקלים: <M>הכנסה פנויה × הקו ÷ 100 − C</M> (מה שחישבנו בשיעור 4.5, פחות ההחזר). שלילי הוא כמה להקטין.
+
+**צעד 4.** ההכנסה שהקו דורש: <M>C × 100 ÷ הקו</M>, ופחות ההכנסה שיש.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 mt-2 text-navy">מרחק = הקו − היחס</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="font-semibold text-n900">הקו</dt><dd>באחוזים כמספר שלם ({f.plain("l.capital")})</dd>
+    <dt class="font-semibold text-n900">היחס</dt><dd>יחס ההחזר או שיעור המימון של התיק, באחוזים</dd>
+    <dt class="ltr font-semibold text-n900">C</dt><dd>ההחזר החודשי שנכנס ליחס, בשקלים (כמו בשיעור 4.3)</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?** בכל קו של אחד משני היחסים, מכל סוג. ״מעל הקו״ הוא ממש מעל: יחס השווה לקו לא חצה אותו, בשני הקווים של בנק ישראל. בקו של בנק או בהשערה, הקצה לא ידוע, ושואלים.
+
+<Callout title="איך מחשבים">
+<p><strong>במחשבון:</strong> כפל, חילוק וחיסור, פעם לכל קו.</p>
+<p><strong>בגיליון אלקטרוני:</strong> אם ההכנסה הפנויה בתא A1, ההחזר בתא B1 והקו בתא C1, המרחק בשקלים בחודש הוא <span class="ltr">{"=ROUNDDOWN($A$1*C1/100,2)-B1"}</span>, ובנקודות (עם היחס בתא D1) <span class="ltr">{"=C1-D1"}</span>.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="6.2"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    "זה כמה צריך להוריד מההחזר בחודש, לא כמה הון עצמי להביא. שני המספרים מודדים אותו מרחק במטבעות שונים.",
+    `זה יותר ממה שצריך: ${f.shekels("e7.cut")} מורידים את היחס ל־${pct("e7.ratio")}, אבל הקו של ${pct("l.capital")} נחצה כבר ב־${f.shekels("a.loancut.40")}.`,
+    `זה המחיר של ${pct("l.h35")}, לא של ${pct("l.capital")}.`,
+  ]}
+>
+  ההחזר קטן בערך ביחס להלוואה, והמרחק הוא {pts("a.pts40")} נקודות אחוז בלבד: בערך אחוז אחד מההלוואה מספיק. ב־{f.shekels("a.short_cut")} היחס עוד {pct("a.ratio_16")}. הטעות הנפוצה היא להניח שמרחק קטן דורש סכום גדול.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## קרוב זול, רחוק יקר
+
+</Section>
+
+לפני שמחליטים לרדת מתחת לקו, שואלים: **כמה אני רחוק ממנו?** ו**מה קורה כשחוצים אותו?** המרחק הקצר מציע פעולה זולה, והמרחק הארוך דורש להצדיק. זה כלל אצבע, לא חוק: הוא נשען על כך שהמחיר גדל בקו ישר בתיק הזה, ועל כך שהקפיצה בקו היא העיקר, וזה לא נבדק.
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: מה עולה להגיע ל־40%
+
+</Section>
+
+**צעד 1 — היחס.** <M>{n("a.pay")} ÷ {n("a.disp")} × 100 = {f.plain("a.ratio")}</M>.
+
+**צעד 2 — המרחק בנקודות.** הקו {pct("l.capital")} פחות היחס: {pts("a.pts40")} נקודות אחוז, מעל הקו.
+
+**צעד 3 — המרחק בשקלים של ההחזר.** ההחזר הגבוה ביותר שמתחת לקו: <M>{n("a.disp")} × {f.plain("l.capital")} ÷ 100 = {n("a.max.40")}</M>. צריך להוריד <M>{n("a.pay")} − {n("a.max.40")} = {n("a.paycut.40")}</M> בחודש.
+
+**צעד 4 — דרך ההכנסה.** ההכנסה שהקו דורש: {f.shekels("a.income_total.40")}, כלומר עוד <M>{n("a.income_total.40")} − {n("a.disp")} = {n("a.income.40")}</M> בחודש.
+
+**צעד 5 — דרך ההון העצמי.** {f.shekels("a.loancut.40")} פחות מההלוואה: ההלוואה {f.shekels("a.loan_after.40")}, יחס ההחזר {pct("a.ratio_after.40")}, שיעור המימון {pct("a.ltv_after.40")}. ב־{f.shekels("a.short_cut")} היחס היה עדיין {pct("a.ratio_16")}.
+
+**צעד 6 — מה זה אומר.** שלוש דרכים, שלושה מחירים: חיסכון, הכנסה שצריך להוכיח, או כסף שאין להם. מי שמעל הקו ב־{pts("a.pts40")} נקודות אחוז לא צריך סכום גדול, אבל גם לא יודע מה הקפיצה שווה. זה מה שעוד נשאר לבדוק, מול הבנק.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הטבלה
+
+</Section>
+
+אותם נועם ושירה, שלושה קווים. השורה הראשונה מלאה. השלימו את ההחזר המרבי ואת ההורדה הדרושה בהחזר, בשקלים.
+
+<FillTable
+  client:visible
+  id="6.2-half"
+  periodLabel="הקו (%)"
+  columns={[
+    { key: "max", label: "ההחזר המרבי" },
+    { key: "cut", label: "להוריד מההחזר" },
+    { key: "income", label: "או הכנסה נוספת" },
+    { key: "equity", label: "או הון עצמי נוסף" },
+  ]}
+  rows={lineRows}
+  blanks={["35.max", "35.cut", "30.max", "30.cut"]}
+  success="בכל שורה אותה נוסחה. ההחזר המרבי יורד עם הקו, וההורדה הדרושה גדלה: כל חמש נקודות אחוז עולות את אותו סכום הון עצמי."
+  hint="ההחזר המרבי: ההכנסה הפנויה כפול הקו, חלקי 100. ההורדה: ההחזר של התיק פחות ההחזר המרבי."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים ומיון אחד
+
+</Section>
+
+הסכומים בתרגילים מספרים להמחשה, והקווים של בנק ישראל לפי תעתיק הצוות (לא אומת). התרגילים מסודרים מהקל אל המאתגר. כדאי מחשבון.
+
+**מיון.** שמונה טענות; לכל אחת, איזה סוג קו היא מתארת. הראשונה כבר ממוינת.
+
+<CardSort
+  client:visible
+  id="6.2-sort"
+  given={1}
+  bins={["מגבלה רגולטורית", "סף הון", "מדיניות בנק (בדוי)", "השערה מהשטח"]}
+  questions={["בנק ישראל אוסר", "בנק ישראל מתיר, והבנק מחזיק יותר הון", "הבנק בוחר לעצמו", "אף אחד לא קבע; טענה לא בדוקה"]}
+  cards={[
+    { text: `בנק לא מאשר הלוואה שיחס ההחזר שלה עולה על ${pct("l.limit")}`, bin: 0, why: "איסור של בנק ישראל, זהה בכל הבנקים." },
+    { text: `מעל ${pct("l.capital")} יחס החזר הבנק מחזיק יותר הון (לפי תיעוד הצוות)`, bin: 1, why: "מותר, אבל עולה לבנק הון. כמה, לא ידוע." },
+    { text: `בנק ב׳ (בדוי) לא מאשר יחס החזר מעל ${pct("x.policy_b")}`, bin: 2, why: "הקו נקבע בבנק עצמו; הוא בדוי." },
+    { text: `תיק עם יחס החזר של ${pct("l.h30")} עד ${pct("l.h35")} נראה לבנק בטוח יותר ונותן ללקוח כוח מיקוח`, bin: 3, why: "דוגמה של הקורס, והמספרים לבדיקה. אין מקור ואין מספר למה שקורה." },
+    { text: `שיעור המימון בדירה יחידה לא יעלה על ${pct("l.ceiling")}`, bin: 0, why: "תקרה של הוראה 329, לפי התעתיק." },
+    { text: `בנק א׳ (בדוי) לא מממן יותר מ־${pct("x.policy_c")} מהשווי`, bin: 2, why: "נמוך מהתקרה, ולכן בחירה של הבנק; הקו בדוי." },
+    { text: `מעל ${pct("l.ltv60")} מימון משהו משתנה בהקצאת ההון של הבנק (טובי זמיר, 2026-08-05)`, bin: 3, why: "מקור יחיד, לא נבדק; ובנתוני בנק ישראל הרצועות אחרות." },
+    { text: `״הבנקים מחמירים בפועל ל־${pct("l.capital")}״ (אילון, FK-H-012)`, bin: 3, why: "אולי מדיניות ואולי סף ההון שנאמר בקיצור: לא ברור, ולכן השערה." },
+  ]}
+  success="ארבעת הסוגים נבדלים במי שקבע, במה שקורה כשחוצים, ובמידת הביטחון שיש לנו במספר."
+/>
+
+<NumericExercise
+  client:visible
+  id="6.2-1"
+  n={1}
+  level="קל"
+  answer={f.raw("e2.cut")}
+  errors={[
+    { value: f.raw("e2.max"), message: "זה ההחזר המרבי מתחת לקו. השאלה היא בכמה ההחזר של המשפחה גבוה ממנו." },
+    { value: f.raw("e2.pay"), message: "זה ההחזר של המשפחה. צריך להוריד ממנו את מה שמעל הקו." },
+  ]}
+>
+  משפחה בדויה, הכנסה פנויה {f.shekels("e2.income")}, ההחזר שהיא שוקלת {f.shekels("e2.pay")}. הקו הוא {pct("l.capital")}. בכמה שקלים בחודש צריך להקטין את ההחזר כדי להגיע לקו?
+</NumericExercise>
+
+<Solution for="6.2-1">
+ההחזר המרבי: <M>{n("e2.income")} × {f.plain("l.capital")} ÷ 100 = {n("e2.max")}</M>. ההורדה: <M>{n("e2.pay")} − {n("e2.max")} = {n("e2.cut")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.2-2"
+  n={2}
+  level="בינוני"
+  answer={f.raw("e3.need")}
+  errors={[
+    { value: f.raw("e3.cut"), message: "זה כמה להקטין את ההחזר. השאלה היא כמה צריכה לגדול ההכנסה." },
+    { value: f.raw("e3.total_income"), message: "זו ההכנסה הכוללת שהקו דורש. השאלה היא כמה להוסיף לה." },
+  ]}
+>
+  משפחה בדויה, הכנסה פנויה {f.shekels("e3.income")}, ההחזר {f.shekels("e3.pay")}, הקו {pct("l.capital")}. כמה שקלים בחודש צריכה לגדול ההכנסה המוכרת כדי שההחזר יהיה בדיוק על הקו?
+</NumericExercise>
+
+<Solution for="6.2-2">
+ההכנסה שהקו דורש: <M>{n("e3.pay")} × 100 ÷ {f.plain("l.capital")} = {n("e3.total_income")}</M>. ההפרש: <M>{n("e3.total_income")} − {n("e3.income")} = {n("e3.need")}</M>. (ההחזר היה צריך לרדת ב־{f.shekels("e3.cut")}: אותו מרחק, במטבע אחר.)
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.2-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("a.loancut.35")}
+  errors={[
+    { value: f.raw("a.paycut.35"), message: "זו הורדת ההחזר הדרושה בחודש, לא ההון העצמי." },
+    { value: f.raw("a.loancut.40"), message: `זה המחיר לקו של ${pct("l.capital")}. השאלה על ${pct("l.h35")}.` },
+  ]}
+>
+  כמה הון עצמי נוסף (בצעדים של 1,000 ₪) צריכים נועם ושירה כדי שיחס ההחזר שלהם יהיה לא יותר מ־{pct("l.h35")}? (קו שהוא השערה מהשטח.)
+</NumericExercise>
+
+<Solution for="6.2-3">
+{f.shekels("a.loancut.35")} פחות מההלוואה: היחס {pct("a.ratio_after.35")}, ושיעור המימון {pct("a.ltv_after.35")}. לעומת {f.shekels("a.loancut.40")} לקו של {pct("l.capital")}, ההפרש הוא <M>{n("a.loancut.35")} − {n("a.loancut.40")} = {n("a.step_35")}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="6.2-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: `לא: מה ש${pct("l.h35")} משנה אצל בנק, אם בכלל, לא ידוע; הקו הוא השערה`, correct: true, feedback: "נכון. אפשר לחשב מחיר, ואי אפשר לחשב ערך של מדרגה שאין לה מספר." },
+    { text: "כן: הרבה פחות ריבית, כי הבנק רואה תיק בטוח יותר", feedback: "אין מקור למספר כזה, והקורס לא ממציא." },
+    { text: "כן: זה שווה בדיוק את מה שעולה", feedback: "אין דרך לדעת." },
+    { text: "לא: כי בנק ישראל אוסר על קו כזה", feedback: "אין איסור כזה; מדובר בהשערה." },
+  ]}
+>
+  הקורס חישב שהגעה ל־{pct("l.h35")} עולה {f.shekels("a.loancut.35")} הון עצמי. האם אפשר לומר כמה זה שווה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="6.2-5"
+  n={5}
+  level="מאתגר"
+  answer={f.raw("e6.extra")}
+  errors={[
+    { value: f.raw("e6.drop"), message: "זה כמה ההחזר החודשי יורד. השאלה היא כמה גדל סך התשלומים לאורך ההלוואה." },
+  ]}
+>
+  משפחה בדויה מאריכה הלוואה של {f.shekels("e6.principal")} בריבית של {f.plain("e6.rate")}% מ־20 ל־25 שנה (שפיצר, כל תשלום מעוגל לאגורה). כמה יותר ישלמו בסך הכול?
+</NumericExercise>
+
+<Solution for="6.2-5">
+ההחזר יורד ב־{f.shekels("e6.drop")} בחודש, אבל משלמים אותו על 60 חודשים נוספים. סך התשלומים הגדל: {f.shekels("e6.extra")}. התקופה קונה הקלה בחודש, והמחיר מופיע בסך הכול.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="6.2-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("a.eq60")}
+  errors={[
+    { value: f.raw("a.eq40"), message: `זה המחיר לקו של ${pct("l.ltv40")} מימון, לא ${pct("l.ltv60")}.` },
+    { value: f.raw("a.loancut.35"), message: "זה המחיר לקו של יחס ההחזר, לא של שיעור המימון." },
+  ]}
+>
+  לפי השערה (טובי זמיר, מקור יחיד), {pct("l.ltv60")} מימון הוא קו. כמה מההלוואה של נועם ושירה צריך להחליף בהון עצמי כדי להגיע אליו, על דירה בשווי {f.shekels("a.price")}?
+</NumericExercise>
+
+<Solution for="6.2-6">
+הלוואה של {pct("l.ltv60")} מהשווי קטנה מההלוואה שיש. ההפרש שצריך להחליף בהון עצמי הוא {f.shekels("a.eq60")}. סכום כזה לא נראה זמין למשפחה שכבר הביאה את כל ההון שלה, ולכן הקו הזה רחוק.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="6.2-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: `לא בהכרח: הקו של ${pct("l.capital")} נחצה כבר ב־${f.shekels("a.loancut.40")}, ושאר הכסף קונה מרחק מקווים שגודל המדרגה בהם לא ידוע, והוא יורד מהכרית`, correct: true, feedback: `נכון. ב־${f.shekels("e7.cut")} היחס ${pct("e7.ratio")}: עוד ${f.shekels("e7.extra")} הון עצמי מעבר לצעד הראשון.` },
+    { text: "כן: ככל שהיחס נמוך יותר, התיק טוב יותר", feedback: "בין קווים המצב שטוח, ולכן יותר נמוך לא בהכרח קונה יותר; ואת המחיר משלמים." },
+    { text: "כן: הון עצמי הוא תמיד עלות אפס", feedback: "הוא מקטין ריבית, אבל לוקח כרית." },
+    { text: "לא: כי הבנק לא מקבל הון עצמי נוסף", feedback: "הבנק מקבל; הטענה לא נכונה." },
+  ]}
+>
+  נועם ושירה יכולים להביא {f.shekels("e7.cut")} הון עצמי נוסף, ואז היחס שלהם {pct("e7.ratio")}. האם זה בהכרח עדיף על {f.shekels("a.loancut.40")}?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על ספים ומדרגות">
+<p><strong>מה זה?</strong> סף הוא מספר שבו משהו משתנה, ומדרגה היא השינוי שם. בשיעור הזה: קווים של יחס ההחזר ושל שיעור המימון, בארבעה סוגים.</p>
+<p><strong>למה זה קיים?</strong> כי בנק ישראל אוסר מעל קו, מבקש הון מעל קו אחר, בנק קובע קו משלו, ואנשי שטח מדברים על קווים שאולי חשובים. כל אחד משנה משהו אחר.</p>
+<p><strong>איך זה עובד?</strong> מודדים את המרחק לקו בנקודות ובשקלים (בחודש או בהלוואה), ומחשבים כמה עולה להתרחק ממנו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> קרוב לקו, המחיר קטן; רחוק, המחיר גדל בקו ישר. גודל המדרגה לא ידוע, ולכן אי אפשר לדעת תמיד אם זה שווה.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים: מה סוג הקו, כמה אני רחוק, כמה עולה להגיע, ומה עוד המשפחה מוותרת עליו. מה שלא ידוע אומרים שהוא לא ידוע.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **סף ומדרגה.** סף הוא מספר שבו משהו משתנה, ומדרגה היא הקפיצה. בין ספים המצב שטוח.
+- **ארבעה סוגים של קווים:** מגבלה רגולטורית, סף הון, מדיניות בנק, והשערה מהשטח. הקורס מסמן כל אחד, והמספרים לבדיקה.
+- **מרחק:** בנקודות (הקו פחות היחס), ובשקלים: של ההחזר, של ההכנסה, או של ההלוואה (הון עצמי נוסף).
+- **נועם ושירה:** {f.shekels("a.loancut.40")} הון עצמי מורידים את היחס אל {pct("l.capital")}; ל־{pct("l.h35")} צריך {f.shekels("a.loancut.35")}. קרוב זול, רחוק יקר.
+- **מה לא ידוע:** גודל המדרגה, חוץ מבאיסור. אפשר לחשב מחיר, ולא תמיד ערך.
+
+**בשיעור הבא — 6.3, <Later lesson="6.3" quiet>מפת המנופים</Later>:** כל מה שהלקוח יכול באמת לשנות, ומה כל דבר עולה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "50% יחס החזר, 40% סף הון ו־75% תקרת מימון בדירה יחידה: לפי תעתיק של הצוות ב־Brain (דף 7503881, עודכן 2026-10-08), ממתין לבדיקה מול ההוראה. ההוראה שנושאת את סף ההון לא נקבעה (329 או 203).", date: "2026-10-08" },
+    { kind: "מחקר / הצעה", text: "35% ו־30% יחס החזר: דוגמה בבריף של הקורס (course/brief/part-3.md, ״המספרים לבדיקה״). לא נמצאה שורה של ידע מהשטח שאומרת אותם. הדוגמה היא ״תיק עם 30%–35% נראה בטוח יותר ומשאיר כוח מיקוח״ — השערה, לא כלל." },
+    { kind: "ידע מהשטח", text: "טובי זמיר, 2026-08-05 (FK-H-004): רצועות של שיעור מימון (40/60/75) קשורות להקצאת ההון של הבנק. מקור יחיד, לא נבדק; בנתוני בנק ישראל הרצועות אחרות. ממתין לאישור אילון." },
+    { kind: "ידע מהשטח", text: "אילון, 2026-07-27, וחזר בדיון הצוות ב־2026-08-05 (FK-H-012): ״הבנקים מחמירים בפועל ל־40%״. לא ברור אם הכוונה למדיניות או לסף ההון. ממתין לאישור אילון." },
+    { kind: "מחקר / הצעה", text: "״40% הוא גבול מחיר, לא גבול סירוב״, והלקוח ״מתומחר גרוע יותר״: מחקר של הצוות (Brain 7503881). הצעה למנוע, לא כלל רשמי; לא אומת." },
+    { kind: "לא אומת", text: "גודל המדרגה בכל קו שאינו איסור, וכמה שווה להגיע אליו: לא נמצא באף מקור שקראנו. הקורס כותב ״לא ידוע״ ולא ממציא מספר." },
+    { kind: "הנחת חישוב", text: "קווי המדיניות של בנק א׳, ב׳ ו־ג׳ (38%, 65%) והמשפחות בתרגילים (דנה ורועי ואחרות) בדויים. סך התשלומים של דנה ורועי הוא החזר כפול חודשים, בלי הצמדה ובלי שינוי ריבית." },
+    { kind: "ידע מתמטי כללי", text: "אחוז מסכום, הפרש וחילוק; תשלום שפיצר (שיעור 3.1).", code: ["מרחק = הקו − היחס", "C ≤ הכנסה פנויה × הקו ÷ 100"] },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, במחשבון ובסרטון חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/positioning.ts (with regulation.ts, affordability.ts, sensitivity.ts) via scripts/lessons/lesson-6-2.ts and _positioning-facts.ts into data/lessons/6-2.json; rechecked by checks/kinds/positioning.py. Illustration: src/components/PositioningCalculator.vue. Video: video/6-2.html. Field knowledge used: FK-H-004, FK-H-012. Open questions: research/stage-6-raw/eylon-6-A.md. */}
