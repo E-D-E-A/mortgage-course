@@ -103,6 +103,8 @@ const outcome = computed(() => {
   }
 });
 const p = computed(() => outcome.value.price);
+// Exactly 18 payments left is the edge lesson 4.2 leaves open: show the caveat the text gives.
+const edgeOpen = computed(() => monthsLeft - v.wait === 18);
 const errorText = computed(() => {
   if (!outcome.value.error) return "";
   return chosen.value === "close" ? "בחסכונות אין מספיק כסף לסגירה, ולכן אפשר לסגור רק מההון העצמי." : "אי אפשר למשוך את המנוף בגודל הזה.";
@@ -199,6 +201,9 @@ function reset() {
       </label>
       <button type="button" class="mt-2 min-h-11 text-body-m text-navy underline" @click="reset">איפוס</button>
     </div>
+    <p v-if="chosen === 'wait' && edgeOpen" class="mt-2 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="status">
+      נשארו בדיוק 18 תשלומים. לפי התעתיק הכלל הוא ״מעל 18״, אבל ב־18 בדיוק זו שאלה פתוחה (שיעור 4.2): בנק עשוי עדיין לספור את ההלוואה, והיחס שמוצג כאן אינו בטוח. עם {{ monthsLeft - 17 }} חודשי המתנה נשארים 17 והכלל ברור.
+    </p>
     <p v-if="errorText" class="mt-2 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="alert">{{ errorText }}</p>
 
     <!-- The ratio, before and after, with the lines -->
@@ -233,7 +238,7 @@ function reset() {
           <li>
             יחס ההחזר:
             <span class="font-semibold"><span class="ltr">{{ pct(p.before.ratio) }}</span> ← <span class="ltr">{{ pct(p.after.ratio) }}</span></span>
-            <span v-if="!gainShown.isZero()" class="block text-caption text-n600">{{ gainShown.isPos() ? "נמוך יותר" : "גבוה יותר" }} ב־<span class="ltr">{{ points(gainShown) }}</span> נקודות אחוז</span>
+            <span v-if="!gainShown.isZero()" class="block text-caption text-n600">{{ gainShown.isPos() ? "נמוך יותר" : "גבוה יותר" }} ב־<span class="ltr">{{ points(gainShown) }}</span> {{ gainShown.abs().lt(1) ? "נקודת אחוז" : "נקודות אחוז" }}</span>
           </li>
           <li>
             התשלום שנכנס ליחס:

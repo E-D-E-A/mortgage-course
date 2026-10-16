@@ -145,6 +145,8 @@ export default function lesson(): LessonData {
     // The cash the lever takes out of the family's pocket (levers.ts: pull().cost.cashNow): the equity added, the loan closed, or nothing.
     add(givenMoney(p("cash"), pull(A, move).cost.cashNow.toString()));
   }
+  // The fall in the total of all payments is part principal never borrowed (the equity added) and part interest.
+  add(difference("l.eq.interest", get("l.eq.saving"), get("l.eq.cash")));
   // More equity also lowers the harshest payment: by how much.
   add(difference("l.eq.stress_drop", get("a.stress"), get("l.eq.stress_max")));
   // The price of one percentage point, for the two levers that cost cash and pass.
@@ -166,6 +168,7 @@ export default function lesson(): LessonData {
   add(given("in.wait", WAIT));
   lev("l.wait.months_left", A, "months_left", { lever: "wait", months: WAIT });
   for (const months of [7, 8]) {
+    add(given(`l.wait${months}.months`, months));
     lev(`l.wait${months}.left`, A, "months_left", { lever: "wait", months });
     lev(`l.wait${months}.disposable`, A, "disposable", { lever: "wait", months });
     lev(`l.wait${months}.ratio`, A, "ratio", { lever: "wait", months });
