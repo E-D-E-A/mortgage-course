@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
 import {
   WORKED_EXAMPLE,
+  addDays,
   addMonths,
   averageMonthlyChange,
   bucketFor,
@@ -61,6 +62,8 @@ describe("dates", () => {
     expect(addMonths("2024-01-31", 1)).toBe("2024-02-29");
     expect(addMonths("2023-07-01", 36)).toBe("2026-07-01");
     expect(daysBetween("2026-07-03", "2026-08-02")).toBe(30);
+    expect(addDays("2026-08-02", -30)).toBe("2026-07-03");
+    expect(addDays("2026-12-30", 3)).toBe("2027-01-02");
   });
   it("refuses a repayment before the grant", () => {
     expect(() => paymentsMade("2026-01-01", "2025-01-01", 12)).toThrow();

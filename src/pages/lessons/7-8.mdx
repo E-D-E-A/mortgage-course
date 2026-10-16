@@ -1,0 +1,666 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "7.8"
+minutes: 80
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FeeCalculator from "../../components/FeeCalculator.vue";
+import RefinanceCalculator from "../../components/RefinanceCalculator.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { PRESETS } from "../../data/case-c.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("7.8");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const verdict = (id) => (f.raw(id) ? "עובר" : "לא עובר");
+export const offers = [
+  { id: "b", name: "בנק ב׳" },
+  { id: "c", name: "בנק ג׳" },
+  { id: "d", name: "בנק ד׳" },
+];
+export const predictionOptions = [
+  "אין הבדל בסך הכול: הכסף הנוסף הוא אותו כסף בכל מקרה",
+  "הלוואה נפרדת, כי כשהנכס כבר משועבד אי אפשר לשנות את ההלוואה הקיימת",
+  `להשאיר את ההלוואה הקיימת ולקחת את ה־${f.whole("case.top_up")} כהלוואה נפרדת: אין עמלת פירעון, ולכן זה זול יותר`,
+  `מחזור והתוספת בהלוואה אחת של בנק ב׳: בסך הכול זול יותר בכמה עשרות אלפי שקלים`,
+];
+export const ratioRows = [
+  { when: "היום, בלי מחזור ובלי תוספת", payment: f.raw("old.first"), ratio: f.raw("ratio.today") },
+  { when: "בנק ב׳: מחזור והתוספת בהלוואה אחת", payment: f.raw("b.top_first"), ratio: f.raw("ratio.b") },
+  { when: "בנק ג׳: מחזור והתוספת בהלוואה אחת", payment: f.raw("c.top_first"), ratio: f.raw("ratio.c") },
+  { when: "בנק ד׳: מחזור והתוספת בהלוואה אחת", payment: f.raw("d.top_first"), ratio: f.raw("ratio.d") },
+  { when: "להשאיר את ההלוואה, ועוד הלוואה נפרדת לתוספת", payment: f.raw("keep.first"), ratio: f.raw("ratio.keep") },
+];
+export const halfRows = [
+  { when: "היום", payment: f.raw("old.first"), ratio: f.raw("ratio.today") },
+  { when: "בנק ב׳", payment: f.raw("b.top_first"), ratio: f.raw("ratio.b") },
+  { when: "בנק ג׳", payment: f.raw("c.top_first"), ratio: f.raw("ratio.c") },
+  { when: "בנק ד׳", payment: f.raw("d.top_first"), ratio: f.raw("ratio.d") },
+];
+export const mapRows = [
+  { topic: "הערכים A ו־C ותאריך הפירעון", known: "הערכים של 2.8.2026 (לא אומתו) מחזירים בדיוק את הדוגמה של הצוות", unknown: "הערכים של יום הפירעון האמיתי, ואיזו קבוצת שנים נקראת", who: "בנק (שיחה אחת), ועורך הדין" },
+  { topic: "מי נותן את התוספת, ובאיזה מחיר", known: "המחיר של התוספת כהלוואה נפרדת בדוי", unknown: "אם בנק יתן אותה בתוך המחזור, ואיך היא מסווגת", who: "הבנק, ויועץ בכיר" },
+  { topic: "אם התוספת מבנק אחר: שני בנקים על נכס אחד", known: "ידע מהשטח בלבד, ממתין לאישור (שיעור 7.7)", unknown: "ההבחנה בין פארי־פאסו לבין משכנתא מדרגה שנייה, והסכמות", who: "מומחה: לא עונים לבד" },
+  { topic: "כלל אותו נכס, מ־1.10.2026", known: `התעתיק של הצוות: ההחזר על הלוואה קיימת נספר אם נשארו יותר מ־${f.plain("rule.months")} חודשים`, unknown: "הנוסח המלא של החוזר, ומה נחשב ״מחזור״ מולו", who: "הבנק, והמקור עצמו" },
+  { topic: "מחזור פנימי: הצעה של הבנק הקיים", known: "ידע מהשטח (ממתין לאישור): אפשר להציע תמהיל חדש, והבנק בוחן מחדש", unknown: "אם יש הצעה כזו, ובאיזה מחיר", who: "הבנק הקיים" },
+];
+
+בשיעורים 7.1 עד 7.7 למדתם כמה עולה לצאת מהלוואה, איך בודקים אם מחזור משתלם, מה ההבדל בין מחזור פנימי לחיצוני, ואילו עסקאות לא עונים עליהן לבד. בסדנה תחברו הכול על התיק האחרון של הקורס, <strong>תיק ג׳: עדי וירון</strong>. הם רוצים למחזר את המשכנתא שלהם, ולהוסיף {f.whole("case.top_up")} לשיפוץ.
+
+<Callout title="מה הסדנה הזו לא אומרת" tone="warning">
+<p><strong>{MARK}</strong></p>
+<p>ההלוואה של עדי וירון והעמלה עליה הן הדוגמה המחושבת של הצוות. הערכים A ו־C שבה הם ערכים שהצוות קרא ב־2.8.2026 (לא אומתו). הצו על פירעון מוקדם והמבחן של סעיף 15א מוכרים לקורס רק מתעתיק של הצוות, ולא נבדקו מול המקור (לא אומת). שלוש ההצעות של הבנקים, ריבית ההלוואה הנפרדת לתוספת, ההכנסות והשווי של הנכס בדויים לגמרי. והקורס לא קובע מה עדי וירון צריכים לעשות: הוא מראה איך בודקים.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="7.8"
+  question={`עדי וירון רוצים לממש גם את התוספת: ${f.whole("case.top_up")} לשיפוץ. אפשרות אחת: להשאיר את ההלוואה הקיימת, ולקחת את התוספת כהלוואה נפרדת (בדויה: ${p("sep.rate")}% ל־${p("sep.months")} חודשים). אפשרות שנייה: למחזר, ולקחת את התוספת בתוך ההלוואה החדשה של בנק ב׳ (${p("b.rate")}%, ${p("b.term")} חודשים, כמו מה שנשאר). אילו מהאפשרויות עולה פחות בסך כל התשלומים, אחרי שמחשיבים גם את עמלת הפירעון ואת עלויות הכניסה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## עדי וירון: האם למחזר?
+
+</Section>
+
+<LessonVideo lesson="7-8" />
+
+<Section kind="הסדנה">
+
+## מה תצאו איתו
+
+</Section>
+
+התוצר: **בדיקת כדאיות מחזור לתיק ג׳, ומפת הנושאים שמחייבים העמקה.** הבדיקה בחמישה חלקים, ובסופה תכתבו המלצה שמציגה גם את החסרונות שלה.
+
+**חמישה כללים של הסדנה:**
+1. **שתי שאלות נפרדות.** האם למחזר את ההלוואה הקיימת, והאם לקחת {f.whole("case.top_up")} נוספים. השנייה אינה חיסכון: זו הלוואה חדשה.
+2. **כל מספר בא ממחשבון.** עמלת היציאה מהמחשבון של שיעורים 7.1 עד 7.3, והמבחן והסכומים ממחשבון המחזור של שיעור 7.4. אין חישוב בראש.
+3. **שלוש מדידות לכל הצעה:** המבחן של הרגולציה (ריבית), ההחזר החודשי, וסך השקלים. הצעה שעוברת רק אחת מהן לא עוברת.
+4. **מה שלא ידוע לא מוסתר.** כל מספר שנשען על ערך שלא אומת מסומן, ומה שהקורס לא יודע עובר למפה.
+5. **התוצאה היא הצעה לדיון, לא החלטה.** המשפחה מחליטה.
+
+### נקודת הפתיחה
+
+עדי וירון לקחו ב־1.7.2023 משכנתא של {f.shekels("case.principal")}: מסלול אחד, <Term t="קבועה לא צמודה" lesson="2.5">קבועה לא צמודה</Term>, ל־{f.plain("case.years")} שנה, בריבית נומינלית של {f.plain("case.rate")}%. שולמו {f.plain("fee.paid")} תשלומים, והחוב עכשיו {f.shekels("fee.balance")}. נשארו {f.plain("old.months")} תשלומים של {f.shekels("old.first")}. הם רוצים לפרוע אותה ב־2.8.2026, כמו בדוגמה המחושבת של הצוות (תאריך שהוא הנחת חישוב של הסדנה), ולהוסיף {f.whole("case.top_up")} לשיפוץ.
+
+ההכנסות שלהם, בדויות: {f.shekels("case.net1")} ו־{f.shekels("case.net2")} נטו בחודש, ביחד {f.shekels("case.income")}. שווי הנכס, בדוי: {f.shekels("case.value")}.
+
+<Section kind="חלק 1">
+
+## מה עולה לצאת: שלוש עמלות ושתי נוסחאות
+
+</Section>
+
+המסלול של עדי וירון הוא קבוע, ולכן חלה עליו <Term t="עמלת היוון" lesson="7.2">עמלת היוון</Term> (שיעור 7.2). לפי התעתיק של הצוות לצו (לא אומת), במסלול קבוע אין <Term t="תחנת יציאה" lesson="7.3">תחנת יציאה</Term>, ולכן אין לאן לחכות כדי להיפטר מהעמלה. הם נתנו <Term t="הודעה מוקדמת" lesson="7.3">הודעה מוקדמת</Term> {f.plain("fee.notice_days")} יום לפני הפירעון, בתוך החלון של הצו, ולכן אין עמלת אי־הודעה. ההלוואה לא צמודה, ולכן אין עמלת מדד.
+
+העמלה נולדת מחשבון אחד עם שני ערכים: **A**, הריבית הממוצעת של היום ({f.plain("avg.today")}% אפקטיבית לשנה), ו־**C**, הממוצעת ביום שההלוואה ניתנה ({f.plain("avg.grant")}%). שניהם ערכים שהצוות קרא ב־2.8.2026, ושניהם לא אומתו. ושימו לב לטעות הקלאסית: הריבית שבחוזה, 5.90%, **נומינלית**, וכל אחד מהממוצעים **אפקטיבי**. 5.90% נומינלי הם {f.plain("rate.contract_eff")}% אפקטיבי, ומי שמערבב ביניהם טועה בעמלה.
+
+<FeeCalculator client:visible />
+
+נסו שלוש משימות במחשבון, שמתחיל בדוגמה של עדי וירון:
+1. הסתכלו על שתי הנוסחאות. איזו מהן קטנה יותר, ומה העמלה אחרי ההפחתה לפי ותק?
+2. שנו את תאריך הפירעון ליום שלפני השלמת שלוש שנים להעמדה. מה קורה להפחתה לפי ותק?
+3. כבו את ההודעה המוקדמת. מה נוסף לסכום?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>הנוסחה הראשונה נותנת {f.shekels("fee.v1")}, והשנייה {f.shekels("fee.v2")}. הבנק גובה את הנמוכה: {f.shekels("fee.lower")}. ההפחתה לפי ותק היא {f.plain("fee.reduction")}% (לפי התעתיק של הצוות, יותר משלוש שנים ופחות מחמש), והעמלה אחריה {f.shekels("fee.discount")}. עם העמלה התפעולית, {f.shekels("fee.operational")} פעם אחת, הסך הוא {f.shekels("fee.total")}.</li>
+    <li>חודש לפני שלוש שנים מלאות ההפחתה היא {f.plain("fee.early_reduction")}%, והעמלה גדלה ל־{f.shekels("fee.early_total")}.</li>
+    <li>נוספת עמלת אי־הודעה, {f.plain("fee.no_notice_pct")}% מהסכום שנפרע, כלומר {f.shekels("fee.no_notice")}, והסך הוא {f.shekels("fee.no_notice_total")}.</li>
+  </ol>
+</details>
+
+הנה השלבים, באותו סדר, עם המספרים:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השלב</th>
+        <th class="py-2 pe-3 text-start font-semibold">הערך</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">תשלומים ששולמו, ונשארו</td><td class="py-2 pe-3"><span class="ltr">{f.plain("fee.paid")} · {f.plain("fee.remaining")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">חוב ביום הפירעון</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.balance")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה ראשונה (§3(3))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v1")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה שנייה (§3(4))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v2")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הנמוכה משתיהן</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.lower")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">אחרי הפחתה של <span class="ltr">{f.plain("fee.reduction")}%</span> לפי ותק</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.discount")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">עמלה תפעולית, פעם אחת</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.operational")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">סך עמלת היציאה</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap font-semibold">{f.shekelsExact("fee.total")}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההלוואה והעמלה: הדוגמה המחושבת של הצוות (ערכי A ו־C שהצוות קרא ב־2.8.2026, לא אומתו; הצו מוכר רק מתעתיק, לא אומת). חישוב באמצעות המחשבון של שיעור 7.2.</p>
+</div>
+
+**כלי לראש:** מחשבון שמכיר רק את הנוסחה הראשונה היה אומר לעדי וירון {f.shekels("fee.total_v1_only")}, כלומר {f.shekels("fee.v1_only_extra")} יותר מהעמלה. הכלל ״הנמוכה משתיהן״ שווה {f.shekels("fee.rule_worth")} לפני ההפחתה. ואם תאריך הפירעון יזוז, הערכים A ו־C יזוזו איתו: את הערכים של יום הפירעון האמיתי הקורס לא יודע.
+
+<Section kind="חלק 2">
+
+## מה נשאר לשלם, והמבחן של סעיף 15א
+
+</Section>
+
+בלי לפרוע, נשאר חוב של {f.shekels("old.balance")} ו־{f.plain("old.months")} תשלומים של {f.shekels("old.first")}, ביחד {f.shekels("old.total")}. כדי להיפטר מההלוואה צריך {f.shekels("old.financed")}: החוב ועמלת היציאה. זה מה שכל אחת מההלוואות החדשות של הסדנה נותנת, ועלויות הכניסה שלה, {f.shekels("case.new_costs")}, משולמות מהכיס.
+
+לפי התעתיק של הצוות להוראה 451 (סעיף 15א, לא אומת), לכל הלוואה קיימת יש שני מספרים. <Term t="ריבית כוללת חזויה" lesson="5.3">הריבית הכוללת החזויה</Term> של ההלוואה הקיימת, בלי העמלה: {f.plain("old.rate0")}%. ו<Term t="שיעור הריבית לצרכי השוואה" lesson="7.4">שיעור הריבית לצרכי השוואה</Term>, שבו העמלה מתווספת לחוב: {f.plain("old.rate1")}%. הצעה חדשה עוברת את המבחן אם הריבית הכוללת החזויה שלה **נמוכה** מ־{f.plain("old.rate1")}%.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">ההצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית, תקופה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית כוללת חזויה</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער מהרף, נקודות אחוז</th>
+        <th class="py-2 pe-3 text-start font-semibold">המבחן</th>
+      </tr>
+    </thead>
+    <tbody>
+      {offers.map((o) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{o.name}</td>
+          <td class="py-2 pe-3"><span class="ltr">{p(`${o.id}.rate`)}%</span>, <span class="ltr">{p(`${o.id}.months`)}</span> חודשים</td>
+          <td class="py-2 pe-3"><span class="ltr">{p(`${o.id}.rate_new`)}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{p(`${o.id}.margin`)}</span></td>
+          <td class="py-2 pe-3">{verdict(`${o.id}.worth`)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הרף: {f.plain("old.rate1")}% (שיעור הריבית לצרכי השוואה של ההלוואה הקיימת). המבחן לפי התעתיק של הצוות להוראה 451 §15א, לא נבדק מול ההוראה. הבנקים, הריביות והתקופות בדויים.</p>
+</div>
+
+שני בנקים עוברים, ואחד לא. אבל המבחן הוא **מבחן ריבית בלבד**, וההמשך מראה מה הוא לא רואה.
+
+<Section kind="חלק 3">
+
+## תשלום נמוך אינו חיסכון
+
+</Section>
+
+השאלה השנייה היא מה קורה בכיס: ההחזר החודשי, והסך. כאן כל אחת משלוש ההצעות, כולל עלויות הכניסה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">ההצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר חודשי ראשון, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">נמוך מהיום ב־, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך שקלים עד הסוף, כולל העלויות, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">חיסכון (שלילי: תוספת), ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">להישאר</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("old.first")}</span></td>
+        <td class="py-2 pe-3">—</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("old.total")}</span></td>
+        <td class="py-2 pe-3">—</td>
+      </tr>
+      {offers.map((o) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{o.name}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.gap`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.switch_total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.saving`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} כל הצעה מלווה {f.shekels("old.financed")} (החוב והעמלה) ועלויות הכניסה, {f.shekels("case.new_costs")}, משולמות מהכיס. הסכום בעמודה לפני האחרונה כולל אותן.</p>
+</div>
+
+בנק ג׳ עבר את המבחן, והוא גם מוריד את ההחזר החודשי הכי הרבה: {f.shekels("c.gap")} בחודש. אבל ההלוואה שלו נמשכת {p("c.months")} חודשים במקום {p("old.months")}, ולכן עדי וירון משלמים בסך הכול {f.shekels("c.extra")} **יותר** מאשר אם יישארו. מי שחישב ״{f.shekels("c.gap")} כפול {p("old.months")} חודשים״ מצא {f.shekels("c.naive")} של חיסכון מדומה, כי שכח ש־{p("c.months")} חודשים הם יותר. זה הסיפור של ״תשלום נמוך אינו חיסכון כולל״ (שיעור 7.4).
+
+רק בנק ב׳ עובר את המבחן וגם חוסך בסך השקלים: {f.shekels("b.saving")}, בתקופה ששווה למה שנשאר. אחרי {p("b.cash_be")} חודשים החיסכון בהחזרים מכסה את עלויות הכניסה. ועד כמה זה שביר? אילו הריבית של בנק ב׳ הייתה {p("t.pass.rate")}%, הפער מהרף היה {p("t.pass.margin")} נקודת אחוז והמבחן עדיין עובר, בקושי. ב־{p("t.fail.rate")}% הפער הוא {p("t.fail.margin")}, והמבחן נכשל.
+
+<RefinanceCalculator
+  client:visible
+  presets={PRESETS}
+  initial="case_c"
+  note="דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. המבחן לפי התעתיק של הצוות להוראה 451 §15א, לא נבדק מול ההוראה."
+/>
+
+נסו שלוש משימות במחשבון, בהלוואה של תיק ג׳:
+1. שנו את התקופה החדשה מ־{p("b.months")} ל־{p("c.months")} חודשים בלי לגעת בריבית. מה קורה לשלוש המדידות?
+2. הגדילו את הריבית עד שהמבחן נכשל. באיזו ריבית זה קורה, בתקופה של {p("b.months")} חודשים?
+3. הוסיפו עלויות כניסה גדולות מאוד, למשל כפליים. האם זה משנה את תוצאת המבחן?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר החודשי יורד, המבחן עדיין עובר, וסך השקלים עולה על מה שבלי מחזור. שלוש המדידות מצביעות בשלושה כיוונים.</li>
+    <li>ב־{p("t.fail.rate")}% המבחן נכשל, וב־{p("t.pass.rate")}% הוא עדיין עובר בקושי. הגבול נמצא ביניהם.</li>
+    <li>לא: המבחן של הרגולציה לא כולל את עלויות הכניסה של ההלוואה החדשה. הן משפיעות על הסך ועל מועד ההחזר של החיסכון, ולא על תוצאת המבחן. זו מגבלה של המבחן, לא של ההלוואה.</li>
+  </ol>
+</details>
+
+<Section kind="חלק 4">
+
+## התוספת: חוב חדש, לא חיסכון
+
+</Section>
+
+{f.whole("case.top_up")} לשיפוץ הם **הלוואה חדשה**. אין להם חיסכון, ואין להם מבחן של סעיף 15א: המבחן נוגע רק להלוואה הקיימת. מה שצריך לבדוק הוא מה התוספת מוסיפה לתשלום, ואיך היא ניתנת.
+
+**כמה התוספת מוסיפה, בתוך ההלוואה החדשה:**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">ההצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההחזר החודשי עם התוספת, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">התוספת מוסיפה לחודש, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">התוספת מוסיפה בסך הכול, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">מזה סכום הריבית, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {offers.map((o) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{o.name}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.top_first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.top_add_first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.top_add_total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`${o.id}.top_interest`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההלוואה החדשה בכל הצעה היא {f.shekels("b.top_loan")}: החוב, עמלת היציאה והתוספת. ההצעות בדויות, והקורס לא יודע אם בנק מוכן לתת תוספת בתוך מחזור.</p>
+</div>
+
+שימו לב: {f.shekels("case.top_up")} הם הקרן, וסכום הריבית עליהם הוא עוד {f.shekels("b.top_interest")} בבנק ב׳, ובבנק ג׳ {f.shekels("c.top_interest")}: התקופה הארוכה של בנק ג׳ מוסיפה ריבית על הכסף הנוסף.
+
+**שתי דרכים לקבל גם מחזור וגם תוספת.** בדרך הראשונה מחזרים הכול בהלוואה חדשה אחת. בדרך השנייה משאירים את ההלוואה הקיימת, ולוקחים את התוספת כהלוואה נפרדת, בדויה, של {p("sep.rate")}% ל־{p("sep.months")} חודשים: החזר של {f.shekels("sep.first")} בחודש, ובסך הכול {f.shekels("sep.total")}, מהם {f.shekels("sep.interest")} ריבית. בדרך השנייה אין עמלת פירעון ואין עלויות כניסה למחזור.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הדרך</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך כל התשלומים, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">לעומת להשאיר ולקחת נפרד, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">להשאיר את ההלוואה, ועוד הלוואה נפרדת</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("keep.total")}</span></td>
+        <td class="py-2 pe-3">—</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">בנק ב׳: הכול בהלוואה אחת</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("b.top_switch_total")}</span></td>
+        <td class="py-2 pe-3">זול יותר ב־<span class="ltr whitespace-nowrap">{f.shekelsExact("b.top_saving")}</span></td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">בנק ג׳: הכול בהלוואה אחת</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("c.top_switch_total")}</span></td>
+        <td class="py-2 pe-3">יקר יותר ב־<span class="ltr whitespace-nowrap">{f.shekelsExact("c.top_worse")}</span></td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">בנק ד׳: הכול בהלוואה אחת</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("d.top_switch_total")}</span></td>
+        <td class="py-2 pe-3">יקר יותר ב־<span class="ltr whitespace-nowrap">{f.shekelsExact("d.top_worse")}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} המחיר של התוספת כהלוואה נפרדת בדוי, והקורס לא יודע אם ומי נותן כזו. כל הסכומים כוללים עד הסוף של שתי ההלוואות, וההלוואות החדשות כוללות את עלויות הכניסה.</p>
+</div>
+
+בבנק ב׳, מחזור והתוספת בהלוואה אחת עולים בסך הכול {f.shekels("b.top_saving")} פחות, **למרות** העמלה והעלויות. הסיבה: הריבית של ההלוואה הקיימת, {p("rate.contract_eff")}% אפקטיבית, גבוהה מזו של בנק ב׳, והתוספת בהלוואה נפרדת מתומחרת כאן בריבית גבוהה יותר, ריבית בדויה. זו אינה מסקנה על השוק: שינוי של המחיר הבדוי של ההלוואה הנפרדת משנה את התוצאה.
+
+<Section kind="חלק 5">
+
+## יחס ההחזר, וכלל אותו נכס
+
+</Section>
+
+כל הצעה היא גם שאלה על <Term t="יחס החזר" lesson="4.3">יחס ההחזר</Term>: ההחזר החודשי חלקי ההכנסה הפנויה, {f.shekels("case.income")}. הגבול של הרגולציה הוא {p("lim.pti")}%, ומעל {p("lim.capital")}% הבנק מחזיק יותר הון (שניהם לפי התעתיק של הצוות להוראה 329, שיעורים 4.4 ו־4.5; לא אומת).
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המצב</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר חודשי, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ratioRows.map((r) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{r.when}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.payment)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.ratio}%</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההכנסה בדויה. בשורה האחרונה שתי ההלוואות נספרות, כי נשארו בקיימת יותר מ־{p("rule.months")} חודשים. הגבולות מתעתיק הצוות, לא אומת.</p>
+</div>
+
+כאן נכנס **<Term t="כלל אותו נכס" lesson="4.3">כלל אותו נכס</Term>**. לפי התעתיק של הצוות לחוזר 2840-06 ו־2852 (בתוקף מ־1.10.2026; לא אומת), כשלוקחים הלוואה על נכס שכבר יש עליו הלוואה, ההחזר על הקיימת נספר ליחס כל עוד נשארו בה יותר מ־{p("rule.months")} חודשים. בשורה האחרונה ההלוואה הקיימת נשארת, ולכן ההחזר שלה נספר יחד עם החדשה: {f.shekels("keep.first")}, כלומר {p("ratio.keep")}%. במחזור, ההלוואה הישנה נסגרת, ולכן נספר רק ההחזר החדש (בבנק ב׳, {p("ratio.b")}%). ושימו לב לבנק ג׳: ההחזר שלו הכי נמוך, ויחס ההחזר הכי נמוך, אבל הוא יקר בכל השאר.
+
+ומה בשיעור המימון? ההלוואה החדשה בבנק ב׳, {f.shekels("b.top_loan")}, היא {p("v.ltv_b")}% משווי הנכס הבדוי ({f.shekels("case.value")}). לפי התעתיק, התקרה של הלוואה לכל מטרה היא {p("v.any_pct")}%, כלומר {f.shekels("v.max_any")}, ונשאר מרווח של {f.shekels("v.room")}. אבל **הקורס לא יודע** איך בנק מסווג תוספת לשיפוץ בתוך מחזור: כהלוואה לכל מטרה או כחלק מהמשכנתא. זו שאלה לבנק.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## בדיקת כדאיות: מה יודעים ומה לא
+
+</Section>
+
+הבדיקה שלכם לא מסתיימת במספר. כל שורה בטבלה היא נושא בתיק של עדי וירון שהמספרים לא מכסים: מה הקורס יודע עליו, ומה הוא לא יודע, ולמי שולחים. זו **מפת הנושאים שמחייבים העמקה** של התיק.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הנושא</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה הקורס יודע</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה הוא לא יודע</th>
+        <th class="py-2 pe-3 text-start font-semibold">למי שולחים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {mapRows.map((r) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{r.topic}</td>
+          <td class="py-2 pe-3">{r.known}</td>
+          <td class="py-2 pe-3">{r.unknown}</td>
+          <td class="py-2 pe-3">{r.who}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">״למי שולחים״ הוא הצעה של הקורס, לא כלל מקצועי. כל מה שכתוב ״ידע מהשטח״ ממתין לאישור אילון.</p>
+</div>
+
+נסו שלוש משימות:
+1. בחרו שורה אחת, והסבירו במשפט למה המספרים בחלקים 1 עד 5 לא עונים עליה.
+2. אם הבנק שייתן את התוספת הוא לא הבנק של ההלוואה החדשה, באיזו שורה זה נמצא, ומה אומרים ללקוחות?
+3. מה היה משתנה בבדיקה אילו תאריך הפירעון היה שונה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>למשל: ״הערכים A ו־C הם של 2.8.2026. ביום פירעון אחר הם אחרים, ולכן העמלה והחיסכון אחרים״.</li>
+    <li>בשורה של שני בנקים על נכס אחד. אומרים ללקוחות שזו שאלה למומחה, שהקורס לא יודע אם ואיך זה ניתן, ולא מבטיחים. לפי ההחלטה של Mogi מ־29.7.2026 משכנתא מדרגה שנייה אינה בגרסה הראשונה של המוצר.</li>
+    <li>העמלה, ולכן הסכום שההלוואה החדשה צריכה לכסות, ולכן החיסכון והמבחן. גם ההפחתה לפי ותק, אם הפירעון מתקרב ליום השלמת חמש שנים, והערכים A ו־C.</li>
+  </ol>
+</details>
+
+<Section kind="ההמלצה">
+
+## איך כותבים המלצה שמציגה גם את החסרונות שלה
+
+</Section>
+
+בדיקת כדאיות היא טבלה והמלצה. ההמלצה מסודרת בשלושה חלקים: **מה מציעים**, **מה החסרונות**, ו**מה היה משנה את ההמלצה**. הנה המלצה לדוגמה, על המספרים של הסדנה:
+
+<blockquote class="my-4 border-s-4 border-turquoise-2 bg-n50 p-4 text-body-m text-n800">
+<p><strong>מה מציעים.</strong> לבקש מכמה בנקים הצעה למחזור לתקופה שנשארה, {p("old.months")} חודשים, בריבית שאינה עולה על {p("t.pass.rate")}%. הצעה כזו עוברת את מבחן סעיף 15א (לפי התעתיק של הצוות), ובבנק ב׳ ({p("b.rate")}%) חוסכת {f.shekels("b.saving")} בסך השקלים, כולל עמלת היציאה של {f.shekels("fee.total")}. לא לקבל הצעה לתקופה ארוכה רק כי ההחזר בה נמוך: בבנק ג׳ זה עולה {f.shekels("c.extra")} יותר.</p>
+<p><strong>החסרונות.</strong> ההחזר החודשי יורד רק ב־{f.shekels("b.gap")}. עלויות הכניסה, {f.shekels("case.new_costs")}, משולמות מהכיס, ועמלת היציאה נכנסת לחוב. ההמלצה נשענת על ערכים שלא אומתו: A ו־C מ־2.8.2026, הצו וסעיף 15א מתעתיק. והתוספת של {f.whole("case.top_up")} מעלה את ההחזר החודשי ב־{f.shekels("b.top_add_first")} ואת יחס ההחזר ל־{p("ratio.b")}%.</p>
+<p><strong>מה היה משנה אותה.</strong> ערכים אחרים של A ו־C ביום הפירעון, הצעה בריבית גבוהה מ־{p("t.pass.rate")}%, תוספת שבנק אחר נותן, או ריבית אחרת על תוספת נפרדת. ומה שהקורס לא יודע, בטבלה למעלה, נבדק לפני שנאמרת מילה ללקוחות.</p>
+</blockquote>
+
+ההמלצה אינה אומרת ״כדאי״. היא אומרת באיזה תנאים כדאי, מה זה עולה, ומה עוד צריך לברר.
+
+<PredictionReveal
+  client:visible
+  id="7.8"
+  options={predictionOptions}
+  correct={3}
+  notes={[
+    "לא: התוספת עולה כסף, ומה שהיא עולה תלוי בריבית ובתקופה. הכסף הנוסף אינו אותו כסף בכל מקרה.",
+    "לא: הקורס לא יודע כלל כזה. מה שידוע לו (שיעור 4.3) הוא שההחזר על הלוואה קיימת נספר ליחס ההחזר, ולא שאסור לשנות אותה.",
+    `לא: אין עמלת פירעון, אבל ההלוואה הקיימת נשארת בריבית של ${p("rate.contract_eff")}% אפקטיבית, והתוספת הנפרדת בריבית גבוהה יותר. סך התשלומים של הדרך הזו הוא ${f.shekels("keep.total")}, יותר מ־${f.shekels("b.top_switch_total")} של המחזור בבנק ב׳.`,
+    "",
+  ]}
+>
+  בדוגמה של הסדנה, מחזור והתוספת בהלוואה אחת של בנק ב׳ עולה בסך הכול {f.shekels("b.top_switch_total")}, ולהישאר ולקחת הלוואה נפרדת עולה {f.shekels("keep.total")}: {f.shekels("b.top_saving")} יותר. אבל התוצאה תלויה במחיר הבדוי של ההלוואה הנפרדת, ובכך שבנק ב׳ מוכן לתת את התוספת בתוך המחזור: הקורס לא יודע לא את זה ולא את זה. מה שהסדנה מלמדת הוא איך להשוות, ולא איזו דרך נכונה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## בנק ב׳, שורה אחר שורה
+
+</Section>
+
+**צעד 1 — מה צריך כדי להיפטר מההלוואה.** החוב {f.shekels("old.balance")} ועמלת היציאה {f.shekels("fee.total")}: <M>{n("old.balance")} + {n("old.fee")} = {n("old.financed")}</M> ₪.
+
+**צעד 2 — המבחן.** הרף הוא {p("old.rate1")}%, והריבית הכוללת החזויה של בנק ב׳ היא {p("b.rate_new")}%: הפער {p("b.margin")} נקודת אחוז, והמבחן עובר.
+
+**צעד 3 — ההחזר החודשי.** {f.shekels("b.first")} מול {f.shekels("old.first")} היום: נמוך ב־{f.shekels("b.gap")}.
+
+**צעד 4 — הסך.** {f.shekels("b.switch_total")} עד הסוף, כולל {f.shekels("case.new_costs")} עלויות כניסה, מול {f.shekels("old.total")} בלי מחזור: חיסכון של {f.shekels("b.saving")}.
+
+**צעד 5 — התוספת.** בתוך ההלוואה, ההחזר עולה ב־{f.shekels("b.top_add_first")} ל־{f.shekels("b.top_first")}, ויחס ההחזר הוא {p("ratio.b")}%.
+
+**צעד 6 — מה לא ידוע.** A ו־C ביום הפירעון, מי נותן את התוספת ובאיזה מחיר, וכלל אותו נכס. אלה עוברים למפה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## יחס ההחזר של כל הצעה
+
+</Section>
+
+כל הצעה כוללת את התוספת. השלימו את יחס ההחזר של כל הצעה (ההחזר החודשי חלקי ההכנסה הפנויה, {f.shekels("case.income")}). השורה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="7.8-half"
+  rowKey="when"
+  periodLabel="המצב"
+  columns={[
+    { key: "payment", label: "החזר חודשי" },
+    { key: "ratio", label: "יחס החזר, באחוזים", format: "percent" },
+  ]}
+  rows={halfRows}
+  blanks={["בנק ב׳.ratio", "בנק ג׳.ratio", "בנק ד׳.ratio"]}
+  success={`נכון. ${p("ratio.b")}%, ${p("ratio.c")}% ו־${p("ratio.d")}%. בנק ג׳ מוריד את היחס, ובכל זאת הוא יקר ב־${f.shekels("c.top_worse")} בסך הכול.`}
+  hint="מחלקים את ההחזר החודשי בהכנסה הפנויה, ומכפילים ב־100."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים, הבנקים והאנשים בתרגילים בדויים, והתרגילים 2 עד 6 צריכים מחשבון (המחשבונים בדף נותנים את כל הערכים). התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="7.8-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "כמה שקלים נחסכים בסך הכול", feedback: "זה לא נבדק במבחן. בנק ג׳ עובר אותו וחוסך מינוס." },
+    { text: "אם ההחזר החודשי נמוך יותר", feedback: "המבחן לא בודק את ההחזר. יש הצעה שמוריד אותו ונכשלת במבחן, ויש כזו שעוברת בלי להוריד אותו הרבה." },
+    { text: "ריבית בלבד: הצעה שעוברת אותו יכולה להיות יקרה יותר בסך השקלים", correct: true, feedback: "נכון. בנק ג׳ עובר את המבחן, ובכל זאת עולה בסך הכול יותר מאשר להישאר." },
+    { text: "אם יחס ההחזר נשאר מתחת לגבול", feedback: "יחס ההחזר הוא שאלה אחרת (שיעור 4.3). המבחן של סעיף 15א לא נוגע בו." },
+  ]}
+>
+  מה המבחן של סעיף 15א (לפי תעתיק הצוות) בודק?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="7.8-2"
+  n={2}
+  level="קל"
+  answer={f.raw("fee.total")}
+  errors={[
+    { value: f.raw("fee.lower"), message: "זו הנמוכה משתי הנוסחאות, לפני ההפחתה לפי ותק ולפני העמלה התפעולית." },
+    { value: f.raw("fee.discount"), message: `זו העמלה אחרי ההפחתה לפי ותק, בלי העמלה התפעולית. עוד נוספים ${f.shekels("fee.operational")} פעם אחת.` },
+    { value: f.raw("fee.total_v1_only"), message: "חישבתם לפי הנוסחה הראשונה בלבד. הבנק גובה את הנמוכה משתי הנוסחאות." },
+  ]}
+>
+  מה סך עמלת היציאה של עדי וירון: העמלה הנמוכה משתי הנוסחאות ({f.shekels("fee.lower")}), אחרי הפחתה של {f.plain("fee.reduction")}% לפי ותק, ועוד העמלה התפעולית של {f.shekels("fee.operational")}?
+</NumericExercise>
+
+<Solution for="7.8-2">
+<M>{n("fee.lower")} × (100 − {n("fee.reduction")}) ÷ 100 = {n("fee.discount")}</M> ₪, ועוד <M>{n("fee.discount")} + {n("fee.operational")} = {n("fee.total")}</M> ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.8-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("old.financed")}
+  errors={[
+    { value: f.raw("old.balance"), message: "זה החוב בלבד. כדי להיפטר מההלוואה צריך גם לשלם את עמלת היציאה." },
+  ]}
+>
+  החוב שנשאר הוא {f.shekels("old.balance")}, ועמלת היציאה {f.shekels("old.fee")}. כמה צריכה ההלוואה החדשה להלוות כדי להיפטר מההלוואה הישנה, כשהעמלה מתווספת להלוואה?
+</NumericExercise>
+
+<Solution for="7.8-3">
+<M>{n("old.balance")} + {n("old.fee")} = {n("old.financed")}</M> ₪. עלויות הכניסה, {f.shekels("case.new_costs")}, משולמות מהכיס ולא נכנסות לסכום.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.8-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("c.extra")}
+  errors={[
+    { value: f.raw("c.naive"), message: `זה ההפרש החודשי כפול ${f.plain("old.months")} חודשים. אבל ההלוואה של בנק ג׳ נמשכת ${f.plain("c.months")} חודשים, ולכן הסך שלה גבוה, לא נמוך.` },
+    { value: f.raw("c.saving"), message: "זה אותו מספר עם סימן הפוך: חיסכון שלילי הוא תוספת." },
+  ]}
+>
+  בנק ג׳: סך כל התשלומים שלו עד הסוף, כולל עלויות הכניסה, הוא {f.shekels("c.switch_total")}. בלי מחזור נשארים {f.shekels("old.total")}. בכמה שקלים בנק ג׳ יקר יותר?
+</NumericExercise>
+
+<Solution for="7.8-4">
+<M>{n("c.switch_total")} − {n("old.total")} = {n("c.extra")}</M> ₪. זה בדיוק מה שהמבחן לא רואה: ההחזר החודשי נמוך, והמבחן עובר, וההלוואה יקרה יותר.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.8-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("b.top_add_first")}
+  errors={[
+    { value: f.raw("b.top_first"), message: "זה ההחזר החודשי כולו עם התוספת. השאלה כמה התוספת מוסיפה לו." },
+  ]}
+>
+  בנק ב׳ בלי התוספת: החזר ראשון של {f.shekels("b.first")}. עם התוספת של {f.whole("case.top_up")} בתוך אותה הלוואה, ההחזר הוא {f.shekels("b.top_first")}. כמה התוספת מוסיפה להחזר החודשי?
+</NumericExercise>
+
+<Solution for="7.8-5">
+<M>{n("b.top_first")} − {n("b.first")} = {n("b.top_add_first")}</M> ₪ בחודש.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.8-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("b.top_saving")}
+  errors={[
+    { value: f.raw("keep.total"), message: "זה סך התשלומים של הדרך שבה משאירים את ההלוואה. השאלה כמה היא יקרה יותר ממחזור בבנק ב׳." },
+  ]}
+>
+  להשאיר את ההלוואה ולקחת הלוואה נפרדת לתוספת: סך כל התשלומים {f.shekels("keep.total")}. מחזור בבנק ב׳ עם התוספת בתוך ההלוואה, כולל עלויות הכניסה: {f.shekels("b.top_switch_total")}. בכמה שקלים הדרך הראשונה יקרה יותר?
+</NumericExercise>
+
+<Solution for="7.8-6">
+<M>{n("keep.total")} − {n("b.top_switch_total")} = {n("b.top_saving")}</M> ₪. אבל כל זה בכללי הדוגמה: המחיר של ההלוואה הנפרדת בדוי, והקורס לא יודע אם בנק ב׳ נותן את התוספת בתוך מחזור.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="7.8-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "למחזר בבנק ג׳, כי ההחזר החודשי בו הכי נמוך", feedback: `ההחזר הנמוך נובע מתקופה ארוכה, והסך עולה בבנק ג׳ ב־${f.shekels("c.extra")} על מה שבלי מחזור. זו הדוגמה של ״תשלום נמוך אינו חיסכון״.` },
+    { text: "למחזר, כי המבחן של הרגולציה עובר", feedback: "המבחן הוא ריבית בלבד, ובנק ד׳ נכשל בו ובנק ג׳ עובר אותו ועולה יותר. ובלי החסרונות זו לא המלצה." },
+    { text: "לא למחזר, כי יש עמלת פירעון", feedback: "העמלה היא חלק מהחשבון, לא סיבה שלא לחשב. בבנק ב׳ החיסכון בסך הכול עדיין חיובי אחריה." },
+    { text: "לבקש הצעות לתקופה שנשארה בריבית שעוברת את המבחן, לציין שההחזר החודשי יורד מעט, שהעמלה ועלויות הכניסה נכנסות לחשבון, שההערכה נשענת על ערכים שלא אומתו, ומה היה משנה אותה", correct: true, feedback: "נכון. היא אומרת מה מציעים, מה החסרונות ומה משנה את ההמלצה, ולא מסתירה מה לא ידוע." },
+  ]}
+>
+  איזו מההמלצות האלה נכונה לכתוב לעדי וירון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על בדיקת כדאיות מחזור">
+<p><strong>מה זה?</strong> בדיקה בחמישה חלקים של הצעה למחזר הלוואה: מה עולה לצאת, המבחן של הרגולציה, ההחזר והסך, התוספת, ויחס ההחזר.</p>
+<p><strong>למה זה קיים?</strong> כי ״ההחזר נמוך יותר״ ו״הריבית נמוכה יותר״ אינם ״משלמים פחות בסך הכול״. מי שבודק רק אחד מהשלושה טועה.</p>
+<p><strong>איך זה עובד?</strong> עמלת היציאה מהמחשבון של 7.2, המבחן ומחשבון המחזור של 7.4, ובדיקה נפרדת לתוספת. כל מספר מסומן לפי מקורו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הלקוחות מחליטים על עשרות אלפי שקלים. בבדיקה הנכונה הם יודעים מה עולה, מה נחסך, ומה עוד לא ידוע.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כותבים המלצה בשלושה חלקים: מה מציעים, מה החסרונות, מה משנה אותה, ומוסיפים לה את מפת הנושאים שמחייבים העמקה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהסדנה
+
+</Section>
+
+- **שתי שאלות, לא אחת:** האם למחזר את הקיימת, והאם לקחת תוספת. התוספת היא חוב חדש, ואין לה מבחן.
+- **שלוש מדידות לכל הצעה:** המבחן (ריבית), ההחזר החודשי וסך השקלים. הצעה אחת עוברת את המבחן ועולה {f.shekels("c.extra")} יותר, ואחת מורידה את ההחזר ויקרה יותר.
+- **עמלת היציאה היא {f.shekels("fee.total")}** מתוך שתי נוסחאות ו־{f.plain("fee.reduction")}% הפחתה, ותלויה בערכים A ו־C שלא אומתו.
+- **יחס ההחזר וכלל אותו נכס** משנים את תמונת התוספת: ההלוואה הקיימת שנשארת נספרת, וההלוואה שנסגרת במחזור לא.
+- **מה שלא ידוע עובר למפה** של הנושאים שמחייבים העמקה, עם מי שמכיר אותם.
+
+**בשיעור הבא — הבדיקה של סוף שלב 7:** שאלות על כל השלב, ואחריה, בשלב 8, האלגוריתם: איך Mogi בונה את ההחלטה מהקלט ועד התוצאה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "תיק ג׳, הבנקים, ההצעות, ריבית ותקופה של ההלוואה הנפרדת לתוספת, עלויות הכניסה, ההכנסות והשווי של הנכס: בדויים. ההלוואות החדשות מלוות את החוב ועמלת היציאה, והתוספת מעל זה. תאריך הפירעון, 2.8.2026, הוא הנחת חישוב שמשחזרת את הדוגמה של הצוות." },
+    { kind: "לא אומת", text: `ההלוואה של תיק ג׳ והעמלה עליה הן הדוגמה המחושבת של הצוות (חוב של ${f.shekels("fee.balance")}, עמלה של ${f.shekels("fee.total")}). הצו (צו הבנקאות, פירעון מוקדם, 2002) מוכר רק מתעתיק של הצוות שנקרא ב־2.8.2026 ו־3.8.2026. ערכי A ו־C, ${p("avg.today")}% ו־${p("avg.grant")}% אפקטיביים, הם ערכים שהצוות קרא ב־2.8.2026. ממתין לבדיקה מול הצו ומול הפרסום של בנק ישראל.`, date: "2026-08-02" },
+    { kind: "לא אומת", text: "המבחן של סעיף 15א להוראה 451: שיעור הריבית לצרכי השוואה מול הריבית הכוללת החזויה של ההלוואה החדשה. לפי תעתיק של הצוות (שנקרא ב־3.8.2026), לא נבדק מול ההוראה.", date: "2026-08-03" },
+    { kind: "לא אומת", text: `כלל אותו נכס: ההחזר על הלוואה קיימת על אותו נכס נספר ליחס ההחזר אם נשארו יותר מ־${p("rule.months")} חודשים, בתוקף מ־1.10.2026. תעתיק של הצוות לחוזר 2840-06 והחוזר 2852; לא נפתחו.`, date: "2026-10-01" },
+    { kind: "לא אומת", text: `הגבולות של הוראה 329 (יחס החזר עד ${p("lim.pti")}%, סף הון ב־${p("lim.capital")}%, תקרה של ${p("v.any_pct")}% להלוואה לכל מטרה): לפי תעתיק של הצוות (עודכן ב־8.10.2026), ממתין לבדיקה מול ההוראה.`, date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "מחזור פנימי: פתיחה מחדש של המשכנתא באותו בנק כשתנאי השוק השתפרו, אפשר להציע תמהיל חדש והבנק בוחן מחדש. אילון, 27.7.2026. ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: "בשני בנקים על אותו נכס (פארי־פאסו או משכנתא מדרגה שנייה): אילון, 27.7.2026, ממתין לאישור אילון. הקורס לא יודע אם ואיך זה ניתן (שיעור 7.7).", date: "2026-07-27" },
+    { kind: "החלטה של Mogi", text: "משכנתא מדרגה שנייה אינה בגרסה הראשונה של המוצר (29.7.2026). ושום חישוב של עמלת פירעון מוקדם או של מבחן מחזור לא נעשה על ידי מודל שפה: זה קוד שאפשר לבדוק, עם בדיקות על הדוגמה המחושבת (הצוות, 29.7.2026).", date: "2026-07-29" },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו פעמיים, בשתי שיטות נפרדות. העמלה משחזרת את הדוגמה של הצוות לאגורה.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/earlyrepay.ts (the fee; lessons 7.1–7.3) and src/lib/calc/refinance.ts (the test and the comparison; lessons 7.4–7.5) with metrics.ts, offers.ts, regulation.ts and ltv.ts, via scripts/lessons/lesson-7-8.ts (on _earlyrepay-facts.ts and _refinance-facts.ts) and data/lessons/7-8.json, rechecked by checks/kinds/earlyrepay.py, refinance.py, metrics.py, regulation.py and ltv.py. Case C's data: src/data/case-c.ts (on refinance-examples.ts). Components: src/components/FeeCalculator.vue and RefinanceCalculator.vue (A and B). Video: video/7-8.html. Field knowledge: FK-H-064 (internal refinance), FK-H-011 (two banks on one property): awaiting Eylon. */}

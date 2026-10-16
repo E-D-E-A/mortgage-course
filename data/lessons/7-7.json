@@ -1,0 +1,135 @@
+{
+  "lesson": "7.7",
+  "title": "עסקאות מורכבות, ב׳: בנייה עצמית, שני בנקים על אותו נכס ומשכנתא הפוכה",
+  "note": "Introduction only. Two conditional teaching examples (two lenders on one property under the single-home ceiling of the team's transcription of directive 329; self-build under a field-knowledge claim that has no source). Neither is a rule. The reverse mortgage has no number: the course does not know its terms.",
+  "facts": [
+    {
+      "id": "p.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000.00"
+    },
+    {
+      "id": "p.pct_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "p.pct_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "20"
+    },
+    {
+      "id": "p.pct_cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "p.a",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "ceiling": "40"
+      },
+      "value": "800000.00"
+    },
+    {
+      "id": "p.b",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "ceiling": "20"
+      },
+      "value": "400000.00"
+    },
+    {
+      "id": "p.both",
+      "kind": "hh_sum",
+      "inputs": {
+        "amounts": "800000|400000"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "p.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1200000",
+        "value": "2000000"
+      },
+      "value": "60"
+    },
+    {
+      "id": "p.cap",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "deal": "only_home"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "p.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "p.cap",
+        "subtrahend": "p.both"
+      },
+      "value": "300000.00"
+    },
+    {
+      "id": "s.land",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000.00"
+    },
+    {
+      "id": "s.future",
+      "kind": "given",
+      "inputs": {},
+      "value": "3000000.00"
+    },
+    {
+      "id": "s.pct_land",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "s.pct_future",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "s.first",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "1000000",
+        "ceiling": "50"
+      },
+      "value": "500000.00"
+    },
+    {
+      "id": "s.cap",
+      "kind": "ltv_max_loan",
+      "inputs": {
+        "value": "3000000",
+        "ceiling": "70"
+      },
+      "value": "2100000.00"
+    },
+    {
+      "id": "s.later",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "s.cap",
+        "subtrahend": "s.first"
+      },
+      "value": "1600000.00"
+    }
+  ]
+}

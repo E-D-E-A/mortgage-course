@@ -1,0 +1,294 @@
+<!doctype html>
+<!--
+  Video scene for lesson 7.2 — "למה הבנק מבקש פיצוי".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/7-2.json. The subtitle cues (window.cues)
+  carry the explanatory sentences.
+
+  Script (one idea: the discounting fee is the value, in today's money, of what the bank loses when
+  the market rate is below the loan's rate; two formulas, the bank charges the lower; the published
+  averages are effective annual rates and the contract rate is nominal, so they are converted
+  differently; the rules are the team's transcription of the 2002 Banking Order, not verified):
+  1. Title.
+  2. A bullet: 100,000 ₪ at 10%, 110,000 ₪ in a year. Repaid today, with the market at 5% the bank
+     relends and gets 105,000 ₪: 5,000 ₪ short in a year; in today's money 110,000 ÷ 1.05 = 104,761.90,
+     less the 100,000 ₪ received: 4,761.90 ₪.
+  3. Market at 12%: the payment is worth 98,214.29 ₪ today, less than the bank got: no loss, no fee.
+  4. Case C: value today of the remaining payments at today's average 694,721.98 ₪ less the balance
+     637,956.74 ₪: the first formula, 56,765.24 ₪.
+  5. The second formula against the average on the grant day: 12,882.44 ₪; the bank charges the lower.
+  6. Effective against nominal: 5.90% nominal is 6.06% effective; ÷ 12 for the contract, the twelfth root for the averages;
+     the mistake gives 51,505.19 ₪.
+  7. 37 months served: 20% off, 10,305.95 ₪, plus 60 ₪: 10,365.95 ₪.
+  8. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 7.2 · עמלת ההיוון</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/7-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "104,761.90", "100,000".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // Numbers and signs stay left to right inside Hebrew lines.
+      const lr = (s) => `⁦${s}⁩`;
+
+      const V = {
+        loan: num(fact("one.loan")), pay: num(fact("one.payment")), relend: num(fact("one.relend")), lost: num(fact("one.lost")),
+        pv5: num(fact("one.pv5")), fee1: num(fact("one.fee")), pv12: num(fact("one.pv12")), gain: num(fact("one.gain")),
+        balance: num(fact("w.balance")), pvA: num(fact("w.pv_today")), pvC: num(fact("w.pv_grant")),
+        v1: num(fact("w.v1")), v2: num(fact("w.v2")), worth: num(fact("w.worth")),
+        effC: pl(fact("w.eff_contract")), mC: pl(fact("w.m_contract")), mA: pl(fact("w.m_today")), mG: pl(fact("w.m_grant")), mM: pl(fact("w.m_mistake")),
+        v1m: num(fact("w.v1_mistake")), months: pl(fact("w.months_served")), red: pl(fact("w.reduction")),
+        disc: num(fact("w.discount")), op: num(fact("w.op")), total: num(fact("w.total")),
+      };
+
+      const S = { title: [0, 9], small: [9, 66], rise: [66, 90], pv: [90, 121], second: [121, 151], mix: [151, 182], red: [182, 206], end: [206, 220] };
+      window.duration = 220;
+      window.cues = [
+        [1, 5, "למה הבנק מבקש פיצוי?"],
+        [5, 8.5, "עמלת ההיוון, בדוגמה קטנה."],
+        [10, 17, `לקחתם ${lr(V.loan + " ₪")} ב־10%, ובעוד שנה משלמים ${lr(V.pay + " ₪")}.`],
+        [17, 24, `הבנק מצפה לקבל ${lr(V.pay + " ₪")} בעוד שנה.`],
+        [24, 31, `אתם מחזירים ${lr(V.loan + " ₪")} היום, והריבית בשוק ירדה ל־5%.`],
+        [31, 38, `הוא מלווה אותם שוב, ומקבל בעוד שנה רק ${lr(V.relend + " ₪")}.`],
+        [38, 45, `חסרים לו ${lr(V.lost + " ₪")} בעוד שנה.`],
+        [45, 52, "אבל כסף של עוד שנה אינו כסף של היום."],
+        [52, 59, `מביאים את ${lr(V.pay + " ₪")} להיום, ב־5%: ${lr(V.pv5 + " ₪")}.`],
+        [59, 65, `הבנק קיבל ${lr(V.loan + " ₪")}. ההפרש, ${lr(V.fee1 + " ₪")}, הוא העמלה.`],
+        [67, 74, "ואם הריבית דווקא עלתה ל־12%?"],
+        [74, 81, `אותם ${lr(V.pay + " ₪")} שווים היום ${lr(V.pv12 + " ₪")}: אין הפסד.`],
+        [81, 89, "אין הפסד, אין עמלה. היא חלה כשהריבית ירדה."],
+        [91, 98, "בהלוואה אמיתית מביאים להיום כל תשלום שנשאר."],
+        [98, 106, `עדי וירון: ${lr(V.pvA + " ₪")} בריבית הממוצעת של היום.`],
+        [106, 113, `מחזירים ${lr(V.balance + " ₪")}: זו היתרה.`],
+        [113, 120, `נוסחה ראשונה: ההפרש, ${lr(V.v1 + " ₪")}.`],
+        [122, 129, "יש נוסחה שנייה: משווים לממוצע של יום ההעמדה."],
+        [129, 136, `הערך הנוכחי בממוצע של ההעמדה: ${lr(V.pvC + " ₪")}.`],
+        [136, 143, `נוסחה שנייה: ההפרש, ${lr(V.v2 + " ₪")}.`],
+        [143, 150, `הבנק גובה את הנמוכה. הכלל שווה ${lr(V.worth + " ₪")}.`],
+        [152, 158, "ולא מערבבים: ריבית החוזה והממוצע הם לא אותו סוג."],
+        [158, 165, `${lr("5.90%")} בחוזה הם ${lr(V.effC + "%")} אפקטיבי.`],
+        [165, 172, "מהחוזה מגיעים לחודשית ב־÷ 12, מהממוצע בשורש 12."],
+        [172, 181, `מי שמחלק את הממוצע ב־12 מקבל ${lr(V.v1m + " ₪")}. פחות מדי.`],
+        [183, 190, `ותק של ${V.months} חודשים: הפחתה של ${lr(V.red + "%")}.`],
+        [190, 197, `${lr(V.v2 + " ₪")} פחות ${lr(V.red + "%")}: ${lr(V.disc + " ₪")}.`],
+        [197, 205, `ועוד ${lr(V.op + " ₪")} תפעולית: ${lr(V.total + " ₪")}.`],
+        [207, 213, "הממוצעים והנוסחאות: תעתיק של הצוות, לא אומת."],
+        [213, 219, "הנמוכה, ההפחתה, והממוצע שממירים."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
+      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "למה הבנק", 72, { w: 700, o });
+          txt(640, 372, "מבקש פיצוי?", 72, { w: 700, o });
+          txt(640, 436, "עמלת ההיוון", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — the small example
+        if (inScene(t, S.small)) {
+          const o = vis(t, S.small);
+          const at = (s) => after(t, S.small, s, o);
+          txt(640, 124, `${V.loan} ₪ ב־10%, החזר אחד בעוד שנה`, 36, { w: 700, o });
+          const W = 640, x0 = 900;
+          const bar = (y, w, label, value, fill, op) => {
+            txt(x0, y - 8, label, 20, { anchor: "start", fill: C.n700, o: op });
+            el("rect", { x: x0 - w, y, width: w, height: 50, rx: 10, fill, opacity: op });
+            txt(x0 - w + 14, y + 34, `${value} ₪`, 26, { anchor: "start", w: 700, fill: C.navy, o: op, ltr: true });
+          };
+          bar(190, W, "מה הבנק ציפה לקבל", V.pay, C.n300, at(7));
+          bar(278, W * 105 / 110, "אם ילווה שוב ב־5%", V.relend, C.tq2, at(21));
+          const og = at(28);
+          txt(640, 366, `חסרים ${V.lost} ₪ בעוד שנה`, 28, { w: 700, fill: C.teal, o: og });
+          const ov = at(38);
+          box(240, 400, 800, 130, ov * 0.95, C.mint);
+          txt(640, 444, `${V.pay} ÷ 1.05 = ${V.pv5} ₪ היום`, 30, { w: 600, o: at(43), ltr: true });
+          txt(640, 490, `${V.pv5} − ${V.loan} = ${V.fee1} ₪`, 32, { w: 700, fill: C.teal, o: at(50), ltr: true });
+          txt(640, 520, "זו עמלת ההיוון: מה שהבנק מפסיד, בכסף של היום", 18, { fill: C.n700, o: at(52) });
+        }
+        // Scene 3 — rates went up
+        if (inScene(t, S.rise)) {
+          const o = vis(t, S.rise);
+          const at = (s) => after(t, S.rise, s, o);
+          txt(640, 130, "ואם הריבית עלתה ל־12%?", 42, { w: 700, o });
+          box(160, 190, 460, 190, at(1));
+          txt(390, 232, "מה שהבנק קיבל", 24, { fill: C.n600, o: at(1) });
+          txt(390, 310, `${V.loan} ₪`, 48, { w: 700, o: at(1), ltr: true });
+          box(660, 190, 460, 190, at(6));
+          txt(890, 232, `${V.pay} ₪ בעוד שנה, בכסף של היום`, 24, { fill: C.n600, o: at(6), ltr: false });
+          txt(890, 310, `${V.pv12} ₪`, 48, { w: 700, fill: C.teal, o: at(8), ltr: true });
+          box(300, 410, 680, 80, at(12) * 0.95, C.mint);
+          txt(640, 460, "פחות ממה שקיבל: אין הפסד, ולכן אין עמלה", 28, { w: 700, o: at(12) });
+        }
+        // Scene 4 — a schedule; the first formula
+        if (inScene(t, S.pv)) {
+          const o = vis(t, S.pv);
+          const at = (s) => after(t, S.pv, s, o);
+          txt(640, 128, "הלוואה אמיתית: כל התשלומים שנשארו", 38, { w: 700, o });
+          box(670, 180, 440, 170, at(2));
+          txt(890, 222, "ערך נוכחי בריבית הממוצעת של היום", 20, { fill: C.n600, o: at(2) });
+          txt(890, 296, `${V.pvA} ₪`, 44, { w: 700, o: at(8), ltr: true });
+          box(170, 180, 440, 170, at(15));
+          txt(390, 222, "היתרה שמחזירים", 20, { fill: C.n600, o: at(15) });
+          txt(390, 296, `${V.balance} ₪`, 44, { w: 700, o: at(15), ltr: true });
+          const ob = at(22);
+          box(330, 390, 620, 120, ob * 0.95, C.mint);
+          txt(640, 432, "נוסחה ראשונה: ההפרש", 24, { fill: C.n700, o: ob });
+          txt(640, 486, `${V.v1} ₪`, 48, { w: 700, fill: C.teal, o: ob, ltr: true });
+        }
+        // Scene 5 — the second formula and the lower of the two
+        if (inScene(t, S.second)) {
+          const o = vis(t, S.second);
+          const at = (s) => after(t, S.second, s, o);
+          txt(640, 120, "שתי נוסחאות, והנמוכה מביניהן", 38, { w: 700, o });
+          // Three values on one scale; it does not start at zero.
+          const lo = 630000, hi = 700000;
+          const vals = [
+            { label: "ערך נוכחי, ממוצע היום", v: fact("w.pv_today"), s: V.pvA, fill: C.teal, from: 1 },
+            { label: "ערך נוכחי, ממוצע ההעמדה", v: fact("w.pv_grant"), s: V.pvC, fill: C.tq2, from: 8 },
+            { label: "היתרה", v: fact("w.pv_contract"), s: V.balance, fill: C.n300, from: 4 },
+          ];
+          vals.forEach((it, i) => {
+            const y = 176 + i * 70;
+            const w = ((Number(it.v) - lo) / (hi - lo)) * 600 + 40;
+            const oc = at(it.from);
+            txt(1040, y - 8, it.label, 18, { anchor: "start", fill: C.n700, o: oc });
+            el("rect", { x: 1040 - w, y, width: w, height: 40, rx: 8, fill: it.fill, opacity: oc });
+            txt(1040 - w - 12, y + 29, `${it.s} ₪`, 24, { anchor: "end", w: 700, o: oc, ltr: true });
+          });
+          txt(1040, 392, "הציר לא מתחיל באפס", 15, { anchor: "start", fill: C.n600, o: at(4) });
+          const a = at(12);
+          box(660, 410, 460, 100, a);
+          txt(890, 446, "ראשונה: היום פחות היתרה", 20, { fill: C.n600, o: a });
+          txt(890, 490, `${V.v1} ₪`, 34, { w: 700, fill: C.n600, o: a, ltr: true });
+          const b = at(17);
+          box(160, 410, 460, 100, b, C.mint);
+          txt(390, 446, "שנייה: היום פחות ההעמדה", 20, { fill: C.n700, o: b });
+          txt(390, 490, `${V.v2} ₪`, 34, { w: 700, fill: C.teal, o: b, ltr: true });
+          txt(640, 546, `הנמוכה נגבית. הכלל שווה ${V.worth} ₪`, 24, { w: 700, o: at(22) });
+        }
+        // Scene 6 — effective against nominal
+        if (inScene(t, S.mix)) {
+          const o = vis(t, S.mix);
+          const at = (s) => after(t, S.mix, s, o);
+          txt(640, 124, "אפקטיבי מול נומינלי: לא מערבבים", 38, { w: 700, o });
+          box(180, 170, 920, 190, at(1));
+          const cols = [{ x: 1060, l: "הריבית" }, { x: 800, l: "סוג" }, { x: 560, l: "לחודש" }, { x: 330, l: "איך" }];
+          for (const c of cols) txt(c.x, 206, c.l, 18, { anchor: "start", fill: C.n600, w: 600, o: at(1) });
+          const rows = [
+            ["בחוזה", `5.90%`, "נומינלית", `${V.mC}%`, "חלקי 12", 3],
+            ["ממוצע היום", "4.82%", "אפקטיבית", `${V.mA}%`, "שורש 12", 9],
+            ["ממוצע בהעמדה", "5.09%", "אפקטיבית", `${V.mG}%`, "שורש 12", 12],
+          ];
+          rows.forEach(([a, b, c, d, e, from], i) => {
+            const y = 252 + i * 38, oc = at(from);
+            txt(1060, y, a, 20, { anchor: "start", w: 600, o: oc });
+            txt(800, y, `${b} ${c}`, 20, { anchor: "start", o: oc });
+            txt(560, y, d, 22, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
+            txt(330, y, e, 20, { anchor: "start", o: oc });
+          });
+          txt(640, 392, `5.90% נומינלי הם ${V.effC}% אפקטיבי`, 26, { w: 700, fill: C.navy, o: at(7) });
+          const om = at(20);
+          box(250, 420, 780, 120, om * 0.95, C.mint);
+          txt(640, 456, "הטעות: מחלקים את הממוצע ב־12", 24, { w: 600, o: om });
+          txt(640, 490, `${V.mM}% לחודש במקום ${V.mA}%`, 22, { o: at(23) });
+          txt(640, 526, `נוסחה ראשונה ${V.v1m} ₪ במקום ${V.v1} ₪: העמלה קטנה מדי`, 22, { w: 700, fill: C.teal, o: at(26) });
+        }
+        // Scene 7 — reduction and the total
+        if (inScene(t, S.red)) {
+          const o = vis(t, S.red);
+          const at = (s) => after(t, S.red, s, o);
+          txt(640, 124, "הפחתה לפי ותק, ובסוף הסך הכול", 38, { w: 700, o });
+          box(190, 170, 900, 100, at(1));
+          const tiers = [["פחות מ־3 שנים", "0%", 0], ["3 עד פחות מ־5", "20%", 1], ["5 שנים ויותר", "30%", 2]];
+          tiers.forEach(([a, b, i]) => {
+            const x = 1000 - i * 300, hot = i === 1 && at(4) > 0.5;
+            if (hot) box(x - 280, 178, 270, 84, at(4) * 0.9, C.mint);
+            txt(x - 140, 214, a, 20, { fill: C.n700, o: at(1) });
+            txt(x - 140, 250, b, 28, { w: 700, o: at(1), ltr: true });
+          });
+          txt(640, 310, `ותק של ${V.months} חודשים: ${V.red}%`, 24, { w: 600, o: at(5) });
+          const chain = [
+            [`${V.v2} ₪`, "הנמוכה", 8],
+            [`${V.disc} ₪`, `אחרי ${V.red}%`, 12],
+            [`${V.total} ₪`, "ועוד 60 ₪ תפעולית", 16],
+          ];
+          chain.forEach(([a, b, from], i) => {
+            const x = 960 - i * 330, oc = at(from);
+            box(x - 140, 350, 280, 130, oc * (i === 2 ? 0.95 : 1), i === 2 ? C.mint : C.n0);
+            txt(x, 396, b, 20, { fill: C.n600, o: oc });
+            txt(x, 450, a, 32, { w: 700, fill: i === 2 ? C.teal : C.navy, o: oc, ltr: true });
+          });
+          txt(640, 520, "לפי תעתיק של הצוות · הממוצעים נקראו ב־2.8.2026 · לא אומת", 18, { fill: C.n600, o: at(19) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "עמלת היוון:", 44, { w: 600, fill: C.n700, o });
+          txt(640, 322, "הערך הנוכחי בשוק פחות היתרה", 48, { w: 700, o: after(t, S.end, 2, o) });
+          txt(640, 392, "שתי נוסחאות, הנמוכה נגבית", 36, { w: 700, fill: C.teal, o: after(t, S.end, 5, o) });
+          txt(640, 452, "ממירים נכון: חוזה ÷ 12, ממוצע בשורש 12", 28, { fill: C.n700, o: after(t, S.end, 8, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

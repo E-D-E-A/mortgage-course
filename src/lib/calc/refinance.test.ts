@@ -1,5 +1,7 @@
 import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
+import { INTERNAL_PRESETS, PRESETS } from "../../data/refinance-examples.ts";
+import { earlyRepaymentFee, WORKED_EXAMPLE } from "./earlyrepay.ts";
 import { presentValue, type Track } from "./metrics.ts";
 import { moneyString } from "./money.ts";
 import { type Forecast } from "./offers.ts";
@@ -224,5 +226,61 @@ describe("monthsAtPayment: keep the payment, finish sooner", () => {
   });
   it("refuses a payment that does not cover the interest", () => {
     expect(() => monthsAtPayment("100000", "6", "400")).toThrow(/60 years/);
+  });
+});
+
+describe("the fee comes from lesson 7.2's module (earlyrepay.ts), and the two modules agree on the loan", () => {
+  it("the worked example's fee input here (10,305.95 + 60) is what earlyRepaymentFee computes", () => {
+    const r = earlyRepaymentFee(WORKED_EXAMPLE);
+    expect(money(r.discount)).toBe("10305.95");
+    expect(money(r.operational)).toBe("60.00");
+    expect(money(r.total)).toBe(FEE);
+  });
+  it("both modules reach the same balance and number of payments left", () => {
+    const r = earlyRepaymentFee(WORKED_EXAMPLE);
+    const t = tailOf(WORKED, r.paid);
+    expect(r.paid).toBe(37);
+    expect(t.payments).toHaveLength(r.remaining);
+    expect(money(t.balance)).toBe(money(r.balance));
+  });
+});
+
+describe("the lessons' presets and a new loan that is not fixed", () => {
+  it("every preset of lessons 7.4 and 7.5 builds, with a fee for each track and a whole-loan figure", () => {
+    for (const p of [...PRESETS, ...INTERNAL_PRESETS]) {
+      const loan = existingLoan(p.tracks.map((t) => ({ track: t.track, paymentsMade: t.paymentsMade, fee: t.fee })), p.shared);
+      expect(loan.tracks).toHaveLength(p.tracks.length);
+      expect(loan.whole.fee.gte(p.tracks.reduce((s, t) => s.plus(t.fee), new Decimal(0)))).toBe(true);
+      expect(loan.whole.comparisonRate.lte(loan.whole.expectedTotalRate)).toBe(true);
+    }
+  });
+
+  it("a prime track in the new offer (variable: the rate moves each year) still gives a payment path and a balance that ends at zero", () => {
+    const offer = {
+      name: "בנק ב׳",
+      month: FORECAST.month,
+      forecast: FORECAST.id,
+      upfront: "0.00",
+      tracks: [{ kind: "prime" as const, amount: "100000.00", months: 120, margin: "-0.5" }],
+    };
+    const n = newLoanOf(offer, FORECAST);
+    expect(n.payments).toHaveLength(120);
+    near(n.balances[119], 0, "1e-6");
+    expect(n.expectedTotalRate.gt(0)).toBe(true);
+  });
+
+  it("with a track that has a fee and one that has none, whole-loan figures sit between the tracks'", () => {
+    const loan = existingLoan(
+      [
+        { track: { principal: "300000", rates: ["6.3"], months: 300 }, paymentsMade: 60, fee: "5200" },
+        { track: { principal: "200000", rates: ["5.2"], months: 240 }, paymentsMade: 60, fee: "0" },
+      ],
+      0,
+    );
+    const [a, b] = loan.tracks;
+    const lo = Decimal.min(a.expectedTotalRate, b.expectedTotalRate);
+    const hi = Decimal.max(a.expectedTotalRate, b.expectedTotalRate);
+    expect(loan.whole.expectedTotalRate.gte(lo)).toBe(true);
+    expect(loan.whole.expectedTotalRate.lte(hi)).toBe(true);
   });
 });

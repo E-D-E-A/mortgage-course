@@ -1,0 +1,896 @@
+{
+  "lesson": "7.5",
+  "title": "מחזור פנימי מול חיצוני",
+  "note": "Mostly field knowledge: nothing here is stated as a rule of any bank. The numbers are one invented comparison on the loan of lesson 7.4 (the worked example of the early-repayment fee, the team's own computation, unrounded; the fee is lesson 7.2's result): a new loan from another bank with up-front costs of 2,400 ₪, and a new loan from the bank the loan is with now with up-front costs of 900 ₪ — the 1,500 ₪ difference is INVENTED (the field claim that an internal refinance needs no appraisal is unverified). The test and every measure are lesson 7.4's (Directive 451 §15א as the team transcribed it; unverified). The new loan covers P + T exactly; its up-front costs are paid in cash. All banks, rates and costs are invented.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-16"
+    },
+    {
+      "id": "old.fee_discount",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "discount"
+      },
+      "value": "10305.95"
+    },
+    {
+      "id": "old.fee_operational",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "operational"
+      },
+      "value": "60.00"
+    },
+    {
+      "id": "old.fee_total",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "old.fee_discount|old.fee_operational"
+      },
+      "value": "10365.95"
+    },
+    {
+      "id": "old.balance",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "balance",
+        "decimals": 2
+      },
+      "value": "637956.74"
+    },
+    {
+      "id": "old.months",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "months",
+        "decimals": 2
+      },
+      "value": 203
+    },
+    {
+      "id": "old.first",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "first",
+        "decimals": 2
+      },
+      "value": "4974.72"
+    },
+    {
+      "id": "old.financed",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "financed",
+        "decimals": 2
+      },
+      "value": "648322.69"
+    },
+    {
+      "id": "old.total",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "total",
+        "decimals": 2
+      },
+      "value": "1009867.74"
+    },
+    {
+      "id": "old.rate0",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "rate_without",
+        "decimals": 2
+      },
+      "value": "6.06"
+    },
+    {
+      "id": "old.rate1",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "measure": "rate_with",
+        "decimals": 2
+      },
+      "value": "5.82"
+    },
+    {
+      "id": "w.rate1_nofee",
+      "kind": "ref_stay",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "0",
+        "shared": "0",
+        "scope": "whole",
+        "measure": "rate_with",
+        "decimals": 2
+      },
+      "value": "6.06"
+    },
+    {
+      "id": "n.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "648322.69"
+    },
+    {
+      "id": "x.costs_ext",
+      "kind": "given",
+      "inputs": {},
+      "value": "2400.00"
+    },
+    {
+      "id": "x.costs_int",
+      "kind": "given",
+      "inputs": {},
+      "value": "900.00"
+    },
+    {
+      "id": "x.cost_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.costs_ext",
+        "subtrahend": "x.costs_int"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "ext.input_rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.2"
+    },
+    {
+      "id": "ext.first",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_first",
+        "decimals": 2
+      },
+      "value": "4808.23"
+    },
+    {
+      "id": "ext.rate",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_rate",
+        "decimals": 2
+      },
+      "value": "5.38"
+    },
+    {
+      "id": "ext.margin",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "margin",
+        "decimals": 2
+      },
+      "value": "0.44"
+    },
+    {
+      "id": "ext.worth",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "worthwhile",
+        "decimals": 2
+      },
+      "value": true
+    },
+    {
+      "id": "ext.saving",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "total_saving",
+        "decimals": 2
+      },
+      "value": "31397.05"
+    },
+    {
+      "id": "ext.cash_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "cash_break_even",
+        "decimals": 2
+      },
+      "value": 15
+    },
+    {
+      "id": "ext.pos_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "position_break_even",
+        "decimals": 2
+      },
+      "value": 41
+    },
+    {
+      "id": "ext.gap",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "monthly_gap",
+        "decimals": 2
+      },
+      "value": "166.49"
+    },
+    {
+      "id": "i0.input_rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.2"
+    },
+    {
+      "id": "i0.first",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_first",
+        "decimals": 2
+      },
+      "value": "4808.23"
+    },
+    {
+      "id": "i0.rate",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_rate",
+        "decimals": 2
+      },
+      "value": "5.35"
+    },
+    {
+      "id": "i0.margin",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "margin",
+        "decimals": 2
+      },
+      "value": "0.48"
+    },
+    {
+      "id": "i0.worth",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "worthwhile",
+        "decimals": 2
+      },
+      "value": true
+    },
+    {
+      "id": "i0.saving",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "total_saving",
+        "decimals": 2
+      },
+      "value": "32897.05"
+    },
+    {
+      "id": "i0.cash_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "cash_break_even",
+        "decimals": 2
+      },
+      "value": 6
+    },
+    {
+      "id": "i0.pos_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "position_break_even",
+        "decimals": 2
+      },
+      "value": 36
+    },
+    {
+      "id": "i0.gap",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "monthly_gap",
+        "decimals": 2
+      },
+      "value": "166.49"
+    },
+    {
+      "id": "i1.input_rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.3"
+    },
+    {
+      "id": "i1.first",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_first",
+        "decimals": 2
+      },
+      "value": "4843.14"
+    },
+    {
+      "id": "i1.rate",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_rate",
+        "decimals": 2
+      },
+      "value": "5.45"
+    },
+    {
+      "id": "i1.margin",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "margin",
+        "decimals": 2
+      },
+      "value": "0.37"
+    },
+    {
+      "id": "i1.worth",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "worthwhile",
+        "decimals": 2
+      },
+      "value": true
+    },
+    {
+      "id": "i1.saving",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "total_saving",
+        "decimals": 2
+      },
+      "value": "25808.85"
+    },
+    {
+      "id": "i1.cash_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "cash_break_even",
+        "decimals": 2
+      },
+      "value": 7
+    },
+    {
+      "id": "i1.pos_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "position_break_even",
+        "decimals": 2
+      },
+      "value": 43
+    },
+    {
+      "id": "i1.gap",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.3",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "monthly_gap",
+        "decimals": 2
+      },
+      "value": "131.58"
+    },
+    {
+      "id": "i2.input_rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.4"
+    },
+    {
+      "id": "i2.first",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_first",
+        "decimals": 2
+      },
+      "value": "4878.20"
+    },
+    {
+      "id": "i2.rate",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "new_rate",
+        "decimals": 2
+      },
+      "value": "5.56"
+    },
+    {
+      "id": "i2.margin",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "margin",
+        "decimals": 2
+      },
+      "value": "0.27"
+    },
+    {
+      "id": "i2.worth",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "worthwhile",
+        "decimals": 2
+      },
+      "value": true
+    },
+    {
+      "id": "i2.saving",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "total_saving",
+        "decimals": 2
+      },
+      "value": "18693.63"
+    },
+    {
+      "id": "i2.cash_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "cash_break_even",
+        "decimals": 2
+      },
+      "value": 10
+    },
+    {
+      "id": "i2.pos_be",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "position_break_even",
+        "decimals": 2
+      },
+      "value": 54
+    },
+    {
+      "id": "i2.gap",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "הבנק הנוכחי#2026-10#forecast_a#900.00#fixed_unlinked:648322.69:203:5.4",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "900.00",
+        "disc": "",
+        "k": 0,
+        "measure": "monthly_gap",
+        "decimals": 2
+      },
+      "value": "96.52"
+    },
+    {
+      "id": "stay.total",
+      "kind": "ref_switch",
+      "inputs": {
+        "tracks": "spitzer|700000|5.90|240|240|0|0|exact",
+        "paid": "37",
+        "fees": "10305.95",
+        "shared": "60.00",
+        "scope": "whole",
+        "offer": "בנק אחר#2026-10#forecast_a#2400.00#fixed_unlinked:648322.69:203:5.2",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5",
+        "cash": "2400.00",
+        "disc": "",
+        "k": 0,
+        "measure": "stay_total",
+        "decimals": 2
+      },
+      "value": "1009867.74"
+    },
+    {
+      "id": "d.ext_i1",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ext.saving",
+        "subtrahend": "i1.saving"
+      },
+      "value": "5588.20"
+    },
+    {
+      "id": "d.i0_ext",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "i0.saving",
+        "subtrahend": "ext.saving"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "d.i0_i1",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "i0.saving",
+        "subtrahend": "i1.saving"
+      },
+      "value": "7088.20"
+    },
+    {
+      "id": "rule.window",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "rule.window_no_lien",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    }
+  ]
+}

@@ -1,0 +1,1313 @@
+{
+  "lesson": "7.2",
+  "title": "עמלת ההיוון: שתי נוסחאות, הנמוכה מביניהן, ריבית ממוצעת והפחתות לפי ותק",
+  "note": "Case C's loan and its two published averages are the team's worked example (A = 4.823049, C = 5.09, effective annual, values read 2026-08-02, not verified; the team's page writes A as 4.823 but its present value matches 4.823049 to the agora); every other loan and rate is invented. Contract rates are nominal (monthly = annual ÷ 12), the averages are effective annual (monthly by the twelfth root). Fees follow the team's transcription of the 2002 Banking Order, not verified. A negative discounting fee is set off against the other fees; the total is floored at zero (our reading). Money is exact and rounded to the agora when shown.",
+  "facts": [
+    {
+      "id": "one.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000.00"
+    },
+    {
+      "id": "one.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "110000.00"
+    },
+    {
+      "id": "one.relend",
+      "kind": "er_percent_of",
+      "inputs": {
+        "amount": "100000.00",
+        "percent": "105",
+        "of_fact": "one.loan"
+      },
+      "value": "105000.00"
+    },
+    {
+      "id": "one.lost",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "one.payment",
+        "subtrahend": "one.relend"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "one.pv5",
+      "kind": "er_pv_single",
+      "inputs": {
+        "payment": "110000",
+        "rate": "5",
+        "years": 1
+      },
+      "value": "104761.90"
+    },
+    {
+      "id": "one.fee",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "one.pv5",
+        "subtrahend": "one.loan"
+      },
+      "value": "4761.90"
+    },
+    {
+      "id": "one.pv12",
+      "kind": "er_pv_single",
+      "inputs": {
+        "payment": "110000",
+        "rate": "12",
+        "years": 1
+      },
+      "value": "98214.29"
+    },
+    {
+      "id": "one.gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "one.loan",
+        "subtrahend": "one.pv12"
+      },
+      "value": "1785.71"
+    },
+    {
+      "id": "w.paid",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "paid"
+      },
+      "value": 37
+    },
+    {
+      "id": "w.remaining",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "remaining"
+      },
+      "value": 203
+    },
+    {
+      "id": "w.months_served",
+      "kind": "er_months_between",
+      "inputs": {
+        "from": "2023-07-01",
+        "to": "2026-08-02"
+      },
+      "value": 37
+    },
+    {
+      "id": "w.payment",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "payment"
+      },
+      "value": "4974.72"
+    },
+    {
+      "id": "w.balance",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "balance"
+      },
+      "value": "637956.74"
+    },
+    {
+      "id": "w.bucket",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "bucket"
+      },
+      "value": "15–20"
+    },
+    {
+      "id": "w.eff_contract",
+      "kind": "er_effective_of_nominal",
+      "inputs": {
+        "rate": "5.90",
+        "decimals": 2
+      },
+      "value": "6.06"
+    },
+    {
+      "id": "w.m_contract",
+      "kind": "er_monthly_percent",
+      "inputs": {
+        "kind": "nominal",
+        "rate": "5.90",
+        "decimals": 4
+      },
+      "value": "0.4917"
+    },
+    {
+      "id": "w.m_today",
+      "kind": "er_monthly_percent",
+      "inputs": {
+        "kind": "effective",
+        "rate": "4.823049",
+        "decimals": 4
+      },
+      "value": "0.3933"
+    },
+    {
+      "id": "w.m_grant",
+      "kind": "er_monthly_percent",
+      "inputs": {
+        "kind": "effective",
+        "rate": "5.09",
+        "decimals": 4
+      },
+      "value": "0.4146"
+    },
+    {
+      "id": "w.m_mistake",
+      "kind": "er_monthly_percent",
+      "inputs": {
+        "kind": "nominal",
+        "rate": "4.823049",
+        "decimals": 4
+      },
+      "value": "0.4019"
+    },
+    {
+      "id": "w.pv_today",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_today"
+      },
+      "value": "694721.98"
+    },
+    {
+      "id": "w.pv_contract",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_contract"
+      },
+      "value": "637956.74"
+    },
+    {
+      "id": "w.pv_grant",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_grant"
+      },
+      "value": "681839.54"
+    },
+    {
+      "id": "w.v1",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v1"
+      },
+      "value": "56765.24"
+    },
+    {
+      "id": "w.v2",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v2"
+      },
+      "value": "12882.44"
+    },
+    {
+      "id": "w.lower",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "lower"
+      },
+      "value": "12882.44"
+    },
+    {
+      "id": "w.binding",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "binding"
+      },
+      "value": "v2"
+    },
+    {
+      "id": "w.worth",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.v1",
+        "subtrahend": "w.v2"
+      },
+      "value": "43882.80"
+    },
+    {
+      "id": "w.reduction",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "reduction_percent"
+      },
+      "value": 20
+    },
+    {
+      "id": "w.discount",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "discount"
+      },
+      "value": "10305.95"
+    },
+    {
+      "id": "w.op",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "operational"
+      },
+      "value": "60.00"
+    },
+    {
+      "id": "w.no_notice",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "no_notice"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "w.total",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "total"
+      },
+      "value": "10365.95"
+    },
+    {
+      "id": "w.total_v1_only",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "total_v1_only"
+      },
+      "value": "45472.19"
+    },
+    {
+      "id": "w.overstate",
+      "kind": "er_ratio",
+      "inputs": {
+        "a": "w.total_v1_only",
+        "b": "w.total",
+        "decimals": 1
+      },
+      "value": "4.4"
+    },
+    {
+      "id": "w.pv_mistake",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_today_nominal_mistake"
+      },
+      "value": "689461.93"
+    },
+    {
+      "id": "w.v1_mistake",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v1_nominal_mistake"
+      },
+      "value": "51505.19"
+    },
+    {
+      "id": "w.mistake_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "w.v1",
+        "subtrahend": "w.v1_mistake"
+      },
+      "value": "5260.05"
+    },
+    {
+      "id": "sens.v1",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v1"
+      },
+      "value": "56767.64"
+    },
+    {
+      "id": "sens.v2",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v2"
+      },
+      "value": "12884.84"
+    },
+    {
+      "id": "sens.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sens.v1",
+        "subtrahend": "w.v1"
+      },
+      "value": "2.40"
+    },
+    {
+      "id": "c2.paid",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "paid"
+      },
+      "value": 43
+    },
+    {
+      "id": "c2.v1",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v1"
+      },
+      "value": "54343.05"
+    },
+    {
+      "id": "c2.v2",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v2"
+      },
+      "value": "-20256.45"
+    },
+    {
+      "id": "c2.binding",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "binding"
+      },
+      "value": "v2"
+    },
+    {
+      "id": "c2.sum",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "sum"
+      },
+      "value": "-20196.45"
+    },
+    {
+      "id": "c2.total",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "total"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "c2.total_v1_only",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "total_v1_only"
+      },
+      "value": "43534.44"
+    },
+    {
+      "id": "c2.reduction",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-01-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "4.40",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "reduction_percent"
+      },
+      "value": 20
+    },
+    {
+      "id": "h.paid",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "paid"
+      },
+      "value": 49
+    },
+    {
+      "id": "h.remaining",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "remaining"
+      },
+      "value": 71
+    },
+    {
+      "id": "h.balance",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "balance"
+      },
+      "value": "195218.35"
+    },
+    {
+      "id": "h.bucket",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "bucket"
+      },
+      "value": "5–10"
+    },
+    {
+      "id": "h.pv_today",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_today"
+      },
+      "value": "200735.29"
+    },
+    {
+      "id": "h.pv_grant",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "pv_grant"
+      },
+      "value": "196907.02"
+    },
+    {
+      "id": "h.v1",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v1"
+      },
+      "value": "5516.94"
+    },
+    {
+      "id": "h.v2",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "v2"
+      },
+      "value": "3828.26"
+    },
+    {
+      "id": "h.lower",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "lower"
+      },
+      "value": "3828.26"
+    },
+    {
+      "id": "h.reduction",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "reduction_percent"
+      },
+      "value": 20
+    },
+    {
+      "id": "h.discount",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "discount"
+      },
+      "value": "3062.61"
+    },
+    {
+      "id": "h.op",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "operational"
+      },
+      "value": "60.00"
+    },
+    {
+      "id": "h.total",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "300000",
+        "rate": "5.0",
+        "term": 120,
+        "method": "spitzer",
+        "granted": "2022-07-01",
+        "repaid": "2026-08-01",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.1",
+        "avg_grant": "4.8",
+        "notice_on": "2026-07-01",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "total"
+      },
+      "value": "3122.61"
+    },
+    {
+      "id": "ex2.fee",
+      "kind": "given",
+      "inputs": {},
+      "value": "25000.00"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "er_after_reduction",
+      "inputs": {
+        "of": "ex2.fee",
+        "percent": 20
+      },
+      "value": "20000.00"
+    },
+    {
+      "id": "ex2.err_30",
+      "kind": "er_after_reduction",
+      "inputs": {
+        "of": "ex2.fee",
+        "percent": 30
+      },
+      "value": "17500.00"
+    },
+    {
+      "id": "ex2.err_cut",
+      "kind": "er_percent_of",
+      "inputs": {
+        "amount": "25000.00",
+        "percent": "20",
+        "of_fact": "ex2.fee"
+      },
+      "value": "5000.00"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "er_effective_of_nominal",
+      "inputs": {
+        "rate": "5.90",
+        "decimals": 2
+      },
+      "value": "6.06"
+    },
+    {
+      "id": "ex3.err_monthly",
+      "kind": "er_monthly_percent",
+      "inputs": {
+        "kind": "nominal",
+        "rate": "5.90",
+        "decimals": 2
+      },
+      "value": "0.49"
+    },
+    {
+      "id": "ex5.eff",
+      "kind": "er_effective_of_nominal",
+      "inputs": {
+        "rate": "4.8",
+        "decimals": 3
+      },
+      "value": "4.907"
+    },
+    {
+      "id": "ex6.v1",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000.00"
+    },
+    {
+      "id": "ex6.v2",
+      "kind": "given",
+      "inputs": {},
+      "value": "18000.00"
+    },
+    {
+      "id": "ex6.lower",
+      "kind": "er_min",
+      "inputs": {
+        "facts": "ex6.v1|ex6.v2"
+      },
+      "value": "18000.00"
+    },
+    {
+      "id": "ex6.disc",
+      "kind": "er_after_reduction",
+      "inputs": {
+        "of": "ex6.lower",
+        "percent": 20
+      },
+      "value": "14400.00"
+    },
+    {
+      "id": "ex6.op",
+      "kind": "er_fee",
+      "inputs": {
+        "principal": "700000",
+        "rate": "5.90",
+        "term": 240,
+        "method": "spitzer",
+        "granted": "2023-07-01",
+        "repaid": "2026-08-02",
+        "track": "fixed",
+        "reset": 0,
+        "linkage": "unlinked",
+        "avg_today": "4.823049",
+        "avg_grant": "5.09",
+        "notice_on": "2026-07-03",
+        "index_change": "0",
+        "directed": 0,
+        "balance": "",
+        "field": "operational"
+      },
+      "value": "60.00"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "er_total",
+      "inputs": {
+        "facts": "ex6.disc|ex6.op"
+      },
+      "value": "14460.00"
+    },
+    {
+      "id": "ex6.err_high",
+      "kind": "er_total",
+      "inputs": {
+        "facts": "ex6.err_high_disc|ex6.op"
+      },
+      "value": "24060.00"
+    },
+    {
+      "id": "ex6.err_no_reduction",
+      "kind": "er_total",
+      "inputs": {
+        "facts": "ex6.lower|ex6.op"
+      },
+      "value": "18060.00"
+    },
+    {
+      "id": "ex6.err_high_disc",
+      "kind": "er_after_reduction",
+      "inputs": {
+        "of": "ex6.v1",
+        "percent": 20
+      },
+      "value": "24000.00"
+    },
+    {
+      "id": "ex7.v2",
+      "kind": "given",
+      "inputs": {},
+      "value": "-2000.00"
+    }
+  ]
+}

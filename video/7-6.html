@@ -1,0 +1,256 @@
+<!doctype html>
+<!--
+  Video scene for lesson 7.6 — "ארבע עסקאות שבהן משהו זז".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t
+  (seconds) and photographs the page. render(t) depends only on t. Every number comes from
+  data/lessons/6-9.json. The subtitle cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: four deals in which something moves, and what the course does not know about them):
+  1. Title: an introduction only.
+  2. The ordinary purchase: one property, one loan on one day, one lender, equity in the account.
+  3. The upgrader: the equity exists, but sits in the old apartment; when does it arrive?
+  4. A bridge, and a loan taken in parts: what a regular schedule assumes.
+  5. The builder: a third party, stages, a different security.
+  6. Three questions, and the rule: what is not known is asked.
+  Every number is the exercise's own (invented); the scene says so.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 7.6 · עסקאות מורכבות, א׳ · היכרות בלבד</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/7-6.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const nw = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 });
+      const shekW = (v) => `${nw.format(Math.round(Number(v)))} ₪`;
+
+      const lr = (x) => `⁦${x}⁩`;
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)", infoBg: "var(--mogi-info-bg)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      const V = {
+        price: fact("u.price"), equity: fact("u.equity_rep"), left: fact("u.left"), spare: fact("u.spare"), sale: fact("u.sale"), oldLoan: fact("u.old_loan"),
+        pctRep: fact("u.pct_rep"), total: fact("d.total"), part: fact("d.part"),
+        cum: [fact("d.part"), fact("d.after2"), fact("d.after3"), fact("d.total")],
+      };
+
+      const S = { title: [0, 9], plain: [9, 34], upg: [34, 84], draws: [84, 128], builder: [128, 158], end: [158, 178] };
+      window.duration = 178;
+      window.cues = [
+        [1, 5, "ארבע עסקאות שבהן משהו זז."],
+        [5, 8.5, "היכרות בלבד: מה שלא יודעים, אומרים."],
+        [10, 17, "ברכישה רגילה: נכס אחד שקיים."],
+        [17, 24, "הלוואה אחת שניתנת ביום אחד."],
+        [24, 33, "מלווה אחד, והון עצמי שכבר בחשבון."],
+        [35, 44, "משפרי דיור: דירה חדשה, והדירה הישנה עוד לא נמכרה."],
+        [44, 54, `בדוגמה: הון עצמי נדרש ${shekW(V.equity)}.`],
+        [54, 65, `ממכירת הישנה נשארים ${shekW(V.left)}, אחרי פירעון ההלוואה.`],
+        [65, 75, "הכסף קיים. השאלה היא מתי הוא מגיע."],
+        [75, 83, "זה לפני מיסים, עלויות ועמלת פירעון."],
+        [85, 95, "הלוואת גישור: שם לפער בזמן."],
+        [95, 105, "את התנאים והמחיר שלה הקורס לא יודע."],
+        [105, 116, "משיכות לשיעורין: ההלוואה מגיעה בחלקים."],
+        [116, 127, "לוח סילוקין רגיל מניח שהכול נמשך ביום אחד."],
+        [129, 138, "קבלן: הדירה עוד לא נבנתה."],
+        [138, 148, "יש צד שלישי, שלבי תשלום, ובטוחה שונה."],
+        [148, 157, "התנאים? הקורס לא יודע. עורך דין ובנק יודעים."],
+        [159, 167, "שלוש שאלות: מה זה? מה שואלים? למי שולחים?"],
+        [167, 177, "ומה שלא יודעים: שואלים ולא מבטיחים."],
+      ];
+
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 20, fill, stroke: C.n200, "stroke-width": 2, opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "ארבע עסקאות שבהן משהו זז", 70, { w: 700, o });
+          txt(640, 360, "היכרות בלבד", 40, { fill: C.n600, o });
+          txt(640, 440, "דוגמאות בדויות, לא נתוני שוק. הקורס לא יודע את התנאים של העסקאות האלה", 24, { fill: C.n500, o: after(t, S.title, 4, o, 0.8) });
+        }
+        // Scene 2 — the ordinary purchase
+        if (inScene(t, S.plain)) {
+          const o = vis(t, S.plain);
+          txt(640, 110, "ברכישה רגילה", 46, { w: 700, o });
+          const items = [
+            { x: 1030, a: "נכס אחד", b: "שקיים", at: 1.5 },
+            { x: 770, a: "הלוואה אחת", b: "ביום אחד", at: 8 },
+            { x: 510, a: "מלווה אחד", b: "", at: 15 },
+            { x: 250, a: "הון עצמי", b: "כבר בחשבון", at: 20 },
+          ];
+          items.forEach((c) => {
+            const oi = after(t, S.plain, c.at, o);
+            if (oi <= 0) return;
+            card(c.x - 118, 200, 236, 220, oi);
+            el("rect", { x: c.x + 104, y: 200, width: 14, height: 220, rx: 7, fill: C.teal, opacity: oi });
+            txt(c.x - 6, 292, c.a, 32, { w: 700, o: oi });
+            if (c.b) txt(c.x - 6, 345, c.b, 28, { fill: C.n700, o: oi });
+          });
+          txt(640, 505, "בעסקאות של היום אחד מהם נשבר", 30, { fill: C.n700, o: after(t, S.plain, 21, o) });
+        }
+        // Scene 3 — the upgrader
+        if (inScene(t, S.upg)) {
+          const o = vis(t, S.upg);
+          txt(640, 100, "משפרי דיור", 46, { w: 700, o });
+          const y = 360;
+          el("line", { x1: 120, x2: 1160, y1: y, y2: y, stroke: C.n300, "stroke-width": 4, opacity: o });
+          txt(1160, y + 44, "היום", 24, { anchor: "start", fill: C.n600, o });
+          txt(120, y + 110, "מאוחר יותר", 24, { anchor: "end", fill: C.n600, o });
+          // equity needed, on the right (earlier)
+          const o1 = after(t, S.upg, 10, o);
+          if (o1 > 0) {
+            card(790, 160, 360, 150, o1);
+            txt(970, 212, "הון עצמי נדרש", 28, { w: 600, fill: C.n700, o: o1 });
+            txt(970, 275, lr(shekW(V.equity)), 54, { w: 700, fill: C.teal, o: o1, ltr: true });
+            el("circle", { cx: 970, cy: y, r: 14, fill: C.navy, opacity: o1 });
+            txt(970, y + 44, "תשלום על החדשה", 24, { fill: C.n700, o: o1 });
+          }
+          // sale proceeds, on the left (later)
+          const o2 = after(t, S.upg, 20, o);
+          if (o2 > 0) {
+            card(130, 160, 380, 150, o2);
+            txt(320, 212, "נשאר ממכירת הישנה", 28, { w: 600, fill: C.n700, o: o2 });
+            txt(320, 275, lr(shekW(V.left)), 54, { w: 700, fill: C.teal, o: o2, ltr: true });
+            el("circle", { cx: 320, cy: y, r: 14, fill: C.navy, opacity: o2 });
+            txt(320, y + 44, "אחרי המכירה והפירעון", 24, { fill: C.n700, o: o2 });
+          }
+          // the gap
+          const o3 = after(t, S.upg, 31, o);
+          if (o3 > 0) {
+            el("rect", { x: 335, y: y - 10, width: 620, height: 20, rx: 10, fill: C.warningBg, opacity: o3 });
+            txt(645, y - 26, "הפער בזמן", 30, { w: 700, o: o3 });
+            txt(645, y + 76, "כמה זמן? הקורס לא יודע", 26, { fill: C.n700, o: o3 });
+          }
+          const o4 = after(t, S.upg, 38, o);
+          txt(640, 530, `נשארים מעבר לנדרש: ${lr(shekW(V.spare))}`, 30, { w: 600, fill: C.n700, o: o4 });
+          txt(640, 574, "לפני מיסים, עלויות מכירה ועמלת פירעון על ההלוואה הישנה", 24, { fill: C.n500, o: after(t, S.upg, 42, o) });
+        }
+        // Scene 4 — bridge and draws
+        if (inScene(t, S.draws)) {
+          const o = vis(t, S.draws);
+          txt(640, 100, "גישור, ומשיכות לשיעורין", 46, { w: 700, o });
+          // right: the bridge
+          const ob = after(t, S.draws, 1, o);
+          if (ob > 0) {
+            card(700, 160, 460, 360, ob);
+            txt(930, 215, "הלוואת גישור", 34, { w: 700, o: ob });
+            txt(930, 262, "הגדרה כללית של השם", 24, { fill: C.n600, o: ob });
+            const ob2 = after(t, S.draws, 6, o);
+            ["תנאים: לא ידוע", "מחיר: לא ידוע", "בטוחה: לא ידוע", "נספרת ביחס החזר? לא ידוע"].forEach((s, i) => {
+              const yy = 330 + i * 50;
+              if (after(t, S.draws, 6 + i * 2, o) > 0) {
+                el("rect", { x: 730, y: yy - 30, width: 400, height: 40, rx: 12, fill: C.warningBg, opacity: after(t, S.draws, 6 + i * 2, o) });
+                txt(930, yy, s, 24, { w: 600, o: after(t, S.draws, 6 + i * 2, o) });
+              }
+            });
+            void ob2;
+          }
+          // left: four draws as steps
+          const od = after(t, S.draws, 20, o);
+          if (od > 0) {
+            card(120, 160, 540, 360, od);
+            txt(390, 215, "משיכות לשיעורין", 34, { w: 700, o: od });
+            txt(390, 255, `הלוואה בדויה של ${lr(shekW(V.total))}`, 24, { fill: C.n600, o: od });
+            V.cum.forEach((c, i) => {
+              const oi = after(t, S.draws, 23 + i * 3, o);
+              if (oi <= 0) return;
+              const w = 170 + i * 90;
+              const yy = 290 + i * 54;
+              el("rect", { x: 610 - w, y: yy, width: w, height: 40, rx: 8, fill: i === 3 ? C.teal : C.tq2, opacity: oi });
+              txt(645, yy + 29, `${i + 1}`, 26, { anchor: "start", w: 600, fill: C.n700, o: oi });
+              txt(610 - w + 14, yy + 29, lr(shekW(c)), 24, { anchor: "start", w: 700, ltr: true, fill: i === 3 ? C.n0 : C.navy, o: oi });
+            });
+          }
+          txt(640, 580, "לוח סילוקין של הלוואה ביום אחד לא מתאר הלוואה כזו", 28, { w: 600, fill: C.n700, o: after(t, S.draws, 34, o) });
+        }
+        // Scene 5 — the builder
+        if (inScene(t, S.builder)) {
+          const o = vis(t, S.builder);
+          txt(640, 100, "קניית דירה מקבלן", 46, { w: 700, o });
+          const chain = [
+            { x: 1030, a: "הקונים", b: "משלמים בשלבים", at: 1 },
+            { x: 640, a: "הקבלן", b: "והדירה עוד לא קיימת", at: 5 },
+            { x: 250, a: "בנק שמלווה", b: "את הפרויקט", at: 9 },
+          ];
+          chain.forEach((c, i) => {
+            const oi = after(t, S.builder, c.at, o);
+            if (oi <= 0) return;
+            card(c.x - 150, 180, 300, 170, oi);
+            txt(c.x, 255, c.a, 34, { w: 700, o: oi });
+            txt(c.x, 305, c.b, 24, { fill: C.n700, o: oi });
+            if (i < 2) txt(c.x - 195, 275, "←", 44, { fill: C.n500, o: after(t, S.builder, c.at + 2, o) });
+          });
+          const og = after(t, S.builder, 13, o);
+          if (og > 0) {
+            el("rect", { x: 340, y: 395, width: 600, height: 56, rx: 28, fill: C.infoBg, opacity: og });
+            txt(640, 432, "הבטוחה של הקונה: ערבות חוק מכר", 28, { w: 600, o: og });
+          }
+          txt(640, 520, "״מימון קבלן״ יכול להיות גם הסדר שהקבלן מציע. התנאים: לא ידועים לקורס", 26, { fill: C.n700, o: after(t, S.builder, 18, o) });
+        }
+        // Scene 6 — close
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 190, "שלוש שאלות לכל עסקה מורכבת", 54, { w: 700, o });
+          [["מה זה?", 1], ["מה שואלים?", 4], ["מתי לא עונים לבד?", 7]].forEach(([s, at], i) => {
+            const oi = after(t, S.end, at, o);
+            if (oi <= 0) return;
+            el("rect", { x: 340, y: 250 + i * 80, width: 600, height: 60, rx: 30, fill: C.successBg, opacity: oi });
+            txt(640, 292 + i * 80, `${i + 1}. ${s}`, 32, { w: 600, o: oi });
+          });
+          txt(640, 540, "מה שהקורס לא יודע, הוא אומר ושואל", 36, { w: 700, fill: C.teal, o: after(t, S.end, 11, o) });
+          txt(640, 590, "המספרים בשיעור בדויים, להמחשה בלבד.", 22, { fill: C.n500, o: after(t, S.end, 13, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

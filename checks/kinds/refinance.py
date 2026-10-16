@@ -25,7 +25,7 @@ Text forms (the facts' inputs):
   shared   a charge in the whole-loan figure only.
   scope    "whole" or the number of one track (from 0).
 """
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
 from kinds.common import agorot
 from kinds.metrics import _irr, _level, _parse, _plain, _pv, _rows

@@ -1,0 +1,551 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "7.7"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import CardSort from "../../components/CardSort.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("7.7");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const predictionOptions = [
+  "שמשכנתא מדרגה שנייה זולה יותר, כי היא קטנה יותר",
+  "שהם אותו דבר בשני שמות, ואין הבדל",
+  "שהשמות מתארים דרגה, באחד המלווים באותה דרגה ובשני אחד בא אחרי השני, אבל איך זה עובד בישראל הקורס לא יודע",
+  "שאחד מהם אסור לפי הוראה 329",
+];
+export const bins = ["ידע מהשטח או תקציר, לא אומת", "מה שהשם עצמו אומר", "החלטה של Mogi", "הקורס לא יודע"];
+export const questions = [
+  "מישהו אמר או סיכם, ואין מקור רשמי שנפתח?",
+  "זה מה שהמילים אומרות, בלי קשר לנוהג בישראל?",
+  "מישהו בצוות החליט, ויש תאריך?",
+  "אין אפילו אמירה אחת?",
+];
+export const cards = [
+  { text: `שני בנקים משעבדים את אותו נכס, למשל אחד על ${f.plain("p.pct_a")}% מהערך והשני על עוד ${f.plain("p.pct_b")}%.`, bin: 0, why: "ידע מהשטח: אילון, 27.7.2026. ממתין לאישור אילון, ולא נמצא לזה מקור רשמי." },
+  { text: "בפארי־פאסו שני המלווים באותה דרגה, ואף אחד מהם לא קודם לשני.", bin: 1, why: "זה מה שהשם אומר. לא נבדק מול הנוהג בישראל." },
+  { text: "במשכנתא מדרגה שנייה ההלוואה מובטחת בשעבוד שבא אחרי השעבוד הקודם על הנכס.", bin: 1, why: "זה מה שהשם אומר. לא נבדק מול הנוהג בישראל." },
+  { text: "תקרת המימון נבחנת על כל ההלוואות על הנכס, גם אם חלקן מבנק אחר.", bin: 0, why: "לפי תקציר של הוראה 329. לא נפתחה ההוראה: לא אומת." },
+  { text: "משכנתא מדרגה שנייה אינה בגרסה הראשונה של המוצר של Mogi.", bin: 2, why: "החלטה של Mogi מ־29.7.2026: תיקים מורכבים באים אחרי התיקים הסטנדרטיים." },
+  { text: "פארי־פאסו ומשכנתא מדרגה שנייה הם שני הסדרים שונים.", bin: 3, why: "אילון אמר ״או״. הקורס לא יודע אם זה שני הסדרים, או שני שמות לאותו הסדר." },
+  { text: "מי נפרע ראשון כשהנכס נמכר, בכל אחד מההסדרים האלה בישראל.", bin: 3, why: "השם מרמז על הדרגה, אבל איך זה עובד בפועל הקורס לא יודע." },
+  { text: "בנק מוכן לקבל שעבוד שני בלי אישור של הבנק הראשון.", bin: 3, why: "אין לקורס אפילו אמירה על זה. שאלה לעורך דין ולבנק." },
+  { text: "למה כדאי למישהו לפנות לשני בנקים על אותו נכס.", bin: 3, why: "אילון אמר ״רוב היועצים כלל לא מכירים״, לא למה כדאי. הקורס לא יודע." },
+  { text: "רוב היועצים כלל לא מכירים את ההסדר הזה.", bin: 0, why: "ידע מהשטח: אילון, 27.7.2026. ממתין לאישור אילון." },
+];
+export const halfRows = [
+  { lender: "בנק א׳", pct: f.raw("p.pct_a"), amount: f.raw("p.a") },
+  { lender: "בנק ב׳", pct: f.raw("p.pct_b"), amount: f.raw("p.b") },
+  { lender: "ביחד", pct: f.raw("p.ltv"), amount: f.raw("p.both") },
+];
+export const mapRows = [
+  { topic: "משפרי דיור", what: "עסקה של דירה חליפית: שני נכסים והלוואה קיימת", unknown: "כמה זמן מותר למכור, ומה אפשר לעשות בהלוואה הישנה", to: "הבנק ועורך הדין", lesson: "7.6" },
+  { topic: "הלוואת גישור", what: "הלוואה קצרה שמגשרת על פער בזמן", unknown: "אם ואיך היא ניתנת, מחיר, בטוחה, ואם היא נספרת ביחס ההחזר", to: "מומחה", lesson: "7.6" },
+  { topic: "משיכות לשיעורין", what: "הלוואה שניתנת בחלקים", unknown: "חישוב ריבית והצמדה, ומתי מתחילים להחזיר", to: "הבנק", lesson: "7.6" },
+  { topic: "מימון קבלן, ליווי בנקאי וערבות חוק מכר", what: "דירה שעוד לא נבנתה, עם צד שלישי ותשלומים בשלבים", unknown: "התנאים, גובה הערבות ולוח התשלומים", to: "עורך הדין ובנק", lesson: "7.6" },
+  { topic: "בנייה עצמית", what: "הלוואה לבניית בית על מגרש", unknown: "מימון בשלבים, שיעורי המימון והשווי העתידי", to: "הבנק ומומחה", lesson: "7.7" },
+  { topic: "שני בנקים על אותו נכס", what: "פארי־פאסו או משכנתא מדרגה שנייה", unknown: "ההבחנה ביניהם, ההסכמות הנדרשות והמחיר", to: "מומחה. במוצר של Mogi: לא בגרסה הראשונה", lesson: "7.7" },
+  { topic: "משכנתא הפוכה", what: "הלוואה לבני גיל הזהב כנגד נכס בבעלותם", unknown: "כל מה שמעבר לשם ולרעיון", to: "מומחה", lesson: "7.7" },
+];
+
+בשיעור 7.6 ראיתם ארבע עסקאות שבהן משהו זז. היום שלוש עסקאות נוספות: <Term t="בנייה עצמית" lesson="1.5">בנייה עצמית</Term>, שני בנקים על אותו נכס, ו<Term t="משכנתא הפוכה" lesson="7.7">משכנתא הפוכה</Term>. באחת מהן יש הבחנה שהקורס עוד לא יודע להכריע בה, ודווקא לכן היא חלק מהשיעור: ההבחנה בין <Term t="פארי־פאסו" lesson="7.7">פארי־פאסו</Term> לבין <Term t="משכנתא מדרגה שנייה" lesson="7.7">משכנתא מדרגה שנייה</Term>. גם זו **היכרות בלבד**.
+
+<Callout title="היכרות בלבד: מה השיעור הזה לא אומר" tone="warning">
+<p><strong>{MARK}</strong></p>
+<p>בשיעור הזה אין כללים, שיעורי מימון, ריביות או נהלים של בנייה עצמית, של שני בנקים על נכס אחד או של משכנתא הפוכה. **הקורס לא יודע אותם.** מה שכתוב כאן הוא ידע מהשטח שממתין לאישור אילון, הגדרה כללית של שם, תקציר שלא נבדק, החלטה של Mogi, או ״הקורס לא יודע״, וכל משפט מסומן. שתי הדוגמאות עם מספרים הן דוגמאות מותנות: הן מראות מה היה יוצא אילו הכלל נכון, ואין בהן שום כלל.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="7.7"
+  question={`אילון אמר (27.7.2026): ״בפארי־פאסו או במשכנתא מדרגה שנייה שני בנקים משעבדים את אותו נכס״. מה הקורס יכול לומר בביטחון על ההבדל בין שני השמות?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מה יודעים ומה לא
+
+</Section>
+
+<LessonVideo lesson="7-7" />
+
+<Section kind="ההסבר">
+
+## בנייה עצמית: בית שעוד לא קיים
+
+</Section>
+
+כשהלוואה ניתנת לבנייה עצמית, ביום שהיא ניתנת **הבית עוד לא קיים**: הוא נבנה בכסף של ההלוואה (שיעור 1.5). מה הקורס יודע, ומה הוא לא יודע:
+
+- **ידע מהשטח (אילון, 27.7.2026; ניסוח חופשי של הצוות, ממתין לאישור אילון):** בבנייה עצמית מקבלים עד {f.plain("s.pct_land")}% מימון על הקרקע, ואחר כך עד {f.plain("s.pct_future")}% מערך הנכס העתידי. לא נמצא לזה מקור רשמי.
+- **מה שתועד אצל הצוות (לא נבדק מחדש מול האתר של הבנק):** רשימת פתיחת תיק של בנק לבנייה עצמית כוללת הוכחת בעלות, תעודת זהות וספח, תוכניות והיתרי בנייה, ושמאות קודם. ובשאלונים של בנקים יש שאלות ייחודיות לקרקע: מה שווי המגרש, ממי נרכש, והאם הוא בבעלותכם.
+- **הקורס לא יודע:** מי קובע את הערך העתידי ובאיזו שיטה, כמה שלבים יש ומתי כל שלב, ומה קורה כשהבנייה מתעכבת או עולה יותר.
+
+אילו הידע מהשטח נכון, זו הייתה התמונה בדוגמה בדויה: מגרש ששווה {f.shekels("s.land")}, ובית שעתיד לעמוד ב־{f.shekels("s.future")} כשיסתיים.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השלב</th>
+        <th class="py-2 pe-3 text-start font-semibold">הערך שנמדד</th>
+        <th class="py-2 pe-3 text-start font-semibold">תקרה</th>
+        <th class="py-2 pe-3 text-start font-semibold">סכום מרבי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">על המגרש</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("s.land")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("s.pct_land")}%</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("s.first")}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">סך ההלוואה, בסוף</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("s.future")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{f.plain("s.pct_future")}%</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("s.cap")}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900">נוסף בשלבים</td>
+        <td class="py-2 pe-3">—</td>
+        <td class="py-2 pe-3">—</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("s.later")}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} אילו הידע מהשטח נכון (ממתין לאישור אילון, אין מקור רשמי). הערכים והבית בדויים.</p>
+</div>
+
+אילו התקרות האלה נכונות, ההלוואה בסוף יכולה להגיע עד {f.shekels("s.cap")}, ומתוכה רק {f.shekels("s.first")} יכולים להינתן על המגרש לפני שהבית נבנה: <M>{n("s.cap")} − {n("s.first")} = {n("s.later")}</M> ₪ מגיעים אחר כך. זה לא שיעור מימון של דירה שקיימת. הוא נמדד ברגעים שונים, מול ערכים שונים, ואחד מהם הוא ערך של בית שעוד לא נבנה.
+
+**מה שואלים:** מי קובע את הערך העתידי, כמה שלבים יש, ומה נדרש כדי לעבור מאחד לשני; מה המצב של המגרש (בבעלות, או נרכש עכשיו); איזה אישורים דרושים (תוכניות והיתרים); מה קורה כשהבנייה עולה יותר. **מתי לא עונים לבד:** תמיד. הקורס לא יודע את התנאים ולא את השלבים.
+
+<Section kind="חלק 2">
+
+## שני בנקים על אותו נכס: הבחנה שהקורס לא יודע להכריע בה
+
+</Section>
+
+ההבחנה הנדרשת כאן היא בין **מה שהקורס יודע** לבין **מה שהוא לא יודע**, ולא בין שני הסדרים. הטבלה מראה כל מקור בנפרד, וכמה אפשר לסמוך עליו.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה נאמר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מי אמר</th>
+        <th class="py-2 pe-3 text-start font-semibold">כמה אפשר לסמוך</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3">בפארי־פאסו או במשכנתא מדרגה שנייה שני בנקים משעבדים את אותו נכס, ו״רוב היועצים כלל לא מכירים״</td>
+        <td class="py-2 pe-3">אילון, 27.7.2026</td>
+        <td class="py-2 pe-3">ידע מהשטח. ממתין לאישור אילון.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3">בפארי־פאסו שני המלווים באותה דרגה. במשכנתא מדרגה שנייה ההלוואה בדרגה שאחרי הראשונה.</td>
+        <td class="py-2 pe-3">משמעות השמות</td>
+        <td class="py-2 pe-3">הגדרה כללית. לא נבדקה מול נוהג בישראל.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3">תקרת המימון כוללת הלוואות מבנקים אחרים על אותו נכס</td>
+        <td class="py-2 pe-3">תקציר של הוראה 329</td>
+        <td class="py-2 pe-3">לא אומת. ההוראה לא נפתחה.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3">משכנתא מדרגה שנייה אינה בגרסה הראשונה של המוצר, ותיקים מורכבים באים אחרי התיקים הסטנדרטיים</td>
+        <td class="py-2 pe-3">Mogi, 29.7.2026</td>
+        <td class="py-2 pe-3">החלטה של Mogi, על המוצר. לא קובעת עובדה על השוק.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3">האם שני השמות הם שני הסדרים או אחד. מי נפרע ראשון בפועל. מה נדרש מהבנק הראשון. מה המחיר. למה בכלל כדאי.</td>
+        <td class="py-2 pe-3">אף אחד</td>
+        <td class="py-2 pe-3">הקורס לא יודע.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+שימו לב למה שהטבלה לא אומרת. אילון אמר ״או״, ולכן יכול להיות ששני השמות הם שני הסדרים שונים, ויכול להיות שהם שני שמות לאותו הסדר. הקורס לא יודע. מה שהשמות עצמם מרמזים הוא הבדל של **דרגה**: אצל אחד המלווים שווים, ואצל השני אחד בא אחרי השני. אבל זו משמעות של מילים, ולא נוהג שבדק מישהו.
+
+### דוגמה מותנית: מה היה יוצא אילו התקציר נכון
+
+נניח שנכס בדוי שווה {f.shekels("p.value")}, ושבנק א׳ נותן {f.plain("p.pct_a")}% מערכו ובנק ב׳ עוד {f.plain("p.pct_b")}% (הדוגמה של אילון, עם בנקים בדויים). ואילו התקציר של הוראה 329 נכון, כלומר <Term t="שיעור מימון" lesson="1.2">שיעור המימון</Term> נבחן על כל ההלוואות יחד, מול תקרה של {f.plain("p.pct_cap")}% לדירה יחידה (תעתיק הצוות, שיעור 4.4, לא אומת).
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המלווה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מערך הנכס</th>
+        <th class="py-2 pe-3 text-start font-semibold">סכום</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">בנק א׳</td><td class="py-2 pe-3"><span class="ltr">{f.plain("p.pct_a")}%</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.a")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">בנק ב׳</td><td class="py-2 pe-3"><span class="ltr">{f.plain("p.pct_b")}%</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.b")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">ביחד</td><td class="py-2 pe-3"><span class="ltr">{f.plain("p.ltv")}%</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.both")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">התקרה</td><td class="py-2 pe-3"><span class="ltr">{f.plain("p.pct_cap")}%</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.cap")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נשאר עד התקרה</td><td class="py-2 pe-3">—</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.room")}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הדוגמה מותנית: היא נכונה רק אילו התקציר נכון. הבנקים והנכס בדויים.</p>
+</div>
+
+הנקודה היא שאין שום חשבון של ״שני בנקים, שני מימונים נפרדים״: אילו התקציר נכון, השניים נספרים יחד. מה שלא נאמר הוא למה מישהו היה עושה את זה, ואם היה צריך הסכמה של הבנק הראשון. **מה שואלים:** מה הדרגה של כל שעבוד, מי נפרע ראשון, מה נדרש מכל בנק, ומה המחיר של כל חלק. **מתי לא עונים לבד:** תמיד. ובמוצר של Mogi זו משכנתא שאינה בגרסה הראשונה (החלטה של Mogi מ־29.7.2026).
+
+<Section kind="חלק 3">
+
+## משכנתא הפוכה: ההפך ממה שלמדתם
+
+</Section>
+
+כל המשכנתאות שלמדתם עד כה לווים משלמים כדי לקנות נכס. **משכנתא הפוכה** היא, לפי ידע מהשטח (אילון, 27.7.2026; ממתין לאישור אילון), הלוואה לבני גיל הזהב: משעבדים נכס בבעלות מלאה כדי לקבל כסף, ומחזירים אותה אחרת. לפי אותו ידע, ההחזר הוא חודשי או בעת הפטירה, דרך מוטב או ביטוח. הקורס לא מציג את המשפט הנוסף, ש״אין בה חובת ביטוח חיים״, כעובדה: הוא ממתין לבדיקה. (במשכנתא רגילה, הטענה ש״יש חובת ביטוח חיים״ נמצאה בבדיקה של הצוות לא מדויקת במלואה מול ההוראה על השוואת הצעות: לא אומת.)
+
+### מה הקורס לא יודע
+
+- מי נותן אותה, באיזה גיל, ועל כמה מערך הנכס.
+- המחיר, ומה קורה לחוב עם השנים.
+- מי מחזיר בפטירה ואיך, ומה קורה ליורשים ולבן או לבת הזוג.
+- אם יש לה מגבלות או הגנות מיוחדות ללקוחות מבוגרים.
+
+### למה זה מורכב
+
+הלווים מבוגרים, אין רכישה, והנכס הוא מקור ההחזר. ויש בה אנשים נוספים שהם לא הלווים: יורשים, מוטב, מבטח. לכן שאלות שהן שוליות במשכנתא רגילה, כמו מי יחיה בבית ומי ירש אותו, הן מרכזיות כאן.
+
+### מה שואלים, ומתי לא עונים לבד
+
+1. מה גיל הלווים, ומי עוד גר בנכס?
+2. מה קורה לחוב עם השנים: הוא גדל, או משולם?
+3. מי מחזיר בפטירה, ואיך?
+4. מה המטרה של הכסף, ומה החלופות?
+5. מה יישאר ליורשים?
+
+כאן **תמיד** שולחים: הקורס מכיר את העסקה רק בשמה וברעיון שלה. כשהלקוחות מבוגרים, ההצעה של הקורס היא להסביר לאט, ולהציע שבן משפחה יהיה בשיחה (הצעה של הקורס, לא כלל).
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מה הקורס יודע על שני בנקים על נכס אחד?
+
+</Section>
+
+כל קלף הוא משפט על העסקה, בין שני בנקים על אותו נכס. לאיזו ערימה הוא שייך: ידע מהשטח או תקציר, מה שהשם עצמו אומר, החלטה של Mogi, או משהו שהקורס לא יודע? בטעות תקבלו רמז, ובתשובה נכונה הסבר.
+
+<CardSort
+  client:visible
+  id="7.7-sort"
+  bins={bins}
+  questions={questions}
+  cards={cards}
+  success="כל משפט נשען על מקור אחר, ורובו על שום מקור. מי שיודע להפריד ביניהם לא נותן ללקוחות את מה שהקורס לא יודע."
+/>
+
+נסו שלוש משימות:
+1. מיינו את כל הקלפים. כמה קלפים יש בכל ערימה?
+2. מצאו שני קלפים שנראים כמו שאלה אחת, אבל הם בערימות שונות.
+3. כתבו בעצמכם משפט אחד שהקורס יכול להגיד ללקוחות על שני בנקים על אותו נכס, בלי להבטיח כלום.
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>שלושה קלפים בערימת ידע מהשטח או תקציר, שני קלפים בערימת מה שהשם אומר, קלף אחד בערימת ההחלטה של Mogi, וארבעה קלפים בערימת ״הקורס לא יודע״.</li>
+    <li>למשל ״פארי־פאסו ומשכנתא מדרגה שנייה הם שני הסדרים שונים״ (הקורס לא יודע) מול ״בפארי־פאסו שני המלווים באותה דרגה״ (מה שהשם אומר). הראשון שואל אם יש שני הסדרים, והשני רק מפרש מילה.</li>
+    <li>למשל: ״יש הסדר שבו שני בנקים משעבדים את אותו נכס. אני לא יודע/ת אם ואיך אפשר לעשות את זה בתיק שלכם, ואבדוק עם מי שמכיר אותו״.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## שיעור מימון של כמה הלוואות
+
+</Section>
+
+זו הנוסחה מ־1.2, כשיש יותר מהלוואה אחת על אותו נכס. אילו התקציר של הוראה 329 נכון, מחברים את ההלוואות קודם:
+
+1. **מחברים את ההלוואות:** <M>{n("p.a")} + {n("p.b")} = {n("p.both")}</M> ₪.
+2. **מחלקים בשווי ומכפילים ב־100:** <M>{n("p.both")} ÷ {n("p.value")} × 100 = {n("p.ltv")}</M>%.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
+  <p class="text-body-l font-semibold text-n900"><M>(x + y) ÷ V × 100</M></p>
+  <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-body-m">
+    <dt class="font-semibold text-n900">x</dt><dd>ההלוואה של הבנק הראשון, בשקלים</dd>
+    <dt class="font-semibold text-n900">y</dt><dd>ההלוואה של הבנק השני, בשקלים</dd>
+    <dt class="font-semibold text-n900">V</dt><dd>שווי הנכס (שיעור 1.1), בשקלים</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700"><strong>מתי הנוסחה נכונה?</strong> רק אילו התקציר נכון, ואילו כל ההלוואות על הנכס נספרות. <strong>איך מחשבים?</strong> במחשבון: חיבור, חילוק בשווי, כפל ב־100.</p>
+</div>
+
+<PredictionReveal
+  client:visible
+  id="7.7"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "הקורס לא יודע מה המחיר של הלוואה בדרגה שנייה, ולכן אין לו מה לומר על זול או יקר. גם גודל ההלוואה אינו מחיר.",
+    "אילון אמר ״או״, והשמות מרמזים על הבדל של דרגה. הקורס לא יודע אם הם אותו הסדר, ולכן אינו אומר שאין הבדל.",
+    "",
+    "הוראה 329 מגבילה תקרות מימון, לא אוסרת סוג הלוואה. ומה שהקורס יודע עליה הוא תעתיק או תקציר, לא אומת.",
+  ]}
+>
+  מה שהקורס יודע בביטחון הוא מה שהשמות אומרים, ובדיוק זה: דרגה שווה מול דרגה שאחרי. מה ההסדר, מי משתמש בו ומה הוא עולה, הוא לא יודע. ההבחנה בין שני השמות היא לכן הבחנה בין ידוע ללא ידוע: ״הקורס לא יודע״ הוא חלק מהתשובה, ולא כישלון שלה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## בנייה עצמית, שורה אחר שורה
+
+</Section>
+
+אילו הידע מהשטח נכון (ממתין לאישור אילון): מגרש ששווה {f.shekels("s.land")}, ובית עתידי ששווה {f.shekels("s.future")}.
+
+**צעד 1 — מה אפשר על המגרש.** <M>{n("s.land")} × {f.plain("s.pct_land")} ÷ 100 = {n("s.first")}</M> ₪.
+
+**צעד 2 — התקרה בסוף.** <M>{n("s.future")} × {f.plain("s.pct_future")} ÷ 100 = {n("s.cap")}</M> ₪, והיא נמדדת מול ערך של בית שעוד לא נבנה.
+
+**צעד 3 — מה נוסף בשלבים.** <M>{n("s.cap")} − {n("s.first")} = {n("s.later")}</M> ₪.
+
+**צעד 4 — מה זה לא אומר.** המספרים לא אומרים כמה שלבים יש, מתי, ומי קובע את הערך העתידי. הם רק מראים שההלוואה נמדדת בשני רגעים ומול שני ערכים.
+
+<Section kind="דוגמה חצי פתורה">
+
+## שני בנקים, שורה אחר שורה
+
+</Section>
+
+אילו התקציר נכון, שני הבנקים נספרים יחד. בטבלה, השורה הראשונה כבר מלאה. השלימו את הסכום של בנק ב׳ ואת השורה של שניהם ביחד.
+
+<FillTable
+  client:visible
+  id="7.7-half"
+  rowKey="lender"
+  periodLabel="המלווה"
+  columns={[
+    { key: "pct", label: "מערך הנכס, באחוזים", format: "percent" },
+    { key: "amount", label: "סכום, ₪" },
+  ]}
+  rows={halfRows}
+  blanks={["בנק ב׳.amount", "ביחד.amount", "ביחד.pct"]}
+  success={`נכון. ${f.shekels("p.b")} לבנק ב׳, ${f.shekels("p.both")} ביחד, ושיעור מימון משותף של ${f.plain("p.ltv")}%. אילו התקציר נכון, זה המספר שנבחן מול התקרה.`}
+  hint="סכום של כל בנק הוא אחוז מערך הנכס. ביחד מחברים, ואת האחוז המשותף מחשבים מהסכום ביחד."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים והבנקים בתרגילים בדויים, והתרגילים 3 עד 6 מותנים בכלל שאין לו מקור מאומת: הם מראים מה היה יוצא אילו הכלל נכון. התרגילים מסודרים מהקל אל המאתגר, ושלושה מהם צריכים מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="7.7-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "הלוואה לתקופה קצרה שמגשרת על פער", feedback: "זו הלוואת גישור (שיעור 7.6)." },
+    { text: "שני מלווים באותה דרגה, ואף אחד מהם לא קודם לשני", correct: true, feedback: "נכון, וזו משמעות השם בלבד. איך זה עובד בישראל, הקורס לא יודע." },
+    { text: "מלווה שבא אחרי המלווה הראשון", feedback: "זה מה שהשם ״מדרגה שנייה״ אומר, לא פארי־פאסו." },
+    { text: "הלוואה לבני גיל הזהב", feedback: "זו משכנתא הפוכה." },
+  ]}
+>
+  מה פירוש השם ״פארי־פאסו״, כהגדרה כללית של השם?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="7.7-2"
+  n={2}
+  level="קל"
+  options={[
+    { text: "אסור ליועץ לטפל במשכנתא מדרגה שנייה", feedback: "ההחלטה היא על המוצר ועל הסדר, לא איסור מקצועי. הקורס לא יודע שיש איסור כזה." },
+    { text: "משכנתא מדרגה שנייה חובה בכל תיק מורכב", feedback: "אין החלטה כזו." },
+    { text: "משכנתא מדרגה שנייה אינה בגרסה הראשונה של המוצר, ותיקים מורכבים באים אחרי התיקים הסטנדרטיים", correct: true, feedback: "נכון. זו החלטה על סדר הבנייה של המוצר." },
+    { text: "היא נחשבת כמו הלוואה רגילה", feedback: "לא נאמר, והקורס לא יודע איך היא נחשבת." },
+  ]}
+>
+  מה ההחלטה של Mogi מ־29.7.2026 לגבי משכנתא מדרגה שנייה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="7.7-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("p.both")}
+  errors={[
+    { value: f.raw("p.a"), message: "זה רק הבנק הראשון. השאלה על שני הבנקים ביחד." },
+  ]}
+>
+  אילו התקציר של הוראה 329 נכון: נכס בדוי שווה {f.shekels("p.value")}. בנק א׳ נותן {f.shekels("p.a")} ובנק ב׳ {f.shekels("p.b")}. מה סך ההלוואות עליו?
+</NumericExercise>
+
+<Solution for="7.7-3">
+<M>{n("p.a")} + {n("p.b")} = {n("p.both")}</M> ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.7-4"
+  n={4}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("p.ltv")}
+  errors={[
+    { value: f.raw("p.pct_a"), message: "זה שיעור המימון של בנק א׳ לבדו. אילו התקציר נכון, מחברים את שתי ההלוואות." },
+    { value: f.raw("p.pct_b"), message: "זה שיעור המימון של בנק ב׳ לבדו. אילו התקציר נכון, מחברים את שתי ההלוואות." },
+  ]}
+>
+  מהו שיעור המימון של שתי ההלוואות ביחד (שהן {f.shekels("p.both")} מתוך {f.shekels("p.value")}), באחוזים?
+</NumericExercise>
+
+<Solution for="7.7-4">
+<M>{n("p.both")} ÷ {n("p.value")} × 100 = {n("p.ltv")}</M>%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.7-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("p.room")}
+  errors={[
+    { value: f.raw("p.cap"), message: "זו התקרה עצמה, כלומר ההלוואה הגבוהה ביותר. השאלה כמה נשאר אחרי ששני הבנקים כבר נתנו." },
+  ]}
+>
+  אילו התקציר נכון, והתקרה היא {f.plain("p.pct_cap")}% מהשווי, כלומר {f.shekels("p.cap")}: כמה עוד אפשר להלוות על הנכס אחרי ששני הבנקים נתנו {f.shekels("p.both")}?
+</NumericExercise>
+
+<Solution for="7.7-5">
+<M>{n("p.cap")} − {n("p.both")} = {n("p.room")}</M> ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="7.7-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("s.later")}
+  errors={[
+    { value: f.raw("s.cap"), message: "זו התקרה הכוללת, כולל מה שכבר ניתן על המגרש. השאלה על מה שנוסף אחר כך." },
+    { value: f.raw("s.first"), message: "זה מה שאפשר על המגרש, בשלב הראשון. השאלה על מה שנוסף אחרי שהבנייה מתקדמת." },
+  ]}
+>
+  אילו הידע מהשטח נכון (ממתין לאישור אילון): על מגרש ששווה {f.shekels("s.land")} אפשר עד {f.shekels("s.first")}, ותקרת ההלוואה בסוף היא {f.shekels("s.cap")}. כמה נוסף בשלבים?
+</NumericExercise>
+
+<Solution for="7.7-6">
+<M>{n("s.cap")} − {n("s.first")} = {n("s.later")}</M> ₪. אבל כמה שלבים יש, ומי קובע את הערך העתידי: זה הקורס לא יודע.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="7.7-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "אין בה חובת ביטוח חיים, ולכן היא זולה יותר", feedback: "המשפט על ביטוח חיים ממתין לבדיקה, ו״זולה יותר״ לא נאמר בשום מקום. זה מסקנה שאין לה כיסוי." },
+    { text: "הבנק יקבל את הכסף כשתמותו, ולכן אין מה לדאוג", feedback: "הקורס לא יודע איך מחזירים בפטירה ומה קורה ליורשים. זו בדיוק הסיבה שיש לדאוג." },
+    { text: "גיל 70 הוא הגיל המינימלי לקבל אותה", feedback: "לא נאמר, והקורס לא יודע גבולות גיל של שום הלוואה. טענה על גיל מקסימלי לנטילת משכנתא לא נמצא לה מקור." },
+    { text: "זו עסקה שהקורס מכיר רק בשמה וברעיון. אני לא יכול/ה להבטיח תנאים, ואפנה אתכם למי שמכיר אותה", correct: true, feedback: "נכון. זה מה שהקורס יודע, והוא אומר אותו." },
+  ]}
+>
+  לקוח בן 74 שואל על משכנתא הפוכה כדי לעזור לילדיו. איזה משפט נכון להגיד לו?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על עסקאות מורכבות, ב׳">
+<p><strong>מה זה?</strong> שלוש עסקאות נוספות שבהן משהו חריג: בית שעוד לא נבנה, שני בנקים על נכס אחד, והלוואה לבני גיל הזהב.</p>
+<p><strong>למה זה קיים?</strong> כי לאנשים יש מצבים שהמשכנתא הרגילה לא עונה עליהם: בונים בית, מחלקים מימון בין בנקים, או רוצים לממש נכס שבבעלותם בלי למכור אותו.</p>
+<p><strong>איך זה עובד?</strong> הקורס לא יודע. הוא יודע את השמות, מה שהשמות אומרים, וטענות מהשטח שממתינות לאישור אילון.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הלקוחות ישאלו על כל אחת מהן, ולפעמים בשם שלה. יועץ שמציג את מה שהוא לא יודע כידע גורם לנזק, ויועץ שאומר ״אני לא יודע, אבדוק״ לא.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מסמנים כל משפט (ידע מהשטח, שם, החלטה, לא ידוע), שואלים את השאלות, ושולחים למי שמכיר את העסקה. בשיעור 7.8 תשתמשו בזה כדי למפות מה בתיק מורכב.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהיום
+
+</Section>
+
+המפה שנבנתה בשיעורים 7.6 ו־7.7 היא חלק מהתוצר של השלב: **מפת הנושאים שמחייבים העמקה בתיק מורכב**. שבע שורות, ובכל אחת מה הקורס לא יודע ולמי כדאי לשלוח (ההצעה של הקורס, לא כלל):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הנושא</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה הקורס לא יודע</th>
+        <th class="py-2 pe-3 text-start font-semibold">למי שולחים</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה זה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {mapRows.map((r) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{r.topic}</td>
+          <td class="py-2 pe-3">{r.unknown}</td>
+          <td class="py-2 pe-3">{r.to}</td>
+          <td class="py-2 pe-3">{r.what}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+- **בנייה עצמית:** הבית עוד לא קיים. הידע מהשטח על מימון בשני שלבים (ממתין לאישור אילון) לא נמצא לו מקור רשמי.
+- **שני בנקים על נכס אחד:** ההבחנה בין פארי־פאסו לבין משכנתא מדרגה שנייה היא הבחנה בין ידוע ללא ידוע. השמות מרמזים על דרגה, והשאר הקורס לא יודע.
+- **משכנתא הפוכה:** הקורס מכיר אותה בשמה וברעיון. כל התנאים שלה לא ידועים.
+- **בכל אחת מהן שולחים למי שמכיר, ולא מבטיחים.**
+
+**בשיעור הבא — 7.8, <Later lesson="7.8" quiet>סדנה: האם לתיק המחזור כדאי למחזר?</Later>** תחזרו לחישובים שהקורס כן יודע, ותבדקו על עדי וירון אם מחזור משתלם, וגם מה בתיק שלהם לא מסתכם במספר.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "שתי הדוגמאות עם מספרים הן דוגמאות מותנות של הקורס: שני בנקים בדויים על נכס בדוי, ומגרש ובית עתידי בדויים. הן מראות מה היה יוצא אילו הכלל נכון, ואינן כלל, מחיר או נוהג של בנק." },
+    { kind: "ידע מהשטח", text: "בפארי־פאסו או במשכנתא מדרגה שנייה שני בנקים משעבדים את אותו נכס, ״רוב היועצים כלל לא מכירים״. אילון, 27.7.2026. ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: `בבנייה עצמית מקבלים עד ${f.plain("s.pct_land")}% מימון על הקרקע, ואחר כך עד ${f.plain("s.pct_future")}% מערך הנכס העתידי. ניסוח חופשי של הצוות. אילון, 27.7.2026. ממתין לאישור אילון. לא נמצא מקור רשמי.`, date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: "משכנתא הפוכה היא לבני גיל הזהב: משעבדים נכס בבעלות מלאה, ומחזירים חודשית או בפטירה דרך מוטב או ביטוח. אילון, 27.7.2026. ממתין לאישור אילון. הקורס אינו מציג את המשפט על ביטוח חיים כעובדה.", date: "2026-07-27" },
+    { kind: "לא אומת", text: "תקרת המימון של הוראה 329 כוללת הלוואות מבנקים אחרים על אותו נכס. לפי תקציר של מקור רשמי; ממתין לבדיקה מול ההוראה." },
+    { kind: "לא אומת", text: `תקרת מימון של ${f.plain("p.pct_cap")}% לדירה יחידה, מתעתיק של הצוות להוראה 329 (עודכן ב־8.10.2026), ממתין לבדיקה מול ההוראה.`, date: "2026-10-08" },
+    { kind: "לא אומת", text: "רשימת פתיחת תיק של בנק לבנייה עצמית (הוכחת בעלות, תעודת זהות וספח, תוכניות והיתרים, שמאות קודם), ושאלות על מגרש בשאלוני בנקים: כפי שתועד אצל הצוות; לא נבדק מחדש מול האתר של הבנק." },
+    { kind: "החלטה של Mogi", text: "משכנתא מדרגה שנייה, כמו תושבי חוץ, פשיטות רגל, הכנסות חריגות, נחלות ושעבודים מורכבים, אינה בגרסה הראשונה של המוצר: תיקים סטנדרטיים קודם. 29.7.2026.", date: "2026-07-29" },
+    { kind: "ידע כלכלי כללי", text: "המשמעות של השמות ״פארי־פאסו״ (דרגה שווה) ו״מדרגה שנייה״ (דרגה אחרי הראשון). הגדרות כלליות של שמות, לא נבדקו מול נוהג בישראל." },
+    { kind: "לא אומת", text: "כל התנאים, השיעורים והנהלים של בנייה עצמית, של שני בנקים על אותו נכס ושל משכנתא הפוכה, וההבחנה בין פארי־פאסו לבין משכנתא מדרגה שנייה: לא ידועים לקורס. שאלות פתוחות לאילון ולעורך דין." },
+    { kind: "מחקר / הצעה", text: "השאלות ״מה שואלים״, ״למי שולחים״ וההצעה להסביר לאט ללקוחות מבוגרים הן הצעה של הקורס, לא כלל מקצועי ולא נבדקה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/ltv.ts and regulation.ts (atPercent, ltvPercent, maxLoanAt) via scripts/lessons/lesson-7-7.ts and data/lessons/7-7.json, rechecked by checks/kinds/ltv.py and regulation.py and the shared difference and sum checks. An introduction ("היכרות בלבד"): no rule of self-build, of two lenders on one property or of a reverse mortgage is stated; the two examples are conditional. Field knowledge: FK-H-003, FK-H-010, FK-H-011 (awaiting Eylon; FK-H-048 for the life-insurance caveat). Decision: second-degree mortgage out of the first version, 29.7.2026 (research/notes/brain-product-journey.md). Team records (not re-opened): the self-build file-opening list and the land fields (research/notes/brain-product-journey.md, repo-domain.md). Video: video/7-7.html. */}

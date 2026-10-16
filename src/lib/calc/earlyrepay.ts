@@ -25,7 +25,7 @@
  *  Dates are ISO strings "2026-08-02". Payments fall on the grant's day of the
  *  month, the first one a month after the grant (CALCULATION ASSUMPTION: a
  *  contract sets its own dates). Helpers: daysBetween, addMonths,
- *  wholeMonthsBetween, paymentsMade.
+ *  addDays, wholeMonthsBetween, paymentsMade.
  *
  *  The remaining stream:
  *    remainingStream(loan, paid)  → { paid, remaining, balance, payments[] }  (exact, unrounded)
@@ -152,6 +152,12 @@ export function addMonths(d: ISODate, k: number): ISODate {
   const nm = (index % 12) + 1;
   const last = new Date(Date.UTC(ny, nm, 0)).getUTCDate();
   return iso(ny, nm, Math.min(da, last));
+}
+
+/** The date `k` calendar days after `d` (k may be negative). */
+export function addDays(d: ISODate, k: number): ISODate {
+  const t = new Date((dayNumber(d) + k) * 86400000);
+  return iso(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate());
 }
 
 /** Whole months elapsed from `from` to `to`: the largest k with addMonths(from, k) ≤ to. */

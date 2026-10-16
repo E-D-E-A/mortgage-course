@@ -1,0 +1,467 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "7.1"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FiveFees from "../../components/FiveFees.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("7.1");
+// An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const predictionOptions = [
+  "כלום: זה הכסף שלהם, והם רק מחזירים אותו",
+  `עמלה אחת קבועה של ${f.shekels("op.one")}`,
+  `אחוז אחד מהיתרה: ${f.shekels("pred.pct1")}`,
+  "כמה עמלות נפרדות, לכל אחת כלל משלה, ואחת מהן עלולה להיות גדולה בהרבה מכל השאר ביחד",
+];
+export const halfRows = [
+  { period: "1", op: f.raw("h1.op"), nn: f.raw("h1.nn"), ix: f.raw("h1.ix"), total: f.raw("h1.total") },
+  { period: "2", op: f.raw("h2.op"), nn: f.raw("h2.nn"), ix: f.raw("h2.ix"), total: f.raw("h2.total") },
+  { period: "3", op: f.raw("h3.op"), nn: f.raw("h3.nn"), ix: f.raw("h3.ix"), total: f.raw("h3.total") },
+];
+
+בשלב 3 למדנו לחשב כמה עוד חייבים בכל רגע: <Term t="יתרת חוב" lesson="7.1">יתרת החוב</Term> (שיעור 3.3), ואיך <Term t="עמלה" lesson="7.1">עמלות</Term> נכנסות לסך התשלומים (שיעור 3.9). בשלב הזה שואלים שאלה אחרת: מה עולה לצאת מהלוואה לפני הזמן?
+את השאלה נשאל על תיק ג׳, עדי וירון (בדויים): משכנתא של 700,000 ₪, קבועה לא צמודה, ב־5.90% לשנה, ל־20 שנה, שנלקחה ביולי 2023. הם רוצים להחזיר אותה ולקחת אחרת. הסכום שאנחנו מחפשים הוא מחיר היציאה.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="7.1"
+  question={`עדי וירון עוד חייבים ${f.shekels("c.balance")} על המשכנתא, אחרי ${f.plain("c.paid")} תשלומים. הם מחליטים להחזיר אותה כולה ביום אחד, ושולחים לבנק הודעה בכתב ${f.plain("c.notice_days")} ימים מראש. מה הבנק רשאי לגבות?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## חמש עמלות, כל אחת עם כלל משלה
+
+</Section>
+
+<LessonVideo lesson="7-1" />
+
+<Section kind="ההסבר">
+
+## מה עולה לצאת מהלוואה
+
+</Section>
+
+### פירעון מוקדם, ולמה יש עליו עמלה
+
+הלוואה מתחילה עם לוח סילוקין (שיעור 2.9): תשלום בכל חודש, ובסוף היתרה מגיעה לאפס. **פירעון מוקדם** הוא להחזיר את כל היתרה, או חלק ממנה, לפני שהלוח דורש. מוכרים דירה, מקבלים ירושה, או עוברים לבנק אחר.
+
+לבנק יש סיבה כלכלית לגבות על זה (ידע כלכלי כללי): הוא נתן את הכסף כדי לקבל ריבית במשך שנים, והחזרה מוקדמת מקצרת את התקופה הזו. וגם צריך לטפל בבקשה.
+
+אבל בישראל הבנק לא קובע לבד מה לגבות. בהלוואה לדיור, העמלות על פירעון מוקדם מוגבלות בצו: צו הבנקאות (פירעון מוקדם של הלוואה לדיור), התשס״ב־2002. הצו תוקן פעם אחת בלבד, ב־2014. **את הצו עצמו לא פתחנו.** כל מה שכתוב כאן עליו הוא תעתיק של הצוות, שנקרא ב־2.8.2026, ולא נבדק מחדש מול הצו. לכן סימנו את הכול ״לא אומת״, והגבלות שיופיעו בשיעור הן הנחת העבודה של הקורס, עד שמישהו יפתח את הצו.
+
+### חמש עמלות, לא אחת
+
+<Term t="עמלת פירעון מוקדם" lesson="7.1">עמלת פירעון מוקדם</Term> היא לא עמלה אחת. לפי התעתיק, הצו מגדיר חמש עמלות נפרדות, ולכל אחת מתי היא חלה וכמה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">העמלה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מתי היא חלה</th>
+        <th class="py-2 pe-3 text-start font-semibold">כמה</th>
+        <th class="py-2 text-start font-semibold">סעיף בצו</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="עמלה תפעולית" lesson="7.1">עמלה תפעולית</Term></td>
+        <td class="py-2 pe-3">תמיד</td>
+        <td class="py-2 pe-3">עד <span class="ltr">{f.shekels("op.one")}</span>, פעם אחת לכל פירעון</td>
+        <td class="py-2"><span class="ltr">§3(1)</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Later lesson="7.3" quiet><Term t="עמלת אי־הודעה מוקדמת" lesson="7.1">עמלת אי־הודעה מוקדמת</Term></Later></td>
+        <td class="py-2 pe-3">הודעה בכתב נמסרה פחות מ־10 ימים לפני, או לא נמסרה</td>
+        <td class="py-2 pe-3"><span class="ltr">0.1%</span> מהסכום שמוחזר</td>
+        <td class="py-2"><span class="ltr">§3(2)</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Later lesson="7.2" quiet>עמלת היוון</Later></td>
+        <td class="py-2 pe-3">מסלול בריבית קבועה; מסלול משתנה שהריבית בו מתעדכנת פחות מפעם בשנה</td>
+        <td class="py-2 pe-3">לפי נוסחה, בשיעור הבא</td>
+        <td class="py-2"><span class="ltr">§3(3)–(5)</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="עמלת מדד" lesson="7.1">עמלת מדד</Term></td>
+        <td class="py-2 pe-3">הלוואה צמודה למדד, שמוחזרת בין ה־1 ל־15 בחודש</td>
+        <td class="py-2 pe-3">הסכום שמוחזר × חצי × הממוצע של השינוי החודשי במדד</td>
+        <td class="py-2"><span class="ltr">§5</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="עמלת הפרשי שער" lesson="7.1">עמלת הפרשי שער</Term></td>
+        <td class="py-2 pe-3">הלוואה במט״ח, כשההודעה ניתנה פחות מיומיים עסקים לפני</td>
+        <td class="py-2 pe-3">תזוזת השער באותם ימים</td>
+        <td class="py-2"><span class="ltr">§6</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+הטבלה היא תעתיק של הצוות (לא אומת). מכאן נעבור עמלה עמלה, כל אחת עם מספרים קטנים.
+
+### העמלה התפעולית: פעם אחת, לא לכל מסלול
+
+העמלה התפעולית היא סכום קבוע וקטן. התקרה היא {f.shekels("op.one")}, והקורס מחשב איתה (בנק רשאי לגבות פחות). השאלה היא לא כמה, אלא כמה פעמים. משכנתא היא בדרך כלל כמה מסלולים. לפי פסיקה של המפקח על הבנקים מ־13.9.2021 (בתעתיק של הצוות; לא אומת), העמלה נגבית **פעם אחת לכל פירעון**, ולא פעם לכל מסלול.
+
+בלי הפסיקה, משכנתא של שלושה מסלולים הייתה משלמת {f.shekels("op.three")}, ושל חמישה {f.shekels("op.five")}: {f.shekels("op.over")} יותר ממה שמותר.
+
+### עמלת אי־הודעה: אחוז אחד מאלף
+
+הבנק רוצה לדעת מראש. מי שמחזיר בלי הודעה בכתב, או עם הודעה שנמסרה פחות מ־10 ימים לפני, משלם 0.1% מהסכום שמוחזר. זה שקל על כל אלף שקל.
+
+עדי וירון: יתרה של {f.shekels("c.balance")}.
+- בלי הודעה: {f.shekels("nn.c_none")}.
+- עם הודעה {f.plain("c.notice_days")} ימים מראש: {f.shekels("nn.c_given")}.
+
+מתי בדיוק הודעה נחשבת, ומה קורה אם היא מוקדמת מדי, הוא נושא של השיעור שאחרי הבא (<Later lesson="7.3">הודעה מוקדמת</Later>).
+
+### עמלת מדד: רק בהלוואה צמודה, ורק עד ה־15
+
+הלוואה צמודה (שיעור 0.8) גדלה עם המדד כל חודש. לפי התעתיק, מי שמחזיר הלוואה צמודה בין ה־1 ל־15 בחודש משלם: הסכום שמוחזר, כפול חצי, כפול הממוצע של השינוי החודשי במדד ב־12 המדדים האחרונים שפורסמו.
+
+דוגמה בדויה: יתרה של {f.shekels("ix.balance")}, והמדד עלה בממוצע 0.25% בחודש.
+
+<M>{n("ix.balance")} × ½ × 0.25% = {n("ix.half")}</M>
+
+אם ההלוואה הוחזרה ב־16 בחודש או אחריו: {f.shekels("ix.fee16")}. בהלוואה לא צמודה, כמו של עדי וירון: גם {f.shekels("ix.fee_c")}. את הניצול של התאריך הזה נבחן בשיעור 7.3.
+
+### עמלת הפרשי שער: לא בקורס
+
+הלוואה במט״ח (שיעור 2.8) נושאת עמלה שמכסה את תזוזת השער בימים שבין ההודעה לפירעון. בתעתיק של הצוות אין נוסחה לסכום שלה, ולכן הקורס לא מחשב אותה. כל ההלוואות בשלב הזה בשקלים.
+
+### מתי אין עמלות בכלל, ומה בדיוק מוגבל
+
+- **הלוואה מוכוונת** (הלוואה מסובסדת שניתנת דרך הממשלה, הסוכנות היהודית או רשות מקומית) אסור לגבות עליה **שום** עמלה (לפי התעתיק, §2; לא אומת).
+- לפי גיליון הסבר של בנק, ולא לפי הצו, אין עמלה כשהבנק מממש משכנתא על דירה יחידה, בכפוף לספים (לא אומת). הקורס לא מחשב מקרה כזה.
+
+<Callout title="עמלה אחת מכל חמש היא כמעט כל הסיפור">
+<p>בהלוואה של עדי וירון העמלה התפעולית היא {f.shekels("op.one")}, עמלת אי־הודעה היא {f.shekels("nn.c_given")} (נמסרה הודעה), עמלת המדד היא {f.shekels("ix.fee_c")} (לא צמודה), והפרשי שער לא חלים. כל ה״קטנות״ ביחד: {f.shekels("op.one")}. מה שנשאר היא <Later lesson="7.2" quiet>עמלת ההיוון</Later>, ובשיעור הבא נראה כמה גדולה היא.</p>
+</Callout>
+
+### מי משלם מה, לפי סוג המסלול
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המסלול</th>
+        <th class="py-2 pe-3 text-start font-semibold">תפעולית</th>
+        <th class="py-2 pe-3 text-start font-semibold">אי־הודעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">היוון</th>
+        <th class="py-2 text-start font-semibold">מדד</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">קבועה לא צמודה</td><td class="py-2 pe-3">כן</td><td class="py-2 pe-3">אם אין הודעה</td><td class="py-2 pe-3">כן</td><td class="py-2">לא</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">קבועה צמודה</td><td class="py-2 pe-3">כן</td><td class="py-2 pe-3">אם אין הודעה</td><td class="py-2 pe-3">כן</td><td class="py-2">אם הוחזרה עד ה־15</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">משתנה, עדכון פחות מפעם בשנה</td><td class="py-2 pe-3">כן</td><td class="py-2 pe-3">אם אין הודעה</td><td class="py-2 pe-3">כן, בדרך כלל קטנה</td><td class="py-2">אם צמודה, ועד ה־15</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">פריים, או משתנה עם עדכון שנתי או תכוף יותר</td><td class="py-2 pe-3">כן</td><td class="py-2 pe-3">אם אין הודעה</td><td class="py-2 pe-3">לא</td><td class="py-2">אם צמודה, ועד ה־15</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הלוואה מוכוונת</td><td class="py-2 pe-3">לא</td><td class="py-2 pe-3">לא</td><td class="py-2 pe-3">לא</td><td class="py-2">לא</td></tr>
+    </tbody>
+  </table>
+</div>
+
+הטבלה כולה לפי תעתיק של הצוות (לא אומת).
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## אילו עמלות חלות על הפירעון הזה?
+
+</Section>
+
+בחרו סוג הלוואה, יום בחודש, וכמה ימים מראש נמסרה הודעה. כרטיס כהה הוא עמלה שחלה.
+
+<FiveFees client:visible />
+
+נסו את שלושת אלה:
+1. בחרו ״קבועה צמודה״ והזיזו את היום מ־10 ל־16. מה קורה לעמלת המדד?
+2. החזירו ליום 10. הזיזו את ההודעה ל־0 ימים (בלי הודעה), ואחר כך ל־30. מה קורה לעמלת האי־הודעה?
+3. עברו ל״פריים״, ואחר כך ל״הלוואה מוכוונת״. אילו עמלות נשארות?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ביום 10 עמלת המדד היא {f.shekels("ix.fee10")}. ב־16 היא {f.shekels("ix.fee16")}: ה־15 הוא הגבול (לפי התעתיק).</li>
+    <li>בלי הודעה: {f.shekels("ill.nn")}, כלומר 0.1% מ־{f.shekels("ix.balance")}. עם הודעה 30 ימים מראש היא נעלמת.</li>
+    <li>בפריים <Later lesson="7.2" quiet>עמלת ההיוון</Later> מפסיקה לחול, והתפעולית נשארת. במוכוונת כל חמש העמלות מתאפסות.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## שתי עמלות עם נוסחה פשוטה
+
+</Section>
+
+**צעד 1 — אחוז מהסכום.** עמלת אי־הודעה היא 0.1% מהסכום שמחזירים. הסכום שמחזירים הוא היתרה, B (שיעור 3.3).
+
+**צעד 2 — חצי מהשינוי.** עמלת מדד היא היתרה, כפול חצי, כפול הממוצע של השינוי החודשי במדד.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-h3 text-navy" dir="ltr">
+    <span class="whitespace-nowrap">U = B × 0.001</span>
+    <span class="whitespace-nowrap">Z = B × ½ × x</span>
+  </div>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">U</dt><dd>עמלת אי־הודעה, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">Z</dt><dd>עמלת מדד, בשקלים (אותיות שלא בשימוש בקורס)</dd>
+    <dt class="ltr font-semibold text-n900">B</dt><dd>הסכום שמוחזר ביום הפירעון (היתרה, כולל הצמדה), בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">0.001</dt><dd>0.1%, כמספר עשרוני</dd>
+    <dt class="ltr font-semibold text-n900">x</dt><dd>הממוצע של השינוי החודשי במדד, כמספר עשרוני (0.25% הם 0.0025)</dd>
+  </dl>
+</div>
+
+**מתי הנוסחאות נכונות?**
+1. עמלת אי־הודעה: רק אם אין הודעה תקפה. עם הודעה בזמן היא אפס.
+2. עמלת מדד: רק בהלוואה צמודה, ורק אם היא הוחזרה בין ה־1 ל־15. אחרת היא אפס.
+3. הממוצע x של 12 המדדים האחרונים: איך סופרים אותו בדיוק (אחד עשר שינויים בין שנים עשר מדדים, או שנים עשר?) לא כתוב בתעתיק. זו שאלה פתוחה, והתרגילים נותנים את x.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> אם היתרה בתא A1: <span class="ltr">{"=A1*0.001"}</span> לעמלת אי־הודעה. אם השינוי החודשי הממוצע, כמספר עשרוני, בתא B1: <span class="ltr">{"=A1/2*B1"}</span> לעמלת מדד.</p>
+<p><strong>עיגול.</strong> כל עמלה מעוגלת לאגורה, והסכום הסופי הוא סכום העמלות. שני מספרים שנראים זהים בקירוב יכולים להיות שונים באגורה; הקורס מעגל פעם אחת, בסוף.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="7.1"
+  options={predictionOptions}
+  correct={3}
+  notes={[
+    "החזרת כסף לא נעשית בחינם: יש כללים, ועל פירעון מוקדם כמעט תמיד יש עלות. הצו מגדיר מה מותר לגבות.",
+    `יש עמלה תפעולית של עד ${f.shekels("op.one")}, אבל היא רק אחת מחמש, והיא הקטנה.`,
+    "אין עמלה של אחוז אחד מהיתרה. יש חמש עמלות, ולכל אחת כלל וסכום משלה.",
+    "",
+  ]}
+>
+  יש חמש עמלות. עדי וירון משלמים {f.shekels("op.one")} תפעולית; עמלת אי־הודעה היא {f.shekels("nn.c_given")} כי נמסרה הודעה, ועמלת המדד אפס כי ההלוואה לא צמודה. מה שנשאר היא <Later lesson="7.2" quiet>עמלת ההיוון</Later>, והיא הכבדה מהן. את הסכום שלה נחשב בשיעור הבא.
+</PredictionReveal>
+
+<Section kind="כלי לראש">
+
+## שקל על כל אלף
+
+</Section>
+
+עמלת אי־הודעה היא 0.1%: שקל על כל אלף שקל שמחזירים. ליתרה של {f.whole("c.balance")} זה בערך {f.whole("nn.c_none")}, ובחישוב מדויק {f.shekels("nn.c_none")}. זה כלל אצבע (בערך), לא הנוסחה: את הסכום המדויק מחשבים עם הנוסחה.
+
+<Section kind="דוגמה פתורה">
+
+## עדי וירון מחזירים את המשכנתא
+
+</Section>
+
+עדי וירון (בדויים) רוצים להחזיר ב־2 באוגוסט 2026 את כל ההלוואה. הם שלחו הודעה בכתב {f.plain("c.notice_days")} ימים לפני. אילו עמלות חלות עליהם, ואילו מהן אפשר לחשב כבר עכשיו?
+
+**צעד 1 — מה ההלוואה.** מסלול אחד, קבועה לא צמודה, 5.90% לשנה, 20 שנה, מיולי 2023. החזר חודשי: {f.shekels("c.payment")}. עד היום שילמו {f.plain("c.paid")} תשלומים, נשארו {f.plain("c.remaining")}, והיתרה היא {f.shekels("c.balance")} (שיעור 3.3).
+
+**צעד 2 — מה חל לפי סוג המסלול.** קבועה: <Later lesson="7.2" quiet>עמלת היוון</Later> חלה. לא צמודה: עמלת מדד לא חלה. בשקלים: הפרשי שער לא חלים. והעמלה התפעולית חלה תמיד.
+
+**צעד 3 — העמלות הקטנות.** העמלה התפעולית: {f.shekels("op.one")}. הודעה נמסרה {f.plain("c.notice_days")} ימים מראש, בטווח שבין 10 ל־45 (נראה למה בשיעור 7.3), ולכן עמלת אי־הודעה: {f.shekels("nn.c_given")}. עמלת מדד: {f.shekels("ix.fee_c")}.
+
+**צעד 4 — מה היה קורה בלי הודעה.** 0.1% מ־{f.shekels("c.balance")}: {f.shekels("nn.c_none")}. הודעה בזמן חסכה להם {f.shekels("nn.c_none")}.
+
+**צעד 5 — מה נשאר.** העמלות הקטנות ביחד: {f.shekels("op.one")}. <Later lesson="7.2" quiet>עמלת ההיוון</Later> עוד לא חושבה, ואת השאלה ״כמה יעלה לצאת מההלוואה?״ אי אפשר לענות בלעדיה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## שלושה פירעונות, שלוש חשבוניות
+
+</Section>
+
+מספרים להמחשה. שלוש הלוואות בדויות, וכל אחת מוחזרת כולה בחודש אוגוסט 2026. בכל טבלה לא נכללת <Later lesson="7.2" quiet>עמלת ההיוון</Later>.
+1. מסלול פריים, יתרה של {f.shekels("h.balance1")}, הוחזר ב־20 בחודש, בלי הודעה. (השורה הראשונה כבר מלאה.)
+2. הלוואה צמודה, יתרה של {f.shekels("h.balance2")}, הוחזרה ב־10 בחודש. נמסרה הודעה בכתב {f.plain("h2.notice_days")} ימים מראש. הממוצע של השינוי החודשי במדד: 0.2%.
+3. אותה הלוואה, אותו יום, אבל בלי הודעה.
+
+<FillTable
+  client:visible
+  id="7.1-half"
+  periodLabel="פירעון"
+  columns={[
+    { key: "op", label: "תפעולית" },
+    { key: "nn", label: "אי־הודעה" },
+    { key: "ix", label: "מדד" },
+    { key: "total", label: "יחד" },
+  ]}
+  rows={halfRows}
+  blanks={["2.op", "2.nn", "2.ix", "2.total", "3.op", "3.nn", "3.ix", "3.total"]}
+  success={`בפריים לא חלה עמלת מדד, ובלי הודעה חלה עמלת אי־הודעה. בהלוואה הצמודה הודעה מבטלת את עמלת אי־הודעה (${f.shekels("h2.total")} ביחד) ובלעדיה היא ${f.shekels("h3.total")}. התפעולית נגבית פעם אחת בכל פירעון.`}
+  hint="התפעולית קבועה. אי־הודעה: 0.1% מהיתרה, רק בלי הודעה בזמן. מדד: היתרה כפול חצי כפול 0.2%, רק בהלוואה צמודה שהוחזרה עד ה־15. יחד: סכום שלוש העמלות."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים והאחוזים בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא העמלות של בנק. הכללים הם תעתיק של הצוות (לא אומת). בתרגילים 2, 4 ו־6 אפשר לחשב בלי מחשבון מיוחד, אבל מחשבון עוזר.
+
+<ChoiceExercise
+  client:visible
+  id="7.1-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "פעם אחת, על כל הפירעון", correct: true, feedback: `נכון. לפי הפסיקה של המפקח על הבנקים (בתעתיק של הצוות; לא אומת), העמלה התפעולית היא פעם אחת לכל פירעון, ${f.shekels("op.one")} בתקרה.` },
+    { text: "שלוש פעמים, פעם לכל מסלול", feedback: `זה ייתן ${f.shekels("op.three")}. הפסיקה קבעה שהעמלה נגבית פעם אחת לפירעון, ולא לכל מסלול.` },
+    { text: "בכל תשלום שנשאר", feedback: "העמלה על הפירעון עצמו, ולא על התשלומים שנשארו." },
+    { text: "אף פעם: זו עמלה לאנשים שמחזירים חלק מההלוואה", feedback: "היא חלה גם על פירעון מלא. לפי התעתיק, רק הלוואה מוכוונת פטורה מכל עמלה." },
+  ]}
+>
+  משכנתא של שלושה מסלולים מוחזרת כולה ביום אחד. כמה פעמים נגבית העמלה התפעולית?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="7.1-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_1pct"), message: "זה 1%. העמלה היא 0.1%: שקל על כל אלף שקל." },
+    { value: f.raw("ex2.err_10pct"), message: "זה 10%. כתבתם 0.1 כאילו הוא 10%. 0.1% הם 0.001 מהסכום." },
+  ]}
+>
+  החזרתם משכנתא ביתרה של {f.shekels("ex2.balance")}, בלי שמסרתם הודעה בכתב. כמה עמלת אי־הודעה תשלמו?
+</NumericExercise>
+
+<Solution for="7.1-2">
+0.1% הם 0.001: <M>{n("ex2.balance")} × 0.001 = {n("ex2.answer")}</M> ₪. אפשר גם בראש: שקל על כל אלף, ובמאתיים וחמישים אלף — מאתיים וחמישים שקל.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="7.1-3"
+  n={3}
+  level="קל"
+  options={[
+    { text: "לא חלה: הוחזרה ב־16 בחודש, אחרי הגבול", correct: true, feedback: "נכון. לפי התעתיק, עמלת מדד חלה רק על הלוואה שהוחזרה בין ה־1 ל־15 בחודש." },
+    { text: "חלה, כי ההלוואה צמודה", feedback: "ההצמדה היא תנאי אחד, והתאריך הוא תנאי שני. שניהם צריכים להתקיים." },
+    { text: "חלה, אבל חצי מהסכום", feedback: "החצי הוא חלק מהנוסחה, לא הנחה. אחרי ה־15 אין עמלה כלל." },
+    { text: "אי אפשר לדעת בלי המדד של החודש", feedback: "הסכום תלוי במדד, אבל השאלה אם העמלה חלה תלויה רק בתאריך ובהצמדה." },
+  ]}
+>
+  הלוואה צמודה הוחזרה ב־16 בחודש. מה נכון לגבי עמלת המדד?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="7.1-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.err_no_half"), message: "שכחתם את החצי. העמלה היא היתרה כפול חצי כפול הממוצע של השינוי החודשי." },
+  ]}
+>
+  החזרתם ב־12 בחודש הלוואה צמודה ביתרה של {f.shekels("ex4.balance")}. הממוצע של השינוי החודשי במדד הוא 0.3%. מהי עמלת המדד?
+</NumericExercise>
+
+<Solution for="7.1-4">
+היתרה כפול חצי כפול 0.003: <M>{n("ex4.balance")} × ½ × 0.003 = {n("ex4.answer")}</M> ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="7.1-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `עמלה תפעולית בלבד, ${f.shekels("ex5.op")}`, feedback: `הודעה שנמסרה ${f.plain("ex5.notice_days")} ימים מראש היא פחות מ־10, ולכן גם עמלת אי־הודעה חלה.` },
+    { text: `תפעולית (${f.shekels("ex5.op")}) ועמלת אי־הודעה (${f.shekels("ex5.nn")})`, correct: true, feedback: `נכון. פריים נפטר מהעמלה הגדולה (שיעור 7.2), אבל לא מהעמלה התפעולית. הודעה של ${f.plain("ex5.notice_days")} ימים קצרה מ־10, ולכן 0.1% מהיתרה: ${f.shekels("ex5.nn")}.` },
+    { text: "תפעולית, אי־הודעה והעמלה הגדולה של שיעור 7.2", feedback: "בפריים אין את העמלה הגדולה בכלל: הריבית שלו זזה לפי בנק ישראל, בתאריכים שאי אפשר לדעת מראש." },
+    { text: "שום עמלה, כי פריים פטור", feedback: "פריים פטור רק מהעמלה הגדולה, שאין לה מקבילה בפריים. פטור מכל העמלות יש רק להלוואה מוכוונת." },
+  ]}
+>
+  מסלול פריים, יתרה של {f.shekels("ex5.balance")}, הוחזר ב־14 בחודש. ההודעה בכתב נמסרה {f.plain("ex5.notice_days")} ימים לפני. אילו עמלות חלות?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="7.1-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_no_op"), message: "חסרה העמלה התפעולית. היא חלה על כל פירעון." },
+    { value: f.raw("ex6.err_no_ix"), message: "חסרה עמלת מדד: ההלוואה צמודה והוחזרה ב־9, לפני ה־15." },
+  ]}
+>
+  הלוואה צמודה, יתרה של {f.shekels("ex6.balance")}, הוחזרה ב־9 בחודש בלי הודעה. הממוצע של השינוי החודשי במדד הוא 0.25%. מהו סכום שלוש העמלות הקטנות (בלי העמלה הגדולה, של שיעור 7.2)?
+</NumericExercise>
+
+<Solution for="7.1-6">
+תפעולית {f.shekels("ex6.op")}. אי־הודעה: <M>{n("ex6.balance")} × 0.001 = {n("ex6.nn")}</M>. מדד: <M>{n("ex6.balance")} × ½ × 0.0025 = {n("ex6.ix")}</M>. ביחד: {f.shekels("ex6.answer")}.
+</Solution>
+
+<Callout title="חמש שאלות על עמלת פירעון מוקדם">
+<p><strong>מה זה?</strong> מה שהבנק גובה כשמחזירים הלוואה לפני הזמן. לא עמלה אחת אלא עד חמש: תפעולית, אי־הודעה, היוון, מדד והפרשי שער.</p>
+<p><strong>למה זה קיים?</strong> הבנק נתן כסף כדי לקבל ריבית לאורך זמן, וההחזרה המוקדמת שוברת את זה (ידע כלכלי כללי). הצו מגביל מה מותר לגבות, כדי שלא יהיה מחיר יציאה שרירותי (לפי תעתיק של הצוות; לא אומת).</p>
+<p><strong>איך זה עובד?</strong> לכל עמלה תנאי ונוסחה משלה. מקבלים עמלות לפי סוג המסלול, התאריך והאם נמסרה הודעה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> שלוש מהעמלות אתם יכולים להשפיע עליהן בזמן: הודעה בכתב, תאריך (לפני ה־15 או אחריו בהלוואה צמודה), וסוג המסלול. <Later lesson="7.2" quiet>עמלת ההיוון</Later> היא הגדולה, והיא תלויה בעיקר בשוק.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני כל החלטה על פירעון או מחזור בודקים את חמש העמלות אחת אחת, ורושמים את הסכום של כל אחת. לא מניחים ש״העמלה היא ₪60״: זו רק אחת מהן, והקטנה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **עמלת פירעון מוקדם** היא חמש עמלות נפרדות, לא אחת.
+- **תפעולית:** עד {f.shekels("op.one")}, פעם אחת לכל פירעון ולא לכל מסלול (לפי פסיקה של המפקח, בתעתיק; לא אומת).
+- **אי־הודעה:** 0.1% מהסכום שמוחזר, אם לא נמסרה הודעה בכתב בזמן. שקל על כל אלף.
+- **מדד:** בהלוואה צמודה שהוחזרה בין ה־1 ל־15 בחודש: הסכום × חצי × השינוי החודשי הממוצע של המדד.
+- **הפרשי שער:** במט״ח, בהודעה קצרה מדי. הקורס לא מחשב אותה.
+- **היוון:** חלה במסלול בריבית קבועה (ובמשתנה שמתעדכן לעתים רחוקות), אף פעם בפריים. הגדולה מכולן, ובשיעור הבא.
+- **הלוואה מוכוונת:** אין עליה שום עמלה. הכול תעתיק של הצוות של צו 2002, ולא נבדק מול הצו.
+
+**בשיעור הבא — 7.2, <Later lesson="7.2" quiet>עמלת היוון</Later>:** שתי נוסחאות, הנמוכה מביניהן, הריבית הממוצעת לפירעון מוקדם, ו<Later lesson="7.2" quiet>הפחתות לפי ותק</Later>. שם נחשב כמה עולה היציאה מההלוואה של עדי וירון.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "חמש העמלות על פירעון מוקדם של הלוואה לדיור, מתי כל אחת חלה וכמה: צו הבנקאות (פירעון מוקדם של הלוואה לדיור), התשס״ב־2002, כפי שתועתק בצוות. לפי תעתיק של הצוות ב־Brain (דף 7798786, נקרא ב־2.8.2026 ועודכן ב־17.8.2026), ממתין לבדיקה מול הצו. הצו תוקן פעם אחת, ב־2014. הצו עצמו לא נפתח.", date: "2026-08-17" },
+    { kind: "לא אומת", text: "העמלה התפעולית נגבית פעם אחת לכל פירעון ולא לכל מסלול: פסיקה של המפקח על הבנקים מ־13.9.2021, בעקבות תובענה ייצוגית. לפי תעתיק בצוות ב־Brain (דף 7798786); ממתין לבדיקה מול הפסיקה.", date: "2021-09-13" },
+    { kind: "לא אומת", text: "הלוואה מוכוונת פטורה מכל עמלה (§2 בצו, לפי התעתיק). הפטור ממימוש משכנתא על דירה יחידה, בכפוף לספים, נקרא מגיליון הסבר של בנק ולא מהצו: לא אומת בכלל, והקורס לא מחשב אותו." },
+    { kind: "ידע כלכלי כללי", text: "בנק שנתן הלוואה מצפה לריבית לאורך כל התקופה, ולכן פירעון מוקדם עולה לו כסף. זה ההסבר הכללי, לא לשון הצו." },
+    { kind: "הנחת חישוב", text: "כל ההלוואות, היתרות והאחוזים בבניית התרגילים בדויים, להמחשה. העמלה התפעולית מחושבת בתקרה (60 ₪); בנק רשאי לגבות פחות. ממוצע השינוי החודשי של המדד הוא נתון של התרגיל: איך סופרים אותו מ־12 המדדים האחרונים הוא שאלה פתוחה. אותה הלוואה של עדי וירון היא הדוגמה המחושבת של הצוות." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ב־TypeScript ונבדקו בנפרד ב־Python, בלי קוד משותף.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/earlyrepay.ts via scripts/lessons/lesson-7-1.ts (helpers in _earlyrepay-facts.ts) and data/lessons/7-1.json, rechecked by checks/kinds/earlyrepay.py. Illustration: src/components/FiveFees.vue. Video: video/7-1.html (every lesson has one, Dvir 2026-10-10). The Order is the team's transcription (Brain 7798786), not verified. */}

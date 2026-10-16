@@ -1,0 +1,307 @@
+<!doctype html>
+<!--
+  Video scene for lesson 7.3 — "תחנות יציאה ותזמון".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number and date comes from data/lessons/7-3.json. The subtitle cues (window.cues)
+  carry the explanatory sentences.
+
+  Script (one idea: the day of repayment matters; the rules are the team's transcription of the 2002
+  Banking Order, not verified):
+  1. Title.
+  2. A variable track (invented): the fee falls as the reset day (15.3.2027) comes closer, and on it only the
+     operational fee is charged: an exit point.
+  3. A fixed track has no exit point; the fee falls slowly and steps down after five years (case C).
+  4. The written notice, 10 to 45 days before: case C's window (18 June to 23 July for 2 August 2026);
+     30 days ahead: no fee; 6 days ahead: 0.1% of the balance.
+  5. A notice that was not used blocks a new one for six months.
+  6. The index fee: 15th against 16th, one day's interest, the net saving.
+  7. The reduction for time served is a step: the day before three years against two days after.
+  8. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 7.3 · תחנות יציאה ותזמון</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/7-3.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "637.96", "60".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // Numbers and signs stay left to right inside Hebrew lines.
+      const lr = (s) => `⁦${s}⁩`;
+      const dm = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" });
+      const dmy = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
+      const dayMonth = (iso) => dm.format(new Date(`${iso}T12:00:00Z`));
+      const dayMonthYear = (iso) => dmy.format(new Date(`${iso}T12:00:00Z`));
+
+      const V = {
+        reset: dayMonthYear(fact("v.reset_date")),
+        t24: num(fact("v24.total")), t12: num(fact("v12.total")), t4: num(fact("v4.total")), tx: num(fact("vx.total")),
+        m24: pl(fact("v24.months")), m12: pl(fact("v12.months")), m4: pl(fact("v4.months")),
+        c5a: num(fact("c5.total_a")), c5b: num(fact("c5.total_b")), c5s: num(fact("c5.saving")),
+        from: dayMonth(fact("n.earliest")), to: dayMonth(fact("n.latest")),
+        okDays: pl(fact("n.ok_days")), shortDays: pl(fact("n.short_days")), shortFee: num(fact("n.short_fee")), noneFee: num(fact("n.none_fee")),
+        counts: dayMonthYear(fact("ag.counts_from")),
+        ix15: num(fact("ix.fee15")), ix16: num(fact("ix.fee16")), ixDay: num(fact("ix.day")), ixNet: num(fact("ix.net")), ixBal: num(fact("ix.balance")),
+        before: num(fact("t3.before")), after: num(fact("t3.after")), saving: num(fact("t3.saving")), mInt: num(fact("t3.month_interest")), red: pl(fact("t3.red_b")),
+      };
+
+      const S = { title: [0, 9], exit: [9, 60], fixed: [60, 86], notice: [86, 125], gaming: [125, 155], idx: [155, 190], step: [190, 222], end: [222, 236] };
+      window.duration = 236;
+      window.cues = [
+        [1, 5, "תחנות יציאה ותזמון."],
+        [5, 8.5, "מתי כדאי לפרוע, ומה חשוב לדעת על הימים."],
+        [10, 17, "מסלול משתנה: הריבית מתעדכנת כל חמש שנים."],
+        [17, 25, `העדכון הבא של ההלוואה הבדויה: ${V.reset}.`],
+        [25, 33, "ככל שהעדכון קרוב, העמלה קטנה."],
+        [33, 41, `${V.m24} חודשים לפני: ${lr(V.t24 + " ₪")}. ${V.m12} חודשים: ${lr(V.t12 + " ₪")}.`],
+        [41, 49, `${V.m4} חודשים לפני העדכון: ${lr(V.t4 + " ₪")}.`],
+        [49, 59, `ביום העדכון, בתחנת היציאה: רק ${lr(V.tx + " ₪")}.`],
+        [61, 68, "במסלול קבוע אין תחנת יציאה."],
+        [68, 76, "העמלה יורדת לאט, ובמדרגה אחרי חמש שנים."],
+        [76, 85, `עדי וירון: ${lr(V.c5a + " ₪")} ביוני 2028, ${lr(V.c5b + " ₪")} ביולי.`],
+        [87, 94, "הודעה בכתב: בין 10 ל־45 ימים לפני הפירעון."],
+        [94, 101, "עדי וירון פורעים ב־2 באוגוסט 2026."],
+        [101, 109, `החלון: מ־${V.from} עד ${V.to}.`],
+        [109, 117, `הודיעו ${V.okDays} ימים מראש: אין עמלת אי־הודעה.`],
+        [117, 124, `הודיעו רק ${V.shortDays} ימים מראש: ${lr(V.shortFee + " ₪")}.`],
+        [126, 134, "הודעה שלא ניצלו חוסמת הודעה חדשה לשישה חודשים."],
+        [134, 142, "לכן מודיעים רק אחרי שההחלטה התקבלה."],
+        [142, 154, "הכלל וההצעה: תעתיק ומחקר של הצוות. לא אומת."],
+        [156, 163, "הלוואה צמודה: עמלת מדד רק בין ה־1 ל־15."],
+        [163, 171, `ב־15 בחודש: ${lr(V.ix15 + " ₪")}. ב־16: ${lr(V.ix16 + " ₪")}.`],
+        [171, 179, `אבל יום המתנה עולה ריבית של יום: ${lr(V.ixDay + " ₪")}.`],
+        [179, 189, `נטו: ${lr(V.ixNet + " ₪")}. הנחת חישוב: חודש של 30 יום.`],
+        [191, 198, "ההפחתה לפי ותק היא מדרגה, לא שיפוע."],
+        [198, 207, `יום לפני שלוש שנים: ${lr(V.before + " ₪")}.`],
+        [207, 214, `יומיים אחרי: ${lr(V.after + " ₪")}. חוסכים ${lr(V.saving + " ₪")}.`],
+        [214, 221, `אבל חודש המתנה עולה ${lr(V.mInt + " ₪")} ריבית.`],
+        [223, 230, "הממוצעים בחישובים קבועים. בפועל הם משתנים."],
+        [230, 235, "וההחלטה? בשיעור 7.4."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
+      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "תחנות יציאה", 72, { w: 700, o });
+          txt(640, 372, "ותזמון", 72, { w: 700, o });
+          txt(640, 436, "מתי כדאי לפרוע", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — a variable track, and the fee as the reset comes closer
+        if (inScene(t, S.exit)) {
+          const o = vis(t, S.exit);
+          const at = (s) => after(t, S.exit, s, o);
+          txt(640, 124, "מסלול משתנה בדוי: עדכון ריבית כל 5 שנים", 36, { w: 700, o });
+          txt(640, 162, `העדכון הבא: ${V.reset}`, 24, { fill: C.n700, o: at(8) });
+          const bars = [
+            { v: Number(fact("v24.total")), s: V.t24, label: `${V.m24} חודשים לפני`, from: 20 },
+            { v: Number(fact("v12.total")), s: V.t12, label: `${V.m12} חודשים לפני`, from: 25 },
+            { v: Number(fact("v4.total")), s: V.t4, label: `${V.m4} חודשים לפני`, from: 32 },
+            { v: Number(fact("vx.total")), s: V.tx, label: "ביום העדכון", from: 40, hot: true },
+          ];
+          const base = 480, maxH = 240, maxV = Number(fact("v24.total"));
+          bars.forEach((b, i) => {
+            const x = 1000 - i * 250, oc = at(b.from);
+            const h = Math.max(10, (b.v / maxV) * maxH);
+            el("rect", { x: x - 80, y: base - h, width: 160, height: h, rx: 8, fill: b.hot ? C.tq2 : C.n300, opacity: oc });
+            txt(x, base - h - 12, `${b.s} ₪`, 26, { w: 700, fill: b.hot ? C.teal : C.navy, o: oc, ltr: true });
+            txt(x, base + 30, b.label, 20, { fill: C.n700, o: oc });
+          });
+          el("line", { x1: 200, x2: 1100, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
+          txt(640, 556, "תחנת יציאה: פירעון ביום העדכון, רק עמלה תפעולית · תעתיק · לא אומת", 18, { fill: C.n600, o: at(44) });
+        }
+        // Scene 3 — a fixed track
+        if (inScene(t, S.fixed)) {
+          const o = vis(t, S.fixed);
+          const at = (s) => after(t, S.fixed, s, o);
+          txt(640, 128, "מסלול קבוע: אין תחנת יציאה", 42, { w: 700, o });
+          box(680, 180, 440, 170, at(2));
+          txt(900, 224, "אין יום שבו הריבית מתעדכנת", 22, { fill: C.n600, o: at(2) });
+          txt(900, 290, "העמלה יורדת לאט", 32, { w: 700, o: at(5) });
+          const b1 = at(10);
+          box(170, 180, 440, 170, b1);
+          txt(390, 224, "מדרגה אחרי חמש שנים של ההלוואה", 22, { fill: C.n600, o: b1 });
+          txt(390, 276, `${V.c5a} ₪`, 34, { w: 600, fill: C.n600, o: at(12), ltr: true });
+          txt(390, 322, `${V.c5b} ₪`, 38, { w: 700, fill: C.teal, o: at(15), ltr: true });
+          txt(640, 410, `חודש אחד קדימה חוסך ${V.c5s} ₪`, 30, { w: 700, o: at(18) });
+          txt(640, 460, "הממוצעים בחישוב קבועים · עדי וירון", 20, { fill: C.n600, o: at(18) });
+        }
+        // Scene 4 — the notice window
+        if (inScene(t, S.notice)) {
+          const o = vis(t, S.notice);
+          const at = (s) => after(t, S.notice, s, o);
+          txt(640, 120, "הודעה בכתב: בין 10 ל־45 ימים לפני", 40, { w: 700, o });
+          // The axis: 1 June to 10 August 2026, earlier dates on the right.
+          const day0 = Date.UTC(2026, 5, 1) / 86400000;
+          const X = (iso) => 1170 - ((Date.parse(iso + "T00:00:00Z") / 86400000 - day0) / 70) * 1060;
+          const ay = 300;
+          const wFrom = X(fact("n.earliest")), wTo = X(fact("n.latest"));
+          const ow = at(5);
+          el("rect", { x: wTo, y: ay - 34, width: wFrom - wTo, height: 68, rx: 10, fill: C.mint, opacity: ow * 0.9 });
+          txt((wFrom + wTo) / 2, ay - 46, "חלון ההודעה", 20, { w: 600, fill: C.teal, o: ow });
+          el("line", { x1: 100, x2: 1180, y1: ay, y2: ay, stroke: C.n300, "stroke-width": 3, opacity: o });
+          [["2026-06-01", "1 ביוני"], ["2026-07-01", "1 ביולי"], ["2026-08-01", "1 באוגוסט"]].forEach(([iso, label]) => {
+            el("line", { x1: X(iso), x2: X(iso), y1: ay - 8, y2: ay + 8, stroke: C.n600, "stroke-width": 2, opacity: o });
+            txt(X(iso), ay + 34, label, 18, { fill: C.n600, o });
+          });
+          // The repayment day.
+          const orp = at(2);
+          el("line", { x1: X("2026-08-02"), x2: X("2026-08-02"), y1: ay - 70, y2: ay + 6, stroke: C.navy, "stroke-width": 3, opacity: orp });
+          txt(X("2026-08-02"), ay - 82, "פירעון: 2 באוגוסט", 20, { w: 700, o: orp });
+          // Two notices.
+          const o1 = at(18);
+          el("circle", { cx: X("2026-07-03"), cy: ay, r: 10, fill: C.teal, opacity: o1 });
+          txt(X("2026-07-03"), ay + 78, `הודעה ${V.okDays} ימים לפני`, 20, { w: 600, fill: C.teal, o: o1 });
+          const o2 = at(27);
+          el("circle", { cx: X("2026-07-27"), cy: ay, r: 10, fill: C.navy, opacity: o2 });
+          txt(X("2026-07-27"), ay + 78, `${V.shortDays} ימים לפני`, 20, { w: 600, o: o2 });
+          const r1 = at(20);
+          box(640, 430, 440, 100, r1 * 0.95, C.mint);
+          txt(860, 470, "בטווח: עמלת אי־הודעה", 20, { fill: C.n700, o: r1 });
+          txt(860, 512, "0 ₪", 36, { w: 700, fill: C.teal, o: r1, ltr: true });
+          const r2 = at(29);
+          box(200, 430, 400, 100, r2);
+          txt(400, 470, "קצר מ־10 ימים: 0.1%", 20, { fill: C.n700, o: r2 });
+          txt(400, 512, `${V.shortFee} ₪`, 36, { w: 700, o: r2, ltr: true });
+        }
+        // Scene 5 — a notice that was not used
+        if (inScene(t, S.gaming)) {
+          const o = vis(t, S.gaming);
+          const at = (s) => after(t, S.gaming, s, o);
+          txt(640, 128, "הודעה שלא ניצלו", 42, { w: 700, o });
+          const ay = 300;
+          const day0 = Date.UTC(2026, 0, 1) / 86400000;
+          const X = (iso) => 1170 - ((Date.parse(iso + "T00:00:00Z") / 86400000 - day0) / 240) * 1060;
+          el("line", { x1: 100, x2: 1180, y1: ay, y2: ay, stroke: C.n300, "stroke-width": 3, opacity: o });
+          const wFrom = X("2026-01-10"), wTo = X(fact("ag.counts_from"));
+          el("rect", { x: wTo, y: ay - 34, width: wFrom - wTo, height: 68, rx: 10, fill: C.n200, opacity: at(5) * 0.9 });
+          txt((wFrom + wTo) / 2, ay - 46, "שישה חודשים: הודעה חדשה לא נחשבת", 20, { w: 600, fill: C.n700, o: at(5) });
+          const o1 = at(2);
+          el("circle", { cx: wFrom, cy: ay, r: 10, fill: C.navy, opacity: o1 });
+          txt(wFrom, ay + 40, "10 בינואר: הודיעו, ולא פרעו", 20, { w: 600, o: o1 });
+          const o2 = at(12);
+          el("circle", { cx: X("2026-05-01"), cy: ay, r: 10, fill: C.n300, opacity: o2 });
+          txt(X("2026-05-01"), ay + 40, "1 במאי: לא נחשבת", 20, { fill: C.n700, o: o2 });
+          const o3 = at(17);
+          txt(wTo, ay + 78, `מ־${V.counts}`, 20, { w: 600, fill: C.teal, o: o3 });
+          box(300, 430, 680, 90, at(21) * 0.95, C.mint);
+          txt(640, 484, "מודיעים רק אחרי שהחלטה התקבלה", 30, { w: 700, o: at(21) });
+        }
+        // Scene 6 — the 16th of the month
+        if (inScene(t, S.idx)) {
+          const o = vis(t, S.idx);
+          const at = (s) => after(t, S.idx, s, o);
+          txt(640, 124, "עמלת מדד: ה־15 מול ה־16", 42, { w: 700, o });
+          txt(640, 170, `הלוואה צמודה · יתרה ${V.ixBal} ₪ · מדד ממוצע +0.25% בחודש`, 22, { fill: C.n700, o: at(1) });
+          const cw = 34, x0 = 640 - (31 * cw) / 2;
+          for (let d = 1; d <= 31; d++) {
+            const x = x0 + (d - 1) * cw, on = d <= 15, od = at(2 + (d - 1) * 0.06);
+            el("rect", { x, y: 214, width: cw - 3, height: 44, rx: 5, fill: on ? C.tq2 : C.n200, opacity: od });
+            if (d === 1 || d === 15 || d === 16 || d === 31) txt(x + (cw - 3) / 2, 242, String(d), 16, { w: 600, o: od, ltr: true });
+          }
+          const a = at(9);
+          box(160, 300, 300, 120, a);
+          txt(310, 340, "פירעון ב־15", 22, { fill: C.n600, o: a });
+          txt(310, 394, `${V.ix15} ₪`, 40, { w: 700, o: at(12), ltr: true });
+          const b = at(15);
+          box(490, 300, 300, 120, b);
+          txt(640, 340, "פירעון ב־16", 22, { fill: C.n600, o: b });
+          txt(640, 394, `${V.ix16} ₪`, 40, { w: 700, fill: C.teal, o: at(17), ltr: true });
+          const c = at(21);
+          box(820, 300, 300, 120, c);
+          txt(970, 340, "יום המתנה", 22, { fill: C.n600, o: c });
+          txt(970, 394, `${V.ixDay} ₪`, 40, { w: 700, o: at(23), ltr: true });
+          const n = at(26);
+          box(340, 450, 600, 90, n * 0.95, C.mint);
+          txt(640, 492, "חיסכון נטו", 22, { fill: C.n700, o: n });
+          txt(640, 528, `${V.ixNet} ₪`, 34, { w: 700, fill: C.teal, o: n, ltr: true });
+        }
+        // Scene 7 — the reduction is a step
+        if (inScene(t, S.step)) {
+          const o = vis(t, S.step);
+          const at = (s) => after(t, S.step, s, o);
+          txt(640, 128, "ההפחתה לפי ותק: מדרגה", 42, { w: 700, o });
+          const a = at(3);
+          box(670, 180, 440, 190, a);
+          txt(890, 222, "יום לפני שלוש שנים", 22, { fill: C.n600, o: a });
+          txt(890, 258, "אין הפחתה", 22, { fill: C.n700, o: a });
+          txt(890, 328, `${V.before} ₪`, 44, { w: 700, o: at(8), ltr: true });
+          const b = at(12);
+          box(170, 180, 440, 190, b);
+          txt(390, 222, "יומיים אחרי", 22, { fill: C.n600, o: b });
+          txt(390, 258, `הפחתה של ${V.red}%`, 22, { fill: C.n700, o: b });
+          txt(390, 328, `${V.after} ₪`, 44, { w: 700, fill: C.teal, o: at(16), ltr: true });
+          const c = at(19);
+          box(300, 400, 680, 70, c * 0.95, C.mint);
+          txt(640, 446, `חוסכים ${V.saving} ₪ בעמלה`, 30, { w: 700, o: c });
+          txt(640, 510, `אבל חודש המתנה עולה ${V.mInt} ₪ בריבית של ההלוואה הקיימת`, 22, { fill: C.n700, o: at(24) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 260, "תחנת יציאה · הודעה · ה־16 · המדרגה", 40, { w: 700, o });
+          txt(640, 340, "מחשבים את העמלה ליום מסוים", 44, { w: 700, fill: C.teal, o: after(t, S.end, 3, o) });
+          txt(640, 410, "והעמלה העתידית לא ידועה היום", 32, { fill: C.n700, o: after(t, S.end, 6, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

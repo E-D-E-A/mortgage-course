@@ -1,0 +1,194 @@
+<!doctype html>
+<!--
+  Video scene for lesson 7.5 — "אותו מבחן, מסלול אחר".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/7-5.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: internal and external refinance run the same test; what differs is mostly what the course does not
+  know — field claims awaiting Eylon, and open questions. Every bank, rate and cost is invented; the 1,500 ₪ difference in
+  up-front costs between the two kinds is an invented assumption):
+  1. Title.
+  2. Internal (the bank the loan is with now) and external (another bank).
+  3. The same arithmetic: the debt plus the fee, the bar of lesson 7.4.
+  4. Three kinds of claims: what the course knows, claims without an official source, what is not known.
+  5. An invented comparison: the same rate, then a tenth of a percentage point more, with different up-front costs.
+  6. Takeaway: the same test on every offer; ask for the unknown in writing.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 7.5 · מחזור פנימי מול חיצוני</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+                <script type="module">
+      const data = await (await fetch("/data/lessons/7-5.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      const g = (id) => fact(id);
+      // Numbers and signs stay left to right inside a right-to-left line.
+      const lr = (x) => `\u2066${x}\u2069`;
+      const V = {
+        fin: num(g("old.financed")), rate1: pl(g("old.rate1")), months: String(g("old.months")),
+        costsExt: num(g("x.costs_ext")), costsInt: num(g("x.costs_int")), gapCost: num(g("x.cost_gap")),
+        extRate: pl(g("ext.input_rate")), i1Rate: pl(g("i1.input_rate")),
+        extSave: num(g("ext.saving")), i0Save: num(g("i0.saving")), i1Save: num(g("i1.saving")), dExt: num(g("d.ext_i1")), dI0: num(g("d.i0_ext")),
+      };
+      const S = { title: [0, 8], two: [8, 36], same: [36, 68], claims: [68, 112], example: [112, 156], end: [156, 170] };
+      window.duration = 170;
+      window.cues = [
+        [1, 4.5, "אותו מבחן, מסלול אחר"],
+        [4.5, 7.5, "מחזור פנימי מול חיצוני."],
+        [9, 17, "פנימי: ההלוואה החדשה בבנק שבו המשכנתא היום."],
+        [17, 25, "חיצוני: ההלוואה החדשה בבנק אחר."],
+        [25, 35, "מה שונה? בעיקר דברים שהקורס לא יודע."],
+        [37, 46, `בשניהם ההלוואה החדשה מכסה את החוב והעמלה: ${V.fin} ₪.`],
+        [46, 56, `בשניהם אותו רף: ${V.rate1}%, שיעור הריבית לצרכי השוואה.`],
+        [56, 67, "ובשניהם משווים כל הצעה לפי המספרים שלה."],
+        [69, 78, "שלושה סוגי טענות, ושלוש דרכים להתייחס אליהן."],
+        [78, 88, "הקורס יודע: החישוב, והמשפט של הרגולטור."],
+        [88, 100, "אנשי שטח אומרים: חיצוני דורש שמאות. בלי מקור רשמי."],
+        [100, 111, "לא ידוע: האם יש עמלת פירעון במחזור פנימי."],
+        [113, 121, "השוואה בדויה: אותה הלוואה, שתי תשובות."],
+        [121, 130, `בנק אחר: ${V.extRate}%, עלויות כניסה ${V.costsExt} ₪.`],
+        [130, 139, `הבנק הנוכחי: אותה ריבית, עלויות ${V.costsInt} ₪. הוא מנצח.`],
+        [139, 148, `ב־${V.i1Rate}% הבנק האחר מנצח, למרות העלויות.`],
+        [148, 155, "ההפרש בעלויות בדוי. הריבית משנה יותר."],
+        [157, 164, "מריצים אותו מבחן על כל הצעה."],
+        [164, 169, "ומה שלא ידוע, שואלים בכתב."],
+      ];
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "אותו מבחן,", 74, { w: 700, o });
+          txt(640, 370, "מסלול אחר", 74, { w: 700, o });
+          txt(640, 435, "מחזור פנימי מול חיצוני · כל הבנקים והמספרים בדויים", 24, { fill: C.n600, o: after(t, S.title, 3, o) });
+        }
+        if (inScene(t, S.two)) {
+          const o = vis(t, S.two);
+          const at = (s) => after(t, S.two, s, o);
+          txt(640, 130, "שני סוגי מחזור", 44, { w: 700, o });
+          const cards = [
+            { x: 880, title: "מחזור פנימי", a: "ההלוואה החדשה", b: "בבנק שבו המשכנתא היום", from: 1 },
+            { x: 400, title: "מחזור חיצוני", a: "ההלוואה החדשה", b: "בבנק אחר", from: 9 },
+          ];
+          for (const c of cards) {
+            const oc = at(c.from);
+            box(c.x - 230, 190, 460, 230, oc);
+            txt(c.x, 255, c.title, 42, { w: 700, fill: C.teal, o: oc });
+            txt(c.x, 330, c.a, 28, { o: oc });
+            txt(c.x, 372, c.b, 28, { o: oc });
+          }
+          box(240, 460, 800, 64, at(23), C.mint);
+          txt(640, 502, "מה שונה? בעיקר דברים שהקורס לא יודע", 28, { w: 700, o: at(23) });
+        }
+        if (inScene(t, S.same)) {
+          const o = vis(t, S.same);
+          const at = (s) => after(t, S.same, s, o);
+          txt(640, 130, "מה אותו דבר", 44, { w: 700, o });
+          box(180, 190, 400, 190, at(1));
+          txt(380, 236, "ההלוואה החדשה מכסה", 24, { fill: C.n600, o: at(1) });
+          txt(380, 276, "את החוב והעמלה", 24, { fill: C.n600, o: at(1) });
+          txt(380, 346, `${V.fin} ₪`, 44, { w: 700, o: at(1), ltr: true });
+          box(700, 190, 400, 190, at(10));
+          txt(900, 236, "הרף של שיעור 7.4", 24, { fill: C.n600, o: at(10) });
+          txt(900, 276, "ריבית לצרכי השוואה", 24, { fill: C.n600, o: at(10) });
+          txt(900, 346, `${V.rate1}%`, 52, { w: 700, fill: C.teal, o: at(10), ltr: true });
+          txt(640, 450, "ובשניהם: כל הצעה נבדקת לפי המספרים שלה", 28, { w: 600, fill: C.n700, o: at(20) });
+        }
+        if (inScene(t, S.claims)) {
+          const o = vis(t, S.claims);
+          const at = (s) => after(t, S.claims, s, o);
+          txt(640, 120, "שלושה סוגי טענות", 44, { w: 700, o });
+          const cols = [
+            { x: 1050, title: "הקורס יודע", note: "החישוב · המשפט של הרגולטור", from: 1, fill: C.n0 },
+            { x: 640, title: "אנשי שטח אומרים", note: "חיצוני דורש שמאות · בלי מקור רשמי", from: 10, fill: C.n0 },
+            { x: 230, title: "לא ידוע", note: "עמלה במחזור פנימי? מחזור חלקי?", from: 22, fill: C.mint },
+          ];
+          for (const c of cols) {
+            const oc = at(c.from);
+            box(c.x - 190, 180, 380, 240, oc, c.fill);
+            txt(c.x, 245, c.title, 34, { w: 700, fill: C.teal, o: oc });
+            txt(c.x, 330, c.note, 22, { o: oc });
+          }
+          txt(640, 500, "בונים רק על הראשונה. את האחרות בודקים בכתב", 26, { fill: C.n700, w: 600, o: at(32) });
+        }
+        if (inScene(t, S.example)) {
+          const o = vis(t, S.example);
+          const at = (s) => after(t, S.example, s, o);
+          txt(640, 110, "השוואה בדויה: כמה חוסכים בסך הכול", 38, { w: 700, o });
+          const rows = [
+            { y: 190, label: "בנק אחר", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsExt + " ₪")}`, v: g("ext.saving"), s: V.extSave, from: 1, color: C.tq2 },
+            { y: 290, label: "הבנק הנוכחי", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsInt + " ₪")}`, v: g("i0.saving"), s: V.i0Save, from: 10, color: C.teal },
+            { y: 390, label: "הבנק הנוכחי", sub: `${lr(V.i1Rate + "%")} · עלויות ${lr(V.costsInt + " ₪")}`, v: g("i1.saving"), s: V.i1Save, from: 19, color: C.teal },
+          ];
+          const maxV = 35000;
+          for (const r of rows) {
+            const oc = at(r.from);
+            txt(1200, r.y, r.label, 26, { anchor: "start", w: 700, o: oc });
+            txt(1200, r.y + 34, r.sub, 20, { anchor: "start", fill: C.n600, o: oc });
+            const w = (Number(r.v) / maxV) * 560;
+            el("rect", { x: 950 - w, y: r.y - 24, width: w, height: 56, rx: 8, fill: r.color, opacity: oc });
+            txt(950 - w - 14, r.y + 14, `${r.s} ₪`, 26, { anchor: "end", w: 700, o: oc, ltr: true });
+          }
+          txt(640, 500, "בריבית זהה העלויות מכריעות. בעשירית נקודת אחוז הריבית מכריעה", 24, { fill: C.n700, w: 600, o: at(30) });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "אותו מבחן על כל הצעה", 52, { w: 700, o });
+          txt(640, 350, "ומה שלא ידוע, שואלים בכתב", 42, { w: 700, fill: C.teal, o: after(t, S.end, 3, o) });
+        }
+      };
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

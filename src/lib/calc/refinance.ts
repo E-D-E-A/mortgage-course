@@ -37,6 +37,7 @@
  *   newLoanOf(offer, forecast)         the new side, from offers.ts (payments, balances, the expected total rate).
  *   fixedOffer(args, forecast)         a one-track fixed unlinked offer, for the simple cases.
  *   trajectory(...)                    month by month: cash saved so far, the balance gap, and the net position.
+ *   stayStream / switchStream          the two sides of the comparison, as payments, balance after each payment, and the amount on day 0.
  *   switchSummary(...)                 monthly gap, totals, break-even months, present-value saving.
  *   monthsAtPayment(amount, rate, pay) how many months a new loan lasts when you keep paying what you pay today
  *                                      (the saving of a lower rate, read as a shorter loan).

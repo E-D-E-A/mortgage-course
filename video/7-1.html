@@ -1,0 +1,281 @@
+<!doctype html>
+<!--
+  Video scene for lesson 7.1 — "חמש עמלות, כל אחת עם כלל משלה".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/7-1.json. The subtitle cues (window.cues)
+  carry the explanatory sentences.
+
+  Script (one idea: leaving a mortgage early is not one fee but up to five, each with its own rule;
+  the rules are the team's transcription of the 2002 Banking Order, not verified):
+  1. Title.
+  2. Case C's loan: 700,000 ₪, 5.90%, 20 years; 37 payments made; balance 637,956.74 ₪. What may the bank charge?
+  3. The five fees as five cards: operational, no notice, discounting (next lesson), index, exchange rate.
+  4. The operational fee: once per repayment, not per track (60 vs 180 for three tracks).
+  5. The no-notice fee: 0.1% of the balance: 637.96 ₪ without notice, 0 with.
+  6. The index fee: only a linked loan, only the 1st–15th: 625 ₪ on the 10th, 0 on the 16th.
+  7. Where no fee applies: a directed loan; no discounting fee on prime.
+  8. Takeaway, with the source mark.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 7.1 · חמש עמלות הפירעון המוקדם</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/7-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "637.96", "60".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // Numbers and signs stay left to right inside Hebrew lines.
+      const lr = (s) => `⁦${s}⁩`;
+
+      const V = {
+        paid: pl(fact("c.paid")),
+        remaining: pl(fact("c.remaining")),
+        balance: num(fact("c.balance")),
+        pay: num(fact("c.payment")),
+        op: num(fact("op.one")),
+        op3: num(fact("op.three")),
+        nnNone: num(fact("nn.c_none")),
+        nnGiven: num(fact("nn.c_given")),
+        ixBalance: num(fact("ix.balance")),
+        ix10: num(fact("ix.fee10")),
+        ix16: num(fact("ix.fee16")),
+        days: pl(fact("c.notice_days")),
+      };
+
+      const S = { title: [0, 9], loan: [9, 38], five: [38, 100], op: [100, 128], nn: [128, 156], ix: [156, 190], none: [190, 212], end: [212, 226] };
+      window.duration = 226;
+      window.cues = [
+        [1, 5, "חמש עמלות, כל אחת עם כלל משלה."],
+        [5, 8.5, "מה עולה לצאת מהלוואה לפני הזמן?"],
+        [10, 16, "עדי וירון: 700,000 ₪, 5.90%, קבועה לא צמודה."],
+        [16, 22, `עברו ${V.paid} תשלומים, ונשארו ${V.remaining}.`],
+        [22, 29, `היתרה: ${lr(V.balance + " ₪")}. הם רוצים להחזיר אותה כולה.`],
+        [29, 37, "מה הבנק רשאי לגבות? לא עמלה אחת."],
+        [39, 46, "לפי הצו, חמש עמלות. לכל אחת תנאי וסכום משלה."],
+        [46, 54, `תפעולית: תמיד, עד ${lr(V.op + " ₪")}.`],
+        [54, 63, "אי־הודעה: אם לא הודעתם בכתב לפחות 10 ימים לפני."],
+        [63, 72, "היוון: במסלול בריבית קבועה. היא הגדולה מכולן."],
+        [72, 81, "מדד: בהלוואה צמודה שהוחזרה בין ה־1 ל־15."],
+        [81, 90, "הפרשי שער: רק בהלוואה במט״ח. הקורס לא מחשב אותה."],
+        [91, 99, "הטבלה היא תעתיק של הצוות. לא אומת מול הצו."],
+        [101, 108, "העמלה התפעולית: פעם אחת לכל פירעון."],
+        [108, 115, "לא פעם לכל מסלול. שלושה מסלולים לא משלמים שלוש פעמים."],
+        [115, 122, `בלי הפסיקה זה היה ${lr(V.op3 + " ₪")}. עם הפסיקה — ${lr(V.op + " ₪")}.`],
+        [122, 127, "הפסיקה: תעתיק של הצוות. לא אומת."],
+        [129, 136, "עמלת אי־הודעה: 0.1% מהסכום שמוחזר. שקל על כל אלף."],
+        [136, 144, `יתרה של ${lr(V.balance + " ₪")}, בלי הודעה: ${lr(V.nnNone + " ₪")}.`],
+        [144, 152, `הודעה בכתב ${V.days} ימים מראש: ${lr("0 ₪")}.`],
+        [152, 155, "הודעה בזמן חוסכת את העמלה הזו."],
+        [157, 164, "עמלת מדד: רק בהלוואה צמודה."],
+        [164, 172, `יתרה ${lr(V.ixBalance + " ₪")}, מדד שעולה ממוצע 0.25% בחודש.`],
+        [172, 180, `הוחזרה ב־10 בחודש: ${lr(V.ix10 + " ₪")}.`],
+        [180, 189, `הוחזרה ב־16: ${lr(V.ix16 + " ₪")}. ה־15 הוא הגבול.`],
+        [191, 198, "הלוואה מוכוונת: אין עליה שום עמלה."],
+        [198, 205, "במסלול פריים אין את העמלה הגדולה, אבל יש תפעולית."],
+        [205, 211, "ובהלוואה לא צמודה אין עמלת מדד."],
+        [213, 219, "חמש עמלות, חמישה כללים."],
+        [219, 225, "לפני כל החלטה בודקים כל אחת מהן."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
+      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "חמש עמלות,", 72, { w: 700, o });
+          txt(640, 372, "כל אחת עם כלל משלה", 72, { w: 700, o });
+          txt(640, 436, "מה עולה לצאת מהלוואה לפני הזמן", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — case C's loan
+        if (inScene(t, S.loan)) {
+          const o = vis(t, S.loan);
+          const at = (s) => after(t, S.loan, s, o);
+          txt(640, 130, "תיק ג׳: עדי וירון (בדויים)", 38, { w: 700, o });
+          box(300, 170, 680, 230, at(1));
+          const lines = [
+            ["ההלוואה", "700,000 ₪ · קבועה לא צמודה", 1],
+            ["הריבית והתקופה", "5.90% לשנה · 20 שנה", 1],
+            ["שולמו", `${V.paid} תשלומים · נשארו ${V.remaining}`, 7],
+            ["היתרה", `${V.balance} ₪`, 14],
+          ];
+          lines.forEach(([a, b, from], i) => {
+            const y = 218 + i * 54;
+            const ol = at(from);
+            txt(950, y, a, 22, { anchor: "start", fill: C.n600, o: ol });
+            txt(640, y, b, 26, { w: i === 3 ? 700 : 600, fill: i === 3 ? C.teal : C.navy, o: ol, ltr: i === 3 });
+          });
+          const oq = at(20);
+          box(330, 440, 620, 70, oq * 0.9, C.mint);
+          txt(640, 486, "מה הבנק רשאי לגבות על החזרה מוקדמת?", 28, { w: 700, o: oq });
+        }
+        // Scene 3 — the five fees
+        if (inScene(t, S.five)) {
+          const o = vis(t, S.five);
+          const at = (s) => after(t, S.five, s, o);
+          txt(640, 128, "חמש עמלות", 42, { w: 700, o });
+          const cards = [
+            { x: 880, y: 160, name: "תפעולית", when: "תמיד", amt: `עד ${V.op} ₪`, from: 8 },
+            { x: 500, y: 160, name: "אי־הודעה", when: "בלי הודעה בכתב בזמן", amt: "0.1% מהסכום שמוחזר", from: 16 },
+            { x: 120, y: 160, name: "היוון", when: "מסלול בריבית קבועה", amt: "הגדולה מכולן · שיעור 7.2", from: 25, big: true },
+            { x: 690, y: 320, name: "מדד", when: "הלוואה צמודה, בין ה־1 ל־15", amt: "חצי מהשינוי החודשי הממוצע", from: 34 },
+            { x: 310, y: 320, name: "הפרשי שער", when: "הלוואה במט״ח", amt: "הקורס לא מחשב", from: 43 },
+          ];
+          for (const c of cards) {
+            const oc = at(c.from);
+            box(c.x, c.y, 280, 130, oc, c.big ? C.mint : C.n0);
+            txt(c.x + 140, c.y + 38, c.name, 28, { w: 700, o: oc });
+            txt(c.x + 140, c.y + 72, c.when, 17, { fill: C.n700, o: oc });
+            txt(c.x + 140, c.y + 104, c.amt, 17, { w: 600, fill: C.teal, o: oc });
+          }
+          txt(640, 508, "תעתיק של הצוות של צו הבנקאות 2002 · לא אומת", 20, { fill: C.n600, o: at(52) });
+        }
+        // Scene 4 — operational fee
+        if (inScene(t, S.op)) {
+          const o = vis(t, S.op);
+          const at = (s) => after(t, S.op, s, o);
+          txt(640, 128, "העמלה התפעולית", 42, { w: 700, o });
+          [0, 1, 2].forEach((i) => {
+            const x = 860 - i * 260;
+            const oc = at(2 + i * 2);
+            box(x, 170, 220, 100, oc);
+            txt(x + 110, 208, `מסלול ${i + 1}`, 22, { fill: C.n600, o: oc });
+            txt(x + 110, 248, `${V.op} ₪`, 28, { w: 700, fill: at(11) > 0 ? C.n300 : C.navy, o: oc, ltr: true });
+            if (at(11) > 0) el("line", { x1: x + 60, x2: x + 160, y1: 242, y2: 242, stroke: C.navy, "stroke-width": 3, opacity: at(11) });
+          });
+          const o2 = at(14);
+          txt(640, 330, `בלי הפסיקה: ${V.op3} ₪`, 26, { fill: C.n700, o: at(8), ltr: false });
+          box(380, 370, 520, 100, o2 * 0.9, C.mint);
+          txt(640, 410, "פעם אחת לכל פירעון", 26, { w: 600, o: o2 });
+          txt(640, 450, `${V.op} ₪`, 34, { w: 700, fill: C.teal, o: o2, ltr: true });
+          txt(640, 510, "לפי פסיקה של המפקח על הבנקים · תעתיק · לא אומת", 18, { fill: C.n600, o: at(20) });
+        }
+        // Scene 5 — the no-notice fee
+        if (inScene(t, S.nn)) {
+          const o = vis(t, S.nn);
+          const at = (s) => after(t, S.nn, s, o);
+          txt(640, 128, "עמלת אי־הודעה: 0.1%", 42, { w: 700, o });
+          const a = at(2);
+          box(150, 180, 460, 190, a);
+          txt(380, 222, "בלי הודעה בכתב", 24, { fill: C.n600, o: a });
+          txt(380, 262, `${V.balance} ₪ × 0.1%`, 24, { o: at(5), ltr: true });
+          txt(380, 330, `${V.nnNone} ₪`, 48, { w: 700, fill: C.teal, o: at(9), ltr: true });
+          const b = at(14);
+          box(670, 180, 460, 190, b);
+          txt(900, 222, `הודעה ${V.days} ימים מראש`, 24, { fill: C.n600, o: b });
+          txt(900, 262, "בטווח שבין 10 ל־45 יום", 22, { o: at(17) });
+          txt(900, 330, "0 ₪", 48, { w: 700, fill: C.teal, o: at(19), ltr: true });
+          txt(640, 440, "שקל על כל אלף שקל שמחזירים", 28, { w: 600, fill: C.n700, o: at(22) });
+        }
+        // Scene 6 — the index fee
+        if (inScene(t, S.ix)) {
+          const o = vis(t, S.ix);
+          const at = (s) => after(t, S.ix, s, o);
+          txt(640, 128, "עמלת מדד: רק עד ה־15", 42, { w: 700, o });
+          txt(640, 176, `הלוואה צמודה · יתרה ${V.ixBalance} ₪ · מדד ממוצע +0.25% בחודש`, 22, { fill: C.n700, o: at(1) });
+          // A month as 31 cells: the 1st–15th carry the fee.
+          const cw = 34, x0 = 640 - (31 * cw) / 2;
+          for (let d = 1; d <= 31; d++) {
+            const x = x0 + (d - 1) * cw;
+            const on = d <= 15;
+            const od = at(3 + (d - 1) * 0.08);
+            el("rect", { x, y: 230, width: cw - 3, height: 46, rx: 5, fill: on ? C.tq2 : C.n200, opacity: od });
+            if (d % 5 === 0 || d === 1 || d === 10 || d === 16) txt(x + (cw - 3) / 2, 260, String(d), 16, { w: 600, o: od, ltr: true });
+          }
+          txt(640, 310, "1–15: עמלת מדד חלה · 16–31: לא חלה", 20, { fill: C.n700, o: at(7) });
+          const a = at(10);
+          box(160, 350, 470, 130, a);
+          txt(395, 390, "הוחזרה ב־10 בחודש", 22, { fill: C.n600, o: a });
+          txt(395, 452, `${V.ix10} ₪`, 44, { w: 700, fill: C.teal, o: at(13), ltr: true });
+          const b = at(19);
+          box(650, 350, 470, 130, b);
+          txt(885, 390, "הוחזרה ב־16 בחודש", 22, { fill: C.n600, o: b });
+          txt(885, 452, `${V.ix16} ₪`, 44, { w: 700, fill: C.teal, o: at(22), ltr: true });
+          txt(640, 520, "היתרה × ½ × השינוי החודשי הממוצע של המדד", 20, { fill: C.n600, o: at(26) });
+        }
+        // Scene 7 — where there is no fee
+        if (inScene(t, S.none)) {
+          const o = vis(t, S.none);
+          const at = (s) => after(t, S.none, s, o);
+          txt(640, 128, "מתי חלק מהעמלות לא חלות", 42, { w: 700, o });
+          const items = [
+            { x: 770, label: "הלוואה מוכוונת", note: "אין שום עמלה", from: 1 },
+            { x: 450, label: "פריים", note: "אין את העמלה הגדולה", from: 7 },
+            { x: 130, label: "לא צמודה", note: "אין עמלת מדד", from: 13 },
+          ];
+          for (const it of items) {
+            const oc = at(it.from);
+            box(it.x - 130, 190, 300, 170, oc);
+            txt(it.x + 20, 246, it.label, 30, { w: 700, o: oc });
+            txt(it.x + 20, 300, it.note, 24, { w: 600, fill: C.teal, o: oc });
+          }
+          txt(640, 430, "התפעולית חלה כמעט תמיד", 26, { fill: C.n700, o: at(17) });
+          txt(640, 480, "מוכוונת: לפי התעתיק · לא אומת", 18, { fill: C.n600, o: at(17) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "עמלת פירעון מוקדם:", 44, { w: 600, fill: C.n700, o });
+          txt(640, 346, "חמש עמלות, חמישה כללים", 54, { w: 700, o: after(t, S.end, 2, o) });
+          txt(640, 420, "ההיוון — בשיעור הבא", 36, { w: 700, fill: C.teal, o: after(t, S.end, 5, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>
