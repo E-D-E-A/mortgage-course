@@ -7,7 +7,7 @@
  * one with no new Python.
  *
  * Teaching numbers only: new inputs, not a lesson's worked example or exercise. Every family is invented and
- * named as the stage-6 lessons name them (מיכל ועידו, דנה ורועי, יעל ואלון, דנה ויואב, אבי ומיכל, נועם ושירה);
+ * named as the stage-6 lessons name them (ליאור ועדי, דנה ורועי, יעל ואלון, הדס ואיתי, אבי ומיכל, נועם ושירה);
  * every bank is the course's fictional "בנק א׳ … ד׳", with the price lists of lessons 6.6–6.8
  * (src/data/case-a-offers.ts) and the RULES of lesson 6.9 (src/data/case-a-positioning.ts), which are the
  * exercise's own, never a real bank's. A question that leans on such a rule states it in its own text.
@@ -105,23 +105,23 @@ export default function check6(): LessonData {
   add(AF.ratio("r3.answer", "6350", v("r3.disposable")));
   add(AF.ratio("r3.err_recognised", "6350", "19800"));
 
-  // ═══ Review r4 (5.3): two offers that differ in the term are not on one basis ═══
+  // ═══ Review r4 (5.3): two offers on different amounts are not on one basis ═══
   const bk = (id: "a" | "b" | "c") => OFFER_BANKS.find((b) => b.id === id)!;
-  const u2 = (id: "a" | "b" | "c", months: number) => uniformOffer(bk(id), basketById("uniform_2"), "forecast_a", "900000.00", "0.00", months);
-  const r4b = u2("b", 240);
-  const r4c = u2("c", 300);
-  add(M.given("r4.loan", "900000.00"));
-  add(M.given("r4.b_years", "20"));
-  add(M.given("r4.c_years", "25"));
+  const u2 = (id: "a" | "b" | "c", loan: string) => uniformOffer(bk(id), basketById("uniform_2"), "forecast_a", loan);
+  const r4b = u2("b", "750000.00");
+  const r4c = u2("c", "1200000.00");
+  add(M.given("r4.b_loan", "750000.00"));
+  add(M.given("r4.c_loan", "1200000.00"));
   for (const [id, o] of [["b", r4b], ["c", r4c]] as const) {
     add(measure(`r4.${id}.total`, o, FORECASTS, "total"));
     add(measure(`r4.${id}.rate`, o, FORECASTS, "rate", 2));
     add(measure(`r4.${id}.first`, o, FORECASTS, "first"));
   }
   add(basis("r4.basis", [r4b, r4c]));
-  add(basis("r4.basis_same", [u2("b", 300), u2("c", 300)]));
-  claim((get("r4.basis").value as string[]).join() === "mix", "r4: the two offers must differ only in the mix (which includes the term)");
-  claim((get("r4.basis_same").value as string[]).length === 0, "r4: the same term at both banks is one basis");
+  add(basis("r4.basis_same", [u2("b", "1200000.00"), u2("c", "1200000.00")]));
+  add(measure("r4.b.total_same", u2("b", "1200000.00"), FORECASTS, "total"));
+  claim((get("r4.basis").value as string[]).join() === "amount", "r4: the two offers must differ only in the amount");
+  claim((get("r4.basis_same").value as string[]).length === 0, "r4: the same amount at both banks is one basis");
   claim(num("r4.b.total") < num("r4.c.total") && num("r4.b.rate") > num("r4.c.rate"), "r4: bank ב׳ has the lower total and bank ג׳ the lower rate");
 
   // ═══ 6.1 ═══
