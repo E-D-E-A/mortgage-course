@@ -56,7 +56,7 @@ const lines = computed<Line[]>(() => {
     {
       key: "threshold",
       kind: "סף הון",
-      name: "מגבלת ההון (40%)",
+      name: "סף ההון (40%)",
       percent: threshold,
       crossed: r.gt(threshold),
       color: "var(--mogi-warning)",
@@ -101,7 +101,7 @@ const pos = (p: Decimal.Value) => `${Math.min(100, (Number(p) / SCALE) * 100)}%`
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">
-      מספרים להמחשה. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת מול המקור. מגבלת ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203). הקו של בנק א׳ הוא מספר להמחשה: בנק אמיתי יכול להציב קו אחר, ולא ידוע לנו איזה.
+      מספרים להמחשה. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת מול המקור. סף ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203). הקו של בנק א׳ הוא מספר להמחשה: בנק אמיתי יכול להציב קו אחר, ולא ידוע לנו איזה.
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">

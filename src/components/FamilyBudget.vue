@@ -68,7 +68,7 @@ const money = (v: Decimal.Value) => withMinus(formatShekelsText(v));
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">
-      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת. מגבלת ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203).
+      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת. סף ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203).
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
@@ -178,7 +178,7 @@ const money = (v: Decimal.Value) => withMinus(formatShekelsText(v));
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">לנפש</th><td class="py-1"><span class="ltr">{{ withMinus(formatShekels(each)) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">תקציב מחיה</th><td class="py-1"><span class="ltr">{{ formatShekels(budget) }}</span></td></tr>
           <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר מרבי לפי המגבלה ({{ PTI_LIMIT }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxLimit) }}</span></td></tr>
-          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר במגבלת ההון ({{ PTI_CAPITAL_THRESHOLD }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxThreshold) }}</span></td></tr>
+          <tr class="border-b border-n100"><th class="py-1 text-start font-normal text-n600">החזר בסף ההון ({{ PTI_CAPITAL_THRESHOLD }}%)</th><td class="py-1"><span class="ltr">{{ formatShekels(maxThreshold) }}</span></td></tr>
           <tr><th class="py-1 text-start font-normal text-n600">החזר מרבי לפי התקציב</th><td class="py-1"><span class="ltr">{{ formatShekels(familyMax) }}</span></td></tr>
         </tbody>
       </table>

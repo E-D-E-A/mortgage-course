@@ -28,7 +28,7 @@ const props = withDefaults(
     income?: number;
     variable?: number;
     termYears?: number;
-    /** What the page calls the 40% line. Lesson 4.4 says "מגבלת ההון" (the term "סף הון" comes in 4.5); later lessons pass nothing. */
+    /** What the page calls the 40% line. Lesson 4.4 says "סף ההון" (the term "סף הון" comes in 4.5); later lessons pass nothing. */
     capitalName?: string;
   }>(),
   { value: 1700000, loan: 1200000, payment: 7000, income: 16000, variable: 840000, termYears: 30, capitalName: "סף הון" },

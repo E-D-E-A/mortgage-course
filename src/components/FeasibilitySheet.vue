@@ -93,7 +93,7 @@ const lines = computed(() => [
   {
     id: "pti40",
     title: "יחס החזר: סף ההון",
-    kind: `מגבלת ההון (${PTI_CAPITAL_THRESHOLD}%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203)`,
+    kind: `סף ההון (${PTI_CAPITAL_THRESHOLD}%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203)`,
     tone: (termOver.value ? "warn" : fits40.value ? "ok" : "warn") as Tone,
     status: termOver.value ? "לא נבדק" : fits40.value ? "מתחת לסף" : "מעל הסף: מותר, והבנק מחזיק יותר הון",
     text: termOver.value
