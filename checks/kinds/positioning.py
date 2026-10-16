@@ -12,7 +12,7 @@ checks/kinds/sensitivity.py (itself written without the TypeScript); what is new
   pos_income_room    payment x 100 / line, rounded UP to the agora, minus the disposable income; 0 when within
   pos_loan_cut       the least that must come off a mix's loan, in whole steps, for payment / disposable income
                      x 100 to be at most the line. Found by counting up from 0 a step at a time (the TypeScript
-                     starts from the proportional cut and settles); the mix keeps its proportions as the
+                     starts from the proportional cut and settles); the payment is the statement's, each track's level payment rounded to the agora and then added; the mix keeps its proportions as the
                      "amount" lever of sensitivity.py does. Inputs: the mix's flat inputs, disposable, percent, step
   pos_term_route     one level-payment loan, term moved from `from` to `to` months: `measure` is one of
                      from_payment, to_payment (each the level payment rounded to the agora), from_total,
@@ -22,7 +22,7 @@ checks/kinds/sensitivity.py (itself written without the TypeScript); what is new
   pos_standing_table one row per line, as the numbered percents give them: percent, status (within / at /
                      over: strictly above is over), points (line - actual)
 """
-from decimal import ROUND_CEILING, ROUND_DOWN, ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_DOWN, Decimal
 
 from kinds import sensitivity
 from kinds.common import agorot
@@ -83,6 +83,11 @@ def income_room(i, _facts=None):
     return money(room if room > 0 else 0)
 
 
+def _statement(j):
+    """The mix's payment as a statement shows it: each track's level payment rounded to the agora, then added."""
+    return sum((agorot(_level(a, r, m)) for _, a, r, m in sensitivity._tracks(j)), Decimal(0))
+
+
 def loan_cut(i, _facts=None):
     cap = Decimal(str(i["percent"]))
     step = Decimal(str(i["step"]))
@@ -90,7 +95,7 @@ def loan_cut(i, _facts=None):
     cut = Decimal(0)
     while True:
         j = sensitivity._flow_inputs({**i, "lever": "amount", "lever_change": str(-cut)}) if cut else sensitivity._flow_inputs(dict(i))
-        if sensitivity._qualifying(j) / disposable * HUNDRED <= cap:
+        if _statement(j) / disposable * HUNDRED <= cap:
             return money(cut)
         cut += step
         if cut >= sensitivity._loan(sensitivity._flow_inputs(dict(i))):

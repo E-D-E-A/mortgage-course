@@ -119,7 +119,7 @@
           const pw = w * (pct / 100);
           cx -= pw;
           el("rect", { x: cx, y, width: pw, height: 54, fill: col, opacity: o, stroke: C.n200, "stroke-width": 1 });
-          if (pw > 80) txt(cx + pw / 2, y + 34, `${Math.round(pct)}%`, 24, { w: 700, fill: fg, o, ltr: true });
+          if (pw > 80) txt(cx + pw / 2, y + 34, (Math.abs(pct - 33.33) < 0.2 ? "שליש" : `${Math.round(pct)}%`), 24, { w: 700, fill: fg, o, ltr: true });
         });
       };
       window.render = (t) => {

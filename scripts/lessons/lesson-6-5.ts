@@ -7,7 +7,7 @@
  * ratio on a form that leaves the loan out (a figure about a family that does not exist).
  *
  * Case A (the car loan, the equity with its gift), case B (אבי: two assessments, the declared
- * income), and a small invented family (דנה ויואב) for the second failure: a position that passes
+ * income), and a small invented family (הדס ואיתי) for the second failure: a position that passes
  * the bank's line and leaves the family short of its own budget.
  *
  * Every number the page, its exercises, its two components and its video show is a fact here;
@@ -44,7 +44,7 @@ const caseB = (aviMonthly: string): PositionCase => ({
   obligations: [],
 });
 
-/** דנה ויואב: invented. They bring 22,000 ₪ net a month and need 14,000 ₪ to live. */
+/** הדס ואיתי: invented. They bring 22,000 ₪ net a month and need 14,000 ₪ to live. */
 const D_NET = "22000";
 const D_BUDGET = "14000";
 
@@ -98,7 +98,7 @@ export default function lesson(): LessonData {
   add(difference("b.rise", latest, avg));
   add(difference("b.gain_latest", get("b.ratio_avg"), get("b.ratio_latest")));
 
-  // ── דנה ויואב: the bank's line allows more than the family's budget does ──
+  // ── הדס ואיתי: the bank's line allows more than the family's budget does ──
   add(givenMoney("d.net", D_NET));
   add(givenMoney("d.budget", D_BUDGET));
   add(maxPayment("d.bank_max", D_NET, "40"));
@@ -122,7 +122,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "6.5",
     title: "הקו האדום: מיצוב מול מידע לא נכון",
-    note: "Case A (the car loan, the gift in the equity), case B (אבי), and an invented family (דנה ויואב). Legal consequences are not facts: the page asks them as questions to a lawyer. Wrong-information examples are what not to do.",
+    note: "Case A (the car loan, the gift in the equity), case B (אבי), and an invented family (הדס ואיתי). Legal consequences are not facts: the page asks them as questions to a lawyer. Wrong-information examples are what not to do.",
     facts,
   };
 }

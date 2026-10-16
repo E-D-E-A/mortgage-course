@@ -27,7 +27,7 @@ import { percentString } from "../../src/lib/calc/percent.ts";
 import { mixInputs, type TrackSpec } from "../../src/lib/calc/schedule.ts";
 import { scenarioFrom } from "../../src/lib/calc/sensitivity.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { difference, given, marginFact, mixFact } from "./_outreach-facts.ts";
+import { difference, firstRatioFact, given, marginFact, mixFact } from "./_outreach-facts.ts";
 import { tableFact } from "./_sensitivity-facts.ts";
 import Decimal from "decimal.js";
 
@@ -65,7 +65,7 @@ export default function lesson68(): LessonData {
     const first = mixFact(`${id}.first`, { tracks: t, scenario: base }, "first");
     const total = mixFact(`${id}.total`, { tracks: t, scenario: base }, "total");
     const stressMax = mixFact(`${id}.stress_max`, { tracks: t, scenario: stress }, "max");
-    const ratio = mixFact(`${id}.ratio`, { tracks: t, scenario: base }, "ratio");
+    const ratio = firstRatioFact(`${id}.ratio`, first);
     const variable = mixFact(`${id}.variable_share`, { tracks: t, scenario: base }, "variable_share");
     const rise = difference(`${id}.rise`, stressMax, first);
     facts.push(first, total, stressMax, rise, ratio, variable);

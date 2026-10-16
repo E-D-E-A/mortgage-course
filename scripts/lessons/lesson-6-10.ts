@@ -17,7 +17,7 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import { ROUND_RULE } from "../../src/data/case-a-offers.ts";
 import { CAR_PAYOFF, RESERVE } from "../../src/data/case-a-levers.ts";
 import { CASE_A, SCENARIOS } from "../../src/data/case-a-mix.ts";
-import { ANSWER_AFTER, BANKS, bank, caseAFile, movesFor, planEquity, REQUEST_DATE } from "../../src/data/case-a-positioning.ts";
+import { ANSWER_AFTER, BANKS, bank, caseAFile, movesFor, planEquity, REQUEST_DATE, WAIT_MONTHS } from "../../src/data/case-a-positioning.ts";
 import { bankClocks, type BankRequest, WINDOW_DAYS } from "../../src/lib/calc/outreach.ts";
 import { CALENDAR_2026 } from "../../src/lib/calc/process.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -57,7 +57,8 @@ export default function lesson610(): LessonData {
   verdictFacts(add, "t.carR.c", C, caseAFile(movesFor({ car: true })), opts);
   verdictFacts(add, "t.wait", A, caseAFile(movesFor({ wait: true })), opts);
   add(difference("t.reserve_after_car", get("a.reserve"), get("t.payoff")));
-  add(given("t.wait_months", 8));
+  add(given("t.wait_months", WAIT_MONTHS));
+  add(given("t.wait_left", (CASE_A.car.monthsLeft as number) - WAIT_MONTHS));
 
   // ── The plan's levers, read by the four banks (the same file as lesson 6.11) ──
   const equity = planEquity().toString();
@@ -117,7 +118,7 @@ export default function lesson610(): LessonData {
   return {
     lesson: "6.10",
     title: "סימולציות תיק",
-    note: "Case A along the process. Levers: lesson 6.4's (reserve 40,000, car payoff 36,000, 8 months of waiting). Banks: lessons 6.6–6.8's four fictional banks with their price lists, and lesson 6.9's INVENTED rules (bankpolicy.ts). Clocks: lesson 6.6's request date and answer times; 24 calendar days of terms from each approval (the team's transcription of Directive 451, not verified). The Bank of Israel decision date is lesson 0.10's (search summaries, not verified), and a rise of 0.25 point is the exercise's assumption. Nothing here says how a real bank answers a refusal, a rate that moves or a competing offer. Base scenario: the index rises 2% a year, prime does not move.",
+    note: "Case A along the process. Levers: lesson 6.4's (reserve 40,000, car payoff 36,000, 9 months of waiting). Banks: lessons 6.6–6.8's four fictional banks with their price lists, and lesson 6.9's INVENTED rules (bankpolicy.ts). Clocks: lesson 6.6's request date and answer times; 24 calendar days of terms from each approval (the team's transcription of Directive 451, not verified). The Bank of Israel decision date is lesson 0.10's (search summaries, not verified), and a rise of 0.25 point is the exercise's assumption. Nothing here says how a real bank answers a refusal, a rate that moves or a competing offer. Base scenario: the index rises 2% a year, prime does not move.",
     facts,
   };
 }

@@ -8,12 +8,13 @@
  * ── The API ──────────────────────────────────────────────────────────────
  *
  * Thresholds, with a kind
- *   ThresholdKind  "regulatory_limit" | "capital_threshold" | "bank_policy" | "field_hypothesis"
+ *   ThresholdKind  "regulatory_limit" | "capital_threshold" | "bank_policy" | "field_hypothesis" | "course_example"
+ *                  (course_example: a line the COURSE chose to teach with, a calculation assumption, never field knowledge)
  *   Metric         "pti" (payment ÷ disposable income, lesson 4.3) | "ltv" (loan ÷ value, lesson 1.2)
  *   Threshold {id, metric, kind, percent, label, source}   one line on one metric; percent is a string
  *   KIND_INFO                    per kind: the Hebrew name, what crossing it means, how the course labels it
- *   EXAMPLE_THRESHOLDS           the course's example set for stage 6 (case A): the five lines of
- *                                lesson 4.5 that concern positioning, plus the field hypotheses
+ *   EXAMPLE_THRESHOLDS           the course's example set for stage 6 (case A): the directive's lines, the
+ *                                course's own 30% and 35%, and one banker's 40% and 60% financing lines
  *   thresholdsOf(metric, list?)  the lines of one metric, lowest first
  *
  * Where a ratio stands
@@ -40,7 +41,9 @@
  *                                (default 1,000 ₪; tracks keep their proportions, sensitivity.ts's
  *                                "amount" lever), for the payment ratio to be at most `percent`. It is also
  *                                the extra equity the client must bring: the price stays the same
- *   ratioAfterCut(tracks, disposable, cut)      the payment ratio after that cut, percent, exact
+ *   statementPayment(tracks)                    the mix's payment as a statement shows it: each track's level payment
+ *                                rounded to the agora, then added (25 years of case A: 8,992.92, not 8,992.91)
+ *   ratioAfterCut(tracks, disposable, cut)      the payment ratio after that cut, percent, exact, on statementPayment
  *   ltvAfterCut(tracks, value, cut)             the financing ratio after it, percent, exact
  *   ltvAfterUse(value, loan, use)               the financing ratio when `use` shekels of the equity go
  *                                elsewhere (closing a debt) and the loan grows by as much, percent, exact
@@ -61,14 +64,15 @@
  *     numbers (lesson 6.2); lesson 6.4 prices each lever as gain against cost.
  *   - Which lines a real bank applies. EXAMPLE_THRESHOLDS are the course's example lines for teaching; the
  *     50 and 40 and the financing ceilings are regulation.ts's (the team's transcription of directive 329,
- *     not checked against the directive); 35, 30 are an example from the course brief ("the numbers are to
- *     be checked"), 60 and 40 of the financing ratio are one banker's remark (FK-H-004).
+ *     not checked against the directive); 35 and 30 are the course's own example, kind
+ *     "course_example" (a calculation assumption, "the numbers are to be checked", NOT field knowledge); 60 and
+ *     40 of the financing ratio are one banker's remark (FK-H-004), kind "field_hypothesis".
  *
  * Amounts are shekels as strings or Decimals; percents are strings. Results are exact Decimals, except where
  * a function says it rounds. Recomputed independently in checks/kinds/positioning.py.
  */
 import Decimal from "decimal.js";
-import { paymentToIncome } from "./affordability.ts";
+import { paymentToIncome, qualifyingPayment } from "./affordability.ts";
 import { annuityPayment } from "./amortization.ts";
 import { floorAgora, LTV_CEILINGS, ltvPercentOf, PTI_CAPITAL_THRESHOLD, PTI_LIMIT } from "./regulation.ts";
 import type { TrackSpec } from "./schedule.ts";
@@ -81,7 +85,7 @@ const ZERO = new Decimal(0);
 
 // ── Thresholds ─────────────────────────────────────────────────────────────
 
-export type ThresholdKind = "regulatory_limit" | "capital_threshold" | "bank_policy" | "field_hypothesis";
+export type ThresholdKind = "regulatory_limit" | "capital_threshold" | "bank_policy" | "field_hypothesis" | "course_example";
 export type Metric = "pti" | "ltv";
 
 export interface Threshold {
@@ -109,39 +113,45 @@ export interface KindInfo {
 export const KIND_INFO: Record<ThresholdKind, KindInfo> = {
   regulatory_limit: {
     name: "מגבלה רגולטורית",
-    crossing: "אסור: הבנק לא מאשר",
+    crossing: "אסור: הבנק לא מאשר (לפי תעתיק הצוות)",
     label: "לפי תעתיק הצוות של ההוראה, לא אומת",
-    whoSets: "בנק ישראל, זהה בכל הבנקים",
+    whoSets: "בנק ישראל, לפי תעתיק הצוות; זהה בכל הבנקים",
   },
   capital_threshold: {
     name: "סף הון",
-    crossing: "מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה",
-    label: "לפי תיעוד הצוות, לא אומת; כמה זה עולה לבנק ומה הוא עושה בגלל זה — לא ידוע",
-    whoSets: "בנק ישראל, זהה בכל הבנקים",
+    crossing: "מותר, אבל הבנק מחזיק יותר הון כנגד ההלוואה (לפי תיעוד הצוות)",
+    label: "לפי תיעוד הצוות, לא אומת; לא ידוע באיזו הוראה, כמה זה עולה לבנק ומה הוא עושה בגלל זה",
+    whoSets: "בנק ישראל, לפי תיעוד הצוות; לא ידוע באיזו הוראה",
   },
   bank_policy: {
     name: "מדיניות בנק",
     crossing: "הבנק הזה לא יאשר, או ידרוש תיקון",
     label: "בדוי: הקורס לא מכיר קו מפורסם של בנק",
-    whoSets: "הבנק עצמו; בנק אחר אולי אחרת",
+    whoSets: "הבנק עצמו; בנק אחר אולי יקבע אחרת",
   },
   field_hypothesis: {
     name: "השערה מהשטח",
-    crossing: "לא ידוע: ייתכן שמתחתיו התיק נראה בטוח יותר ויש כוח מיקוח",
-    label: "השערה לבדיקה: המספרים לבדיקה, ממתין לאישור אילון",
+    crossing: "לא ידוע מה משתנה בבנק כשחוצים אותו",
+    label: "ידע מהשטח ממקור יחיד, לא נבדק; ממתין לאישור אילון",
     whoSets: "אף אחד לא קבע: טענה של איש מקצוע, שלא נבדקה",
+  },
+  course_example: {
+    name: "דוגמה של הקורס",
+    crossing: "לפי הדוגמה, התיק נראה בטוח יותר ויש כוח מיקוח; לא ידוע אם זה נכון",
+    label: "הנחת חישוב: דוגמה של הקורס, והמספרים לבדיקה",
+    whoSets: "הקורס בחר אותם להדגמה; אף מקור לא קבע אותם",
   },
 };
 
 /** The course's example lines for stage 6, case A (lesson 6.2). A teaching set, not a map of real banks. */
 export const EXAMPLE_THRESHOLDS: Threshold[] = [
-  { id: "pti.30", metric: "pti", kind: "field_hypothesis", percent: "30", label: "30% יחס החזר", source: "דוגמה מהבריף של הקורס (30%–35%); המספרים לבדיקה" },
-  { id: "pti.35", metric: "pti", kind: "field_hypothesis", percent: "35", label: "35% יחס החזר", source: "דוגמה מהבריף של הקורס (30%–35%); המספרים לבדיקה" },
-  { id: "pti.40", metric: "pti", kind: "capital_threshold", percent: PTI_CAPITAL_THRESHOLD, label: "סף ההון: 40% יחס החזר", source: "תיעוד הצוות (Brain 7503881); לא אומת" },
-  { id: "pti.50", metric: "pti", kind: "regulatory_limit", percent: PTI_LIMIT, label: "המגבלה: 50% יחס החזר", source: "תעתיק הצוות להוראה 329 (Brain 7503881); לא אומת" },
+  { id: "pti.30", metric: "pti", kind: "course_example", percent: "30", label: "30% יחס החזר", source: "הנחת חישוב: דוגמה של הקורס (30%–35%), והמספרים לבדיקה" },
+  { id: "pti.35", metric: "pti", kind: "course_example", percent: "35", label: "35% יחס החזר", source: "הנחת חישוב: דוגמה של הקורס (30%–35%), והמספרים לבדיקה" },
+  { id: "pti.40", metric: "pti", kind: "capital_threshold", percent: PTI_CAPITAL_THRESHOLD, label: "סף ההון: 40% יחס החזר", source: "תיעוד הצוות; לא אומת" },
+  { id: "pti.50", metric: "pti", kind: "regulatory_limit", percent: PTI_LIMIT, label: "המגבלה: 50% יחס החזר", source: "תעתיק הצוות להוראה 329; לא אומת" },
   { id: "ltv.40", metric: "ltv", kind: "field_hypothesis", percent: "40", label: "40% מימון", source: "טובי זמיר, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
   { id: "ltv.60", metric: "ltv", kind: "field_hypothesis", percent: "60", label: "60% מימון", source: "טובי זמיר, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
-  { id: "ltv.75", metric: "ltv", kind: "regulatory_limit", percent: LTV_CEILINGS.only_home, label: "התקרה: 75% מימון (דירה יחידה)", source: "תעתיק הצוות להוראה 329 (Brain 7503881); לא אומת" },
+  { id: "ltv.75", metric: "ltv", kind: "regulatory_limit", percent: LTV_CEILINGS.only_home, label: "התקרה: 75% מימון (דירה יחידה)", source: "תעתיק הצוות להוראה 329; לא אומת" },
 ];
 
 /** The lines of one metric, lowest first. */
@@ -254,9 +264,17 @@ export function tracksAfterCut(tracks: TrackSpec[], cut: Numeric): TrackSpec[] {
   return applyLever({ tracks, scenario: SCENARIO }, { lever: "amount", change: c.neg() }).tracks;
 }
 
-/** The payment ratio, percent, exact, after `cut` shekels came off the loan. */
+/** The mix's payment as a statement shows it: each track's level payment rounded to the agora, then added. */
+export function statementPayment(tracks: TrackSpec[]): Decimal {
+  return tracks.reduce(
+    (sum, t) => sum.plus(new Decimal(qualifyingPayment({ amount: t.amount, ratePercent: t.rate, months: t.months, method: t.method })).toDecimalPlaces(2, Decimal.ROUND_HALF_UP)),
+    ZERO,
+  );
+}
+
+/** The payment ratio, percent, exact, after `cut` shekels came off the loan (on the statement payment). */
 export function ratioAfterCut(tracks: TrackSpec[], disposable: Numeric, cut: Numeric): Decimal {
-  return paymentToIncome(qualifyingTotal(tracksAfterCut(tracks, cut)), disposable);
+  return paymentToIncome(statementPayment(tracksAfterCut(tracks, cut)), disposable);
 }
 
 /** The financing ratio, percent, exact, after `cut` shekels came off the loan (the value does not move). */
@@ -279,7 +297,7 @@ export function loanCut(tracks: TrackSpec[], disposable: Numeric, percent: Numer
   const ok = (cut: Decimal) => ratioAfterCut(tracks, disposable, cut).lte(cap);
   if (ok(ZERO)) return ZERO;
   const loan = loanOf(tracks);
-  const pay = qualifyingTotal(tracks);
+  const pay = statementPayment(tracks);
   const need = paymentToIncome(pay, disposable);
   // The payment is close to proportional to the loan: start from the proportional cut, then settle on the exact step.
   let cut = loan.mul(need.minus(cap)).div(need).div(stepD).floor().mul(stepD);

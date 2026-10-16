@@ -27,13 +27,14 @@ import {
   paymentCut,
   paymentRoom,
   standing,
+  statementPayment,
   type Metric,
   type Threshold,
   type ThresholdKind,
 } from "../lib/calc/positioning.ts";
 import { ltvPercentOf, withMinus } from "../lib/calc/regulation.ts";
 import type { TrackSpec } from "../lib/calc/schedule.ts";
-import { applyLever, loanOf, qualifyingTotal } from "../lib/calc/sensitivity.ts";
+import { applyLever, loanOf } from "../lib/calc/sensitivity.ts";
 
 type Control = "equity" | "income" | "term" | "wait" | "close";
 const props = withDefaults(
@@ -75,9 +76,9 @@ const tracksNow = computed<TrackSpec[]>(() => (has("term") ? moved.value.map((t)
 const monthsLeft = computed(() => (props.car ? props.car.monthsLeft - wait.value : 0));
 const carCounts = computed(() => !!props.car && !close.value && overMonthsLine(monthsLeft.value));
 const disposable = computed(() => new Decimal(props.recognised).plus(income.value).minus(carCounts.value && props.car ? props.car.monthly : 0));
-const payment = computed(() => qualifyingTotal(tracksNow.value));
-// The payment the page shows is rounded to the agora; the distances are measured from that figure, as the lesson's facts are.
-const shownPayment = computed(() => payment.value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP));
+const payment = computed(() => statementPayment(tracksNow.value));
+// The payment is the statement's: each track's payment rounded to the agora, then added; the distances are measured from that figure, as the lesson's facts are.
+const shownPayment = computed(() => statementPayment(tracksNow.value));
 const loan = computed(() => loanOf(tracksNow.value));
 const ratio = computed(() => paymentToIncome(payment.value, disposable.value));
 const ltv = computed(() => ltvPercentOf(loan.value, props.price));
@@ -89,9 +90,10 @@ const KIND_COLOR: Record<ThresholdKind, string> = {
   capital_threshold: "var(--mogi-warning)",
   bank_policy: "var(--mogi-teal-deep)",
   field_hypothesis: "var(--mogi-n500)",
+  course_example: "var(--mogi-n500)",
 };
-const KIND_DASH: Record<ThresholdKind, string> = { regulatory_limit: "0", capital_threshold: "6 3", bank_policy: "3 2", field_hypothesis: "1 3" };
-const KIND_ORDER: ThresholdKind[] = ["regulatory_limit", "capital_threshold", "bank_policy", "field_hypothesis"];
+const KIND_DASH: Record<ThresholdKind, string> = { regulatory_limit: "0", capital_threshold: "6 3", bank_policy: "3 2", field_hypothesis: "1 3", course_example: "1 3" };
+const KIND_ORDER: ThresholdKind[] = ["regulatory_limit", "capital_threshold", "bank_policy", "field_hypothesis", "course_example"];
 
 interface Row {
   t: Threshold;
@@ -137,7 +139,7 @@ const crossedCount = (rs: Row[]) => rs.filter((r) => r.over).length;
 
 const metricName = (m: Metric) => (m === "pti" ? "יחס ההחזר" : "שיעור המימון");
 const ladders = computed(() => [
-  { metric: "pti" as Metric, rows: ptiRows.value, scale: 70, gap: 9 },
+  { metric: "pti" as Metric, rows: ptiRows.value, scale: 70, gap: 12 },
   { metric: "ltv" as Metric, rows: ltvRows.value, scale: 100, gap: 14 },
 ].filter((l) => l.rows.length));
 const pos = (p: Decimal.Value, scale: number) => `${Math.min(100, (Number(p) / scale) * 100)}%`;
@@ -154,6 +156,8 @@ function labelTops(rs: Row[], gap: number): Record<string, string> {
   return tops;
 }
 const pctText = (d: Decimal) => withMinus(percentString(d));
+// "נקודת אחוז" is singular up to one, plural above it.
+const pointsWord = (d: Decimal) => (d.abs().lte(1) ? "נקודת אחוז" : "נקודות אחוז");
 // A ratio that rounds onto a line while the verdict says "over" shows more digits, so the screen never says "40%" beside "crossed".
 function actualText(m: Metric, rs: Row[]): string {
   const a = actualOf(m);
@@ -164,6 +168,8 @@ function actualText(m: Metric, rs: Row[]): string {
 const money = (d: Decimal) => withMinus(formatShekelsText(d));
 const statusText = (r: Row) => (r.over ? "נחצה" : r.at ? "בדיוק על הקו" : "לא נחצה");
 const statusClass = (r: Row) => (r.over ? "bg-warning-bg" : "bg-success-bg");
+// The nearest crossed payment-ratio line and what it costs from here, for the sticky line: the answer to the lesson's task stays in view while a slider moves.
+const nearestCrossed = computed(() => [...ptiRows.value].filter((r) => r.over).pop() ?? null);
 const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%, שיעור המימון ${percentString(ltv.value)}%`);
 </script>
 
@@ -204,6 +210,8 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
     <p class="sticky bottom-2 z-10 mt-4 rounded-md border border-n200 bg-n50 p-3 text-body-m text-n800 shadow-md sm:static sm:shadow-none" role="status">
       יחס ההחזר <span class="ltr font-semibold">{{ actualText("pti", ptiRows) }}%</span> · שיעור המימון <span class="ltr font-semibold">{{ actualText("ltv", ltvRows) }}%</span>
       <span class="text-n600"> · החזר <span class="ltr">{{ formatShekelsText(shownPayment) }}</span> על הכנסה פנויה <span class="ltr">{{ formatShekelsText(disposable) }}</span></span>
+      <span v-if="nearestCrossed" class="block text-n900">הקו הקרוב שנחצה: <span class="ltr font-semibold">{{ nearestCrossed.t.percent }}%</span> · להגיע אליו: <span class="ltr whitespace-nowrap font-semibold">{{ nearestCrossed.equityNeeded ? money(nearestCrossed.equityNeeded) : "—" }}</span> הון עצמי נוסף, או <span class="ltr whitespace-nowrap font-semibold">{{ money(nearestCrossed.incomeNeeded ?? new Decimal(0)) }}</span> הכנסה מוכרת נוספת בחודש</span>
+      <span v-else class="block text-n900">אף קו של יחס ההחזר לא נחצה.</span>
     </p>
 
     <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
@@ -226,7 +234,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
           v-for="r in l.rows"
           :key="r.t.id"
           class="absolute bottom-0 border-s-4"
-          :style="{ insetInlineStart: pos(r.t.percent, l.scale), borderColor: KIND_COLOR[r.t.kind], borderStyle: r.t.kind === 'regulatory_limit' ? 'solid' : r.t.kind === 'field_hypothesis' ? 'dotted' : 'dashed', top: labelTops(l.rows, l.gap)[r.t.id] }"
+          :style="{ insetInlineStart: pos(r.t.percent, l.scale), borderColor: KIND_COLOR[r.t.kind], borderStyle: r.t.kind === 'regulatory_limit' ? 'solid' : r.t.kind === 'field_hypothesis' || r.t.kind === 'course_example' ? 'dotted' : 'dashed', top: labelTops(l.rows, l.gap)[r.t.id] }"
         >
           <span class="absolute -top-1 start-1 whitespace-nowrap text-caption font-semibold text-n800"><span class="ltr">{{ r.t.percent }}%</span></span>
         </div>
@@ -244,8 +252,8 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
           <span class="rounded-pill px-2 py-0.5 text-caption text-n900" :class="statusClass(r)">{{ statusText(r) }}</span>
         </div>
         <p class="mt-1 text-body-m text-n800">
-          <template v-if="r.over">מעל הקו ב־<span class="ltr font-semibold">{{ pctText(r.points.abs()) }}</span> נקודות אחוז.</template>
-          <template v-else>מתחת לקו ב־<span class="ltr font-semibold">{{ pctText(r.points) }}</span> נקודות אחוז.</template>
+          <template v-if="r.over">מעל הקו ב־<span class="ltr font-semibold">{{ pctText(r.points.abs()) }}</span> {{ pointsWord(r.points) }}.</template>
+          <template v-else>מתחת לקו ב־<span class="ltr font-semibold">{{ pctText(r.points) }}</span> {{ pointsWord(r.points) }}.</template>
         </p>
         <p v-if="r.t.metric === 'pti'" class="mt-1 text-body-m text-n800">
           <template v-if="r.over">
@@ -278,7 +286,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
             <th class="py-1 pe-3 text-start font-semibold">הקו</th>
             <th class="py-1 pe-3 text-start font-semibold">סוג</th>
             <th class="py-1 pe-3 text-start font-semibold">מצב</th>
-            <th class="py-1 pe-3 text-start font-semibold">נקודות אחוז</th>
+            <th class="py-1 pe-3 text-start font-semibold">הקו פחות היחס, בנקודות אחוז</th>
             <th class="py-1 text-start font-semibold">מקום או מחיר</th>
           </tr>
         </thead>

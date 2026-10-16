@@ -32,6 +32,7 @@ import {
   loanRoomFact,
   mixFact,
   paymentCutFact,
+  minusWhole,
   paymentRoomFact,
   points,
   shortestTermFact,
@@ -155,6 +156,7 @@ export default function lesson(): LessonData {
   const e6 = add(givenMoney("e6.principal", "1000000"));
   add(givenNumber("e6.rate", "4.5"));
   add(termRouteFact("e6.extra", v(e6), "4.5", 240, 300, "extra_total"));
+  add(minusWhole("e6.months", 300, 240));
   add(termRouteFact("e6.drop", v(e6), "4.5", 240, 300, "payment_drop"));
 
   // 7: the 100,000 that case A could bring, against the 17,000 that reaches 40%.

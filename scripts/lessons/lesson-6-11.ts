@@ -40,7 +40,7 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { sum, untilDrop } from "./affordability-facts.ts";
 import { type LevMeasure, levFact, stepFact } from "./_lever-facts.ts";
-import { maxLoanAt, totalFact, verdictFacts } from "./_bankpolicy-facts.ts";
+import { maxLoanAt, movedRatioFact, totalFact, verdictFacts } from "./_bankpolicy-facts.ts";
 import { clocksFact, daysUntilFact, eventsInsideFact, governingFact, latestStartFact, roundAnswerFact, roundFitsFact, roundsFitFact } from "./_outreach-facts.ts";
 import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
 import { maxPayment } from "./regulation-facts.ts";
@@ -74,6 +74,7 @@ export default function lesson611(): LessonData {
   add(given("in.target", TARGET_RATIO));
   add(given("in.plan_ratio", PLAN_RATIO));
   add(given("in.wait", WAIT_MONTHS));
+  add(given("in.wait_left", (CASE_A.car.monthsLeft as number) - WAIT_MONTHS));
   add(given("in.ltv_ceiling", "75"));
   for (const [m, id] of [
     ["loan", "a.loan"],
@@ -158,6 +159,27 @@ export default function lesson611(): LessonData {
   add(difference("p17.a.room", lineA, get("p17.a.qualifying")));
   add(difference("p.extra_cash", get("l.eq.add"), get("l.eq17.add")));
 
+  // ── How fragile the margin is: the same file when the prime moves (lessons 6.6 and 6.10 use +0.25) ──
+  add(given("in.move", "0.25"));
+  const aPol = bank("a");
+  for (const [key, pts] of [["05", "0.05"], ["10", "0.10"], ["25", "0.25"]] as const) {
+    const { fact } = movedRatioFact(`p.mv${key}.ratio`, aPol, planned, pts, BASE);
+    add(fact);
+  }
+  add(difference("p.mv25.over", get("p.mv25.ratio"), get("in.target")));
+  // The equity that would keep the file under the line even after that move: the next whole thousands up.
+  let cover = Number(equity);
+  for (;;) {
+    cover += Number(EQUITY_STEP);
+    const f = caseAFile(movesFor({ equity: String(cover) })); // throws when the savings do not reach
+    const { ratio } = movedRatioFact("tmp", aPol, f, "0.25", BASE);
+    if (ratio.lte(PLAN_RATIO)) break;
+  }
+  add(givenMoney("p.cover.add", String(cover)));
+  add(movedRatioFact("p.cover.ratio", aPol, caseAFile(movesFor({ equity: String(cover) })), "0.25", BASE).fact);
+  add(difference("p.cover.extra", get("p.cover.add"), get("l.eq.add")));
+  add(difference("p.cover.reserve", get("a.reserve"), get("p.cover.add")));
+
   // ── The alternatives the plan did not take, read by the banks ──
   const alt = (key: string, moves: LeverMove[], banks: string[]) => {
     const file = caseAFile(moves);
@@ -170,6 +192,7 @@ export default function lesson611(): LessonData {
   add(difference("ew.c_vs_plan", get("p.a.total"), get("ew.c.total")));
   add(difference("bo.b_vs_plan", get("p.a.total"), get("bo.b.total")));
   add(difference("cr.c_vs_plan", get("p.a.total"), get("cr.c.total")));
+  add(difference("cr.c_over_plan", get("cr.c.total"), get("p.a.total")));
 
   // ── The outreach plan: the clocks of lesson 6.6's request, in parallel and one after the other ──
   add(given("o.request", REQUEST_DATE));
@@ -214,7 +237,7 @@ export default function lesson611(): LessonData {
   return {
     lesson: "6.11",
     title: "סדנה: תוכנית המיצוב של התיק המרכזי",
-    note: "Case A (src/data/case-a-levers.ts, case-a-mix.ts) with lesson 6.4's levers (savings 40,000, car payoff 36,000, parent's income 4,000, 8 months of waiting) priced by src/lib/calc/levers.ts; the four fictional banks of lessons 6.6–6.8 with lesson 6.9's INVENTED rules (bankpolicy.ts, src/data/case-a-positioning.ts); the clocks of lesson 6.6 (24 calendar days of terms from each approval, the team's transcription of Directive 451, not verified) and the exercise's re-pricing round (3 business days, 7 days left after the answer). The plan's equity is the smallest whole thousand that leaves the ratio at most 0.1 point under the 40% line (a rule of the workshop). Nothing here says how a real bank decides or prices. Base scenario: the index rises 2% a year, prime does not move.",
+    note: "Case A (src/data/case-a-levers.ts, case-a-mix.ts) with lesson 6.4's levers (savings 40,000, car payoff 36,000, parent's income 4,000, 9 months of waiting) priced by src/lib/calc/levers.ts; the four fictional banks of lessons 6.6–6.8 with lesson 6.9's INVENTED rules (bankpolicy.ts, src/data/case-a-positioning.ts); the clocks of lesson 6.6 (24 calendar days of terms from each approval, the team's transcription of Directive 451, not verified) and the exercise's re-pricing round (3 business days, 7 days left after the answer). The plan's equity is the smallest whole thousand that leaves the ratio at most 0.1 point under the 40% line (a rule of the workshop). Nothing here says how a real bank decides or prices. Base scenario: the index rises 2% a year, prime does not move.",
     facts,
   };
 }

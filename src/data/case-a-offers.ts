@@ -24,7 +24,8 @@ import type { MixEdit } from "../lib/calc/outreach.ts";
 import { firstYearMargin } from "../lib/calc/outreach.ts";
 import type { TrackKind, TrackSpec } from "../lib/calc/schedule.ts";
 import { loanOf, measuresOf, scenarioFrom, stressRise, variableAmount, type GoalContext } from "../lib/calc/sensitivity.ts";
-import { GOAL_CONTEXT, INITIAL_MIX, SCENARIOS, caseAPasses, caseARatio } from "./case-a-mix.ts";
+import { paymentToIncome } from "../lib/calc/affordability.ts";
+import { GOAL_CONTEXT, INITIAL_MIX, SCENARIOS, caseADisposable, caseAPasses } from "./case-a-mix.ts";
 import { PTI_CAPITAL_THRESHOLD } from "../lib/calc/regulation.ts";
 import Decimal from "decimal.js";
 
@@ -120,7 +121,7 @@ export interface MixReading {
   total: Decimal;
   /** Percent of the loan that is not fixed for its whole term. */
   variableShare: Decimal;
-  /** Payment-to-income ratio of case A, percent (affordability.ts through case-a-mix.ts). */
+  /** First payment over the disposable income of case A, percent. */
   ratio: Decimal;
   /** Above the 40% capital threshold (a threshold, not a ban). */
   aboveThreshold: boolean;
@@ -134,7 +135,8 @@ export function readMix(tracks: TrackSpec[]): MixReading {
   const base = measuresOf(tracks, GOALS.base);
   const stress = measuresOf(tracks, GOALS.stress);
   const loan = loanOf(tracks);
-  const ratio = caseARatio(tracks);
+  // The ratio of lesson 5.6: the first payment over the disposable income (a linked track starts without its index growth).
+  const ratio = paymentToIncome(base.first, caseADisposable());
   const linked = tracks.filter((t) => t.kind === "fixed_linked" || t.kind === "variable_linked").reduce((s, t) => s.plus(t.amount), new Decimal(0));
   return {
     first: base.first,

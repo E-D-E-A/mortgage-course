@@ -10,14 +10,14 @@
  * 75% ceiling and the 40% threshold are the team's transcription of directive 329 (Brain 7503881), not
  * checked against the directive. The payoff of the car loan (36,000 ₪) is a CALCULATION ASSUMPTION of this
  * stage: the 26 remaining payments of 1,450 ₪ add up to 37,700 ₪ without interest, and the sum needed to close
- * the loan today is lower; the course picks 36,000 ₪ and says so. "מיכל ועידו" are an invented family for the
+ * the loan today is lower; the course picks 36,000 ₪ and says so. "ליאור ועדי" are an invented family for the
  * exercises, not case A.
  */
 import { CASE_A } from "../../src/data/case-a-mix.ts";
 import { LTV_CEILINGS, PTI_CAPITAL_THRESHOLD } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { disposable, ratio as affRatio, untilDrop } from "./affordability-facts.ts";
-import { MIX_A, difference, equityNeededFact, given, givenMoney, givenNumber, leverFact, loanRoomFact, mixFact, points, sumOf } from "./_positioning-facts.ts";
+import { disposable, ratio as affRatio } from "./affordability-facts.ts";
+import { MIX_A, difference, equityNeededFact, givenMoney, givenNumber, leverFact, loanRoomFact, minusWhole, mixFact, points, sumOf, timesFact } from "./_positioning-facts.ts";
 import { ltv, maxLoan } from "./regulation-facts.ts";
 
 export default function lesson(): LessonData {
@@ -39,13 +39,15 @@ export default function lesson(): LessonData {
   add(points("c.ltv_gap", v(ltv0), LTV_CEILINGS.only_home));
   const line = add(givenNumber("c.line", PTI_CAPITAL_THRESHOLD));
   add(givenMoney("c.income", CASE_A.recognisedIncome));
-  add(givenMoney("c.car", CASE_A.car.monthly as string));
+  const car = add(givenMoney("c.car", CASE_A.car.monthly as string));
   add(givenNumber("c.car_months", CASE_A.car.monthsLeft as number));
   add(disposable("c.disp", CASE_A.recognisedIncome, [CASE_A.car]));
   const pay = add(mixFact("c.pay", MIX_A, "qualifying"));
   const ratio0 = add(mixFact("c.ratio", MIX_A, "ratio"));
   add(difference("c.over", ratio0, line)); // how far over the line: ratio − line, in percentage points
-  add(untilDrop("c.until_drop", CASE_A.car.monthsLeft as number));
+  // Waiting: after 9 payments 17 are left, fewer than 18, so the loan certainly stops counting (lesson 4.2 left exactly 18 open).
+  add(givenNumber("c.left_after", 17));
+  add(minusWhole("c.until_drop", CASE_A.car.monthsLeft as number, 17));
 
   // ── Closing the car loan from the equity: the loan grows by what leaves the equity ──
   const payoff = add(givenMoney("c.payoff", "36000"));
@@ -67,7 +69,13 @@ export default function lesson(): LessonData {
     add(leverFact(`${k}.ratio`, MIX_A, { lever: "amount", change: `-${cut}` }, "ratio"));
   }
 
-  // ── Exercises: an invented family, מיכל ועידו ──
+  // ── A third equity amount, for the half-solved table (not printed anywhere else) ──
+  add(givenMoney("b1.cut", "30000"));
+  const b1loan = add(leverFact("b1.loan", MIX_A, { lever: "amount", change: "-30000" }, "loan"));
+  add(ltv("b1.ltv", v(b1loan), CASE_A.price));
+  add(leverFact("b1.ratio", MIX_A, { lever: "amount", change: "-30000" }, "ratio"));
+
+  // ── Exercises: an invented family, ליאור ועדי ──
   const mPrice = add(givenMoney("m.price", "1800000"));
   const mLoan = add(givenMoney("m.loan", "1300000"));
   const mUse = add(givenMoney("m.use", "20000"));

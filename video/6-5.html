@@ -37,7 +37,7 @@
       const data = await (await fetch("/data/lessons/6-5.json")).json();
       const fact = (id) => data.facts.find((f) => f.id === id).value;
       const nf = (v) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(Number(v)) ? 0 : 2, maximumFractionDigits: 2 }).format(Number(v));
-      const shek = (v) => `${nf(v)} ₪`;
+      const shek = (v) => `\u2066${nf(v)}\u2069 ₪`;
 
       const V = {
         carMonthly: fact("a.car_monthly"), carMonths: fact("a.car_months"), ratio: fact("a.ratio"), formRatio: fact("t.ratio"),
@@ -89,7 +89,7 @@
         [96, 105, "ארבע בדיקות: נכון? מלא? מתועד?"],
         [105, 113, "ואם זה סותר את הלקוח: שואלים אותו."],
         [113, 120, "סיפור שעבר את כולן הוא מיצוב."],
-        [122, 130, `דנה ויואב: ${shek(V.net)} נטו, ותקציב מחיה של ${shek(V.budget)}.`],
+        [122, 130, `הדס ואיתי: ${shek(V.net)} נטו, ותקציב מחיה של ${shek(V.budget)}.`],
         [130, 141, `תשלום של ${shek(V.bankMax)} משאיר ${shek(V.dLeft)}: חסרים ${shek(V.short)}.`],
         [141, 150, "תיק שעובר את הבנק וחונק את המשפחה הוא כישלון."],
         [152, 158, "מה המחיר המשפטי של מידע לא נכון? לא ידוע לקורס."],
@@ -120,7 +120,7 @@
           const of = after(t, S.two, 1, o);
           el("rect", { x: 140, y: 118, width: 1000, height: 100, rx: 14, fill: C.n0, stroke: C.n200, "stroke-width": 2, opacity: of });
           txt(1110, 160, "העובדה: הלוואת רכב", 28, { anchor: "start", w: 700, o: of });
-          txt(1110, 200, `${lr(shek(V.carMonthly))} בחודש, עוד ${V.carMonths} תשלומים · יחס ההחזר ${lr(V.ratio + "%")}`, 26, { anchor: "start", fill: C.n700, o: of });
+          txt(1110, 200, `${shek(V.carMonthly)} בחודש, עוד ${V.carMonths} תשלומים · יחס ההחזר ${lr(V.ratio + "%")}`, 26, { anchor: "start", fill: C.n700, o: of });
           const card = (x, head, lines, at, fill, stroke) => {
             const oc = after(t, S.two, at, o);
             el("rect", { x, y: 250, width: 560, height: 250, rx: 16, fill, stroke, "stroke-width": 3, opacity: oc });
@@ -129,7 +129,7 @@
           };
           card(660, "סיפור 1", [
             ["ההלוואה כתובה בטופס, וסוגרים אותה", 26, 400],
-            [`מהחסכונות: ${lr(shek(V.payoff))}`, 26, 400],
+            [`מהחסכונות: ${shek(V.payoff)}`, 26, 400],
             [`יחס בטופס: ${lr(V.formRatio + "%")}`, 34, 700],
           ], 18, C.successBg, C.success);
           card(60, "סיפור 2", [
@@ -137,7 +137,7 @@
             ["והיא ממשיכה להיגבות", 26, 400],
             [`יחס בטופס: ${lr(V.formRatio + "%")}`, 34, 700],
           ], 30, C.warningBg, C.warning);
-          txt(640, 540, "אותו מספר", 40, { w: 700, o: after(t, S.two, 38, o) });
+          txt(640, 560, "אותו מספר", 40, { w: 700, o: after(t, S.two, 38, o) });
         }
         // Scene 3 — the paper and the reality
         if (inScene(t, S.paper)) {
@@ -159,10 +159,10 @@
           row(190, "סיפור 1: שינו את העסקה", V.formRatio, V.formRatio, 1, true);
           row(350, "סיפור 2: שינו את הנייר", V.formRatio, V.ratio, 14, false);
           const og = after(t, S.paper, 22, o);
-          el("rect", { x: 800, y: 395, width: 300, height: 56, rx: 28, fill: C.dangerBg, opacity: og });
-          txt(950, 432, `פער של ${V.gap} נקודות`, 26, { w: 700, o: og });
+          el("rect", { x: 760, y: 395, width: 380, height: 56, rx: 28, fill: C.dangerBg, opacity: og });
+          txt(950, 432, `פער של ${V.gap} נקודות אחוז`, 26, { w: 700, o: og });
           const on = after(t, S.paper, 28, o);
-          txt(640, 530, `המשפחה בסיפור 2 עדיין משלמת ${lr(shek(V.carMonthly))} בחודש`, 28, { fill: C.n700, o: on });
+          txt(640, 530, `המשפחה בסיפור 2 עדיין משלמת ${shek(V.carMonthly)} בחודש`, 28, { fill: C.n700, o: on });
         }
         // Scene 4 — the four tests
         if (inScene(t, S.tests)) {
@@ -187,24 +187,24 @@
           const max = Number(V.net), x0 = 140, x1 = 1140;
           const X = (v) => x0 + (Number(v) / max) * (x1 - x0);
           const oa = after(t, S.dana, 1, o);
-          txt(1140, 170, `דנה ויואב: ${lr(shek(V.net))} נטו בחודש`, 28, { anchor: "start", w: 700, o: oa });
+          txt(1140, 170, `הדס ואיתי: ${shek(V.net)} נטו בחודש`, 28, { anchor: "start", w: 700, o: oa });
           // payment | left
           const op = after(t, S.dana, 4, o);
           el("rect", { x: x0, y: 230, width: X(V.bankMax) - x0, height: 80, rx: 8, fill: C.n300, opacity: op });
-          txt((x0 + X(V.bankMax)) / 2, 282, `תשלום ${lr(shek(V.bankMax))}`, 26, { w: 700, o: op });
+          txt((x0 + X(V.bankMax)) / 2, 282, `תשלום ${shek(V.bankMax)}`, 26, { w: 700, o: op });
           const ol = after(t, S.dana, 7, o);
           el("rect", { x: X(V.bankMax), y: 230, width: x1 - X(V.bankMax), height: 80, rx: 8, fill: C.tq2, opacity: ol });
-          txt((X(V.bankMax) + x1) / 2, 282, `נשאר ${lr(shek(V.dLeft))}`, 26, { w: 700, o: ol });
+          txt((X(V.bankMax) + x1) / 2, 282, `נשאר ${shek(V.dLeft)}`, 26, { w: 700, o: ol });
           // The family's budget: what must be left, drawn from the right end; the shortage is the gap to what is left.
           const ob = after(t, S.dana, 12, o);
           const bx = x1 - (Number(V.budget) / max) * (x1 - x0);
           el("line", { x1: bx, x2: bx, y1: 205, y2: 345, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "8 6", opacity: ob });
-          txt(bx, 192, `תקציב מחיה ${lr(shek(V.budget))}`, 24, { w: 700, o: ob });
+          txt(bx, 192, `תקציב מחיה ${shek(V.budget)}`, 24, { w: 700, o: ob });
           const og = after(t, S.dana, 15, o);
           el("rect", { x: bx, y: 322, width: X(V.bankMax) - bx, height: 14, rx: 4, fill: C.danger, opacity: og });
           const os = after(t, S.dana, 17, o);
           el("rect", { x: 380, y: 400, width: 520, height: 70, rx: 35, fill: C.dangerBg, opacity: os });
-          txt(640, 447, `חסרים ${lr(shek(V.short))} בכל חודש`, 34, { w: 700, o: os });
+          txt(640, 447, `חסרים ${shek(V.short)} בכל חודש`, 34, { w: 700, o: os });
           txt(640, 530, "הפרטים בטופס נכונים, והמשפחה חנוקה", 28, { fill: C.n700, o: after(t, S.dana, 21, o) });
         }
         // Scene 6 — close

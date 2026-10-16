@@ -114,3 +114,9 @@ export const standingTableFact = (id: string, actual: string, percents: string[]
   inputs: { actual, ...Object.fromEntries(percents.map((p, k) => [`percent_${k + 1}`, p])) },
   value: percents.map((p, k) => ({ period: k + 1, percent: p, status: statusOf(actual, p), points: percentString(pointsTo(actual, p)) })),
 });
+
+/** A whole-number difference a − b (kind fc_minus, checked in factors.py): payments until 17 are left of 26, and the like. */
+export const minusWhole = (id: string, a: number, b: number): Fact => ({ id, kind: "fc_minus", inputs: { a: String(a), b: String(b), decimals: 0 }, value: String(a - b) });
+
+/** A money fact times a whole count (kind met_times, checked in metrics.py). */
+export const timesFact = (id: string, of: Fact, count: number): Fact => ({ id, kind: "met_times", inputs: { of: of.id, count }, value: moneyString(new Decimal(of.value as string).mul(count)) });

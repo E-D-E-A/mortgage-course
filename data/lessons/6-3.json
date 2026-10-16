@@ -595,21 +595,29 @@
       "value": "40618.11"
     },
     {
+      "id": "l9.left",
+      "kind": "given",
+      "inputs": {},
+      "value": 17
+    },
+    {
       "id": "l9.months",
-      "kind": "aff_months_until_drop",
+      "kind": "fc_minus",
       "inputs": {
-        "months_left": 26
+        "a": "26",
+        "b": "17",
+        "decimals": 0
       },
-      "value": 8
+      "value": "9"
     },
     {
       "id": "l9.paid",
       "kind": "met_times",
       "inputs": {
         "of": "c.car",
-        "count": 8
+        "count": 9
       },
-      "value": "11600.00"
+      "value": "13050.00"
     },
     {
       "id": "l9.ratio",
@@ -619,6 +627,90 @@
         "disposable": "21700.00"
       },
       "value": "37.7"
+    },
+    {
+      "id": "b1.cut",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000.00"
+    },
+    {
+      "id": "b1.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "amount",
+        "lever_change": "-30000",
+        "measure": "loan"
+      },
+      "value": "1610000.00"
+    },
+    {
+      "id": "b1.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1610000.00",
+        "value": "2200000.00"
+      },
+      "value": "73.18"
+    },
+    {
+      "id": "b1.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "lever": "amount",
+        "lever_change": "-30000",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.66"
     },
     {
       "id": "e2.income",
@@ -667,12 +759,20 @@
       "value": 30
     },
     {
+      "id": "e3.line",
+      "kind": "given",
+      "inputs": {},
+      "value": 17
+    },
+    {
       "id": "e3.months",
-      "kind": "aff_months_until_drop",
+      "kind": "fc_minus",
       "inputs": {
-        "months_left": 30
+        "a": "30",
+        "b": "17",
+        "decimals": 0
       },
-      "value": 12
+      "value": "13"
     },
     {
       "id": "e4.price",

@@ -13,7 +13,7 @@
 // first payment of the family's mix. Every date and shekel figure comes from src/lib/calc
 // (outreach.ts, process.ts, sensitivity.ts); the page passes the rules in as props.
 import { computed, reactive, ref } from "vue";
-import { formatShekelsText } from "../lib/calc/money.ts";
+import { formatShekels } from "../lib/calc/money.ts";
 import { ANSWER_DAYS, ANSWER_DAYS_EXTENDED, bankClocks, effectOf, eventsInside, governingIndex, latestRoundStart, roundsThatFit } from "../lib/calc/outreach.ts";
 import { addCalendarDays, calendarDaysBetween, type BankCalendar } from "../lib/calc/process.ts";
 import type { TrackSpec } from "../lib/calc/schedule.ts";
@@ -91,9 +91,11 @@ const leftText = (n: number) => (n < 0 ? "נגמר" : n === 0 ? "היום האח
 const spec = computed(() => scenarioFrom(props.scenario));
 const primeEffect = computed(() => effectOf(props.tracks, spec.value, { target: "prime", points: String(primeMove.value) }));
 const lapseEffect = computed(() => effectOf(props.tracks, spec.value, { target: "fixed_unlinked", points: String(lapseMove.value) }));
-const signed = (v: { toString(): string; isNegative(): boolean; isZero(): boolean }) => (v.isZero() ? "0 ₪" : `${v.isNegative() ? "−" : "+"}${formatShekelsText(v.toString().replace("-", ""))}`);
+const signed = (v: { toString(): string; isNegative(): boolean; isZero(): boolean }) => (v.isZero() ? "0 ₪" : `${v.isNegative() ? "−" : "+"}${formatShekels(v.toString().replace("-", ""))}`);
 const pts = (n: number) => (n === 0 ? "0" : `${n > 0 ? "+" : "−"}${Math.abs(n)}`);
-const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED : ANSWER_DAYS);
+const ptsWord = (n: number) => (n !== 0 && Math.abs(n) <= 1 ? "נקודת אחוז" : "נקודות אחוז");
+const dateFull = new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const longYear = (iso: string) => (iso ? dateFull.format(when(iso)) : "");
 </script>
 
 <template>
@@ -115,7 +117,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
           :max="maxDate"
           class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2 focus:shadow-ring-input"
         />
-        <span class="text-caption text-n700">{{ valid ? long(request) : "בחרו תאריך בטווח של לוח החגים שבידינו." }}</span>
+        <span class="text-caption text-n700">{{ valid ? longYear(request) : "בחרו תאריך בטווח של לוח החגים שבידינו." }}</span>
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">היום: {{ offset }} ימים אחרי שנשלחו הבקשות<span v-if="valid"> ({{ short(today) }})</span></span>
@@ -128,7 +130,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
         <p class="text-body-m font-semibold text-n900">{{ b.name }}</p>
         <label class="mt-1 flex flex-col gap-1">
           <span class="text-caption text-n700">ענה אחרי {{ answered[b.id] }} ימי עסקים<span v-if="answered[b.id] > ANSWER_DAYS">: סוג הלוואה שהבנק הגדיר מראש</span></span>
-          <input v-model.number="answered[b.id]" type="range" min="1" :max="ANSWER_DAYS_EXTENDED" step="1" :aria-label="`${b.name}: ימי עסקים עד התשובה, עד ${limit(b.id)}`" />
+          <input v-model.number="answered[b.id]" type="range" min="1" :max="ANSWER_DAYS_EXTENDED" step="1" :aria-label="`${b.name}: ימי עסקים עד התשובה, מ־1 עד ${ANSWER_DAYS_EXTENDED}`" />
         </label>
         <label class="flex min-h-11 items-center gap-2 text-caption text-n800"><input v-model="lien[b.id]" type="checkbox" class="h-5 w-5 shrink-0" /> נרשם שעבוד חדש</label>
       </div>
@@ -145,7 +147,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
             <div v-for="(c, k) in clocks" :key="c.name">
               <p class="mb-1 flex flex-wrap items-center gap-2 text-caption text-n800">
                 <span class="font-semibold text-n900">{{ c.name }}</span>
-                <span v-if="k === governing" class="rounded-pill bg-navy px-2 py-0.5 text-micro font-semibold text-n0">הקובע</span>
+                <span v-if="k === governing" class="rounded-pill bg-navy px-2 py-0.5 text-caption font-semibold text-n0">הקובע</span>
                 <span>{{ short(c.approved) }} ← <span class="font-semibold">{{ short(c.validUntil) }}</span> · {{ leftText(left(c)) }}</span>
               </p>
               <div class="relative h-6 rounded-sm bg-n100">
@@ -214,7 +216,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
         <div class="mt-3 grid gap-4 sm:grid-cols-2">
           <div>
             <label class="flex flex-col gap-1">
-              <span class="text-caption font-semibold text-n600">הפריים זז ב־<span class="ltr">{{ pts(primeMove) }}</span> נקודות אחוז</span>
+              <span class="text-caption font-semibold text-n600">הפריים זז ב־<span class="ltr">{{ pts(primeMove) }}</span> {{ ptsWord(primeMove) }}</span>
               <input v-model.number="primeMove" type="range" min="-0.5" max="0.5" step="0.25" aria-label="הזזת הפריים בנקודות אחוז" />
             </label>
             <p class="mt-2 text-body-m text-n800">
@@ -224,7 +226,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
           </div>
           <div>
             <label class="flex flex-col gap-1">
-              <span class="text-caption font-semibold text-n600">הריבית הקבועה חוזרת אחרי שהתנאים נגמרו: <span class="ltr">{{ pts(lapseMove) }}</span> נקודות אחוז</span>
+              <span class="text-caption font-semibold text-n600">הריבית הקבועה חוזרת אחרי שהתנאים נגמרו: <span class="ltr">{{ pts(lapseMove) }}</span> {{ ptsWord(lapseMove) }}</span>
               <input v-model.number="lapseMove" type="range" min="-0.4" max="0.4" step="0.1" aria-label="שינוי הריבית הקבועה אחרי שהתנאים נגמרו" />
             </label>
             <p class="mt-2 text-body-m text-n800">

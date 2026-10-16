@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Lesson 6.11's illustration: case A's positioning plan, tried by hand. The learner pulls the four
 // levers of lesson 6.4 — more equity from the savings, closing the car loan from the savings, waiting
-// until 18 payments of the car loan are left, a parent as a second borrower — and sees where the case
+// until the car loan stops counting, a parent as a second borrower — and sees where the case
 // then stands (ratio, financing ratio, what is left of the savings) and how each of the four
 // FICTIONAL banks reads it under its invented rules (src/lib/calc/bankpolicy.ts, data in
 // src/data/case-a-positioning.ts): the decision, the relief, and the first payment and the total
@@ -50,7 +50,7 @@ const best = computed(() => {
   return ok.length ? ok.reduce((a, r) => (r.total!.lt(a.total!) ? r : a)).bank.id : null;
 });
 const pct = (d: Decimal) => percentString(d);
-const pts = (d: Decimal) => (d.isZero() ? "במחירון" : `הנחה של ${new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(d.toNumber())} נקודות אחוז`);
+const pts = (d: Decimal) => (d.isZero() ? "במחירון" : `הנחה של ${new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(d.toNumber())} ${d.lt(1) ? "נקודת אחוז" : "נקודות אחוז"}`);
 const why = (v: Verdict) => v.lines.filter((l) => l.outcome === "refuse").map((l) => (l.id === "ratio" ? `יחס החזר מעל ${l.max}%` : `שיעור מימון מעל ${l.max}%`)).join(" וגם ");
 const cash = computed(() => equity.value + (car.value ? Number(CAR_PAYOFF) : 0));
 function remember() {

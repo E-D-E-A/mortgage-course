@@ -199,7 +199,7 @@ function reset() {
         </span>
         <input v-model.number="v.mix" type="range" min="-30" max="30" step="5" aria-label="הזזת חלק מההלוואה בין מסלולים, בנקודות אחוז" />
       </label>
-      <button type="button" class="mt-2 min-h-11 text-body-m text-navy underline" @click="reset">איפוס</button>
+      <button type="button" class="mt-2 min-h-11 min-w-11 px-2 text-body-m text-navy underline" @click="reset">איפוס</button>
     </div>
     <p v-if="chosen === 'wait' && edgeOpen" class="mt-2 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="status">
       נשארו בדיוק 18 תשלומים. לפי התעתיק הכלל הוא ״מעל 18״, אבל ב־18 בדיוק זו שאלה פתוחה (שיעור 4.2): בנק עשוי עדיין לספור את ההלוואה, והיחס שמוצג כאן אינו בטוח. עם {{ monthsLeft - 17 }} חודשי המתנה נשארים 17 והכלל ברור.

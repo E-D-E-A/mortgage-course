@@ -40,6 +40,7 @@ const pointChoices = computed(() => {
   const sums = new Set([0, a, b, +(a + b).toFixed(2)]);
   return [...sums].sort((x, y) => x - y);
 });
+const ptsUnit = (x: number | string) => (Number(x) < 1 ? "נקודת אחוז" : "נקודות אחוז");
 const pts = (x: number | string) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(x));
 
 interface Answer {
@@ -96,7 +97,7 @@ function lineText(l: Verdict["lines"][number]): string {
   const name = LINE_HE[l.id];
   const actual = pct(l.actual);
   if (l.outcome === "refuse") return `${name} ${actual}% — מעל ${l.max}%: סירוב.`;
-  if (l.outcome === "relief") return `${name} ${actual}% — לא מעל ${l.reliefLine}%: הנחה של ${pts(l.reliefPoints)} נקודות אחוז לכל מסלול.`;
+  if (l.outcome === "relief") return `${name} ${actual}% — לא מעל ${l.reliefLine}%: הנחה של ${pts(l.reliefPoints)} ${ptsUnit(l.reliefPoints)} לכל מסלול.`;
   return l.reliefLine === null ? `${name} ${actual}% — לא מעל ${l.max}%: מחירון, ואין כלל הנחה בקו הזה.` : `${name} ${actual}% — מעל ${l.reliefLine}%: בלי הנחה, מחירון.`;
 }
 </script>
@@ -111,11 +112,11 @@ function lineText(l: Verdict["lines"][number]): string {
         <li>המחיר הרגיל הוא מחירון הבנק: ריבית אחת לכל סוג מסלול.</li>
         <li>יחס החזר מעל <span dir="ltr">{{ policy.ratioMax }}%</span>: סירוב.</li>
         <li v-if="policy.ratioReliefLine !== null">
-          יחס החזר <span dir="ltr">{{ policy.ratioReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ratioReliefPoints) }} נקודות אחוז מהריבית של כל מסלול.
+          יחס החזר <span dir="ltr">{{ policy.ratioReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ratioReliefPoints) }} {{ ptsUnit(policy.ratioReliefPoints) }} מהריבית של כל מסלול.
         </li>
         <li>שיעור מימון מעל <span dir="ltr">{{ policy.ltvMax }}%</span>: סירוב.</li>
         <li v-if="policy.ltvReliefLine !== null">
-          שיעור מימון <span dir="ltr">{{ policy.ltvReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ltvReliefPoints) }} נקודות אחוז מהריבית של כל מסלול.
+          שיעור מימון <span dir="ltr">{{ policy.ltvReliefLine }}%</span> או פחות: הנחה של {{ pts(policy.ltvReliefPoints) }} {{ ptsUnit(policy.ltvReliefPoints) }} מהריבית של כל מסלול.
         </li>
         <li class="text-n700">שתי ההנחות מצטברות. ״מעל״ הוא מעל ממש: בדיוק על הקו אינו מעליו, ולכן מקבל את ההנחה. יחס ההחזר נמדד לפי המחירון, לפני ההנחות.</li>
       </ul>
@@ -198,7 +199,7 @@ function lineText(l: Verdict["lines"][number]): string {
             :disabled="answer.checked"
             @click="answer.points = p"
           >
-            {{ p === 0 ? "בלי הנחה" : `${pts(p)} נקודת אחוז` }}
+            {{ p === 0 ? "בלי הנחה" : `${pts(p)} ${ptsUnit(p)}` }}
           </button>
         </div>
       </div>
@@ -216,7 +217,7 @@ function lineText(l: Verdict["lines"][number]): string {
       <div v-if="answer.checked" class="mt-4 rounded-md border-s-4 p-4" :class="isRight(current) ? 'border-success bg-success-bg' : 'border-warning bg-warning-bg'" aria-live="polite">
         <p class="text-body-m font-semibold text-n900">
           {{ isRight(current) ? "נכון." : "לא מדויק." }}
-          {{ verdict.decision === "refuse" ? "לפי הכללים הבנק מסרב." : verdict.relief.isZero() ? "לפי הכללים הבנק מאשר, במחירון." : `לפי הכללים הבנק מאשר, עם הנחה של ${pts(verdict.relief.toString())} נקודות אחוז לכל מסלול.` }}
+          {{ verdict.decision === "refuse" ? "לפי הכללים הבנק מסרב." : verdict.relief.isZero() ? "לפי הכללים הבנק מאשר, במחירון." : `לפי הכללים הבנק מאשר, עם הנחה של ${pts(verdict.relief.toString())} ${ptsUnit(verdict.relief.toString())} לכל מסלול.` }}
         </p>
         <ul class="mt-2 grid list-none gap-1 ps-0 text-body-m text-n800">
           <li v-for="l in verdict.lines" :key="l.id">{{ lineText(l) }}</li>
@@ -254,7 +255,7 @@ function lineText(l: Verdict["lines"][number]): string {
             <td class="py-1 pe-3 font-semibold text-n900">{{ f.title }}</td>
             <td class="py-1 pe-3"><span dir="ltr">{{ pct(verdicts[i].ltv) }}%</span></td>
             <td class="py-1 pe-3"><span dir="ltr">{{ pct(verdicts[i].ratio) }}%</span></td>
-            <td class="py-1 pe-3">{{ !answers[i].checked ? "עוד לא נבדק" : verdicts[i].decision === "refuse" ? `סירוב (${reasonLines(verdicts[i]).map((l) => LINE_HE[l.id]).join(", ")})` : verdicts[i].relief.isZero() ? "אישור, במחירון" : `אישור, הנחה של ${pts(verdicts[i].relief.toString())} נקודות אחוז` }}</td>
+            <td class="py-1 pe-3">{{ !answers[i].checked ? "עוד לא נבדק" : verdicts[i].decision === "refuse" ? `סירוב (${reasonLines(verdicts[i]).map((l) => LINE_HE[l.id]).join(", ")})` : verdicts[i].relief.isZero() ? "אישור, במחירון" : `אישור, הנחה של ${pts(verdicts[i].relief.toString())} ${ptsUnit(verdicts[i].relief.toString())}` }}</td>
           </tr>
         </tbody>
       </table>

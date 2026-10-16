@@ -28,7 +28,7 @@ describe("the invented offers of case A", () => {
     expect(req.ratio.toFixed(2)).toBe("40.25");
     expect(req.aboveThreshold).toBe(true);
     const swap = readMix(counterTracks("swap_linked"));
-    expect(swap.ratio.toFixed(2)).toBe("38.52");
+    expect(swap.ratio.toFixed(2)).toBe("38.54");
     expect(swap.aboveThreshold).toBe(false);
     expect(swap.total.toFixed(2)).toBe("3107086.13");
     expect(req.passes && swap.passes).toBe(true);

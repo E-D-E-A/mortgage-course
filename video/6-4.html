@@ -36,7 +36,7 @@
       const data = await (await fetch("/data/lessons/6-4.json")).json();
       const fact = (id) => data.facts.find((f) => f.id === id).value;
       const nf = (v) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(Number(v)) ? 0 : 2, maximumFractionDigits: 2 }).format(Number(v));
-      const shek = (v) => `${nf(v)} ₪`;
+      const shek = (v) => `\u2066${nf(v)}\u2069 ₪`;
       const minus = (s) => String(s).replace("-", "−");
 
       const V = {
@@ -120,17 +120,17 @@
           box(60, "המחיר", C.warningBg, C.warning);
           const o1 = after(t, S.pair, 11, o);
           txt(1190, 265, "ההחזר החודשי יורד", 28, { anchor: "start", fill: C.n700, o: o1 });
-          txt(1190, 314, `${lr(shek(V.firstA))} ← ${lr(shek(V.firstB))}`, 32, { anchor: "start", w: 700, o: o1 });
-          txt(1190, 357, `ירידה של ${lr(shek(V.gainPay))} בחודש`, 26, { anchor: "start", fill: C.n700, o: o1 });
+          txt(1190, 314, `${shek(V.firstA)} ← ${shek(V.firstB)}`, 32, { anchor: "start", w: 700, o: o1 });
+          txt(1190, 357, `ירידה של ${shek(V.gainPay)} בחודש`, 26, { anchor: "start", fill: C.n700, o: o1 });
           const o2 = after(t, S.pair, 22, o);
           txt(1190, 424, "יחס ההחזר יורד", 28, { anchor: "start", fill: C.n700, o: o2 });
           txt(1190, 470, `${lr(V.ratioA + "%")} ← ${lr(V.ratioB + "%")}`, 34, { anchor: "start", w: 700, o: o2 });
           const o3 = after(t, S.pair, 32, o);
           txt(570, 265, "סך כל התשלומים עולה", 28, { anchor: "start", fill: C.n700, o: o3 });
-          txt(570, 314, `${V.yA} שנים: ${lr(shek(V.totalA))}`, 28, { anchor: "start", w: 700, o: o3 });
-          txt(570, 356, `${V.yB} שנים: ${lr(shek(V.totalB))}`, 28, { anchor: "start", w: 700, o: o3 });
+          txt(570, 314, `${V.yA} שנים: ${shek(V.totalA)}`, 28, { anchor: "start", w: 700, o: o3 });
+          txt(570, 356, `${V.yB} שנים: ${shek(V.totalB)}`, 28, { anchor: "start", w: 700, o: o3 });
           const o4 = after(t, S.pair, 36, o);
-          txt(570, 430, `עוד ${lr(shek(V.extra))}`, 40, { anchor: "start", w: 700, fill: C.danger, o: o4 });
+          txt(570, 430, `עוד ${shek(V.extra)}`, 40, { anchor: "start", w: 700, fill: C.danger, o: o4 });
           txt(570, 472, "ריבית על יותר חודשים", 24, { anchor: "start", fill: C.n700, o: o4 });
         }
         // Scene 3 — four currencies, and a wall
@@ -160,9 +160,9 @@
         // Scene 4 — the ruler: case A against the 40% line
         if (inScene(t, S.ruler)) {
           const o = vis(t, S.ruler);
-          txt(640, 90, "נועם ושירה: חמישה מנופים מול הקו", 44, { w: 700, o });
+          txt(640, 90, "נועם ושירה: חמישה מנופים מתוך שבעה, מול הקו", 44, { w: 700, o });
           const min = 32, max = 41, x0 = 90, x1 = 740;
-          const X = (v) => x0 + ((Number(v) - min) / (max - min)) * (x1 - x0);
+          const X = (v) => x1 - ((Number(v) - min) / (max - min)) * (x1 - x0);
           const rows = [
             { name: "היום", ratio: V.base, price: "יחס ההחזר", fill: C.n300, at: 0 },
             { name: `עוד ${shek(V.eqCash)} להון העצמי`, ratio: V.eqRatio, price: "מזומן; נשארים בחסכונות פחות", fill: C.teal, at: 10 },

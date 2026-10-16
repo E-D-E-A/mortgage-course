@@ -66,7 +66,7 @@
         [9, 17, "שתי הצעות שלמות על אותו תמהיל, סכום ותאריך."],
         [17, 28, `הפרש בהחזר הראשון: ${V.gapFirst} ₪ בחודש.`],
         [28, 40, `הפרש בסך התשלומים: ${V.gapTotal} ₪.`],
-        [40, 47, "רק הצעה שלמה, אמיתית ועל אותו בסיס היא מתחרה."],
+        [40, 47, "מתחרה: שלמה, אמיתית, בכתב, על אותו בסיס."],
         [49, 58, `צעד: ${V.pts} נקודת אחוז פחות בריבית.`],
         [58, 70, `על המסלול הקבוע: ${V.n[2].first} ₪ בחודש, ${V.n[2].total} ₪ בסך הכול.`],
         [70, 83, `על כל המסלולים: ${V.allFirst} ₪ בחודש, ${V.allTotal} ₪ בסך הכול.`],
@@ -173,7 +173,7 @@
             const y = 190 + i * 110;
             const oc = at(from);
             txt(X0, y + 22, nm, 26, { anchor: "start", w: 700, o: oc });
-            txt(X0, y + 58, `${label} ₪`, 24, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
+            txt(X0, y + 58, `${label} ₪`, 24, { anchor: "end", w: 700, fill: C.teal, o: oc, ltr: true });
             const w = v * scale * Math.min(1, clamp((t - S.rounds[0] - from) / 3));
             el("rect", { x: X0 - 200 - w, y: y + 8, width: w, height: 40, rx: 6, fill: col, opacity: oc });
             txt(X0 - 200, y + 76, verdict, 20, { anchor: "start", fill: C.n700, o: at(from + 4) });

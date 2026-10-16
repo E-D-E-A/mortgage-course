@@ -16,6 +16,7 @@ import {
   pointsTo,
   ratioAfterCut,
   shortestTerm,
+  statementPayment,
   standing,
   standings,
   statusOf,
@@ -28,8 +29,8 @@ import { qualifyingTotal } from "./sensitivity.ts";
 const t = (id: string) => EXAMPLE_THRESHOLDS.find((x) => x.id === id)!;
 
 describe("thresholds and their kinds", () => {
-  it("has the four kinds, each with a name and a label", () => {
-    expect(Object.keys(KIND_INFO).sort()).toEqual(["bank_policy", "capital_threshold", "field_hypothesis", "regulatory_limit"]);
+  it("has the four kinds and the course's own example, each with a name and a label", () => {
+    expect(Object.keys(KIND_INFO).sort()).toEqual(["bank_policy", "capital_threshold", "course_example", "field_hypothesis", "regulatory_limit"]);
     for (const k of Object.values(KIND_INFO)) {
       expect(k.name.length).toBeGreaterThan(0);
       expect(k.label.length).toBeGreaterThan(0);
@@ -44,8 +45,10 @@ describe("thresholds and their kinds", () => {
     expect(t("pti.40").kind).toBe("capital_threshold");
   });
 
-  it("labels what the course only heard as a field hypothesis", () => {
-    expect(EXAMPLE_THRESHOLDS.filter((x) => x.kind === "field_hypothesis").map((x) => x.id)).toEqual(["pti.30", "pti.35", "ltv.40", "ltv.60"]);
+  it("labels one banker's remark as a field hypothesis, and the course's own 30% and 35% as its example, never as field knowledge", () => {
+    expect(EXAMPLE_THRESHOLDS.filter((x) => x.kind === "field_hypothesis").map((x) => x.id)).toEqual(["ltv.40", "ltv.60"]);
+    expect(EXAMPLE_THRESHOLDS.filter((x) => x.kind === "course_example").map((x) => x.id)).toEqual(["pti.30", "pti.35"]);
+    for (const x of EXAMPLE_THRESHOLDS) expect(x.source).not.toMatch(/Brain|בריף|ריפו/);
   });
 
   it("lists the lines of one metric, lowest first", () => {
@@ -230,5 +233,14 @@ describe("what must give to reach a line", () => {
   it("is the equity that must replace the loan to reach a financing line (60% of 2,200,000 = 1,320,000)", () => {
     expect(equityToReach("2200000", "1640000", "60").toFixed(2)).toBe("320000.00");
     expect(equityToReach("2200000", "1640000", "75").toFixed(2)).toBe("0.00");
+  });
+});
+
+describe("the statement payment", () => {
+  it("rounds each track to the agora and then adds: 25 years of case A is 8,992.92, as a statement shows it", () => {
+    const m25 = INITIAL_MIX.map((x) => ({ ...x, months: 300 }));
+    expect(statementPayment(m25).toFixed(2)).toBe("8992.92");
+    expect(qualifyingTotal(m25).toDecimalPlaces(2).toFixed(2)).toBe("8992.91");
+    expect(statementPayment(INITIAL_MIX).toFixed(2)).toBe("8181.30");
   });
 });

@@ -28,6 +28,9 @@ import {
 import type { BankCalendar } from "../../src/lib/calc/process.ts";
 import { mixInputs, type TrackKind, type TrackSpec } from "../../src/lib/calc/schedule.ts";
 import { type ScenarioSpec, scenarioFrom } from "../../src/lib/calc/sensitivity.ts";
+import { paymentToIncome } from "../../src/lib/calc/affordability.ts";
+import { percentString } from "../../src/lib/calc/percent.ts";
+import { CASE_A, caseADisposable } from "../../src/data/case-a-mix.ts";
 import type { Fact } from "../build-data.ts";
 
 export { difference, given, givenMoney, mixFact, leverFact, type Mix } from "./_sensitivity-facts.ts";
@@ -135,3 +138,11 @@ export const marginFact = (id: string, tracks: TrackSpec[], costs: Record<TrackK
 });
 
 export const asDecimal = (x: unknown) => new Decimal(String(x));
+
+/** A payment over case A's disposable income, percent (kind out_first_ratio): the ratio of lesson 5.6 for an unindexed first payment. */
+export const firstRatioFact = (id: string, payment: Fact): Fact => ({
+  id,
+  kind: "out_first_ratio",
+  inputs: { payment: String(payment.value), income: CASE_A.recognisedIncome, obligation_monthly: CASE_A.car.monthly, obligation_months: CASE_A.car.monthsLeft as number },
+  value: percentString(paymentToIncome(String(payment.value), caseADisposable())),
+});

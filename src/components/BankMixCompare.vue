@@ -7,9 +7,9 @@
 // can rise in the harsh scenario) and the ratio, with who is better on each. Below, in its own
 // box, a toy: what the two mixes would be worth to a bank under INVENTED costs of funds. Every
 // number comes from outreach.ts / sensitivity.ts through case-a-offers.ts; the component does none.
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { BANK_NAME, bankMargin, better, COUNTERS, counterTracks, EXERCISE_COST_OF_FUNDS, LOWER_IS_BETTER, priced, readMix, REQUESTED, type ReadKey } from "../data/case-a-offers.ts";
-import { formatShekelsText } from "../lib/calc/money.ts";
+import { formatShekels, formatShekelsText } from "../lib/calc/money.ts";
 import { shareOf } from "../lib/calc/mix.ts";
 import { KIND_NAME_HE as KIND_HE } from "../data/case-a-mix.ts";
 import type { TrackKind, TrackSpec } from "../lib/calc/schedule.ts";
@@ -28,6 +28,16 @@ const goals: { id: Goal; label: string; key: ReadKey }[] = [
 const pick = ref(COUNTERS[0].id);
 const goal = ref<Goal>("payment");
 const showTable = ref(false);
+function onKey(e: KeyboardEvent, i: number) {
+  const n = COUNTERS.length;
+  // In a right-to-left page the first tab is on the right: ArrowLeft moves to the next one.
+  const step = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0;
+  const to = e.key === "Home" ? 0 : e.key === "End" ? n - 1 : step ? (i + step + n) % n : -1;
+  if (to < 0) return;
+  e.preventDefault();
+  pick.value = COUNTERS[to].id;
+  nextTick(() => document.getElementById(`mix-tab-${COUNTERS[to].id}`)?.focus());
+}
 const counter = computed(() => COUNTERS.find((c) => c.id === pick.value) ?? COUNTERS[0]);
 const requestedTracks = computed(() => priced(counter.value.bank, REQUESTED));
 const counterTracksNow = computed(() => counterTracks(counter.value.id));
@@ -58,6 +68,7 @@ const pct = (n: number) => `${Math.round(n)}%`;
 const costs = EXERCISE_COST_OF_FUNDS as Record<TrackKind, string>;
 const pctText = (d: { toFixed(n: number): string }) => `${d.toFixed(2).replace(/\.?0+$/, "")}%`;
 const money = (d: { toString(): string }) => formatShekelsText(d.toString());
+const moneyExact = (d: { toString(): string }) => formatShekels(d.toString());
 const rows = computed(() => [
   { key: "first" as ReadKey, label: "החזר ראשון", a: money(a.value.first), b: money(b.value.first), unit: "בחודש" },
   { key: "total" as ReadKey, label: "סך התשלומים (תרחיש בסיס)", a: money(a.value.total), b: money(b.value.total), unit: "" },
@@ -74,7 +85,7 @@ const verdict = computed(() => {
       : w === "requested"
         ? `ביעד ״${g?.label}״ מה שביקשתם טוב יותר.`
         : `ביעד ״${g?.label}״ אין הבדל.`;
-  const cost = w === "counter" && others.length ? ` המחיר: מה שביקשתם טוב יותר ב־${others.map((o) => o.label).join(", ")}.` : "";
+  const cost = w === "counter" && others.length ? ` המחיר: מה שביקשתם טוב יותר במדדים האלה: ${others.map((o) => o.label).join(", ")}.` : "";
   return lead + cost;
 });
 </script>
@@ -85,11 +96,14 @@ const verdict = computed(() => {
 
     <div role="tablist" aria-label="ההצעות הנגדיות" class="mt-3 flex flex-wrap gap-2">
       <button
-        v-for="c in COUNTERS"
+        v-for="(c, i) in COUNTERS"
         :key="c.id"
         type="button"
         role="tab"
+        :id="`mix-tab-${c.id}`"
         :aria-selected="pick === c.id"
+        :tabindex="pick === c.id ? 0 : -1"
+        @keydown="onKey($event, i)"
         class="min-h-11 rounded-md border px-3 py-2 text-start text-body-m transition-colors duration-fast ease-out"
         :class="pick === c.id ? 'border-navy bg-n50 font-semibold text-n900' : 'border-n200 bg-n0 text-n800 hover:bg-n50'"
         @click="pick = c.id"
@@ -128,7 +142,12 @@ const verdict = computed(() => {
       </div>
     </fieldset>
 
-    <div class="mt-3 grid gap-2" aria-live="polite">
+    <div class="sticky top-2 z-sticky mt-3 rounded-md border border-n200 bg-n50 p-3 shadow-sm" aria-live="polite">
+      <p class="text-body-m font-semibold text-n900">{{ verdict }}</p>
+      <p class="mt-1 text-caption text-n700">אין מנצחת אחת: ההצעה טובה או לא טובה ביחס ליעד. ואם היא מתאימה ליעד של המשפחה, עדיין שואלים מה היא העבירה למשפחה.</p>
+    </div>
+
+    <div class="mt-3 grid gap-2">
       <div v-for="r in rows" :key="r.key" class="rounded-md border p-3" :class="r.key === goalKey ? 'border-navy bg-n50' : 'border-n200'">
         <p class="text-caption font-semibold text-n600">{{ r.label }}<span v-if="r.unit" class="font-normal"> · {{ r.unit }}</span></p>
         <div class="mt-1 grid grid-cols-2 gap-3">
@@ -146,11 +165,6 @@ const verdict = computed(() => {
       </div>
     </div>
 
-    <div class="mt-3 rounded-md bg-n50 p-3" aria-live="polite">
-      <p class="text-body-m font-semibold text-n900">{{ verdict }}</p>
-      <p class="mt-1 text-caption text-n700">אין מנצחת אחת: ההצעה טובה או לא טובה ביחס ליעד. ואם היא מתאימה ליעד של המשפחה, עדיין שואלים מה היא העבירה למשפחה.</p>
-    </div>
-
     <div class="mt-4 rounded-md border border-dashed border-n300 p-3">
       <p class="text-body-m font-semibold text-n900">מבט של הבנק: תרגיל, עם עלויות מומצאות</p>
       <p class="mt-1 text-caption text-n700">הבנק מרוויח מההפרש בין הריבית שהוא גובה למה שהכסף עולה לו, והוא שונה בכל סוג מסלול. את העלויות שלו אנחנו לא יודעים, וכאן הן מומצאות:</p>
@@ -158,7 +172,7 @@ const verdict = computed(() => {
         <li v-for="(v, k) in costs" :key="k">{{ KIND_HE[k] }}: <span class="ltr">{{ v }}%</span></li>
       </ul>
       <p class="mt-2 text-body-m text-n800">
-        לפי הכללים האלה, ההפרש בשנה הראשונה (בלי להתחשב בקרן שמוחזרת): <span class="ltr font-semibold">{{ money(marginA) }}</span> במה שביקשתם, ו־<span class="ltr font-semibold">{{ money(marginB) }}</span> בהצעה הנגדית.
+        לפי הכללים האלה, ההפרש בשנה הראשונה (בלי להתחשב בקרן שמוחזרת): <span class="ltr font-semibold">{{ moneyExact(marginA) }}</span> במה שביקשתם, ו־<span class="ltr font-semibold">{{ moneyExact(marginB) }}</span> בהצעה הנגדית.
       </p>
     </div>
 

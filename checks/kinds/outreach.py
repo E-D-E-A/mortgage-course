@@ -28,11 +28,12 @@ from the rules:
                     Statement rounding.
   out_simple_monthly amount x points / 100 / 12, to the agora.
   out_stop          "time" when fits = "no", "small_gain" when last_gain < threshold, else "continue".
+  out_first_ratio   a payment over the disposable income, percent.
   out_margin        sum of amount x (rate - cost of its kind) / 100 over a mix's tracks (cost_<kind>
                     are in the fact), to the agora: a toy view of a bank's year, with invented costs.
 """
 from datetime import date, timedelta
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from kinds import schedule
 from kinds.common import agorot
@@ -181,6 +182,14 @@ def stop(i, _facts=None):
     return "continue"
 
 
+def first_ratio(i, _facts=None):
+    """The first payment over the disposable income (income minus an obligation with more than 18 months left), percent, two decimals, trailing zeros dropped."""
+    deducted = Decimal(str(i["obligation_monthly"])) if int(i["obligation_months"]) > 18 else Decimal(0)
+    r = Decimal(str(i["payment"])) / (Decimal(str(i["income"])) - deducted) * 100
+    s = format(r.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP).normalize(), "f")
+    return "0" if s in ("-0", "0") else s
+
+
 def margin(i, _facts=None):
     total = Decimal(0)
     for k in range(1, int(i["tracks"]) + 1):
@@ -202,4 +211,5 @@ KINDS = {
     "out_simple_monthly": simple_monthly,
     "out_stop": stop,
     "out_margin": margin,
+    "out_first_ratio": first_ratio,
 }

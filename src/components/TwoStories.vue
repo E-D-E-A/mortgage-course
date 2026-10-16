@@ -7,7 +7,7 @@
 // its four answers (all four "yes" = positioning), so the component and the page cannot disagree.
 // What a wrong telling leads to is shown only as what it is: a paper that describes a family that
 // does not exist. Legal consequences are not here: the page lists them as questions to a lawyer.
-import { computed, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
 import { save } from "../lib/progress.ts";
 
 type Verdict = "positioning" | "wrong";
@@ -73,6 +73,19 @@ function retry() {
 function go(i: number) {
   current.value = i;
 }
+// Tabs: one Tab stop; the arrow keys move between them. The page is right to left, so ArrowLeft is "next".
+function onTabKey(e: KeyboardEvent, i: number) {
+  const n = props.scenarios.length;
+  let to = -1;
+  if (e.key === "ArrowLeft") to = (i + 1) % n;
+  else if (e.key === "ArrowRight") to = (i - 1 + n) % n;
+  else if (e.key === "Home") to = 0;
+  else if (e.key === "End") to = n - 1;
+  if (to < 0) return;
+  e.preventDefault();
+  go(to);
+  nextTick(() => document.getElementById(`${props.id}-tab-${to}`)?.focus());
+}
 const tabState = (sc: Scenario) => (allRight(sc) ? "✓ " : "");
 const mark = (ok: boolean) => (ok ? "כן" : "לא");
 </script>
@@ -85,7 +98,11 @@ const mark = (ok: boolean) => (ok ? "כן" : "לא");
         :key="sc.id"
         type="button"
         role="tab"
+        :id="`${id}-tab-${i}`"
         :aria-selected="i === current"
+        :aria-controls="`${id}-panel`"
+        :tabindex="i === current ? 0 : -1"
+        @keydown="onTabKey($event, i)"
         class="min-h-11 rounded-pill border px-4 text-body-m"
         :class="i === current ? 'border-navy bg-navy text-n0' : 'border-n300 text-n800 hover:bg-n50'"
         @click="go(i)"
@@ -93,6 +110,7 @@ const mark = (ok: boolean) => (ok ? "כן" : "לא");
         {{ tabState(sc) }}{{ sc.title }}
       </button>
     </div>
+    <div :id="`${id}-panel`" role="tabpanel" :aria-labelledby="`${id}-tab-${current}`">
     <p class="mt-2 text-caption text-n600">נפתרו {{ doneCount }} מתוך {{ scenarios.length }}</p>
 
     <div class="mt-3 rounded-md bg-n50 p-3">
@@ -159,6 +177,8 @@ const mark = (ok: boolean) => (ok ? "כן" : "לא");
       <button v-else-if="!allRight(scenario)" type="button" class="min-h-11 text-body-m text-navy underline" @click="retry">לנסות שוב</button>
       <button v-else-if="current < scenarios.length - 1" type="button" class="min-h-11 text-body-m text-navy underline" @click="go(current + 1)">לדוגמה הבאה</button>
       <p v-if="!isChecked && !readyToCheck" class="text-caption text-n600">סמנו לכל סיפור מה הוא, ואז בדקו.</p>
+    </div>
+
     </div>
 
     <p v-if="finished" class="mt-4 rounded-md bg-success-bg p-3 text-body-m text-n800" role="status">

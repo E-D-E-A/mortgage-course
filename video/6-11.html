@@ -86,7 +86,7 @@
         eq: { cash: fact("l.eq.add"), ratio: fact("l.eq.ratio"), left: fact("l.eq.reserve"), ltv: fact("l.eq.ltv") },
         eq17: { cash: fact("l.eq17.add"), ratio: fact("l.eq17.ratio"), room: fact("p17.a.room") },
         planRoom: fact("p.a.room"),
-        before: fact("b.a.total"), after: fact("p.a.total"), gain: fact("p.a.gain"), g1: fact("p.a.equity_gain"), g2: fact("p.a.relief_gain"), relief: fact("p.a.relief"),
+        before: fact("b.a.total"), after: fact("p.a.total"), gain: fact("p.a.gain"), g1: fact("p.a.equity_gain"), g2: fact("p.a.relief_gain"), relief: fact("p.a.relief"), mv: fact("p.mv25.ratio"), mvp: fact("in.move"),
         reserve: fact("a.reserve"),
         o: { req: fact("o.request"), a: fact("o.a.approved"), b: fact("o.b.approved"), c: fact("o.c.approved"), ua: fact("o.a.valid_until"), uc: fact("o.c.valid_until"), sc: fact("o.seq.c.approved"), dec: fact("o.decision"), sign: fact("o.sign_by"), late: fact("o.seq.late") },
       };
@@ -106,11 +106,12 @@
         [87, 101, "המתנה ולווה נוסף: בלי מזומן, והמחיר במקום אחר."],
         [103, 114, "לפני ההנחה, בבנק א׳, סך התשלומים כך."],
         [114, 126, `אחרי ההון הנוסף: נמוך ב־${shekW(V.gain)}.`],
-        [126, 141, "חצי מההלוואה הקטנה, חצי מחציית הקו."],
+        [126, 134, `${shekW(V.g1)} מההלוואה הקטנה, ${shekW(V.g2)} מהקו.`],
+        [134, 141, `אחרי תזוזה בפריים היחס ${V.mv}%: מעל הקו.`],
         [143, 153, "שלושה בנקים, אותה בקשה, אותו יום."],
         [153, 165, `במקביל כל האישורים עד ${dt(V.o.c)}.`],
         [165, 175, `אחד אחרי השני: ${V.o.late} ימים מאוחר יותר.`],
-        [175, 183, `בנק ישראל מחליט ב־${dt(V.o.dec)}: חותמים לפני.`],
+        [175, 183, `בנק ישראל מחליט ב־${dt(V.o.dec)}: הריבית יכולה לזוז לשני הכיוונים.`],
         [185, 194, "שואלים כל בנק איפה הקו ומה מוחזק."],
         [194, 203, "ושואלים בכתב. שאלה אינה מידע לא נכון."],
         [205, 212, "מנוף, מחיר, ומתי לא."],
@@ -195,6 +196,7 @@
           txt(1090 - w1 / 2, 456, `הלוואה קטנה ${lr(shekW(V.g1))}`, 24, { w: 600, o: o3 });
           txt(1090 - w1 - (900 - w1) / 2, 456, `הנחה ${lr(V.relief)} נקודת אחוז: ${lr(shekW(V.g2))}`, 24, { w: 600, o: o3, fill: C.n0 });
           txt(640, 520, `סך הכול ${lr(shek(V.gain))} פחות`, 30, { w: 700, o: after(t, S.plan, 28, o), fill: C.teal });
+          txt(640, 585, `אחרי תזוזה של ${V.mvp} בפריים: יחס ${lr(V.mv + "%")}, מעל הקו של 40%`, 26, { w: 600, o: after(t, S.plan, 33, o), fill: C.n700 });
         }
         // The outreach plan on a calendar
         if (inScene(t, S.out)) {
@@ -220,8 +222,8 @@
           dot(V.o.sc, yB, `ג׳ ${day(V.o.sc)}.11`, after(t, S.out, 26, o));
           // the Bank of Israel date and the end of bank א׳'s terms, on the first line
           const od = after(t, S.out, 34, o);
-          el("line", { x1: X(V.o.dec), x2: X(V.o.dec), y1: 190, y2: 520, stroke: C.danger, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: od });
-          txt(X(V.o.dec), 178, `בנק ישראל ${day(V.o.dec)}.11`, 22, { w: 700, fill: C.danger, o: od });
+          el("line", { x1: X(V.o.dec), x2: X(V.o.dec), y1: 190, y2: 520, stroke: C.n700, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: od });
+          txt(X(V.o.dec), 178, `בנק ישראל ${day(V.o.dec)}.11`, 22, { w: 700, fill: C.n700, o: od });
           el("line", { x1: X(V.o.ua), x2: X(V.o.ua), y1: 215, y2: 520, stroke: C.n600, "stroke-width": 3, opacity: od });
           txt(X(V.o.ua), 520 + 28, `התוקף של א׳ נגמר ${day(V.o.ua)}.11`, 22, { w: 700, o: od });
         }

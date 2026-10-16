@@ -65,13 +65,13 @@ export default function lesson69(): LessonData {
     add(disposable(`d${n}.disposable`, String(d.file.income), d.file.obligations));
     add(totalFact(`d${n}.list_total`, listTracks(A, d.file.tracks), BASE));
   });
-  // File 2 again, the way it stands one payment later: 18 payments of the car loan left, so it no longer counts (lesson 4.2).
+  // File 2 again, the way it stands three payments later: 17 left, below the open edge of 18, so the car loan no longer counts (lesson 4.2).
   const f2 = DAY_FILES[1].file;
-  const f2Later = { ...f2, obligations: [{ ...f2.obligations[0], monthsLeft: 18 }] };
+  const f2Later = { ...f2, obligations: [{ ...f2.obligations[0], monthsLeft: 17 }] };
   verdictFacts(add, "d2w", A, f2Later, opts);
   add(disposable("d2w.disposable", String(f2.income), f2Later.obligations));
-  add(given("d2.months_left", 19));
-  add(given("d2w.months_left", 18));
+  add(given("d2.months_left", 20));
+  add(given("d2w.months_left", 17));
   add(givenMoney("d2.car", "1500"));
   add(sum("ex2.err_added", ["17000", "1500"]));
   add(difference("d2.later_gain", get("d2.total"), get("d2w.total")));

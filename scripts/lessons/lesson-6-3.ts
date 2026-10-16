@@ -18,7 +18,7 @@ import { CANDIDATES, CASE_A } from "../../src/data/case-a-mix.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { LTV_CEILINGS, MAX_TERM_MONTHS, PTI_CAPITAL_THRESHOLD } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { disposable, ratio as affRatio, untilDrop } from "./affordability-facts.ts";
+import { disposable, ratio as affRatio } from "./affordability-facts.ts";
 import {
   MIX_A,
   difference,
@@ -29,6 +29,7 @@ import {
   leverFact,
   loanCutFact,
   loanRoomFact,
+  minusWhole,
   mixFact,
   paymentCutFact,
   sumOf,
@@ -101,9 +102,17 @@ export default function lesson(): LessonData {
   add(difference("l7.total_gap", totalInit, totalHalf));
 
   // ── Lever 9: timing. The car loan leaves the ratio after these payments, at the same payment ──
-  add(untilDrop("l9.months", CASE_A.car.monthsLeft as number));
-  add(times("l9.paid", car, 8));
+  // After 9 payments 17 are left, fewer than 18; at exactly 18 lesson 4.2 left the rule open.
+  add(givenNumber("l9.left", 17));
+  add(minusWhole("l9.months", CASE_A.car.monthsLeft as number, 17));
+  add(times("l9.paid", car, 9));
   add(affRatio("l9.ratio", v(pay), v(income)));
+
+  // ── A third action for the half-solved table (30,000 of equity; printed nowhere else) ──
+  add(givenMoney("b1.cut", "30000"));
+  const b1loan = add(leverFact("b1.loan", MIX_A, { lever: "amount", change: "-30000" }, "loan"));
+  add(ltv("b1.ltv", v(b1loan), v(price)));
+  add(leverFact("b1.ratio", MIX_A, { lever: "amount", change: "-30000" }, "ratio"));
 
   // ── Exercises: an invented family, יעל ואלון ──
   const e2Income = add(givenMoney("e2.income", "16000"));
@@ -113,7 +122,8 @@ export default function lesson(): LessonData {
   add(sumOf("e2.total", [e2Income, e2Need]));
 
   add(givenNumber("e3.left", 30));
-  add(untilDrop("e3.months", 30));
+  add(givenNumber("e3.line", 17));
+  add(minusWhole("e3.months", 30, 17));
 
   const e4Price = add(givenMoney("e4.price", "1800000"));
   const e4Loan = add(givenMoney("e4.loan", "1300000"));

@@ -107,8 +107,9 @@ const gapText = (total: Decimal) => {
   const gap = total.minus(competitorTotal.value);
   return gap.isNegative() ? { word: "זולה ב־", amount: gap.abs().toString() } : { word: "יקרה ב־", amount: gap.toString() };
 };
-const advice: Record<string, string> = { continue: "אפשר להמשיך", small_gain: "עצרו: חסך מעט", time: "עצרו: אין זמן" };
+const adviceText = (r: { advice: string; fits: boolean }) => (r.advice === "continue" ? "אפשר להמשיך" : r.advice === "small_gain" ? "עצרו: חסך מעט" : r.fits ? "עצרו: הסבב הבא לא נכנס" : "עצרו: הסבב הזה לא נכנס");
 const showTable = ref(false);
+const ptsWord = (n: number) => (n !== 0 && Math.abs(n) <= 1 ? "נקודת אחוז" : "נקודות אחוז");
 </script>
 
 <template>
@@ -116,7 +117,7 @@ const showTable = ref(false);
     <p class="text-body-l font-semibold text-n900">שורות המשא ומתן, ומה שווה צעד אחד</p>
     <p class="mt-1 text-caption text-n700">ההצעה של {{ bankName }} לתמהיל שביקשו נועם ושירה (דוגמה לימודית, לא הצעה של בנק).</p>
     <label class="mt-3 flex flex-col gap-1 sm:max-w-sm">
-      <span class="text-caption font-semibold text-n600">צעד: <span class="ltr">{{ notch }}</span> נקודות אחוז פחות</span>
+      <span class="text-caption font-semibold text-n600">צעד: <span class="ltr">{{ notch }}</span> {{ ptsWord(notch) }} פחות</span>
       <input v-model.number="notch" type="range" min="0.05" max="0.25" step="0.05" aria-label="גודל הצעד בנקודות אחוז" />
     </label>
     <ul class="list-reset mt-3 grid gap-2 sm:grid-cols-2" aria-label="מה שווה צעד, לכל מסלול">
@@ -146,11 +147,15 @@ const showTable = ref(false);
         כל סבב לוקח {{ roundDays }} ימי עסקים, ונשארים {{ reserve }} ימים אחרי התשובה (כללים של התרגיל, לא של בנק). התנאים של {{ bankName }} עד {{ short(validUntil) }}.
         כמה בנק מזיז בסבב, ואם בכלל: לא ידוע. הערכים כאן הם הנחות שלכם.
       </p>
+      <div class="sticky top-2 z-sticky mt-3 rounded-md border border-n200 p-3 shadow-sm" :class="verdict.tone" aria-live="polite">
+        <p class="text-body-m font-semibold text-n900">{{ verdict.title }}</p>
+        <p class="mt-1 text-body-m text-n800">{{ verdict.text }}</p>
+      </div>
       <div class="mt-3 grid gap-3 sm:grid-cols-3">
         <div v-for="(r, k) in inputs" :key="k" class="rounded-md border border-n200 bg-n0 p-3">
           <p class="text-body-m font-semibold text-n900">סבב {{ k + 1 }}: הבנק הוריד</p>
           <label class="mt-1 flex flex-col gap-1">
-            <span class="text-caption text-n700"><span class="ltr">{{ r.points }}</span> נקודות אחוז</span>
+            <span class="text-caption text-n700"><span class="ltr">{{ r.points }}</span> {{ ptsWord(r.points) }}</span>
             <input v-model.number="r.points" type="range" min="0" max="0.3" step="0.05" :aria-label="`סבב ${k + 1}: כמה נקודות אחוז הבנק הוריד`" />
           </label>
           <label class="mt-1 flex flex-col gap-1">
@@ -166,37 +171,19 @@ const showTable = ref(false);
         <input v-model.number="threshold" type="range" min="0" max="40000" step="1000" aria-label="הקו שלכם בשקלים" />
       </label>
 
-      <div class="mt-3 overflow-x-auto">
-        <table class="w-full min-w-[34rem] border-collapse text-caption sm:text-body-m">
-          <thead>
-            <tr class="border-b border-n200 text-caption text-n600">
-              <th class="py-2 pe-2 text-start">סבב</th>
-              <th class="py-2 pe-2 text-start">מתי</th>
-              <th class="py-2 pe-2 text-start">חסך</th>
-              <th class="py-2 pe-2 text-start">מול ההצעה של {{ competitor.name }}</th>
-              <th class="py-2 text-start">מה אומר הכלל</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="r in run" :key="r.round" class="border-b border-n100 align-top">
-              <td class="py-1 pe-2 font-semibold text-n900">{{ r.round }}</td>
-              <td class="py-1 pe-2">{{ short(r.start) }} ← {{ short(r.answer) }}<span v-if="!r.fits" class="block text-n700">לא נכנס: אין הצעה</span></td>
-              <td class="py-1 pe-2"><span class="ltr">{{ money(r.gainTotal) }}</span></td>
-              <td class="py-1 pe-2">{{ gapText(r.totalAfter).word }}<span class="ltr">{{ formatShekelsText(gapText(r.totalAfter).amount) }}</span></td>
-              <td class="py-1">{{ advice[r.advice] }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <ol class="list-reset mt-3 grid gap-2 sm:grid-cols-3" aria-label="הסבבים">
+        <li v-for="r in run" :key="r.round" class="rounded-md border border-n200 bg-n0 p-3">
+          <p class="text-body-m font-semibold text-n900">סבב {{ r.round }} · {{ adviceText(r) }}</p>
+          <p class="text-caption text-n700">{{ short(r.start) }} ← {{ short(r.answer) }}<span v-if="!r.fits"> · לא נכנס: אין הצעה</span></p>
+          <p class="mt-1 text-body-m text-n800">חסך: <span class="ltr font-semibold">{{ money(r.gainTotal) }}</span></p>
+          <p class="text-body-m text-n800">מול {{ competitor.name }}: {{ gapText(r.totalAfter).word }}<span class="ltr">{{ formatShekelsText(gapText(r.totalAfter).amount) }}</span></p>
+        </li>
+      </ol>
       <p class="mt-2 text-caption text-n700">
         בלי סבבים: ההצעה של {{ bankName }} {{ gapText(ownTotalStart).word }}<span class="ltr">{{ formatShekelsText(gapText(ownTotalStart).amount) }}</span> מההצעה של {{ competitor.name }}, בסך התשלומים.
         <template v-if="lastRun">אחרי הסבב האחרון שנכנס: ההחזר הראשון <span class="ltr">{{ money(lastRun.firstAfter) }}</span>.</template>
       </p>
 
-      <div class="mt-3 rounded-md p-3" :class="verdict.tone" aria-live="polite">
-        <p class="text-body-m font-semibold text-n900">{{ verdict.title }}</p>
-        <p class="mt-1 text-body-m text-n800">{{ verdict.text }}</p>
-      </div>
     </div>
 
     <p class="mt-3 text-caption text-n600">{{ note }}</p>

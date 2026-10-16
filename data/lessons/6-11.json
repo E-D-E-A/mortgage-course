@@ -1,7 +1,7 @@
 {
   "lesson": "6.11",
   "title": "סדנה: תוכנית המיצוב של התיק המרכזי",
-  "note": "Case A (src/data/case-a-levers.ts, case-a-mix.ts) with lesson 6.4's levers (savings 40,000, car payoff 36,000, parent's income 4,000, 8 months of waiting) priced by src/lib/calc/levers.ts; the four fictional banks of lessons 6.6–6.8 with lesson 6.9's INVENTED rules (bankpolicy.ts, src/data/case-a-positioning.ts); the clocks of lesson 6.6 (24 calendar days of terms from each approval, the team's transcription of Directive 451, not verified) and the exercise's re-pricing round (3 business days, 7 days left after the answer). The plan's equity is the smallest whole thousand that leaves the ratio at most 0.1 point under the 40% line (a rule of the workshop). Nothing here says how a real bank decides or prices. Base scenario: the index rises 2% a year, prime does not move.",
+  "note": "Case A (src/data/case-a-levers.ts, case-a-mix.ts) with lesson 6.4's levers (savings 40,000, car payoff 36,000, parent's income 4,000, 9 months of waiting) priced by src/lib/calc/levers.ts; the four fictional banks of lessons 6.6–6.8 with lesson 6.9's INVENTED rules (bankpolicy.ts, src/data/case-a-positioning.ts); the clocks of lesson 6.6 (24 calendar days of terms from each approval, the team's transcription of Directive 451, not verified) and the exercise's re-pricing round (3 business days, 7 days left after the answer). The plan's equity is the smallest whole thousand that leaves the ratio at most 0.1 point under the 40% line (a rule of the workshop). Nothing here says how a real bank decides or prices. Base scenario: the index rises 2% a year, prime does not move.",
   "facts": [
     {
       "id": "a.price",
@@ -73,7 +73,13 @@
       "id": "in.wait",
       "kind": "given",
       "inputs": {},
-      "value": 8
+      "value": 9
+    },
+    {
+      "id": "in.wait_left",
+      "kind": "given",
+      "inputs": {},
+      "value": 17
     },
     {
       "id": "in.ltv_ceiling",
@@ -2393,7 +2399,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "ratio"
       },
       "value": "37.7"
@@ -2419,7 +2425,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "ltv"
       },
       "value": "74.55"
@@ -2445,7 +2451,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "qualifying"
       },
       "value": "8181.30"
@@ -2471,7 +2477,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "total"
       },
       "value": "2945264.34"
@@ -2497,7 +2503,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "stress_max"
       },
       "value": "9435.33"
@@ -2523,7 +2529,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "reserve"
       },
       "value": "40000.00"
@@ -2549,7 +2555,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "bans"
       },
       "value": "none"
@@ -2575,7 +2581,7 @@
         "stress_prime_shift": "2",
         "stress_anchor_shift": "2",
         "lever": "wait",
-        "lever_months": 8,
+        "lever_months": 9,
         "measure": "loan"
       },
       "value": "1640000.00"
@@ -4407,6 +4413,181 @@
       "value": "4000.00"
     },
     {
+      "id": "in.move",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "p.mv05.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.96"
+    },
+    {
+      "id": "p.mv10.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.7",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.04"
+    },
+    {
+      "id": "p.mv25.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "539008.54",
+        "t1_rate": "4.85",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "539995.73",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "539995.73",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.28"
+    },
+    {
+      "id": "p.mv25.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "p.mv25.ratio",
+        "subtrahend": "in.target"
+      },
+      "value": "0.28"
+    },
+    {
+      "id": "p.cover.add",
+      "kind": "given",
+      "inputs": {},
+      "value": "37000.00"
+    },
+    {
+      "id": "p.cover.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "533681.71",
+        "t1_rate": "4.85",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "534659.15",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "534659.14",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.89"
+    },
+    {
+      "id": "p.cover.extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "p.cover.add",
+        "subtrahend": "l.eq.add"
+      },
+      "value": "16000.00"
+    },
+    {
+      "id": "p.cover.reserve",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.reserve",
+        "subtrahend": "p.cover.add"
+      },
+      "value": "3000.00"
+    },
+    {
       "id": "w.a.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -4476,7 +4657,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.7"
     },
@@ -4665,7 +4846,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.56"
     },
@@ -4854,7 +5035,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.7"
     },
@@ -5043,7 +5224,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.92"
     },
@@ -5143,7 +5324,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.22"
     },
@@ -5332,7 +5513,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.08"
     },
@@ -5521,7 +5702,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.22"
     },
@@ -5710,7 +5891,7 @@
         "measure": "ratio",
         "income": "21700",
         "obligation_monthly": "1450",
-        "obligation_months": 18
+        "obligation_months": 17
       },
       "value": "37.44"
     },
@@ -6711,6 +6892,15 @@
         "subtrahend": "cr.c.total"
       },
       "value": "-19610.50"
+    },
+    {
+      "id": "cr.c_over_plan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "cr.c.total",
+        "subtrahend": "p.a.total"
+      },
+      "value": "19610.50"
     },
     {
       "id": "o.request",

@@ -11,6 +11,8 @@ import Decimal from "decimal.js";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentString } from "../../src/lib/calc/percent.ts";
 import { floorAgora } from "../../src/lib/calc/regulation.ts";
+import { disposableIncome, paymentToIncome } from "../../src/lib/calc/affordability.ts";
+import { applyEdit } from "../../src/lib/calc/outreach.ts";
 import { evaluate, type BankPolicy, type LoanFile, type Verdict } from "../../src/lib/calc/bankpolicy.ts";
 import { mixInputs } from "../../src/lib/calc/schedule.ts";
 import { measuresOf, qualifyingTotal, scenarioFrom, type ScenarioSpec } from "../../src/lib/calc/sensitivity.ts";
@@ -90,4 +92,23 @@ export function totalFact(id: string, tracks: Parameters<typeof mixInputs>[0], s
   const m = measuresOf(tracks, sc);
   const value = measure === "total" ? m.total : measure === "first" ? m.first : qualifyingTotal(tracks);
   return { id, kind: "sens_mix", inputs: { ...mixInputs(tracks, sc), measure }, value: moneyString(value) };
+}
+
+/**
+ * The ratio of a file at a bank's list rates when the prime track's rate rises by `points` (kind sens_mix, measure ratio, on the moved tracks).
+ * It answers "how far does the file sit from a line if the prime moves", and says nothing about whether a bank re-reads the ratio at a moved rate.
+ */
+export function movedRatioFact(id: string, policy: BankPolicy, file: LoanFile, points: string, scenario: ScenarioSpec): { fact: Fact; ratio: Decimal } {
+  const listed = file.tracks.map((t) => ({ kind: t.kind, amount: new Decimal(t.amount).toFixed(2), rate: policy.prices[t.kind], months: t.months }));
+  const moved = applyEdit(listed, { target: "prime", points });
+  const disposable = disposableIncome(file.income, file.obligations);
+  const ratio = paymentToIncome(qualifyingTotal(moved), disposable);
+  const sc = scenarioFrom(scenario);
+  const fact: Fact = {
+    id,
+    kind: "sens_mix",
+    inputs: { ...mixInputs(moved, sc), measure: "ratio", income: new Decimal(file.income).toString(), ...obligationInputs(file) },
+    value: percentString(ratio),
+  };
+  return { fact, ratio };
 }

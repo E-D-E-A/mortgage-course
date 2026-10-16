@@ -25,7 +25,7 @@
  * the list — exactly the offers of lessons 6.6–6.8 — and bank ד׳ refuses it.
  *
  * The levers are lesson 6.4's (src/data/case-a-levers.ts and src/lib/calc/levers.ts): more equity
- * from the savings, closing the car loan from the savings, waiting until 18 payments are left, a
+ * from the savings, closing the car loan from the savings, waiting until fewer than 18 payments are left, a
  * parent as a second borrower. Their amounts (the 40,000 ₪ of savings, the 36,000 ₪ payoff, the
  * parent's 4,000 ₪) are that lesson's teaching assumptions. The plan's equity is the smallest whole
  * thousand that leaves the ratio at least a tenth of a point under the 40% line (a rule of the
@@ -62,8 +62,8 @@ export const bank = (id: string): BankPolicy => {
 export const MARGIN = "0.1";
 /** The ratio the plan aims at: the line minus the margin. */
 export const PLAN_RATIO = new Decimal(TARGET_RATIO).minus(MARGIN).toString();
-/** How many payments of the car loan the family waits out: 26 left, 18 to go (lesson 4.2's rule). */
-export const WAIT_MONTHS = 8;
+/** How many payments of the car loan the family waits out: 26 left, 17 after the wait: below the open edge of 18 (lessons 4.2 and 6.4). */
+export const WAIT_MONTHS = 9;
 
 /** The smallest whole thousand of the savings that puts the ratio at most PLAN_RATIO (lesson 6.4's search, at a stricter target). */
 export function planEquity(): Decimal {
@@ -78,7 +78,7 @@ export type LeverKey = "equity" | "car" | "wait" | "parent";
 export const LEVER_NAME_HE: Record<LeverKey, string> = {
   equity: "עוד הון עצמי מהחסכונות",
   car: "סגירת הלוואת הרכב מהחסכונות",
-  wait: "המתנה עד שנשארים 18 תשלומים",
+  wait: "המתנה עד שהלוואת הרכב מפסיקה להיספר",
   parent: "הורה כלווה נוסף",
 };
 
