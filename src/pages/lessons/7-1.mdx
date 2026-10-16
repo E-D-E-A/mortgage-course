@@ -11,6 +11,8 @@ import LessonVideo from "../../components/LessonVideo.astro";
 import Prediction from "../../components/Prediction.vue";
 import PredictionReveal from "../../components/PredictionReveal.vue";
 import FiveFees from "../../components/FiveFees.vue";
+import BigPictureMap from "../../components/BigPictureMap.vue";
+import { mapUpTo } from "../../components/big-picture/index.ts";
 import FillTable from "../../components/FillTable.vue";
 import NumericExercise from "../../components/NumericExercise.vue";
 import ChoiceExercise from "../../components/ChoiceExercise.vue";
@@ -23,6 +25,7 @@ import { formatShekels } from "../../lib/calc/money.ts";
 {/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("7.1");
+export const map = mapUpTo("7.1");
 // An amount inside an equation, without ₪, with its agorot when it has any. Formatting only — the value is the fact's.
 export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
 export const n = (id) => nv(f.raw(id));
@@ -192,6 +195,12 @@ export const halfRows = [
 </div>
 
 הטבלה כולה לפי תעתיק של הצוות (לא אומת).
+
+### איפה זה במפה
+
+בשלב 7 המפה הכוללת מקבלת צמתים חדשים: הצו על פירעון מוקדם, והעמלות שהוא קובע. לחצו על ״חמש עמלות פירעון מוקדם״ כדי לראות מה מחובר אליהן, ואילו קשרים יתווספו בשיעורים הבאים.
+
+<BigPictureMap client:visible regions={map.regions} nodes={map.nodes} links={map.links} lesson="7.1" newFrom="7.1" initial="early_repay_fees" />
 
 <Section kind="המחשה: הזיזו בעצמכם">
 

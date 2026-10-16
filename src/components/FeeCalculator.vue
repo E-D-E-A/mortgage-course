@@ -83,7 +83,9 @@ const served = computed(() => {
   const mo = k % 12;
   const yText = y === 0 ? "" : y === 1 ? "שנה" : `${y} שנים`;
   const mText = mo === 0 ? "" : mo === 1 ? "חודש" : `${mo} חודשים`;
-  return [yText, mText].filter(Boolean).join(" ו־") || "פחות מחודש";
+  // "ו" before a word ("וחודש"), "ו־" before a number ("ו־11 חודשים").
+  if (yText && mText) return `${yText} ${mo === 1 ? "ו" : "ו־"}${mText}`;
+  return yText || mText || "פחות מחודש";
 });
 const noticeText = computed(() => {
   const s = r.value?.notice;
@@ -197,7 +199,7 @@ const steps = computed<Step[]>(() => {
 </script>
 
 <template>
-  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
+  <div class="fc-root my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
       הלוואה אחת, קבועה לא צמודה, בשפיצר. ברירת המחדל היא ההלוואה של עדי וירון והממוצעים שהצוות קרא ב־2.8.2026 (לא אומת). שאר המספרים להמחשה. דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.
     </p>
@@ -223,11 +225,11 @@ const steps = computed<Step[]>(() => {
     <div class="mt-3 grid gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">יום ההעמדה</span>
-        <input v-model="granted" type="date" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2" />
+        <input v-model="granted" type="date" class="fc-date h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2" />
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">יום הפירעון</span>
-        <input v-model="repaid" type="date" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2" />
+        <input v-model="repaid" type="date" class="fc-date h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2" />
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">הממוצע ביום הפירעון (אפקטיבי, באחוזים)</span>
@@ -259,9 +261,12 @@ const steps = computed<Step[]>(() => {
     <button type="button" class="mt-1 min-h-11 text-body-m text-navy underline" @click="reset">חזרה לדוגמה של עדי וירון</button>
 
     <p v-if="problem" class="mt-3 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="alert">{{ problem }}</p>
-    <p v-else-if="r && r.remaining === 0" class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800">ההלוואה כבר נפרעה במלואה בתאריך הזה: אין מה לפרוע.</p>
+    <p v-if="r && r.remaining === 0" class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800">ההלוואה כבר נפרעה במלואה בתאריך הזה: אין מה לפרוע.</p>
 
-    <ol v-else class="mt-4 grid gap-3" aria-live="polite">
+    <p v-if="r && !problem && r.remaining > 0" class="sticky bottom-2 z-10 mt-4 flex flex-wrap items-baseline justify-between gap-x-3 rounded-md border border-navy bg-n0 p-3 text-body-m font-semibold text-n900 shadow-md sm:hidden" role="status">
+      <span>מה שמשלמים</span><span class="ltr">{{ formatShekels(r.total) }}</span>
+    </p>
+    <ol v-if="!problem && r && r.remaining > 0" class="mt-4 grid gap-3" aria-live="polite">
       <li v-for="s in steps" :key="s.n" class="rounded-md border p-3" :class="s.n === steps.length ? 'border-navy' : 'border-n100'">
         <p class="text-body-m font-semibold text-n900"><span class="ltr text-n600">{{ s.n }}.</span> {{ s.title }}</p>
         <dl class="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-body-m">
@@ -303,3 +308,18 @@ const steps = computed<Step[]>(() => {
     </div>
   </div>
 </template>
+
+<style>
+/* A focused control is never left under the sticky total on a phone; the date picker's icon gets a ring like the other controls. */
+@media (max-width: 639.98px) {
+  .fc-root input,
+  .fc-root button {
+    scroll-margin-bottom: 9rem;
+  }
+}
+.fc-date:focus-visible,
+.fc-date::-webkit-calendar-picker-indicator:focus-visible {
+  outline: 2px solid var(--mogi-navy);
+  outline-offset: 2px;
+}
+</style>

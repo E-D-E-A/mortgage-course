@@ -111,6 +111,21 @@ const path = computed(() => {
   const w = loanChosen.value.whole;
   return trajectory(stayStream(w.balance, w.payments, loanChosen.value.balances), switchStream(next.value), cashNow.value);
 });
+// One card per track (and the whole loan) for the phone: the verdict first.
+const testCards = computed(() => {
+  if (!loanChosen.value || !test.value) return [];
+  const out: { name: string; cmp: Decimal; exp: Decimal; test: NonNullable<typeof test.value>; whole: boolean }[] = [];
+  if (preset.value.tracks.length > 1) {
+    preset.value.tracks.forEach((t, i) => {
+      const rt = rowTests.value[i];
+      if (rt) out.push({ name: t.name, cmp: loanAll.value.tracks[i].comparisonRate, exp: loanAll.value.tracks[i].expectedTotalRate, test: rt, whole: false });
+    });
+  }
+  const w = loanChosen.value.whole;
+  const name = preset.value.tracks.length > 1 ? `ההלוואה כולה${chosen.value.length < preset.value.tracks.length ? " (רק המסלולים שנבחרו)" : ""}` : preset.value.tracks[0].name;
+  out.push({ name, cmp: w.comparisonRate, exp: w.expectedTotalRate, test: test.value, whole: true });
+  return out;
+});
 const kept = computed(() => {
   if (!loanChosen.value || !next.value) return null;
   try {
@@ -250,7 +265,20 @@ const chartLabel = computed(() => (summary.value ? `המצב שלכם לאורך
       <!-- 1. The regulator's test. -->
       <h3 class="mt-5 text-body-l font-semibold text-n900">1. המבחן של הרגולטור, לכל מסלול ולהלוואה כולה</h3>
       <p class="mt-1 text-caption text-n600">ריבית אפקטיבית לשנה, על התשלומים שנשארו. ״כולל עמלה״: העמלה מתווספת לחוב שמסלקים. ההצעה החדשה: <span class="ltr font-semibold">{{ pct(next.expectedTotalRate) }}</span> (הריבית הכוללת החזויה שלה, כולל עלויות הכניסה).</p>
-      <div class="mt-2 overflow-x-auto">
+      <ul class="list-reset mt-2 space-y-2 sm:hidden" aria-label="המבחן לכל מסלול">
+        <li v-for="r in testCards" :key="r.name" class="rounded-md border border-n200 p-3" :class="r.whole && preset.tracks.length > 1 ? 'bg-n50' : ''">
+          <p class="flex flex-wrap items-center gap-2 text-body-m font-semibold text-n900">
+            <span class="rounded-pill px-2 py-0.5 text-caption" :class="r.test.worthwhile ? 'bg-success-bg' : 'bg-warning-bg'">{{ r.test.worthwhile ? "ההצעה זולה יותר" : "ההצעה לא זולה יותר" }}</span>
+            <span class="text-caption font-normal text-n600">(<span class="ltr">{{ pctSigned(r.test.margin) }}</span> {{ pointsWord(r.test.margin) }})</span>
+          </p>
+          <p class="mt-1 text-body-m text-n900"><BidiText :text="r.name" /></p>
+          <dl class="mt-1 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-body-m text-n700">
+            <dt>ריבית לצרכי השוואה (כולל עמלה)</dt><dd class="text-end font-semibold text-n900"><span class="ltr">{{ pct(r.cmp) }}</span></dd>
+            <dt>ריבית כוללת חזויה (בלי עמלה)</dt><dd class="text-end"><span class="ltr">{{ pct(r.exp) }}</span></dd>
+          </dl>
+        </li>
+      </ul>
+      <div class="mt-2 hidden overflow-x-auto sm:block" tabindex="0" role="region" aria-label="טבלת המבחן לכל מסלול">
         <table class="w-full min-w-[30rem] border-collapse text-body-m">
           <thead>
             <tr class="border-b border-n200 text-caption text-n600">
@@ -350,7 +378,7 @@ const chartLabel = computed(() => (summary.value ? `המצב שלכם לאורך
       <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
         {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
       </button>
-      <div v-if="showTable" class="mt-2 max-h-80 overflow-auto">
+      <div v-if="showTable" class="mt-2 max-h-80 overflow-auto" tabindex="0" role="region" aria-label="טבלת המצב לאורך הזמן">
         <table class="w-full min-w-[30rem] border-collapse text-body-m">
           <thead class="sticky top-0 bg-n0">
             <tr class="border-b border-n200 text-caption text-n600">
@@ -373,3 +401,12 @@ const chartLabel = computed(() => (summary.value ? `המצב שלכם לאורך
     </template>
   </div>
 </template>
+
+<style>
+/* The sticky result box covers the bottom of the screen on a phone: a focused control is scrolled above it. */
+@media (max-width: 639px) {
+  html {
+    scroll-padding-bottom: 9rem;
+  }
+}
+</style>

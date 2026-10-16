@@ -94,7 +94,7 @@ const exitIndex = computed(() => series.value.findIndex((s) => s.r.status === "e
 
 const longDate = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
 const fmtDate = (d: ISODate) => longDate.format(new Date(`${d}T12:00:00Z`));
-const shortDate = new Intl.DateTimeFormat("he-IL", { month: "numeric", year: "2-digit" });
+const shortDate = new Intl.DateTimeFormat("he-IL", { month: "short", year: "2-digit" });
 const fmtShort = (d: ISODate) => shortDate.format(new Date(`${d}T12:00:00Z`));
 const axisLabels = computed(() => {
   const n = series.value.length;
@@ -141,7 +141,7 @@ const tableRows = computed(() =>
 
     <label class="mt-4 flex flex-col">
       <span class="text-caption font-semibold text-n600">יום הפירעון</span>
-      <input v-model.number="index" type="range" min="0" :max="series.length - 1" step="1" aria-label="יום הפירעון" />
+      <input v-model.number="index" type="range" min="0" :max="series.length - 1" step="1" aria-label="יום הפירעון" :aria-valuetext="fmtDate(at.date)" />
       <span class="text-body-l font-semibold text-n900">{{ fmtDate(at.date) }}</span>
     </label>
 
@@ -160,7 +160,7 @@ const tableRows = computed(() =>
         </svg>
         <!-- y-axis labels in HTML, so they stay readable on a phone -->
         <div class="pointer-events-none absolute inset-y-0 start-0" aria-hidden="true">
-          <span v-for="t in ticks" :key="`y${t}`" class="absolute whitespace-nowrap rounded-sm bg-n0/80 px-1 text-caption text-n600" :style="{ top: `${(yOf(t) / H) * 100}%`, transform: 'translateY(-100%)' }"><span class="ltr">{{ t.toLocaleString("en-US") }}</span></span>
+          <template v-for="(t, ti) in ticks" :key="`y${t}`"><span v-if="t > 0" class="absolute whitespace-nowrap rounded-sm bg-n0/80 px-1 text-caption text-n600" :style="{ top: `${(yOf(t) / H) * 100}%`, transform: ti === ticks.length - 1 ? 'none' : 'translateY(-100%)' }"><span class="ltr">{{ t.toLocaleString("en-US") }} ₪</span></span></template>
         </div>
       </div>
       <div class="mt-1 flex justify-between text-caption text-n600" style="direction: ltr" aria-hidden="true">
