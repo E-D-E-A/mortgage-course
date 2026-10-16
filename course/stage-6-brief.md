@@ -1,0 +1,37 @@
+# Stage 6: the brief for its authors (2026-10-16)
+
+Stage 6, "מיצוב ואסטרטגיה", is eleven lessons and a check. Four authors write it at the same time. This page holds what they all share. Read first: `course/AUTHORING.md`, `course/course-map.md` (stage 6, sections 4, 5 and 8), `course/brief/part-3.md` (stage 6 as the brief wrote it), `course/stage-5-brief.md` (the working pattern and the labelling rules, all of which hold here), and the stage-4 and stage-5 lessons you build on (4.5, 4.11, 4.12, 5.6–5.10).
+
+## Who owns what
+
+| Author | Lessons | Owns, besides each lesson's own files |
+|---|---|---|
+| A | 6.1–6.3 | `src/lib/calc/positioning.ts` (+ test, `checks/kinds/positioning.py`): where a ratio or a financing ratio sits against a threshold, the distance to it, and the cost in shekels of moving away from it, over a list of thresholds with a **kind** (regulatory limit / capital threshold / bank policy / field hypothesis). **Write the API first**, document it in the header: B, C and D import it. The positioning calculator component (מחשבון מיצוב, required in 6.2; B extends its use in 6.4), the lever map component (6.3), and the map-click lesson 6.1 (reuses `BigPictureMap` with `mapUpTo("6.1")`). |
+| B | 6.4–6.5 | `src/lib/calc/levers.ts` (+ test, `checks/kinds/levers.py`): the price in shekels of each lever for a given case (longer term, more equity, closing a loan first, fewer or more borrowers, mix shift...) as a gain-versus-cost pair, reusing `metrics.ts`, `schedule.ts`, `affordability.ts`, `regulation.ts`. The red-line lesson 6.5: a "same fact, two stories" component (`TwoStories.vue`) and a sorter of examples into "positioning" versus "misleading information". |
+| C | 6.6–6.8 | `src/lib/calc/outreach.ts` (+ test, `checks/kinds/outreach.py`): the four clocks (24/12 days validity per approval from its own date; days left; when a second round no longer fits), a rate that moves while waiting (prime shift effect on a quoted offer: reuse `forecast.ts`/`offers.ts`). Components: the four-clocks timeline (6.6), the negotiation lines table/decision (6.7), the "bank's mix vs the requested mix" comparison (6.8, built on `offers.ts` and `sensitivity.ts`). |
+| D | 6.9–6.11 and the map | `src/components/big-picture/stage-6.ts` (every stage-6 node and link; register it in `index.ts`: the coordinator does it, you fill it), the underwriter simulation (6.9: a case, a decision and a price from stated *invented* policy rules), the conversation tree (6.10), the workshop (6.11: the positioning plan of case A), `src/data/case-a-positioning.ts`. The stage check is written in a later round. |
+
+A lesson's own files are listed in AUTHORING. Anything shared that you need changed, say so in your report; the coordinator changes it. Every lesson has its own video (`video/6-X.html`, `pnpm video 6-X`; look at its key frames and fix until clean).
+
+## Sources and open points
+
+- As in stage 5: offline notes `research/notes/*`, `research/field-knowledge.md`, `research/source-map.md`; the Brain is not reachable (cite through the note: e.g. "Brain 33718276, דרך research/notes/brain-calculation.md"); official sites blocked; a directive is only "תעתיק של הצוות, לא אומת".
+- **Almost all of this stage is field knowledge.** The thresholds ("40% versus 30%–35%", FK-H-050, 051, 052, 055, 071 and others), how a bank prices, what a clerk does, negotiation moves (FK-H-072, 073, 081, 091, 093) are **hypotheses**: label "ידע מהשטח (FK-H-0xx), ממתין לאישור אילון", or "השערה לבדיקה", never as fact. The brief says "המספרים לבדיקה". A number such as "35%" appears only as the *course's example threshold*, in a calculation assumption, never as how banks decide.
+- **Not for the course:** hiding a rent offset from the bank and inflating documented debt (the source map: they cross the red line). They appear **only** in 6.5, as examples of what is forbidden and why, never as technique. FK-H-096, the "Hila/Yuval"-style persuasion claims and unattributed claims stay out unless a lesson uses them as a counter-example.
+- **Real client data never**: the six real offers and the aggregated observations in the Drive are out (the team must approve first). Bank offers in this stage for case A are **invented**: fictional banks "בנק א׳, ב׳, ג׳, ד׳", invented rates and policies, each marked "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים", and the policy of each fictional bank (when 6.9's underwriter decides) is *stated on the page as the exercise's rule*, never presented as how real banks work.
+- **The red line (6.5)** is a decision of Mogi: Brain 33718276 (a figure that contradicts what the client said is not sent to a bank without asking the client, 2026-08-31, via `brain-calculation.md`). Positioning chooses among *true* data and presents true facts in full, documented, in the strongest form. Hiding a commitment, inflating income, submitting a wrong document is fraud. The lesson says plainly why, and names the price (a bank can refuse, cancel, demand early repayment, and the advisor and client carry legal risk). **Legal consequences are not stated as law**: "לא אומת; שאלה לעורך הדין" with the question listed. A positioning that "passes the bank but strangles the family" is a failure (brief part 3).
+- **Open questions that go to Eylon** (non-exhaustive; add yours): the real thresholds and bands per bank; which bank prefers what; the price of a ratio above 40%; whether a second round can improve a quote; whether telling a bank it is one of several helps (untested central commercial assumption); how fast a quote's prime moves when the Bank of Israel moves; what a bank may refuse to negotiate. The course says "לא ידוע" for each.
+
+## Case A in stage 6
+
+Case A gets its bank offers here, all invented. The starting point is the stage-5 case (`src/data/case-a-mix.ts`): price 2,200,000; equity 560,000; loan 1,640,000; LTV 74.55%; initial mix 40.4% of disposable income (21,700 − 1,450 = 20,250); the car loan of 1,450 a month for 26 more months. The levers act in opposite directions (map section 8): closing the car loan lowers the ratio but takes equity and pushes the financing ratio over 75%. Compute every consequence with the existing modules (`regulation.ts`, `affordability.ts`, `sensitivity.ts`, `case-a-mix.ts`); retype nothing. Case B (אבי) may appear for documentation of income (a lever) and the red line; case C is stage 7's.
+
+## Rules that matter most here
+
+- **Label every claim**; **fictional banks only**; **no arithmetic in MDX**; money by the statement rule; `<Later>` for terms before their lesson; new terms in `src/data/definitions/6-X.json`; plural address; the LLM never computes.
+- **Positioning is advice to a client with a stake:** every lever page shows what the client gains, what the client pays, and when not to pull it; never present a lever as free.
+- **Questions to Eylon:** write yours to `research/stage-6-raw/eylon-6-<letter>.md` (a row per question: the question, why it matters for which lesson, what the course says meanwhile, FK ids, the official source). Do not edit `research/eylon-list.md`.
+
+## Done means
+
+`pnpm data`, `pnpm check:python`, `pnpm check:terms`, `pnpm test` pass; build into your own folder (`pnpm astro build --outDir <scratchpad>/<letter>/dist`); look at every page at 390px and 1280px; no git. Report: files; terms; every non-math claim with label/source/date; FK ids used; questions; shared-file changes needed; doubts.
