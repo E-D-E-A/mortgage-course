@@ -224,7 +224,7 @@ export const cards: FactorCard[] = [
         { name: "gap", calc: { op: "minus", a: "declared", b: "monthly" } },
       ],
       formats: { declared: "shekels", annual: "shekels", monthly: "shekels", gap: "shekels" },
-      text: "דנה, עצמאית (דוגמה בדויה), מצהירה על {declared} בחודש. בשומה האחרונה ההכנסה השנתית נטו {annual}. חלקי {months}: {monthly} בחודש — {gap} פחות ממה שהצהירה. איזה משני המספרים הבנק יכיר, ולמה — שיעור 4.1.",
+      text: "אילנה, עצמאית (דוגמה בדויה), מצהירה על {declared} בחודש. בשומה האחרונה ההכנסה השנתית נטו {annual}. חלקי {months}: {monthly} בחודש — {gap} פחות ממה שהצהירה. איזה משני המספרים הבנק יכיר, ולמה — שיעור 4.1.",
     },
     algorithm: {
       text: "נתון שנכנס לחישוב, עם סימון לכל הכנסה: נכללת, דורשת בדיקה, או לא נכללת. הכנסה ש״דורשת בדיקה״ נבדקת ביד לפני שסומכים עליה.",
