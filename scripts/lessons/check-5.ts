@@ -29,6 +29,8 @@ import { type Track } from "../../src/lib/calc/metrics.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentString } from "../../src/lib/calc/percent.ts";
 import { effectiveAnnualRate, roundedString } from "../../src/lib/calc/rates.ts";
+import { OBLIGATION_MONTHS } from "../../src/lib/calc/affordability.ts";
+import { MAX_TERM_MONTHS, PTI_CAPITAL_THRESHOLD, PTI_LIMIT } from "../../src/lib/calc/regulation.ts";
 import { paymentToIncome } from "../../src/lib/calc/affordability.ts";
 import { applyLever, qualifyingTotal, variableAmount } from "../../src/lib/calc/sensitivity.ts";
 import { stressTracks } from "../../src/lib/calc/mixcheck.ts";
@@ -72,6 +74,12 @@ export default function check5(): LessonData {
   const v = (id: string) => get(id).value as string;
   const FC = FORECASTS;
   const bank = (id: "a" | "b" | "c") => BANKS.find((b) => b.id === id)!;
+
+  // The lines of Directive 329 the questions lean on, as the team transcribed them (unverified), as facts.
+  add(M.given("rule.capital", PTI_CAPITAL_THRESHOLD));
+  add(M.given("rule.pti_limit", PTI_LIMIT));
+  add(M.given("rule.max_years", String(Number(MAX_TERM_MONTHS) / 12)));
+  add(M.given("rule.months_line", String(OBLIGATION_MONTHS)));
 
   // ═══ Review r1 (1.2): equity, loan and the financing ratio ═══
   add(reg.given("r1.price", "1850000"));
@@ -174,6 +182,7 @@ export default function check5(): LessonData {
   add(M.difference("q6.gap_unequal", get("q6.b_total"), get("q6.a_total")));
   add(M.difference("q6.gap_equal", get("q6.b_total"), get("q6.a_total_900")));
   claim((get("q6.basis").value as string[]).join() === "amount", "q6: only the amount differs");
+  claim(Number(v("q6.gap_unequal")) > 10 * Number(v("q6.gap_equal")), "q6: most of the gap comes from the amount");
   claim(Number(v("q6.gap_unequal")) > Number(v("q6.gap_equal")) && Number(v("q6.gap_equal")) > 0, "q6: the unequal-amount gap is the larger one");
 
   // ═══ 5.4: a forward anchor from two yields, and the payment after the first reset ═══
