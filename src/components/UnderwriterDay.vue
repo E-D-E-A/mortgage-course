@@ -198,7 +198,7 @@ function lineText(l: Verdict["lines"][number]): string {
             :disabled="answer.checked"
             @click="answer.points = p"
           >
-            <span dir="ltr">{{ p === 0 ? "0" : `−${pts(p)}` }}</span>
+            {{ p === 0 ? "בלי הנחה" : `${pts(p)} נקודת אחוז` }}
           </button>
         </div>
       </div>

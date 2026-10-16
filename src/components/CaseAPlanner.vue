@@ -69,7 +69,7 @@ function remember() {
     <div class="mt-2 grid gap-2 sm:grid-cols-3">
       <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-body-m" :class="car ? 'border-navy bg-n50 font-semibold text-n900' : 'border-n200 text-n700'">
         <input v-model="car" type="checkbox" class="size-5" @change="remember" />
-        {{ LEVER_NAME_HE.car }} (<span dir="ltr">{{ formatWholeShekels(CAR_PAYOFF) }}</span>)
+        <span>{{ LEVER_NAME_HE.car }}: <span dir="ltr">{{ formatWholeShekels(CAR_PAYOFF) }}</span></span>
       </label>
       <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-body-m" :class="wait ? 'border-navy bg-n50 font-semibold text-n900' : 'border-n200 text-n700'">
         <input v-model="wait" type="checkbox" class="size-5" @change="remember" />
@@ -77,7 +77,7 @@ function remember() {
       </label>
       <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-body-m" :class="parent ? 'border-navy bg-n50 font-semibold text-n900' : 'border-n200 text-n700'">
         <input v-model="parent" type="checkbox" class="size-5" @change="remember" />
-        {{ LEVER_NAME_HE.parent }} (<span dir="ltr">{{ formatWholeShekels(BORROWER_INCOME) }}</span> בחודש)
+        <span>{{ LEVER_NAME_HE.parent }}: <span dir="ltr">{{ formatWholeShekels(BORROWER_INCOME) }}</span> בחודש</span>
       </label>
     </div>
 

@@ -48,8 +48,9 @@ const current = computed(() => props.nodes[currentId.value]);
 const stepEl = ref<HTMLElement | null>(null);
 const focusStep = () => nextTick(() => stepEl.value?.focus());
 function choose(i: number) {
+  const next = props.nodes[currentId.value].options![i].next;
   path.value = [...path.value, { node: currentId.value, pick: i }];
-  if (props.nodes[currentId.value].options![i] && props.nodes[props.nodes[currentId.value].options![i].next]?.end) save(`exercise:${props.id}`, { reached: props.nodes[currentId.value].options![i].next });
+  if (props.nodes[next]?.end) save(`exercise:${props.id}`, { reached: next });
   focusStep();
 }
 function backTo(step: number) {

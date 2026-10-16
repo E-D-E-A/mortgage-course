@@ -79,6 +79,7 @@ export default function lesson69(): LessonData {
   // ── Case A: the rule's relief lines against the case, at bank א׳ ──
   add(givenMoney("a.price", CASE_A.price));
   add(givenMoney("a.income", CASE_A.recognisedIncome));
+  add(given("a.car_months", CASE_A.car.monthsLeft as number));
   const aDisp = add(disposable("a.disposable", CASE_A.recognisedIncome, [CASE_A.car]));
   const line = add(maxPayment("a.line_payment", aDisp.value as string, A.ratioReliefLine as string));
   add(given("a.line", A.ratioReliefLine as string));
