@@ -427,6 +427,12 @@
       "value": "40"
     },
     {
+      "id": "q3.limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
       "id": "q3.disposable",
       "kind": "given",
       "inputs": {},
@@ -505,6 +511,30 @@
       "value": "4932.57"
     },
     {
+      "id": "q4.from_total",
+      "kind": "pos_term_route",
+      "inputs": {
+        "principal": "800000.00",
+        "rate": "4.2",
+        "from": 180,
+        "to": 240,
+        "measure": "from_total"
+      },
+      "value": "1079640.00"
+    },
+    {
+      "id": "q4.to_total",
+      "kind": "pos_term_route",
+      "inputs": {
+        "principal": "800000.00",
+        "rate": "4.2",
+        "from": 180,
+        "to": 240,
+        "measure": "to_total"
+      },
+      "value": "1183816.80"
+    },
+    {
       "id": "q4.answer",
       "kind": "pos_term_route",
       "inputs": {
@@ -535,12 +565,10 @@
       "value": 30
     },
     {
-      "id": "q5.months",
-      "kind": "aff_months_until_drop",
-      "inputs": {
-        "months_left": 30
-      },
-      "value": 12
+      "id": "q5.line_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 18
     },
     {
       "id": "q5.monthly",
@@ -549,13 +577,45 @@
       "value": "1300.00"
     },
     {
+      "id": "q5.wait",
+      "kind": "given",
+      "inputs": {},
+      "value": 13
+    },
+    {
+      "id": "q5.remaining",
+      "kind": "lev_measure",
+      "inputs": {
+        "price": "1700000",
+        "equity": "500000",
+        "reserve": "40000",
+        "deal": "only_home",
+        "incomes": "10500|9500",
+        "obligation_monthly": "1300",
+        "obligation_months": 30,
+        "candidates": 1,
+        "c1_id": "case",
+        "c1_tracks": "fixed_unlinked|1200000|4.5|300",
+        "base_inflation": "0",
+        "base_prime_shift": "0",
+        "base_anchor_shift": "0",
+        "stress_inflation": "0",
+        "stress_prime_shift": "0",
+        "stress_anchor_shift": "0",
+        "lever": "wait",
+        "lever_months": 13,
+        "measure": "months_left"
+      },
+      "value": 17
+    },
+    {
       "id": "q5.err_paid",
       "kind": "met_times",
       "inputs": {
         "of": "q5.monthly",
-        "count": 12
+        "count": 13
       },
-      "value": "15600.00"
+      "value": "16900.00"
     },
     {
       "id": "q6.disposable",
@@ -1003,6 +1063,12 @@
       "value": 3
     },
     {
+      "id": "q9.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
       "id": "q9.loan_monthly",
       "kind": "given",
       "inputs": {},
@@ -1142,6 +1208,12 @@
         "subtrahend": "q9.ratio_form"
       },
       "value": "2.50"
+    },
+    {
+      "id": "q10.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
     },
     {
       "id": "q10.net",
@@ -1385,6 +1457,35 @@
         "measure": "last_answer"
       },
       "value": "2026-11-26"
+    },
+    {
+      "id": "q12.left_after",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-26",
+        "date": "2026-12-03"
+      },
+      "value": 7
+    },
+    {
+      "id": "q12.fourth_answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-26",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-30"
+    },
+    {
+      "id": "q12.fourth_left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-30",
+        "date": "2026-12-03"
+      },
+      "value": 3
     },
     {
       "id": "q13.prime_amount",
@@ -2486,6 +2587,12 @@
       "value": 17
     },
     {
+      "id": "q17.line_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 18
+    },
+    {
       "id": "q17.value",
       "kind": "given",
       "inputs": {},
@@ -2550,6 +2657,21 @@
       "kind": "given",
       "inputs": {},
       "value": "4.35"
+    },
+    {
+      "id": "q17.track_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "450000"
+    },
+    {
+      "id": "q17.err_ratio_only",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.35",
+        "relief": "0.20"
+      },
+      "value": "4.15"
     },
     {
       "id": "q18.loan",
@@ -3231,12 +3353,6 @@
       "value": "40000"
     },
     {
-      "id": "q20.ratio_max",
-      "kind": "given",
-      "inputs": {},
-      "value": "45"
-    },
-    {
       "id": "q20.ratio_line",
       "kind": "given",
       "inputs": {},
@@ -3253,12 +3369,6 @@
       "kind": "given",
       "inputs": {},
       "value": "70"
-    },
-    {
-      "id": "q20.ltv_max",
-      "kind": "given",
-      "inputs": {},
-      "value": "75"
     },
     {
       "id": "q20.price.prime",
