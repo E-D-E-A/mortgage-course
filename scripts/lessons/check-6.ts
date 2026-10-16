@@ -169,7 +169,17 @@ export default function check6(): LessonData {
   claim(num("q4.answer") > 0 && num("q4.err_drop") > 0, "q4: the longer term lowers the payment and raises the total");
 
   // ═══ 6.3 ═══
-  // q5: waiting for the 18-month rule. Its price is time and risk, not shekels. A car loan of 1,300 a month, 30 payments left; 13 months of waiting leave 17.
+  // q5: how much more recognised income puts the payment on the line.
+  add(P.givenMoney("q5.disposable", "14500"));
+  add(P.givenMoney("q5.payment", "6400"));
+  add(P.givenNumber("q5.line", PTI_CAPITAL_THRESHOLD));
+  add(P.incomeRoomFact("q5.answer", "14500", "6400", PTI_CAPITAL_THRESHOLD));
+  add(P.sumOf("q5.err_total", [get("q5.disposable"), get("q5.answer")]));
+  add(P.paymentCutFact("q5.err_cut", "14500", "6400", PTI_CAPITAL_THRESHOLD));
+  add(AF.ratio("q5.ratio", "6400", "14500"));
+  claim(num("q5.ratio") > 40, "q5: the family is over the line");
+
+  // q6: waiting for the 18-month rule. Its price is time and risk, not shekels. A car loan of 1,300 a month, 30 payments left; 13 months of waiting leave 17.
   const c5: PositionCase = {
     deal: "only_home",
     price: "1700000",
@@ -181,23 +191,13 @@ export default function check6(): LessonData {
     incomes: ["10500", "9500"],
     obligations: [{ kind: "loan", monthly: "1300", monthsLeft: 30 }],
   };
-  add(L.given("q5.left", 30));
-  add(L.given("q5.line_months", OBLIGATION_MONTHS));
-  add(L.givenMoney("q5.monthly", "1300"));
-  add(L.given("q5.wait", 13));
-  lev("q5.remaining", c5, "months_left", { lever: "wait", months: 13 });
-  add(M.times("q5.err_paid", get("q5.monthly"), 13));
-  claim(num("q5.remaining") === 17, "q5: the wait leaves 17 payments, clearly under the 18-month line");
-
-  // q6: how much more recognised income puts the payment on the line.
-  add(P.givenMoney("q6.disposable", "14500"));
-  add(P.givenMoney("q6.payment", "6400"));
-  add(P.givenNumber("q6.line", PTI_CAPITAL_THRESHOLD));
-  add(P.incomeRoomFact("q6.answer", "14500", "6400", PTI_CAPITAL_THRESHOLD));
-  add(P.sumOf("q6.err_total", [get("q6.disposable"), get("q6.answer")]));
-  add(P.paymentCutFact("q6.err_cut", "14500", "6400", PTI_CAPITAL_THRESHOLD));
-  add(AF.ratio("q6.ratio", "6400", "14500"));
-  claim(num("q6.ratio") > 40, "q6: the family is over the line");
+  add(L.given("q6.left", 30));
+  add(L.given("q6.line_months", OBLIGATION_MONTHS));
+  add(L.givenMoney("q6.monthly", "1300"));
+  add(L.given("q6.wait", 13));
+  lev("q6.remaining", c5, "months_left", { lever: "wait", months: 13 });
+  add(M.times("q6.err_paid", get("q6.monthly"), 13));
+  claim(num("q6.remaining") === 17, "q6: the wait leaves 17 payments, clearly under the 18-month line");
 
   // ═══ 6.4 ═══
   // q7: what one percentage point costs. One track, 1,050,000 at 4.8% for 25 years, a household bringing 16,500 a month.
@@ -261,7 +261,17 @@ export default function check6(): LessonData {
   claim(Number(v("q8.wait.left")) < 18, "q8: after the wait the loan is clearly not counted");
 
   // ═══ 6.5 ═══
-  // q9: the same ratio from two roads. A family with a personal loan of 1,200 a month, 28 payments left.
+  // q9: a position the bank accepts and the family's own budget does not.
+  add(P.givenNumber("q9.line", PTI_CAPITAL_THRESHOLD));
+  add(reg.given("q9.net", "21000"));
+  add(reg.given("q9.budget", "13800"));
+  add(reg.maxPayment("q9.bank_max", "21000", PTI_CAPITAL_THRESHOLD));
+  add(reg.left("q9.left", "21000", [v("q9.bank_max")]));
+  add(L.difference("q9.short", get("q9.budget"), get("q9.left")));
+  add(reg.budgetMax("q9.answer", "21000", [], "13800"));
+  claim(num("q9.short") > 0 && num("q9.answer") < num("q9.bank_max"), "q9: the line allows a payment the budget does not");
+
+  // q10: the same ratio from two roads. A family with a personal loan of 1,200 a month, 28 payments left.
   const c9: PositionCase = {
     deal: "only_home",
     price: "1900000",
@@ -274,29 +284,19 @@ export default function check6(): LessonData {
     obligations: [{ kind: "loan", monthly: "1200", monthsLeft: 28 }],
   };
   const c9Omitted: PositionCase = { ...c9, obligations: [] };
-  add(L.given("q9.line", PTI_CAPITAL_THRESHOLD));
-  add(L.givenMoney("q9.loan_monthly", "1200"));
-  add(L.given("q9.loan_months", 28));
-  add(L.givenMoney("q9.reserve", "50000"));
-  add(L.givenMoney("q9.payoff", "28000"));
-  add(L.givenMoney("q9.raise", "2000"));
-  lev("q9.ratio_real", c9, "ratio");
-  lev("q9.ratio_closed", c9, "ratio", { lever: "close_loan", payoff: "28000", from: "reserve" });
-  lev("q9.ratio_form", c9Omitted, "ratio");
-  lev("q9.reserve_after", c9, "reserve", { lever: "close_loan", payoff: "28000", from: "reserve" });
-  add(L.difference("q9.gap", get("q9.ratio_real"), get("q9.ratio_form")));
-  claim(v("q9.ratio_closed") === v("q9.ratio_form"), "q9: closing the loan and leaving it out of the form print the same ratio");
-  claim(num("q9.ratio_real") > 40 && num("q9.ratio_form") < 40, "q9: the omission would take the ratio under the 40% line");
-
-  // q10: a position the bank accepts and the family's own budget does not.
-  add(P.givenNumber("q10.line", PTI_CAPITAL_THRESHOLD));
-  add(reg.given("q10.net", "21000"));
-  add(reg.given("q10.budget", "13800"));
-  add(reg.maxPayment("q10.bank_max", "21000", PTI_CAPITAL_THRESHOLD));
-  add(reg.left("q10.left", "21000", [v("q10.bank_max")]));
-  add(L.difference("q10.short", get("q10.budget"), get("q10.left")));
-  add(reg.budgetMax("q10.answer", "21000", [], "13800"));
-  claim(num("q10.short") > 0 && num("q10.answer") < num("q10.bank_max"), "q10: the line allows a payment the budget does not");
+  add(L.given("q10.line", PTI_CAPITAL_THRESHOLD));
+  add(L.givenMoney("q10.loan_monthly", "1200"));
+  add(L.given("q10.loan_months", 28));
+  add(L.givenMoney("q10.reserve", "50000"));
+  add(L.givenMoney("q10.payoff", "28000"));
+  add(L.givenMoney("q10.raise", "2000"));
+  lev("q10.ratio_real", c9, "ratio");
+  lev("q10.ratio_closed", c9, "ratio", { lever: "close_loan", payoff: "28000", from: "reserve" });
+  lev("q10.ratio_form", c9Omitted, "ratio");
+  lev("q10.reserve_after", c9, "reserve", { lever: "close_loan", payoff: "28000", from: "reserve" });
+  add(L.difference("q10.gap", get("q10.ratio_real"), get("q10.ratio_form")));
+  claim(v("q10.ratio_closed") === v("q10.ratio_form"), "q10: closing the loan and leaving it out of the form print the same ratio");
+  claim(num("q10.ratio_real") > 40 && num("q10.ratio_form") < 40, "q10: the omission would take the ratio under the 40% line");
 
   // ═══ 6.6 ═══
   // q11: which bank's terms end first. A has the answer first, B (no new lien: 12 days) governs, C answers last.
@@ -404,44 +404,11 @@ export default function check6(): LessonData {
     add(O.given(`c8.price.${k}`, BANK_PRICES.b[k]));
   }
   claim(num("c8.first_diff") > 0 && num("c8.total_diff") > 0 && num("c8.answer") > 0, "q15/q16: the counter costs more at the start and in total, and carries less exposure");
-  claim(num("c8.margin_diff") > 0, "q15: in the exercise's invented costs the bank earns more from the counter");
-  claim(num("c8.err_max") !== num("c8.answer") && num("c8.first_diff") !== num("c8.answer"), "q16: the wrong answers differ from the right one");
+  claim(num("c8.margin_diff") > 0, "q16: in the exercise's invented costs the bank earns more from the counter");
+  claim(num("c8.err_max") !== num("c8.answer") && num("c8.first_diff") !== num("c8.answer"), "q15: the wrong answers differ from the right one");
 
   // ═══ 6.9 ═══
-  // q17: applying a bank's invented rules to a file. Bank ג׳: relief 0.20 at a ratio of 38 or less, 0.10 at a financing ratio of 72 or less.
-  const C = bank("c");
-  const q17Tracks = (months: number) => ({
-    value: "1900000",
-    income: "18300",
-    obligations: [{ kind: "loan" as const, monthly: "1300", monthsLeft: months }],
-    tracks: [
-      { kind: "prime" as const, amount: "450000", months: 360 },
-      { kind: "variable_unlinked" as const, amount: "450000", months: 360 },
-      { kind: "fixed_unlinked" as const, amount: "450000", months: 360 },
-    ],
-  });
-  const v17 = verdictFacts(add, "q17", C, q17Tracks(17), { scenario: BASE });
-  const v17c = verdictFacts(add, "q17c", C, q17Tracks(22), { scenario: BASE });
-  add(O.given("q17.income", "18300"));
-  add(O.given("q17.car_monthly", "1300"));
-  add(O.given("q17.car_months", 17));
-  add(O.given("q17.line_months", OBLIGATION_MONTHS));
-  add(O.given("q17.value", "1900000"));
-  add(O.given("q17.ratio_max", C.ratioMax));
-  add(O.given("q17.ratio_line", C.ratioReliefLine as string));
-  add(O.given("q17.ratio_points", C.ratioReliefPoints));
-  add(O.given("q17.ltv_max", C.ltvMax));
-  add(O.given("q17.ltv_line", C.ltvReliefLine as string));
-  add(O.given("q17.ltv_points", C.ltvReliefPoints));
-  for (const k of ["prime", "variable_unlinked", "fixed_unlinked"] as const) add(O.given(`q17.price.${k}`, C.prices[k]));
-  add(O.given("q17.err_list", C.prices.fixed_unlinked));
-  add(O.given("q17.track_amount", "450000"));
-  add({ id: "q17.err_ratio_only", kind: "bp_rate", inputs: { list_rate: C.prices.fixed_unlinked, relief: C.ratioReliefPoints }, value: new Decimal(C.prices.fixed_unlinked).minus(C.ratioReliefPoints).toFixed(2) });
-  claim(v17.decision === "approve" && v17c.decision === "approve", "q17: bank ג׳ approves the file either way");
-  claim(Number(v17.relief) === 0.3 && Number(v17c.relief) === 0.1, "q17: both reliefs when the loan is not counted, only the financing relief when it is");
-  claim(new Set([v("q17.rate_3"), v("q17c.rate_3"), v("q17.err_list"), v("q17.err_ratio_only")]).size === 4, "q17: the four rates are different numbers");
-
-  // q18: a bank whose financing ceiling is under the file's. Bank ד׳: refuses above a financing ratio of 70.
+  // q17: a bank whose financing ceiling is under the file's. Bank ד׳: refuses above a financing ratio of 70.
   const D = bank("d");
   const q18File = {
     value: "2000000",
@@ -453,17 +420,50 @@ export default function check6(): LessonData {
       { kind: "fixed_unlinked" as const, amount: "500000", months: 360 },
     ],
   };
-  const v18 = verdictFacts(add, "q18", D, q18File, { scenario: BASE });
-  add(O.given("q18.ltv_max", D.ltvMax));
-  add(O.given("q18.ratio_max", D.ratioMax));
-  add(O.given("q18.value", "2000000"));
-  add(O.given("q18.income", "24000"));
-  add(L.givenMoney("q18.reserve", "35000"));
-  add(maxLoanAt("q18.max_loan", "2000000", D.ltvMax));
-  add(L.difference("q18.short", get("q18.loan"), get("q18.max_loan")));
-  add(L.difference("q18.short_after", get("q18.short"), get("q18.reserve")));
-  claim(v18.decision === "refuse" && v18.lines.find((l) => l.id === "ltv")?.outcome === "refuse" && v18.lines.find((l) => l.id === "ratio")?.outcome !== "refuse", "q18: refused on the financing ratio alone");
-  claim(num("q18.short_after") > 0, "q18: even all the savings do not reach the ceiling");
+  const v18 = verdictFacts(add, "q17", D, q18File, { scenario: BASE });
+  add(O.given("q17.ltv_max", D.ltvMax));
+  add(O.given("q17.ratio_max", D.ratioMax));
+  add(O.given("q17.value", "2000000"));
+  add(O.given("q17.income", "24000"));
+  add(L.givenMoney("q17.reserve", "35000"));
+  add(maxLoanAt("q17.max_loan", "2000000", D.ltvMax));
+  add(L.difference("q17.short", get("q17.loan"), get("q17.max_loan")));
+  add(L.difference("q17.short_after", get("q17.short"), get("q17.reserve")));
+  claim(v18.decision === "refuse" && v18.lines.find((l) => l.id === "ltv")?.outcome === "refuse" && v18.lines.find((l) => l.id === "ratio")?.outcome !== "refuse", "q17: refused on the financing ratio alone");
+  claim(num("q17.short_after") > 0, "q17: even all the savings do not reach the ceiling");
+
+  // q18: applying a bank's invented rules to a file. Bank ג׳: relief 0.20 at a ratio of 38 or less, 0.10 at a financing ratio of 72 or less.
+  const C = bank("c");
+  const q17Tracks = (months: number) => ({
+    value: "1900000",
+    income: "18300",
+    obligations: [{ kind: "loan" as const, monthly: "1300", monthsLeft: months }],
+    tracks: [
+      { kind: "prime" as const, amount: "450000", months: 360 },
+      { kind: "variable_unlinked" as const, amount: "450000", months: 360 },
+      { kind: "fixed_unlinked" as const, amount: "450000", months: 360 },
+    ],
+  });
+  const v17 = verdictFacts(add, "q18", C, q17Tracks(17), { scenario: BASE });
+  const v17c = verdictFacts(add, "q17c", C, q17Tracks(22), { scenario: BASE });
+  add(O.given("q18.income", "18300"));
+  add(O.given("q18.car_monthly", "1300"));
+  add(O.given("q18.car_months", 17));
+  add(O.given("q18.line_months", OBLIGATION_MONTHS));
+  add(O.given("q18.value", "1900000"));
+  add(O.given("q18.ratio_max", C.ratioMax));
+  add(O.given("q18.ratio_line", C.ratioReliefLine as string));
+  add(O.given("q18.ratio_points", C.ratioReliefPoints));
+  add(O.given("q18.ltv_max", C.ltvMax));
+  add(O.given("q18.ltv_line", C.ltvReliefLine as string));
+  add(O.given("q18.ltv_points", C.ltvReliefPoints));
+  for (const k of ["prime", "variable_unlinked", "fixed_unlinked"] as const) add(O.given(`q18.price.${k}`, C.prices[k]));
+  add(O.given("q18.err_list", C.prices.fixed_unlinked));
+  add(O.given("q18.track_amount", "450000"));
+  add({ id: "q18.err_ratio_only", kind: "bp_rate", inputs: { list_rate: C.prices.fixed_unlinked, relief: C.ratioReliefPoints }, value: new Decimal(C.prices.fixed_unlinked).minus(C.ratioReliefPoints).toFixed(2) });
+  claim(v17.decision === "approve" && v17c.decision === "approve", "q18: bank ג׳ approves the file either way");
+  claim(Number(v17.relief) === 0.3 && Number(v17c.relief) === 0.1, "q18: both reliefs when the loan is not counted, only the financing relief when it is");
+  claim(new Set([v("q18.rate_3"), v("q17c.rate_3"), v("q18.err_list"), v("q18.err_ratio_only")]).size === 4, "q18: the four rates are different numbers");
 
   // ═══ 6.10 ═══
   // q19: the Bank of Israel moves 0.25 point before the signature. The offer: three equal tracks.

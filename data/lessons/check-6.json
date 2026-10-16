@@ -559,31 +559,86 @@
       "value": "1065.43"
     },
     {
-      "id": "q5.left",
+      "id": "q5.disposable",
+      "kind": "given",
+      "inputs": {},
+      "value": "14500.00"
+    },
+    {
+      "id": "q5.payment",
+      "kind": "given",
+      "inputs": {},
+      "value": "6400.00"
+    },
+    {
+      "id": "q5.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "q5.answer",
+      "kind": "pos_income_room",
+      "inputs": {
+        "disposable": "14500",
+        "payment": "6400",
+        "percent": "40"
+      },
+      "value": "1500.00"
+    },
+    {
+      "id": "q5.err_total",
+      "kind": "met_sum",
+      "inputs": {
+        "facts": "q5.disposable|q5.answer"
+      },
+      "value": "16000.00"
+    },
+    {
+      "id": "q5.err_cut",
+      "kind": "pos_payment_cut",
+      "inputs": {
+        "disposable": "14500",
+        "payment": "6400",
+        "percent": "40"
+      },
+      "value": "600.00"
+    },
+    {
+      "id": "q5.ratio",
+      "kind": "aff_ratio",
+      "inputs": {
+        "payment": "6400",
+        "disposable": "14500"
+      },
+      "value": "44.14"
+    },
+    {
+      "id": "q6.left",
       "kind": "given",
       "inputs": {},
       "value": 30
     },
     {
-      "id": "q5.line_months",
+      "id": "q6.line_months",
       "kind": "given",
       "inputs": {},
       "value": 18
     },
     {
-      "id": "q5.monthly",
+      "id": "q6.monthly",
       "kind": "given",
       "inputs": {},
       "value": "1300.00"
     },
     {
-      "id": "q5.wait",
+      "id": "q6.wait",
       "kind": "given",
       "inputs": {},
       "value": 13
     },
     {
-      "id": "q5.remaining",
+      "id": "q6.remaining",
       "kind": "lev_measure",
       "inputs": {
         "price": "1700000",
@@ -609,68 +664,13 @@
       "value": 17
     },
     {
-      "id": "q5.err_paid",
+      "id": "q6.err_paid",
       "kind": "met_times",
       "inputs": {
-        "of": "q5.monthly",
+        "of": "q6.monthly",
         "count": 13
       },
       "value": "16900.00"
-    },
-    {
-      "id": "q6.disposable",
-      "kind": "given",
-      "inputs": {},
-      "value": "14500.00"
-    },
-    {
-      "id": "q6.payment",
-      "kind": "given",
-      "inputs": {},
-      "value": "6400.00"
-    },
-    {
-      "id": "q6.line",
-      "kind": "given",
-      "inputs": {},
-      "value": "40"
-    },
-    {
-      "id": "q6.answer",
-      "kind": "pos_income_room",
-      "inputs": {
-        "disposable": "14500",
-        "payment": "6400",
-        "percent": "40"
-      },
-      "value": "1500.00"
-    },
-    {
-      "id": "q6.err_total",
-      "kind": "met_sum",
-      "inputs": {
-        "facts": "q6.disposable|q6.answer"
-      },
-      "value": "16000.00"
-    },
-    {
-      "id": "q6.err_cut",
-      "kind": "pos_payment_cut",
-      "inputs": {
-        "disposable": "14500",
-        "payment": "6400",
-        "percent": "40"
-      },
-      "value": "600.00"
-    },
-    {
-      "id": "q6.ratio",
-      "kind": "aff_ratio",
-      "inputs": {
-        "payment": "6400",
-        "disposable": "14500"
-      },
-      "value": "44.14"
     },
     {
       "id": "q7.loan",
@@ -1069,37 +1069,91 @@
       "value": "40"
     },
     {
-      "id": "q9.loan_monthly",
+      "id": "q9.net",
+      "kind": "given",
+      "inputs": {},
+      "value": "21000.00"
+    },
+    {
+      "id": "q9.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "13800.00"
+    },
+    {
+      "id": "q9.bank_max",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "21000",
+        "percent": "40"
+      },
+      "value": "8400.00"
+    },
+    {
+      "id": "q9.left",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "21000",
+        "out_1": "8400.00"
+      },
+      "value": "12600.00"
+    },
+    {
+      "id": "q9.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q9.budget",
+        "subtrahend": "q9.left"
+      },
+      "value": "1200.00"
+    },
+    {
+      "id": "q9.answer",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "21000",
+        "budget": "13800"
+      },
+      "value": "7200.00"
+    },
+    {
+      "id": "q10.line",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "q10.loan_monthly",
       "kind": "given",
       "inputs": {},
       "value": "1200.00"
     },
     {
-      "id": "q9.loan_months",
+      "id": "q10.loan_months",
       "kind": "given",
       "inputs": {},
       "value": 28
     },
     {
-      "id": "q9.reserve",
+      "id": "q10.reserve",
       "kind": "given",
       "inputs": {},
       "value": "50000.00"
     },
     {
-      "id": "q9.payoff",
+      "id": "q10.payoff",
       "kind": "given",
       "inputs": {},
       "value": "28000.00"
     },
     {
-      "id": "q9.raise",
+      "id": "q10.raise",
       "kind": "given",
       "inputs": {},
       "value": "2000.00"
     },
     {
-      "id": "q9.ratio_real",
+      "id": "q10.ratio_real",
       "kind": "lev_measure",
       "inputs": {
         "price": "1900000",
@@ -1123,7 +1177,7 @@
       "value": "41.24"
     },
     {
-      "id": "q9.ratio_closed",
+      "id": "q10.ratio_closed",
       "kind": "lev_measure",
       "inputs": {
         "price": "1900000",
@@ -1150,7 +1204,7 @@
       "value": "38.74"
     },
     {
-      "id": "q9.ratio_form",
+      "id": "q10.ratio_form",
       "kind": "lev_measure",
       "inputs": {
         "price": "1900000",
@@ -1174,7 +1228,7 @@
       "value": "38.74"
     },
     {
-      "id": "q9.reserve_after",
+      "id": "q10.reserve_after",
       "kind": "lev_measure",
       "inputs": {
         "price": "1900000",
@@ -1201,67 +1255,13 @@
       "value": "22000.00"
     },
     {
-      "id": "q9.gap",
+      "id": "q10.gap",
       "kind": "difference",
       "inputs": {
-        "minuend": "q9.ratio_real",
-        "subtrahend": "q9.ratio_form"
+        "minuend": "q10.ratio_real",
+        "subtrahend": "q10.ratio_form"
       },
       "value": "2.50"
-    },
-    {
-      "id": "q10.line",
-      "kind": "given",
-      "inputs": {},
-      "value": "40"
-    },
-    {
-      "id": "q10.net",
-      "kind": "given",
-      "inputs": {},
-      "value": "21000.00"
-    },
-    {
-      "id": "q10.budget",
-      "kind": "given",
-      "inputs": {},
-      "value": "13800.00"
-    },
-    {
-      "id": "q10.bank_max",
-      "kind": "reg_max_payment",
-      "inputs": {
-        "income": "21000",
-        "percent": "40"
-      },
-      "value": "8400.00"
-    },
-    {
-      "id": "q10.left",
-      "kind": "reg_left",
-      "inputs": {
-        "net": "21000",
-        "out_1": "8400.00"
-      },
-      "value": "12600.00"
-    },
-    {
-      "id": "q10.short",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "q10.budget",
-        "subtrahend": "q10.left"
-      },
-      "value": "1200.00"
-    },
-    {
-      "id": "q10.answer",
-      "kind": "reg_budget_max_payment",
-      "inputs": {
-        "net": "21000",
-        "budget": "13800"
-      },
-      "value": "7200.00"
     },
     {
       "id": "q11.request",
@@ -2197,6 +2197,163 @@
         "tracks": 3,
         "block_months": 12,
         "t1_kind": "prime",
+        "t1_amount": "500000.00",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "500000.00",
+        "t2_rate": "4.15",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "500000.00",
+        "t3_rate": "4.45",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "q17.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1500000.00",
+        "value": "2000000"
+      },
+      "value": "75"
+    },
+    {
+      "id": "q17.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "500000.00",
+        "t1_rate": "4.65",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "500000.00",
+        "t2_rate": "4.15",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "500000.00",
+        "t3_rate": "4.45",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "24000",
+        "obligation_monthly": "0",
+        "obligation_months": 0
+      },
+      "value": "31.36"
+    },
+    {
+      "id": "q17.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "31.36",
+        "ltv": "75",
+        "ratio_max": "50",
+        "ltv_max": "70"
+      },
+      "value": "refuse"
+    },
+    {
+      "id": "q17.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "31.36",
+        "ltv": "75",
+        "ratio_max": "50",
+        "ltv_max": "70",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.10",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "q17.ltv_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "70"
+    },
+    {
+      "id": "q17.ratio_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "q17.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "q17.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "24000"
+    },
+    {
+      "id": "q17.reserve",
+      "kind": "given",
+      "inputs": {},
+      "value": "35000.00"
+    },
+    {
+      "id": "q17.max_loan",
+      "kind": "bp_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "percent": "70"
+      },
+      "value": "1400000.00"
+    },
+    {
+      "id": "q17.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q17.loan",
+        "subtrahend": "q17.max_loan"
+      },
+      "value": "100000.00"
+    },
+    {
+      "id": "q17.short_after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q17.short",
+        "subtrahend": "q17.reserve"
+      },
+      "value": "65000.00"
+    },
+    {
+      "id": "q18.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
         "t1_amount": "450000.00",
         "t1_rate": "4.55",
         "t1_months": 360,
@@ -2222,7 +2379,7 @@
       "value": "1350000.00"
     },
     {
-      "id": "q17.ltv",
+      "id": "q18.ltv",
       "kind": "ltv_percent",
       "inputs": {
         "loan": "1350000.00",
@@ -2231,7 +2388,7 @@
       "value": "71.05"
     },
     {
-      "id": "q17.ratio",
+      "id": "q18.ratio",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2265,7 +2422,7 @@
       "value": "36.8"
     },
     {
-      "id": "q17.decision",
+      "id": "q18.decision",
       "kind": "bp_decision",
       "inputs": {
         "ratio": "36.8",
@@ -2276,7 +2433,7 @@
       "value": "approve"
     },
     {
-      "id": "q17.relief",
+      "id": "q18.relief",
       "kind": "bp_relief",
       "inputs": {
         "ratio": "36.8",
@@ -2291,7 +2448,7 @@
       "value": "0.3"
     },
     {
-      "id": "q17.rate_1",
+      "id": "q18.rate_1",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.55",
@@ -2300,7 +2457,7 @@
       "value": "4.25"
     },
     {
-      "id": "q17.rate_2",
+      "id": "q18.rate_2",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.20",
@@ -2309,7 +2466,7 @@
       "value": "3.90"
     },
     {
-      "id": "q17.rate_3",
+      "id": "q18.rate_3",
       "kind": "bp_rate",
       "inputs": {
         "list_rate": "4.35",
@@ -2318,7 +2475,7 @@
       "value": "4.05"
     },
     {
-      "id": "q17.first",
+      "id": "q18.first",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2349,7 +2506,7 @@
       "value": "6497.60"
     },
     {
-      "id": "q17.total",
+      "id": "q18.total",
       "kind": "sens_mix",
       "inputs": {
         "tracks": 3,
@@ -2569,215 +2726,34 @@
       "value": "2395750.61"
     },
     {
-      "id": "q17.income",
+      "id": "q18.income",
       "kind": "given",
       "inputs": {},
       "value": "18300"
     },
     {
-      "id": "q17.car_monthly",
+      "id": "q18.car_monthly",
       "kind": "given",
       "inputs": {},
       "value": "1300"
     },
     {
-      "id": "q17.car_months",
+      "id": "q18.car_months",
       "kind": "given",
       "inputs": {},
       "value": 17
     },
     {
-      "id": "q17.line_months",
+      "id": "q18.line_months",
       "kind": "given",
       "inputs": {},
       "value": 18
     },
     {
-      "id": "q17.value",
+      "id": "q18.value",
       "kind": "given",
       "inputs": {},
       "value": "1900000"
-    },
-    {
-      "id": "q17.ratio_max",
-      "kind": "given",
-      "inputs": {},
-      "value": "50"
-    },
-    {
-      "id": "q17.ratio_line",
-      "kind": "given",
-      "inputs": {},
-      "value": "38"
-    },
-    {
-      "id": "q17.ratio_points",
-      "kind": "given",
-      "inputs": {},
-      "value": "0.20"
-    },
-    {
-      "id": "q17.ltv_max",
-      "kind": "given",
-      "inputs": {},
-      "value": "75"
-    },
-    {
-      "id": "q17.ltv_line",
-      "kind": "given",
-      "inputs": {},
-      "value": "72"
-    },
-    {
-      "id": "q17.ltv_points",
-      "kind": "given",
-      "inputs": {},
-      "value": "0.10"
-    },
-    {
-      "id": "q17.price.prime",
-      "kind": "given",
-      "inputs": {},
-      "value": "4.55"
-    },
-    {
-      "id": "q17.price.variable_unlinked",
-      "kind": "given",
-      "inputs": {},
-      "value": "4.20"
-    },
-    {
-      "id": "q17.price.fixed_unlinked",
-      "kind": "given",
-      "inputs": {},
-      "value": "4.35"
-    },
-    {
-      "id": "q17.err_list",
-      "kind": "given",
-      "inputs": {},
-      "value": "4.35"
-    },
-    {
-      "id": "q17.track_amount",
-      "kind": "given",
-      "inputs": {},
-      "value": "450000"
-    },
-    {
-      "id": "q17.err_ratio_only",
-      "kind": "bp_rate",
-      "inputs": {
-        "list_rate": "4.35",
-        "relief": "0.20"
-      },
-      "value": "4.15"
-    },
-    {
-      "id": "q18.loan",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "500000.00",
-        "t1_rate": "4.65",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "500000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "500000.00",
-        "t3_rate": "4.45",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "loan"
-      },
-      "value": "1500000.00"
-    },
-    {
-      "id": "q18.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1500000.00",
-        "value": "2000000"
-      },
-      "value": "75"
-    },
-    {
-      "id": "q18.ratio",
-      "kind": "sens_mix",
-      "inputs": {
-        "tracks": 3,
-        "block_months": 12,
-        "t1_kind": "prime",
-        "t1_amount": "500000.00",
-        "t1_rate": "4.65",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "t2_kind": "variable_unlinked",
-        "t2_amount": "500000.00",
-        "t2_rate": "4.15",
-        "t2_months": 360,
-        "t2_method": "spitzer",
-        "t2_reset": 60,
-        "t3_kind": "fixed_unlinked",
-        "t3_amount": "500000.00",
-        "t3_rate": "4.45",
-        "t3_months": 360,
-        "t3_method": "spitzer",
-        "rounding": "statement",
-        "inflation_1": "2",
-        "prime_shift_1": "0",
-        "prime_shift_2": "0",
-        "anchor_shift_1": "0",
-        "measure": "ratio",
-        "income": "24000",
-        "obligation_monthly": "0",
-        "obligation_months": 0
-      },
-      "value": "31.36"
-    },
-    {
-      "id": "q18.decision",
-      "kind": "bp_decision",
-      "inputs": {
-        "ratio": "31.36",
-        "ltv": "75",
-        "ratio_max": "50",
-        "ltv_max": "70"
-      },
-      "value": "refuse"
-    },
-    {
-      "id": "q18.relief",
-      "kind": "bp_relief",
-      "inputs": {
-        "ratio": "31.36",
-        "ltv": "75",
-        "ratio_max": "50",
-        "ltv_max": "70",
-        "ratio_relief_line": "40",
-        "ratio_relief_points": "0.10",
-        "ltv_relief_line": "none",
-        "ltv_relief_points": "0"
-      },
-      "value": "0"
-    },
-    {
-      "id": "q18.ltv_max",
-      "kind": "given",
-      "inputs": {},
-      "value": "70"
     },
     {
       "id": "q18.ratio_max",
@@ -2786,49 +2762,73 @@
       "value": "50"
     },
     {
-      "id": "q18.value",
+      "id": "q18.ratio_line",
       "kind": "given",
       "inputs": {},
-      "value": "2000000"
+      "value": "38"
     },
     {
-      "id": "q18.income",
+      "id": "q18.ratio_points",
       "kind": "given",
       "inputs": {},
-      "value": "24000"
+      "value": "0.20"
     },
     {
-      "id": "q18.reserve",
+      "id": "q18.ltv_max",
       "kind": "given",
       "inputs": {},
-      "value": "35000.00"
+      "value": "75"
     },
     {
-      "id": "q18.max_loan",
-      "kind": "bp_max_loan",
-      "inputs": {
-        "value": "2000000",
-        "percent": "70"
-      },
-      "value": "1400000.00"
+      "id": "q18.ltv_line",
+      "kind": "given",
+      "inputs": {},
+      "value": "72"
     },
     {
-      "id": "q18.short",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "q18.loan",
-        "subtrahend": "q18.max_loan"
-      },
-      "value": "100000.00"
+      "id": "q18.ltv_points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
     },
     {
-      "id": "q18.short_after",
-      "kind": "difference",
+      "id": "q18.price.prime",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.55"
+    },
+    {
+      "id": "q18.price.variable_unlinked",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.20"
+    },
+    {
+      "id": "q18.price.fixed_unlinked",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.35"
+    },
+    {
+      "id": "q18.err_list",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.35"
+    },
+    {
+      "id": "q18.track_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "450000"
+    },
+    {
+      "id": "q18.err_ratio_only",
+      "kind": "bp_rate",
       "inputs": {
-        "minuend": "q18.short",
-        "subtrahend": "q18.reserve"
+        "list_rate": "4.35",
+        "relief": "0.20"
       },
-      "value": "65000.00"
+      "value": "4.15"
     },
     {
       "id": "q19.amount",
