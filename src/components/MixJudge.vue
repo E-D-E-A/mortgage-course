@@ -6,13 +6,17 @@
 // no arithmetic: every cell is a number the page took from a fact. Its job is
 // to keep "what must match" and "what this yardstick cannot say" beside the
 // numbers.
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 interface Row {
   measure: string;
   mix: string;
   ref: string;
+  /** A word beside the reference number ("תקרה"), outside the left-to-right run. */
+  refNote?: string;
   gap: string;
+  /** A word or unit beside the gap ("עודף", "נק׳"). */
+  gapNote?: string;
   /** "better" or "worse" for the mix, or "" when the gap is not a verdict. */
   verdict?: "better" | "worse" | "";
 }
@@ -41,6 +45,16 @@ const props = defineProps<{ yardsticks: Yardstick[]; refHead: string; mixHead?: 
 const pick = ref(props.yardsticks[0].id);
 const broken = ref(false);
 const current = () => props.yardsticks.find((y) => y.id === pick.value) ?? props.yardsticks[0];
+function onKey(e: KeyboardEvent, i: number) {
+  const n = props.yardsticks.length;
+  // In a right-to-left page the first tab is on the right: ArrowLeft moves to the next one.
+  const step = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0;
+  const to = e.key === "Home" ? 0 : e.key === "End" ? n - 1 : step ? (i + step + n) % n : -1;
+  if (to < 0) return;
+  e.preventDefault();
+  choose(props.yardsticks[to].id);
+  nextTick(() => document.getElementById(`judge-tab-${props.yardsticks[to].id}`)?.focus());
+}
 function choose(id: string) {
   pick.value = id;
   broken.value = false;
@@ -56,13 +70,15 @@ const word = (v?: string) => (v === "better" ? "טוב יותר" : v === "worse"
 
     <div role="tablist" aria-label="קני המידה" class="mt-3 flex flex-wrap gap-2">
       <button
-        v-for="y in yardsticks"
+        v-for="(y, i) in yardsticks"
         :id="`judge-tab-${y.id}`"
         :key="y.id"
         type="button"
         role="tab"
         :aria-selected="pick === y.id"
         :aria-controls="`judge-panel-${y.id}`"
+        :tabindex="pick === y.id ? 0 : -1"
+        @keydown="onKey($event, i)"
         class="min-h-11 rounded-md border px-3 py-1 text-body-m transition-colors duration-fast ease-out"
         :class="pick === y.id ? 'border-turquoise-2 bg-mint/30 text-n900' : 'border-n200 text-n700 hover:bg-n50'"
         @click="choose(y.id)"
@@ -103,9 +119,9 @@ const word = (v?: string) => (v === "better" ? "טוב יותר" : v === "worse"
             <tr v-for="r in rows()" :key="r.measure" class="border-b border-n100 align-top">
               <th class="py-2 pe-3 text-start font-normal text-n700">{{ r.measure }}</th>
               <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{{ r.mix }}</span></td>
-              <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{{ r.ref }}</span></td>
+              <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{{ r.ref }}</span><span v-if="r.refNote" class="ms-1 text-caption text-n600">{{ r.refNote }}</span></td>
               <td class="py-2">
-                <span class="ltr whitespace-nowrap rounded-sm px-1.5 py-0.5" :class="tone(r.verdict)">{{ r.gap }}</span>
+                <span class="ltr whitespace-nowrap rounded-sm px-1.5 py-0.5" :class="tone(r.verdict)">{{ r.gap }}</span><span v-if="r.gapNote" class="ms-1 text-caption text-n700">{{ r.gapNote }}</span>
                 <span v-if="word(r.verdict)" class="ms-2 text-caption text-n700">{{ word(r.verdict) }}</span>
               </td>
             </tr>
@@ -120,10 +136,10 @@ const word = (v?: string) => (v === "better" ? "טוב יותר" : v === "worse"
             <dt class="text-caption text-n600">{{ mixHead ?? "התמהיל" }}</dt>
             <dd><span class="ltr whitespace-nowrap">{{ r.mix }}</span></dd>
             <dt class="text-caption text-n600">{{ refHead }}</dt>
-            <dd><span class="ltr whitespace-nowrap">{{ r.ref }}</span></dd>
+            <dd><span class="ltr whitespace-nowrap">{{ r.ref }}</span><span v-if="r.refNote" class="ms-1 text-caption text-n600">{{ r.refNote }}</span></dd>
             <dt class="text-caption text-n600">הפער</dt>
             <dd>
-              <span class="ltr whitespace-nowrap rounded-sm px-1.5 py-0.5" :class="tone(r.verdict)">{{ r.gap }}</span>
+              <span class="ltr whitespace-nowrap rounded-sm px-1.5 py-0.5" :class="tone(r.verdict)">{{ r.gap }}</span><span v-if="r.gapNote" class="ms-1 text-caption text-n700">{{ r.gapNote }}</span>
               <span v-if="word(r.verdict)" class="ms-2 text-caption text-n700">{{ word(r.verdict) }}</span>
             </dd>
           </dl>

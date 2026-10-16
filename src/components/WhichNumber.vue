@@ -9,7 +9,7 @@
 // from the lesson's facts), so the lesson's term check reads it all; the four
 // kinds and what each is for are fixed here, in plain words, labelled as the
 // course's teaching device — not a regulatory classification.
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, reactive, ref } from "vue";
 import { load, save } from "../lib/progress.ts";
 import BidiText from "./BidiText.vue";
 
@@ -24,7 +24,7 @@ interface Item {
 const props = defineProps<{ id: string; items: Item[] }>();
 
 const KINDS: { id: Kind; name: string; asks: string; use: string; notUse: string }[] = [
-  { id: "average", name: "ריבית ממוצעת (בנק ישראל)", asks: "מה הריבית שהבנקים נתנו בפועל, בממוצע, בתקופה מסוימת?", use: "להבין את השוק ולשים הצעה בהקשר", notUse: "להחליט שהצעה טובה או רעה, או לדרוש אותה כמחיר" },
+  { id: "average", name: "ריבית ממוצעת", asks: "מה הריבית בממוצע על הלוואות שניתנו בפועל, כפי שבנק ישראל מפרסם (גם ממוצע של בנק אחד ב״קו המשווה״)?", use: "להבין את השוק ולשים הצעה בהקשר", notUse: "להחליט שהצעה טובה או רעה, או לדרוש אותה כמחיר" },
   { id: "estimate", name: "אומדן", asks: "מה אפשר להעריך לפני שבנק ענה?", use: "לתכנן ולבדוק אם הצעה סבירה", notUse: "להציג אותו כהצעה, או להבטיח אותו" },
   { id: "offer", name: "הצעה אישית", asks: "מה בנק מוכן לתת לתיק הזה, עכשיו?", use: "להחליט ולהשוות הצעות על אותה בסיס", notUse: "להסיק ממנה מה בנק אחר ייתן, או מה יהיה אחרי שייגמר התוקף" },
   { id: "deal", name: "עסקה שבוצעה", asks: "מה נחתם בפועל, במקרה אחד, בעבר?", use: "ללמוד מה אושר למקרים דומים", notUse: "לדרוש אותה, או להניח שהיא תקפה היום" },
@@ -32,36 +32,53 @@ const KINDS: { id: Kind; name: string; asks: string; use: string; notUse: string
 const byId = Object.fromEntries(KINDS.map((k) => [k.id, k])) as Record<Kind, (typeof KINDS)[number]>;
 
 const picked = reactive<Record<number, Kind | undefined>>({});
+// The first pick of each sentence is the one that counts for the score; later picks only let the learner read the other explanations.
+const firstPick = reactive<Record<number, Kind | undefined>>({});
+const top = ref<HTMLElement | null>(null);
 const showTable = ref(false);
 onMounted(() => {
   const saved = load<{ picked: Record<number, Kind> }>(`exercise:${props.id}`);
   if (saved?.picked) Object.assign(picked, saved.picked);
+  const first = load<{ first: Record<number, Kind> }>(`exercise:${props.id}:first`);
+  if (first?.first) Object.assign(firstPick, first.first);
 });
 
 const answered = computed(() => props.items.filter((_, i) => picked[i]).length);
-const correctCount = computed(() => props.items.filter((it, i) => picked[i] === it.answer).length);
+const correctCount = computed(() => props.items.filter((it, i) => firstPick[i] === it.answer).length);
 const done = computed(() => answered.value === props.items.length);
 
 function pick(i: number, k: Kind) {
+  if (!firstPick[i]) {
+    firstPick[i] = k;
+    save(`exercise:${props.id}:first`, { first: { ...firstPick } });
+  }
   picked[i] = k;
   save(`exercise:${props.id}`, { picked: { ...picked }, correct: done.value && correctCount.value === props.items.length });
 }
 function restart() {
-  for (const i of props.items.keys()) picked[i] = undefined;
+  for (const i of props.items.keys()) {
+    picked[i] = undefined;
+    firstPick[i] = undefined;
+  }
   save(`exercise:${props.id}`, { picked: {}, correct: false });
+  save(`exercise:${props.id}:first`, { first: {} });
+  nextTick(() => top.value?.focus());
 }
 </script>
 
 <template>
-  <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
+  <div ref="top" tabindex="-1" class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm focus:outline-none sm:p-5">
     <p class="text-caption text-n600">כל המספרים והבנקים כאן בדויים, להמחשה בלבד. ״בנק א׳״ אינו בנק אמיתי.</p>
 
-    <ul class="list-reset mt-3 grid gap-2 sm:grid-cols-2" aria-label="ארבעת המספרים">
+    <details class="mt-3">
+    <summary class="min-h-11 cursor-pointer py-2 text-body-m font-semibold text-n900">ארבעת המספרים, ומה כל אחד עונה</summary>
+    <ul class="list-reset mt-1 grid gap-2 sm:grid-cols-2" aria-label="ארבעת המספרים">
       <li v-for="k in KINDS" :key="k.id" class="rounded-md bg-n50 p-3">
         <p class="text-body-m font-semibold text-n900">{{ k.name }}</p>
         <p class="text-caption text-n700">{{ k.asks }}</p>
       </li>
     </ul>
+    </details>
 
     <ol class="list-reset mt-5 grid gap-4">
       <li v-for="(it, i) in items" :key="i" class="rounded-md border border-n200 p-3">

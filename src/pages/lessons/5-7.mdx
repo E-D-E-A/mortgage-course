@@ -111,28 +111,50 @@ export const halfRows = [
   <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">הידית וצעד</th>
-        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
-        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר</th>
-        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
-        <th class="py-2 pe-3 text-start font-semibold">יחס החזר אחרי</th>
+        <th class="py-2 pe-2 text-start font-semibold">הידית וצעד</th>
+        <th class="py-2 pe-2 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-2 text-start font-semibold">הגבוה ביותר</th>
       </tr>
     </thead>
     <tbody>
       <tr class="border-b border-n100 text-n700">
-        <td class="py-2 pe-3 font-semibold">לפני: התמהיל הראשוני</td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.first")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.max")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.total")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr">{pc(f.plain("init.ratio"))}</span></td>
+        <td class="py-2 pe-2 font-semibold">לפני: התמהיל הראשוני</td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.first")}</span></td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.max")}</span></td>
       </tr>
       {tableRows.map((r) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3"><span class="font-semibold">{r.what}</span><br /><span class="text-caption text-n600">{r.step}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_first"))}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_max"))}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_total"))}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(lv(r.id, "ratio")))}</span></td>
+          <td class="py-2 pe-2"><span class="font-semibold">{r.what}</span><br /><span class="text-caption text-n600">{r.step}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_first"))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_max"))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+ועוד שתי עמודות של אותן הזזות, סך התשלומים ויחס ההחזר אחרי:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">הידית וצעד</th>
+        <th class="py-2 pe-2 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-2 text-start font-semibold">יחס החזר אחרי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 text-n700">
+        <td class="py-2 pe-2 font-semibold">לפני: התמהיל הראשוני</td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.total")}</span></td>
+        <td class="py-2 pe-2"><span class="ltr">{pc(f.plain("init.ratio"))}</span></td>
+      </tr>
+      {tableRows.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-2"><span class="font-semibold">{r.what}</span><br /><span class="text-caption text-n600">{r.step}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_total"))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(f.plain(lv(r.id, "ratio")))}</span></td>
         </tr>
       ))}
     </tbody>
@@ -148,7 +170,7 @@ export const halfRows = [
 
 ### אחוז: להעביר כסף בין מסלולים
 
-הזזת כסף בין שני מסלולים משנה את ההחזר **רק לפי הפער בין אחוזי הריבית שלהם**. בהנחות של הקורס הפערים קטנים, ולכן ההשפעה קטנה:
+הזזת כסף בין שני מסלולים משנה את ההחזר **בעיקר לפי הפער בין אחוזי הריבית שלהם**. בהנחות של הקורס הפערים קטנים, ולכן ההשפעה קטנה:
 
 - 10 נקודות אחוז ({f.shekels("ex1.shift")}) מהפריים, {rate(1)}, אל הקבועה, {rate(3)}: ההחזר הראשון משתנה ב־{delta("lv.pct_pf.d_first")}.
 - אותו סכום מהפריים אל המשתנה, {rate(2)}: {delta("lv.pct_pv.d_first")}. הפער גדול יותר, וההשפעה גדולה יותר.
@@ -165,7 +187,7 @@ export const halfRows = [
 
 מקצרים את כל המסלולים מ־30 ל־25 שנה: ההחזר הראשון משתנה ב־{delta("lv.term.d_first")}, סך התשלומים משתנה ב־{delta("lv.term.d_total")} ויחס ההחזר עולה ל־{f.plain("lv.term.ratio")}%. התשלום עלה והסך ירד: הידית הזו עובדת בשני הכיוונים. גם **יתרת החוב** יורדת מהר יותר: אחרי חמש שנים נשארים {f.shekels("lv.term.bal60")} במקום {f.shekels("init.bal60")}.
 
-מקצרים רק מסלול אחד, מחמש שנים: הפריים (מסלול 1) {delta("lv.term_t1.d_first")}, או הקבועה (מסלול 3) {delta("lv.term_t3.d_first")}. הסכומים כמעט שווים, ולכן ההשפעות כמעט שוות; בתמהיל שבו מסלול אחד גדול הרבה יותר, הידית שלו תזיז יותר. כל מסלול עם תקופה משלו (שיעור 3.7).
+מקצרים רק מסלול אחד, מחמש שנים: הפריים (מסלול 1) {delta("lv.term_t1.d_first")}, או הקבועה (מסלול 3) {delta("lv.term_t3.d_first")}. הסכומים כמעט שווים, ולכן ההשפעות כמעט שוות. כל מסלול עם תקופה משלו (שיעור 3.7).
 
 ואם מקצרים ב־10 שנים, ל־20? ההחזר הראשון עולה ל־{f.shekels("lv.term10.first")} ויחס ההחזר ל־{f.plain("lv.term10.ratio")}%: **מעל 50%, וזה כבר נפסל** לפי הוראה 329 כפי שהצוות תעתק אותה (לא אומת). גם ידית תקופה פוגשת גבול.
 
@@ -173,7 +195,7 @@ export const halfRows = [
 
 **האחוז במסלול.** מעלים ב־0.25 נקודת אחוז את אחוז הריבית של **כל** המסלולים: {delta("lv.rate_all.d_first")} בחודש הראשון ו־{delta("lv.rate_all.d_total")} בסך התשלומים. אם מעלים אותו במסלול אחד בלבד, כל אחד מהם נותן בערך שליש: {delta("lv.rate_t1.d_first")}, {delta("lv.rate_t2.d_first")} ו־{delta("lv.rate_t3.d_first")}, ויחד {delta("lv.rate_parts.d_first")}, בדיוק כמו כולם יחד. **שינויי ריבית במסלולים נפרדים מצטברים.**
 
-**ריבית השוק.** אחרי החתימה הפריים והעוגן זזים. בתרחיש שבו שניהם עולים נקודת אחוז אחת מהשנה השנייה: ההחזר הראשון לא משתנה ({delta("lv.market.d_first")}), ההחזר הגבוה ביותר עולה ב־{delta("lv.market.d_max")}, והסך ב־{delta("lv.market.d_total")}. רק שני המסלולים המשתנים מרגישים אותו: הפריים מיד, והמשתנה כל 5 שנים. הקבועה לא מרגישה כלום. זו **החשיפה** של שיעור 5.6 במספרים.
+**ריבית השוק.** אחרי החתימה הפריים והעוגן זזים. בתרחיש שבו שניהם עולים נקודת אחוז אחת מהשנה השנייה: ההחזר הראשון לא משתנה ({delta("lv.market.d_first")}), ההחזר הגבוה ביותר עולה ב־{f.shekels("lv.market.d_max")}, והסך ב־{f.shekels("lv.market.d_total")}. רק שני המסלולים המשתנים מרגישים אותו: הפריים מהשנה השנייה (בתרחיש), והמשתנה בעדכון, כל 5 שנים. הקבועה לא מרגישה כלום. זו **החשיפה** של שיעור 5.6 במספרים.
 
 ### מדד: אפס, ואז הרבה
 
@@ -250,7 +272,7 @@ export const halfRows = [
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>ההחזר הראשון: {f.shekels("lv.pct_pv.first")} ({delta("lv.pct_pv.d_first")}); התשלום הגבוה ביותר: {delta("lv.pct_pv.d_max")}; סך התשלומים: {delta("lv.pct_pv.d_total")}. החלק במסלולים משתנים (פריים ומשתנה) נשאר {f.plain("lv.pct_pv.variable_share")}%: הכסף עבר בין שני משתנים.</li>
     <li>הלוואה של {f.whole("lv.amount40.loan")} (שיעור מימון {f.plain("lv.amount40.ltv")}%): ההחזר הראשון {f.shekels("lv.amount40.first")} ({delta("lv.amount40.d_first")}), התשלום הגבוה ביותר {delta("lv.amount40.d_max")}, הסך {delta("lv.amount40.d_total")}, ויחס ההחזר {f.plain("lv.amount40.ratio")}%. כל המסלולים קטנים באותו יחס, ולכן החלק המשתנה נשאר {f.plain("lv.amount40.variable_share")}%. אחוז ריבית של {f.plain("task2.rate_1")}% בפריים: ההחזר הראשון {delta("lv.rate_t1.d_first")}, והסך {delta("lv.rate_t1.d_total")}. תקופה של 25 שנה בכל המסלולים: ההחזר הראשון {delta("lv.term.d_first")}, והסך {delta("lv.term.d_total")}.</li>
-    <li>עם הפריים והעוגן ב־+1: ההחזר הראשון לא זז ({delta("lv.market.d_first")}), התשלום הגבוה ביותר {delta("lv.market.d_max")} והסך {delta("lv.market.d_total")}. אחרי שמסלול 3 נעשה צמוד, והמדד עולה מ־2% ל־3%: התשלום הגבוה ביותר עולה ב־{delta("task3.d_max")} והסך ב־{delta("task3.d_total")}. באותו תמהיל, בלי מסלול צמוד, אותה הזזה לא שינתה כלום.</li>
+    <li>עם הפריים והעוגן ב־<span class="ltr">+1</span>: ההחזר הראשון לא זז ({delta("lv.market.d_first")}), התשלום הגבוה ביותר עולה ב־{f.shekels("lv.market.d_max")} והסך ב־{f.shekels("lv.market.d_total")}. אחרי שמסלול 3 נעשה צמוד, והמדד עולה מ־2% ל־3%: התשלום הגבוה ביותר עולה ב־{f.shekels("task3.d_max")} והסך ב־{f.shekels("task3.d_total")}. באותו תמהיל, בלי מסלול צמוד, אותה הזזה לא שינתה כלום.</li>
   </ol>
 </details>
 
@@ -348,7 +370,7 @@ export const halfRows = [
 
 **צעד 4 — הגבולות.** ההעברה של 20 נקודות אחוז היא בין שני מסלולים משתנים, ולכן החלק המשתנה לא זז: {f.plain("lv.pct_pv20.variable_share")}%, מרווח של {f.shekels("lv.pct_pv20.variable_room")} מול שני השלישים. אילו העבירו את הכסף מהקבועה, הם היו חוצים את הגבול (תרגיל 5).
 
-**מה לקחת מזה.** מבין הצעדים שבטבלה, אחד בלבד נמצא בשליטתם של נועם ושירה לבדם ולא דורש כסף נוסף או הסכמה של בנק: האחוז בין המסלולים. מה שהטבלה לא בודקת הוא החשיפה: החלק המשתנה לא זז, אבל הפריים מרגיש את ריבית בנק ישראל מיד והמשתנה רק בעוד 5 שנים. זו דוגמה, לא המלצה: בשיעור 5.8 בוחרים בין שלוש חלופות.
+**מה לקחת מזה.** מבין הצעדים שבטבלה, אחד בלבד לא מגדיל את הכסף שצריך להביא: האחוז בין המסלולים (ההלוואה נשארת אותו סכום). גם אותו הבנק צריך לאשר, והוא יכול לתמחר אחרת (ידע מהשטח, FK-H-057; ממתין לאישור אילון). מה שהטבלה לא בודקת הוא החשיפה: החלק המשתנה לא זז, אבל הפריים והמשתנה נעים בתרחיש בזמנים שונים. זו דוגמה, לא המלצה: בשיעור 5.8 בוחרים בין שלוש חלופות.
 
 <Section kind="דוגמה חצי פתורה">
 
@@ -475,10 +497,10 @@ export const halfRows = [
     { text: `הלוואה קטנה ב־40,000 ₪: יחס ההחזר ${f.plain("lv.amount40.ratio")}%`, correct: true, feedback: `נכון. יחס החזר של ${f.plain("lv.amount40.ratio")}% הוא מתחת ל־40%, והצעד לא חוצה אף גבול אחר. הצעד הזה דורש עוד הון עצמי, ולא החלטה של בנק.` },
     { text: `10 נקודות אחוז מהפריים למשתנה: יחס החזר ${f.plain("lv.pct_pv.ratio")}%`, feedback: "הצעד הזה מוריד את היחס, אבל לא מספיק: הוא נשאר מעל 40%." },
     { text: `10 נקודות אחוז מהקבועה למשתנה: יחס החזר ${f.plain("lv.pct_fv.ratio")}%`, feedback: "היחס עדיין מעל 40%, ויותר חמור: ההעברה חוצה את גבול שני השלישים המשתנים." },
-    { text: `תקופה קצרה ב־5 שנים: יחס החזר ${f.plain("lv.term.ratio")}%`, feedback: "תקופה קצרה יותר מעלה את ההחזר, ולכן את היחס. כדי להוריד אותו צריך להאריך, ואת התקופה אי אפשר להאריך מעבר ל־30 שנה." },
+    { text: `תקופה קצרה ב־5 שנים: יחס החזר ${f.plain("lv.term.ratio")}%`, feedback: "תקופה קצרה יותר מעלה את ההחזר, ולכן את היחס. כדי להוריד אותו צריך להאריך, ואת התקופה אי אפשר להאריך מעבר ל־30 שנה (לפי התעתיק של 329, לא אומת)." },
   ]}
 >
-  איזה צעד אחד מוריד את יחס ההחזר של התמהיל הראשוני ({f.plain("init.ratio")}%) מתחת ל־40%?
+  מבין האפשרויות האלה, איזה צעד אחד מוריד את יחס ההחזר של התמהיל הראשוני ({f.plain("init.ratio")}%) מתחת ל־40%?
 </ChoiceExercise>
 
 <NumericExercise
@@ -531,12 +553,12 @@ export const halfRows = [
 <Sources
   items={[
     { kind: "ידע מתמטי כללי", text: "רגישות כהפרש תוצאה מחולק בגודל הצעד; הזזה של ידית אחת בכל פעם; תוצאה של שתי ידיות יחד אינה בהכרח סכום התוצאות לחוד." },
-    { kind: "הנחת חישוב", text: "תיק A והתמהיל הראשוני: src/data/case-a-mix.ts (מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים; 546,000 ב־4.60%, 547,000 ב־4.10%, 547,000 ב־4.40%). אחוזי הריבית הם רשימת המחירים של הקורס; כל סוג מסלול מקבל אחוז אחד בכל תמהיל, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
-    { kind: "הנחת חישוב", text: "תרחיש הבסיס: המדד עולה 2% בשנה, הפריים והעוגן לא זזים. ריבית השוק: הפריים והעוגן (בכל נקודת עדכון, כל 5 שנים) עולים נקודת אחוז אחת, הפריים מהשנה השנייה. מסלול משתנה מתעדכן כל 5 שנים: הנחת הקורס לפי DEC-3, החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). שניהם תרחישי הוראה, לא תחזיות. ידית הסכום מקטינה את כל המסלולים באותו יחס. כלל העיגול של הקורס (שיעור 3.8)." },
-    { kind: "לא אומת", text: "מגבלות הוראה 329: יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
-    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות ב־Brain (דף 67436545), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "תיק A והתמהיל הראשוני: הנחות הקורס (מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים; 546,000 ב־4.60%, 547,000 ב־4.10%, 547,000 ב־4.40%). אחוזי הריבית הם רשימת המחירים של הקורס; כל סוג מסלול מקבל אחוז אחד בכל תמהיל, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
+    { kind: "הנחת חישוב", text: "תרחיש הבסיס: המדד עולה 2% בשנה, הפריים והעוגן לא זזים. ריבית השוק: הפריים והעוגן (בכל נקודת עדכון, כל 5 שנים) עולים נקודת אחוז אחת, הפריים מהשנה השנייה. מסלול משתנה מתעדכן כל 5 שנים: הנחת הקורס, החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). שניהם תרחישים להמחשה, לא תחזיות. ידית הסכום מקטינה את כל המסלולים באותו יחס. כלל העיגול של הקורס (שיעור 3.8)." },
+    { kind: "לא אומת", text: "מגבלות הוראה 329: יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות (עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות (2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
     { kind: "ידע מהשטח", text: "FK-H-057: שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע; הנתונים הציבוריים הם ממוצעים ולא מחיר שבנק יאשר. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
-    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. DEC-1: אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
+    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
     { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות, כולל הפעלת כל ידית מחדש בבדיקה הפייתונית.", date: "2026-10-16" },
   ]}
 />

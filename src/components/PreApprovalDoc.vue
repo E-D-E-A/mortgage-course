@@ -64,17 +64,17 @@ const lines = computed<Line[]>(() => [
     id: "valid",
     title: "תוקף",
     tag: "directive",
-    what: `ניתן ב־${props.doc.issued}. הבנק מחזיק בתנאים לפחות ${props.doc.validDays} יום, כלומר עד ${props.doc.validUntil} לפחות.`,
-    rule: `לפי תעתיק של הצוות: לפחות ${props.doc.validDays} יום, ו־${props.doc.validDaysNoLien} כשלא נרשם שעבוד חדש, ורשום באופן בולט (שיעור 1.8). ימים רגילים, לא ימי עסקים.`,
-    next: "בתוך החלון הזה צריך להספיק: למסור מסמכים, לשמאות, לחתימה. אחריו הבנק כבר לא חייב.",
+    what: `ניתן ב־${props.doc.issued}. הבנק מחזיק בתנאים לפחות ${props.doc.validDays} ימים, כלומר עד ${props.doc.validUntil} לפחות.`,
+    rule: `לפי תעתיק של הצוות: לפחות ${props.doc.validDays} ימים, ו־${props.doc.validDaysNoLien} ימים כשלא נרשם שעבוד חדש, ורשום באופן בולט (שיעור 1.8). ימים רגילים, לא ימי עסקים.`,
+    next: "אחרי החלון הבנק כבר לא חייב לתנאים. מה שעוד צריך לקרות עד ההעמדה מופיע בשורה האחרונה.",
   },
   ...props.doc.tracks.map((t, k) => ({
     id: `track${k}`,
     title: `מסלול ${k + 1}: ${t.kindHe}`,
     tag: "directive" as Tag,
     what: t.variable
-      ? `${formatWholeShekels(t.amount)} ל־${t.months / 12} שנה. ריבית ${t.rate}% — נכונה ליום שבו האישור ניתן. התשלום הראשון במסלול: ${formatShekels(t.first)}.`
-      : `${formatWholeShekels(t.amount)} ל־${t.months / 12} שנה. ריבית ${t.rate}% קבועה, לפי החוזה. התשלום הראשון במסלול: ${formatShekels(t.first)}.`,
+      ? `${formatWholeShekels(t.amount)} ל־${t.months / 12} שנה. ריבית ${Number(t.rate).toFixed(2)}% — נכונה ליום שבו האישור ניתן. התשלום הראשון במסלול: ${formatShekels(t.first)}.`
+      : `${formatWholeShekels(t.amount)} ל־${t.months / 12} שנה. ריבית ${Number(t.rate).toFixed(2)}% קבועה, לפי החוזה. התשלום הראשון במסלול: ${formatShekels(t.first)}.`,
     rule: t.variable
       ? "לפי התעתיק: במסלול משתנה האישור מציג את הריבית שנובעת מכללי העדכון, ומציין שהיא נכונה ליום שהאישור ניתן."
       : "לפי התעתיק: במסלול קבוע האישור מציג את הריבית שנקבעה בחוזה.",
@@ -121,8 +121,8 @@ const lines = computed<Line[]>(() => [
     title: "עמלות שנגבות ביום ההעמדה",
     tag: "extra",
     what: `עמלת פתיחת תיק: ${formatShekels(props.doc.upfront)}, תיגבה ביום שהכסף מועבר.`,
-    rule: "אילו עמלות נכנסות לחישוב הריבית הכוללת החזויה — שאלה משפטית שהצוות סימן כפתוחה. בחישוב שלפניכם העמלה הזו נחשבת, כהנחת חישוב.",
-    next: "העמלה נגבית רק בהעמדה. אם ההלוואה לא תיפתח, אין עמלה.",
+    rule: "אילו עמלות נכנסות לחישוב הריבית הכוללת החזויה — שאלה משפטית שהצוות סימן כפתוחה. בחישוב שלפניכם העמלה הזו נחשבת, כהנחת חישוב. העמלה עצמה והסכום שלה הם המצאה של הקורס.",
+    next: "בדוגמה כאן העמלה נגבית ביום שהכסף מועבר: זו הנחה של הקורס. מתי בנק אמיתי גובה עמלה כזו, ומה קורה אם ההלוואה לא נפתחת — לא ידוע לנו; שאלה לאילון.",
   },
   {
     id: "early",
@@ -144,8 +144,8 @@ const lines = computed<Line[]>(() => [
     id: "after",
     title: "מה צריך להשלים",
     tag: "extra",
-    what: "רשימת המסמכים שהבנק יבקש בפתיחת התיק, ורשימת שמאים לפי אזור הנכס.",
-    rule: "רשימת השמאים: לפי התעתיק, חלק מהאישור (סעיף 4ג(ג)(2)). הרשימות האלה מגיעות עם האישור לפי מחקר הצוות; מה ברשימת המסמכים — הבנק קובע.",
+    what: "רשימת מסמכים ורשימת שמאים לפי אזור הנכס (בדוגמה: הנחה של הקורס).",
+    rule: "רשימת השמאים: לפי התעתיק, חלק מהאישור (סעיף 4ג(ג)(2)). רשימה כזו מגיעה עם האישור לפי מחקר הצוות, ומה ברשימת המסמכים הבנק קובע. הרשימות בדוגמה הן הנחה של הקורס.",
     next: "שמאות, מסמכים, חיתום, חתימה, רישום הערת אזהרה, ואז העמדה. עד אז ההצעה היא מחיר על נתונים שלא נבדקו.",
   },
 ]);
@@ -153,7 +153,6 @@ const lines = computed<Line[]>(() => [
 const selected = ref("highest");
 const emphasise = ref(false);
 const showTable = ref(false);
-const current = computed(() => lines.value.find((l) => l.id === selected.value) ?? lines.value[0]);
 const tagText = (t: Tag) => (t === "directive" ? "ההוראה מחייבת להציג (לפי התעתיק)" : "הבנק מוסיף");
 const lineClass = (l: Line) => [
   "block w-full min-h-11 rounded-sm px-2 py-2 text-start text-body-m",
@@ -177,6 +176,11 @@ const lineClass = (l: Line) => [
             <span class="block text-caption font-semibold text-n600">{{ l.title }}</span>
             <span class="block text-body-m text-n900">{{ l.what }}</span>
           </button>
+          <div v-if="selected === l.id" class="mx-2 mb-2 mt-1 rounded-md bg-n0 p-3 text-body-m text-n800" role="status" aria-live="polite">
+            <p class="text-caption font-semibold text-n600">{{ tagText(l.tag) }}</p>
+            <p class="mt-1"><strong class="text-n900">מה כתוב בהוראה:</strong> {{ l.rule }}</p>
+            <p class="mt-1"><strong class="text-n900">מה זה אומר:</strong> {{ l.next }}</p>
+          </div>
         </li>
       </ul>
     </div>
@@ -192,12 +196,6 @@ const lineClass = (l: Line) => [
         הדגשת מה שההוראה מחייבת להציג
       </button>
       <span v-if="emphasise" class="flex items-center gap-2 text-caption text-n700"><span class="inline-block h-3 w-3 rounded-sm bg-mint ring-1 ring-n300"></span>חובה להציג, לפי התעתיק</span>
-    </div>
-
-    <div class="mt-4 rounded-md bg-n50 p-4 text-body-m text-n800" role="status" aria-live="polite">
-      <p class="text-caption font-semibold text-n600">{{ current.title }} · {{ tagText(current.tag) }}</p>
-      <p class="mt-2"><strong class="text-n900">מה כתוב בהוראה:</strong> {{ current.rule }}</p>
-      <p class="mt-2"><strong class="text-n900">מה זה אומר:</strong> {{ current.next }}</p>
     </div>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">

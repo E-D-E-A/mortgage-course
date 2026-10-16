@@ -60,7 +60,7 @@ export default function lesson(): LessonData {
     const n = k + 1;
     add(given(`avg.${n}`, AVERAGES[k]));
     add(effectiveOf(`eff.${n}`, t.ratePercent, 4));
-    add(pointsGap(`gap.eff.${n}`, get(`eff.${n}`), get(`avg.${n}`), 3));
+    add(pointsGap(`gap.eff.${n}`, get(`eff.${n}`), get(`avg.${n}`), 4));
     add(pointsGap(`gap.nom.${n}`, get(`x.r${n}`), get(`avg.${n}`), 2));
   });
 

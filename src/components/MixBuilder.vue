@@ -276,6 +276,16 @@ const lineActual = (l: LineResult) => (isTerm(l) ? `${l.actual.toNumber() / 12} 
 const lineLimit = (l: LineResult) => (isTerm(l) ? `עד ${l.limit.toNumber() / 12} שנה` : l.id === "variable" ? "עד שני שלישים" : `${percentString(l.limit)}%`);
 const lineRoom = (l: LineResult) => (isTerm(l) ? `${withMinus(String(l.room.toNumber()))} חודשים` : withMinus(formatShekels(l.room)));
 
+// Back to the starting state: the tracks, the scenario and the loan as the page gave them.
+const snapshot = () => ({ loan: loanNow.value, rows: rows.map(({ key: _k, ...r }) => ({ ...r })), scenario: { ...scenario } });
+const startState = snapshot();
+const dirty = computed(() => JSON.stringify(snapshot()) !== JSON.stringify(startState));
+function resetAll() {
+  rows.splice(0, rows.length, ...startState.rows.map((r) => ({ ...r, key: nextKey++ })));
+  Object.assign(scenario, startState.scenario);
+  loanNow.value = startState.loan;
+}
+
 // Tell the page what the learner changed (not the starting state).
 const touched = ref(false);
 watch(
@@ -456,6 +466,10 @@ const yearRows = computed(() => {
       להוסיף מסלול
     </button>
 
+    <button v-if="dirty" type="button" class="ms-2 mt-3 min-h-11 rounded-md border border-n300 px-4 text-body-m text-n700 hover:bg-n50" @click="resetAll">
+      החזרה למצב ההתחלתי
+    </button>
+
     <!-- The scenario -->
     <div v-if="scenarioPresets" class="mt-4" role="group" aria-label="תרחישים מוכנים">
       <p class="text-caption font-semibold text-n600">תרחישים מוכנים (להמחשה, לא תחזיות)</p>
@@ -491,6 +505,22 @@ const yearRows = computed(() => {
       </div>
       <p class="mt-2 text-caption text-n600">המדד עולה באופן אחיד בתוך השנה. העוגן משפיע רק על המסלולים המשתנים, ורק בנקודות העדכון שלהם.</p>
     </fieldset>
+
+    <!-- On a phone the results are far below the sliders: the three headline numbers stay at the bottom of the screen while you move one. -->
+    <div v-if="ok" class="sticky bottom-2 z-10 mt-4 grid grid-cols-3 gap-2 rounded-md border border-n200 bg-n0 p-2 shadow-md sm:hidden" aria-hidden="true" data-block="sticky-summary">
+      <div class="min-w-0">
+        <p class="text-caption leading-tight text-n600">{{ titles.first }}</p>
+        <p class="ltr text-body-m font-semibold text-n900">{{ formatWholeShekels(ok.summary.firstPayment) }}</p>
+      </div>
+      <div class="min-w-0">
+        <p class="text-caption leading-tight text-n600">{{ titles.max }}</p>
+        <p class="ltr text-body-m font-semibold text-n900">{{ formatWholeShekels(ok.summary.maxPayment) }}</p>
+      </div>
+      <div class="min-w-0">
+        <p class="text-caption leading-tight text-n600">{{ titles.total }}</p>
+        <p class="ltr text-body-m font-semibold text-n900">{{ formatWholeShekels(ok.summary.totalPaid) }}</p>
+      </div>
+    </div>
 
     <!-- The results -->
     <div role="status" aria-live="polite" class="mt-4">

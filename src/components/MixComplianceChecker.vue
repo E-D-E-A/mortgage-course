@@ -58,7 +58,7 @@ function load(id: string) {
 }
 
 const AMOUNT_MAX = 3000000;
-const STEP = 10000;
+const STEP = 1000;
 const mix = computed<MixTrack[]>(() => tracks.value.map((t) => ({ label: t.label, type: t.type, amount: String(Math.max(STEP, t.amount)), ratePercent: String(t.rate), months: t.years * 12 })));
 const result = computed(() => checkMix(mix.value, { deal: deal.value, value: value.value, disposableIncome: income.value }));
 const lines = computed<LineResult[]>(() => result.value.lines);
@@ -100,6 +100,7 @@ const verdict = computed(() => {
       >
         {{ p.label }}
       </button>
+      <button type="button" class="min-h-11 rounded-md border border-n300 px-3 py-1 text-body-m text-navy" @click="load(presetId)">איפוס התמהיל</button>
     </div>
 
     <ol class="list-reset mt-4 space-y-3">
@@ -113,6 +114,16 @@ const verdict = computed(() => {
             <span class="text-caption font-semibold text-n600">הסכום</span>
             <input v-model.number="t.amount" type="range" :min="STEP" :max="AMOUNT_MAX" :step="STEP" />
             <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekelsText(t.amount) }}</span></span>
+            <input
+              v-model.number="t.amount"
+              type="number"
+              inputmode="numeric"
+              :min="STEP"
+              :max="AMOUNT_MAX"
+              :step="STEP"
+              :aria-label="`הסכום של מסלול ${typeLabel(t.type)}, בשקלים, בהקלדה`"
+              class="ltr min-h-11 rounded-md border border-n300 px-2 text-body-m text-n900"
+            />
           </label>
           <label class="flex flex-col gap-1">
             <span class="text-caption font-semibold text-n600">הריבית בחוזה, בשנה</span>

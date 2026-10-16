@@ -14,13 +14,13 @@ import type { BigPicture, MapLink, MapNode, Region } from "./types.ts";
 export type { BigPicture, MapLink, MapNode, Region, RegionId } from "./types.ts";
 
 export const REGIONS: Region[] = [
-  { id: "market", label: "השוק", empty: "יתמלא בשלבים 0 ו־4." },
+  { id: "market", label: "השוק", empty: "יתמלא בשלבים 0, 2, 4 ו־5." },
   { id: "regulation", label: "הרגולציה", empty: "יתמלא בשלבים 1, 4, 5 ו־7." },
-  { id: "bank", label: "הבנק", empty: "יתמלא בשלבים 1 ו־4." },
+  { id: "bank", label: "הבנק", empty: "יתמלא בשלבים 0 עד 4." },
   { id: "client", label: "הלקוח", empty: "יתמלא בשלבים 1 ו־4." },
   { id: "property", label: "הנכס והעסקה", empty: "יתמלא בשלבים 1 ו־4." },
-  { id: "mix", label: "התמהיל", empty: "יתמלא בשלבים 2, 3 ו־5." },
-  { id: "result", label: "התוצאה", empty: "יתמלא בשלבים 3, 5 ו־6." },
+  { id: "mix", label: "התמהיל", empty: "יתמלא בשלבים 1, 2, 3 ו־5." },
+  { id: "result", label: "התוצאה", empty: "יתמלא בשלבים 2 עד 6." },
 ];
 
 const STAGES = [stage0, stage1, stage2, stage3, stage4, stage4market, stage5];
