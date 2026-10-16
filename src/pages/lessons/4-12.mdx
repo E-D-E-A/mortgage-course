@@ -34,7 +34,7 @@ export const predictionOptions = [
   "אפס: הרגולציה קובעת ריבית אחת לכולם",
 ];
 export const layers = [
-  { id: "cost", label: "עלות המימון", start: f.raw("tower.cost"), what: "מה עולה לבנק הכסף שהוא מלווה" },
+  { id: "cost", label: "עלות המימון", start: f.raw("tower.cost"), what: "מה עולה לבנק הכסף שהוא מלווה, מעבר לעוגן" },
   { id: "risk", label: "סיכון", start: f.raw("tower.risk"), what: "הסיכוי שלא ישלמו, ומה יפסיד אז" },
   { id: "capital", label: "דרישות הון", start: f.raw("tower.capital"), what: "ההון שהוא חייב להחזיק כנגד ההלוואה" },
   { id: "competition", label: "תחרות", start: f.raw("tower.competition"), min: "-0.5", what: "הבנקים האחרים שאפשר ללכת אליהם" },
@@ -49,7 +49,7 @@ export const scenarios = [
     { layer: "risk", dir: "maybe_down", why: "יש יותר כרית אם הנכס יירד בערכו (שיעור 1.1).", kind: "ידע כלכלי כללי" },
     { layer: "capital", dir: "unknown", why: "רצועות של שיעור המימון קשורות להון של הבנק (טובי זמיר, 2026-08-05). אם זה מגיע למחיר — לא ידוע.", kind: "ידע מהשטח" },
   ] },
-  { id: "pti", label: "יחס ההחזר עובר את סף ההון", note: "אצל טובי זמיר אין מספר לכך; הסף עצמו לפי תעתיק, לא אומת.", effects: [
+  { id: "pti", label: "יחס ההחזר עובר את מגבלת ההון", note: "אצל טובי זמיר אין מספר לכך; הסף עצמו לפי תעתיק, לא אומת.", effects: [
     { layer: "capital", dir: "unknown", why: "מעל 40% הבנק מחזיק יותר הון (מגבלת ההון, לפי תיעוד הצוות). אם זה מגיע למחיר — לא ידוע.", kind: "לא אומת" },
     { layer: "risk", dir: "maybe_up", why: "יש פחות מקום לטעות בתקציב של המשפחה.", kind: "ידע כלכלי כללי" },
   ] },
