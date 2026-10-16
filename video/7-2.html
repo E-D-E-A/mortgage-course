@@ -72,33 +72,33 @@
       window.duration = 220;
       window.cues = [
         [1, 5, "למה הבנק מבקש פיצוי?"],
-        [5, 8.5, "עמלת ההיוון, בדוגמה קטנה."],
-        [10, 17, `לקחתם ${lr(V.loan + " ₪")} ב־10%, ובעוד שנה משלמים ${lr(V.pay + " ₪")}.`],
-        [17, 24, `הבנק מצפה לקבל ${lr(V.pay + " ₪")} בעוד שנה.`],
-        [24, 31, `אתם מחזירים ${lr(V.loan + " ₪")} היום, והריבית בשוק ירדה ל־5%.`],
-        [31, 38, `הוא מלווה אותם שוב, ומקבל בעוד שנה רק ${lr(V.relend + " ₪")}.`],
-        [38, 45, `חסרים לו ${lr(V.lost + " ₪")} בעוד שנה.`],
+        [5, 9, "עמלת ההיוון. דוגמה לימודית, מספרים להמחשה."],
+        [10, 17, `לקחתם ${lr(V.loan)} ₪ ב־10%, ובעוד שנה משלמים ${lr(V.pay)} ₪.`],
+        [17, 24, `הבנק מצפה לקבל ${lr(V.pay)} ₪ בעוד שנה.`],
+        [24, 31, `אתם מחזירים ${lr(V.loan)} ₪ היום, והריבית בשוק ירדה ל־5%.`],
+        [31, 38, `הוא מלווה אותם שוב, ומקבל בעוד שנה רק ${lr(V.relend)} ₪.`],
+        [38, 45, `חסרים לו ${lr(V.lost)} ₪ בעוד שנה.`],
         [45, 52, "אבל כסף של עוד שנה אינו כסף של היום."],
-        [52, 59, `מביאים את ${lr(V.pay + " ₪")} להיום, ב־5%: ${lr(V.pv5 + " ₪")}.`],
-        [59, 65, `הבנק קיבל ${lr(V.loan + " ₪")}. ההפרש, ${lr(V.fee1 + " ₪")}, הוא העמלה.`],
+        [52, 59, `מביאים את ${lr(V.pay)} ₪ להיום, ב־5%: ${lr(V.pv5)} ₪.`],
+        [59, 65, `הבנק קיבל ${lr(V.loan)} ₪. ההפרש, ${lr(V.fee1)} ₪, הוא העמלה.`],
         [67, 74, "ואם הריבית דווקא עלתה ל־12%?"],
-        [74, 81, `אותם ${lr(V.pay + " ₪")} שווים היום ${lr(V.pv12 + " ₪")}: אין הפסד.`],
+        [74, 81, `אותם ${lr(V.pay)} ₪ שווים היום ${lr(V.pv12)} ₪: אין הפסד.`],
         [81, 89, "אין הפסד, אין עמלה. היא חלה כשהריבית ירדה."],
         [91, 98, "בהלוואה אמיתית מביאים להיום כל תשלום שנשאר."],
-        [98, 106, `עדי וירון: ${lr(V.pvA + " ₪")} בריבית הממוצעת של היום.`],
-        [106, 113, `מחזירים ${lr(V.balance + " ₪")}: זו היתרה.`],
-        [113, 120, `נוסחה ראשונה: ההפרש, ${lr(V.v1 + " ₪")}.`],
+        [98, 106, `עדי וירון: ${lr(V.pvA)} ₪ בריבית הממוצעת ביום הפירעון.`],
+        [106, 113, `מחזירים ${lr(V.balance)} ₪: זו היתרה.`],
+        [113, 120, `נוסחה ראשונה: ההפרש, ${lr(V.v1)} ₪.`],
         [122, 129, "יש נוסחה שנייה: משווים לממוצע של יום ההעמדה."],
-        [129, 136, `הערך הנוכחי בממוצע של ההעמדה: ${lr(V.pvC + " ₪")}.`],
-        [136, 143, `נוסחה שנייה: ההפרש, ${lr(V.v2 + " ₪")}.`],
-        [143, 150, `הבנק גובה את הנמוכה. הכלל שווה ${lr(V.worth + " ₪")}.`],
+        [129, 136, `הערך הנוכחי בממוצע של ההעמדה: ${lr(V.pvC)} ₪.`],
+        [136, 143, `נוסחה שנייה: ההפרש, ${lr(V.v2)} ₪.`],
+        [143, 150, `לפי התעתיק, גובים את הנמוכה. ההפרש: ${lr(V.worth)} ₪.`],
         [152, 158, "ולא מערבבים: ריבית החוזה והממוצע הם לא אותו סוג."],
         [158, 165, `${lr("5.90%")} בחוזה הם ${lr(V.effC + "%")} אפקטיבי.`],
         [165, 172, "מהחוזה מגיעים לחודשית ב־÷ 12, מהממוצע בשורש 12."],
-        [172, 181, `מי שמחלק את הממוצע ב־12 מקבל ${lr(V.v1m + " ₪")}. פחות מדי.`],
+        [172, 181, `מי שמחלק את הממוצע ב־12 מקבל ${lr(V.v1m)} ₪. פחות מדי.`],
         [183, 190, `ותק של ${V.months} חודשים: הפחתה של ${lr(V.red + "%")}.`],
-        [190, 197, `${lr(V.v2 + " ₪")} פחות ${lr(V.red + "%")}: ${lr(V.disc + " ₪")}.`],
-        [197, 205, `ועוד ${lr(V.op + " ₪")} תפעולית: ${lr(V.total + " ₪")}.`],
+        [190, 197, `${lr(V.v2)} ₪ פחות ${lr(V.red + "%")}: ${lr(V.disc)} ₪.`],
+        [197, 205, `ועוד ${lr(V.op)} ₪ תפעולית: ${lr(V.total)} ₪.`],
         [207, 213, "הממוצעים והנוסחאות: תעתיק של הצוות, לא אומת."],
         [213, 219, "הנמוכה, ההפחתה, והממוצע שממירים."],
       ];
@@ -126,13 +126,20 @@
       };
       // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
       // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
-      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
-      const txt = (x, y, s, size, opts = {}) =>
-        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const iso = (s) => s.replace(/(\d[\d,.]*%?)/g, "\u2066$1\u2069");
+      // An amount ("637.96 ₪") is read right to left: the number first, the sign after it. So it is drawn as a right-to-left
+      // line whose number is its own isolate; anchors swap because an RTL "start" is the right edge. Equations stay left to right.
+      const txt = (x, y, s, size, opts = {}) => {
+        const amount = opts.ltr && s.includes("₪") && !/[=÷×−]/.test(s);
+        const ltr = opts.ltr && !amount;
+        const anchor = amount && opts.anchor === "start" ? "end" : amount && opts.anchor === "end" ? "start" : opts.anchor ?? "middle";
+        return el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": anchor, opacity: opts.o ?? 1, direction: ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, ltr ? s : iso(s));
+      };
       const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
 
       window.render = (t) => {
         svg.replaceChildren();
+        txt(640, 562, "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים", 15, { fill: C.n600 });
         // Scene 1 — title
         if (inScene(t, S.title)) {
           const o = vis(t, S.title);
@@ -181,7 +188,7 @@
           const at = (s) => after(t, S.pv, s, o);
           txt(640, 128, "הלוואה אמיתית: כל התשלומים שנשארו", 38, { w: 700, o });
           box(670, 180, 440, 170, at(2));
-          txt(890, 222, "ערך נוכחי בריבית הממוצעת של היום", 20, { fill: C.n600, o: at(2) });
+          txt(890, 222, "ערך נוכחי בריבית הממוצעת ביום הפירעון", 20, { fill: C.n600, o: at(2) });
           txt(890, 296, `${V.pvA} ₪`, 44, { w: 700, o: at(8), ltr: true });
           box(170, 180, 440, 170, at(15));
           txt(390, 222, "היתרה שמחזירים", 20, { fill: C.n600, o: at(15) });
@@ -199,7 +206,7 @@
           // Three values on one scale; it does not start at zero.
           const lo = 630000, hi = 700000;
           const vals = [
-            { label: "ערך נוכחי, ממוצע היום", v: fact("w.pv_today"), s: V.pvA, fill: C.teal, from: 1 },
+            { label: "ערך נוכחי, ממוצע ביום הפירעון", v: fact("w.pv_today"), s: V.pvA, fill: C.teal, from: 1 },
             { label: "ערך נוכחי, ממוצע ההעמדה", v: fact("w.pv_grant"), s: V.pvC, fill: C.tq2, from: 8 },
             { label: "היתרה", v: fact("w.pv_contract"), s: V.balance, fill: C.n300, from: 4 },
           ];
@@ -214,13 +221,13 @@
           txt(1040, 392, "הציר לא מתחיל באפס", 15, { anchor: "start", fill: C.n600, o: at(4) });
           const a = at(12);
           box(660, 410, 460, 100, a);
-          txt(890, 446, "ראשונה: היום פחות היתרה", 20, { fill: C.n600, o: a });
+          txt(890, 446, "ראשונה: ביום הפירעון פחות היתרה", 20, { fill: C.n600, o: a });
           txt(890, 490, `${V.v1} ₪`, 34, { w: 700, fill: C.n600, o: a, ltr: true });
           const b = at(17);
           box(160, 410, 460, 100, b, C.mint);
           txt(390, 446, "שנייה: היום פחות ההעמדה", 20, { fill: C.n700, o: b });
           txt(390, 490, `${V.v2} ₪`, 34, { w: 700, fill: C.teal, o: b, ltr: true });
-          txt(640, 546, `הנמוכה נגבית. הכלל שווה ${V.worth} ₪`, 24, { w: 700, o: at(22) });
+          txt(640, 538, `הנמוכה נגבית. ההפרש בין הנוסחאות: ${V.worth} ₪`, 24, { w: 700, o: at(22) });
         }
         // Scene 6 — effective against nominal
         if (inScene(t, S.mix)) {
@@ -228,19 +235,19 @@
           const at = (s) => after(t, S.mix, s, o);
           txt(640, 124, "אפקטיבי מול נומינלי: לא מערבבים", 38, { w: 700, o });
           box(180, 170, 920, 190, at(1));
-          const cols = [{ x: 1060, l: "הריבית" }, { x: 800, l: "סוג" }, { x: 560, l: "לחודש" }, { x: 330, l: "איך" }];
+          const cols = [{ x: 1060, l: "הריבית" }, { x: 800, l: "סוג" }, { x: 480, l: "לחודש" }, { x: 290, l: "איך" }];
           for (const c of cols) txt(c.x, 206, c.l, 18, { anchor: "start", fill: C.n600, w: 600, o: at(1) });
           const rows = [
             ["בחוזה", `5.90%`, "נומינלית", `${V.mC}%`, "חלקי 12", 3],
-            ["ממוצע היום", "4.82%", "אפקטיבית", `${V.mA}%`, "שורש 12", 9],
+            ["ממוצע ביום הפירעון", "4.823049%", "אפקטיבית", `${V.mA}%`, "שורש 12", 9],
             ["ממוצע בהעמדה", "5.09%", "אפקטיבית", `${V.mG}%`, "שורש 12", 12],
           ];
           rows.forEach(([a, b, c, d, e, from], i) => {
             const y = 252 + i * 38, oc = at(from);
             txt(1060, y, a, 20, { anchor: "start", w: 600, o: oc });
             txt(800, y, `${b} ${c}`, 20, { anchor: "start", o: oc });
-            txt(560, y, d, 22, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
-            txt(330, y, e, 20, { anchor: "start", o: oc });
+            txt(480, y, d, 22, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
+            txt(290, y, e, 20, { anchor: "start", o: oc });
           });
           txt(640, 392, `5.90% נומינלי הם ${V.effC}% אפקטיבי`, 26, { w: 700, fill: C.navy, o: at(7) });
           const om = at(20);

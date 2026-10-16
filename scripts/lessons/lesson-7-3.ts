@@ -136,6 +136,7 @@ export default function lesson73(): LessonData {
     difference("ex4.answer", x4fee, x4day),
     totalOf("ex4.err_sum", [x4fee, x4day]),
     percentOfAmount("ex4.balance_pct", "400000", "0.25"),
+    difference("ex4.err_nohalf", percentOfAmount("ex4.balance_pct", "400000", "0.25"), x4day),
     given("ex4.balance", "400000.00"),
     given("ex5.balance", "250000.00"),
   ];

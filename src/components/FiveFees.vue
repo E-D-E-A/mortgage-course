@@ -72,7 +72,7 @@ const sum = computed(() => fees.value.op.plus(fees.value.nn).plus(fees.value.ix)
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      הלוואה בדויה, יתרה של <span class="ltr">500,000 ₪</span>. המדד עלה בממוצע <span class="ltr">0.25%</span> בחודש. ההלוואה מוחזרת כולה באוגוסט 2026. מספרים להמחשה.
+      הלוואה בדויה, יתרה של <span class="ltr">500,000 ₪</span>. המדד עלה בממוצע <span class="ltr">0.25%</span> בחודש. ההלוואה מוחזרת כולה באוגוסט 2026. מספרים להמחשה. דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.
     </p>
 
     <div class="mt-3 inline-flex flex-wrap rounded-md border border-n200 p-1" role="group" aria-label="סוג ההלוואה">

@@ -79,7 +79,7 @@
         v1: fact("fee.v1"), v2: fact("fee.v2"), lower: fact("fee.lower"), red: fact("fee.reduction"), disc: fact("fee.discount"), op: fact("fee.operational"), total: fact("fee.total"),
         rate0: fact("old.rate0"), rate1: fact("old.rate1"), balance: fact("old.balance"), financed: fact("old.financed"), first: fact("old.first"), months: fact("old.months"),
         banks: ["b", "c", "d"].map((id) => ({ id, rate: fact(`${id}.rate`), term: fact(`${id}.term`), rn: Number(fact(`${id}.rate_new`)), margin: fact(`${id}.margin`), worth: fact(`${id}.worth`), gap: fact(`${id}.gap`), saving: fact(`${id}.saving`), first: fact(`${id}.first`) })),
-        keep: fact("keep.total"), topSave: fact("b.top_saving"), top: fact("case.top_up"),
+        keep: fact("keep.total"), topSave: fact("b.top_saving"), bSave: fact("b.saving"), topVs: fact("b.top_vs_sep"), top: fact("case.top_up"),
         totals: { b: fact("b.top_switch_total"), c: fact("c.top_switch_total"), d: fact("d.top_switch_total") },
         ratio: { today: fact("ratio.today"), b: fact("ratio.b"), c: fact("ratio.c"), d: fact("ratio.d"), keep: fact("ratio.keep") },
         limCap: fact("lim.capital"), limPti: fact("lim.pti"), months18: fact("rule.months"), income: fact("case.income"),
@@ -93,11 +93,11 @@
         [5, 8.5, "בדוגמה בדויה, על ההלוואה של הצוות."],
         [10, 18, "קודם: כמה עולה לצאת מההלוואה."],
         [18, 28, `נוסחה ראשונה: ${shekW(V.v1)}. שנייה: ${shekW(V.v2)}.`],
-        [28, 37, "הבנק גובה את הנמוכה משתיהן."],
+        [28, 37, "לפי התעתיק: הבנק גובה את הנמוכה."],
         [37, 45, `אחרי הפחתה לפי ותק של ${V.red}%: ${shekW(V.disc)}.`],
         [45, 51, `ועוד ${shekW(V.op)}: סך העמלה ${shekW(V.total)}.`],
         [53, 62, "עכשיו המבחן של הרגולציה: ריבית מול ריבית."],
-        [62, 72, `הרף: ${V.rate1}%, כולל העמלה.`],
+        [62, 72, `הרף: ${V.rate1}%, כולל העמלה (לפי התעתיק).`],
         [72, 83, "בנקים ב׳ וג׳ עוברים. בנק ד׳ לא."],
         [83, 91, "אבל המבחן בודק ריבית בלבד."],
         [93, 104, "תשלום נמוך אינו חיסכון כולל."],
@@ -107,9 +107,9 @@
         [139, 148, `התוספת: ${shekW(V.top)} לשיפוץ. חוב חדש, לא חיסכון.`],
         [148, 158, "מחזור והתוספת בהלוואה אחת, או הלוואה נפרדת."],
         [158, 167, "המחיר של ההלוואה הנפרדת בדוי."],
-        [167, 174, `בבנק ב׳ זול ב־${shekW(V.topSave)} בדוגמה.`],
+        [167, 174, `מזה ${shekW(V.bSave)} חיסכון המחזור, ו־${shekW(V.topVs)} התוספת.`],
         [176, 186, "יחס ההחזר: ההחזר חלקי ההכנסה הפנויה."],
-        [186, 196, `בשאר ההחזרים נספרת ההלוואה שנשארה: יותר מ־${V.months18} חודשים.`],
+        [186, 196, `ההחזר על הקיימת נספר אם נשארו בה יותר מ־${V.months18} חודשים.`],
         [196, 204, "זה כלל אותו נכס, לפי התעתיק של הצוות."],
         [206, 216, "מה שהמספרים לא מכסים: A ו־C ביום הפירעון."],
         [216, 225, "מי נותן את התוספת, ובאיזה מחיר."],
@@ -139,28 +139,30 @@
             const oi = after(t, S.fee, at, o);
             if (oi <= 0) return;
             el("rect", { x: R - Math.max(w, 6), y, width: Math.max(w, 6), height: 56, rx: 10, fill, opacity: oi });
-            txt(R + 20, y + 38, label, 26, { anchor: "start", w: strong ? 700 : 600, fill: C.n700, o: oi });
+            txt(R, y - 12, label, 24, { anchor: "start", w: strong ? 700 : 600, fill: C.n700, o: oi });
             txt(R - Math.max(w, 6) - 14, y + 38, lr(shekW(val)), 28, { anchor: "end", w: 700, ltr: true, o: oi });
           };
           bar(y0, Number(V.v1) * U, C.n300, "נוסחה ראשונה", V.v1, 9, false);
           bar(y0 + 90, Number(V.v2) * U, C.tq2, "נוסחה שנייה", V.v2, 18, false);
           const olow = after(t, S.fee, 27, o);
           if (olow > 0) {
-            el("rect", { x: 130, y: y0 + 80, width: 970, height: 76, rx: 16, fill: "none", stroke: C.teal, "stroke-width": 4, opacity: olow });
-            txt(640, y0 + 190, "הנמוכה משתיהן", 30, { w: 700, fill: C.teal, o: olow });
+            el("rect", { x: 130, y: y0 + 58, width: 990, height: 98, rx: 16, fill: "none", stroke: C.teal, "stroke-width": 4, opacity: olow });
+            txt(300, y0 + 128, "הנמוכה משתיהן", 30, { w: 700, fill: C.teal, o: olow });
           }
-          bar(y0 + 230, Number(V.disc) * U, C.teal, `אחרי הפחתה של ${V.red}% לפי ותק`, V.disc, 36, true);
+          bar(y0 + 240, Number(V.disc) * U, C.teal, `אחרי הפחתה של ${V.red}% לפי ותק`, V.disc, 36, true);
           const ot = after(t, S.fee, 43, o);
           if (ot > 0) {
-            el("rect", { x: 330, y: y0 + 330, width: 620, height: 74, rx: 37, fill: C.successBg, opacity: ot });
-            txt(640, y0 + 378, `סך העמלה, עם ${lr(shekW(V.op))} תפעולית: ${lr(shekW(V.total))}`, 30, { w: 700, o: ot });
+            el("rect", { x: 330, y: y0 + 335, width: 620, height: 74, rx: 37, fill: C.successBg, opacity: ot });
+            txt(640, y0 + 383, `סך העמלה, עם ${lr(shekW(V.op))} תפעולית: ${lr(shekW(V.total))}`, 30, { w: 700, o: ot });
           }
+          txt(640, 146, "הצו מתעתיק של הצוות, והערכים של 2.8.2026 לא אומתו", 22, { fill: C.n600, o });
         }
         // Scene 3 — the test: the bar and three offers
         if (inScene(t, S.test)) {
           const o = vis(t, S.test);
           txt(640, 100, "המבחן של סעיף 15א", 46, { w: 700, o });
           txt(640, 146, "ריבית כוללת חזויה של ההצעה, מול הרף של ההלוואה הקיימת", 26, { fill: C.n600, o });
+          txt(640, 184, "לפי תעתיק הצוות להוראה 451, לא אומת", 22, { fill: C.n500, o });
           const lo = 5.2, hi = 6.1;
           const X = (r) => 1100 - ((r - lo) / (hi - lo)) * 880;
           const y = 330;
@@ -201,22 +203,22 @@
             txt(1090 - w - 12, y + 34, lr(shekW(b.gap)), 24, { anchor: "end", w: 600, ltr: true, o: oi });
           });
           // right: totals diverging around x=330
-          const x0 = 340;
+          const x0 = 440;
           el("line", { x1: x0, x2: x0, y1: 200, y2: 540, stroke: C.n300, "stroke-width": 3, opacity: o });
           V.banks.forEach((b, i) => {
             const y = 230 + i * 110;
             const oi = after(t, S.pay, 22 + i * 4, o);
             if (oi <= 0) return;
             const sv = Number(b.saving);
-            const w = Math.abs(sv) / maxSave * 250;
+            const w = Math.abs(sv) / maxSave * 230;
             const good = sv > 0;
             el("rect", { x: good ? x0 : x0 - 0, y, width: 0, height: 0, fill: "none" });
             // positive saving grows to the right (saves), negative to the left (pays more)
             el("rect", { x: good ? x0 : x0 - w, y, width: w, height: 46, rx: 8, fill: good ? C.success : C.danger, opacity: oi });
             txt(good ? x0 + w + 12 : x0 - w - 12, y + 34, lr(shekW(Math.abs(sv))), 24, { anchor: good ? "start" : "end", w: 700, ltr: true, fill: good ? C.success : C.danger, o: oi });
           });
-          txt(340 + 130, 585, "חוסך", 24, { fill: C.success, w: 600, o: after(t, S.pay, 36, o) });
-          txt(340 - 130, 585, "משלם יותר", 24, { fill: C.danger, w: 600, o: after(t, S.pay, 36, o) });
+          txt(x0 + 120, 585, "חוסך", 24, { fill: C.success, w: 600, o: after(t, S.pay, 36, o) });
+          txt(x0 - 120, 585, "משלם יותר", 24, { fill: C.danger, w: 600, o: after(t, S.pay, 36, o) });
         }
         // Scene 5 — the top-up
         if (inScene(t, S.top)) {
@@ -239,7 +241,8 @@
             txt(830 - w + 14, y + 33, lr(shekW(r.v)), 24, { anchor: "start", w: 700, ltr: true, fill: i === 1 ? C.n0 : C.navy, o: oi });
           });
           const on = after(t, S.top, 28, o);
-          txt(640, 600, `ההלוואה הנפרדת בדויה. בדוגמה, בנק ב׳ זול ב־${lr(shekW(V.topSave))}`, 28, { w: 700, fill: C.teal, o: on });
+          txt(640, 560, `ההפרש ${lr(shekW(V.topSave))}: ${lr(shekW(V.bSave))} חיסכון המחזור, ${lr(shekW(V.topVs))} התוספת`, 26, { w: 700, fill: C.teal, o: on });
+          txt(640, 592, "ההלוואה הנפרדת בדויה, ובלי עלויות כניסה", 22, { fill: C.n600, o: on });
         }
         // Scene 6 — the repayment ratio
         if (inScene(t, S.ratio)) {
@@ -261,6 +264,7 @@
             [[x40, `${V.limCap}%`, C.warning], [x50, `${V.limPti}%`, C.danger]].forEach(([x, s, col]) => {
               el("line", { x1: x, x2: x, y1: 180, y2: 500, stroke: col, "stroke-width": 3, "stroke-dasharray": "10 8", opacity: og });
               txt(x, 530, lr(s), 26, { w: 700, ltr: true, fill: col, o: og });
+              txt(x, 562, s.startsWith(V.limCap) ? "סף הון" : "מגבלה", 24, { fill: C.n700, o: og });
             });
           }
           txt(640, 600, `בהלוואה שנשארת, ההחזר שלה נספר כל עוד נשארו יותר מ־${V.months18} חודשים`, 26, { fill: C.n700, o: after(t, S.ratio, 20, o) });

@@ -59,6 +59,7 @@ export default function lesson72(): LessonData {
   const x6op = fee("ex6.op", W, "operational");
   const x6hi = afterReduction("ex6.err_high_disc", x6v1, 20);
   const x7 = given("ex7.v2", "-2000.00");
+  const x7pay = given("ex7.pay", "2000.00");
 
   const facts: Fact[] = [
     // The small picture: a bullet of 110,000 ₪ in a year, a loan of 100,000 ₪ at 10%.
@@ -97,6 +98,7 @@ export default function lesson72(): LessonData {
     fee("w.no_notice", W, "no_notice"),
     fee("w.total", W, "total"),
     fee("w.total_v1_only", W, "total_v1_only"),
+    difference("w.real_saving", fee("w.total_v1_only", W, "total_v1_only"), fee("w.total", W, "total")),
     ratioOf("w.overstate", fee("w.total_v1_only", W, "total_v1_only"), fee("w.total", W, "total"), 1),
 
     // The mistake: dividing the published (effective) average by 12.
@@ -152,6 +154,7 @@ export default function lesson72(): LessonData {
     totalOf("ex6.err_no_reduction", [x6lower, x6op]),
     x6hi,
     x7,
+    x7pay,
   ];
 
   return {

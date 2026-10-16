@@ -135,6 +135,7 @@ export default function lesson74(): LessonData {
     swc("c.gap36", OC, "gap_at", { k: 36 }),
     difference("c.extra", byId("c.switch_total"), byId("stay.total")),
     difference("d.extra", byId("d.switch_total"), byId("stay.total")),
+    effective("d.eff_nominal", "0.475", 2),
     difference("d.extra_no_costs", byId("d.total"), byId("stay.total")),
     times("c.naive", byId("c.gap"), 203),
     times("d.naive", byId("d.gap"), 203),

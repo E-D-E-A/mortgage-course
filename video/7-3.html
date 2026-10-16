@@ -74,32 +74,32 @@
       window.duration = 236;
       window.cues = [
         [1, 5, "תחנות יציאה ותזמון."],
-        [5, 8.5, "מתי כדאי לפרוע, ומה חשוב לדעת על הימים."],
+        [5, 9, "דוגמה לימודית, מספרים להמחשה. מתי כדאי לפרוע?"],
         [10, 17, "מסלול משתנה: הריבית מתעדכנת כל חמש שנים."],
         [17, 25, `העדכון הבא של ההלוואה הבדויה: ${V.reset}.`],
         [25, 33, "ככל שהעדכון קרוב, העמלה קטנה."],
-        [33, 41, `${V.m24} חודשים לפני: ${lr(V.t24 + " ₪")}. ${V.m12} חודשים: ${lr(V.t12 + " ₪")}.`],
-        [41, 49, `${V.m4} חודשים לפני העדכון: ${lr(V.t4 + " ₪")}.`],
-        [49, 59, `ביום העדכון, בתחנת היציאה: רק ${lr(V.tx + " ₪")}.`],
+        [33, 41, `${V.m24} חודשים לפני: ${lr(V.t24)} ₪. ${V.m12} חודשים: ${lr(V.t12)} ₪.`],
+        [41, 49, `${V.m4} חודשים לפני העדכון: ${lr(V.t4)} ₪.`],
+        [49, 59, `לפי התעתיק: ביום העדכון רק ${lr(V.tx)} ₪.`],
         [61, 68, "במסלול קבוע אין תחנת יציאה."],
         [68, 76, "העמלה יורדת לאט, ובמדרגה אחרי חמש שנים."],
-        [76, 85, `עדי וירון: ${lr(V.c5a + " ₪")} ביוני 2028, ${lr(V.c5b + " ₪")} ביולי.`],
+        [76, 85, `עדי וירון: ${lr(V.c5a)} ₪ ביוני 2028, ${lr(V.c5b)} ₪ ביולי.`],
         [87, 94, "הודעה בכתב: בין 10 ל־45 ימים לפני הפירעון."],
         [94, 101, "עדי וירון פורעים ב־2 באוגוסט 2026."],
         [101, 109, `החלון: מ־${V.from} עד ${V.to}.`],
         [109, 117, `הודיעו ${V.okDays} ימים מראש: אין עמלת אי־הודעה.`],
-        [117, 124, `הודיעו רק ${V.shortDays} ימים מראש: ${lr(V.shortFee + " ₪")}.`],
+        [117, 124, `הודיעו רק ${V.shortDays} ימים מראש: ${lr(V.shortFee)} ₪.`],
         [126, 134, "הודעה שלא ניצלו חוסמת הודעה חדשה לשישה חודשים."],
         [134, 142, "לכן מודיעים רק אחרי שההחלטה התקבלה."],
         [142, 154, "הכלל וההצעה: תעתיק ומחקר של הצוות. לא אומת."],
         [156, 163, "הלוואה צמודה: עמלת מדד רק בין ה־1 ל־15."],
-        [163, 171, `ב־15 בחודש: ${lr(V.ix15 + " ₪")}. ב־16: ${lr(V.ix16 + " ₪")}.`],
-        [171, 179, `אבל יום המתנה עולה ריבית של יום: ${lr(V.ixDay + " ₪")}.`],
-        [179, 189, `נטו: ${lr(V.ixNet + " ₪")}. הנחת חישוב: חודש של 30 יום.`],
+        [163, 171, `ב־15 בחודש: ${lr(V.ix15)} ₪. ב־16: ${lr(V.ix16)} ₪.`],
+        [171, 179, `אבל יום המתנה עולה ריבית של יום: ${lr(V.ixDay)} ₪.`],
+        [179, 189, `נטו: ${lr(V.ixNet)} ₪, למי שפורע מכספו. חודש = 30 יום.`],
         [191, 198, "ההפחתה לפי ותק היא מדרגה, לא שיפוע."],
-        [198, 207, `יום לפני שלוש שנים: ${lr(V.before + " ₪")}.`],
-        [207, 214, `יומיים אחרי: ${lr(V.after + " ₪")}. חוסכים ${lr(V.saving + " ₪")}.`],
-        [214, 221, `אבל חודש המתנה עולה ${lr(V.mInt + " ₪")} ריבית.`],
+        [198, 207, `יום לפני שלוש שנים: ${lr(V.before)} ₪.`],
+        [207, 214, `יומיים אחרי: ${lr(V.after)} ₪. חוסכים ${lr(V.saving)} ₪.`],
+        [214, 221, "אבל חודש המתנה עולה ריבית. כמה? תלוי בהצעה האחרת."],
         [223, 230, "הממוצעים בחישובים קבועים. בפועל הם משתנים."],
         [230, 235, "וההחלטה? בשיעור 7.4."],
       ];
@@ -127,13 +127,20 @@
       };
       // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
       // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
-      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
-      const txt = (x, y, s, size, opts = {}) =>
-        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const iso = (s) => s.replace(/(\d[\d,.]*%?)/g, "\u2066$1\u2069");
+      // An amount ("637.96 ₪") is read right to left: the number first, the sign after it. So it is drawn as a right-to-left
+      // line whose number is its own isolate; anchors swap because an RTL "start" is the right edge. Equations stay left to right.
+      const txt = (x, y, s, size, opts = {}) => {
+        const amount = opts.ltr && s.includes("₪") && !/[=÷×−]/.test(s);
+        const ltr = opts.ltr && !amount;
+        const anchor = amount && opts.anchor === "start" ? "end" : amount && opts.anchor === "end" ? "start" : opts.anchor ?? "middle";
+        return el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": anchor, opacity: opts.o ?? 1, direction: ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, ltr ? s : iso(s));
+      };
       const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
 
       window.render = (t) => {
         svg.replaceChildren();
+        txt(640, 562, "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים", 15, { fill: C.n600 });
         // Scene 1 — title
         if (inScene(t, S.title)) {
           const o = vis(t, S.title);
@@ -162,7 +169,7 @@
             txt(x, base + 30, b.label, 20, { fill: C.n700, o: oc });
           });
           el("line", { x1: 200, x2: 1100, y1: base, y2: base, stroke: C.n300, "stroke-width": 1, opacity: o });
-          txt(640, 556, "תחנת יציאה: פירעון ביום העדכון, רק עמלה תפעולית · תעתיק · לא אומת", 18, { fill: C.n600, o: at(44) });
+          txt(640, 540, "תחנת יציאה: פירעון ביום העדכון, רק עמלה תפעולית · תעתיק · לא אומת", 18, { fill: C.n600, o: at(44) });
         }
         // Scene 3 — a fixed track
         if (inScene(t, S.fixed)) {
@@ -288,7 +295,8 @@
           const c = at(19);
           box(300, 400, 680, 70, c * 0.95, C.mint);
           txt(640, 446, `חוסכים ${V.saving} ₪ בעמלה`, 30, { w: 700, o: c });
-          txt(640, 510, `אבל חודש המתנה עולה ${V.mInt} ₪ בריבית של ההלוואה הקיימת`, 22, { fill: C.n700, o: at(24) });
+          txt(640, 500, `ריבית חודש על כל היתרה: ${V.mInt} ₪`, 22, { fill: C.n700, o: at(24) });
+          txt(640, 534, "מחליפים הלוואה? ההמתנה עולה רק את הפרש הריביות (שיעור 7.4)", 20, { fill: C.n600, o: at(26) });
         }
         // Scene 8 — takeaway
         if (inScene(t, S.end)) {

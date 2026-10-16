@@ -213,11 +213,12 @@
           ["גיל?", "מחיר?", "מה קורה לחוב?", "מי מחזיר בפטירה?", "יורשים?"].forEach((s, i) => {
             const oj = after(t, S.rev, 7 + i * 2, o);
             if (oj <= 0) return;
-            const x = 1100 - i * 220;
-            el("rect", { x: x - 90, y: 360, width: 180, height: 70, rx: 35, fill: C.warningBg, opacity: oj });
-            txt(x, 405, s, 26, { w: 600, o: oj });
+            const x = i < 3 ? 1000 - i * 350 : 825 - (i - 3) * 350;
+            const yy = i < 3 ? 340 : 430;
+            el("rect", { x: x - 160, y: yy, width: 320, height: 70, rx: 35, fill: C.warningBg, opacity: oj });
+            txt(x, yy + 45, s, 26, { w: 600, o: oj });
           });
-          txt(640, 500, "הקורס לא יודע: זו שאלה, לא תשובה", 34, { w: 700, fill: C.teal, o: after(t, S.rev, 18, o) });
+          txt(640, 540, "הקורס לא יודע: זו שאלה, לא תשובה", 34, { w: 700, fill: C.teal, o: after(t, S.rev, 18, o) });
         }
         // Scene 6 — close
         if (inScene(t, S.end)) {

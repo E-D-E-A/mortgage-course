@@ -136,7 +136,7 @@
           box(180, 190, 400, 190, at(1));
           txt(380, 236, "ההלוואה החדשה מכסה", 24, { fill: C.n600, o: at(1) });
           txt(380, 276, "את החוב והעמלה", 24, { fill: C.n600, o: at(1) });
-          txt(380, 346, `${V.fin} ₪`, 44, { w: 700, o: at(1), ltr: true });
+          txt(380, 346, `${lr(V.fin)} ₪`, 44, { w: 700, o: at(1) });
           box(700, 190, 400, 190, at(10));
           txt(900, 236, "הרף של שיעור 7.4", 24, { fill: C.n600, o: at(10) });
           txt(900, 276, "ריבית לצרכי השוואה", 24, { fill: C.n600, o: at(10) });
@@ -165,9 +165,9 @@
           const at = (s) => after(t, S.example, s, o);
           txt(640, 110, "השוואה בדויה: כמה חוסכים בסך הכול", 38, { w: 700, o });
           const rows = [
-            { y: 190, label: "בנק אחר", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsExt + " ₪")}`, v: g("ext.saving"), s: V.extSave, from: 1, color: C.tq2 },
-            { y: 290, label: "הבנק הנוכחי", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsInt + " ₪")}`, v: g("i0.saving"), s: V.i0Save, from: 10, color: C.teal },
-            { y: 390, label: "הבנק הנוכחי", sub: `${lr(V.i1Rate + "%")} · עלויות ${lr(V.costsInt + " ₪")}`, v: g("i1.saving"), s: V.i1Save, from: 19, color: C.teal },
+            { y: 190, label: "בנק אחר", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsExt)} ₪`, v: g("ext.saving"), s: V.extSave, from: 1, color: C.tq2 },
+            { y: 290, label: "הבנק הנוכחי", sub: `${lr(V.extRate + "%")} · עלויות ${lr(V.costsInt)} ₪`, v: g("i0.saving"), s: V.i0Save, from: 10, color: C.teal },
+            { y: 390, label: "הבנק הנוכחי", sub: `${lr(V.i1Rate + "%")} · עלויות ${lr(V.costsInt)} ₪`, v: g("i1.saving"), s: V.i1Save, from: 19, color: C.teal },
           ];
           const maxV = 35000;
           for (const r of rows) {
@@ -176,7 +176,7 @@
             txt(1200, r.y + 34, r.sub, 20, { anchor: "start", fill: C.n600, o: oc });
             const w = (Number(r.v) / maxV) * 560;
             el("rect", { x: 950 - w, y: r.y - 24, width: w, height: 56, rx: 8, fill: r.color, opacity: oc });
-            txt(950 - w - 14, r.y + 14, `${r.s} ₪`, 26, { anchor: "end", w: 700, o: oc, ltr: true });
+            txt(950 - w - 14, r.y + 14, `${lr(r.s)} ₪`, 26, { anchor: "end", w: 700, o: oc });
           }
           txt(640, 500, "בריבית זהה העלויות מכריעות. בעשירית נקודת אחוז הריבית מכריעה", 24, { fill: C.n700, w: 600, o: at(30) });
         }

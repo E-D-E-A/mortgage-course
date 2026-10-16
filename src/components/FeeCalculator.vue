@@ -51,7 +51,7 @@ const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Dat
 const problem = computed(() => {
   if (!isDate(granted.value) || !isDate(repaid.value)) return "בחרו תאריך מלא בשני השדות.";
   if (repaid.value < granted.value) return "תאריך הפירעון לפני תאריך ההעמדה.";
-  if (!isNumber(avgToday.value)) return "הממוצע של היום: כתבו מספר, למשל 4.82.";
+  if (!isNumber(avgToday.value)) return "הממוצע ביום הפירעון: כתבו מספר, למשל 4.82.";
   if (hasGrant.value && !isNumber(avgGrant.value)) return "הממוצע בהעמדה: כתבו מספר, למשל 5.09.";
   if (Number(avgToday.value) <= -100 || (hasGrant.value && Number(avgGrant.value) <= -100)) return "ממוצע של −100% ומטה לא מוגדר.";
   return "";
@@ -127,10 +127,10 @@ const steps = computed<Step[]>(() => {
       title: "שלוש ריביות חודשיות: לא מערבבים",
       lines: [
         { label: `הריבית בחוזה (נומינלית ${rate.value.toFixed(2)}%, שווה ל־${contractEff.value}% אפקטיבית): חלקי 12`, value: monthlyContract.value },
-        { label: `הממוצע היום (אפקטיבי ${avgToday.value}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyToday.value },
+        { label: `הממוצע ביום הפירעון (אפקטיבי ${avgToday.value}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyToday.value },
         { label: `הממוצע בהעמדה (אפקטיבי ${hasGrant.value ? avgGrant.value : "—"}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyGrant.value },
       ],
-      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית בחוזה נומינלית: משווים רק ריביות חודשיות. הפרק בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה פרק הוא שייך)" : ""}.`,
+      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית בחוזה נומינלית: משווים רק ריביות חודשיות. הטווח בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה טווח הוא שייך)" : ""}.`,
     },
   ];
   if (d) {
@@ -139,7 +139,7 @@ const steps = computed<Step[]>(() => {
         n: 4,
         title: "הערך הנוכחי של התשלומים שנשארו",
         lines: [
-          { label: "בריבית הממוצעת של היום", value: m(d.pvToday) },
+          { label: "בריבית הממוצעת ביום הפירעון", value: m(d.pvToday) },
           { label: "בריבית של החוזה (שווה ליתרה)", value: m(d.pvContract) },
           { label: "בריבית הממוצעת של יום ההעמדה", value: m(d.pvGrant) },
         ],
@@ -148,8 +148,8 @@ const steps = computed<Step[]>(() => {
         n: 5,
         title: "שתי הנוסחאות",
         lines: [
-          { label: d.v1Applies ? "נוסחה ראשונה: היום פחות החוזה" : "נוסחה ראשונה: לא חלה (הממוצע של היום לא נמוך מהחוזה)", value: d.v1Applies ? m(d.v1) : "—" },
-          { label: d.v2Applies ? "נוסחה שנייה: היום פחות ההעמדה" : hasGrant.value ? "נוסחה שנייה: לא חלה (הממוצע בהעמדה לא נמוך מהחוזה)" : "נוסחה שנייה: לא קיימת (לא פורסם ממוצע בהעמדה)", value: d.v2Applies ? m(d.v2) : "—" },
+          { label: d.v1Applies ? "נוסחה ראשונה: ביום הפירעון פחות החוזה" : "נוסחה ראשונה: לא חלה (הממוצע ביום הפירעון לא נמוך מהחוזה)", value: d.v1Applies ? m(d.v1) : "—" },
+          { label: d.v2Applies ? "נוסחה שנייה: ביום הפירעון פחות ההעמדה" : hasGrant.value ? "נוסחה שנייה: לא חלה (הממוצע בהעמדה לא נמוך מהחוזה)" : "נוסחה שנייה: לא קיימת (לא פורסם ממוצע בהעמדה)", value: d.v2Applies ? m(d.v2) : "—" },
         ],
       },
       {
@@ -199,7 +199,7 @@ const steps = computed<Step[]>(() => {
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      הלוואה אחת, קבועה לא צמודה, בשפיצר. ברירת המחדל היא ההלוואה של עדי וירון והממוצעים שהצוות קרא ב־2.8.2026 (לא אומת). שאר המספרים להמחשה.
+      הלוואה אחת, קבועה לא צמודה, בשפיצר. ברירת המחדל היא ההלוואה של עדי וירון והממוצעים שהצוות קרא ב־2.8.2026 (לא אומת). שאר המספרים להמחשה. דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.
     </p>
 
     <div class="mt-3 grid gap-x-4 gap-y-3 sm:grid-cols-3">
@@ -230,8 +230,8 @@ const steps = computed<Step[]>(() => {
         <input v-model="repaid" type="date" class="h-11 rounded-md border border-n200 bg-n0 px-2 text-body-m text-n900 outline-none focus:border-turquoise-2" />
       </label>
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">הממוצע היום (אפקטיבי, באחוזים)</span>
-        <input v-model="avgToday" type="text" inputmode="decimal" class="ltr h-11 rounded-md border border-n300 px-2 text-body-m text-n900" aria-label="הממוצע היום, אפקטיבי, באחוזים" />
+        <span class="text-caption font-semibold text-n600">הממוצע ביום הפירעון (אפקטיבי, באחוזים)</span>
+        <input v-model="avgToday" type="text" inputmode="decimal" class="ltr h-11 rounded-md border border-n300 px-2 text-body-m text-n900" aria-label="הממוצע ביום הפירעון, אפקטיבי, באחוזים" />
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-caption font-semibold text-n600">הממוצע ביום ההעמדה (אפקטיבי)</span>

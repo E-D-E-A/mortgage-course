@@ -71,13 +71,13 @@
       window.duration = 226;
       window.cues = [
         [1, 5, "חמש עמלות, כל אחת עם כלל משלה."],
-        [5, 8.5, "מה עולה לצאת מהלוואה לפני הזמן?"],
+        [5, 9, "דוגמה לימודית, מספרים להמחשה. מה עולה לצאת?"],
         [10, 16, "עדי וירון: 700,000 ₪, 5.90%, קבועה לא צמודה."],
         [16, 22, `עברו ${V.paid} תשלומים, ונשארו ${V.remaining}.`],
-        [22, 29, `היתרה: ${lr(V.balance + " ₪")}. הם רוצים להחזיר אותה כולה.`],
+        [22, 29, `היתרה: ${lr(V.balance)} ₪. הם רוצים להחזיר אותה כולה.`],
         [29, 37, "מה הבנק רשאי לגבות? לא עמלה אחת."],
-        [39, 46, "לפי הצו, חמש עמלות. לכל אחת תנאי וסכום משלה."],
-        [46, 54, `תפעולית: תמיד, עד ${lr(V.op + " ₪")}.`],
+        [39, 46, "לפי התעתיק של הצוות: חמש עמלות, כל אחת עם כלל משלה."],
+        [46, 54, `תפעולית: תמיד, עד ${lr(V.op)} ₪.`],
         [54, 63, "אי־הודעה: אם לא הודעתם בכתב לפחות 10 ימים לפני."],
         [63, 72, "היוון: במסלול בריבית קבועה. היא הגדולה מכולן."],
         [72, 81, "מדד: בהלוואה צמודה שהוחזרה בין ה־1 ל־15."],
@@ -85,16 +85,16 @@
         [91, 99, "הטבלה היא תעתיק של הצוות. לא אומת מול הצו."],
         [101, 108, "העמלה התפעולית: פעם אחת לכל פירעון."],
         [108, 115, "לא פעם לכל מסלול. שלושה מסלולים לא משלמים שלוש פעמים."],
-        [115, 122, `בלי הפסיקה זה היה ${lr(V.op3 + " ₪")}. עם הפסיקה — ${lr(V.op + " ₪")}.`],
+        [115, 122, `בלי הפסיקה זה היה ${lr(V.op3)} ₪. עם הפסיקה — ${lr(V.op)} ₪.`],
         [122, 127, "הפסיקה: תעתיק של הצוות. לא אומת."],
         [129, 136, "עמלת אי־הודעה: 0.1% מהסכום שמוחזר. שקל על כל אלף."],
-        [136, 144, `יתרה של ${lr(V.balance + " ₪")}, בלי הודעה: ${lr(V.nnNone + " ₪")}.`],
+        [136, 144, `יתרה של ${lr(V.balance)} ₪, בלי הודעה: ${lr(V.nnNone)} ₪.`],
         [144, 152, `הודעה בכתב ${V.days} ימים מראש: ${lr("0 ₪")}.`],
         [152, 155, "הודעה בזמן חוסכת את העמלה הזו."],
         [157, 164, "עמלת מדד: רק בהלוואה צמודה."],
-        [164, 172, `יתרה ${lr(V.ixBalance + " ₪")}, מדד שעולה ממוצע 0.25% בחודש.`],
-        [172, 180, `הוחזרה ב־10 בחודש: ${lr(V.ix10 + " ₪")}.`],
-        [180, 189, `הוחזרה ב־16: ${lr(V.ix16 + " ₪")}. ה־15 הוא הגבול.`],
+        [164, 172, `יתרה ${lr(V.ixBalance)} ₪, מדד שעולה ממוצע 0.25% בחודש.`],
+        [172, 180, `הוחזרה ב־10 בחודש: ${lr(V.ix10)} ₪.`],
+        [180, 189, `הוחזרה ב־16: ${lr(V.ix16)} ₪. ה־15 הוא הגבול.`],
         [191, 198, "הלוואה מוכוונת: אין עליה שום עמלה."],
         [198, 205, "במסלול פריים אין את העמלה הגדולה, אבל יש תפעולית."],
         [205, 211, "ובהלוואה לא צמודה אין עמלת מדד."],
@@ -125,13 +125,20 @@
       };
       // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
       // In a right-to-left line every number (with its % or ₪) is its own left-to-right isolate, so it reads the right way round.
-      const iso = (s) => s.replace(/(\d[\d,.]*%?(?: ₪)?)/g, "\u2066$1\u2069");
-      const txt = (x, y, s, size, opts = {}) =>
-        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, opts.ltr ? s : iso(s));
+      const iso = (s) => s.replace(/(\d[\d,.]*%?)/g, "\u2066$1\u2069");
+      // An amount ("637.96 ₪") is read right to left: the number first, the sign after it. So it is drawn as a right-to-left
+      // line whose number is its own isolate; anchors swap because an RTL "start" is the right edge. Equations stay left to right.
+      const txt = (x, y, s, size, opts = {}) => {
+        const amount = opts.ltr && s.includes("₪") && !/[=÷×−]/.test(s);
+        const ltr = opts.ltr && !amount;
+        const anchor = amount && opts.anchor === "start" ? "end" : amount && opts.anchor === "end" ? "start" : opts.anchor ?? "middle";
+        return el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": anchor, opacity: opts.o ?? 1, direction: ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, ltr ? s : iso(s));
+      };
       const box = (x, y, w, h, o, fill = C.n0, stroke) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: stroke ?? (fill === C.n0 ? C.n200 : "none"), "stroke-width": stroke ? 3 : 1, opacity: o });
 
       window.render = (t) => {
         svg.replaceChildren();
+        txt(640, 562, "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים", 15, { fill: C.n600 });
         // Scene 1 — title
         if (inScene(t, S.title)) {
           const o = vis(t, S.title);

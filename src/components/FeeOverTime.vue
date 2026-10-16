@@ -131,7 +131,7 @@ const tableRows = computed(() =>
     <p class="text-caption text-n600">
       <template v-if="kind === 'fixed'">הלוואה של עדי וירון: 700,000 ₪, קבועה לא צמודה, 5.90%, מ־1.7.2023. הממוצעים הם ערכים שהצוות קרא ב־2.8.2026 (לא אומת).</template>
       <template v-else>הלוואה בדויה: 400,000 ₪, מסלול משתנה בריבית 4.5%, ל־25 שנה, מ־15.3.2022. הריבית מתעדכנת כל 5 שנים, ב־15.3.2027. הממוצעים בדויים.</template>
-      הממוצעים מוחזקים קבועים לאורך הציר, והם לא כך באמת: הם משתנים בכל חודש.
+      הממוצעים מוחזקים קבועים לאורך הציר, והם לא כך באמת: הם משתנים בכל חודש. דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.
     </p>
 
     <div class="mt-3 inline-flex flex-wrap rounded-md border border-n200 p-1" role="group" aria-label="סוג המסלול">
@@ -193,8 +193,8 @@ const tableRows = computed(() =>
       <summary class="min-h-11 cursor-pointer text-body-m font-semibold text-n900">הממוצעים וההודעה</summary>
       <div class="mt-2 grid gap-x-4 gap-y-3 sm:grid-cols-3">
         <label class="flex flex-col">
-          <span class="text-caption font-semibold text-n600">הממוצע היום (אפקטיבי)</span>
-          <input v-model.number="avgToday" type="range" min="2" max="7" step="0.01" aria-label="הממוצע היום" />
+          <span class="text-caption font-semibold text-n600">הממוצע ביום הפירעון (אפקטיבי)</span>
+          <input v-model.number="avgToday" type="range" min="2" max="7" step="0.01" aria-label="הממוצע ביום הפירעון" />
           <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ avgToday.toFixed(2) }}%</span></span>
         </label>
         <label class="flex flex-col">

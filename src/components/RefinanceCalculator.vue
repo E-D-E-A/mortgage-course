@@ -89,7 +89,7 @@ const loanChosen = computed(() =>
 const longestLeft = computed(() => Math.max(...(loanChosen.value ?? loanAll.value).tracks.map((t) => t.months)));
 const feeMax = (t: PresetTrack) => Math.max(2000, Math.ceil((Number(t.fee) * 1.5) / 1000) * 1000);
 
-// ── The new loan: it lends what it takes to be free of the old one (P, and T too when the fee is added to the loan). ──
+// ── The new loan: it lends what it takes to be free of the old one (P, and the fee too when the fee is added to the loan). ──
 const amount = computed(() => (loanChosen.value ? (financeFee.value ? loanChosen.value.whole.financed : loanChosen.value.whole.balance) : new Decimal(0)));
 const cashNow = computed(() => new Decimal(upfront.value).plus(loanChosen.value && !financeFee.value ? loanChosen.value.whole.fee : 0));
 const next = computed(() => {
@@ -295,7 +295,7 @@ const chartLabel = computed(() => (summary.value ? `המצב שלכם לאורך
       <h3 class="mt-5 text-body-l font-semibold text-n900">2. ההחזר החודשי, וסך השקלים</h3>
       <dl class="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 rounded-md border border-n200 p-3 text-body-m text-n700">
         <dt>נשארו להלוואה הקיימת</dt><dd class="text-end"><span class="ltr">{{ loanChosen.whole.months }}</span> חודשים</dd>
-        <dt>ההלוואה החדשה נמשכת</dt><dd class="text-end"><span class="ltr font-semibold text-n900">{{ next.months }}</span> חודשים</dd>
+        <dt>ההלוואה החדשה נגמרת אחרי</dt><dd class="text-end"><span class="ltr font-semibold text-n900">{{ next.months }}</span> חודשים</dd>
         <dt>סכום ההלוואה החדשה</dt><dd class="text-end"><span class="ltr">{{ formatShekels(next.loan) }}</span></dd>
         <dt>סך התשלומים אם נשארים</dt><dd class="text-end"><span class="ltr">{{ formatShekels(summary.stayTotal) }}</span></dd>
         <dt>סך התשלומים אם עוברים (כולל עלויות כניסה<template v-if="!financeFee"> והעמלה</template>)</dt><dd class="text-end"><span class="ltr font-semibold text-n900">{{ formatShekels(summary.switchTotal) }}</span></dd>

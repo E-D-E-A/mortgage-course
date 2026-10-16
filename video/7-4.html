@@ -155,16 +155,16 @@
           box(230, 160, 820, 150, at(1));
           txt(640, 196, "מה צריך כדי להיפטר מההלוואה היום", 20, { fill: C.n600, o: at(1) });
           el("rect", { x: 270, y: 216, width: 600, height: 56, rx: 8, fill: C.tq2, opacity: at(2) });
-          txt(570, 252, `חוב: ${lr(V.sBal + " ₪")}`, 26, { w: 700, o: at(2) });
+          txt(570, 252, `חוב: ${lr(V.sBal)} ₪`, 26, { w: 700, o: at(2) });
           el("rect", { x: 870, y: 216, width: 60, height: 56, rx: 8, fill: C.teal, opacity: at(19) });
-          txt(900, 292, `+ ${V.sFee} ₪`, 20, { w: 700, fill: C.navy, o: at(19), ltr: true });
-          txt(1000, 252, `= ${V.sFin} ₪`, 26, { w: 700, o: at(24), ltr: true });
+          txt(900, 292, `+ ${lr(V.sFee)} ₪`, 20, { w: 700, fill: C.navy, o: at(19) });
+          txt(1000, 252, `= ${lr(V.sFin)} ₪`, 26, { w: 700, o: at(24) });
           // The payments
           const pays = [0, 1, 2];
           pays.forEach((i) => {
             const x = 905 - i * 215;
             box(x - 95, 335, 190, 70, at(8 + i));
-            txt(x, 380, `${V.sPay} ₪`, 26, { w: 700, o: at(8 + i), ltr: true });
+            txt(x, 380, `${lr(V.sPay)} ₪`, 26, { w: 700, o: at(8 + i) });
           });
           txt(640, 436, "אותם שלושה תשלומים", 20, { fill: C.n600, o: at(10) });
           // Two rates
@@ -179,16 +179,16 @@
         if (inScene(t, S.old)) {
           const o = vis(t, S.old);
           const at = (s) => after(t, S.old, s, o);
-          txt(640, 118, `תיק ג׳: ${lr(V.loan + " ₪")}, ${lr(V.nominal + "%")}, ${lr(V.months)} תשלומים נשארו`, 34, { w: 700, o });
+          txt(640, 118, `תיק ג׳: ${lr(V.loan)} ₪, ${lr(V.nominal + "%")}, ${lr(V.months)} תשלומים נשארו`, 34, { w: 700, o });
           box(180, 170, 400, 210, at(8));
           txt(380, 214, "ריבית כוללת חזויה", 24, { w: 600, o: at(8) });
           txt(380, 246, "בלי עמלה", 19, { fill: C.n600, o: at(8) });
           txt(380, 330, `${V.rate0}%`, 62, { w: 700, o: at(8), ltr: true });
           box(700, 170, 400, 210, at(18));
           txt(900, 214, "שיעור הריבית לצרכי השוואה", 24, { w: 600, o: at(18) });
-          txt(900, 246, `עם עמלה ${lr(V.feeTotal + " ₪")} בחוב`, 19, { fill: C.n600, o: at(18) });
+          txt(900, 246, `עם עמלה ${lr(V.feeTotal)} ₪ בחוב`, 19, { fill: C.n600, o: at(18) });
           txt(900, 330, `${V.rate1}%`, 62, { w: 700, fill: C.teal, o: at(18), ltr: true });
-          txt(640, 440, `כדי להיפטר מהחוב צריך ${lr(V.fin + " ₪")}, לא פחות`, 24, { fill: C.n700, o: at(14) });
+          txt(640, 440, `כדי להיפטר מהחוב צריך ${lr(V.fin)} ₪, לא פחות`, 24, { fill: C.n700, o: at(14) });
           txt(640, 490, "שיעור הריבית לצרכי השוואה הוא הרף של הצעה חדשה", 26, { w: 700, fill: C.teal, o: at(26) });
         }
         // Scene 5 — the test on a rate line
@@ -219,15 +219,15 @@
           const at = (s) => after(t, S.trap, s, o);
           txt(640, 118, `בנק ג׳: אותה ריבית, ${lr(V.cMonths)} חודשים`, 40, { w: 700, o });
           const cards = [
-            { x: 1050, title: "ההחזר", big: `${V.cFirst} ₪`, note: `במקום ${lr(V.first + " ₪")}`, sub: `נמוך ב־${lr(V.cGap + " ₪")}`, from: 2 },
+            { x: 1050, title: "ההחזר", big: `${lr(V.cFirst)} ₪`, note: `במקום ${lr(V.first)} ₪`, sub: `נמוך ב־${lr(V.cGap)} ₪`, from: 2 },
             { x: 640, title: "המחיר", big: `${V.cRate}%`, note: `מול ${lr(V.rate1 + "%")}`, sub: "המבחן עובר", from: 12 },
-            { x: 230, title: "השקלים", big: `${V.cExtra} ₪`, note: "יותר בסך הכול", sub: `${lr(V.cSwitch + " ₪")} מול ${lr(V.stayTotal + " ₪")}`, from: 24, warn: true },
+            { x: 230, title: "השקלים", big: `${lr(V.cExtra)} ₪`, note: "יותר בסך הכול", sub: `${lr(V.cSwitch)} ₪ מול ${lr(V.stayTotal)} ₪`, from: 24, warn: true },
           ];
           for (const c of cards) {
             const oc = at(c.from);
             box(c.x - 190, 170, 380, 270, oc, c.warn ? C.mint : C.n0);
             txt(c.x, 220, c.title, 30, { w: 700, fill: C.teal, o: oc });
-            txt(c.x, 305, c.big, 52, { w: 700, o: oc, ltr: true });
+            txt(c.x, 305, c.big, 52, { w: 700, o: oc });
             txt(c.x, 350, c.note, 24, { fill: C.n700, o: oc });
             txt(c.x, 400, c.sub, 20, { fill: C.n600, o: oc });
           }
