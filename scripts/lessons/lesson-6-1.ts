@@ -8,9 +8,9 @@
  *
  * Case A's price, equity, loan, incomes, car loan and initial mix are stage 5's (src/data/case-a-mix.ts). The
  * 75% ceiling and the 40% threshold are the team's transcription of directive 329 (Brain 7503881), not
- * checked against the directive. The payoff of the car loan (35,000 ₪) is a CALCULATION ASSUMPTION of this
+ * checked against the directive. The payoff of the car loan (36,000 ₪) is a CALCULATION ASSUMPTION of this
  * stage: the 26 remaining payments of 1,450 ₪ add up to 37,700 ₪ without interest, and the sum needed to close
- * the loan today is lower; the course picks 35,000 ₪ and says so. "מיכל ועידו" are an invented family for the
+ * the loan today is lower; the course picks 36,000 ₪ and says so. "מיכל ועידו" are an invented family for the
  * exercises, not case A.
  */
 import { CASE_A } from "../../src/data/case-a-mix.ts";
@@ -48,7 +48,7 @@ export default function lesson(): LessonData {
   add(untilDrop("c.until_drop", CASE_A.car.monthsLeft as number));
 
   // ── Closing the car loan from the equity: the loan grows by what leaves the equity ──
-  const payoff = add(givenMoney("c.payoff", "35000"));
+  const payoff = add(givenMoney("c.payoff", "36000"));
   const loanClosed = add(sumOf("c.loan_closed", [loan, payoff]));
   const ltvClosed = add(ltv("c.ltv_closed", v(loanClosed), CASE_A.price));
   add(difference("c.ltv_over", ltvClosed, ceiling)); // how far over the ceiling, in percentage points
@@ -78,7 +78,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "6.1",
     title: "התמונה הכוללת",
-    note: "Case A's stage-5 numbers; the 75% and 40% lines are the team's transcription of directive 329 (not checked); the car-loan payoff of 35,000 is a calculation assumption; the second family is invented.",
+    note: "Case A's stage-5 numbers; the 75% and 40% lines are the team's transcription of directive 329 (not checked); the car-loan payoff of 36,000 is a calculation assumption; the second family is invented.",
     facts,
   };
 }

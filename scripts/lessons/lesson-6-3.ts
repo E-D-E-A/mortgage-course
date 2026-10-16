@@ -8,7 +8,7 @@
  * ltv.py, affordability.py and regulation.py) recomputes each one.
  *
  * LABELS. The 75% ceiling, the 40% threshold and the 18-month rule are the team's transcription of directive
- * 329 (Brain 7503881, 67436545), not checked against the directive. The car loan's payoff (35,000 ₪) is a
+ * 329 (Brain 7503881, 67436545), not checked against the directive. The car loan's payoff (36,000 ₪) is a
  * calculation assumption shared with lesson 6.1: the 26 remaining payments sum to 37,700 ₪ without interest and
  * the payoff is lower. The price list behind the "half" mix is the course's (one rate per track kind), which a
  * bank's package pricing need not follow (lesson 5.10). "יעל ואלון" and the exercise family are invented.
@@ -76,7 +76,7 @@ export default function lesson(): LessonData {
   add(leverFact("l2.ratio_25", MIX_A, { lever: "term", track: "all", months: -60 }, "ratio"));
 
   // ── Lever 3: closing the car loan before the request, from the equity ──
-  const payoff = add(givenMoney("l3.payoff", "35000"));
+  const payoff = add(givenMoney("l3.payoff", "36000"));
   add(times("l3.sum_left", car, CASE_A.car.monthsLeft as number));
   const closed = add(sumOf("l3.loan_closed", [loan, payoff]));
   const l3ltv = add(ltv("l3.ltv", v(closed), v(price)));
@@ -123,7 +123,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "6.3",
     title: "מפת המנופים",
-    note: "Case A is stage 5's; 75%, 40% and the 18-month rule are the team's transcription of directive 329 (not checked); the car-loan payoff of 35,000 is a calculation assumption; the 'half' mix uses the course's one-rate-per-track price list; the second family is invented.",
+    note: "Case A is stage 5's; 75%, 40% and the 18-month rule are the team's transcription of directive 329 (not checked); the car-loan payoff of 36,000 is a calculation assumption; the 'half' mix uses the course's one-rate-per-track price list; the second family is invented.",
     facts,
   };
 }
