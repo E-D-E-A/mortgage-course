@@ -30,6 +30,7 @@
       <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
     </div>
     <script type="module">
+      const lr = (x) => `\u2066${x}\u2069`;
       const data = await (await fetch("/data/lessons/6-2.json")).json();
       const fact = (id) => data.facts.find((f) => f.id === id).value;
       const nf0 = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 2 });
@@ -159,7 +160,7 @@
           const o = vis(t, S.end);
           txt(640, 250, "מחיר מחושב, ערך לא תמיד", 66, { w: 700, o });
           txt(640, 340, "אפשר לחשב מה עולה להגיע לקו, ולא תמיד כמה שווה להגיע אליו", 30, { fill: C.n700, o: after(t, S.end, 1, o) });
-          txt(640, 470, "50%, 40%: תעתיק הצוות, לא אומת. 35%, 30%: דוגמה של הקורס, לבדיקה", 22, { fill: C.n500, o: after(t, S.end, 4, o) });
+          txt(640, 470, `${lr("50%")}, ${lr("40%")}: תעתיק הצוות, לא אומת. ${lr("35%")}, ${lr("30%")}: דוגמה של הקורס, לבדיקה`, 22, { fill: C.n500, o: after(t, S.end, 4, o) });
         }
       };
 
