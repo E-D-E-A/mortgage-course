@@ -1,0 +1,1123 @@
+{
+  "lesson": "6.6",
+  "title": "אסטרטגיית הפנייה לבנקים",
+  "note": "The 5/7 business-day and 24/12 calendar-day rules are the Brain's transcription of Directive 451, not verified against it. The round rule (3 business days, 7 reserve days) is the exercise's own. All four banks and all dates are invented.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-16"
+    },
+    {
+      "id": "clock.answer",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "clock.answer_extended",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "clock.window",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "clock.window_no_lien",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "round.days",
+      "kind": "given",
+      "inputs": {},
+      "value": 3
+    },
+    {
+      "id": "round.reserve",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "decision.1",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-21"
+    },
+    {
+      "id": "decision.2",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-23"
+    },
+    {
+      "id": "calendar.closed_2026",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27"
+    },
+    {
+      "id": "worked.request",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-01"
+    },
+    {
+      "id": "worked.today",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-09"
+    },
+    {
+      "id": "worked.a.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 2
+    },
+    {
+      "id": "worked.a.answer_by",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "answer_by"
+      },
+      "value": "2026-11-06"
+    },
+    {
+      "id": "worked.a.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-03"
+    },
+    {
+      "id": "worked.a.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-27"
+    },
+    {
+      "id": "worked.a.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-27"
+      },
+      "value": 18
+    },
+    {
+      "id": "worked.b.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 4
+    },
+    {
+      "id": "worked.b.answer_by",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 4,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "answer_by"
+      },
+      "value": "2026-11-06"
+    },
+    {
+      "id": "worked.b.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 4,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-05"
+    },
+    {
+      "id": "worked.b.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 4,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-29"
+    },
+    {
+      "id": "worked.b.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-29"
+      },
+      "value": 20
+    },
+    {
+      "id": "worked.c.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "worked.c.answer_by",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 5,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "answer_by"
+      },
+      "value": "2026-11-06"
+    },
+    {
+      "id": "worked.c.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 5,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-06"
+    },
+    {
+      "id": "worked.c.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 5,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-30"
+    },
+    {
+      "id": "worked.c.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-30"
+      },
+      "value": 21
+    },
+    {
+      "id": "worked.d.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "worked.d.answer_by",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 7,
+        "extended": "yes",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "answer_by"
+      },
+      "value": "2026-11-09"
+    },
+    {
+      "id": "worked.d.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 7,
+        "extended": "yes",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-09"
+    },
+    {
+      "id": "worked.d.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 7,
+        "extended": "yes",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-12-03"
+    },
+    {
+      "id": "worked.d.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-12-03"
+      },
+      "value": 24
+    },
+    {
+      "id": "worked.governing",
+      "kind": "out_governing",
+      "inputs": {
+        "names": "בנק א׳|בנק ב׳|בנק ג׳|בנק ד׳",
+        "ends": "2026-11-27|2026-11-29|2026-11-30|2026-12-03"
+      },
+      "value": "בנק א׳"
+    },
+    {
+      "id": "worked.governing_left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-27"
+      },
+      "value": 18
+    },
+    {
+      "id": "worked.decision_inside",
+      "kind": "out_events_inside",
+      "inputs": {
+        "dates": "2026-10-21|2026-11-23",
+        "from": "2026-11-09",
+        "to": "2026-11-27"
+      },
+      "value": 1
+    },
+    {
+      "id": "worked.decision_in",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-23"
+      },
+      "value": 14
+    },
+    {
+      "id": "worked.d_wait",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-01",
+        "date": "2026-11-09"
+      },
+      "value": 8
+    },
+    {
+      "id": "worked.a_wait",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-01",
+        "date": "2026-11-03"
+      },
+      "value": 2
+    },
+    {
+      "id": "worked.round_1.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-09",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "worked.round_1.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-09",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-12"
+    },
+    {
+      "id": "worked.round_2.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-12",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "worked.round_2.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-12",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-16"
+    },
+    {
+      "id": "worked.round_3.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-16",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "worked.round_3.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-16",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-19"
+    },
+    {
+      "id": "worked.round_4.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-19",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "no"
+    },
+    {
+      "id": "worked.round_4.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-19",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-23"
+    },
+    {
+      "id": "worked.rounds_count",
+      "kind": "out_rounds_fit",
+      "inputs": {
+        "start": "2026-11-09",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "count"
+      },
+      "value": 3
+    },
+    {
+      "id": "worked.rounds_last_answer",
+      "kind": "out_rounds_fit",
+      "inputs": {
+        "start": "2026-11-09",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "last_answer"
+      },
+      "value": "2026-11-19"
+    },
+    {
+      "id": "worked.latest_start",
+      "kind": "out_latest_start",
+      "inputs": {
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "not_before": "2026-11-09",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-17"
+    },
+    {
+      "id": "worked.d_rounds_count",
+      "kind": "out_rounds_fit",
+      "inputs": {
+        "start": "2026-11-09",
+        "valid_until": "2026-12-03",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "count"
+      },
+      "value": 5
+    },
+    {
+      "id": "rate.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "0",
+        "measure": "first_before"
+      },
+      "value": "8181.30"
+    },
+    {
+      "id": "rate.up.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "0.25",
+        "measure": "first_delta"
+      },
+      "value": "82.16"
+    },
+    {
+      "id": "rate.up.after",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "0.25",
+        "measure": "first_after"
+      },
+      "value": "8263.46"
+    },
+    {
+      "id": "rate.up.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "0.25",
+        "measure": "total_delta"
+      },
+      "value": "29577.01"
+    },
+    {
+      "id": "rate.down.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "-0.25",
+        "measure": "first_delta"
+      },
+      "value": "-80.99"
+    },
+    {
+      "id": "rate.down.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "prime",
+        "edit_points": "-0.25",
+        "measure": "total_delta"
+      },
+      "value": "-29153.19"
+    },
+    {
+      "id": "rate.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "rate.prime_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "546000"
+    },
+    {
+      "id": "rate.prime_rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.60"
+    },
+    {
+      "id": "rate.prime_months",
+      "kind": "given",
+      "inputs": {},
+      "value": 360
+    },
+    {
+      "id": "lapse.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.20"
+    },
+    {
+      "id": "lapse.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "fixed_unlinked",
+        "edit_points": "0.20",
+        "measure": "first_delta"
+      },
+      "value": "65.00"
+    },
+    {
+      "id": "lapse.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "fixed_unlinked",
+        "edit_points": "0.20",
+        "measure": "total_delta"
+      },
+      "value": "23402.11"
+    },
+    {
+      "id": "case.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000"
+    },
+    {
+      "id": "ex2.requested",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-12"
+    },
+    {
+      "id": "ex2.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 3
+    },
+    {
+      "id": "ex2.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-12",
+        "answered_after": 3,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-16"
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-12",
+        "answered_after": 3,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-12-10"
+    },
+    {
+      "id": "ex2.err_request",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-12",
+        "days": 24
+      },
+      "value": "2026-12-06"
+    },
+    {
+      "id": "ex2.err_short",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-16",
+        "days": 12
+      },
+      "value": "2026-11-28"
+    },
+    {
+      "id": "ex2.err_day_one",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-16",
+        "days": 23
+      },
+      "value": "2026-12-09"
+    },
+    {
+      "id": "ex3.a.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 2
+    },
+    {
+      "id": "ex3.a.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-03"
+    },
+    {
+      "id": "ex3.a.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-27"
+    },
+    {
+      "id": "ex3.b.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 4
+    },
+    {
+      "id": "ex3.b.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 4,
+        "extended": "no",
+        "new_lien": "no",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-05"
+    },
+    {
+      "id": "ex3.b.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 4,
+        "extended": "no",
+        "new_lien": "no",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-17"
+    },
+    {
+      "id": "ex3.c.after",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "ex3.c.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 5,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-06"
+    },
+    {
+      "id": "ex3.c.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 5,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-30"
+    },
+    {
+      "id": "ex3.governing",
+      "kind": "out_governing",
+      "inputs": {
+        "names": "בנק א׳|בנק ב׳|בנק ג׳",
+        "ends": "2026-11-27|2026-11-17|2026-11-30"
+      },
+      "value": "בנק ב׳"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-17"
+      },
+      "value": 8
+    },
+    {
+      "id": "ex3.err_first",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-27"
+      },
+      "value": 18
+    },
+    {
+      "id": "ex3.err_last",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-30"
+      },
+      "value": 21
+    },
+    {
+      "id": "ex5.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-10"
+    },
+    {
+      "id": "ex5.end",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-26"
+    },
+    {
+      "id": "ex5.answer",
+      "kind": "out_rounds_fit",
+      "inputs": {
+        "start": "2026-11-10",
+        "valid_until": "2026-11-26",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "count"
+      },
+      "value": 2
+    },
+    {
+      "id": "ex5.err_no_reserve",
+      "kind": "out_rounds_fit",
+      "inputs": {
+        "start": "2026-11-10",
+        "valid_until": "2026-11-26",
+        "round_days": 3,
+        "reserve": 0,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "count"
+      },
+      "value": 4
+    },
+    {
+      "id": "ex5.days",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-10",
+        "date": "2026-11-26"
+      },
+      "value": 16
+    },
+    {
+      "id": "ex6.end",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-27"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "out_latest_start",
+      "inputs": {
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "not_before": "2026-11-09",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-17"
+    },
+    {
+      "id": "ex6.err_no_reserve",
+      "kind": "out_latest_start",
+      "inputs": {
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 0,
+        "not_before": "2026-11-09",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-24"
+    },
+    {
+      "id": "ex6.err_last_day",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-27"
+    },
+    {
+      "id": "ex7.err_simple",
+      "kind": "out_simple_monthly",
+      "inputs": {
+        "amount": "546000",
+        "points": "0.25"
+      },
+      "value": "113.75"
+    },
+    {
+      "id": "worked.span",
+      "kind": "proc_calendar_days_between",
+      "inputs": {
+        "from": "2026-11-01",
+        "to": "2026-11-09"
+      },
+      "value": 8
+    }
+  ]
+}

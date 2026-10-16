@@ -1,0 +1,1053 @@
+{
+  "lesson": "6.7",
+  "title": "משא ומתן",
+  "note": "The rounds' effects, the 3-business-day round, the 7 reserve days and the 10,000 ₪ line are the exercise's own rules, not how any bank acts. Banks, prices and dates are invented.",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-16"
+    },
+    {
+      "id": "round.days",
+      "kind": "given",
+      "inputs": {},
+      "value": 3
+    },
+    {
+      "id": "round.reserve",
+      "kind": "given",
+      "inputs": {},
+      "value": 7
+    },
+    {
+      "id": "clock.window",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000"
+    },
+    {
+      "id": "case.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000"
+    },
+    {
+      "id": "state.request",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-01"
+    },
+    {
+      "id": "state.today",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-09"
+    },
+    {
+      "id": "state.approved",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "approved"
+      },
+      "value": "2026-11-03"
+    },
+    {
+      "id": "state.valid_until",
+      "kind": "out_clocks",
+      "inputs": {
+        "requested": "2026-11-01",
+        "answered_after": 2,
+        "extended": "no",
+        "new_lien": "yes",
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes",
+        "measure": "valid_until"
+      },
+      "value": "2026-11-27"
+    },
+    {
+      "id": "state.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-09",
+        "date": "2026-11-27"
+      },
+      "value": 18
+    },
+    {
+      "id": "offer.a.first",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8181.30"
+    },
+    {
+      "id": "offer.b.first",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8150.17"
+    },
+    {
+      "id": "offer.a.total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2945264.34"
+    },
+    {
+      "id": "offer.b.total",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.70",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.30",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2934061.70"
+    },
+    {
+      "id": "gap.first",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "offer.a.first",
+        "subtrahend": "offer.b.first"
+      },
+      "value": "31.13"
+    },
+    {
+      "id": "gap.total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "offer.a.total",
+        "subtrahend": "offer.b.total"
+      },
+      "value": "11202.64"
+    },
+    {
+      "id": "price.a.prime",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.60"
+    },
+    {
+      "id": "price.a.variable",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.10"
+    },
+    {
+      "id": "price.a.fixed",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.40"
+    },
+    {
+      "id": "price.b.prime",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.70"
+    },
+    {
+      "id": "price.b.variable",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.00"
+    },
+    {
+      "id": "price.b.fixed",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "notch.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
+    },
+    {
+      "id": "notch.half",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.05"
+    },
+    {
+      "id": "notch.t1.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "1",
+        "edit_points": "-0.10",
+        "measure": "first_delta"
+      },
+      "value": "-32.54"
+    },
+    {
+      "id": "notch.t1.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "1",
+        "edit_points": "-0.10",
+        "measure": "total_delta"
+      },
+      "value": "-11711.43"
+    },
+    {
+      "id": "notch.t1.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "546000"
+    },
+    {
+      "id": "notch.t1.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.60"
+    },
+    {
+      "id": "notch.t2.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "2",
+        "edit_points": "-0.10",
+        "measure": "first_delta"
+      },
+      "value": "-31.64"
+    },
+    {
+      "id": "notch.t2.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "2",
+        "edit_points": "-0.10",
+        "measure": "total_delta"
+      },
+      "value": "-11385.92"
+    },
+    {
+      "id": "notch.t2.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "547000"
+    },
+    {
+      "id": "notch.t2.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.10"
+    },
+    {
+      "id": "notch.t3.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "3",
+        "edit_points": "-0.10",
+        "measure": "first_delta"
+      },
+      "value": "-32.21"
+    },
+    {
+      "id": "notch.t3.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "3",
+        "edit_points": "-0.10",
+        "measure": "total_delta"
+      },
+      "value": "-11599.42"
+    },
+    {
+      "id": "notch.t3.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "547000"
+    },
+    {
+      "id": "notch.t3.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.40"
+    },
+    {
+      "id": "notch.all.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "first_delta"
+      },
+      "value": "-96.39"
+    },
+    {
+      "id": "notch.all.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "total_delta"
+      },
+      "value": "-34696.77"
+    },
+    {
+      "id": "notch.half.first",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "3",
+        "edit_points": "-0.05",
+        "measure": "first_delta"
+      },
+      "value": "-16.13"
+    },
+    {
+      "id": "notch.half.total",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "3",
+        "edit_points": "-0.05",
+        "measure": "total_delta"
+      },
+      "value": "-5807.84"
+    },
+    {
+      "id": "round_1.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-09",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "round_1.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-09",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-12"
+    },
+    {
+      "id": "round_2.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-12",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "round_2.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-12",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-16"
+    },
+    {
+      "id": "round_3.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-16",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "yes"
+    },
+    {
+      "id": "round_3.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-16",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-19"
+    },
+    {
+      "id": "round_4.fits",
+      "kind": "out_round_fits",
+      "inputs": {
+        "start": "2026-11-19",
+        "valid_until": "2026-11-27",
+        "round_days": 3,
+        "reserve": 7,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "no"
+    },
+    {
+      "id": "round_4.answer",
+      "kind": "out_round_answer",
+      "inputs": {
+        "start": "2026-11-19",
+        "round_days": 3,
+        "closed": "2026-03-03,2026-04-02,2026-04-08,2026-04-22,2026-05-22,2026-07-23,2026-09-13,2026-09-20,2026-09-21,2026-10-27",
+        "friday_counts": "yes"
+      },
+      "value": "2026-11-23"
+    },
+    {
+      "id": "round_1.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
+    },
+    {
+      "id": "round_1.first_before",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "first_before"
+      },
+      "value": "8181.30"
+    },
+    {
+      "id": "round_1.first_after",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "first_after"
+      },
+      "value": "8084.91"
+    },
+    {
+      "id": "round_1.total_before",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "total_before"
+      },
+      "value": "2945264.34"
+    },
+    {
+      "id": "round_1.total_after",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4.10",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.40",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "total_after"
+      },
+      "value": "2910567.57"
+    },
+    {
+      "id": "round_1.gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "round_1.total_before",
+        "subtrahend": "round_1.total_after"
+      },
+      "value": "34696.77"
+    },
+    {
+      "id": "round_1.vs_b",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "offer.b.total",
+        "subtrahend": "round_1.total_after"
+      },
+      "value": "23494.13"
+    },
+    {
+      "id": "round_2.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.05"
+    },
+    {
+      "id": "round_2.total_before",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.5",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.3",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "fixed_unlinked",
+        "edit_points": "-0.05",
+        "measure": "total_before"
+      },
+      "value": "2910567.57"
+    },
+    {
+      "id": "round_2.total_after",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 3,
+        "block_months": 12,
+        "t1_kind": "prime",
+        "t1_amount": "546000",
+        "t1_rate": "4.5",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "variable_unlinked",
+        "t2_amount": "547000",
+        "t2_rate": "4",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "t2_reset": 60,
+        "t3_kind": "fixed_unlinked",
+        "t3_amount": "547000",
+        "t3_rate": "4.3",
+        "t3_months": 360,
+        "t3_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "fixed_unlinked",
+        "edit_points": "-0.05",
+        "measure": "total_after"
+      },
+      "value": "2904796.35"
+    },
+    {
+      "id": "round_2.gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "round_2.total_before",
+        "subtrahend": "round_2.total_after"
+      },
+      "value": "5771.22"
+    },
+    {
+      "id": "round_2.vs_b",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "offer.b.total",
+        "subtrahend": "round_2.total_after"
+      },
+      "value": "29265.35"
+    },
+    {
+      "id": "stop.after_1",
+      "kind": "out_stop",
+      "inputs": {
+        "fits": "yes",
+        "last_gain": "34696.77",
+        "threshold": "10000"
+      },
+      "value": "continue"
+    },
+    {
+      "id": "stop.after_2",
+      "kind": "out_stop",
+      "inputs": {
+        "fits": "yes",
+        "last_gain": "5771.22",
+        "threshold": "10000"
+      },
+      "value": "small_gain"
+    },
+    {
+      "id": "stop.late",
+      "kind": "out_stop",
+      "inputs": {
+        "fits": "no",
+        "last_gain": "34696.77",
+        "threshold": "10000"
+      },
+      "value": "time"
+    },
+    {
+      "id": "slack.left",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-16",
+        "date": "2026-11-27"
+      },
+      "value": 11
+    },
+    {
+      "id": "slack.reserve_end",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-11-16",
+        "days": 7
+      },
+      "value": "2026-11-23"
+    },
+    {
+      "id": "slack.answer",
+      "kind": "out_days_until",
+      "inputs": {
+        "today": "2026-11-23",
+        "date": "2026-11-27"
+      },
+      "value": 4
+    },
+    {
+      "id": "ex6.start",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-11-16"
+    }
+  ]
+}
