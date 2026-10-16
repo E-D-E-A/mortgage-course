@@ -29,6 +29,7 @@ export default function lesson42(): LessonData {
   // ── Case A ──
   add(given("case.noam", "12400"));
   add(given("case.shira", "9300"));
+  add(given("case.michal_declared", "8200"));
   const total = add(sum("case.total", ["12400", "9300"]));
   add(given("case.car", "1450"));
   add(given("case.car_months", 26));

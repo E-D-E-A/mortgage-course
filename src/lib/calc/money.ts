@@ -20,9 +20,12 @@ export function moneyString(value: Decimal.Value): string {
 const shekelFormat = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const wholeFormat = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 });
 
+/** Intl writes a hyphen-minus (with a direction mark); the course shows the real minus sign. */
+const minus = (s: string) => s.replace("-", "−");
+
 /** "16,288.95 ₪" — the agorot are shown. */
 export function formatShekels(value: Decimal.Value): string {
-  return `${shekelFormat.format(toAgorot(value).toNumber())} ₪`;
+  return `${minus(shekelFormat.format(toAgorot(value).toNumber()))} ₪`;
 }
 
 /** For running text: "50,000 ₪" when there are no agorot, "59,550.80 ₪" when there are. */
@@ -33,7 +36,7 @@ export function formatShekelsText(value: Decimal.Value): string {
 
 /** "16,289 ₪" — rounded to the shekel, for illustrations where agorot are noise. */
 export function formatWholeShekels(value: Decimal.Value): string {
-  return `${wholeFormat.format(new Decimal(value).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber())} ₪`;
+  return `${minus(wholeFormat.format(new Decimal(value).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber()))} ₪`;
 }
 
 /** "5%" or "4.5%". */

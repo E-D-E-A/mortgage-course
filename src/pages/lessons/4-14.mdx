@@ -118,27 +118,25 @@ export const predictionOptions = [
 
 אותה שרשרת, בחמש החלטות מתוארכות (לא אומת). הטבלה מראה מה היה התשלום על אותה הלוואה אילו נלקחה באותו יום, במסלול של הפריים פחות חצי נקודת אחוז:
 
-<p class="text-caption text-n600">הריביות לפי תקצירים של הודעות רשמיות, חיפוש ב־10 באוקטובר 2026; לא אומת. הפריים בטבלה היא ריבית בנק ישראל ועוד 1.5 נקודות אחוז (לא אומת).</p>
+<p class="text-caption text-n600">הריביות לפי תקצירים של הודעות רשמיות, חיפוש ב־10 באוקטובר 2026; לא אומת. הפריים בטבלה היא ריבית בנק ישראל ועוד 1.5 נקודות אחוז (לא אומת), והמסלול הוא הפריים פחות חצי נקודת אחוז.</p>
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[440px] border-collapse text-body-m">
+  <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-3 text-start font-semibold">ההחלטה</th>
-        <th class="py-2 pe-3 text-start font-semibold">הפריים</th>
         <th class="py-2 pe-3 text-start font-semibold">התשלום החודשי</th>
-        <th class="py-2 pe-3 text-start font-semibold">ריבית בנק ישראל</th>
-        <th class="py-2 pe-3 text-start font-semibold">הריבית במסלול</th>
+        <th class="py-2 pe-3 text-start font-semibold">בנק ישראל</th>
+        <th class="py-2 pe-3 text-start font-semibold">פריים</th>
       </tr>
     </thead>
     <tbody>
       {decisions.map((d) => (
         <tr class="border-b border-n100">
           <td class="py-2 pe-3 text-n700">{d.day}<br /><span class="text-caption text-n600">{d.why}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{d.prime}%</span></td>
-          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(d.payment)}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900 whitespace-nowrap"><span class="ltr">{formatShekels(d.payment).replace(" ₪", "\u00a0₪")}</span></td>
           <td class="py-2 pe-3"><span class="ltr">{d.rate}%</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{d.track}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{d.prime}%</span></td>
         </tr>
       ))}
     </tbody>
