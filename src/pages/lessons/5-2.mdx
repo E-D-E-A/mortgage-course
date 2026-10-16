@@ -1,0 +1,437 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.2"
+minutes: 30
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import UniformBaskets from "../../components/UniformBaskets.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { KIND_HE } from "../../lib/calc/offers.ts";
+import { EXAMPLE_LABEL } from "../../data/offer-examples.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.2");
+// An amount inside an equation, without ₪. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const banks = ["א", "ב", "ג"];
+export const bankName = (k) => `בנק ${k}׳`;
+export const baskets = ["b1", "b2", "b3"];
+export const basketName = { b1: "סל אחיד 1", b2: "סל אחיד 2", b3: "סל אחיד 3" };
+export const splitOf = (id) => f.rows(id);
+export const bankKey = { א: "a", ב: "b", ג: "c" };
+export const lowestOf = (b) => f.raw(`u.${b}.lowest_rate`);
+export const b2tracks = (k) => f.rows(`u.${bankKey[k]}.b2.tracks`);
+export const predictionOptions = [
+  "להשוות את הריבית הנמוכה ביותר שכל בנק הציע, באיזה מסלול שהוא",
+  "להשוות את אותו תמהיל, באותו סכום ובאותה תקופה, אצל כל הבנקים",
+  "לבחור את הבנק שהציע הכי הרבה מסלולים",
+  "להשוות את ההחזר החודשי הראשון של כל הצעה כמו שהיא",
+];
+export const half = (id) => f.rows(id);
+export const halfAmount = (id, kind) => Number(half(id).find((p) => p.kind === kind)?.amount ?? 0);
+export const halfRows = [
+  { period: KIND_HE.fixed_unlinked, b1: halfAmount("half.b1", "fixed_unlinked"), b2: halfAmount("half.b2", "fixed_unlinked"), b3: halfAmount("half.b3", "fixed_unlinked") },
+  { period: KIND_HE.prime, b1: halfAmount("half.b1", "prime"), b2: halfAmount("half.b2", "prime"), b3: halfAmount("half.b3", "prime") },
+  { period: KIND_HE.variable_linked, b1: halfAmount("half.b1", "variable_linked"), b2: halfAmount("half.b2", "variable_linked"), b3: halfAmount("half.b3", "variable_linked") },
+];
+
+בשיעור הקודם קראתם אישור עקרוני אחד: מה בנק א׳ חייב לכתוב בו, ומה הבנק מוסיף. אבל דנה ויואב מקבלים אישורים משלושה בנקים, וכל בנק בחר תמהיל אחר. איך משווים?
+היום נראה מה בנק ישראל עשה בשביל זה: שלושה תמהילים קבועים, שכל הבנקים מציעים באותו הרכב. הם נקראים <Term t="סל אחיד" lesson="5.2">סלים אחידים</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.2"
+  question="דנה ויואב קיבלו אישורים משלושה בנקים, וכל בנק הציע תמהיל אחר משלו. הם רוצים לדעת איזה בנק זול יותר בשבילם. מה הדרך ההוגנת ביותר להשוות מחיר?"
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלושה סלים
+
+</Section>
+
+<LessonVideo lesson="5-2" />
+
+<Section kind="ההסבר">
+
+## הבעיה: שני תמהילים, ומחיר אחד?
+
+</Section>
+
+בנק א׳ הציע לדנה ויואב {f.shekels("explain.loan")} בשלושה מסלולים: קבועה לא צמודה, פריים וקבועה צמודה. בנק ג׳ הציע את אותו סכום בשני מסלולים: קבועה לא צמודה ופריים, בחלוקה אחרת. ההחזר הראשון של בנק א׳ הוא {f.shekels("prob.a_first")}, ושל בנק ג׳ {f.shekels("prob.c_first")}. העלות הממשית של האשראי (שיעור 3.10): {f.plain("prob.a_rate")}% אצל בנק א׳ ו־{f.plain("prob.c_rate")}% אצל בנק ג׳.
+
+האם בנק ג׳ זול יותר? **אי אפשר לדעת.** המספרים שונים, אבל גם התמהילים שונים: חלוקה אחרת בין המסלולים, תקופות שונות, סוגי מסלולים שונים. ההבדל יכול לבוא מהריביות של הבנקים, ויכול לבוא מהתמהיל שכל אחד בחר. מי שמשווה שני אישורים כאלה משווה כמעט שני דברים שונים. אפשר לומר זאת גם כך: שני תמהילים שונים הם שתי שאלות שונות, ולא שתי תשובות לאותה שאלה.
+
+מה שחסר הוא שאלה אחת, שכולם עונים עליה.
+
+## הפתרון: שלושה תמהילים שכולם מציעים
+
+לפי התעתיק של הצוות מ<Term t="הוראה 451" lesson="5.2">הוראה 451</Term> (נספח 5; תעתיק מגרסה 22, שהצוות קרא ב־3 באוגוסט 2026, ולא נבדק מחדש מול ההוראה), יש שלושה תמהילים קבועים. הם נקראים **סלים אחידים**. כל סל הוא כמה חלקים מההלוואה, וכל חלק הוא מסלול מהטבלה שלמדתם בשלב 2:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[26rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הסל</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההרכב</th>
+        <th class="py-2 pe-3 text-start font-semibold">ב־{f.shekels("explain.loan")}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">סל אחיד 1</td>
+        <td class="py-2 pe-3">כולה קבועה לא צמודה</td>
+        <td class="py-2 pe-3"><span class="ltr">{formatShekels(splitOf("basket1.split")[0].amount)}</span></td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">סל אחיד 2</td>
+        <td class="py-2 pe-3">שליש קבועה לא צמודה, שליש פריים, שליש משתנה צמודה (כל חמש שנים)</td>
+        <td class="py-2 pe-3"><span class="ltr">{formatShekels(splitOf("basket2.split")[0].amount)}</span> לכל אחד מהשלושה</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">סל אחיד 3</td>
+        <td class="py-2 pe-3">חצי קבועה לא צמודה, חצי פריים</td>
+        <td class="py-2 pe-3"><span class="ltr">{formatShekels(splitOf("basket3.split")[0].amount)}</span> לכל אחד משניים</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+ועוד שלושה פרטים, גם הם לפי התעתיק:
+- **כל חלק נקרא בשמו מהטבלה של הוראה 451**: קבועה לא צמודה, משתנה פריים, ו<Term t="משתנה צמודה" lesson="5.2">משתנה צמודה</Term> על בסיס אג״ח ממשלתית, שמתעדכנת כל חמש שנים (שיעורים 2.2 ו־2.7). כך אפשר לחזות את התשלומים של כל חלק לפי הכללים שבהוראה (שיעור 5.4).
+- **שליש הוא בדיוק שליש**, לא 33%. כך הצוות סימן בדף הסלים ב־Brain: הסלים נקבעים כשברים מדויקים של ההלוואה.
+- **בסלים האחידים הלווה בוחר תקופה אחת, והלוח הוא שפיצר** (לפי דף J-080 ב־Brain, אוגוסט 2026; לא נבדק מול ההוראה). תקופה אחת לכל המסלולים, ושיטת החזר אחת: כך שני בנקים נבדלים רק בריביות.
+
+<Callout title="מה קורה כשהסכום לא מתחלק?" tone="warning">
+<p>{f.shekels("explain.loan")} מתחלקים לשלישים של {formatShekels(splitOf("basket2.split")[0].amount)}. אבל מיליון ₪ לא: שליש ממנו הוא 333,333.33 ₪ ועוד, בלי סוף. מה בנק עושה אז — מעגל אגורה לכאן או לכאן, או מציע סכום אחר — ההוראה, כפי שהצוות תעתק אותה, לא אומרת. זו שאלה פתוחה לאילון. בקורס הכלי מסרב לפצל סכום שלא מתחלק לחלקים שלמים של אגורה, ובדוגמאות הסכומים מתחלקים.</p>
+</Callout>
+
+## מה אין באף סל
+
+שימו לב למה שחסר: **קבועה צמודה** לא נמצאת באף אחד משלושת הסלים. מסלול קבוע לא צמוד נמצא בכולם, וצמוד יש רק בסל 2, כמשתנה.
+
+<Callout title="מה אומרים בשטח, ומה כתוב" tone="warning">
+<p>אילון אמר ב־27 ביולי 2026, וחזר על זה ב־26 באוגוסט: ״הוראה 451 (׳שלושת הסלים׳, סוף 2020)״ — שלוש הצעות בתמהילים אחידים, ״(פריים, קבועה צמודה, קבועה לא צמודה)״ (ידע מהשטח, FK-H-031, ממתין לאישור אילון).</p>
+<p>זה לא מסתדר עם התעתיק. לפי התעתיק של נספח 5, הסלים הם קבועה לא צמודה לבדה, שלישים, וחצי־חצי, וקבועה צמודה אינה באף אחד. גם התאריך שונה: לפי תקציר של מקור רשמי (הסבר של בנק ישראל על הרפורמה, נקרא ב־2026-10-09; לא אומת) הרפורמה נכנסה לתוקף ב־31 באוגוסט 2022, לא בסוף 2020.</p>
+<p>הקורס מלמד את התעתיק, ואומר במפורש שטענת השטח שונה. אילון עוד לא נשאל, ושתי השאלות — ההרכב והתאריך — ברשימה שלו.</p>
+</Callout>
+
+## הסל המוצע
+
+מלבד שלושת הסלים, הבנק מציע גם <Term t="סל מוצע" lesson="5.2">סל מוצע</Term>: התמהיל שהוא בחר לדנה ויואב בעצמו. זה הסל שבו בנקים נבדלים זה מזה: מסלולים, חלוקה, תקופה לכל מסלול. ובדיוק בגלל זה אי אפשר להשוות את המחיר שלו למחיר של סל מוצע של בנק אחר, כמו בבעיה שלמעלה.
+
+בנק א׳ למשל הציע סל מוצע של שלושה מסלולים באותה תקופה; בסל המוצע של בנק ב׳ התקופות שונות בין המסלולים, ובסל המוצע של בנק ג׳ יש שני מסלולים. ההרכב שונה אצל כל אחד. בדיקת הבסיס של הקורס, על שני הסלים המוצעים של בנק א׳ ושל בנק ג׳, מוצאת הבדל אחד: {f.raw("prob.basis_ac").includes("mix") ? "בתמהיל" : "אין הבדל"}. לעומת זאת, בדיקה על סל אחיד 3 של אותם שני בנקים לא מוצאת שום הבדל {f.raw("prob.basis_uniform").length === 0 ? "בבסיס" : ""}: ההבדל היחיד שנשאר הוא הריביות.
+
+<Callout title="מה הסלים נועדו לו" tone="info">
+<p>אילון אמר ב־26 באוגוסט 2026 שהסלים האחידים הם ״הצעת דמה עם מרווח גבוה״ (ידע מהשטח, FK-H-032, ממתין לאישור אילון). הצוות תיקן את זה בסיכום ב־Drive באותו יום, לפי המדריך של בנק ישראל. הקורס לא מלמד את ״הצעת דמה״. הוא מלמד בשביל מה הסלים נועדו: להשוות מחיר על אותו דבר. איך בנקים מתמחרים סל אחיד לעומת סל מוצע, ומה הם מעדיפים שהלקוח יבחר — לא ידוע. זו שאלה פתוחה לאילון.</p>
+</Callout>
+
+## אותם בנקים, שלושה סלים
+
+עכשיו נשווה אחרת. אותם שלושה בנקים בדויים, אותו סכום ({f.shekels("explain.loan")}), אותה תקופה ({f.plain("explain.years")} שנה), אותו תאריך ואותה תחזית. בטבלה: העלות הממשית של האשראי (שיעור 3.10) בכל בנק וכל סל. נמוך ביותר בכל סל מודגש.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        {baskets.map((b) => (<th class="py-2 pe-3 text-start font-semibold">{basketName[b]}</th>))}
+      </tr>
+    </thead>
+    <tbody>
+      {banks.map((k) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n900">{bankName(k)}</td>
+          {baskets.map((b) => (
+            <td class={lowestOf(b).includes(bankName(k)) ? "py-2 pe-3 font-semibold text-n900" : "py-2 pe-3"}>
+              <span class="ltr">{f.plain(`u.${bankKey[k]}.${b}.rate`)}%</span>{lowestOf(b).includes(bankName(k)) ? " ◂ נמוך" : ""}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+הריביות והתחזית כאן בדויות: {EXAMPLE_LABEL}.
+
+בסל 1 הנמוך ביותר הוא {lowestOf("b1")[0]}. בסל 2 — {lowestOf("b2")[0]}. בסל 3 — {lowestOf("b3")[0]}. אין ״בנק זול ביותר״ בכלל: יש בנק זול ביותר **בסל מסוים**, בתנאים האלה. ולכן הסלים האחידים עונים על שאלה צרה ומדויקת: כמה עולה תמהיל ידוע, בכל בנק. הם לא עונים על שאלה רחבה כמו ״איזה בנק טוב יותר לדנה ויואב״.
+
+(איך בנקים מתמחרים כל סל, ולמה בנק אחד נמוך בסל אחד וגבוה באחר, לא ידוע לנו. הריביות כאן הן בחירה של הקורס כדי להמחיש, לא ממצא על השוק.)
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## שלושת הסלים זה לצד זה
+
+</Section>
+
+בחרו בנק, סכום ותקופה. שלושת הסלים האחידים מחושבים על אותו סכום ועל אותה תקופה. הסל המוצע של הבנק מופיע ליד, בתמהיל משלו.
+
+<UniformBaskets client:visible />
+
+נסו שלושה דברים:
+1. בבנק א׳, בסכום {f.shekels("explain.loan")} ובתקופה של {f.plain("explain.years")} שנה: איזה סל נותן את ההחזר הראשון הנמוך ביותר, ואיזה סל נותן את העלות הממשית הנמוכה ביותר?
+2. החליפו את הסכום ל־1,000,000 ₪. מה קורה לסל 2?
+3. עברו בין שלושת הבנקים בסל 1. מי נמוך ביותר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>הנמוך ביותר בהחזר הראשון הוא סל 2: {f.shekels("u.a.b2.first")}. אבל לסל 2 יש את ההחזר המרבי החזוי הגבוה ביותר ({f.shekels("u.a.b2.highest")}) ואת העלות הממשית הגבוהה ביותר ({f.plain("u.a.b2.rate")}%). הנמוכה ביותר בעלות היא סל 3: {f.plain("u.a.b3.rate")}%. מדד אחד בוחר סל אחד, מדד אחר בוחר אחר (שיעור 3.11).</li>
+    <li>סל 2 מוחלף בהודעה: מיליון ₪ לא מתחלקים לשלישים שלמים של אגורה. סלים 1 ו־3 מתחלקים (הכלי מציג אותם), והסל המוצע של כל בנק יכול להתחלק או לא.</li>
+    <li>בסל 1: {lowestOf("b1")[0]}, עם {f.plain("u.b.b1.rate")}%. בסל 3 הנמוך ביותר הוא כבר {lowestOf("b3")[0]}.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="5.2"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "הריבית הנמוכה ביותר יכולה להיות במסלול שמהווה חלק קטן מהתמהיל, או במסלול מסוכן יותר. השוואה כזו מחברת תפוחים עם תפוזים.",
+    "",
+    "מספר המסלולים לא אומר דבר על המחיר. בנק יכול להציע הרבה מסלולים ביוקר, ופחות מסלולים בזול.",
+    `ההחזר הראשון של תמהילים שונים משתנה גם בגלל החלוקה. בבעיה שלמעלה: ${f.shekels("prob.a_first")} אצל בנק א׳ מול ${f.shekels("prob.c_first")} אצל בנק ג׳, ואי אפשר לדעת אם ההפרש בא מהריביות או מהתמהיל.`,
+  ]}
+>
+  רק כשהתמהיל, הסכום והתקופה זהים, ההבדל שנשאר הוא ההבדל בריביות של הבנקים. זה מה שהסלים האחידים נותנים. ובשיעור 5.3 נראה שגם אז צריך לוודא את התאריך והתחזית.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## שלוש הצעות לסל אחיד 2
+
+</Section>
+
+דנה ויואב רוצים להשוות את סל 2 אצל שלושת הבנקים, על {f.shekels("explain.loan")} ל־{f.plain("explain.years")} שנה.
+
+**צעד 1 — מחלקים את ההלוואה.** סל 2 הוא שלישים: <M>{n("explain.loan")} ÷ 3 = {nv(splitOf("basket2.split")[0].amount)}</M>. שלושה מסלולים של {formatShekels(splitOf("basket2.split")[0].amount)} כל אחד: קבועה לא צמודה, פריים, משתנה צמודה.
+
+**צעד 2 — כל בנק נותן ריבית לכל מסלול.** (ריביות בדויות; בפריים ובצמוד ליום ההצעה):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[24rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">קבועה לא צמודה</th>
+        <th class="py-2 pe-3 text-start font-semibold">פריים</th>
+        <th class="py-2 pe-3 text-start font-semibold">משתנה צמודה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {banks.map((k) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n900">{bankName(k)}</td>
+          {b2tracks(k).map((t) => (<td class="py-2 pe-3"><span class="ltr">{t.rate}%</span></td>))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 3 — ההחזר הראשון של כל בנק.** מחברים את שלושת התשלומים הראשונים. בנק א׳: <M>{nv(b2tracks("א")[0].first)} + {nv(b2tracks("א")[1].first)} + {nv(b2tracks("א")[2].first)} = {n("u.a.b2.first")}</M>. בנק ב׳: {f.shekels("u.b.b2.first")}. בנק ג׳: {f.shekels("u.c.b2.first")}.
+
+**צעד 4 — העלות הממשית של האשראי.** בנק א׳ {f.plain("u.a.b2.rate")}%, בנק ב׳ {f.plain("u.b.b2.rate")}%, בנק ג׳ {f.plain("u.c.b2.rate")}%. הנמוך ביותר: {lowestOf("b2")[0]}.
+
+**צעד 5 — מה אפשר להגיד.** שלוש ההצעות על אותו סל, אותו סכום ואותה תקופה, ולכן ההפרשים הם בריביות של הבנקים. בסל הזה, בתנאים האלה, {lowestOf("b2")[0]} נמוך ביותר. מה זה אומר על סל 3? כלום; שם הדירוג שונה.
+
+**צעד 6 — ומה עם הסלים המוצעים?** ההחזר הראשון: בנק א׳ {f.shekels("prob.a_first")}, בנק ב׳ {f.shekels("prob.b_first")}, בנק ג׳ {f.shekels("prob.c_first")}. אלה שלושה תמהילים שונים, ולכן ההשוואה הזו אינה השוואת מחיר.
+
+<Section kind="דוגמה חצי פתורה">
+
+## חותכים הלוואה לסלים
+
+</Section>
+
+הלוואה של {f.shekels("half.loan")}. מלאו את הסכום של כל מסלול בכל סל אחיד. אפס פירושו ״המסלול הזה לא בסל״. השורה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="5.2-half"
+  periodLabel="המסלול"
+  columns={[
+    { key: "b1", label: "סל 1" },
+    { key: "b2", label: "סל 2" },
+    { key: "b3", label: "סל 3" },
+  ]}
+  rows={halfRows}
+  blanks={["משתנה פריים.b1", "משתנה פריים.b2", "משתנה פריים.b3", "משתנה צמודה.b1", "משתנה צמודה.b2", "משתנה צמודה.b3"]}
+  success="בכל סל הסכומים מסתכמים בהלוואה כולה: מיליון ומאתיים אלף. סל 1 לא מתחלק, סל 2 מתחלק לשלישים וסל 3 לחצאים."
+  hint="סל 1: הכול קבועה. סל 2: שליש לכל אחד משלושה. סל 3: חצי לכל אחד משניים. מסלול שאינו בסל — אפס."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והבנקים בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא הצעות של בנק.
+התרגילים מסודרים מהקל אל המאתגר. בתרגיל 6 תצטרכו מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="5.2-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "כדי שהבנקים יוכלו לתמחר גבוה יותר", feedback: "הסלים נועדו למטרה ההפוכה: להשוות. הצוות תיקן את ״הצעת דמה״ בסיכום מ־26 באוגוסט 2026." },
+    { text: "כדי שאפשר יהיה להשוות מחיר בין בנקים על אותו תמהיל", correct: true, feedback: "נכון. כשההרכב זהה, ההבדל שנשאר הוא בריביות." },
+    { text: "כדי שלכל לווה יהיה אותו תמהיל", feedback: "אין בתעתיק כלל שמחייב לווה לבחור בסל אחיד. הסלים נועדו להשוואה." },
+    { text: "כדי שכל מסלול ייספר כשליש", feedback: "רק בסל 2 יש שלישים. בסל 1 אין חלוקה ובסל 3 יש חצאים." },
+  ]}
+>
+  למה בנק ישראל קבע שלושה סלים אחידים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.2-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_third"), message: "זה שליש, כמו בסל 2. בסל 3 יש שני חלקים: חצי ו־חצי." },
+    { value: f.raw("explain.loan"), message: "זו ההלוואה כולה. בסל 3 היא מתחלקת לשני מסלולים." },
+  ]}
+>
+  מה הסכום במסלול הפריים בסל אחיד 3, בהלוואה של {f.shekels("explain.loan")}?
+</NumericExercise>
+
+<Solution for="5.2-2">
+סל 3 הוא חצי קבועה לא צמודה וחצי פריים: <M>{n("explain.loan")} ÷ 2 = {n("ex2.answer")}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.2-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_33"), message: "כתבתם שליש כ־33%. שליש הוא בדיוק שליש, ולא 33%: 33% משאירים חלק מההלוואה בחוץ." },
+  ]}
+>
+  בהלוואה של {f.shekels("half.loan")}, מה הסכום של המסלול משתנה צמודה בסל אחיד 2?
+</NumericExercise>
+
+<Solution for="5.2-3">
+<M>{n("half.loan")} ÷ 3 = {n("ex3.answer")}</M>. אם כותבים 33% מקבלים {n("ex3.err_33")}: ההלוואה כולה לא מתחלקת. בסל אחיד השברים מדויקים.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.2-4"
+  ordered
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "קבועה לא צמודה", feedback: "היא בכל שלושת הסלים." },
+    { text: "משתנה פריים", feedback: "היא בסלים 2 ו־3." },
+    { text: "קבועה צמודה", correct: true, feedback: "נכון, לפי התעתיק של הצוות: קבועה צמודה לא נמצאת באף סל. בסל 2 יש מסלול צמוד, אבל הוא משתנה." },
+    { text: "משתנה צמודה", feedback: "היא בסל 2, כשליש, ומתעדכנת כל חמש שנים." },
+  ]}
+>
+  איזה מסלול אינו בשום אחד משלושת הסלים האחידים?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="5.2-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `בנק ג׳ זול יותר, כי ההחזר הראשון שלו (${f.shekels("prob.c_first")}) גבוה מזה של בנק א׳ (${f.shekels("prob.a_first")})`, feedback: "גבוה יותר פירושו יקר יותר, לא זול. אבל גם הכיוון לא מוכיח דבר: התמהילים שונים." },
+    { text: "אי אפשר לדעת: שני הסלים המוצעים שונים בהרכב, והמספרים משקפים גם את התמהיל וגם את הריביות", correct: true, feedback: "נכון. בדיקת הבסיס מראה הבדל בתמהיל. כדי להשוות מחיר צריך אותו תמהיל, ולכן משווים סל אחיד." },
+    { text: "בנק א׳ זול יותר, כי יש לו יותר מסלולים", feedback: "מספר המסלולים לא אומר דבר על המחיר." },
+    { text: "שניהם שווים, כי הסכום זהה", feedback: "אותו סכום לא מספיק: צריך גם אותו תמהיל ואותה תקופה." },
+  ]}
+>
+  הסל המוצע של בנק א׳ נותן החזר ראשון של {f.shekels("prob.a_first")}, והסל המוצע של בנק ג׳ נותן {f.shekels("prob.c_first")}. מה אפשר להגיד על המחיר של שני הבנקים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.2-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  errors={[
+    { value: f.raw("ex6.err_b2"), message: "זה ההפרש בין סל 1 לסל 2. השאלה היא על סל 1 מול סל 3." },
+  ]}
+>
+  בבנק א׳, ההחזר הראשון בסל אחיד 1 הוא {f.shekels("ex6.b1")}, בסל אחיד 2 הוא {f.shekels("ex6.b2")} ובסל אחיד 3 הוא {f.shekels("ex6.b3")}. בכמה שקלים ההחזר הראשון בסל 1 גבוה מההחזר הראשון בסל 3?
+</NumericExercise>
+
+<Solution for="5.2-6">
+<M>{n("ex6.b1")} − {n("ex6.b3")} = {n("ex6.answer")}</M>. ההחזר הראשון הוא רק מדד אחד: סל 3 נמוך יותר בהתחלה, אבל ב־5.3 נראה שני מדדים נוספים שיכולים לבחור אחרת.
+</Solution>
+
+<Callout title="חמש שאלות על הסלים האחידים">
+<p><strong>מה זה?</strong> שלושה תמהילים קבועים, באותו הרכב בכל בנק: סל 1 כולו קבועה לא צמודה, סל 2 שלישים של קבועה, פריים ומשתנה צמודה, סל 3 חצי קבועה וחצי פריים. לצידם הסל המוצע: מה שהבנק בחר.</p>
+<p><strong>למה זה קיים?</strong> כדי שאפשר יהיה להשוות מחיר בין בנקים. כשההרכב זהה, ההבדל שנשאר הוא בריביות (לפי התעתיק; לא נבדק מול ההוראה).</p>
+<p><strong>איך זה עובד?</strong> כל סל הוא שברים מדויקים של ההלוואה, תקופה אחת ושיטת החזר אחת. כל בנק נותן ריבית לכל מסלול.</p>
+<p><strong>איך זה משפיע עליכם?</strong> אתם מקבלים מחיר של תמהיל שאתם יכולים להשוות. הסל המוצע הוא מה שהבנק חושב שמתאים לכם, ואותו לא ניתן להשוות במחיר.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים בנקים על סל אחיד, ושואלים מה הבנק מציע מעבר לו. בנק נמוך בסל אחד לא בהכרח נמוך באחר, ושלושת הסלים הם רק שלוש נקודות על הדרך.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שני תמהילים שונים הם שתי שאלות שונות.** מהמחיר של הצעה בתמהיל שהבנק בחר לא ניתן ללמוד איזה בנק זול.
+- **שלושה סלים אחידים** (לפי תעתיק של הצוות מנספח 5, לא נבדק מול ההוראה): סל 1 כולו קבועה לא צמודה; סל 2 שלישים של קבועה לא צמודה, פריים ומשתנה צמודה לחמש שנים; סל 3 חצי קבועה וחצי פריים.
+- **שברים מדויקים:** שליש הוא בדיוק שליש. סכום שלא מתחלק בדיוק — אין לנו כלל כתוב מה עושים.
+- **תקופה אחת ולוח שפיצר** בסלים האחידים (לפי Brain J-080; לא נבדק).
+- **קבועה צמודה** לא נמצאת באף סל. טענת השטח (FK-H-031) שונה, והיא ברשימה לאילון.
+- **הסל המוצע** הוא תמהיל שהבנק בחר, ולכן לא ניתן להשוואת מחיר ישירה.
+- **נמוך בסל אחד** אינו נמוך בסל אחר.
+
+**בשיעור הבא — 5.3, מדדי ההשוואה של <Later lesson="5.3" quiet>הוראה 451</Later> ומתי מותר להשוות:** שלושה מספרים לכל הצעה, ומה צריך להיות זהה כדי שההשוואה תהיה הוגנת.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "שלושת הסלים האחידים (הוראת בנק ישראל 451, נספח 5): סל 1 כולו קבועה לא צמודה; סל 2 שליש קבועה לא צמודה, שליש משתנה פריים ושליש משתנה צמודה המתעדכנת כל 5 שנים על בסיס אג״ח ממשלתית; סל 3 חצי קבועה לא צמודה וחצי משתנה פריים; וסל מוצע. כל רכיב נקרא בשמו מהטבלה בנספח 4. לפי תעתיק של הצוות ב־Brain (דף 7733250, מגרסה 22 של ההוראה מ־19.7.2023, שהורדה ב־2026-08-03), ממתין לבדיקה מול ההוראה.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "כל בנק מציע את שלושת הסלים בהרכב זהה; בסלים האחידים הלווה בוחר תקופה אחת והלוח הוא שפיצר; קבועה צמודה אינה באף סל. לפי דף J-080 ב־Brain (אוגוסט 2026), ממתין לבדיקה מול ההוראה.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "שליש הוא בדיוק שליש: ״לא 33%״. הערת הצוות בדף 7733250. מה עושים כשהסכום לא מתחלק — לא נמצא בתעתיק.", date: "2026-08-17" },
+    { kind: "ידע מהשטח", text: "אילון (2026-07-27, וחזר ב־2026-08-26): ״הוראה 451 (׳שלושת הסלים׳, סוף 2020)... (פריים, קבועה צמודה, קבועה לא צמודה)״ (FK-H-031) — סותר את התעתיק. ״הצעת דמה עם מרווח גבוה״ (FK-H-032) — תוקן בסיכום ב־Drive מ־2026-08-26 לפי המדריך של בנק ישראל; הקורס לא מלמד אותו. ממתין לאישור אילון.", date: "2026-08-26" },
+    { kind: "לא אומת", text: "הרפורמה באישור העקרוני האחיד נכנסה לתוקף ב־31 באוגוסט 2022: לפי תקציר של מקור רשמי (הסבר של בנק ישראל על הרפורמה, נקרא ב־2026-10-09); ממתין לבדיקה מול המקור.", date: "2026-10-09" },
+    { kind: "הנחת חישוב", text: "שלושת הבנקים, הריביות והמרווחים שלהם, התחזית (עוגן הפריים, העוגן הריאלי של המשתנה הצמודה ואינפלציה קבועה של 2.5% לשנה), דנה ויואב, והתאריך — בדויים, להמחשה. לא הצעות של בנק ולא תחזית של בנק ישראל. הסכומים נבחרו כך שיתחלקו בדיוק. ריבית חודשית = אחוז הריבית לשנה חלקי 12. הלוחות לפי כלל העיגול של הקורס (הריבית של כל חודש מעוגלת לאגורה, התשלום האחרון סוגר את היתרה); בנק יכול לעגל אחרת." },
+    { kind: "מחקר / הצעה", text: "איך בנקים מתמחרים סל אחיד לעומת סל מוצע, ומה הם מעדיפים שהלקוח יבחר — לא ידוע. ״הרכב הסלים״ ו״מועד הרפורמה״ ברשימה לאילון." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript (העלות הממשית בחצייה) ובנפרד ב־Python (בשיטת ניוטון), וכל פיצול של סל נבדק בנפרד כשבר מדויק.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/offers.ts (UNIFORM_BASKETS, splitBasket, measureOffer; schedules via metrics.ts) and src/data/offer-examples.ts (invented banks and forecasts) via scripts/lessons/lesson-5-2.ts and data/lessons/5-2.json, rechecked by checks/kinds/offers.py. Illustration: src/components/UniformBaskets.vue. Video: video/5-2.html. */}

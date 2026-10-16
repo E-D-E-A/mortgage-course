@@ -1,0 +1,542 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.6"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import MixBuilder from "../../components/MixBuilder.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { CANDIDATES, INITIAL_MIX, KIND_NAME_HE, SCENARIOS, builderTracks } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.6");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const name = Object.fromEntries(CANDIDATES.map((c) => [c.id, c.name]));
+export const table = f.rows("cand.table");
+export const row = Object.fromEntries(table.map((r) => [r.id, r]));
+export const rankOf = (id) => Object.fromEntries(f.rows(id).map((r) => [r.id, r.rank]));
+export const rPay = rankOf("rank.payment");
+export const rTotal = rankOf("rank.total");
+export const rExp = rankOf("rank.exposure");
+export const rHigh = rankOf("rank.highest");
+export const builderStart = builderTracks(INITIAL_MIX);
+export const sc = SCENARIOS.base;
+export const pc = (v) => `${v}%`;
+export const rate = (i) => `${f.plain(`init.rate_${i}`)}%`;
+export const PAY_MONTHS = [1, 27, 61, 121, 241, 360];
+export const PAY_IDS = ["initial", "half", "linked"];
+export const predictionOptions = [
+  "כן: תמהיל שהוא טוב באמת, טוב בשלושת היעדים",
+  "לא: במבחר שבשיעור, כל יעד מנצח תמהיל אחר",
+  "כן, אם בוחרים רק תמהילים שעוברים את הגבולות של בנק ישראל",
+  "לא, אבל רק כי הגבולות של בנק ישראל מונעים את התמהיל הטוב",
+];
+
+בשלב 3 למדתם לקרוא תמהיל במספרים: <Term t="החזר ראשון" lesson="3.8">החזר ראשון</Term>, התשלום הגבוה ביותר בתרחיש, ו<Term t="סך תשלומים" lesson="3.9">סך כל התשלומים</Term>. בשלב הזה אתם בונים תמהיל. לפני שבונים צריך לדעת למה מכוונים, והתשובה היא לא אחת: יש שלושה יעדים, והם מושכים לכיוונים שונים.
+בשיעור הזה נכיר אותם על התיק המרכזי של הקורס, נועם ושירה, ונראה שלוש שאלות שכל יעד מחייב לענות עליהן: מה בדיוק מודדים, באיזה חודש, ובאיזה תרחיש.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p>הסכומים ואחוזי הריבית הם <strong>הנחות של הקורס</strong>, לא הצעה של בנק: לנועם ושירה אין עדיין הצעות, אלה מגיעות בשלב 6. שלושת היעדים הם <strong>תכנון של Mogi</strong>, לא עובדה על השוק (לפי דף J-090 ב־Brain, עודכן ב־2026-10-08, כפי שנרשם בצוות). הקורס לא טוען שכך מחלקים תמהילים בשוק, ולא יודע איך בנקים מתמחרים תמהיל (שאלה פתוחה לאילון).</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.6"
+  question={`נועם ושירה לוקחים הלוואה של ${f.whole("a.loan")} ובודקים כמה תמהילים שלה. כל תמהיל בנוי לשרת יעד אחר: החזר חודשי נמוך, סך תשלומים נמוך, או שקט מפני שינויי ריבית ומדד. האם יש ביניהם תמהיל אחד שמנצח בשלושת היעדים?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלושה יעדים שמושכים לכיוונים שונים
+
+</Section>
+
+<LessonVideo lesson="5-6" />
+
+<Section kind="ההסבר">
+
+## מה מנסים להשיג בתמהיל
+
+</Section>
+
+### שלושה יעדים
+
+לפי התכנון של Mogi (J-090), בניית תמהיל מייצרת שלושה תמהילים, לפי שלושה יעדים:
+
+1. **תמהיל החזר חודשי נמוך** — התשלום החודשי הקטן ביותר.
+2. **תמהיל חיסכון כולל מרבי** — סך התשלומים הקטן ביותר על פני חיי ההלוואה.
+3. **תמהיל חשיפה מינימלית לריבית** — כמה שפחות שינוי בתשלום כשהריבית או המדד זזים. את זה נקרא <Term t="יציבות" lesson="5.6">יציבות</Term>: תשלום יציב הוא תשלום שכמעט לא זז כשהריבית או המדד זזים.
+
+מ־Mogi מגיעה גם הערה כללית: אין תמהיל אחד הטוב ביותר. תמהיל שזול ביותר בסך הכול דורש בדרך כלל החזר גבוה יותר עכשיו, ותמהיל בטוח ביותר עולה בדרך כלל יותר (תכנון של Mogi, לא נבדק מול נתוני שוק). אילון אמר דבר דומה על שלוש גישות לבחירת משכנתא: החזר חודשי מינימלי, החזר כולל מינימלי וחשיפה מינימלית לשינויי ריבית (ידע מהשטח, FK-H-059, אילון, 2026-07-27; ממתין לאישור אילון).
+
+כל יעד הוא **מספר שמחשבים לכל תמהיל, והקטן ביותר מנצח**. כדי שהמספר יהיה מוגדר, צריך לענות על שאלה אחת לכל יעד:
+
+- **החזר נמוך — באיזה חודש?**
+- **סך תשלומים — באיזה תרחיש?**
+- **חשיפה — כמה זזים הדברים, ובאיזה כיוון?**
+
+### החזר נמוך — באיזה חודש?
+
+נועם ושירה הם זוג שכירים. נטו הם מרוויחים {f.shekels("a.recognised")} בחודש, והם קונים דירה ב־{f.shekels("a.price")} עם הון עצמי של {f.shekels("a.equity")}. ההלוואה: {f.shekels("a.loan")}, שיעור מימון של {f.plain("a.ltv")}%. עד {f.plain("a.car_months")} חודשים הם עוד משלמים {f.shekels("a.car")} בחודש על הלוואת רכב.
+
+התמהיל הראשוני שלהם הוא שלושה מסלולים ל־{f.plain("init.years")} שנה, בחלקים כמעט שווים. אלה הנחות של הקורס, לא הצעה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המסלול</th>
+        <th class="py-2 pe-3 text-start font-semibold">הסכום</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחוז הריבית</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="פריים" lesson="2.1">פריים</Term></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.amount_1")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{rate(1)}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="משתנה לא צמודה" lesson="2.7">משתנה לא צמודה</Term>, עדכון כל 5 שנים</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.amount_2")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{rate(2)}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="קבועה לא צמודה" lesson="2.5">קבועה לא צמודה</Term></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.amount_3")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{rate(3)}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+למה כל מסלול מקבל את האחוז שלו? ההנחות של הקורס:
+
+- **פריים, {rate(1)}.** הפריים היום 4.75%: ריבית בנק ישראל, 3.25%, ועוד 1.5 נקודות אחוז (חשבון לפי המוסכמה שהקורס למד בשיעור 2.1, לא נתון שפורסם). כאן המסלול נמוך ממנה ב־{f.plain("prime.spread")} נקודת אחוז: מרווח שהקורס מניח.
+- **משתנה לא צמודה, {rate(2)}.** אחוז הריבית נקבע מחדש כל 5 שנים, ולכן הבנק לא מחייב אותו ל־30 שנה. בהנחה של הקורס זה המסלול הזול ביותר בהתחלה.
+- **קבועה לא צמודה, {rate(3)}.** אחוז הריבית ננעל ל־30 שנה: ביניים בין השניים, בלי הצמדה, והתשלום לא זז.
+
+המחירים האלה הם **רשימת מחירים של הקורס**: אותו אחוז ריבית לכל סוג מסלול, בכל תמהיל, כדי שאפשר יהיה להשוות. בשוק הבנק מתמחר את התיק כולו, ושינוי בתמהיל יכול לשנות את הריביות (ידע מהשטח, FK-H-057, אילון, 2026-10-08; ממתין לאישור אילון). רשימת המחירים כוללת גם מסלולים צמודים, שאליהם נגיע: קבועה צמודה {f.plain("price.fixed_linked")}% ומשתנה צמודה {f.plain("price.variable_linked")}% (אחוז הריבית שלפני ההצמדה).
+
+מה <Term t="החזר חודשי" lesson="3.1">ההחזר החודשי</Term> של התמהיל הזה? {f.shekels("init.first")} בחודש הראשון. ומה יחס ההחזר? ב<Term t="יחס החזר" lesson="4.3">יחס החזר</Term> הבנק מודד את ההחזר מול <Term t="הכנסה פנויה" lesson="1.9">ההכנסה הפנויה</Term>: {f.shekels("a.recognised")} פחות הלוואת הרכב, כי נשארו בה יותר מ־18 חודשים (שיעור 4.2). זה {f.shekels("a.disposable")}, והיחס הוא {f.plain("init.ratio")}%. זה קצת מעל <Term t="סף הון" lesson="4.5">סף ההון</Term>, 40% (שיעור 4.5). זה מותר; לפי תיעוד הצוות הבנק מחזיק אז יותר הון, וזה יכול להעלות את המחיר (לא אומת). כדי לרדת מתחת ל־40% צריך תשלום של {f.shekels("init.max_at_40")} לכל היותר, כלומר {f.shekels("init.over_40")} פחות מהתשלום הראשוני.
+
+אבל "ההחזר הנמוך" יכול להיות כמה דברים:
+
+- **ההחזר הראשון.** זה מה ששילמו בחודש הראשון, והוא גם מה שהבנק מודד מול ההכנסה (שיעור 4.3).
+- **ההחזר הגבוה ביותר.** התשלום הגדול ביותר שיוצא בתרחיש. למשפחה אכפת לא רק מהחודש הראשון.
+- **ההחזר בחודשים שהמשפחה הכי לחוצה.** אצל נועם ושירה אלה {f.plain("a.car_months")} החודשים הראשונים, עד שהלוואת הרכב נגמרת. בחודש 1 נשארים להם לחיות אחרי כל התשלומים {f.shekels("init.left_1")}, ובחודש 27, אחרי שהלוואת הרכב נגמרה, {f.shekels("init.left_27")}.
+
+הנה שלושה תמהילים של אותו סכום, והתשלום שלהם בכמה חודשים (תרחיש הבסיס: המדד עולה {sc.inflation}% בשנה, הפריים והעוגן לא זזים; להמחשה, לא תחזית):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        {PAY_MONTHS.map((m) => (<th class="py-2 pe-3 text-start font-semibold">חודש <span class="ltr">{m}</span></th>))}
+      </tr>
+    </thead>
+    <tbody>
+      {PAY_IDS.map((id) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold text-n900">{name[id]}</td>
+          {PAY_MONTHS.map((m) => (<td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(f.raw(`pay.${id}.${m}`))}</span></td>))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+התמהיל ״{name.linked}״ — משתנה צמודה וקבועה צמודה — מתחיל נמוך מכולם, ו<Term t="הצמדה" lesson="0.8">הצמדה</Term> לאורך השנים מעלה את התשלום עד {f.shekels("linked.max")} בחודש {f.plain("pay.linked.max_month")}. התמהילים הלא צמודים לא זזים כמעט. לכן:
+
+- אם ״נמוך״ פירושו **ההחזר הראשון**, המנצח בין התמהילים שעוברים את הגבולות הוא ״{name.linked}״.
+- אם ״נמוך״ פירושו **ההחזר הגבוה ביותר**, המנצח הוא ״{name.half}״, ו״{name.linked}״ הוא דווקא האחרון.
+
+אותו יעד, שני מנצחים. לכן יעד של ״החזר נמוך״ תמיד נכתב עם החודש: **החזר ראשון נמוך**, או **החזר גבוה ביותר נמוך**. Mogi מציגה את שניהם.
+
+### סך תשלומים — באיזה תרחיש?
+
+הסכום של כל התשלומים תלוי במה שיקרה לפריים, לעוגן ולמדד. התמהיל הראשוני עם תרחיש הבסיס: {f.shekels("init.total")}. אותו תמהיל בתרחיש מחמיר — המדד עולה {SCENARIOS.stress.inflation}% בשנה, והפריים והעוגן עולים ב־{SCENARIOS.stress.primeShift} נקודות אחוז מהשנה השנייה — {f.shekels("init.stress_total")}.
+
+אין "סך תשלומים של התמהיל" בלי להגיד באיזה תרחיש. להשוות שני תמהילים על סך התשלומים אפשר רק **באותו תרחיש**, ובאותו סכום הלוואה. את זה נראה שוב בשיעור 5.3.
+
+### חשיפה — יציבות
+
+התמהיל הראשוני משלם בחודש הראשון {f.shekels("init.first")}. בתרחיש המחמיר התשלום הגבוה ביותר שלו הוא {f.shekels("init.stress_max")}: גבוה ב־{f.shekels("init.rise")}. את ההפרש הזה נשתמש בו כמדד ליציבות: **בכמה התשלום הגבוה ביותר בתרחיש המחמיר גבוה מההחזר הראשון**. ככל שהוא קטן, התמהיל יציב יותר. תמהיל שכולו קבועה לא צמודה: אפס.
+
+זו בחירה של הקורס: הדף של Mogi נותן שם ליעד (חשיפה מינימלית לריבית), לא נוסחה. מדדים אחרים אפשריים, למשל כמה מההלוואה יושב במסלול משתנה או צמוד (שיעור 3.7).
+
+### שבעה תמהילים, שלושה יעדים
+
+הנה שבעה תמהילים של אותה הלוואה, {f.shekels("a.loan")}, כולם לפי אותה רשימת מחירים. הטבלה מראה את שלוש המדידות, ואת מה שהבנק בודק:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">עלייה במחמיר</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">חלק משתנה</th>
+        <th class="py-2 pe-3 text-start font-semibold">עובר?</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CANDIDATES.map((c) => (
+        <tr class={`border-b border-n100 ${row[c.id].passes === "no" ? "text-n600" : ""}`}>
+          <td class="py-2 pe-3 font-semibold">{c.name}</td>
+          <td class={`py-2 pe-3 ${rPay[c.id] === 1 ? "font-bold text-teal-deep" : ""}`}><span class="ltr whitespace-nowrap">{formatShekels(row[c.id].first)}</span></td>
+          <td class={`py-2 pe-3 ${rHigh[c.id] === 1 ? "font-bold text-teal-deep" : ""}`}><span class="ltr whitespace-nowrap">{formatShekels(row[c.id].max)}</span></td>
+          <td class={`py-2 pe-3 ${rTotal[c.id] === 1 ? "font-bold text-teal-deep" : ""}`}><span class="ltr whitespace-nowrap">{formatShekels(row[c.id].total)}</span></td>
+          <td class={`py-2 pe-3 ${rExp[c.id] === 1 ? "font-bold text-teal-deep" : ""}`}><span class="ltr whitespace-nowrap">{formatShekels(row[c.id].rise)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(row[c.id].ratio)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(row[c.id].variable_share)}</span></td>
+          <td class="py-2 pe-3">{row[c.id].passes === "yes" ? "עובר" : "לא עובר"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} מודגש: המנצח בכל עמודה בין התמהילים שעוברים. "עובר" פירושו שלא נחצה אף איסור של <Term t="הוראה 329" lesson="4.4">הוראה 329</Term> כפי שהצוות תעתק אותה (לא אומת): שיעור מימון, יחס החזר עד 50%, עד שני שלישים משתנה, עד 30 שנה (שיעור 4.4). חציית 40% לא פוסלת.</p>
+</div>
+
+מה רואים:
+
+1. **אין תמהיל שמנצח בשלושה.** ״{name.linked}״ מנצח בהחזר הראשון ({f.shekels(`linked.first`)}), ״{name.short}״ בסך התשלומים, ו״{name.fixed}״ ביציבות.
+2. **הגבולות משנים מי מנצח.** בלעדיהם, ״{name.linked_heavy}״ היה מנצח בהחזר הראשון ו״{name.fixed_20}״ בסך התשלומים. הראשון עובר את גבול שני השלישים המשתנים, והשני את גבול 50% של יחס ההחזר. תמהיל שהבנק לא יכול לאשר אינו תשובה.
+3. **התמהיל הראשוני לא מנצח באף יעד.** ״{name.half}״ טוב ממנו בשלושתם: ההחזר הראשון, סך התשלומים והיציבות. אצל נועם ושירה, הצעד הראשון הוא לוותר על תמהילים כאלה, ורק אחר כך לבחור בין היעדים. (בשלב 8 נקרא לזה <Later lesson="8.15">חזית יעילה</Later>.)
+4. **כל יעד עולה במשהו.** ״{name.linked}״ נותן את ההחזר הראשון הנמוך, אבל עולה ב־{f.shekels("linked.total_gap")} בסך התשלומים מול הראשוני, והתשלום הגבוה שלו בחודש {f.plain("pay.linked.max_month")} גבוה ב־{f.shekels("linked.max_gap")} מזה של הראשוני.
+
+<Callout title="שלוש מילים על ״הכי טוב״" tone="warning">
+<p>״הכי טוב״ בלי יעד הוא לא מספר. ״הכי זול״ בלי תרחיש הוא לא מספר. ״הכי נמוך״ בלי חודש הוא לא מספר. כשיועץ אומר ״זה התמהיל הטוב ביותר״, שאלו: לפי איזה יעד, באיזה חודש, ובאיזה תרחיש.</p>
+<p>הטענה ״יש שלושה תמהילים טיפוסיים שהבנקים מאשרים״ נשמעה מאחד המייסדים (ידע מהשטח, FK-H-061, 2026-10-01; לא נבדק). הקורס לא משתמש בה: הוא לא יודע אילו תמהילים נפוצים בשוק, או מה בנק מעדיף.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## ארבעה שינויים, שלושה מספרים
+
+</Section>
+
+זה התמהיל הראשוני של נועם ושירה בבונה התמהיל של שיעור 3.7. שלוש הכרטיסיות שמתחת לסליידרים הן שלושת המספרים של השיעור. התרחיש הוא תרחיש הבסיס.
+
+<MixBuilder
+  client:visible
+  loan={1640000}
+  tracks={builderStart}
+  scenario={{ inflation: Number(sc.inflation), primeShift: Number(sc.primeShift), primeFromYear: 2, anchorShift: Number(sc.anchorShift) }}
+  amountStep={1000}
+  labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
+/>
+
+נסו את שלוש אלה, כל אחת מהמצב ההתחלתי:
+1. שנו את סוג מסלול 3 ל״קבועה צמודה״ וקבעו אחוז ריבית של {f.plain("price.fixed_linked")}%. מה קרה לכל אחד משלושת המספרים?
+2. החזירו, וקבעו את התקופה של שלושת המסלולים ל־25 שנה. מה קרה עכשיו?
+3. החזירו, והעלו את ״המדד עולה בשנה״ ל־{SCENARIOS.stress.inflation}% ואת ״הפריים זזה״ ל־<span class="ltr">+{SCENARIOS.stress.primeShift}</span> נקודות אחוז, ואת ״העוגן״ ל־<span class="ltr">+{SCENARIOS.stress.anchorShift}</span>. איזה מהמספרים זז, ואיזה לא?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר הראשון יורד ל־{f.shekels("task1.first")} (מ־{f.shekels("init.first")}), אבל התשלום הגבוה ביותר עולה ל־{f.shekels("task1.max")} וסך התשלומים ל־{f.shekels("task1.total")} (מ־{f.shekels("init.total")}). מסלול צמוד אחד מספיק כדי שהיעדים ימשכו לכיוונים שונים.</li>
+    <li>ההחזר הראשון עולה ל־{f.shekels("task2.first")}, וסך התשלומים יורד ל־{f.shekels("task2.total")}. תקופה קצרה יותר: תשלום גדול יותר, סך קטן יותר.</li>
+    <li>ההחזר הראשון לא זז: {f.shekels("init.first")}. התשלום הגבוה ביותר עולה ל־{f.shekels("init.stress_max")}, וסך התשלומים ל־{f.shekels("init.stress_total")}. התרחיש מזיז רק את מה שחשוף אליו.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## שלושה יעדים, שלוש מדידות
+
+</Section>
+
+**צעד 1 — רשימת התשלומים.** לכל תמהיל ולכל תרחיש יש רשימה של תשלומים, אחד לכל חודש (שיעור 3.7). את התשלום של חודש k כותבים C<sub>k</sub>, כמו C בשיעור 0.6.
+
+**צעד 2 — כל יעד לוקח מהרשימה מספר אחד.**
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy">יעד 1: <span class="ltr">C<sub>k</sub></span></p>
+  <p class="text-h3 text-navy">יעד 2: <span class="ltr">C<sub>1</sub> + C<sub>2</sub> + … + C<sub>n</sub></span></p>
+  <p class="text-h3 text-navy">יעד 3: <span class="ltr">max C<sub>k</sub></span> בתרחיש המחמיר, פחות <span class="ltr">C<sub>1</sub></span> בתרחיש הבסיס</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום של התמהיל בחודש k, בשקלים. בחודש 1 זה ההחזר הראשון. את k בוחרים לפי השאלה ״באיזה חודש״</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר החודשים עד התשלום האחרון של המסלול הארוך ביותר</dd>
+    <dt class="ltr font-semibold text-n900">max</dt><dd>״הגבוה ביותר מבין״, כמו בשיעור 3.8</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">בכל יעד, <strong>הקטן ביותר מנצח</strong>.</p>
+</div>
+
+**מתי זה נכון?**
+1. כל התמהילים שמשווים הם על אותה הלוואה, באותו יום, ובאותו תרחיש. ביעד 3 יש שני תרחישים, ושניהם זהים לכל התמהילים.
+2. מנצח רק תמהיל שעבר את הגבולות. מי שלא עבר אינו מועמד.
+3. שוויון: כשיש שני תמהילים עם אותו מספר, שניהם מנצחים. כאן הרשימה לפי הסדר, והראשון בה נקרא ראשון.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה לכל תמהיל עם התשלום בכל חודש (שיעור 3.7). יעד 1: התא של החודש הרצוי. יעד 2: <span class="ltr">=SUM(B2:B361)</span>. יעד 3: <span class="ltr">=MAX(C2:C361)-B2</span>, כשעמודה B היא תרחיש הבסיס ועמודה C התרחיש המחמיר. אחרי זה: <span class="ltr">=MIN(...)</span> על שורת המספרים של התמהילים, ו־<span class="ltr">MATCH</span> כדי לדעת מי המנצח.</p>
+<p><strong>במחשבון:</strong> מחשבון רגיל לא מספיק לתשלומים לאורך 360 חודשים; בונה התמהיל עושה זאת.</p>
+</Callout>
+
+<Callout title="עיגול">
+<p>כמו בשיעור 3.8: הלוחות מעוגלים לפי כלל העיגול של הקורס (הריבית של כל חודש מעוגלת לאגורה, והתשלום האחרון סוגר את היתרה). לכן סך התשלומים של שני תמהילים כמעט־שווים יכול להיבדל באגורות מהמכפלה של התשלום ב־360.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="5.6"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `אילו זה היה נכון, בטבלה היה תמהיל אחד מודגש בשלוש העמודות. ההחזר הראשון הנמוך הוא של ״${name.linked}״, סך התשלומים הנמוך של ״${name.short}״, והיציבות של ״${name.fixed}״.`,
+    "",
+    "הגבולות משנים מי מנצח, אבל לא מבטלים את הסתירה: גם בין התמהילים שעוברים, שלושה תמהילים שונים מנצחים בשלושה יעדים.",
+    "הגבולות הם לא הסיבה. בלי הגבולות מנצחים תמהילים אחרים (צמוד ברובו, וקבועה ל־20 שנה), ועדיין כל יעד מנצח תמהיל שונה.",
+  ]}
+>
+  הטבלה מראה שבמבחר הזה כל יעד מנצח תמהיל אחר: {name.linked} בהחזר הראשון, {name.short} בסך התשלומים, {name.fixed} ביציבות. זה לא חוק טבע: במבחר אחר ייתכן שתמהיל אחד מנצח בכמה יעדים. אבל הרעיון חוזר: מי שמקבל תשלום נמוך עכשיו משלם יותר אחר כך, ומי שמשלם יותר עכשיו מקבל שקט או סך נמוך. ״חצי־חצי״, למשל, טוב מהראשוני בשלושת היעדים, ובכל זאת בכל אחד מהם יש תמהיל אחר שמנצח אותו.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: ״הצמוד״ מול הראשוני
+
+</Section>
+
+היועץ מציע לנועם ושירה את ״{name.linked}״: {f.shekels("linked.first")} בחודש הראשון במקום {f.shekels("init.first")}. הם רוצים להבין אם זה "החזר נמוך" באמת.
+
+**צעד 1 — ההחזר הראשון.** <M>{n("init.first")} − {n("linked.first")} = {n("linked.first_gap")}</M> ₪ פחות בחודש.
+
+**צעד 2 — החודש שבו התשלום הכי גבוה.** בתמהיל הצמוד המדד מעלה את התשלום כל חודש: {f.shekels(`pay.linked.27`)} בחודש 27, {f.shekels(`pay.linked.121`)} בחודש 121, ו־{f.shekels("linked.max")} בחודש {f.plain("pay.linked.max_month")}. הגבוה ביותר גבוה מזה של הראשוני ב־<M>{n("linked.max")} − {n("init.max")} = {n("linked.max_gap")}</M> ₪, וגבוה מההחזר הראשון של התמהיל הצמוד עצמו ב־{f.shekels("ex6.climb")}.
+
+**צעד 3 — סך התשלומים.** {f.shekels("linked.total")}, מול {f.shekels("init.total")} בראשוני: <M>{n("linked.total")} − {n("init.total")} = {n("linked.total_gap")}</M> ₪ יותר. בתרחיש בסיס, שבו המדד עולה {sc.inflation}% בשנה.
+
+**צעד 4 — חשיפה.** בתרחיש המחמיר התשלום הגבוה ביותר של התמהיל הצמוד הוא {f.shekels("linked.stress_max")}, כלומר גבוה מההחזר הראשון ב־{f.shekels("linked.rise")}. בראשוני: {f.shekels("init.rise")}.
+
+**צעד 5 — הגבולות.** יחס ההחזר של התמהיל הצמוד: {f.plain("linked.ratio")}%, מתחת ל־40%. החלק המשתנה: הוא עדיין בתוך שני השלישים, עם {f.shekels("linked.variable_room")} של מרווח. כלומר הוא עובר, ובקושי בחלק המשתנה.
+
+**מסקנה.** ״הצמוד״ הוא החזר נמוך לפי **החזר ראשון** בלבד. לפי ההחזר הגבוה ביותר, לפי סך התשלומים ולפי היציבות, הוא הגרוע מבין הכול. זה לא הופך אותו לפסול; זה אומר שהוא תשובה ליעד אחד, ושהמחיר שלו נכתב לצדו.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מי מנצח איזה יעד?
+
+</Section>
+
+עכשיו אתם. לכל יעד, בחרו את התמהיל שמנצח בטבלה שלמעלה. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="5.6-match"
+  promptLabel="היעד"
+  answerLabel="התמהיל המנצח"
+  options={CANDIDATES.map((c) => c.name)}
+  rows={[
+    { prompt: "ההחזר הראשון הנמוך ביותר, בין התמהילים שעוברים את הגבולות", answer: name.linked, given: true, why: `${formatShekels(row.linked.first)} בחודש הראשון.` },
+    { prompt: "סך התשלומים הנמוך ביותר, בין התמהילים שעוברים את הגבולות", answer: name.short, why: `${formatShekels(row.short.total)}: שתי תקופות של 25 שנה, בתשלום גבוה יותר כל חודש.` },
+    { prompt: "העלייה הקטנה ביותר בתשלום בתרחיש המחמיר", answer: name.fixed, why: "קבועה לא צמודה: התשלום לא זז כשהריבית והמדד זזים." },
+    { prompt: "ההחזר הגבוה ביותר הנמוך ביותר, בין התמהילים שעוברים", answer: name.half, why: `${formatShekels(row.half.max)}: אין בו מסלול צמוד, ולכן התשלום לא עולה אף פעם.` },
+    { prompt: "ההחזר הראשון הנמוך ביותר, אילו לא היו גבולות", answer: name.linked_heavy, why: `${formatShekels(row.linked_heavy.first)} — אבל ${pc(row.linked_heavy.variable_share)} מההלוואה משתנה, ויותר משני שלישים אסור.` },
+    { prompt: "סך התשלומים הנמוך ביותר, אילו לא היו גבולות", answer: name.fixed_20, why: `${formatShekels(row.fixed_20.total)} — אבל יחס ההחזר הוא ${pc(row.fixed_20.ratio)}, מעל 50%.` },
+  ]}
+  success="נכון. שימו לב שלשני היעדים האחרונים המנצחים הם תמהילים שהבנק לא יכול לאשר: בלי הגבולות, התוצאה מטעה."
+  hint="הסתכלו בעמודה של היעד בטבלה. בשני היעדים האחרונים מתעלמים מעמודת ״עובר?״."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והתרחישים בתרגילים הם הנחות של הקורס, לא נתוני שוק ולא הצעת בנק. התרגילים מסודרים מהקל אל המאתגר. בתרגילים 2, 4, 5 ו־6 אפשר להסתכל בטבלאות של השיעור.
+
+<ChoiceExercise
+  client:visible
+  id="5.6-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ההחזר בחודש הראשון, ותו לא", feedback: "זו אחת האפשרויות, ולא היחידה. ההחזר בחודש הראשון הוא מה שהבנק בודק, אבל תמהיל עם החזר ראשון נמוך יכול לעלות מאוד אחר כך." },
+    { text: "אין תשובה אחת: צריך לומר באיזה חודש, ושני מדדים יכולים לבחור שני תמהילים", correct: true, feedback: "נכון. בשיעור: לפי ההחזר הראשון מנצח ״צמוד״, ולפי ההחזר הגבוה ביותר מנצח ״חצי־חצי״." },
+    { text: "הסכום הכולל חלקי מספר החודשים", feedback: "זה ממוצע על כל ההלוואה, וזה לא המספר שמשלמים בחודש. בשיעור 3.8: ההחזר החודשי הוא מה שמשלמים בפועל, לא ממוצע." },
+    { text: "ההחזר שהבנק מאשר, תמיד", feedback: "הבנק מאשר או לא מאשר תמהיל לפי הגבולות; הוא לא קובע מהו ״החזר נמוך״. זו החלטה של הלווה." },
+  ]}
+>
+  יועץ אומר: ״בחרתי לכם את התמהיל עם ההחזר החודשי הנמוך ביותר״. מה בדיוק צריך להבהיר?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.6-2"
+  n={2}
+  level="קל"
+  answer={f.raw("init.left_27")}
+  errors={[
+    { value: f.raw("init.left_1"), message: "זה מה שנשאר בחודש הראשון, כשהלוואת הרכב עוד פעילה. בחודש 27 היא כבר נגמרה, ואין תשלום עליה." },
+  ]}
+>
+  נועם ושירה מרוויחים נטו {f.shekels("a.recognised")} בחודש. הם משלמים את התמהיל הראשוני ({f.shekels("init.pay_27")} בחודש 27) ועוד הלוואת רכב של {f.shekels("a.car")} שנגמרת אחרי {f.plain("a.car_months")} תשלומים. כמה נשאר להם בחודש 27 אחרי כל התשלומים?
+</NumericExercise>
+
+<Solution for="5.6-2">
+בחודש 27 הלוואת הרכב כבר לא קיימת (היא נגמרה בחודש {f.plain("a.car_months")}). נשאר <M>{n("a.recognised")} − {n("init.pay_27")} = {n("init.left_27")}</M> ₪. בחודש הראשון, עם הלוואת הרכב, נשארו {f.shekels("init.left_1")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.6-3"
+  n={3}
+  level="בינוני"
+  options={[
+    { text: `ההחזר הראשון שלו גבוה ב־${f.shekels("ex3.first_gap")} מזה של הראשוני`, correct: true, feedback: "נכון. תקופה קצרה יותר היא תשלום גדול יותר כל חודש: זה המחיר של סך תשלומים נמוך." },
+    { text: "הוא חשוף יותר מהראשוני לעליית ריבית", feedback: `לא: העלייה במחמיר שלו קטנה יותר, ${f.shekels(`ex3.short_rise`)} מול ${f.shekels("init.rise")}. הוא קצר, לא חשוף יותר.` },
+    { text: "הוא עובר את 50% מההכנסה הפנויה", feedback: `לא: יחס ההחזר שלו הוא ${pc(row.short.ratio)}. הוא מעל 40%, שזה סף הון ולא איסור.` },
+    { text: "אין לו מחיר: הוא זול יותר בכל מדד", feedback: "הוא זול יותר רק בסך התשלומים. ההחזר הראשון שלו הגבוה ביותר מבין התמהילים שעוברים." },
+  ]}
+>
+  התמהיל ״{name.short}״ מנצח ביעד סך התשלומים. מה המחיר שלו, לפי הטבלה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.6-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.total_gap")}
+  errors={[
+    { value: f.raw("ex4.first_gap"), message: "זה ההפרש בהחזר הראשון, בחודש אחד. השאלה על סך התשלומים, לאורך כל ההלוואה." },
+    { value: f.raw("ex4.err_times"), message: "הכפלתם את ההפרש החודשי ב־360. זה קרוב, אבל לא מדויק: התשלום האחרון של כל מסלול סוגר את העיגול, ולכן סך התשלומים הוא לא בדיוק התשלום הראשון כפול 360." },
+  ]}
+>
+  בכמה שקלים סך התשלומים של ״{name.fixed}״ ({f.shekels("ex4.fixed_total")}) גבוה מזה של התמהיל הראשוני ({f.shekels("init.total")})?
+</NumericExercise>
+
+<Solution for="5.6-4">
+<M>{n("ex4.fixed_total")} − {n("init.total")} = {n("ex4.total_gap")}</M> ₪. זה המחיר של היציבות המלאה: {f.shekels("ex4.first_gap")} יותר בחודש הראשון, ו־{f.shekels("ex4.total_gap")} יותר על פני ההלוואה. ברשימת המחירים של הקורס, המחיר קטן יחסית; בשוק, אחוז הריבית של כל הסכום בקבועה יכול להיות אחר (ידע מהשטח, FK-H-057, ממתין לאישור אילון).
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.6-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("init.rise")}
+  errors={[
+    { value: f.raw("init.stress_max"), message: "זה התשלום הגבוה ביותר בתרחיש המחמיר עצמו. המדד של יציבות הוא כמה הוא גבוה מההחזר הראשון." },
+  ]}
+>
+  התמהיל הראשוני משלם {f.shekels("init.first")} בחודש הראשון. בתרחיש המחמיר התשלום הגבוה ביותר שלו הוא {f.shekels("init.stress_max")}. מה מדד העלייה במחמיר (היציבות) של התמהיל?
+</NumericExercise>
+
+<Solution for="5.6-5">
+<M>{n("init.stress_max")} − {n("init.first")} = {n("init.rise")}</M> ₪. ככל שהמספר קטן, התמהיל יציב יותר. בתמהיל שכולו קבועה לא צמודה: אפס.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.6-6"
+  n={6}
+  level="מאתגר"
+  unit="%"
+  tolerance={0.05}
+  near={0.1}
+  answer={f.raw("linked.ratio")}
+  errors={[
+    { value: f.raw("ex7.err_recognised"), tolerance: 0.05, message: "חילקתם בהכנסה המוכרת. ביחס ההחזר מחלקים בהכנסה הפנויה: ההכנסה פחות הלוואת הרכב, כי נשארו בה יותר מ־18 חודשים." },
+    { value: f.raw("ex7.err_first"), tolerance: 0.005, message: "השתמשתם בהחזר הראשון של התמהיל הצמוד, שכבר כולל חודש אחד של מדד. ביחס ההחזר משתמשים בתשלום הראשון של כל מסלול על הסכום שלו, בלי תוספת של מדד (שיעורים 3.8 ו־4.3)." },
+  ]}
+>
+  התשלום שנכנס ליחס ההחזר של ״{name.linked}״ הוא {f.shekels("linked.qualifying")}, ההכנסה המוכרת {f.shekels("a.recognised")} והלוואת הרכב {f.shekels("a.car")} (עוד {f.plain("a.car_months")} חודשים). מה יחס ההחזר, באחוזים? (ספרה אחת או שתיים אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="5.6-6">
+קודם ההכנסה הפנויה: <M>{n("a.recognised")} − {n("a.car")} = {n("a.disposable")}</M> ₪. אחר כך: <M>{n("linked.qualifying")} ÷ {n("a.disposable")} × 100 = {f.plain("linked.ratio")}%</M> (בעיגול). התשלום שהבנק מודד הוא לא ההחזר הראשון של הטבלה ({f.shekels("linked.first")}); הוא התשלום הראשון של כל מסלול על הסכום שלו, בלי חודש המדד.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.6-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לשאול לפי איזה יעד, באיזה חודש ובאיזה תרחיש הוא הכי טוב, ומה המחיר שלו ביעדים האחרים", correct: true, feedback: "נכון. ״הכי טוב״ בלי יעד, חודש ותרחיש הוא לא מספר, וכל יעד עולה במשהו." },
+    { text: "להאמין לו: אם ההחזר הראשון הוא הנמוך ביותר, זה גם הזול ביותר", feedback: `לא: ההחזר הראשון הנמוך ביותר הוא של ״${name.linked}״, וסך התשלומים שלו הגבוה ביותר מבין התמהילים שעוברים.` },
+    { text: "לבקש תמהיל שמנצח בכל שלושת היעדים", feedback: "במבחר של השיעור אין כזה. אם יועץ מבטיח אחד, שאלו על איזה בנק, איזה מחיר ואיזה תרחיש."},
+    { text: "לבדוק רק את הגבולות של בנק ישראל: מה שעובר הוא טוב", feedback: "הגבולות הם תנאי כניסה, לא יעד. כל חמשת התמהילים שעוברים אותם שונים מאוד בעלות ובסיכון." },
+  ]}
+>
+  יועץ אומר לנועם ושירה: ״התמהיל הצמוד הוא הכי טוב בשבילכם, כי ההחזר הראשון שלו הנמוך ביותר״. מה כדאי לעשות?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על שלושת היעדים">
+<p><strong>מה זה?</strong> שלוש דרכים לומר ״תמהיל טוב״: החזר חודשי נמוך, סך תשלומים נמוך, ויציבות (תשלום שכמעט לא זז כשהריבית והמדד זזים). כל יעד הוא מספר שמחשבים לכל תמהיל; הקטן ביותר מנצח.</p>
+<p><strong>למה זה קיים?</strong> כי אין תמהיל שמנצח בכולם. בלי יעד אי אפשר לבחור, ובלי שאלות ״באיזה חודש״ ו״באיזה תרחיש״ אי אפשר להשוות. לפי התכנון של Mogi, שלושה תמהילים נבנים לשלושה יעדים (לא עובדה על השוק).</p>
+<p><strong>איך זה עובד?</strong> לוקחים רשימה של תשלומים לכל תמהיל ולכל תרחיש, מוציאים ממנה מספר (תשלום בחודש מסוים, הסכום, או ההפרש במחמיר), ובוחרים את הקטן. מי שלא עבר את הגבולות לא משתתף.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההחזר הראשון קובע מה הבנק מאשר ומה נשאר לכם לחיות בחודשים הראשונים; סך התשלומים קובע כמה מהכסף שלכם יוצא; היציבות קובעת כמה אתם חשופים. התמהיל שאתם בוחרים הוא החלטה על המשקל של שלושתם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> קודם מוותרים על תמהילים שיש תמהיל אחר טוב מהם בכל שלושת היעדים. אחר כך שואלים את המשפחה מה חשוב לה, ובוחרים. בשלב 8 האלגוריתם יעשה את שני הצעדים האלה בעצמו, ו־<Later lesson="8.8">משקולות</Later> יבטאו את מה שחשוב למשפחה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שלושה יעדים (תכנון של Mogi):** החזר חודשי נמוך, סך תשלומים נמוך, יציבות. כל יעד הוא מספר; הקטן ביותר מנצח.
+- **״החזר נמוך״ דורש חודש:** החזר ראשון (מה שהבנק מודד, ומה ששילמו בחודשים הראשונים), או ההחזר הגבוה ביותר. שני המדדים יכולים לבחור שני תמהילים.
+- **״סך תשלומים״ דורש תרחיש,** ו**יציבות** נמדדת כאן בהפרש בין התשלום הגבוה ביותר בתרחיש מחמיר להחזר הראשון.
+- **אין תמהיל שמנצח בשלושה** בקבוצה של השיעור. לפני שבוחרים בין היעדים, מוותרים על תמהילים שאחר טוב מהם בכל שלושה.
+- **הגבולות הם תנאי כניסה:** תמהיל שעובר את גבול של הוראה 329 לא יכול לנצח, גם אם המספר שלו מצוין. חציית 40% לא פוסלת.
+- **המספרים כאן הם הנחות של הקורס,** לא הצעת בנק, ורשימת מחירים אחת לכל התמהילים היא כלי הוראה.
+
+**בשיעור הבא — 5.7, <Later lesson="5.7" quiet>רגישות</Later>:** מה משתנה כשמזיזים רק דבר אחד — אחוז, סכום, תקופה, ריבית או מדד.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "בניית תמהיל מייצרת שלושה תמהילים לפי שלושה יעדים: החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית; ״אין תמהיל אחד הטוב ביותר״. זה תכנון של Mogi (J-090), לא עובדה על השוק. לפי דף J-090 ב־Brain (דף 7503881, עודכן ב־2026-10-08), כפי שנרשם בצוות ב־research/notes; הדף לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "FK-H-059: שלוש אסטרטגיות לבחירת משכנתא — החזר חודשי מינימלי, החזר כולל מינימלי, חשיפה מינימלית לשינויי ריבית. אילון, 2026-07-27. ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "ידע מהשטח", text: "FK-H-057: שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע; הנתונים הציבוריים הם ממוצעים ולא מחיר שבנק יאשר. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "FK-H-061: ״יש כשלושה תמהילים טיפוסיים שהבנקים מאשרים״ (עמדה של אחד המייסדים, לא מיוחסת, 2026-10-01). לא נבדק, והקורס לא משתמש בו אלא כהסתייגות. שאלה 24 לאילון: מה שלושת התמהילים?", date: "2026-10-01" },
+    { kind: "לא אומת", text: "מגבלות הוראה 329 (שיעור מימון, יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה) לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות ב־Brain (דף 67436545), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "ריבית בנק ישראל 3.25%, מ־2026-09-03, והפריים היא ריבית בנק ישראל ועוד 1.5 נקודות אחוז, 4.75% (חשבון). לפי תקציר של מקור רשמי; ממתין לבדיקה. דף אחד ב־Brain (7831553) מייחס את התוספת להוראה של בנק ישראל; לא נבדק, ולכן הקורס לא אומר מי קובע אותה.", date: "2026-10-09" },
+    { kind: "הנחת חישוב", text: "תיק A: מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים (scripts/case_sketch.py). רשימת המחירים לכל סוג מסלול, והתמהיל הראשוני (546,000 ב־4.60%, 547,000 ב־4.10%, 547,000 ב־4.40%), הם הנחות של הקורס ב־src/data/case-a-mix.ts; לא הצעת בנק ולא נתוני שוק. כל סוג מסלול מקבל אחוז ריבית אחד בכל התמהילים, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
+    { kind: "הנחת חישוב", text: "תרחיש הבסיס: המדד עולה 2% בשנה, הפריים והעוגן לא זזים. התרחיש המחמיר: המדד עולה 4% בשנה, והפריים והעוגן (בכל נקודת עדכון) עולים ב־2 נקודות אחוז, הפריים מהשנה השנייה. שניהם תרחישים להמחשה, לא תחזיות; איך הוראת בנק ישראל מחשבת תחזית — שיעור 5.4. מסלול משתנה מתעדכן כל 5 שנים (הנחת הקורס, החלטה של Mogi DEC-3). ״יציבות״ כהפרש בין התשלום הגבוה ביותר במחמיר להחזר הראשון היא בחירה של הקורס." },
+    { kind: "הנחת חישוב", text: "כלל העיגול של הקורס (הריבית של כל חודש מעוגלת לאגורה, התשלום מעוגל כשהוא נקבע, והתשלום האחרון סוגר את היתרה): לוחות שפיצר ששני בנקים פרסמו תאמו לו עד האגורה (בדיקה של הצוות, Linear ENG-223, 2026-10-04); לוחות צמודים וחזויים לא נבדקו מול לוח של בנק.", date: "2026-10-04" },
+    { kind: "ידע מתמטי כללי", text: "בחירת הקטן ביותר מרשימה של מספרים; סכום רשימה; הפרש בין שני מספרים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (built on schedule.ts, affordability.ts, regulation.ts) and src/data/case-a-mix.ts via scripts/lessons/lesson-5-6.ts and data/lessons/5-6.json, rechecked by checks/kinds/sensitivity.py (with schedule.py). Illustration: src/components/MixBuilder.vue (props only). Field knowledge: FK-H-059, FK-H-057, FK-H-061 (awaiting Eylon). Video: video/5-6.html. */}

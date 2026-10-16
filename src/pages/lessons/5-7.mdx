@@ -1,0 +1,539 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.7"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import MixBuilder from "../../components/MixBuilder.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { INITIAL_MIX, SCENARIOS, builderTracks } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.7");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const builderStart = builderTracks(INITIAL_MIX);
+export const sc = SCENARIOS.base;
+export const pc = (v) => `${v}%`;
+export const rate = (i) => `${f.plain(`init.rate_${i}`)}%`;
+// A change with its sign: "+243.46 ₪", "−498.86 ₪", "0.00 ₪".
+export const delta = (id) => { const v = f.raw(id); return `${Number(v) > 0 ? "+" : ""}${formatShekels(v)}`; };
+export const lv = (id, what) => `lv.${id}.${what}`;
+export const predictionOptions = [
+  "יעלה: קבועה יקרה יותר מפריים",
+  `ירד, אבל מעט: בערך ${f.whole("ex1.drop")} בחודש`,
+  "ירד הרבה: מאות שקלים בחודש",
+  "לא ישתנה: ההלוואה כולה נשארת אותו סכום",
+];
+export const tableRows = [
+  { id: "pct_pv", what: "אחוז: 10 נקודות אחוז מהפריים למשתנה", step: "164,000 ₪" },
+  { id: "amount", what: "סכום: ההלוואה קטנה", step: "100,000 ₪ פחות" },
+  { id: "term", what: "תקופה: כל המסלולים קצרים יותר", step: "5 שנים פחות" },
+  { id: "rate_all", what: "ריבית: אחוז הריבית בכל המסלולים", step: "0.25 נקודת אחוז יותר" },
+  { id: "market", what: "ריבית השוק: הפריים והעוגן", step: "נקודת אחוז אחת יותר, מהשנה השנייה" },
+  { id: "index", what: "מדד: העלייה השנתית", step: "נקודת אחוז אחת יותר" },
+];
+export const halfRows = [
+  { period: "ריבית גבוהה יותר", pay: f.raw("lv.rate_all.first"), ratio: f.raw("lv.rate_all.ratio") },
+  { period: "תקופה קצרה יותר", pay: f.raw("lv.term.first"), ratio: f.raw("lv.term.ratio") },
+  { period: "הלוואה קטנה יותר", pay: f.raw("lv.amount.first"), ratio: f.raw("lv.amount.ratio") },
+];
+
+בשיעור הקודם ראיתם ששלושת היעדים של תמהיל מושכים לכיוונים שונים. כדי לבנות תמהיל צריך עוד דבר: לדעת **כמה** כל הזזה מזיזה. כמה ₪ בחודש עולה חצי נקודת אחוז? מה עושות חמש שנים פחות? ומתי הזזה מגיעה לגבול?
+בשיעור הזה מזיזים דבר אחד בכל פעם, על התמהיל הראשוני של נועם ושירה, ורואים מה זז ומה לא.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p>אחוזי הריבית הם רשימת המחירים של הקורס (שיעור 5.6): <strong>הנחה של הקורס</strong>, לא הצעה של בנק ולא נתוני שוק. התרחישים הם תרחישים להמחשה, לא תחזיות. בשוק, שינוי באחד הנתונים יכול לשנות גם את הריביות שבנק מציע (ידע מהשטח, FK-H-057, אילון, 2026-10-08; ממתין לאישור אילון), ולכן ״כמה זה עולה״ אצל בנק אמיתי ייתן מספרים אחרים.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.7"
+  question={`בתמהיל הראשוני של נועם ושירה, ${f.whole("init.amount_1")} בפריים (${rate(1)}), ${f.whole("init.amount_2")} במשתנה לא צמודה (${rate(2)}) ו־${f.whole("init.amount_3")} בקבועה לא צמודה (${rate(3)}). מעבירים 10 נקודות אחוז מההלוואה, ${f.whole("ex1.shift")}, מהפריים אל הקבועה. מה יקרה להחזר הראשון?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מזיזים דבר אחד בכל פעם
+
+</Section>
+
+<LessonVideo lesson="5-7" />
+
+<Section kind="ההסבר">
+
+## רגישות: כמה זז, כשזזה ידית אחת
+
+</Section>
+
+### מה זו רגישות
+
+<Term t="רגישות" lesson="5.7">רגישות</Term> היא כמה תוצאה זזה כשמזיזים נתון אחד בצעד ידוע, וכל השאר נשאר במקומו. הנתון שמזיזים נקרא כאן **ידית**. בתמהיל יש חמש ידיות:
+
+1. **אחוז** — כמה מההלוואה יושב בכל מסלול.
+2. **סכום** — כמה כסף לוקחים בסך הכול.
+3. **תקופה** — כמה שנים נמשך כל מסלול.
+4. **ריבית** — האחוז במסלול (מה שמסכמים עם הבנק), ואחריו ריבית השוק: הפריים והעוגן שזזים אחרי החתימה.
+5. **מדד** — כמה המדד עולה בשנה (משפיע רק על מסלול צמוד).
+
+למה **אחת בכל פעם**? כי אם מזיזים שתיים ורואים שהתשלום קפץ, לא יודעים מי אשם. התוצאות שנעקוב אחריהן הן אלה של שיעור 5.6: ההחזר הראשון, ההחזר הגבוה ביותר, סך התשלומים, ולצדם יחס ההחזר (שיעור 4.3).
+
+נועם ושירה, זוג שכירים, קונים דירה ב־{f.shekels("a.price")} ולוקחים {f.shekels("a.loan")} (שיעור מימון {f.plain("a.ltv")}%). ההכנסה הפנויה שלהם היא {f.shekels("a.disposable")}: {f.shekels("a.recognised")} פחות הלוואת רכב של {f.shekels("a.car")} שנשארו בה {f.plain("a.car_months")} חודשים. התמהיל הראשוני: שלושה מסלולים ל־30 שנה, {rate(1)} בפריים, {rate(2)} במשתנה לא צמודה ו־{rate(3)} בקבועה לא צמודה. {f.shekels("init.first")} בחודש הראשון, יחס החזר של {f.plain("init.ratio")}%, ו־{f.shekels("init.total")} בסך הכול. בתרחיש הבסיס: המדד עולה {sc.inflation}% בשנה, והפריים והעוגן לא זזים.
+
+### חמש ידיות, שש שורות
+
+כל שורה היא הזזה אחת של התמהיל הראשוני. העמודות הן **ההפרש** מהמצב ההתחלתי (פלוס הוא עלייה):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הידית וצעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר אחרי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 text-n700">
+        <td class="py-2 pe-3 font-semibold">לפני: התמהיל הראשוני</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.first")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.max")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("init.total")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{pc(f.plain("init.ratio"))}</span></td>
+      </tr>
+      {tableRows.map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3"><span class="font-semibold">{r.what}</span><br /><span class="text-caption text-n600">{r.step}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_first"))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_max"))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta(lv(r.id, "d_total"))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(lv(r.id, "ratio")))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ״הגבוה ביותר״ הוא התשלום הגבוה ביותר בתרחיש הבסיס. בשורת ״ריבית השוק״ הפריים והעוגן זזים נקודת אחוז אחת (תרחיש להמחשה, לא תחזית).</p>
+</div>
+
+מה רואים:
+
+- **שורה אחת מהשש לא זזה בכלל:** המדד. בתמהיל הזה אין מסלול צמוד, ולכן אין למה שהמדד יזיז. ״אפס״ הוא תשובה, לא שגיאה.
+- **ריבית השוק לא מזיזה את ההחזר הראשון,** אבל מזיזה את הגבוה ביותר ואת הסך: הפריים נעה מהשנה השנייה, והמשתנה בעוד חמש שנים.
+- **תקופה וריבית מושכות לכיוונים שונים:** תקופה קצרה מעלה את ההחזר ומקטינה את הסך; ריבית גבוהה מעלה את שניהם.
+
+### אחוז: להעביר כסף בין מסלולים
+
+הזזת כסף בין שני מסלולים משנה את ההחזר **רק לפי הפער בין אחוזי הריבית שלהם**. בהנחות של הקורס הפערים קטנים, ולכן ההשפעה קטנה:
+
+- 10 נקודות אחוז ({f.shekels("ex1.shift")}) מהפריים, {rate(1)}, אל הקבועה, {rate(3)}: ההחזר הראשון משתנה ב־{delta("lv.pct_pf.d_first")}.
+- אותו סכום מהפריים אל המשתנה, {rate(2)}: {delta("lv.pct_pv.d_first")}. הפער גדול יותר, וההשפעה גדולה יותר.
+
+אבל ״אחוז״ הוא הידית שמזיזה את החשיפה ואת ההגבלות. מעבירים 10 נקודות אחוז **מהקבועה אל המשתנה**: ההחזר הראשון משתנה ב־{delta("lv.pct_fv.d_first")}, אבל {f.plain("lv.pct_fv.variable_share")}% מההלוואה כבר משתנים, והתמהיל חצה את גבול שני השלישים. לפני ההזזה היה מרווח של {f.shekels("init.variable_room")}, ואחריה {f.shekels("lv.pct_fv.variable_room")}. כלומר צריך להעביר רק קצת כדי להגיע לגבול. הזזה בין שני מסלולים משתנים, פריים ומשתנה, לא משנה את החלק המשתנה: {f.plain("lv.pct_pv.variable_share")}% לפני ואחרי.
+
+### סכום: כל 100,000 ₪
+
+אם ההלוואה קטנה ב־100,000 ₪ (הלוואה של {f.shekels("lv.amount.loan")}, שיעור מימון {f.plain("lv.amount.ltv")}%), כל המסלולים קטנים באותו יחס, וההחזר הראשון יורד ב־{f.shekels("ex2.per_100k")}. אם היא קטנה ב־200,000 ₪: {delta("lv.amount2.d_first")}, פי שניים בערך. **ההשפעה של הסכום כמעט ישרה:** כל 100,000 ₪ בהלוואה הם כ־{f.whole("ex2.per_100k")} בחודש, בתנאים של התמהיל הזה.
+
+הידית הזו מראה מה היה קורה, לא מה מציעים: אצל נועם ושירה ההון העצמי הוא {f.shekels("a.equity")}, והכסף שמקטין את ההלוואה צריך לבוא מאיפשהו.
+
+### תקופה: כל מסלול והתקופה שלו
+
+מקצרים את כל המסלולים מ־30 ל־25 שנה: ההחזר הראשון משתנה ב־{delta("lv.term.d_first")}, סך התשלומים משתנה ב־{delta("lv.term.d_total")} ויחס ההחזר עולה ל־{f.plain("lv.term.ratio")}%. התשלום עלה והסך ירד: הידית הזו עובדת בשני הכיוונים. גם **יתרת החוב** יורדת מהר יותר: אחרי חמש שנים נשארים {f.shekels("lv.term.bal60")} במקום {f.shekels("init.bal60")}.
+
+מקצרים רק מסלול אחד, מחמש שנים: הפריים (מסלול 1) {delta("lv.term_t1.d_first")}, או הקבועה (מסלול 3) {delta("lv.term_t3.d_first")}. הסכומים כמעט שווים, ולכן ההשפעות כמעט שוות; בתמהיל שבו מסלול אחד גדול הרבה יותר, הידית שלו תזיז יותר. כל מסלול עם תקופה משלו (שיעור 3.7).
+
+ואם מקצרים ב־10 שנים, ל־20? ההחזר הראשון עולה ל־{f.shekels("lv.term10.first")} ויחס ההחזר ל־{f.plain("lv.term10.ratio")}%: **מעל 50%, וזה כבר נפסל** לפי הוראה 329 כפי שהצוות תעתק אותה (לא אומת). גם ידית תקופה פוגשת גבול.
+
+### ריבית: מה שמסכמים, ומה שזז אחר כך
+
+**האחוז במסלול.** מעלים ב־0.25 נקודת אחוז את אחוז הריבית של **כל** המסלולים: {delta("lv.rate_all.d_first")} בחודש הראשון ו־{delta("lv.rate_all.d_total")} בסך התשלומים. אם מעלים אותו במסלול אחד בלבד, כל אחד מהם נותן בערך שליש: {delta("lv.rate_t1.d_first")}, {delta("lv.rate_t2.d_first")} ו־{delta("lv.rate_t3.d_first")}, ויחד {delta("lv.rate_parts.d_first")}, בדיוק כמו כולם יחד. **שינויי ריבית במסלולים נפרדים מצטברים.**
+
+**ריבית השוק.** אחרי החתימה הפריים והעוגן זזים. בתרחיש שבו שניהם עולים נקודת אחוז אחת מהשנה השנייה: ההחזר הראשון לא משתנה ({delta("lv.market.d_first")}), ההחזר הגבוה ביותר עולה ב־{delta("lv.market.d_max")}, והסך ב־{delta("lv.market.d_total")}. רק שני המסלולים המשתנים מרגישים אותו: הפריים מיד, והמשתנה כל 5 שנים. הקבועה לא מרגישה כלום. זו **החשיפה** של שיעור 5.6 במספרים.
+
+### מדד: אפס, ואז הרבה
+
+על התמהיל הראשוני העלאה של נקודת אחוז במדד: {delta("lv.index.d_total")}. עכשיו אותה ידית על ״צמוד״ (משתנה צמודה וקבועה צמודה), מהטבלה של שיעור 5.6:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הזזה</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold">המדד עולה נקודת אחוז יותר</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_up.d_first")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_up.d_max")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_up.d_total")}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold">המדד עולה נקודת אחוז פחות</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_down.d_first")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_down.d_max")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.index_down.d_total")}</span></td>
+      </tr>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-3 font-semibold">הפריים והעוגן עולים נקודת אחוז</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.market.d_first")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.market.d_max")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{delta("lk.market.d_total")}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} המדד משפיע על ההחזר הראשון כמעט בכלל לא (חודש אחד של מדד), ועל ההחזר הגבוה ביותר, שבו המדד הצטבר 30 שנה, מאוד. העלייה של נקודת אחוז מעלה יותר ממה שהירידה של נקודת אחוז מורידה: המדד מצטבר חודש אחרי חודש, והתשלום גדל עם הצטברות.</p>
+</div>
+
+אותה ידית: אפס במקום אחד, אלפי שקלים במקום אחר. **רגישות היא תכונה של התמהיל הנתון, לא של הידית לבדה.**
+
+### רגישות כחילוק
+
+כדי להשוות בין ידיות אפשר לחלק את ההפרש בגודל הצעד: **כמה זז לכל יחידה**. כשהעליתם את אחוז הריבית ב־0.25 נקודת אחוז והחזר ראשון עלה ב־{f.shekels("lv.rate_all.d_first")}, זה {f.shekels("lv.rate_all.per_point")} בחודש לכל נקודת אחוז שלמה, ו־{f.shekels("lv.rate_all.per_point_total")} בסך התשלומים.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## ידית אחת בכל פעם
+
+</Section>
+
+זה הבונה של שיעור 3.7, והוא מתחיל מהתמהיל הראשוני של נועם ושירה בתרחיש הבסיס. הבונה לא נותן לשנות את סכום ההלוואה כולה: את ידית הסכום ראיתם בטבלה.
+
+<MixBuilder
+  client:visible
+  loan={1640000}
+  tracks={builderStart}
+  scenario={{ inflation: Number(sc.inflation), primeShift: Number(sc.primeShift), primeFromYear: 2, anchorShift: Number(sc.anchorShift) }}
+  amountStep={1000}
+  labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
+/>
+
+נסו את שלוש אלה. בכל אחת, החזירו קודם את הבונה למצב ההתחלתי:
+1. **אחוז.** קבעו את הסכום של מסלול 1 ל־{f.whole("task1.amount_1")} ושל מסלול 2 ל־{f.whole("task1.amount_2")} (מסלול 3 מקבל את מה שנשאר, {f.whole("task1.amount_3")}). מה קרה לשלושת המספרים ולחלק המשתנה?
+2. **ריבית ותקופה, אחת בכל פעם.** קבעו את אחוז הריבית של מסלול 1 ל־{f.plain("task2.rate_1")}%. אחר כך החזירו, וקבעו את התקופה של שלושת המסלולים ל־25 שנה.
+3. **שוק ומדד.** קבעו את ״הפריים זזה״ ו״העוגן״ ל־<span class="ltr">+1</span>. אחר כך החזירו, שנו את סוג מסלול 3 ל״קבועה צמודה״ באחוז ריבית של 2.9%, והעלו את המדד ל־3%.
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר הראשון: {f.shekels("lv.pct_pv.first")} ({delta("lv.pct_pv.d_first")}); התשלום הגבוה ביותר: {delta("lv.pct_pv.d_max")}; סך התשלומים: {delta("lv.pct_pv.d_total")}. החלק במסלולים משתנים (פריים ומשתנה) נשאר {f.plain("lv.pct_pv.variable_share")}%: הכסף עבר בין שני משתנים.</li>
+    <li>אחוז ריבית של {f.plain("task2.rate_1")}% בפריים: ההחזר הראשון {delta("lv.rate_t1.d_first")}, והסך {delta("lv.rate_t1.d_total")}. תקופה של 25 שנה בכל המסלולים: ההחזר הראשון {delta("lv.term.d_first")}, והסך {delta("lv.term.d_total")}.</li>
+    <li>עם הפריים והעוגן ב־+1: ההחזר הראשון לא זז ({delta("lv.market.d_first")}), התשלום הגבוה ביותר {delta("lv.market.d_max")} והסך {delta("lv.market.d_total")}. אחרי שמסלול 3 נעשה צמוד, והמדד עולה מ־2% ל־3%: התשלום הגבוה ביותר עולה ב־{delta("task3.d_max")} והסך ב־{delta("task3.d_total")}. באותו תמהיל, בלי מסלול צמוד, אותה הזזה לא שינתה כלום.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## רגישות: ההפרש מול הצעד
+
+</Section>
+
+**צעד 1 — בוחרים תוצאה וידית.** למשל: ההחזר הראשון, ואחוז הריבית בכל המסלולים.
+
+**צעד 2 — מחשבים פעמיים.** פעם במצב ההתחלתי ופעם אחרי הצעד, כשכל שאר הנתונים נשארים, והלוח מחושב לפי אותם כללים: {f.shekels("init.first")} לפני, {f.shekels("lv.rate_all.first")} אחרי, אחרי העלאה של 0.25 נקודת אחוז.
+
+**צעד 3 — מחלקים.**
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy">רגישות = (התוצאה אחרי − התוצאה לפני) ÷ גודל הצעד</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="font-semibold text-n900">התוצאה</dt><dd>המספר שעוקבים אחריו: החזר ראשון או גבוה ביותר, סך תשלומים, או יחס החזר. בשקלים או באחוזים</dd>
+    <dt class="font-semibold text-n900">גודל הצעד</dt><dd>כמה הזזתם את הידית, ביחידה שלה: נקודות אחוז, שקלים, שנים או נקודות אחוז של מדד</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">הדוגמה: <span class="ltr">({n("lv.rate_all.first")} − {n("init.first")}) ÷ 0.25 = {n("lv.rate_all.per_point")}</span> ₪ לנקודת אחוז</p>
+</div>
+
+**מתי זה נכון?**
+1. **בצעד קטן ליד המצב הנוכחי.** תקופה, למשל, לא ישרה: חמש שנים פחות מוסיפות {f.shekels("lv.term.d_first")}, אבל עשר שנים פחות מוסיפות {f.shekels("lv.term10.d_first")}, יותר מפי שניים.
+2. **ידית אחת בכל פעם.** שתי ידיות יחד לא מצטברות בדיוק: ריבית ותקופה יחד נותנות {delta("combo.d_first")}, ושתיהן לחוד נותנות יחד {delta("combo.sum")}; ההפרש בין השניים הוא {delta("combo.gap")}.
+3. **באותו תרחיש.** רגישות של ידית מסוימת נמדדת בתרחיש אחד, אותו תרחיש לפני ואחרי.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> שתי עמודות של תשלומים, אחת לפני ואחת אחרי הצעד, ובתא אחד <span class="ltr">=(B2-A2)/0.25</span> לרגישות של ההחזר הראשון; <span class="ltr">=SUM(B2:B361)-SUM(A2:A361)</span> להפרש בסך התשלומים.</p>
+<p><strong>בבונה התמהיל:</strong> רושמים את שלושת המספרים, מזיזים ידית אחת, ורושמים שוב.</p>
+</Callout>
+
+<Callout title="עיגול">
+<p>הלוחות מעוגלים לפי כלל העיגול של הקורס (שיעור 3.8): הריבית של כל חודש לאגורה, והתשלום האחרון סוגר את היתרה. לכן הפרש בסך התשלומים אינו בדיוק ההפרש החודשי כפול מספר החודשים: {f.shekels("lv.rate_all.d_first")} כפול 360 הוא {f.shekels("ex4.err_times")}, והפרש הסך בפועל {f.shekels("lv.rate_all.d_total")}.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="5.7"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `בהנחות של הקורס הקבועה, ${rate(3)}, זולה מהפריים, ${rate(1)}. כסף שעובר ממסלול יקר לזול מקטין את ההחזר, לא מגדיל אותו.`,
+    "",
+    `הפער בין שני אחוזי הריבית הוא ${f.plain("ex1.gap")} נקודת אחוז בלבד, וההעברה היא 164,000 ₪ מתוך 1,640,000 ₪. ההשפעה: ${delta("lv.pct_pf.d_first")}, לא מאות שקלים.`,
+    "הסכום הכולל באמת לא משתנה, אבל התשלום תלוי באחוז הריבית של כל חלק. כשמשנים את החלוקה בין מסלולים, ההחזר משתנה לפי הפער בין האחוזים.",
+  ]}
+>
+  ההחזר הראשון יורד ב־{f.shekels("ex1.drop")}: הפער בין הפריים ({rate(1)}) לקבועה ({rate(3)}) הוא {f.plain("ex1.gap")} נקודת אחוז, והסכום שעבר הוא עשירית מההלוואה. מי שמזיז כסף בין מסלולים בלי לשים לב לפער בין האחוזים שלהם צפוי לטעות בגודל ההשפעה, ובכיוון שלה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: איך יורדים מתחת ל־40%?
+
+</Section>
+
+יחס ההחזר של התמהיל הראשוני הוא {f.plain("init.ratio")}%, קצת מעל 40%. מה הצעד הקטן שמוריד אותו מתחת ל־40%?
+
+**צעד 1 — כמה צריך לרדת.** תשלום שהוא 40% מההכנסה הפנויה, {f.shekels("a.disposable")}, הוא {f.shekels("w.max_at_40")}. התשלום של התמהיל הראשוני גבוה ממנו ב־{f.shekels("w.over_40")}.
+
+**צעד 2 — כל ידית, הצעד הקטן.**
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הצעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מתחת ל־40%?</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[
+        ["pct_pv", "10 נקודות אחוז מהפריים למשתנה"],
+        ["pct_pv20", "20 נקודות אחוז מהפריים למשתנה"],
+        ["amount40", "הלוואה קטנה ב־40,000 ₪"],
+        ["rate_down", "אחוז הריבית 0.15 נקודת אחוז פחות בכל המסלולים"],
+      ].map(([id, what]) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{what}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(f.raw(lv(id, "first")))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(lv(id, "ratio")))}</span></td>
+          <td class="py-2 pe-3">{Number(f.raw(lv(id, "ratio"))) <= 40 ? "כן" : "לא"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+**צעד 3 — אילו צעדים בידיים שלהם.** עשר נקודות אחוז מהפריים למשתנה לא מספיקות. עשרים מספיקות ({f.plain("lv.pct_pv20.ratio")}%), ובלי לשנות את סכום ההלוואה: מסלול 1 יורד ל־{f.whole("w.amount_1")}, מסלול 2 עולה ל־{f.whole("w.amount_2")}, ומסלול 3 נשאר {f.whole("w.amount_3")}. ההלוואה פחות ב־40,000 ₪ דורשת עוד הון עצמי. 0.15 נקודת אחוז פחות דורשת שהבנק יסכים: את זה הקורס לא יודע (איך בנקים מתמחרים תיק: שאלה פתוחה לאילון).
+
+**צעד 4 — הגבולות.** ההעברה של 20 נקודות אחוז היא בין שני מסלולים משתנים, ולכן החלק המשתנה לא זז: {f.plain("lv.pct_pv20.variable_share")}%, מרווח של {f.shekels("lv.pct_pv20.variable_room")} מול שני השלישים. אילו העבירו את הכסף מהקבועה, הם היו חוצים את הגבול (תרגיל 5).
+
+**מה לקחת מזה.** מבין הצעדים שבטבלה, אחד בלבד נמצא בשליטתם של נועם ושירה לבדם ולא דורש כסף נוסף או הסכמה של בנק: האחוז בין המסלולים. מה שהטבלה לא בודקת הוא החשיפה: החלק המשתנה לא זז, אבל הפריים מרגיש את ריבית בנק ישראל מיד והמשתנה רק בעוד 5 שנים. זו דוגמה, לא המלצה: בשיעור 5.8 בוחרים בין שלוש חלופות.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את יחס ההחזר
+
+</Section>
+
+כמה הידיות מזיזות את יחס ההחזר? ההזזות הן אותן הזזות של הטבלה: ריבית יותר ב־0.25 נקודת אחוז בכל המסלולים, תקופה קצרה ב־5 שנים, והלוואה קטנה ב־100,000 ₪. לכל הזזה כתוב ההחזר הראשון אחריה. השלימו את יחס ההחזר, באחוזים: ההחזר חלקי ההכנסה הפנויה, {f.shekels("a.disposable")}. השורה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="5.7-half"
+  periodLabel="ההזזה"
+  columns={[
+    { key: "pay", label: "החזר ראשון אחרי" },
+    { key: "ratio", label: "יחס החזר, %", format: "percent" },
+  ]}
+  rows={halfRows}
+  blanks={[`${halfRows[1].period}.ratio`, `${halfRows[2].period}.ratio`]}
+  success={`נכון. תקופה קצרה מזיזה את היחס הכי חזק כלפי מעלה, מ־${f.plain("init.ratio")}% ל־${f.plain("lv.term.ratio")}%, והלוואה קטנה מורידה אותו הכי הרבה, ל־${f.plain("lv.amount.ratio")}%.`}
+  hint="מחלקים את ההחזר ב־20,250 ומכפילים ב־100 (שיעור 4.3). בגיליון: =B2/20250*100."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והתרחישים בתרגילים הם הנחות של הקורס, לא נתוני שוק ולא הצעת בנק. התרגילים מסודרים מהקל אל המאתגר. בכל התרגילים אפשר להסתכל בטבלאות של השיעור.
+
+<ChoiceExercise
+  client:visible
+  id="5.7-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "המדד: אין בו מסלול צמוד", correct: true, feedback: "נכון. המדד משפיע רק על מסלול צמוד. בתמהיל הראשוני אין כזה, ולכן העלאה של המדד לא מזיזה שקל." },
+    { text: "ריבית השוק: הפריים והעוגן", feedback: "היא כן מזיזה: הפריים והמשתנה מרגישים אותה, ובתרחיש של השיעור היא מעלה את התשלום הגבוה ביותר." },
+    { text: "התקופה", feedback: "תקופה קצרה יותר מעלה את ההחזר ומקטינה את הסך. היא מזיזה הרבה." },
+    { text: "הסכום", feedback: "כל 100,000 ₪ הם כמה מאות שקלים בחודש. הסכום מזיז הרבה." },
+  ]}
+>
+  איזו ידית אינה מזיזה כלום בתמהיל הראשוני של נועם ושירה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.7-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.per_100k")}
+  errors={[
+    { value: f.raw("lv.amount.d_total"), tolerance: 0.05, message: "זה השינוי בסך התשלומים, על פני כל ההלוואה. השאלה על ההחזר הראשון, בחודש אחד." },
+  ]}
+>
+  ההחזר הראשון של התמהיל הראשוני הוא {f.shekels("init.first")}. אם ההלוואה קטנה ב־100,000 ₪, כל המסלולים קטנים באותו יחס, וההחזר הראשון הוא {f.shekels("lv.amount.first")}. בכמה שקלים הוא יורד?
+</NumericExercise>
+
+<Solution for="5.7-2">
+<M>{n("init.first")} − {n("lv.amount.first")} = {n("ex2.per_100k")}</M> ₪. כל 100,000 ₪ בהלוואה הם כ־{f.whole("ex2.per_100k")} בחודש בתנאים האלה. בהלוואה קטנה ב־200,000 ₪ ההפרש כפול בערך: {f.shekels("lv.amount2.d_first")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.7-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("ex3.interest_in_60")}
+  errors={[
+    { value: f.raw("ex3.principal_60"), message: "זו הקרן ששולמה: ההלוואה פחות היתרה. השאלה היא כמה מהכסף ששילמו הלך לריבית, ואת זה מקבלים כשמורידים את הקרן מכל התשלומים." },
+    { value: f.raw("ex3.err_naive"), message: "זו היתרה אילו כל התשלומים היו קרן: ההלוואה פחות כל מה ששולם. אבל חלק מכל תשלום הוא ריבית, והיא לא מקטינה את החוב." },
+  ]}
+>
+  נועם ושירה משלמים {f.shekels("init.first")} בחודש בתמהיל הראשוני. בחמש שנים, 60 תשלומים, הם שילמו {f.shekels("ex3.paid")}. אחרי התשלום ה־60 היתרה שלהם {f.shekels("init.bal60")}, מתוך הלוואה של {f.shekels("a.loan")}. כמה מהכסף ששילמו הלך לריבית?
+</NumericExercise>
+
+<Solution for="5.7-3">
+קודם הקרן שהחזירו: <M>{n("a.loan")} − {n("init.bal60")} = {n("ex3.principal_60")}</M> ₪. אחר כך הריבית: מה ששילמו פחות הקרן, <M>{n("ex3.paid")} − {n("ex3.principal_60")} = {n("ex3.interest_in_60")}</M> ₪. פחות מעשירית מההלוואה נפרעה בחמש שנים, והיתרה לא ירדה ב־{f.shekels("ex3.paid")}. בתמהיל עם תקופות קצרות ב־5 שנים, אחרי חמש שנים נשארים {f.shekels("lv.term.bal60")}: יותר קרן בכל תשלום.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.7-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("lv.rate_all.d_total")}
+  errors={[
+    { value: f.raw("lv.rate_all.d_first"), message: "זה ההפרש בחודש אחד, בהחזר הראשון. השאלה על סך התשלומים, לאורך כל ההלוואה." },
+    { value: f.raw("ex4.err_times"), message: "הכפלתם את ההפרש החודשי ב־360. זה קרוב, אבל לא מדויק: התשלום האחרון בכל מסלול סוגר את העיגול, ולכן הסך אינו בדיוק התשלום הראשון כפול 360." },
+  ]}
+>
+  כל אחוזי הריבית בתמהיל הראשוני עולים ב־0.25 נקודת אחוז. ההחזר הראשון עולה מ־{f.shekels("init.first")} ל־{f.shekels("lv.rate_all.first")}, וסך התשלומים מ־{f.shekels("init.total")} ל־{f.shekels("lv.rate_all.total")}. בכמה שקלים עלה סך התשלומים?
+</NumericExercise>
+
+<Solution for="5.7-4">
+<M>{n("lv.rate_all.total")} − {n("init.total")} = {n("lv.rate_all.d_total")}</M> ₪. וההפרש בהחזר הראשון: <M>{n("lv.rate_all.first")} − {n("init.first")} = {n("lv.rate_all.d_first")}</M> ₪ בחודש. מבחינת ההשפעה על הכיס: {f.shekels("lv.rate_all.per_point_total")} על כל נקודת אחוז שלמה בסך התשלומים.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.7-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("ex5.over")}
+  errors={[
+    { value: f.raw("ex1.shift"), message: "זה הסכום שהועבר, לא כמה המשתנה חצה את הגבול. מחשבים את המשתנה אחרי ההעברה פחות הגבול של שני שלישים." },
+    { value: f.raw("init.variable_room"), message: "זה המרווח לפני ההעברה, כשההלוואה עוד בתוך הגבול." },
+  ]}
+>
+  בתמהיל הראשוני המשתנה (פריים ומשתנה לא צמודה) הוא {f.shekels("init.variable")}, ושני שלישים מההלוואה הם {f.shekels("ex5.limit")}. מעבירים 10 נקודות אחוז מההלוואה, 164,000 ₪, מהקבועה אל המשתנה. בכמה שקלים המשתנה חוצה את הגבול?
+</NumericExercise>
+
+<Solution for="5.7-5">
+המשתנה אחרי ההעברה: {f.shekels("ex5.variable_after")}, שהם {f.plain("lv.pct_fv.variable_share")}% מההלוואה. הגבול: {f.shekels("ex5.limit")}. <M>{n("ex5.variable_after")} − {n("ex5.limit")} = {n("ex5.over")}</M> ₪. לפני ההעברה המרווח היה {f.shekels("init.variable_room")} בלבד: העברה קטנה כמעט תמיד מגיעה לגבול.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.7-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: `הלוואה קטנה ב־40,000 ₪: יחס ההחזר ${f.plain("lv.amount40.ratio")}%`, correct: true, feedback: `נכון. יחס החזר של ${f.plain("lv.amount40.ratio")}% הוא מתחת ל־40%, והצעד לא חוצה אף גבול אחר. הצעד הזה דורש עוד הון עצמי, ולא החלטה של בנק.` },
+    { text: `10 נקודות אחוז מהפריים למשתנה: יחס החזר ${f.plain("lv.pct_pv.ratio")}%`, feedback: "הצעד הזה מוריד את היחס, אבל לא מספיק: הוא נשאר מעל 40%." },
+    { text: `10 נקודות אחוז מהקבועה למשתנה: יחס החזר ${f.plain("lv.pct_fv.ratio")}%`, feedback: "היחס עדיין מעל 40%, ויותר חמור: ההעברה חוצה את גבול שני השלישים המשתנים." },
+    { text: `תקופה קצרה ב־5 שנים: יחס החזר ${f.plain("lv.term.ratio")}%`, feedback: "תקופה קצרה יותר מעלה את ההחזר, ולכן את היחס. כדי להוריד אותו צריך להאריך, ואת התקופה אי אפשר להאריך מעבר ל־30 שנה." },
+  ]}
+>
+  איזה צעד אחד מוריד את יחס ההחזר של התמהיל הראשוני ({f.plain("init.ratio")}%) מתחת ל־40%?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.7-7"
+  n={7}
+  level="מאתגר"
+  answer={f.raw("combo.gap")}
+  errors={[
+    { value: f.raw("combo.d_first"), message: "זה השינוי של שתי הידיות יחד. השאלה היא כמה הוא שונה ממה שהיה אילו הן היו מצטברות." },
+    { value: f.raw("combo.sum"), message: "זה הסכום של שני השינויים כשכל אחד לחוד. השאלה היא ההפרש בינו לבין שינוי שתי הידיות יחד." },
+  ]}
+>
+  ריבית של 0.25 נקודת אחוז יותר מעלה את ההחזר הראשון ב־{f.shekels("lv.rate_all.d_first")}. תקופה קצרה ב־5 שנים מעלה אותו ב־{f.shekels("lv.term.d_first")}. כשעושים את שתיהן יחד ההחזר הראשון הוא {f.shekels("combo.first")}, כלומר {f.shekels("combo.d_first")} יותר מההתחלה. מה ההפרש בין השינוי של שתי הידיות יחד לבין סכום השינויים של כל אחת לחוד? (שלילי: פחות.)
+</NumericExercise>
+
+<Solution for="5.7-7">
+הסכום של שני השינויים לחוד: <M>{n("lv.rate_all.d_first")} + {n("lv.term.d_first")} = {n("combo.sum")}</M> ₪. השינוי של שתי הידיות יחד: {f.shekels("combo.d_first")}. <M>{n("combo.d_first")} − {n("combo.sum")} = {n("combo.gap")}</M> ₪. המסקנה: ידיות לא מצטברות בדיוק, כי כל אחת פועלת על מצב שהאחרת כבר שינתה. לכן מזיזים ידית אחת, ובודקים את התוצאה לפני הידית הבאה.
+</Solution>
+
+<Callout title="חמש שאלות על רגישות">
+<p><strong>מה זה?</strong> כמה תוצאה זזה כשמזיזים נתון אחד בצעד ידוע ושום דבר אחר לא משתנה. בתמהיל יש חמש ידיות: אחוז, סכום, תקופה, ריבית ומדד.</p>
+<p><strong>למה זה קיים?</strong> כי תמהיל הוא מערכת: כשהתשלום קפץ, צריך לדעת מי הזיז אותו. בלי להזיז ידית אחת בכל פעם אי אפשר לדעת, ואי אפשר לתכנן.</p>
+<p><strong>איך זה עובד?</strong> מחשבים את התמהיל לפני ואחרי הצעד, ומחלקים את ההפרש בגודל הצעד. התוצאה תקפה לצעד קטן ליד המצב הנוכחי, ולא לכל צעד בכל כיוון.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הרגישות אומרת אילו ידיות באמת משפיעות על הכיס שלכם: אצל נועם ושירה, 100,000 ₪ ו־5 שנים משנים הרבה יותר מ־10 נקודות אחוז בין מסלולים. והיא אומרת מתי אין השפעה (מדד, בלי מסלול צמוד) ומתי יש הרבה (מדד, עם מסלול צמוד).</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כשיש גבול שצריך לחצות או לא לחצות, בודקים אילו ידיות מגיעות אליו בצעד הקטן ביותר, ומה כל אחת עולה. בשלב 8 האלגוריתם יעשה זאת מול כל הידיות יחד; כאן אתם עושים את זה ידנית.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **רגישות** — כמה תוצאה זזה כשמזיזים ידית אחת בצעד ידוע; ההפרש מחולק בגודל הצעד.
+- **חמש ידיות:** אחוז (בין מסלולים), סכום, תקופה, ריבית (במסלול, ובשוק) ומדד.
+- **אחוז:** ההשפעה על ההחזר לפי הפער בין האחוזים; ההשפעה הגדולה היא על החשיפה ועל הגבול של שני שלישים.
+- **סכום:** כמעט ישר. **תקופה:** תשלום גבוה יותר וסך נמוך יותר, ולא ישר. **ריבית:** אחוזים במסלולים נפרדים מצטברים; ריבית השוק פוגעת רק במשתנים. **מדד:** אפס בלי מסלול צמוד, הרבה איתו.
+- **ידיות מגיעות לגבולות:** יחס החזר של 40% או 50%, שני שלישים משתנים. בודקים אותם אחרי כל הזזה.
+- **לא מצטברות בדיוק,** ולכן ידית אחת בכל פעם. כל המספרים כאן הם הנחות של הקורס.
+
+**בשיעור הבא — 5.8, <Later lesson="5.8" quiet>סדנה</Later>: שלוש חלופות לתיק המרכזי:** מרכיבים שלושה תמהילים לשלושה יעדים, ובודקים תקופות נפרדות, תרחישים ויתרת חוב.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "רגישות כהפרש תוצאה מחולק בגודל הצעד; הזזה של ידית אחת בכל פעם; תוצאה של שתי ידיות יחד אינה בהכרח סכום התוצאות לחוד." },
+    { kind: "הנחת חישוב", text: "תיק A והתמהיל הראשוני: src/data/case-a-mix.ts (מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים; 546,000 ב־4.60%, 547,000 ב־4.10%, 547,000 ב־4.40%). אחוזי הריבית הם רשימת המחירים של הקורס; כל סוג מסלול מקבל אחוז אחד בכל תמהיל, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
+    { kind: "הנחת חישוב", text: "תרחיש הבסיס: המדד עולה 2% בשנה, הפריים והעוגן לא זזים. ריבית השוק: הפריים והעוגן (בכל נקודת עדכון, כל 5 שנים) עולים נקודת אחוז אחת, הפריים מהשנה השנייה. שניהם תרחישי הוראה, לא תחזיות. ידית הסכום מקטינה את כל המסלולים באותו יחס. כלל העיגול של הקורס (שיעור 3.8)." },
+    { kind: "לא אומת", text: "מגבלות הוראה 329: יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות ב־Brain (דף 67436545), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "FK-H-057: שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע; הנתונים הציבוריים הם ממוצעים ולא מחיר שבנק יאשר. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות, כולל הפעלת כל ידית מחדש בבדיקה הפייתונית.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (levers) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-7.ts and data/lessons/5-7.json, rechecked by checks/kinds/sensitivity.py (with schedule.py). Illustration: src/components/MixBuilder.vue (props only; the loan amount cannot be moved in it). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-7.html. */}

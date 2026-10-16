@@ -1,0 +1,724 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.4"
+minutes: 40
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import CurveForecast from "../../components/CurveForecast.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { CURVE_LABEL } from "../../data/curves.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.4");
+// A number inside an equation, as the data writes it. Formatting only — the value is the fact's.
+export const nv = (v) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 6 }).format(Number(v));
+export const n = (id) => nv(f.raw(id));
+export const pct = (id) => `${f.plain(id)}%`;
+// A money fact inside an equation, without ₪, with agorot when it has any. Formatting only — the value is the fact's.
+export const amt = (id) => { const x = Number(f.raw(id)); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const label = CURVE_LABEL;
+// A curve yield with its four decimals, as the data file holds it ("3.2" is "3.2000"). Formatting only.
+export const y4 = (id) => Number(f.plain(id)).toFixed(4);
+// The years a block covers, from its first and last month: "1–5", "6–10". Formatting only.
+export const yrs = (b) => `${(b.from_month - 1) / 12 + 1}–${b.to_month / 12}`;
+export const wBlocks = f.raw("w.blocks");
+export const wPath = f.raw("w.path");
+export const wbBlocks = f.raw("wb.blocks");
+export const wbPath = f.raw("wb.path");
+export const flPath = f.raw("fl.path");
+export const halfBlocks = f.raw("half.blocks");
+export const halfPath = f.raw("half.path");
+export const halfRows = halfBlocks.map((b, i) => ({ period: yrs(b), anchor: b.anchor, rate: b.rate, payment: halfPath[i].payment }));
+export const prBlocks = f.raw("t.pr.blocks");
+export const vlBlocks = f.raw("t.vl.blocks");
+export const yearly = f.raw("infl.yearly");
+export const predictionOptions = [
+  `${f.plain("pred.y5")}% — העוגן נשאר כמו היום`,
+  `${f.plain("pred.y10")}% — התשואה לעשר שנים`,
+  `בערך ${f.plain("pred.forward")}% — הריבית שהעקום מגלם לחמש השנים האלה`,
+  "אי אפשר לחשב: אף אחד לא יודע מה יהיה העוגן בעוד חמש שנים",
+];
+
+בשיעור 3.8 חישבנו <Term t="החזר מרבי חזוי" lesson="5.4">החזר מרבי חזוי</Term> לפי <Term t="תחזית" lesson="5.4">תחזית</Term> **בדויה**: ריביות שהמצאנו כדי לראות איך זה עובד. בשיעור 5.3 ראינו ש<Term t="ריבית כוללת חזויה" lesson="5.4">הריבית הכוללת החזויה</Term> וההחזר המרבי החזוי שב<Term t="אישור עקרוני" lesson="5.4">אישור העקרוני</Term> נשענים על תחזית. עכשיו נשאל את השאלה שהשארנו פתוחה: מאיפה התחזית באה, ואיך מחשבים אותה?
+התשובה נשענת על שני כלים משיעור 0.12: <Term t="עקום אפס" lesson="5.4">עקום אפס</Term> ו<Term t="ציפיות אינפלציה" lesson="5.4">ציפיות אינפלציה</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.4"
+  question={`נניח שבעקום אפס (מספרים להמחשה) התשואה לחמש שנים היא ${f.plain("pred.y5")}% בשנה, ולעשר שנים ${f.plain("pred.y10")}%. מסלול משתנה לא צמודה מתעדכן כל 5 שנים, והעוגן שלו היום הוא התשואה לחמש שנים. איזה עוגן מניחה התחזית לשנים 6 עד 10?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מעקום אפס לתחזית
+
+</Section>
+
+<LessonVideo lesson="5-4" />
+
+<Section kind="ההסבר">
+
+## מי קובע איזו תחזית
+
+</Section>
+
+הבנק לא בוחר לבד מודל תחזית. לפי התעתיק בצוות של <Term t="הוראה 451" lesson="5.4">הוראה 451</Term> (נספח 4, גרסה 22 מ־19.7.2023, שנקראה ב־3 באוגוסט 2026; **לא נבדק מחדש מול ההוראה**), ההוראה קובעת לכל סוג מסלול מאיפה לוקחים את התחזית, ממקור שבנק ישראל מפרסם.
+
+מסלול יכול להזדקק לשני סוגי תחזית: של **הריבית**, אם היא משתנה (מסלול פריים, או מסלול שמתעדכן כל כמה שנים), ושל **ההצמדה**, אם הוא צמוד. כך נראית הטבלה, כפי שהצוות תעתק אותה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[26rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">סוג המסלול</th>
+        <th class="py-2 pe-3 text-start font-semibold">תחזית הריבית</th>
+        <th class="py-2 pe-3 text-start font-semibold">תחזית ההצמדה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">קבועה לא צמודה</td><td class="py-2 pe-3">לא צריך</td><td class="py-2 pe-3">לא צריך</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">קבועה צמודה</td><td class="py-2 pe-3">לא צריך</td><td class="py-2 pe-3">ציפיות אינפלציה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">משתנה פריים</td><td class="py-2 pe-3">עקום אפס נומינלי</td><td class="py-2 pe-3">לא צריך</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">משתנה לא צמודה (כל כמה שנים, על בסיס אג״ח ממשלתית)</td><td class="py-2 pe-3">עקום אפס נומינלי</td><td class="py-2 pe-3">לא צריך</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">משתנה צמודה (כל כמה שנים, על בסיס אג״ח ממשלתית צמודה)</td><td class="py-2 pe-3">עקום אפס ריאלי</td><td class="py-2 pe-3">ציפיות אינפלציה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700">מט״ח או צמוד מט״ח, ו״אחר״</td><td class="py-2 pe-3" colspan="2">אין תחזית כלל</td></tr>
+    </tbody>
+  </table>
+</div>
+
+"עקום נומינלי" הוא עקום האפס של אג״ח ממשלתיות לא צמודות (תשואה לפני <Term t="אינפלציה" lesson="5.4">אינפלציה</Term>); "עקום ריאלי" הוא של אג״ח צמודות למדד (אחריה). את שניהם, ואת ציפיות האינפלציה שנגזרות מהם, בנק ישראל מפרסם באתר שלו (לפי התעתיק, ולפי חיפוש של הצוות ב־3.8.2026 הם מתעדכנים פעמיים בחודש; לא אומת).
+
+<Callout title="מה בתעתיק ומה לא">
+<p><strong>בתעתיק:</strong> הטבלה למעלה; נוסחת העוגן העתידי (בהמשך); חמשת כללי החישוב (בסוף השיעור); ושמסלול שאין לו תחזית (מט״ח, ״אחר״) מוגבל ל־3% מתיק המשכנתאות של הבנק. בנק שרוצה מסלול שאינו בטבלה פונה למפקח על הבנקים, שעונה תוך 90 יום.</p>
+<p><strong>לא בתעתיק, ולכן לא ידוע לנו:</strong> איך בדיוק הופכים את העקום לתחזית של מסלול פריים; באיזה יום ובאיזה אג״ח מגדיר כל בנק את העוגן שלו; ואיך מעגלים. הקורס מניח הנחות, ואומר מתי. כל אחת מהן שאלה פתוחה לאילון.</p>
+<p>בטבלה שבתעתיק יש גם שורה של ״משתנה צמודה על בסיס <Term t="מק״מ" lesson="5.4">מק״מ</Term>״, בלי תחזית הצמדה. מק״מ הוא בדרך כלל לא צמוד, ולכן השורה נראית כטעות תעתיק. היא לא נבדקה, ולכן לא מלמדים אותה.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## מעקום אפס לעוגן עתידי
+
+</Section>
+
+בשיעור 0.12 ראינו שעקום עולה מגלם ריביות גבוהות יותר בעתיד, ושאפשר לחשב את הריבית שהוא מגלם לכל תקופה. עכשיו ניתן לזה שם: <Term t="ריבית פורוורד" lesson="5.4">ריבית פורוורד</Term> היא הריבית שהעקום מגלם לתקופה בעתיד. ולמסלול משתנה, זה בדיוק מה שצריך: בנקודת עדכון בעתיד יקבע <Term t="עוגן" lesson="5.4">עוגן</Term> חדש, והתחזית מניחה שהוא יהיה הריבית שהעקום מגלם לתקופה הבאה. את ההנחה הזו קוראים <Term t="ריבית עוגן עתידית" lesson="5.4">ריבית עוגן עתידית</Term>.
+
+כדי לראות איך מחשבים, ניקח עקום להמחשה. **{label}.** הנה כמה מנקודותיו:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <caption class="pb-2 text-start text-caption text-n600">{label} (גרסה א׳). תשואות באחוזים בשנה.</caption>
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">אורך (שנים)</th>
+        <th class="py-2 pe-3 text-start font-semibold">עקום נומינלי</th>
+        <th class="py-2 pe-3 text-start font-semibold">עקום ריאלי</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[1, 5, 10, 15, 20].map((y) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n700"><span class="ltr">{y}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{y4(`curve.nom${y}`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{y4(`curve.real${y}`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+נקח מסלול <Term t="משתנה לא צמודה" lesson="5.4">משתנה לא צמודה</Term> שהריבית בו מתעדכנת כל 5 שנים (שיעור 2.7). הוא מסתמך על העקום הנומינלי, כי הוא לא צמוד.
+
+**צעד 1 — העוגן של היום.** בקורס ניקח את העוגן של יום ההצעה כתשואה לחמש שנים בעקום, מעוגלת לשתי ספרות אחרי הנקודה: {f.plain("curve.nom5")}% נהיה {f.raw("fwd.anchors")[0]}%. (זו **הנחת חישוב של הקורס**: בנק אמיתי מגדיר לעצמו איזה עוגן ובאיזה יום.)
+
+**צעד 2 — הריבית הגלומה לשנים 6 עד 10.** חמש שנים ועוד חמש שנים צריכות להסתיים באותו סכום כמו עשר שנים ישר. כמו ב־0.12, מחלקים את הגידול של עשר שנים בגידול של חמש, ולוקחים שורש חמישי:
+
+<div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
+  <M>{n("fwd.f10")}<sup>10</sup> = {n("fwd.g10")}</M>
+  <M>{n("fwd.f5")}<sup>5</sup> = {n("fwd.g5")}</M>
+  <M>{n("fwd.g10")} ÷ {n("fwd.g5")} = {n("fwd.ratio")}</M>
+  <M>{n("fwd.ratio")}<sup>1/5</sup> − 1 = {f.plain("fwd.root")}%</M>
+</div>
+
+כאן {n("fwd.f10")} הוא 1 ועוד התשואה לעשר שנים, {f.plain("curve.nom10")}%, כמספר עשרוני, ו־{n("fwd.f5")} הוא אותו דבר לחמש שנים. (המספרים מעוגלים להצגה.) כלומר ריבית פורוורד של {f.plain("fwd.root")}% בשנה לשנים 6 עד 10.
+
+**צעד 3 — עוגן עתידי.** מעגלים לשתי ספרות, כמו את העוגן של היום: **{f.plain("fwd.a2")}%**. כך עושים גם לתקופה הבאה, שבין שנה 10 לשנה 15, ולזו שאחריה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">העוגן בתחזית</th>
+        <th class="py-2 pe-3 text-start font-semibold">איך הגענו אליו</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">1–5</span></td><td class="py-2 pe-3"><span class="ltr">{f.raw("fwd.anchors")[0]}%</span></td><td class="py-2 pe-3 text-n700">העוגן של היום (הנחת הקורס)</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">6–10</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("fwd.a2")}%</span></td><td class="py-2 pe-3 text-n700">ריבית פורוורד מ־5 ל־10 שנים</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">11–15</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("fwd.a3")}%</span></td><td class="py-2 pe-3 text-n700">ריבית פורוורד מ־10 ל־15 שנים</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">16–20</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("fwd.a4")}%</span></td><td class="py-2 pe-3 text-n700">ריבית פורוורד מ־15 ל־20 שנים</td></tr>
+    </tbody>
+  </table>
+</div>
+
+העקום עולה, ולכן העוגן בתחזית עולה מתקופה לתקופה. אילו חישבו אותו על עקום שטוח, הוא היה נשאר כמו היום.
+
+<Callout title="מה העוגן העתידי אינו" tone="warning">
+<p>הוא לא ניחוש של בנק ישראל ולא הערכה של הבנק לגבי הריבית בעוד חמש שנים. הוא מה שהמחירים של היום מגלמים, בנוסף ל״תוספת על זמן ארוך״ שראינו ב־0.12, לפי כלל קבוע שכל הבנקים מחשבים אותו אותו דבר. הכלל מאפשר להשוות; הוא לא מבטיח שהעוגן ייצא כך.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## מעוגן לריבית ולתשלום
+
+</Section>
+
+העוגן הוא רק חלק מהריבית של המסלול. כמו בשיעור 2.1, הריבית במסלול היא העוגן ועוד ה<Term t="מרווח" lesson="5.4">מרווח</Term>, והמרווח כתוב בחוזה ולא זז. אז התחזית משנה רק את העוגן, והמרווח נשאר.
+
+נניח הצעה למסלול כזה, בעקום של ההסבר. תרגיל נפרד, לא התיק של נועם ושירה: הילה ואורן קיבלו הצעה ל־{f.shekels("w.amount")}, 20 שנה, בשפיצר, בריבית של {pct("w.rate")} ל־5 השנים הראשונות. הריבית בהצעה היא ריבית כוללת, ואת המרווח צריך להוציא ממנה.
+
+**צעד 1 — המרווח.** <M>{n("w.rate")} − {f.raw("fwd.anchors")[0]} = {n("w.spread")}</M> נקודות אחוז.
+
+<Callout title="את המרווח מחשבים ככה רק ביום ההצעה" tone="warning">
+<p>הפעולה הזו נכונה אך ורק כשהעוגן הוא של אותו יום שבו נקבעה הריבית. בהצעה אמיתית המרווח כתוב: Mogi שומרת את העוגן, תאריך הקריאה שלו והמרווח מהחוזה (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). ריבית שנקבעה לפני שנים, פחות העוגן של היום, לא מחזירה את המרווח (שיעור 2.1).</p>
+</Callout>
+
+**צעד 2 — הריבית בכל תקופה.** בכל תקופה, העוגן העתידי ועוד אותו מרווח:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[28rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">עוגן</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית (עוגן + מרווח)</th>
+        <th class="py-2 pe-3 text-start font-semibold">התשלום בחודש הראשון של התקופה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {wBlocks.map((b, i) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">{yrs(b)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{b.anchor}%</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{b.rate}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(wPath[i].payment)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+הריבית של התקופה הראשונה היא זו שבהצעה, והשאר: <M>{wBlocks[1].anchor} + {n("w.spread")} = {wBlocks[1].rate}</M>, וכן הלאה.
+
+**צעד 3 — התשלום.** בכל נקודת עדכון התשלום מחושב מחדש על היתרה שנשארה, לחודשים שנשארו (שיעור 3.6), באותה נוסחה כמו בשיעור 3.1. החישוב כולו הוא של קוד, לא של מודל שפה: **מודל שפה לא מחשב אף מספר כזה** (החלטה של Mogi, 2026-07-29).
+
+**צעד 4 — ההחזר המרבי החזוי.** התשלום הראשון: {f.shekels("w.first")}. הגבוה ביותר בלוח החזוי: {f.shekels("w.highest")}, בחודש {f.plain("w.highest_month")}. זה התשלום האחרון, שסוגר את היתרה, ולכן הוא גבוה באגורות בלבד מתשלומי התקופה האחרונה (שנעים סביב {formatShekels(wPath[3].payment)}). ההפרש מהראשון: <M>{amt("w.highest")} − {amt("w.first")} = {amt("w.gap")}</M> ₪, כלומר {f.plain("w.above")}% מעל הראשון.
+
+**מה מובטח ומה חזוי** (כמו ב־3.8): חמש השנים הראשונות מובטחות בחוזה. כל מה שאחריהן הוא תוצאה של חישוב על העקום של יום אחד.
+
+<Section kind="ההסבר">
+
+## ציפיות אינפלציה: מחלקים, לא מחסרים
+
+</Section>
+
+מסלול צמוד צריך תחזית של המדד. את ציפיות האינפלציה הוא מקבל משני העקומים, בדיוק כמו ב־0.12, בחילוק:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">π = (1 + i) ÷ (1 + r) − 1</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">π</dt><dd>ציפיות האינפלציה בשנה, עד האורך הנתון, כמספר עשרוני</dd>
+    <dt class="ltr font-semibold text-n900">i</dt><dd>התשואה של עקום האפס הנומינלי באותו אורך, כמספר עשרוני: 4% הם 0.04</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>התשואה של עקום האפס הריאלי באותו אורך, כמספר עשרוני</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">זו הנוסחה מ־0.12.</p>
+</div>
+
+**דוגמה לחמש שנים, בעקום ההמחשה:** נומינלי {f.plain("infl.n5")}%, ריאלי {f.plain("infl.r5")}%. <M>{n("infl.fn5")} ÷ {n("infl.fr5")} − 1 = {f.plain("infl.pi5")}%</M> בשנה. (כאן {n("infl.fn5")} הוא 1 ועוד התשואה הנומינלית כמספר עשרוני, ו־{n("infl.fr5")} — 1 ועוד הריאלית.)
+
+**ולמה לא להחסיר?** החיסור, <M>{f.plain("infl.n5")} − {f.plain("infl.r5")} = {f.plain("infl.simple5")}</M>, גבוה מהחילוק ב־{f.plain("infl.err5")} נקודות אחוז בשנה. מעט, אבל לא אפס: הצמדה וריבית מוכפלות, לא מתחברות. ובתחזית ל־20 שנה הטעות מצטברת: המדד החזוי אחרי 20 שנה הוא פי {f.plain("idx.comp20")} בחילוק, ופי {f.plain("idx.simple20")} בחיסור. כלומר {f.plain("idx.gap20")}% יותר. לפי הערת מחקר בצוות מ־3.8.2026 (לא אומת), החיסור טועה כך בכמה מאיות נקודת אחוז בשנה — וכאן, {f.plain("infl.err5")}.
+
+**מציפיות לאורך — לתחזית שנה אחר שנה.** העקום נותן ציפיות לכל אורך, כממוצע בשנה מהיום ועד אותו אורך. אבל התשלום משתנה בכל שנה, ולכן צריך את האינפלציה שצפויה בכל שנה לחוד. מה שצפוי אחרי חמש שנים הוא לא מה שצפוי בשנה החמישית. ככה עושים את זה:
+
+1. לכל אורך t מחשבים את המדד החזוי: <M>(1 + π<sub>t</sub>)<sup>t</sup></M>, ביחס להיום.
+2. האינפלציה החזויה בשנה מסוימת היא היחס בין המדד של סוף השנה למדד של תחילתה, פחות 1.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <caption class="pb-2 text-start text-caption text-n600">{label} (גרסה א׳)</caption>
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">אורך (שנים)</th>
+        <th class="py-2 pe-3 text-start font-semibold">נומינלי</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריאלי</th>
+        <th class="py-2 pe-3 text-start font-semibold">ציפיות עד האורך</th>
+        <th class="py-2 pe-3 text-start font-semibold">האינפלציה החזויה באותה שנה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[1, 2, 5, 10, 20].map((y) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n700"><span class="ltr">{y}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{y4(`infl.n${y}`)}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{y4(`infl.r${y}`)}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{f.plain(`infl.at${y}`)}%</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{f.plain(`infl.year${y}`)}%</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+העקום עולה, ולכן גם האינפלציה החזויה עולה משנה לשנה. בתחזית של הקורס כל שנה מעוגלת לשתי ספרות, והמדד זז בקצב אחיד בתוך השנה (כמו בשיעורים 3.5 ו־3.7). אין אצלנו מדד ממשי; יש רק מה שהעקומים מגלמים.
+
+**מה זה עושה לתשלום.** נקח מסלול <Term t="קבועה צמודה" lesson="5.4">קבועה צמודה</Term> ל־{f.shekels("w.amount")}, 20 שנה, בריבית של 3.2%. ריבית קבועה, אז התחזית שלו היא רק התחזית של המדד. התשלום הראשון: {f.shekels("fl.first")}. אחרי 5 שנים: {formatShekels(flPath[1].payment)}; אחרי 10: {formatShekels(flPath[2].payment)}; אחרי 15: {formatShekels(flPath[3].payment)}; והאחרון: {formatShekels(flPath[4].payment)}. התשלום עולה בכל חודש, כי המדד החזוי עולה, ולכן ההחזר המרבי החזוי כאן הוא התשלום האחרון: {f.shekels("fl.highest")}, גבוה מהראשון ב־{f.shekels("fl.gap")}. ככל שהאינפלציה החזויה גבוהה יותר, התשלום עולה מהר יותר.
+
+<Section kind="ההסבר">
+
+## חמישה סוגי מסלול, חמש תחזיות
+
+</Section>
+
+אותו סכום, {f.shekels("w.amount")} ל־20 שנה, בחמישה סוגי מסלול. הריבית של כל אחד בדויה ושונה, כמו בהצעות אמיתיות, ולכן **הטבלה מראה צורות, לא איזה מסלול זול יותר**:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <caption class="pb-2 text-start text-caption text-n600">{label} (גרסה א׳). ריביות בדויות להמחשה.</caption>
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המסלול</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית בהצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר מרבי חזוי</th>
+        <th class="py-2 pe-3 text-start font-semibold">בחודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים חזוי</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[
+        ["fu", "קבועה לא צמודה", "4.8%"],
+        ["fl", "קבועה צמודה", "3.2%"],
+        ["pr", "פריים", "4.2%"],
+        ["vu", "משתנה לא צמודה, כל 5 שנים", "4.3%"],
+        ["vl", "משתנה צמודה, כל 5 שנים", "2.5%"],
+      ].map(([k, name, rate]) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n700">{name}</td>
+          <td class="py-2 pe-3"><span class="ltr">{rate}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(f.raw(`t.${k}.first`))}</span></td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{formatShekels(f.raw(`t.${k}.highest`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{f.plain(`t.${k}.month`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(f.raw(`t.${k}.total`))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+- **קבועה לא צמודה:** שום דבר לא זז. הראשון, המרבי, והתשלום בכל חודש: אותו מספר.
+- **קבועה צמודה:** הריבית קבועה, אבל התשלום עולה כל חודש עם המדד החזוי. המרבי הוא האחרון.
+- **פריים:** לפי הנחת הקורס, מסלול שהעוגן שלו זז פעם בשנה, על העקום הנומינלי (בהסבר למטה). הריבית עולה בתחזית מ־{prBlocks[0].rate}% בשנה הראשונה ל־{prBlocks[19].rate}% בשנה ה־20.
+- **משתנה לא צמודה:** מדרגות, כמו בדוגמה של הילה ואורן.
+- **משתנה צמודה:** שני דברים זזים יחד. מדרגות בריבית (מ־{vlBlocks[0].rate}% ל־{vlBlocks[3].rate}%, כי נעשה שימוש בעקום הריאלי), ועלייה חודשית בגלל המדד.
+- **מט״ח או ״אחר״:** אין תחזית. אין לנו מה לחשב, ולכן אין ״ההחזר המרבי החזוי״ של התמהיל כולו (שיעור 3.8: נתון חסר אינו אפס).
+
+<Callout title="הנחת הקורס לגבי פריים" tone="warning">
+<p>הטבלה בתעתיק אומרת רק שלמסלול פריים משתמשים בעקום האפס הנומינלי. איך הופכים אותו לריבית של פריים, התעתיק לא אומר. הקורס מניח: פריים מתנהג כמו מסלול שהעוגן שלו מתעדכן כל שנה; העוגן של היום הוא התשואה לשנה אחת בעקום; ומכאן אותה חשבונאות של מרווח ועוגן עתידי. זו הנחה של הקורס, לא כלל של ההוראה. <strong>שאלה פתוחה לאילון</strong> (גם כי ״פריים = ריבית בנק ישראל + 1.5״ נחשבת בקורס למוסכמה, לא לכלל של ההוראה).</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## מהעקום לתשלום
+
+</Section>
+
+בחרו סוג מסלול וגרסת עקום. **{label}.** גרסה א׳ היא העקום של ההסבר; גרסה ב׳ היא גרסה אחרת של התחזית, שפורסמה בתאריך אחר, שבה העקום הנומינלי תלול יותר אחרי שנה 5; ״שטוח״ הוא עקום שבו הכול כמו היום.
+
+<CurveForecast client:visible />
+
+נסו את אלה:
+1. משתנה לא צמודה, גרסה א׳. מה ההחזר הגבוה ביותר, ובאיזה חודש?
+2. עברו לגרסה ב׳. ההצעה זהה: אותה ריבית, אותו סכום. מה קרה להחזר הראשון, ומה להחזר המרבי החזוי? ובאיזה חודש הוא עכשיו?
+3. עברו ל״שטוח״. מה ההחזר המרבי החזוי עכשיו, ומה הוא ביחס לראשון?
+4. עברו לקבועה צמודה, גרסה ״שטוח״. האם ההחזר עדיין עולה? למה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{f.shekels("w.highest")}, בחודש {f.plain("w.highest_month")} (האחרון, שסוגר את היתרה; בחודשים 181 עד 239 התשלום נמוך מעט).</li>
+    <li>ההחזר הראשון זהה, {f.shekels("wb.first")}: הוא מחושב מהריבית שבהצעה, והעקום לא נוגע בו. ההחזר המרבי החזוי עלה ל־{f.shekels("wb.highest")}, והוא כבר בחודש {f.plain("wb.highest_month")}: בגרסה ב׳ העוגן הצפוי מזנק בנקודת העדכון הראשונה ({wbBlocks[1].anchor}% במקום {wBlocks[1].anchor}%), ואחריה יורד מעט. אותה הצעה, תחזית אחרת, מספרים אחרים.</li>
+    <li>{f.shekels("wf.highest")}, בחודש {f.plain("wf.highest_month")}: בעקום שטוח התחזית היא ״שום דבר לא זז״, והמרבי שווה לראשון.</li>
+    <li>כן: {f.shekels("ill.fl_flat.highest")} בחודש {f.plain("ill.fl_flat.month")}. גם בעקום שטוח הנומינלי גבוה מהריאלי, ולכן יש אינפלציה חזויה, והמדד עולה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## התחזית, בסימנים
+
+</Section>
+
+**צעד 1 — העוגן העתידי.** זו הנוסחה מ־0.12: ריבית פורוורד בין שני אורכים של העקום. כשהמסלול מתעדכן כל p שנים, האורכים הם t₁ ו־t₂, והפרש ביניהם הוא p.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-h3 text-navy" dir="ltr">
+    <span class="whitespace-nowrap">A =</span>
+    <span class="whitespace-nowrap ps-8">[ (1 + y₂)<sup>t₂</sup> ÷ (1 + y₁)<sup>t₁</sup> ]<sup>1/(t₂ − t₁)</sup> − 1</span>
+  </div>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">A</dt><dd>העוגן העתידי, כמו A בשיעור 2.1, כמספר עשרוני: 4.49% הם 0.0449</dd>
+    <dt class="ltr font-semibold text-n900">y₁, y₂</dt><dd>התשואות של עקום האפס (הנומינלי, או הריאלי במסלול צמוד) באורכים t₁ ו־t₂, כמספרים עשרוניים</dd>
+    <dt class="ltr font-semibold text-n900">t₁, t₂</dt><dd>תחילת התקופה וסופה, בשנים מהיום; ההפרש ביניהם הוא הזמן בין עדכונים</dd>
+  </dl>
+</div>
+
+(ההוראה כתובה בחודשים, ובקורס האורכים הם בשנים שלמות.)
+
+**צעד 2 — הריבית.** העוגן העתידי ועוד המרווח, כמו בשיעור 2.1:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">r = A + s</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית של המסלול בתקופה, לשנה, כמספר עשרוני</dd>
+    <dt class="ltr font-semibold text-n900">A</dt><dd>העוגן בתקופה: של היום בתקופה הראשונה, העתידי אחר כך</dd>
+    <dt class="ltr font-semibold text-n900">s</dt><dd>המרווח מהחוזה, כמו בשיעור 0.9, כמספר עשרוני; לא זז</dd>
+  </dl>
+</div>
+
+**צעד 3 — המדד.** המדד החזוי אחרי t שנים, ביחס להיום, הוא הנוסחה של ציפיות האינפלציה, במעריך:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">M<sub>t</sub> ÷ M<sub>0</sub> = [ (1 + i<sub>t</sub>) ÷ (1 + r<sub>t</sub>) ]<sup>t</sup></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">M<sub>t</sub> ÷ M<sub>0</sub></dt><dd>המדד (M) אחרי t שנים, ביחס למדד של היום (M₀): פי כמה הוא גדל</dd>
+    <dt class="ltr font-semibold text-n900">i<sub>t</sub>, r<sub>t</sub></dt><dd>התשואות של העקום הנומינלי והריאלי באורך t שנים, כמספרים עשרוניים</dd>
+    <dt class="ltr font-semibold text-n900">t</dt><dd>מספר השנים</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">האינפלציה החזויה בשנה y היא <span class="ltr">M<sub>y</sub> ÷ M<sub>y−1</sub> − 1</span>.</p>
+</div>
+
+**צעד 4 — התשלומים.** לכל חודש: הריבית של התקופה שלו, והמדד של החודש. התשלום מחושב מחדש בכל שינוי ריבית, ומוצמד בכל חודש (שיעורים 3.5–3.7). ההחזר הראשון הוא התשלום הראשון, וההחזר המרבי החזוי הוא הגבוה ביותר מכולם.
+
+**מתי זה נכון?**
+1. התשואות הן של עקום אפס: לכל אורך, כאילו הייתה אג״ח עם תשלום אחד.
+2. כל התשלומים של כל המסלולים מחושבים מאותם עקומים, מאותה גרסה (בהמשך).
+3. הריבית של המסלול בתקופה הראשונה היא זו שבהצעה; המרווח נלקח מהחוזה או מההצעה, ולא מפחיתים עוגן של היום מריבית ישנה.
+4. התוצאה היא תחזית. היא לא הבטחה, והיא לא אומרת כמה סביר שהעוגן ייצא כך.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> העוגן העתידי בין 5 ל־10 שנים, כשהתשואה לחמש שנים ב־B1 ולעשר שנים ב־B2, שתיהן כמספרים עשרוניים:</p>
+<p><span class="ltr whitespace-nowrap">{"=((1+B2)^10/(1+B1)^5)^(1/5)-1"}</span></p>
+<p>ציפיות אינפלציה, כשהנומינלי ב־B1 והריאלי ב־B2:</p>
+<p><span class="ltr whitespace-nowrap">{"=(1+B1)/(1+B2)-1"}</span></p>
+<p>התשלום החדש בנקודת עדכון, כש־r הריבית בשנה, n החודשים שנשארו ו־B היתרה:</p>
+<p><span class="ltr whitespace-nowrap">{"=PMT(r/12,n,-B)"}</span></p>
+<p><strong>במחשבון:</strong> שתי החזקות, חילוק, ואז הכפתור <span class="ltr">x<sup>y</sup></span> עם 1/5, כלומר 0.2.</p>
+<p><strong>עיגול:</strong> התשואות בעקומי ההמחשה בארבע ספרות. עוגן, ריבית ואינפלציה בשנה מעוגלים בקורס לשתי ספרות לפני שנכנסים ללוח (הנחת הקורס), כדי שאפשר יהיה לבדוק כל טבלה על המספרים שמודפסים בה. איך מעגל בנק או ההוראה עצמה — לא ידוע לנו.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="5.4"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "התחזית לא מניחה ששום דבר לא יזוז. עקום עולה מגלם ריביות גבוהות יותר בעתיד, ולכן לפיו העוגן עולה.",
+    `${f.plain("pred.y10")}% היא הריבית בממוצע על עשר השנים כולן. אם חמש השנים הראשונות ב־${f.plain("pred.y5")}%, השנייה צריכה להיות מעל ${f.plain("pred.y10")}% כדי שהממוצע ייצא ${f.plain("pred.y10")}%.`,
+    "",
+    "נכון שאי אפשר לדעת. אבל התחזית אינה ניחוש: היא חישוב קבוע על העקום של היום, כדי שכל הבנקים יחשבו אותו דבר. מה שהעוגן ייצא בפועל — זה כבר לא החישוב.",
+  ]}
+>
+  <M>(1.04<sup>10</sup> ÷ 1.035<sup>5</sup>)<sup>1/5</sup> − 1 = {n("pred.forward4")}%</M>, בעיגול {f.plain("pred.forward")}%. זו ריבית הפורוורד לחמש השנים האלה, והיא העוגן העתידי בתחזית.
+</PredictionReveal>
+
+<Section kind="ההסבר">
+
+## מי קובע את הגרסה
+
+</Section>
+
+העקומים מתעדכנים (לפי התעתיק, ולפי חיפוש של הצוות ב־3.8.2026, פעמיים בחודש; לא אומת). לכן **אותה הצעה, באותה ריבית, תוצג עם מספרים שונים אם חישבו אותה על גרסה אחרת של העקום**. בעקום ההמחשה, אותה הצעה של הילה ואורן, {pct("w.rate")} על {f.shekels("w.amount")}, על גרסה ב׳:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[28rem] border-collapse text-body-m">
+    <caption class="pb-2 text-start text-caption text-n600">{label}. אותה הצעה, שתי גרסאות.</caption>
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית בגרסה א׳</th>
+        <th class="py-2 pe-3 text-start font-semibold">תשלום בגרסה א׳</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית בגרסה ב׳</th>
+        <th class="py-2 pe-3 text-start font-semibold">תשלום בגרסה ב׳</th>
+      </tr>
+    </thead>
+    <tbody>
+      {wBlocks.map((b, i) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n700"><span class="ltr whitespace-nowrap">{yrs(b)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{b.rate}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(wPath[i].payment)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{wbBlocks[i].rate}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(wbPath[i].payment)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+ההחזר הראשון זהה, {f.shekels("wb.first")}. ההחזר המרבי החזוי: {f.shekels("w.highest")} בגרסה א׳ ו־{f.shekels("wb.highest")} בגרסה ב׳, הפרש של {f.shekels("wb.gap")}. בסך הכול התשלומים החזויים גבוהים ב־{f.shekels("wb.total_gap")}. ההצעה לא השתנתה; התחזית כן.
+
+זו הסיבה לכללים הנוהליים שהצוות תעתק מההוראה (לא נבדק מול ההוראה):
+1. התחזית נשענת על עקומים וציפיות אינפלציה שפורסמו באתר בנק ישראל.
+2. העוגן העתידי מחושב לפי הנוסחה שלמעלה.
+3. כשמסלולי ההלוואה מועמדים בתאריכים שונים, מחשבים כאילו כל ההלוואה הועמדה ביום החישוב.
+4. מחשבים כאילו ההלוואה הועמדה בתחילת החודש שבו ניתן האישור העקרוני.
+5. אם בנק ישראל לא פרסם, משתמשים בתחזית האחרונה שפרסם.
+
+המסקנה לשיעור הקודם: **השוואה בין הצעות חוקית רק על אותה גרסה של התחזית**, כמו על אותו סכום, אותו תמהיל ואותו תאריך (5.3). אם שתי הצעות חושבו על גרסאות שונות, ההפרש ביניהן מערבב את מחיר ההצעה עם מה שזז בעקום. Mogi, כשתשווה, תחשב את שתיהן מחדש על אותה גרסה, ותשמור את הגרסה לכל חישוב (החלטה של Mogi: אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08).
+
+<Section kind="דוגמה פתורה">
+
+## הילה ואורן: מהצעה לתחזית
+
+</Section>
+
+הילה ואורן (בדויים, תרגיל נפרד) קיבלו הצעה ל־{f.shekels("w.amount")} במשתנה לא צמודה, 20 שנה, עדכון כל 5 שנים, ריבית {pct("w.rate")}. הם רוצים לדעת מה ההחזר המרבי החזוי, מה מובטח, ואם מגרסה אחרת של התחזית היה יוצא מספר אחר.
+
+**צעד 1 — העוגן של היום.** עוגן לחמש שנים: התשואה בעקום, {f.plain("curve.nom5")}%, מעוגלת: {f.raw("fwd.anchors")[0]}%.
+
+**צעד 2 — המרווח.** <M>{n("w.rate")} − {f.raw("fwd.anchors")[0]} = {n("w.spread")}</M> נקודות אחוז.
+
+**צעד 3 — עוגנים עתידיים.** <span class="ltr">{f.raw("fwd.anchors").join("% · ")}%</span> (לתקופות 1–5, 6–10, 11–15 ו־16–20).
+
+**צעד 4 — ריביות.** כל עוגן ועוד {f.plain("w.spread")}: <span class="ltr">{wBlocks.map((b) => b.rate).join("% · ")}%</span>.
+
+**צעד 5 — תשלומים.** {wPath.map((p, i) => `${formatShekels(p.payment)} (תקופה ${i + 1})`).join(", ")}.
+
+**צעד 6 — המרבי.** {f.shekels("w.highest")} בחודש {f.plain("w.highest_month")}; ההחזר הראשון {f.shekels("w.first")}; ההפרש {f.shekels("w.gap")}.
+
+**צעד 7 — מה מובטח.** רק חמש השנים הראשונות. כל השאר הוא חישוב על העקום של יום אחד, בגרסה אחת.
+
+**צעד 8 — גרסה אחרת.** בגרסה ב׳ ההחזר המרבי החזוי {f.shekels("wb.highest")} ובחודש {f.plain("wb.highest_month")}. ההצעה זהה; ההפרש הוא רק תחזית.
+
+<Section kind="דוגמה חצי פתורה">
+
+## השלימו את הריביות
+
+</Section>
+
+אותו עקום (גרסה א׳, {label}), הפעם הצעה ל־{f.shekels("half.amount")}, 20 שנה, עדכון כל 5 שנים, בריבית של {pct("half.rate")} ל־5 השנים הראשונות. המרווח, אחרי חישוב כמו בצעדים 1 ו־2 של הדוגמה הפתורה: {f.plain("half.spread")} נקודות אחוז. העוגנים והתשלומים כבר בטבלה. השלימו את הריבית בכל תקופה: העוגן ועוד המרווח. התקופה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="5.4-half"
+  periodLabel="שנים"
+  columns={[
+    { key: "anchor", label: "עוגן", format: "percent" },
+    { key: "rate", label: "ריבית (עוגן + מרווח)", format: "percent" },
+    { key: "payment", label: "תשלום בחודש הראשון של התקופה" },
+  ]}
+  rows={halfRows}
+  blanks={[`${halfRows[1].period}.rate`, `${halfRows[2].period}.rate`, `${halfRows[3].period}.rate`]}
+  success={`נכון. ההחזר המרבי החזוי כאן ${f.shekels("half.highest")}, בחודש ${f.plain("half.highest_month")}, והראשון ${f.shekels("half.first")}.`}
+  hint="בכל תקופה מחברים את העוגן של אותה תקופה לאותו מרווח. את הריבית של התקופה הראשונה לא מחשבים: היא זו שבהצעה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הריביות, העקומים והסכומים בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא העקומים של בנק ישראל. התרגילים מסודרים מהקל אל המאתגר. בתרגילים 3, 4 ו־6 תצטרכו מחשבון או גיליון.
+
+<ChoiceExercise
+  client:visible
+  id="5.4-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "עקום האפס הנומינלי", feedback: "העקום הנומינלי שייך למסלול לא צמוד. במסלול צמוד העוגן הוא תשואה אחרי אינפלציה." },
+    { text: "עקום האפס הריאלי, ובנוסף ציפיות אינפלציה למדד", correct: true, feedback: "נכון, לפי הטבלה בתעתיק של ההוראה. הריאלי נותן את העוגן, והציפיות את תנועת המדד." },
+    { text: "תחזית המקרו של חטיבת המחקר של בנק ישראל", feedback: "לא. החלטה של Mogi (2026-10-07): רק נתוני התחזית שבנק ישראל מפרסם להוראה 451, לא תחזית המקרו." },
+    { text: "הנחה שהאינפלציה קבועה, 2% בשנה", feedback: "גם זה לא. אינפלציה קבועה אינה מה שההוראה קובעת, והיא מחליקה הבדלים בין שנים." },
+  ]}
+>
+  לפי טבלת הייחוס שבתעתיק, מאיפה לוקחים את התחזית למסלול משתנה צמודה שמתעדכן כל כמה שנים על בסיס אג״ח ממשלתית צמודה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.4-2"
+  n={2}
+  level="קל"
+  unit="%"
+  tolerance={0.005}
+  near={0}
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.anchor1"), tolerance: 0.005, message: "זה העוגן בלבד. הריבית של המסלול היא העוגן ועוד המרווח, ויש גם מרווח." },
+    { value: f.raw("ex2.rate"), tolerance: 0.005, message: "זו הריבית של היום. אחרי העדכון העוגן משתנה, והמרווח נשאר." },
+  ]}
+>
+  מסלול משתנה לא צמודה, ריבית בהצעה {f.plain("ex2.rate")}%, והעוגן של אותו יום {f.plain("ex2.anchor0")}%. לפי התחזית העוגן בנקודת העדכון הבאה יהיה {f.plain("ex2.anchor1")}%. מה הריבית של המסלול בתקופה הבאה, באחוזים?
+</NumericExercise>
+
+<Solution for="5.4-2">
+המרווח: <M>{n("ex2.rate")} − {n("ex2.anchor0")} = {n("ex2.spread")}</M>. הריבית בתקופה הבאה: <M>{n("ex2.anchor1")} + {n("ex2.spread")} = {n("ex2.answer")}</M>%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.4-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  tolerance={0.005}
+  near={0}
+  answer={f.raw("ex3.answer")}
+  errors={[
+    { value: f.raw("ex3.err_simple"), tolerance: 0.005, message: "חיסרתם. הצמדה וריבית מוכפלות זו בזו, ולכן מחלקים: (1 + נומינלי) ÷ (1 + ריאלי) − 1." },
+  ]}
+>
+  בעקום האפס הנומינלי התשואה לעשר שנים {f.plain("ex3.nominal")}% בשנה, ובריאלי {f.plain("ex3.real")}%. מהן ציפיות האינפלציה בשנה לעשר שנים, באחוזים? (שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="5.4-3">
+<M>1.06 ÷ 1.02 − 1 = {f.plain("ex3.answer")}%</M> (בעיגול). בגיליון: <span class="ltr">{"=1.06/1.02-1"}</span>. החיסור היה נותן {f.plain("ex3.err_simple")}%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.4-4"
+  n={4}
+  level="בינוני"
+  unit="%"
+  tolerance={0.005}
+  near={0.02}
+  answer={f.raw("ex4.answer")}
+  errors={[
+    { value: f.raw("ex4.y6"), tolerance: 0.005, message: "זו התשואה ל־6 שנים כולן, כממוצע על כל התקופה. התקופה האחרונה גבוהה ממנו, כי שלוש השנים הראשונות ב־3%." },
+    { value: f.raw("ex4.err_avg"), tolerance: 0.005, message: "זה הממוצע הפשוט של שתי התשואות. הוא לא התקופה האחרונה לבדה." },
+  ]}
+>
+  מסלול משתנה מתעדכן כל 3 שנים. בעקום האפס התשואה ל־3 שנים {f.plain("ex4.y3")}% בשנה, ול־6 שנים {f.plain("ex4.y6")}%. מה העוגן העתידי לשנים 4 עד 6, באחוזים? (שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="5.4-4">
+<M>(1.04<sup>6</sup> ÷ 1.03<sup>3</sup>)<sup>1/3</sup> − 1 = {f.plain("ex4.answer")}%</M> (בעיגול). בגיליון: <span class="ltr">{"=(1.04^6/1.03^3)^(1/3)-1"}</span>. הקיצור של ״פעמיים הארוכה פחות הקצרה״ ({f.plain("ex4.err_double")}%) קרוב, אבל הוא קירוב; בתרגיל מתקבל כנכון בקירוב.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.4-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "כן: הראשונה טובה יותר, כי ההחזר המרבי החזוי שלה נמוך יותר", feedback: "ההפרש עשוי להיות כולו מהעקום: אם הגרסאות שונות, ההשוואה לא מראה מי הצעה טובה יותר." },
+    { text: "לא כך: יש לחשב את שתי ההצעות מחדש על אותה גרסה של התחזית ורק אז להשוות", correct: true, feedback: "נכון. השוואה חוקית רק על אותה גרסה, כמו אותו סכום, תמהיל ותאריך. עד אז ההפרש מערבב הצעה עם תחזית." },
+    { text: "לא כך: מספרים של תחזית אף פעם לא משווים", feedback: "משווים, אבל על אותו בסיס. התחזית היא בדיוק מה שהוראה 451 קבעה כדי שאפשר יהיה להשוות." },
+    { text: "כן, אבל רק אם הבנק הראשון גדול מהשני", feedback: "גודל הבנק לא קשור. מה שקובע הוא הגרסה של התחזית שעליה חושב המספר." },
+  ]}
+>
+  מכל אחד משני בנקים (בדויים) קיבלתם הצעה לאותו מסלול, באותו סכום ובאותה ריבית. ההחזר המרבי החזוי של הראשונה הוא {f.whole("w.highest")} ושל השנייה {f.whole("wb.highest")}. הבנק הראשון חישב על גרסה א׳ של התחזית, והשני על גרסה ב׳. האם אפשר לומר שההצעה הראשונה טובה יותר?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.4-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("ex6.answer")}
+  near={2}
+  errors={[
+    { value: f.raw("ex6.err_flat"), message: "זה ההחזר הראשון, בריבית של 4%. אחרי העדכון הריבית היא העוגן העתידי ועוד המרווח." },
+    { value: f.raw("ex6.err_anchor"), message: `הנחתם שהריבית החדשה היא העוגן, ${f.plain("ex6.anchor1")}%. צריך להוסיף את המרווח, ${f.plain("ex6.spread")} נקודות אחוז.` },
+    { value: f.raw("ex6.err_all_months"), message: "היתרה נכונה, אבל מספר החודשים לא: עברו 60 חודשים מתוך 300, ולכן נשארו 240." },
+  ]}
+>
+  לקחתם {f.shekels("ex6.loan")} ל־25 שנה (300 חודשים) במשתנה לא צמודה, עדכון כל 5 שנים. הריבית בהצעה {f.plain("ex6.rate0")}%, והעוגן של אותו יום {f.plain("ex6.anchor0")}%. לפי התחזית העוגן בנקודת העדכון הראשונה יהיה {f.plain("ex6.anchor1")}%. אחרי 60 תשלומים היתרה {f.shekels("ex6.balance_60")}. מה התשלום החזוי מחודש 61?
+</NumericExercise>
+
+<Solution for="5.4-6">
+המרווח: <M>{n("ex6.rate0")} − {n("ex6.anchor0")} = {n("ex6.spread")}</M>. הריבית החדשה: <M>{n("ex6.anchor1")} + {n("ex6.spread")} = {n("ex6.rate")}</M>%. התשלום מחושב מחדש על {f.shekels("ex6.balance_60")}, ל־240 חודשים (5 חלקי 12 בכל חודש): בגיליון <span class="ltr">{`=PMT(${f.plain("ex6.rate")}%/12, 240, -${f.raw("ex6.balance_60")})`}</span>. התשלום החזוי: {f.shekels("ex6.answer")}, במקום {f.shekels("ex6.first")} עד עכשיו.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.4-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "שאלה אם המספר כולל את המסלול הזה: לפי התעתיק אין למט״ח תחזית, והאישור אמור לציין שהמספר לא כולל מסלול בלי תחזית", correct: true, feedback: "נכון (לפי התעתיק של סעיף 4ג(ב4), לא אומת). אם המספר לא כולל את המט״ח, הוא לא ריבית על כל ההלוואה, ואי אפשר להשוות אותו להצעה אחרת בלי הבהרה." },
+    { text: "להניח שהבנק חישב מט״ח בעזרת העקום הנומינלי, כי הוא קרוב", feedback: "אין שורה כזו בטבלת הייחוס. ״קרוב״ אינו תחזית מוגדרת, והבנק לא בוחר מודל." },
+    { text: "להניח שהמט״ח אפס, ולכן המספר מלא", feedback: "נתון חסר אינו אפס. מסלול בלי תחזית לא תורם 0 לחישוב; הוא פשוט לא בחישוב." },
+    { text: "לא לשאול: ההוראה מבטיחה שכל מספר באישור כולל את כל המסלולים", feedback: "ההפך: לפי התעתיק האישור צריך לציין במפורש כשמסלול אין לו תחזית ולכן אינו נכלל בעלות." },
+  ]}
+>
+  באישור עקרוני יש תמהיל עם מסלול במט״ח. כתוב בו ״ריבית כוללת חזויה {f.plain("ex7.total_rate")}%״. מה כדאי לשאול?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על תחזית לפי הוראה 451">
+<p><strong>מה זה?</strong> חישוב מוסכם של התשלומים העתידיים של הלוואה, על עקומים שבנק ישראל מפרסם: עקום אפס נומינלי ו/או ריאלי לריבית, וציפיות אינפלציה להצמדה. התוצאה היא לוח תשלומים חזוי, שממנו יוצאים ההחזר המרבי החזוי והריבית הכוללת החזויה.</p>
+<p><strong>למה זה קיים?</strong> כדי שכל הבנקים יחשבו אותו דבר, ושאפשר יהיה להשוות בין הצעות (לפי התעתיק, לא אומת). בנק לא בוחר מודל; הטבלה בהוראה בוחרת.</p>
+<p><strong>איך זה עובד?</strong> עד נקודת העדכון הראשונה הריבית היא זו שבהצעה. אחר כך: ריבית פורוורד מהעקום היא העוגן העתידי, ועוד המרווח מהחוזה. במסלול צמוד, ציפיות האינפלציה (בחילוק) קובעות את תנועת המדד. בכל שינוי ריבית התשלום מחושב מחדש.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההחזר המרבי החזוי והריבית הכוללת החזויה שבאישור תלויים בגרסת העקום, לא רק בהצעה. הם לא תקרה ולא הבטחה. מסלול בלי תחזית (מט״ח, ״אחר״) לא נכלל בהם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים על איזה גרסה חושב כל מספר, ומשווים רק בין מספרים שחושבו על אותה גרסה. ובודקים גם מה קורה אם הריבית עולה יותר מהתחזית (שיעור 3.8), כי התחזית אינה הבטחה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הטבלה בהוראה** קובעת לכל סוג מסלול מאיפה התחזית: עקום נומינלי לפריים ולמשתנה לא צמודה, עקום ריאלי למשתנה צמודה, ציפיות אינפלציה לכל מסלול צמוד, ושום דבר למט״ח ו״אחר״ (לפי תעתיק בצוות, לא אומת).
+- **ריבית פורוורד** — הריבית שהעקום מגלם לתקופה בעתיד. **ריבית עוגן עתידית** — ריבית פורוורד שמשמשת עוגן למסלול משתנה בנקודת עדכון בעתיד. הריבית של המסלול אז: עוגן עתידי + המרווח מהחוזה.
+- **ציפיות אינפלציה** — מחלקים, לא מחסרים. ולתשלום צריך אותן שנה אחר שנה, לא כממוצע.
+- **התחזית אינה הבטחה:** היא חישוב על העקום של יום אחד, בגרסה אחת. אותה הצעה על גרסה אחרת נותנת החזר מרבי חזוי אחר.
+- **משווים רק על אותה גרסה**, אותו סכום, אותו תמהיל ואותו תאריך.
+- **מה הקורס הניח, ולא ההוראה:** העוגן של היום הוא התשואה באורך תקופת העדכון; פריים מתנהג כמסלול שמתעדכן כל שנה; עיגול לשתי ספרות. כל אחד מהם שאלה פתוחה לאילון.
+
+**בשיעור הבא — 5.5, <Later lesson="5.5" quiet>ממוצע שוק, אומדן, הצעה אישית ועסקה שבוצעה</Later>:** ארבעה מספרים שנראים אותו דבר ועונים על שאלות שונות.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "טבלת הייחוס של נספח 4 בהוראת בנק ישראל 451: לאיזה סוג מסלול אילו תחזיות (עקום אפס נומינלי, עקום אפס ריאלי, ציפיות אינפלציה); אין תחזית למט״ח ול״אחר״; מסלול בלי תחזית מוגבל ל־3% מתיק המשכנתאות של הבנק; בקשה למפקח על הבנקים, עם תשובה תוך 90 יום. לפי תעתיק בצוות ב־Brain (דף 7733250, מגרסה 22 של ההוראה מ־19.7.2023, שהורדה ב־2026-08-03), ממתין לבדיקה מול המקור.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "נוסחת העוגן העתידי למסלול שמתעדכן אחת למספר חודשים קבוע (העוגן בין נקודת העדכון הראשונה לשנייה לפי התשואות של העקום בשני האורכים, בחזקות לפי החודשים), וחמשת הכללים הנוהליים (אותם עקומים לכל המסלולים; כאילו נמשכה בתחילת חודש האישור; פרסום אחרון אם אין חדש). לפי התעתיק בצוות ב־Brain (דף 7733250), ממתין לבדיקה מול המקור. הקורס מציג אותה בשנים שלמות.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "בנק ישראל מפרסם קובץ עם עקום נומינלי, עקום ריאלי והפער ביניהם, שמשמש לחישובים לפי הוראה 451; ציפיות האינפלציה הן (1 + נומינלי) ÷ (1 + ריאלי) − 1, והחיסור הפשוט שגוי בכמה בסיסי ריבית; הקובץ מתעדכן פעמיים בחודש. לפי תעתיק בצוות ב־Brain (דפים 7831553, בדיקה מ־2026-08-03, ו־67469313, 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "תחזיות רק מנתוני התחזית שבנק ישראל מפרסם לחישובים לפי הוראה 451; לא תחזית המקרו של חטיבת המחקר, ולא הנחה של אינפלציה קבועה; שומרים את תאריך המקור וגרסתו עם כל חישוב. Brain, דף 67436545 (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם).", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "מודל שפה אינו מחשב שום מספר שלקוח או בנק נשענים עליו: החישוב הוא קוד, ואותו קלט נותן תמיד אותה תוצאה. Brain, דף 16515075 (הוחלט בפגישת הצוות ב־2026-07-29).", date: "2026-07-29" },
+    { kind: "הנחת חישוב", text: "עקומי האפס בשיעור בדויים, בארבע ספרות, ואינם נתוני בנק ישראל ולא קירוב שלהם. העוגן של יום ההצעה הוא התשואה בעקום באורך תקופת העדכון, מעוגלת לשתי ספרות; המרווח הוא הריבית בהצעה פחות העוגן הזה; העוגן העתידי ושיעור האינפלציה החזויה בכל שנה מעוגלים לשתי ספרות לפני שנכנסים ללוח; פריים מטופל כמסלול שמתעדכן כל שנה; המדד זז בקצב אחיד בתוך כל שנה; הלוחות לפי כלל העיגול של הקורס. אף אחת מההנחות האלה אינה מהוראה 451 ככל שידוע לנו; כולן שאלות פתוחות לאילון. הילה ואורן — זוג בדוי." },
+    { kind: "ידע מתמטי כללי", text: "ריבית פורוורד מעקום אפס (שיעור 0.12), חילוק במקום חיסור לציפיות אינפלציה, והתשלום המחושב מחדש לפי נוסחת השפיצר (שיעור 3.1)." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/forecast.ts (built on schedule.ts, amortization.ts and metrics.ts) via scripts/lessons/lesson-5-4.ts and scripts/lessons/_forecast-facts.ts into data/lessons/5-4.json, rechecked by checks/kinds/forecast.py (and metrics.py for exercise 6). Curves: src/data/curves.ts (illustrative, not Bank of Israel data). Illustration: src/components/CurveForecast.vue. Video: video/5-4.html. */}

@@ -1,0 +1,287 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.6 — "שלושה יעדים שמושכים לכיוונים שונים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t
+  (seconds) and photographs the page. render(t) depends only on t. Every number comes from
+  data/lessons/5-6.json. The subtitle cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: a mix can aim at three goals — a low monthly payment, a low total, little
+  exposure — and they pull in different directions; each goal needs its own "which month" or
+  "which scenario"):
+  1. Title.
+  2. Case A, the initial mix: three tracks (course assumptions), first payment, payment ratio.
+  3. Goal 1, a low payment — but in which month? The linked mix starts lowest and climbs; half-half
+     stays flat. First month and highest month pick different winners.
+  4. Goal 2, a low total — under which scenario? Totals of the five mixes that pass the limits.
+  5. Goal 3, exposure: how far the highest payment under the harsh scenario is above the first.
+  6. The limits change winners: without them, two mixes the bank cannot approve would win.
+  7. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.6 · שלושת יעדי התמהיל</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/5-6.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // 0 → 1 over d seconds from s seconds into a scene (for drawing a line or growing a bar).
+      const grow = (t, sc, s, d) => clamp((t - sc[0] - s) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", n400: "var(--mogi-n400)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      const T = Object.fromEntries(fact("cand.table").map((r) => [r.id, r]));
+      const NAME = { initial: "הראשוני", half: "חצי־חצי", fixed: "קבועה בלבד", linked: "צמוד", short: "25 שנה", linked_heavy: "צמוד, בעיקר משתנה", fixed_20: "קבועה ל־20 שנה" };
+      const V = {
+        loan: num(fact("a.loan")),
+        first: num(fact("init.first")),
+        ratio: pl(fact("init.ratio")),
+        linkedFirst: num(fact("linked.first")),
+        linkedMax: num(fact("linked.max")),
+        halfFirst: num(fact("pay.half.1")),
+        shortTotal: num(T.short.total),
+        shortFirst: num(T.short.first),
+        linkedRise: num(T.linked.rise),
+        linkedHeavyShare: pl(T.linked_heavy.variable_share),
+        fixed20Ratio: pl(T.fixed_20.ratio),
+      };
+
+      const S = { title: [0, 9], mix: [9, 36], g1: [36, 96], g2: [96, 130], g3: [130, 160], limits: [160, 188], end: [188, 202] };
+      window.duration = 202;
+      window.cues = [
+        [1, 5, "שלושה יעדים שמושכים לכיוונים שונים."],
+        [5, 8.5, "החזר נמוך, סך נמוך, ויציבות."],
+        [10, 16, `נועם ושירה: הלוואה של ${V.loan} ₪.`],
+        [16, 23, "שלושה מסלולים ל־30 שנה, בהנחות של הקורס."],
+        [23, 30, `החזר ראשון ${V.first} ₪, ויחס החזר ${V.ratio}%.`],
+        [30, 35, "לאיזה יעד בונים את התמהיל?"],
+        [37, 43, "יעד ראשון: החזר חודשי נמוך. אבל באיזה חודש?"],
+        [43, 50, `בחודש הראשון ״צמוד״ הכי נמוך: ${V.linkedFirst} ₪.`],
+        [50, 58, "ההצמדה מעלה את התשלום לאורך השנים."],
+        [58, 67, `בחודש 360 הוא כבר ${V.linkedMax} ₪.`],
+        [67, 76, `״חצי־חצי״ לא זז: ${V.halfFirst} ₪ בכל חודש.`],
+        [76, 86, "לפי החודש הראשון מנצח הצמוד."],
+        [86, 95, "לפי התשלום הגבוה ביותר מנצח חצי־חצי."],
+        [97, 104, "יעד שני: סך תשלומים נמוך. בתרחיש בסיס."],
+        [104, 113, `25 שנה מנצח: ${V.shortTotal} ₪ בסך הכול.`],
+        [113, 122, `המחיר: החזר ראשון של ${V.shortFirst} ₪.`],
+        [122, 129, "משווים רק באותו תרחיש, ועל אותה הלוואה."],
+        [131, 138, "יעד שלישי: יציבות. כמה התשלום עולה בתרחיש מחמיר."],
+        [138, 146, "קבועה בלבד: אפס. התשלום לא זז."],
+        [146, 154, `הצמוד: ${V.linkedRise} ₪ מעל ההחזר הראשון.`],
+        [154, 159, "כל תמהיל כאן עובר את הגבולות."],
+        [161, 168, "אבל הגבולות משנים מי מנצח."],
+        [168, 176, `צמוד ברובו: ${V.linkedHeavyShare}% משתנה, יותר משני שלישים.`],
+        [176, 184, `קבועה ל־20 שנה: יחס החזר ${V.fixed20Ratio}%, מעל 50%.`],
+        [184, 187.5, "בלי אישור, הם לא מועמדים."],
+        [189, 194, "אין תמהיל שמנצח בשלושה יעדים."],
+        [194, 201, "קודם יעד, חודש ותרחיש. אחר כך בוחרים."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "שלושה יעדים", 80, { w: 700, o });
+          txt(640, 360, "שמושכים לכיוונים שונים", 52, { w: 700, o: after(t, S.title, 1, o) });
+          txt(640, 430, "החזר נמוך · סך תשלומים נמוך · יציבות", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — case A, the initial mix
+        if (inScene(t, S.mix)) {
+          const o = vis(t, S.mix);
+          txt(640, 132, `נועם ושירה · הלוואה של ${V.loan} ₪`, 38, { w: 700, o });
+          const tracks = [
+            { x: 840, head: "פריים", i: 1 },
+            { x: 480, head: "משתנה לא צמודה · עדכון כל 5 שנים", i: 2 },
+            { x: 120, head: "קבועה לא צמודה", i: 3 },
+          ];
+          tracks.forEach((tr, k) => {
+            const ok = after(t, S.mix, 1 + k * 3, o);
+            box(tr.x, 180, 320, 150, ok);
+            txt(tr.x + 300, 222, tr.head, 22, { anchor: "start", w: 700, o: ok });
+            txt(tr.x + 300, 268, `${num(fact(`init.amount_${tr.i}`))} ₪`, 30, { anchor: "end", w: 700, o: ok, ltr: true });
+            txt(tr.x + 300, 308, `${fact(`init.rate_${tr.i}`)}% · 30 שנה`, 22, { anchor: "start", fill: C.n600, o: ok });
+          });
+          const o2 = after(t, S.mix, 13, o);
+          box(240, 380, 800, 120, o2);
+          txt(1010, 430, "החזר ראשון", 22, { anchor: "start", fill: C.n600, o: o2 });
+          txt(1010, 478, `${V.first} ₪`, 44, { anchor: "end", w: 700, o: o2, ltr: true });
+          txt(560, 430, "יחס החזר", 22, { anchor: "start", fill: C.n600, o: o2 });
+          txt(560, 478, `${V.ratio}%`, 44, { anchor: "end", w: 700, o: o2, ltr: true });
+          txt(640, 540, "הנחות של הקורס — לא הצעת בנק ולא נתוני שוק", 20, { fill: C.n600, o: after(t, S.mix, 15, o) });
+        }
+        // Scene 3 — goal 1: which month?
+        if (inScene(t, S.g1)) {
+          const o = vis(t, S.g1);
+          txt(640, 124, "יעד 1 · החזר חודשי נמוך — באיזה חודש?", 38, { w: 700, o });
+          const G = { left: 200, right: 1000, base: 500, top: 215, lo: 6000, hi: 12500 };
+          const X = (m) => G.right - (m / 360) * (G.right - G.left);
+          const Y = (v) => G.base - ((Number(v) - G.lo) / (G.hi - G.lo)) * (G.base - G.top);
+          el("line", { x1: G.left, x2: G.right, y1: G.base + 14, y2: G.base + 14, stroke: C.n300, "stroke-width": 1, opacity: o });
+          for (const [m, s] of [[0, "0"], [60, "5"], [120, "10"], [180, "15"], [240, "20"], [300, "25"], [360, "30"]]) txt(X(m), G.base + 40, s, 18, { fill: C.n600, o, ltr: true });
+          txt(600, G.base + 68, "שנים (מימין לשמאל) · הציר האנכי לא מתחיל באפס", 17, { fill: C.n600, o });
+          const months = [1, 27, 61, 121, 241, 360];
+          const line = (id, color, dash, share) => {
+            const pts = months.map((m) => [X(m), Y(fact(`pay.${id}.${m}`))]);
+            const upto = Math.floor(share * (pts.length - 1));
+            const frac = share * (pts.length - 1) - upto;
+            const shown = pts.slice(0, upto + 1);
+            if (upto < pts.length - 1) shown.push([pts[upto][0] + (pts[upto + 1][0] - pts[upto][0]) * frac, pts[upto][1] + (pts[upto + 1][1] - pts[upto][1]) * frac]);
+            el("polyline", { points: shown.map((p) => p.join(",")).join(" "), fill: "none", stroke: color, "stroke-width": 5, "stroke-dasharray": dash, opacity: o });
+          };
+          const g1 = after(t, S.g1, 8, 1);
+          if (g1 > 0) line("half", C.teal, "none", grow(t, S.g1, 30, 6));
+          if (t >= S.g1[0] + 8) line("linked", C.navy, "none", grow(t, S.g1, 8, 22));
+          // labels
+          const oFirst = after(t, S.g1, 8, o);
+          el("circle", { cx: X(1), cy: Y(fact("pay.linked.1")), r: 9, fill: C.navy, opacity: oFirst });
+          txt(X(1) + 22, Y(fact("pay.linked.1")) + 8, `${num(fact("pay.linked.1"))} ₪`, 22, { w: 700, anchor: "start", o: oFirst, ltr: true });
+          txt(X(1) + 22, Y(fact("pay.linked.1")) - 18, "צמוד · חודש 1", 18, { anchor: "start", fill: C.n600, o: oFirst, ltr: true });
+          const oLast = after(t, S.g1, 22, o);
+          el("circle", { cx: X(360), cy: Y(fact("pay.linked.360")), r: 9, fill: C.navy, opacity: oLast });
+          txt(X(360) + 22, Y(fact("pay.linked.360")) + 8, `${num(fact("pay.linked.360"))} ₪`, 22, { w: 700, anchor: "start", o: oLast, ltr: true });
+          const oHalf = after(t, S.g1, 31, o);
+          txt(X(180), Y(fact("pay.half.1")) + 36, `חצי־חצי · ${num(fact("pay.half.1"))} ₪ בכל חודש`, 20, { w: 700, fill: C.teal, o: oHalf });
+          // verdicts
+          const o1 = after(t, S.g1, 40, o);
+          box(1030, 215, 210, 120, o1 * 0.9, C.mint);
+          txt(1135, 252, "החזר ראשון", 20, { w: 700, o: o1 });
+          txt(1135, 288, "מנצח: צמוד", 26, { w: 700, o: o1 });
+          const o2 = after(t, S.g1, 49, o);
+          box(1030, 355, 210, 120, o2 * 0.9, C.mint);
+          txt(1135, 392, "הגבוה ביותר", 20, { w: 700, o: o2 });
+          txt(1135, 428, "מנצח: חצי־חצי", 26, { w: 700, o: o2 });
+        }
+        // Scene 4 — goal 2: the total
+        if (inScene(t, S.g2)) {
+          const o = vis(t, S.g2);
+          txt(640, 124, "יעד 2 · סך תשלומים נמוך — באיזה תרחיש?", 38, { w: 700, o });
+          const ids = ["short", "half", "initial", "fixed", "linked"];
+          const max = Number(T.linked.total);
+          ids.forEach((id, k) => {
+            const y = 190 + k * 66;
+            const g = grow(t, S.g2, 2 + k * 1.2, 2.5);
+            const w = (Number(T[id].total) / max) * 600 * g;
+            txt(1240, y + 34, NAME[id], 24, { anchor: "start", w: 700, o });
+            el("rect", { x: 1030 - w, y, width: w, height: 46, rx: 8, fill: id === "short" ? C.teal : C.tq2, opacity: o });
+            if (g > 0.95) txt(1030 - w - 12, y + 34, `${num(T[id].total)} ₪`, 22, { anchor: "end", w: 700, o, ltr: true });
+          });
+          const o2 = after(t, S.g2, 12, o);
+          box(200, 540, 880, 56, o2 * 0.9, C.mint);
+          txt(640, 576, `תרחיש בסיס: המדד עולה 2% בשנה · המחיר של 25 שנה: החזר ראשון ${V.shortFirst} ₪`, 20, { w: 700, o: o2 });
+        }
+        // Scene 5 — goal 3: exposure
+        if (inScene(t, S.g3)) {
+          const o = vis(t, S.g3);
+          txt(640, 124, "יעד 3 · יציבות", 40, { w: 700, o });
+          txt(640, 166, "בכמה התשלום הגבוה ביותר במחמיר גבוה מההחזר הראשון", 22, { fill: C.n600, o });
+          const ids = ["fixed", "half", "short", "initial", "linked"];
+          const cap = 1400;
+          ids.forEach((id, k) => {
+            const y = 210 + k * 64;
+            const g = grow(t, S.g3, 3 + k * 2, 2.5);
+            const v = Number(T[id].rise);
+            const w = (Math.min(v, cap) / cap) * 520 * g;
+            txt(1240, y + 32, NAME[id], 24, { anchor: "start", w: 700, o });
+            if (w > 0) el("rect", { x: 1030 - w, y, width: w, height: 44, rx: 8, fill: id === "fixed" ? C.teal : C.tq2, opacity: o });
+            if (v > cap && g > 0.95) {
+              el("line", { x1: 1030 - w + 150, x2: 1030 - w + 130, y1: y - 4, y2: y + 48, stroke: C.n50 ?? "var(--mogi-n50)", "stroke-width": 8, opacity: o });
+            }
+            if (g > 0.95) txt(1030 - w - 12, y + 32, `${num(T[id].rise)} ₪`, 22, { anchor: "end", w: 700, o, ltr: true });
+          });
+        }
+        // Scene 6 — the limits change who wins
+        if (inScene(t, S.limits)) {
+          const o = vis(t, S.limits);
+          txt(640, 124, "הגבולות משנים מי מנצח", 40, { w: 700, o });
+          const rows = [
+            { y: 190, goal: "החזר ראשון נמוך", free: NAME.linked_heavy, why: `${V.linkedHeavyShare}% משתנה — מעל שני שלישים`, legal: NAME.linked, from: 3 },
+            { y: 330, goal: "סך תשלומים נמוך", free: NAME.fixed_20, why: `יחס החזר ${V.fixed20Ratio}% — מעל 50%`, legal: NAME.short, from: 11 },
+          ];
+          for (const r of rows) {
+            const oa = after(t, S.limits, r.from - 2, o);
+            box(160, r.y, 960, 120, oa);
+            txt(1100, r.y + 38, r.goal, 22, { anchor: "start", w: 700, o: oa });
+            const tf = txt(1100, r.y + 78, `בלי גבולות: ${r.free}`, 22, { anchor: "start", fill: C.n600, o: oa });
+            const ob = after(t, S.limits, r.from, o);
+            txt(620, r.y + 78, r.why, 20, { anchor: "start", fill: C.n700, o: ob });
+            const bb = tf.getBBox();
+            el("line", { x1: bb.x - 4, x2: bb.x + bb.width + 4, y1: r.y + 72, y2: r.y + 72, stroke: C.n600, "stroke-width": 3, opacity: ob });
+            const oc = after(t, S.limits, r.from + 6, o);
+            txt(620, r.y + 38, `עם גבולות: ${r.legal}`, 24, { anchor: "start", w: 700, fill: C.teal, o: oc });
+          }
+          txt(640, 506, "תמהיל שהבנק לא יכול לאשר אינו תשובה", 22, { fill: C.n700, w: 600, o: after(t, S.limits, 18, o) });
+        }
+        // Scene 7 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [
+            { y: 250, a: "החזר נמוך", b: "באיזה חודש?", from: 0.5 },
+            { y: 320, a: "סך תשלומים", b: "באיזה תרחיש?", from: 2.5 },
+            { y: 390, a: "יציבות", b: "כמה זז, ולאן?", from: 4.5 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.end, r.from, o);
+            txt(1060, r.y, r.a, 36, { anchor: "start", w: 700, o: or });
+            txt(620, r.y, r.b, 30, { anchor: "start", fill: C.teal, o: or });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

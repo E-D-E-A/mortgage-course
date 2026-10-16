@@ -1,0 +1,631 @@
+{
+  "lesson": "5.9",
+  "title": "האם התמהיל טוב?",
+  "note": "Invented household, invented rates and invented averages (labelled illustrative). The rise of the changing rates is a teaching scenario, not a forecast. Measures via metrics.ts on the statement convention.",
+  "facts": [
+    {
+      "id": "term.months",
+      "kind": "given",
+      "inputs": {},
+      "value": "300"
+    },
+    {
+      "id": "term.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
+      "id": "term.long_months",
+      "kind": "given",
+      "inputs": {},
+      "value": "360"
+    },
+    {
+      "id": "term.long_years",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "rise",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "x.a1",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000"
+    },
+    {
+      "id": "x.r1",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.9"
+    },
+    {
+      "id": "x.a2",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000"
+    },
+    {
+      "id": "x.r2",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.95"
+    },
+    {
+      "id": "x.a3",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000"
+    },
+    {
+      "id": "x.r3",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.5"
+    },
+    {
+      "id": "x.loan",
+      "kind": "mix_loan",
+      "inputs": {
+        "tracks": "fixed_unlinked|500000|4.9|300;prime|400000|3.95|300;variable_unlinked|300000|4.5|300"
+      },
+      "value": "1200000.00"
+    },
+    {
+      "id": "x.changing",
+      "kind": "mix_changing",
+      "inputs": {
+        "tracks": "fixed_unlinked|500000|4.9|300;prime|400000|3.95|300;variable_unlinked|300000|4.5|300"
+      },
+      "value": "700000.00"
+    },
+    {
+      "id": "x.changing_share",
+      "kind": "reg_variable_share",
+      "inputs": {
+        "variable": "700000",
+        "loan": "1200000"
+      },
+      "value": "58.33"
+    },
+    {
+      "id": "x.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.9|300|300|0|0|statement;spitzer|400000|3.95|300|300|0|0|statement;spitzer|300000|4.5|300|300|0|0|statement"
+      },
+      "value": "6661.71"
+    },
+    {
+      "id": "x.high",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.9|300|300|0|0|statement;spitzer|400000|3.95,5.95|12|300|0|0|statement;spitzer|300000|4.5,6.5|60|300|0|0|statement"
+      },
+      "value": "7409.81"
+    },
+    {
+      "id": "x.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.9|300|300|0|0|statement;spitzer|400000|3.95|300|300|0|0|statement;spitzer|300000|4.5|300|300|0|0|statement"
+      },
+      "value": "1998513.48"
+    },
+    {
+      "id": "x.total_s",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.9|300|300|0|0|statement;spitzer|400000|3.95,5.95|12|300|0|0|statement;spitzer|300000|4.5,6.5|60|300|0|0|statement"
+      },
+      "value": "2199254.80"
+    },
+    {
+      "id": "mini.nominal",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "mini.avg",
+      "kind": "given",
+      "inputs": {},
+      "value": "12.5"
+    },
+    {
+      "id": "mini.monthly",
+      "kind": "mix_monthly",
+      "inputs": {
+        "nominal": "12",
+        "decimals": 4
+      },
+      "value": "1"
+    },
+    {
+      "id": "mini.eff",
+      "kind": "mix_effective",
+      "inputs": {
+        "nominal": "12",
+        "decimals": 4
+      },
+      "value": "12.6825"
+    },
+    {
+      "id": "mini.gap_nom",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "mini.nominal",
+        "b": "mini.avg",
+        "decimals": 2
+      },
+      "value": "-0.5"
+    },
+    {
+      "id": "mini.gap_eff",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "mini.eff",
+        "b": "mini.avg",
+        "decimals": 4
+      },
+      "value": "0.1825"
+    },
+    {
+      "id": "goal.first_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "6700"
+    },
+    {
+      "id": "goal.high_max",
+      "kind": "given",
+      "inputs": {},
+      "value": "7400"
+    },
+    {
+      "id": "goal.first_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "goal.first_max",
+        "subtrahend": "x.first"
+      },
+      "value": "38.29"
+    },
+    {
+      "id": "goal.high_over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.high",
+        "subtrahend": "goal.high_max"
+      },
+      "value": "9.81"
+    },
+    {
+      "id": "x.high_flat",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.9|300|300|0|0|statement;spitzer|400000|3.95|300|300|0|0|statement;spitzer|300000|4.5|300|300|0|0|statement"
+      },
+      "value": "6662.19"
+    },
+    {
+      "id": "goal.flat_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "goal.high_max",
+        "subtrahend": "x.high_flat"
+      },
+      "value": "737.81"
+    },
+    {
+      "id": "avg.1",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "eff.1",
+      "kind": "mix_effective",
+      "inputs": {
+        "nominal": "4.9",
+        "decimals": 4
+      },
+      "value": "5.0116"
+    },
+    {
+      "id": "gap.eff.1",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "eff.1",
+        "b": "avg.1",
+        "decimals": 3
+      },
+      "value": "0.012"
+    },
+    {
+      "id": "gap.nom.1",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "x.r1",
+        "b": "avg.1",
+        "decimals": 2
+      },
+      "value": "-0.1"
+    },
+    {
+      "id": "avg.2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "eff.2",
+      "kind": "mix_effective",
+      "inputs": {
+        "nominal": "3.95",
+        "decimals": 4
+      },
+      "value": "4.0223"
+    },
+    {
+      "id": "gap.eff.2",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "eff.2",
+        "b": "avg.2",
+        "decimals": 3
+      },
+      "value": "0.022"
+    },
+    {
+      "id": "gap.nom.2",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "x.r2",
+        "b": "avg.2",
+        "decimals": 2
+      },
+      "value": "-0.05"
+    },
+    {
+      "id": "avg.3",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.55"
+    },
+    {
+      "id": "eff.3",
+      "kind": "mix_effective",
+      "inputs": {
+        "nominal": "4.5",
+        "decimals": 4
+      },
+      "value": "4.594"
+    },
+    {
+      "id": "gap.eff.3",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "eff.3",
+        "b": "avg.3",
+        "decimals": 3
+      },
+      "value": "0.044"
+    },
+    {
+      "id": "gap.nom.3",
+      "kind": "mix_points_gap",
+      "inputs": {
+        "a": "x.r3",
+        "b": "avg.3",
+        "decimals": 2
+      },
+      "value": "-0.05"
+    },
+    {
+      "id": "b.r1",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.05"
+    },
+    {
+      "id": "b.r2",
+      "kind": "given",
+      "inputs": {},
+      "value": "3.95"
+    },
+    {
+      "id": "b.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|300|300|0|0|statement;spitzer|600000|3.95|300|300|0|0|statement"
+      },
+      "value": "6675.52"
+    },
+    {
+      "id": "b.high",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|300|300|0|0|statement;spitzer|600000|3.95,5.95|12|300|0|0|statement"
+      },
+      "value": "7349.37"
+    },
+    {
+      "id": "b.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|300|300|0|0|statement;spitzer|600000|3.95|300|300|0|0|statement"
+      },
+      "value": "2002656.66"
+    },
+    {
+      "id": "b.total_s",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|300|300|0|0|statement;spitzer|600000|3.95,5.95|12|300|0|0|statement"
+      },
+      "value": "2196618.61"
+    },
+    {
+      "id": "bx.first",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.first",
+        "subtrahend": "x.first"
+      },
+      "value": "13.81"
+    },
+    {
+      "id": "bx.total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.total",
+        "subtrahend": "x.total"
+      },
+      "value": "4143.18"
+    },
+    {
+      "id": "bx.high",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.high",
+        "subtrahend": "b.high"
+      },
+      "value": "60.44"
+    },
+    {
+      "id": "bx.total_s",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.total_s",
+        "subtrahend": "b.total_s"
+      },
+      "value": "2636.19"
+    },
+    {
+      "id": "b360.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|360|360|0|0|statement;spitzer|600000|3.95|360|360|0|0|statement"
+      },
+      "value": "6086.51"
+    },
+    {
+      "id": "b360.high",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|360|360|0|0|statement;spitzer|600000|3.95,5.95|12|360|0|0|statement"
+      },
+      "value": "6797.88"
+    },
+    {
+      "id": "b360.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|360|360|0|0|statement;spitzer|600000|3.95|360|360|0|0|statement"
+      },
+      "value": "2191145.44"
+    },
+    {
+      "id": "b360.total_s",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|5.05|360|360|0|0|statement;spitzer|600000|3.95,5.95|12|360|0|0|statement"
+      },
+      "value": "2438698.35"
+    },
+    {
+      "id": "b360.first_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.first",
+        "subtrahend": "b360.first"
+      },
+      "value": "575.20"
+    },
+    {
+      "id": "b360.total_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b360.total",
+        "subtrahend": "x.total"
+      },
+      "value": "192631.96"
+    },
+    {
+      "id": "y.r1",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.7"
+    },
+    {
+      "id": "y.r2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.1"
+    },
+    {
+      "id": "y.r3",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.4"
+    },
+    {
+      "id": "y.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|300|300|0|0|statement;spitzer|400000|4.1|300|300|0|0|statement;spitzer|300000|4.4|300|300|0|0|statement"
+      },
+      "value": "6620.25"
+    },
+    {
+      "id": "y.high",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|300|300|0|0|statement;spitzer|400000|4.1,6.1|12|300|0|0|statement;spitzer|300000|4.4,6.4|60|300|0|0|statement"
+      },
+      "value": "7368.66"
+    },
+    {
+      "id": "y.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|300|300|0|0|statement;spitzer|400000|4.1|300|300|0|0|statement;spitzer|300000|4.4|300|300|0|0|statement"
+      },
+      "value": "1986068.36"
+    },
+    {
+      "id": "y.total_s",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|300|300|0|0|statement;spitzer|400000|4.1,6.1|12|300|0|0|statement;spitzer|300000|4.4,6.4|60|300|0|0|statement"
+      },
+      "value": "2187414.69"
+    },
+    {
+      "id": "yx.first",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.first",
+        "subtrahend": "y.first"
+      },
+      "value": "41.46"
+    },
+    {
+      "id": "yx.high",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.high",
+        "subtrahend": "y.high"
+      },
+      "value": "41.15"
+    },
+    {
+      "id": "yx.total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.total",
+        "subtrahend": "y.total"
+      },
+      "value": "12445.12"
+    },
+    {
+      "id": "yx.total_s",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.total_s",
+        "subtrahend": "y.total_s"
+      },
+      "value": "11840.11"
+    },
+    {
+      "id": "goal.y_room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "goal.high_max",
+        "subtrahend": "y.high"
+      },
+      "value": "31.34"
+    },
+    {
+      "id": "y360.first",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|360|360|0|0|statement;spitzer|400000|4.1|360|360|0|0|statement;spitzer|300000|4.4|360|360|0|0|statement"
+      },
+      "value": "6028.26"
+    },
+    {
+      "id": "y360.high",
+      "kind": "met_highest_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|360|360|0|0|statement;spitzer|400000|4.1,6.1|12|360|0|0|statement;spitzer|300000|4.4,6.4|60|360|0|0|statement"
+      },
+      "value": "6830.96"
+    },
+    {
+      "id": "y360.total",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|360|360|0|0|statement;spitzer|400000|4.1|360|360|0|0|statement;spitzer|300000|4.4|360|360|0|0|statement"
+      },
+      "value": "2170177.41"
+    },
+    {
+      "id": "y360.total_s",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.7|360|360|0|0|statement;spitzer|400000|4.1,6.1|12|360|0|0|statement;spitzer|300000|4.4,6.4|60|360|0|0|statement"
+      },
+      "value": "2433936.81"
+    },
+    {
+      "id": "y360.first_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "x.first",
+        "subtrahend": "y360.first"
+      },
+      "value": "633.45"
+    },
+    {
+      "id": "y360.total_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "y360.total",
+        "subtrahend": "x.total"
+      },
+      "value": "171663.93"
+    },
+    {
+      "id": "win.first",
+      "kind": "mix_argmin",
+      "inputs": {
+        "facts": "x.first|y.first|b.first"
+      },
+      "value": 2
+    },
+    {
+      "id": "win.high",
+      "kind": "mix_argmin",
+      "inputs": {
+        "facts": "x.high|y.high|b.high"
+      },
+      "value": 3
+    },
+    {
+      "id": "win.total",
+      "kind": "mix_argmin",
+      "inputs": {
+        "facts": "x.total|y.total|b.total"
+      },
+      "value": 2
+    }
+  ]
+}

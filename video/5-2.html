@@ -1,0 +1,298 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.2 — "שלושה סלים".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/5-2.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: two proposed mixes cannot be compared by price; three uniform baskets,
+  the same at every bank, can — per the team's transcription of Directive 451 appendix 5,
+  not checked against the directive):
+  1. Title.
+  2. Two offers, two mixes: the first payment and the actual cost differ, but so do the mixes.
+  3. The three baskets: all fixed unlinked; thirds; halves. The same at every bank.
+  4. A third is exactly a third (900,000 / 3), not 33%; 1,000,000 does not divide.
+  5. Fixed linked is in no basket; the field claim (FK-H-031) differs and is listed for Eylon.
+  6. Three fictional banks x three baskets, the actual cost: the lowest differs by basket.
+  7. The proposed basket: the bank's own mix; not comparable by price between banks.
+  8. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.2 · הסלים האחידים והסל המוצע</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+        <script type="module">
+      const data = await (await fetch("/data/lessons/5-2.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+
+      const split1 = fact("basket1.split"), split2 = fact("basket2.split"), split3 = fact("basket3.split");
+      const bankIds = ["a", "b", "c"], bankNames = { a: "בנק א׳", b: "בנק ב׳", c: "בנק ג׳" };
+      const lowestNames = { b1: fact("u.b1.lowest_rate"), b2: fact("u.b2.lowest_rate"), b3: fact("u.b3.lowest_rate") };
+      const rate = (bk, b) => pl(fact(`u.${bk}.${b}.rate`));
+      const V = {
+        loan: num(fact("explain.loan")),
+        years: String(fact("explain.years")),
+        aFirst: num(fact("prob.a_first")),
+        cFirst: num(fact("prob.c_first")),
+        aRate: pl(fact("prob.a_rate")),
+        cRate: pl(fact("prob.c_rate")),
+        third: num(split2[0].amount),
+        half: num(split3[0].amount),
+        slip: num(fact("explain.err_33")),
+        gap: num(fact("explain.err_gap")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], prob: [10, 50], baskets: [50, 102], exact: [102, 124], missing: [124, 142], table: [142, 182], proposed: [182, 202], end: [202, 214] };
+      window.duration = 214;
+      window.cues = [
+        [1, 5, "שלושה סלים"],
+        [5, 9.5, "סל אחיד, סל מוצע, ולמה בכלל צריך אותם."],
+        [11, 18, "בנק א׳ ובנק ג׳ הציעו לאותם לווים הצעות שונות."],
+        [18, 26, `א׳: החזר ראשון ${V.aFirst} ₪. ג׳: ${V.cFirst} ₪.`],
+        [26, 34, `העלות הממשית: ${V.aRate}% מול ${V.cRate}%.`],
+        [34, 42, "אבל גם התמהילים שונים, ולכן אי אפשר לדעת מי זול."],
+        [42, 49, "שני תמהילים שונים הם שתי שאלות שונות."],
+        [51, 58, "לפי תעתיק של הצוות, יש שלושה סלים אחידים."],
+        [58, 66, "סל 1: כל ההלוואה קבועה לא צמודה."],
+        [66, 76, "סל 2: שליש קבועה, שליש פריים, שליש משתנה צמודה."],
+        [76, 85, "סל 3: חצי קבועה לא צמודה, חצי פריים."],
+        [85, 93, "בכל בנק ההרכב זהה, ולכן אפשר להשוות מחיר."],
+        [93, 101, "תקופה אחת לכל המסלולים, ולוח שפיצר (לפי Brain, לא נבדק)."],
+        [103, 110, `${V.loan} ₪ בסל 2: שליש הוא בדיוק ${V.third} ₪.`],
+        [110, 117, "לא 33%: כך חסרים אלפי שקלים בכל חלק."],
+        [117, 123, "מיליון ₪ לא מתחלק בדיוק. מה עושים אז? ברשימה לאילון."],
+        [125, 132, "מה שחסר: קבועה צמודה לא נמצאת באף סל."],
+        [132, 141, "אילון אמר אחרת. הקורס מלמד את התעתיק, ושואל."],
+        [143, 150, "אותם שלושה בנקים בדויים, אותו סכום, אותה תקופה."],
+        [150, 160, "בטבלה: העלות הממשית של האשראי, בכל בנק וכל סל."],
+        [160, 170, `בסל 1 הנמוך ב${lowestNames.b1[0]}; בסל 2 — ${lowestNames.b2[0]}.`],
+        [170, 181, `בסל 3 — ${lowestNames.b3[0]}. אין ״בנק זול ביותר״ בכלל.`],
+        [183, 191, "הסל המוצע הוא מה שהבנק בחר: מסלולים וחלוקה משלו."],
+        [191, 201, "ולכן אי אפשר להשוות את המחיר שלו בין בנקים."],
+        [203, 208, "שלושה סלים שכולם מציעים: אותו הרכב בכל בנק."],
+        [208, 213, "כך משווים מחיר, על אותו תמהיל."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      const KC = { fixed: C.teal, prime: C.tq2, linked: C.n300 };
+      // A stacked bar (a basket) from right to left: parts are [fraction, colour, label].
+      function basketBar(x, y, w, parts, o, label) {
+        let cx = x + w;
+        for (const [fr, col, lab] of parts) {
+          const pw = w * fr;
+          el("rect", { x: cx - pw + 3, y, width: pw - 6, height: 74, rx: 8, fill: col, opacity: o });
+          txt(cx - pw / 2, y + 44, lab, 20, { w: 700, fill: col === KC.fixed ? C.n0 : C.navy, o });
+          cx -= pw;
+        }
+      }
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 300, "שלושה סלים", 80, { w: 700, o });
+          txt(640, 380, "סל אחיד · סל מוצע", 34, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — the problem: two different mixes
+        if (inScene(t, S.prob)) {
+          const o = vis(t, S.prob);
+          const at = (s) => after(t, S.prob, s, o);
+          txt(640, 126, "שתי הצעות, שני תמהילים", 40, { w: 700, o });
+          // Bank A: three tracks (fixed 40%, prime 40%, linked 20%); bank C: two (fixed 1/3, prime 2/3).
+          const cards = [
+            { x: 690, name: "בנק א׳", parts: [[0.4, KC.fixed, "קבועה"], [0.4, KC.prime, "פריים"], [0.2, KC.linked, "צמודה"]], first: V.aFirst, rate: V.aRate, from: 1 },
+            { x: 150, name: "בנק ג׳", parts: [[1 / 3, KC.fixed, "קבועה"], [2 / 3, KC.prime, "פריים"]], first: V.cFirst, rate: V.cRate, from: 8 },
+          ];
+          for (const c of cards) {
+            const oc = at(c.from);
+            box(c.x, 170, 440, 280, oc);
+            txt(c.x + 220, 212, c.name, 28, { w: 700, o: oc });
+            basketBar(c.x + 20, 236, 400, c.parts, oc);
+            txt(c.x + 220, 346, `החזר ראשון: ${c.first} ₪`, 24, { o: at(c.from + 7), w: 600 });
+            txt(c.x + 220, 388, `עלות ממשית: ${c.rate}%`, 24, { o: at(c.from + 12), w: 600, fill: C.teal });
+          }
+          const ow = at(26);
+          box(250, 476, 780, 70, ow * 0.6, C.mint);
+          txt(640, 520, "מי זול יותר? אי אפשר לדעת: גם התמהילים שונים", 26, { w: 700, o: ow });
+        }
+        // Scene 3 — the three baskets
+        if (inScene(t, S.baskets)) {
+          const o = vis(t, S.baskets);
+          const at = (s) => after(t, S.baskets, s, o);
+          txt(640, 124, "שלושת הסלים האחידים", 42, { w: 700, o });
+          txt(640, 160, "כל בנק מציע אותם באותו הרכב · תעתיק של הצוות, לא נבדק מול ההוראה", 18, { fill: C.n600, o });
+          const rows = [
+            { y: 200, name: "סל 1", parts: [[1, KC.fixed, "קבועה לא צמודה"]], from: 1, amounts: [V.loan] },
+            { y: 310, name: "סל 2", parts: [[1 / 3, KC.fixed, "קבועה"], [1 / 3, KC.prime, "פריים"], [1 / 3, KC.linked, "משתנה צמודה"]], from: 11, amounts: [V.third, V.third, V.third] },
+            { y: 420, name: "סל 3", parts: [[0.5, KC.fixed, "קבועה לא צמודה"], [0.5, KC.prime, "פריים"]], from: 22, amounts: [V.half, V.half] },
+          ];
+          for (const r of rows) {
+            const or = at(r.from);
+            txt(1130, r.y + 46, r.name, 30, { anchor: "start", w: 700, o: or });
+            basketBar(220, r.y, 780, r.parts, or);
+            let cx = 1000;
+            r.parts.forEach(([fr], k) => {
+              const pw = 780 * fr;
+              txt(cx - pw / 2, r.y + 100, `${r.amounts[k]} ₪`, 18, { fill: C.n600, o: or, ltr: true });
+              cx -= pw;
+            });
+          }
+          txt(640, 560, `הלוואה של ${V.loan} ₪, ${V.years} שנה, תקופה אחת לכל המסלולים`, 20, { fill: C.n700, o: at(32) });
+        }
+        // Scene 4 — an exact third
+        if (inScene(t, S.exact)) {
+          const o = vis(t, S.exact);
+          const at = (s) => after(t, S.exact, s, o);
+          txt(640, 140, "שליש הוא בדיוק שליש", 44, { w: 700, o });
+          box(200, 200, 400, 180, at(1));
+          box(680, 200, 400, 180, at(2));
+          txt(880, 244, `סל 2 על ${V.loan} ₪`, 22, { fill: C.n600, o: at(2) });
+          eqn(880, 310, `${V.loan} ÷ 3 = ${V.third}`, 30, { o: at(3) });
+          txt(880, 356, "שלושה חלקים שלמים", 20, { fill: C.teal, w: 700, o: at(4) });
+          txt(400, 244, "לא 33%", 22, { fill: C.n600, o: at(8) });
+          eqn(400, 310, `${V.loan} × 33% = ${V.slip}`, 26, { o: at(9), fill: C.n600 });
+          txt(400, 356, `חסרים ${V.gap} ₪ בכל חלק`, 20, { fill: C.n600, w: 700, o: at(10) });
+          txt(640, 450, "מיליון ₪ לא מתחלק לשלישים שלמים", 24, { fill: C.n700, w: 600, o: at(13) });
+          txt(640, 490, "מה בנק עושה אז: לא כתוב בתעתיק. שאלה לאילון", 20, { fill: C.n600, o: at(16) });
+        }
+        // Scene 5 — what is in none
+        if (inScene(t, S.missing)) {
+          const o = vis(t, S.missing);
+          const at = (s) => after(t, S.missing, s, o);
+          txt(640, 150, "מה אין באף סל", 44, { w: 700, o });
+          box(390, 210, 500, 110, at(1), C.mint);
+          txt(640, 278, "קבועה צמודה", 44, { w: 700, o: at(1) });
+          txt(640, 372, "אילון (FK-H-031): ״פריים, קבועה צמודה, קבועה לא צמודה״", 22, { fill: C.n700, o: at(8) });
+          txt(640, 412, "התעתיק: קבועה לא צמודה · שלישים · חצי־חצי", 22, { fill: C.n700, o: at(10) });
+          txt(640, 470, "הקורס מלמד את התעתיק, והשאלה ברשימה לאילון", 22, { fill: C.teal, w: 700, o: at(13) });
+        }
+        // Scene 6 — banks × baskets
+        if (inScene(t, S.table)) {
+          const o = vis(t, S.table);
+          const at = (s) => after(t, S.table, s, o);
+          txt(640, 124, "אותו סכום, אותה תקופה, שלושה בנקים", 36, { w: 700, o });
+          txt(640, 160, "העלות הממשית של האשראי (ריביות והתחזית בדויות)", 20, { fill: C.n600, o });
+          const cols = [{ x: 790, k: "b1", label: "סל 1" }, { x: 580, k: "b2", label: "סל 2" }, { x: 370, k: "b3", label: "סל 3" }];
+          box(240, 190, 800, 300, at(1));
+          for (const c of cols) txt(c.x, 228, c.label, 24, { w: 700, fill: C.n600, o: at(1) });
+          const from = { b1: 8, b2: 18, b3: 28 };
+          bankIds.forEach((bk, i) => {
+            const y = 290 + i * 70;
+            txt(1010, y, bankNames[bk], 24, { anchor: "start", w: 600, o: at(2) });
+            for (const c of cols) {
+              const low = lowestNames[c.k].includes(bankNames[bk]);
+              const oc = at(from[c.k]);
+              if (low) box(c.x - 85, y - 36, 170, 56, oc * 0.7, C.mint);
+              txt(c.x, y, `${rate(bk, c.k)}%`, 28, { w: low ? 700 : 400, fill: low ? C.teal : C.navy, o: oc, ltr: true });
+            }
+          });
+        }
+        // Scene 7 — the proposed basket
+        if (inScene(t, S.proposed)) {
+          const o = vis(t, S.proposed);
+          const at = (s) => after(t, S.proposed, s, o);
+          txt(640, 150, "הסל המוצע", 44, { w: 700, o });
+          box(300, 210, 680, 210, at(1));
+          txt(640, 262, "התמהיל שהבנק בחר", 30, { w: 700, o: at(1) });
+          txt(640, 310, "מסלולים, חלוקה ותקופה לכל מסלול", 24, { fill: C.n700, o: at(5) });
+          txt(640, 370, "כאן בנקים נבדלים. לכן המחיר שלו לא ניתן להשוואה בין בנקים", 20, { fill: C.teal, w: 700, o: at(9) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 270, "שלושה סלים אחידים,", 44, { w: 700, o });
+          txt(640, 340, "אותו הרכב בכל בנק", 44, { w: 700, o: after(t, S.end, 2, o) });
+          txt(640, 410, "= מחיר שאפשר להשוות", 40, { w: 700, fill: C.teal, o: after(t, S.end, 5, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

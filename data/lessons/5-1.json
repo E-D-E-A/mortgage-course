@@ -1,0 +1,279 @@
+{
+  "lesson": "5.1",
+  "title": "מה כתוב באישור העקרוני",
+  "note": "A fictional pre-approval of בנק א׳ for דנה ויואב: invented rates, an invented forecast (not the Bank of Israel's), an invented opening fee as the up-front charge A (which charges count is an open legal question). Figures follow the team's transcription of Directive 451 section 4ג(ב4) and appendix 4 (Brain 7733250), not checked against the directive. Schedules follow the statement convention (agorot, the last payment closes the balance); the IRR is found by bisection (TypeScript) and by Newton's method (Python).",
+  "facts": [
+    {
+      "id": "data_date",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-16"
+    },
+    {
+      "id": "doc.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "1500000.00"
+    },
+    {
+      "id": "doc.loan",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "loan",
+        "decimals": 2
+      },
+      "value": "900000.00"
+    },
+    {
+      "id": "doc.fee",
+      "kind": "given",
+      "inputs": {},
+      "value": "360.00"
+    },
+    {
+      "id": "doc.received",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "received",
+        "decimals": 2
+      },
+      "value": "899640.00"
+    },
+    {
+      "id": "doc.issued",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-05"
+    },
+    {
+      "id": "clock.window",
+      "kind": "given",
+      "inputs": {},
+      "value": 24
+    },
+    {
+      "id": "clock.window_no_lien",
+      "kind": "given",
+      "inputs": {},
+      "value": 12
+    },
+    {
+      "id": "doc.valid_until",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-05",
+        "days": 24
+      },
+      "value": "2026-10-29"
+    },
+    {
+      "id": "doc.valid_until_no_lien",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-05",
+        "days": 12
+      },
+      "value": "2026-10-17"
+    },
+    {
+      "id": "doc.tracks",
+      "kind": "off_track_rows",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5"
+      },
+      "value": [
+        {
+          "kind": "fixed_unlinked",
+          "amount": "360000.00",
+          "months": 300,
+          "rate": "5.05",
+          "first": "2115.02"
+        },
+        {
+          "kind": "prime",
+          "amount": "360000.00",
+          "months": 300,
+          "rate": "4.45",
+          "first": "1990.79"
+        },
+        {
+          "kind": "fixed_linked",
+          "amount": "180000.00",
+          "months": 300,
+          "rate": "3.1",
+          "first": "864.75"
+        }
+      ]
+    },
+    {
+      "id": "doc.prime_path",
+      "kind": "off_rate_path",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "track": 1,
+        "count": 4
+      },
+      "value": [
+        "4.45",
+        "4.65",
+        "4.85",
+        "4.95"
+      ]
+    },
+    {
+      "id": "doc.first",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "first",
+        "decimals": 2
+      },
+      "value": "4970.56"
+    },
+    {
+      "id": "doc.highest",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "highest",
+        "decimals": 2
+      },
+      "value": "5807.89"
+    },
+    {
+      "id": "doc.highest_month",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "highest_month",
+        "decimals": 2
+      },
+      "value": 300
+    },
+    {
+      "id": "doc.total",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "total",
+        "decimals": 2
+      },
+      "value": "1617347.35"
+    },
+    {
+      "id": "doc.rate",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "rate",
+        "decimals": 2
+      },
+      "value": "5.22"
+    },
+    {
+      "id": "doc.rate_4",
+      "kind": "off_measure",
+      "inputs": {
+        "offer": "בנק א׳#2026-10#forecast_a#360.00#fixed_unlinked:360000.00:300:5.05;prime:360000.00:300:-0.55;fixed_linked:180000.00:300:3.10",
+        "forecasts": "forecast_a@@prime=5.00,5.20,5.40,5.50|vlinked=2.00,2.40,2.60|vunlinked=3.80,4.30,4.60|infl=2.5;;forecast_b@@prime=5.00,5.80,6.50,6.80|vlinked=2.00,3.00,3.50|vunlinked=3.80,5.00,5.60|infl=3.2;;forecast_c@@prime=5.10,5.30,5.50,5.60|vlinked=2.10,2.50,2.70|vunlinked=3.90,4.40,4.70|infl=2.5",
+        "measure": "rate",
+        "decimals": 4
+      },
+      "value": "5.2208"
+    },
+    {
+      "id": "doc.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "doc.highest",
+        "subtrahend": "doc.first"
+      },
+      "value": "837.33"
+    },
+    {
+      "id": "doc.above",
+      "kind": "met_percent_above",
+      "inputs": {
+        "value": "doc.highest",
+        "base": "doc.first",
+        "decimals": 1
+      },
+      "value": "16.8"
+    },
+    {
+      "id": "ex2.used",
+      "kind": "given",
+      "inputs": {},
+      "value": 9
+    },
+    {
+      "id": "ex2.answer",
+      "kind": "proc_days_left",
+      "inputs": {
+        "window": 24,
+        "used": 9
+      },
+      "value": 15
+    },
+    {
+      "id": "ex2.err_no_lien",
+      "kind": "proc_days_left",
+      "inputs": {
+        "window": 12,
+        "used": 9
+      },
+      "value": 3
+    },
+    {
+      "id": "ex2.err_next_day",
+      "kind": "proc_days_left",
+      "inputs": {
+        "window": 24,
+        "used": 10
+      },
+      "value": 14
+    },
+    {
+      "id": "ex4.highlight",
+      "kind": "given",
+      "inputs": {},
+      "value": 10
+    },
+    {
+      "id": "ex4.err_of_highest",
+      "kind": "met_share",
+      "inputs": {
+        "part": "doc.gap",
+        "whole": "doc.highest",
+        "decimals": 1
+      },
+      "value": "14.4"
+    },
+    {
+      "id": "ex6.second_issued",
+      "kind": "given",
+      "inputs": {},
+      "value": "2026-10-07"
+    },
+    {
+      "id": "ex6.second_until",
+      "kind": "proc_add_calendar_days",
+      "inputs": {
+        "start": "2026-10-07",
+        "days": 24
+      },
+      "value": "2026-10-31"
+    }
+  ]
+}

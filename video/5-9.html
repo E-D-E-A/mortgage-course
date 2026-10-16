@@ -1,0 +1,185 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.9 — "ארבע שאלות לפני שאומרים ״טוב״".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/5-9.json. Rates, averages and offers are the course's own (invented); the scene marks them "להמחשה".
+  The subtitle cues (window.cues) carry the explanatory sentences — the narration script.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.9 · האם התמהיל טוב?</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/5-9.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+
+      const V = {
+        nominal: fact("mini.nominal"), avg: fact("mini.avg"), eff: fact("mini.eff"), gapNom: fact("mini.gap_nom"), gapEff: fact("mini.gap_eff"),
+        xFirst: fact("x.first"), yFirst: fact("y.first"), yxFirst: fact("yx.first"), y360First: fact("y360.first"), y360FirstGap: fact("y360.first_gap"),
+        y360TotalGap: fact("y360.total_gap"), yxTotal: fact("yx.total"), loan: fact("x.loan"), term: fact("term.months"), term360: fact("term.long_months"),
+      };
+      const minus = (s) => String(s).replace("-", "−");
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+      const S = { title: [0, 10], four: [10, 62], flip: [62, 106], basis: [106, 150], end: [150, 164] };
+      window.duration = 164;
+      window.cues = [
+        [1, 6, "תמהיל טוב? טוב ביחס למה?"],
+        [6, 9.5, "ארבעה קני מידה, וכל אחד עם כלל משלו."],
+        [11, 22, "קנה מידה ראשון: היעדים של הלקוחות."],
+        [22, 34, "קנה מידה שני: הריבית הממוצעת של בנק ישראל."],
+        [34, 46, "קנה מידה שלישי: הסל האחיד של אותו בנק."],
+        [46, 58, "קנה מידה רביעי: הצעה של בנק אחר."],
+        [58, 62, "בכולם: קודם מוודאים שהבסיס זהה."],
+        [63, 74, `ריבית של ${V.nominal}% בחוזה, וממוצע של ${V.avg}%.`],
+        [74, 84, `נראה ${String(V.gapNom).replace("-", "")} נקודת אחוז לטובתכם.`],
+        [84, 96, `אבל ${V.nominal}% נומינלית הם ${V.eff}% אפקטיבית.`],
+        [96, 105, "אותו מספר, סימן הפוך: רק בגלל שיטה שונה."],
+        [107, 118, "אותו תמהיל אצל שני בנקים, על אותן 300 חודשים."],
+        [118, 130, `ההחזר הראשון נמוך ב־${shek(V.yxFirst)}: הפער אמיתי.`],
+        [130, 141, `אצל ב׳ על ${V.term360} חודשים ההחזר נמוך עוד יותר.`],
+        [141, 149, "אבל הסך גבוה בהרבה: זו שאלה אחרת."],
+        [151, 158, "טוב ביחס למה, על איזה בסיס, באיזה מדד."],
+        [158, 163, "ובכמה שקלים. ההמלצה מציגה גם את החיסרון."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "האם התמהיל טוב?", 84, { w: 700, o });
+          txt(640, 365, "טוב — ביחס למה?", 40, { fill: C.n600, o });
+          txt(640, 430, "המספרים בשיעור להמחשה, לא נתוני שוק", 24, { fill: C.n500, o: after(t, S.title, 5, o, 0.8) });
+        }
+        // Scene 2 — four yardsticks
+        if (inScene(t, S.four)) {
+          const o = vis(t, S.four);
+          txt(640, 96, "ארבעה קני מידה", 44, { w: 700, o });
+          const cards = [
+            { h: "יעדי הלקוח", s: "אותו תרחיש, אותה תקופה, אותו מדד", at: 1 },
+            { h: "הממוצע של בנק ישראל", s: "אותה שיטת ריבית, אותו חודש", at: 12 },
+            { h: "הסל האחיד", s: "אותו סכום, אותה תקופה, אותו בנק", at: 24 },
+            { h: "הצעה של בנק אחר", s: "אותם סכומים, אותו תאריך", at: 36 },
+          ];
+          cards.forEach((c, i) => {
+            const oi = after(t, S.four, c.at, o);
+            if (oi <= 0) return;
+            const col = i % 2, row = Math.floor(i / 2);
+            const x = 1230 - col * 600, y = 150 + row * 200;
+            el("rect", { x: x - 560, y, width: 560, height: 170, rx: 14, fill: C.n0, stroke: C.n200, "stroke-width": 2, opacity: oi });
+            el("rect", { x: x - 560, y, width: 14, height: 170, rx: 7, fill: C.teal, opacity: oi });
+            txt(x - 30, y + 62, c.h, 36, { anchor: "start", w: 700, o: oi });
+            txt(x - 30, y + 112, "חייב להיות זהה:", 22, { anchor: "start", fill: C.n600, o: oi });
+            txt(x - 30, y + 146, c.s, 24, { anchor: "start", fill: C.n700, o: oi });
+          });
+        }
+        // Scene 3 — the same offer against the same average, two conventions
+        if (inScene(t, S.flip)) {
+          const o = vis(t, S.flip);
+          txt(640, 96, "אותה הצעה, אותו ממוצע", 44, { w: 700, o });
+          const min = 11.7, max = 12.9, x0 = 220, x1 = 1060;
+          const X = (v) => x0 + ((Number(v) - min) / (max - min)) * (x1 - x0);
+          el("line", { x1: x0, x2: x1, y1: 330, y2: 330, stroke: C.n300, "stroke-width": 4, opacity: o });
+          // the average
+          const oa = after(t, S.flip, 1, o);
+          el("line", { x1: X(V.avg), x2: X(V.avg), y1: 250, y2: 410, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "8 6", opacity: oa });
+          txt(X(V.avg), 232, `ממוצע: ${V.avg}% (להמחשה)`, 26, { w: 700, o: oa });
+          // nominal
+          const on = after(t, S.flip, 11, o);
+          el("circle", { cx: X(V.nominal), cy: 330, r: 14, fill: C.teal, opacity: on });
+          txt(X(V.nominal), 392, `נומינלית ${V.nominal}%`, 26, { w: 700, o: on });
+          const og = after(t, S.flip, 14, o);
+          txt(X(V.nominal), 452, `${String(V.gapNom).replace("-", "")} נק׳ לטובתכם`, 28, { fill: C.success, w: 700, o: og });
+          // effective
+          const oe = after(t, S.flip, 23, o);
+          el("circle", { cx: X(V.eff), cy: 330, r: 14, fill: C.tq2, opacity: oe });
+          txt(X(V.eff), 392, `אפקטיבית ${V.eff}%`, 26, { w: 700, o: oe });
+          const oh = after(t, S.flip, 28, o);
+          txt(X(V.eff), 452, `${V.gapEff} נק׳ לרעתכם`, 28, { fill: C.danger, w: 700, o: oh });
+          txt(640, 560, "הפער הוא מידע רק כששני הצדדים נמדדו באותה שיטה", 30, { fill: C.n700, o: after(t, S.flip, 33, o) });
+        }
+        // Scene 4 — same basis, then a broken one
+        if (inScene(t, S.basis)) {
+          const o = vis(t, S.basis);
+          txt(640, 96, "אותו תמהיל, שני בנקים", 44, { w: 700, o });
+          const rowY = (i) => 210 + i * 110;
+          const oa = after(t, S.basis, 1, o);
+          txt(1190, rowY(0), "על אותן 300 חודשים", 28, { anchor: "start", w: 700, o: oa });
+          txt(1190, rowY(0) + 44, `בנק א׳ ${shek(V.xFirst)}   ·   בנק ב׳ ${shek(V.yFirst)}`, 26, { anchor: "start", fill: C.n700, o: oa });
+          const og = after(t, S.basis, 10, o);
+          el("rect", { x: 70, y: rowY(0) - 30, width: 280, height: 56, rx: 28, fill: C.successBg, opacity: og });
+          txt(210, rowY(0) + 8, `פער ${shek(V.yxFirst)}`, 26, { w: 700, o: og });
+          const ob = after(t, S.basis, 24, o);
+          txt(1190, rowY(1) + 40, `ב׳ על ${V.term360} חודשים`, 28, { anchor: "start", w: 700, o: ob });
+          txt(1190, rowY(1) + 84, `החזר ראשון ${shek(V.y360First)}: נמוך ב־${shek(V.y360FirstGap)}`, 26, { anchor: "start", fill: C.n700, o: ob });
+          const oc = after(t, S.basis, 32, o);
+          txt(1190, rowY(1) + 128, `אבל הסך גבוה ב־${shek(V.y360TotalGap)}`, 26, { anchor: "start", fill: C.n700, o: oc });
+          el("rect", { x: 70, y: rowY(1) + 56, width: 280, height: 56, rx: 28, fill: C.warningBg, opacity: oc });
+          txt(210, rowY(1) + 94, "בסיס שונה", 26, { w: 700, o: oc });
+        }
+        // Scene 5 — close
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 240, "ביחס למה? על איזה בסיס?", 56, { w: 700, o });
+          txt(640, 330, "באיזה מדד? ובכמה שקלים?", 44, { fill: C.n700, o: after(t, S.end, 1.5, o) });
+          txt(640, 470, "הריביות, הממוצעים וההצעות בשיעור הם של הקורס, להמחשה", 22, { fill: C.n500, o: after(t, S.end, 8, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

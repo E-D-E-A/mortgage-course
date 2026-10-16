@@ -1,0 +1,311 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.1 — "קוראים אישור עקרוני".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/5-1.json. The subtitle cues (window.cues)
+  carry the explanatory sentences — the script for narration, if it is ever added.
+
+  Script (one idea: the numbers on an example pre-approval are of three kinds — set in the
+  contract, forecast, and given by the borrowers and not yet checked):
+  1. Title; an example document of a fictional "בנק א׳", numbers for illustration.
+  2. The document track by track: the fixed rate is the contract's, the prime rate is
+     "as of the day of issue", the linked track's payment rises with the index; the first
+     payment of the mix.
+  3. The prime rate after day one is a forecast (illustrative path, not the Bank of Israel's).
+  4. The first payment against the highest expected payment: a forecast, not a ceiling.
+  5. The total of the expected payments and the expected total rate (the actual cost of the
+     credit of 3.10), computed on what the borrowers actually received.
+  6. The validity: at least 24 calendar days (the team's transcription, not checked).
+  7. What is missing until the loan is advanced: documents, appraisal, underwriting,
+     signing, a caution note, drawdown.
+  8. Takeaway: three kinds of numbers.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.1 · מה כתוב באישור העקרוני</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+        <script type="module">
+      const data = await (await fetch("/data/lessons/5-1.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      const dm = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+
+      const tr = fact("doc.tracks");
+      const path = fact("doc.prime_path");
+      const kindHe = { fixed_unlinked: "קבועה לא צמודה", prime: "משתנה פריים", fixed_linked: "קבועה צמודה" };
+      const V = {
+        loan: num(fact("doc.loan")),
+        first: num(fact("doc.first")),
+        highest: num(fact("doc.highest")),
+        month: String(fact("doc.highest_month")),
+        above: pl(fact("doc.above")),
+        total: num(fact("doc.total")),
+        rate: pl(fact("doc.rate")),
+        received: num(fact("doc.received")),
+        fee: num(fact("doc.fee")),
+        issued: dm(fact("doc.issued")),
+        until: dm(fact("doc.valid_until")),
+        days: String(fact("clock.window")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 10], doc: [10, 52], path: [52, 80], pay: [80, 118], total: [118, 146], window: [146, 170], todo: [170, 198], end: [198, 210] };
+      window.duration = 210;
+      window.cues = [
+        [1, 5, "קוראים אישור עקרוני"],
+        [5, 9.5, "דוגמה לימודית: בנק א׳, דנה ויואב, מספרים להמחשה."],
+        [11, 18, `דנה ויואב ביקשו ${V.loan} ₪. בנק א׳ הציע שלושה מסלולים.`],
+        [18, 26, `במסלול הקבוע: ${tr[0].rate}%. זו ריבית של החוזה.`],
+        [26, 35, `במסלול הפריים: ${tr[1].rate}%, אבל רק ליום שהאישור ניתן.`],
+        [35, 43, `במסלול הצמוד: ${tr[2].rate}%, והתשלום עולה כשהמדד עולה.`],
+        [43, 51, "לכל מסלול יש תשלום ראשון, ויחד הם ההחזר הראשון."],
+        [53, 60, "הריבית של הפריים אחרי היום הראשון היא תחזית."],
+        [60, 68, "בתחזית של הדוגמה העוגן עולה, שנה אחר שנה."],
+        [68, 79, "החוזה לא משתנה. התחזית כן, ואיתה כל מה שנשען עליה."],
+        [81, 88, `ההחזר הראשון: ${V.first} ₪. זה החודש הראשון.`],
+        [88, 96, `ההחזר הגבוה ביותר הצפוי: ${V.highest} ₪, בחודש ${V.month}.`],
+        [96, 105, `גבוה ב־${V.above}% מהראשון. זו תחזית אחת, לא תקרה.`],
+        [105, 117, "תחזית אחרת תיתן מספר אחר. הבנק לא מתחייב לו."],
+        [119, 126, `סך התשלומים הצפוי: ${V.total} ₪, סכום כל התשלומים החזויים.`],
+        [126, 135, `הריבית הכוללת החזויה: ${V.rate}% לשנה.`],
+        [135, 145, `היא מחושבת על ${V.received} ₪, כי ${V.fee} ₪ נגבים בהעמדה.`],
+        [147, 154, `האישור ניתן ב־${V.issued}. הבנק מחזיק בתנאים ${V.days} יום לפחות.`],
+        [154, 162, `כלומר עד ${V.until}. ימים רגילים, לא ימי עסקים.`],
+        [162, 169, "אחרי החלון הבנק כבר לא חייב. אפשר לקבל יותר, לא פחות."],
+        [171, 178, "האישור הוא מחיר, לא הלוואה. עוד לא נבדק כלום."],
+        [178, 186, "קודם מסמכים ושמאות, ואז חיתום."],
+        [186, 192, "אחר כך חתימה והערת אזהרה."],
+        [192, 197, "ורק בסוף העמדה: הכסף עובר."],
+        [199, 204, "שלושה סוגי מספרים בדף: נקבע בחוזה, חזוי,"],
+        [204, 209, "ונמסר על ידכם ועוד לא נבדק."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // Visible only between two moments of a scene.
+      const during = (t, sc, s, e, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6), clamp((sc[0] + e - t) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      // An equation, left to right. Parts are strings, or [base, exponent] pairs.
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "קוראים", 72, { w: 700, o });
+          txt(640, 360, "אישור עקרוני", 72, { w: 700, o });
+          txt(640, 420, "בנק א׳ · דנה ויואב · דוגמה לימודית", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — the document, track by track
+        if (inScene(t, S.doc)) {
+          const o = vis(t, S.doc);
+          const at = (s) => after(t, S.doc, s, o);
+          box(150, 110, 980, 440, o);
+          txt(1100, 156, "בנק א׳ · אישור עקרוני להלוואה לדיור", 28, { anchor: "start", w: 700, o });
+          txt(1100, 188, `ניתן ב־${V.issued} · ביקשו ${V.loan} ₪ · 25 שנה`, 20, { anchor: "start", fill: C.n600, o });
+          const cols = [{ x: 1100, label: "המסלול" }, { x: 760, label: "הסכום" }, { x: 560, label: "הריבית באישור" }, { x: 240, label: "תשלום ראשון" }];
+          for (const c of cols) txt(c.x, 232, c.label, 17, { anchor: c.x === 760 || c.x === 240 ? "end" : "start", fill: C.n600, w: 600, o: at(1) });
+          el("line", { x1: 170, x2: 1110, y1: 246, y2: 246, stroke: C.n200, "stroke-width": 1, opacity: at(1) });
+          const notes = ["חוזה", "ליום האישור בלבד", "צמודה: התשלום עולה"];
+          const start = [7, 15, 24];
+          tr.forEach((r, i) => {
+            const y = 296 + i * 70;
+            const or = at(start[i]);
+            if (i === 1) box(160, y - 36, 960, 62, or * 0.35, C.mint);
+            txt(1100, y, kindHe[r.kind], 24, { anchor: "start", w: 600, o: or });
+            txt(760, y, `${num(r.amount)} ₪`, 24, { anchor: "end", o: or, ltr: true });
+            txt(560, y, `${pl(r.rate)}%`, 28, { anchor: "start", w: 700, fill: C.teal, o: or, ltr: true });
+            txt(240, y, `${num(r.first)} ₪`, 24, { anchor: "end", o: or, ltr: true });
+            txt(560, y + 26, notes[i], 16, { anchor: "start", fill: C.n600, o: or });
+          });
+          const ot = at(33);
+          el("line", { x1: 170, x2: 1110, y1: 478, y2: 478, stroke: C.n200, "stroke-width": 1, opacity: ot });
+          txt(1100, 516, "ההחזר הראשון: כל המסלולים יחד", 22, { anchor: "start", w: 600, o: ot });
+          txt(240, 516, `${V.first} ₪`, 28, { anchor: "end", w: 700, o: ot, ltr: true });
+        }
+        // Scene 3 — the prime rate after day one: a forecast
+        if (inScene(t, S.path)) {
+          const o = vis(t, S.path);
+          const at = (s) => after(t, S.path, s, o);
+          txt(640, 132, "ריבית הפריים: היום, ואחר כך", 40, { w: 700, o });
+          txt(640, 170, "תחזית להמחשה, לא של בנק ישראל", 20, { fill: C.n600, o });
+          const lo = 4.3, hi = 5.05;
+          const H = (v) => ((Number(v) - lo) / (hi - lo)) * 230;
+          path.forEach((r, i) => {
+            const x = 960 - i * 210;
+            const h = H(r);
+            const op = at(1 + i * 2.4);
+            el("rect", { x: x - 55, y: 470 - h, width: 110, height: h, rx: 8, fill: i === 0 ? C.navy : C.teal, opacity: op });
+            txt(x, 458 - h, `${pl(r)}%`, 26, { w: 700, o: op, ltr: true });
+            txt(x, 506, i === 0 ? "יום האישור" : i === path.length - 1 ? `שנה ${i + 1} ואילך` : `שנה ${i + 1}`, 20, { fill: C.n600, o: op });
+          });
+          txt(640, 548, "הציר האנכי לא מתחיל באפס", 15, { fill: C.n600, o });
+          txt(640, 198, "נקבע בחוזה: המרווח. חזוי: העוגן, ולכן כל התשלומים", 20, { fill: C.teal, w: 700, o: at(14) });
+        }
+        // Scene 4 — first and highest
+        if (inScene(t, S.pay)) {
+          const o = vis(t, S.pay);
+          const at = (s) => after(t, S.pay, s, o);
+          txt(640, 132, "שני החזרים באישור", 40, { w: 700, o });
+          const a = Number(fact("doc.first")), b = Number(fact("doc.highest"));
+          const lo = 4400;
+          const W = (v) => ((v - lo) / (b + 100 - lo)) * 620;
+          const bars = [
+            { y: 214, label: "ההחזר הראשון", sub: "חודש 1", v: V.first, w: W(a), fill: C.navy, from: 1 },
+            { y: 330, label: "ההחזר הגבוה ביותר הצפוי", sub: `חודש ${V.month}, לפי התחזית`, v: V.highest, w: W(b), fill: C.teal, from: 8 },
+          ];
+          for (const r of bars) {
+            const op = at(r.from);
+            txt(1100, r.y + 20, r.label, 24, { anchor: "start", w: 600, o: op });
+            txt(1100, r.y + 50, r.sub, 18, { anchor: "start", fill: C.n600, o: op });
+            el("rect", { x: 1100 - 340 - r.w, y: r.y + 66, width: r.w, height: 34, rx: 6, fill: r.fill, opacity: op });
+            txt(1100 - 346 - r.w, r.y + 92, `${r.v} ₪`, 26, { anchor: "end", w: 700, o: op, ltr: true });
+          }
+          const ob = at(20);
+          box(300, 440, 680, 90, ob * 0.6, C.mint);
+          txt(640, 480, `גבוה ב־${V.above}% מהראשון`, 28, { w: 700, o: ob });
+          txt(640, 512, "תחזית אחת, לא תקרה. בנק לא מתחייב לה.", 20, { fill: C.n700, o: at(26) });
+          txt(640, 560, "הציר לא מתחיל באפס", 15, { fill: C.n600, o });
+        }
+        // Scene 5 — the total, and the expected total rate
+        if (inScene(t, S.total)) {
+          const o = vis(t, S.total);
+          const at = (s) => after(t, S.total, s, o);
+          txt(640, 132, "מה עוד כתוב בדף", 40, { w: 700, o });
+          const cards = [
+            { x: 700, label: "סך התשלומים הצפוי", v: `${V.total} ₪`, from: 1, note: "סכום כל התשלומים החזויים" },
+            { x: 240, label: "ריבית כוללת חזויה", v: `${V.rate}%`, from: 8, note: "העלות הממשית של האשראי, לשנה" },
+          ];
+          for (const c of cards) {
+            const oc = at(c.from);
+            box(c.x, 180, 340, 170, oc);
+            txt(c.x + 170, 222, c.label, 22, { fill: C.n600, o: oc });
+            txt(c.x + 170, 288, c.v, 44, { w: 700, o: oc, ltr: true });
+            txt(c.x + 170, 328, c.note, 17, { fill: C.n600, o: oc });
+          }
+          const ow = at(15);
+          box(240, 392, 800, 110, ow * 0.6, C.mint);
+          txt(640, 436, `מחושבת על מה שקיבלו בפועל: ${V.received} ₪`, 24, { w: 600, o: ow });
+          txt(640, 474, `העמלה, ${V.fee} ₪, נגבית ביום ההעמדה`, 20, { fill: C.n700, o: ow });
+          txt(640, 540, "אילו עמלות נכנסות לחישוב: שאלה משפטית פתוחה", 17, { fill: C.n600, o: at(21) });
+        }
+        // Scene 6 — the window
+        if (inScene(t, S.window)) {
+          const o = vis(t, S.window);
+          const at = (s) => after(t, S.window, s, o);
+          txt(640, 132, "תוקף האישור", 40, { w: 700, o });
+          el("rect", { x: 200, y: 260, width: 880, height: 40, rx: 8, fill: C.n100, opacity: o });
+          el("rect", { x: 200 + 880 * (1 - Math.min(1, ease((t - S.window[0] - 3) / 8))), y: 260, width: 880 * Math.min(1, ease((t - S.window[0] - 3) / 8)), height: 40, rx: 8, fill: C.teal, opacity: at(3) });
+          txt(1080, 330, `ניתן: ${V.issued}`, 22, { anchor: "start", w: 600, o: at(3) });
+          txt(200, 330, `עד ${V.until} לפחות`, 22, { anchor: "end", w: 600, o: at(9) });
+          txt(640, 290, `${V.days} ימים`, 26, { w: 700, fill: C.n0, o: at(10) });
+          txt(640, 410, "ימים רגילים: שבתות וחגים נספרים", 22, { fill: C.n700, o: at(13) });
+          txt(640, 450, "בלי שעבוד חדש: 12 יום", 22, { fill: C.n700, o: at(16) });
+        }
+        // Scene 7 — what is still missing
+        if (inScene(t, S.todo)) {
+          const o = vis(t, S.todo);
+          const at = (s) => after(t, S.todo, s, o);
+          txt(640, 132, "ומה עוד חסר עד שהכסף מגיע", 40, { w: 700, o });
+          txt(640, 172, "בדף יש מחיר, עוד לא הלוואה", 22, { fill: C.n600, o: at(1) });
+          const steps = ["מסמכים", "שמאות", "חיתום", "חתימה", "הערת אזהרה", "העמדה"];
+          const from = [6, 9, 12, 15, 17, 21];
+          steps.forEach((s, i) => {
+            const x = 1090 - i * 170;
+            const op = at(from[i]);
+            box(x - 70, 270, 140, 90, op, i === steps.length - 1 ? C.mint : C.n0);
+            txt(x, 322, s, i === 4 ? 20 : 24, { w: 700, o: op });
+            if (i < steps.length - 1) txt(x - 85, 322, "◂", 24, { fill: C.n600, o: op });
+          });
+          txt(640, 430, "כל צעד יכול לשנות מספר שבדף", 24, { fill: C.teal, w: 700, o: at(8) });
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "שלושה סוגי מספרים באישור", 40, { w: 600, fill: C.n700, o });
+          const kinds = ["נקבע בחוזה", "חזוי", "נמסר, ועוד לא נבדק"];
+          kinds.forEach((k, i) => txt(640, 330 + i * 60, k, 40, { w: 700, fill: i === 1 ? C.teal : C.navy, o: after(t, S.end, 1 + i * 1.5, o) }));
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

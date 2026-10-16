@@ -1,0 +1,626 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.8"
+minutes: 60
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import MixBuilder from "../../components/MixBuilder.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { INITIAL_MIX, KIND_NAME_HE, SCENARIOS, SCENARIO_NAME_HE, builderTracks, candidate } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.8");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const pc = (v) => `${v}%`;
+export const delta = (id) => { const v = f.raw(id); return `${Number(v) > 0 ? "+" : ""}${formatShekels(v)}`; };
+export const money = (id) => formatShekels(f.raw(id));
+export const sc = SCENARIOS;
+export const ALTS = [
+  { id: "linked", letter: "א׳", goal: "החזר נמוך", name: "צמוד" },
+  { id: "short", letter: "ב׳", goal: "סך תשלומים נמוך", name: "25 שנה" },
+  { id: "fixed", letter: "ג׳", goal: "יציבות", name: "קבועה בלבד" },
+];
+export const ALL = [{ id: "initial", letter: "", goal: "", name: "הראשוני" }, ...ALTS];
+export const nTracks = { initial: 3, linked: 2, short: 2, fixed: 1 };
+export const kindsOf = (id) => (id === "initial" ? INITIAL_MIX : candidate(id).tracks).map((t) => KIND_NAME_HE[t.kind]);
+export const builderStart = builderTracks(candidate("short").tracks);
+export const predictionOptions = [
+  "חלופה א׳: החזר נמוך (צמוד)",
+  "חלופה ב׳: סך תשלומים נמוך (25 שנה)",
+  "חלופה ג׳: יציבה (קבועה בלבד)",
+  "שלושתן בערך אותו דבר: אחרי 10 שנים נשאר כמעט אותו חוב",
+];
+export const balMonths = [60, 84, 120, 180];
+export const ltvRoom = f.rows("alt.initial.check").find((r) => r.id === "ltv").room;
+export const halfRows = [
+  { period: "5 שנים", balance: f.raw("alt.short.bal.60"), repaid: f.raw("alt.short.principal_60") },
+  { period: "10 שנים", balance: f.raw("alt.short.bal.120"), repaid: f.raw("alt.short.principal_120") },
+  { period: "15 שנים", balance: f.raw("alt.short.bal.180"), repaid: f.raw("alt.short.principal_180") },
+];
+
+בשיעורים הקודמים למדתם מה שלושת היעדים של תמהיל (5.6) ומה זז כשמזיזים ידית אחת (5.7). בסדנה הזו תחברו הכול על התיק המרכזי של הקורס: נועם ושירה. תבנו **שלוש חלופות**, אחת לכל יעד, ותבדקו כל אחת לאורך זמן, בכמה תרחישים ומול הגבולות של <Term t="הוראה 329" lesson="4.4">הוראה 329</Term>.
+
+<Callout title="מה הסדנה הזו לא אומרת">
+<p><strong>{MARK}</strong></p>
+<p>לנועם ושירה אין הצעות של בנקים: את אלה בוחנים בשלב 6. אחוזי הריבית כאן הם רשימת המחירים של הקורס, אותה רשימה לכל החלופות, כדי שאפשר יהיה להשוות. בשוק, כשמשנים תמהיל הבנק יכול לשנות את הריביות (ידע מהשטח, FK-H-057, אילון, 2026-10-08; ממתין לאישור אילון), ולכן הצעה אמיתית עשויה לשנות את הסדר בין החלופות. שלושת היעדים הם תכנון של Mogi (J-090), לא עובדה על השוק. וגם: הקורס לא קובע מה נועם ושירה צריכים: תקציב המחיה שלהם ומה שחשוב להם אינם נתונים של התיק.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.8"
+  question={`נועם ושירה לוקחים הלוואה של ${f.whole("a.loan")} בשלוש חלופות: אחת עם החזר ראשון נמוך (צמוד), אחת עם סך תשלומים נמוך (תקופה של 25 שנה), ואחת יציבה (קבועה לא צמודה בלבד). אחרי 10 שנים הם מוכרים את הדירה. באיזו חלופה הם עדיין חייבים הכי הרבה לבנק?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלוש חלופות לתיק המרכזי
+
+</Section>
+
+<LessonVideo lesson="5-8" />
+
+<Section kind="הסדנה">
+
+## מה תצאו איתו
+
+</Section>
+
+התוצר: **טבלת השוואה של שלוש חלופות, והמלצה מנומקת שמציגה גם את החסרונות שלה.** את הטבלה תבנו בארבעה חלקים, ובסוף תכתבו המלצה.
+
+**ארבעה כללים של הסדנה:**
+1. **אותה הלוואה, אותה רשימת מחירים ואותם תרחישים.** {f.shekels("a.loan")} בכל חלופה, ואותם שלושה תרחישים, כדי שההשוואה תהיה הוגנת. השוואה בין חלופות במספרים של תרחישים שונים היא לא השוואה (ראו חלק 2).
+2. **כל חלופה עוברת את האיסורים של 329.** חציית סף ההון (40%) לא פוסלת, אבל מסומנת.
+3. **שלוש חלופות מתוך מבחר קבוע.** הן המנצחות של שבעת התמהילים בשיעור 5.6. תמהיל טוב יותר ממנה יכול להיות מחוץ למבחר.
+4. **התוצאה היא הצעה לדיון, לא החלטה.** המשפחה מחליטה מה חשוב לה.
+
+### נקודת הפתיחה
+
+נועם ושירה, זוג שכירים בני 31 ו־30 ועם ילד, קונים דירה יד שנייה ב־{f.shekels("a.price")}. ההון העצמי שלהם {f.shekels("a.equity")}, ההלוואה {f.shekels("a.loan")} ושיעור המימון {f.plain("a.ltv")}%. הם מרוויחים נטו {f.shekels("a.recognised")} בחודש, וגם משלמים עוד {f.plain("a.car_months")} חודשים הלוואת רכב של {f.shekels("a.car")}. ההכנסה הפנויה לצורך יחס ההחזר היא {f.shekels("a.disposable")}.
+
+התמהיל הראשוני שלהם, מהשיעורים הקודמים: שלושה מסלולים ל־30 שנה בחלקים כמעט שווים, ויחס החזר של {f.plain("alt.initial.ratio")}%. ושלוש החלופות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">החלופה</th>
+        <th class="py-2 pe-3 text-start font-semibold">המסלולים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALL.map((a) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{a.letter ? `${a.letter}: ${a.goal}` : "הראשוני"}<br /><span class="text-caption font-normal text-n600">״{a.name}״</span></td>
+          <td class="py-2 pe-3">
+            {Array.from({ length: nTracks[a.id] }, (_, k) => (
+              <span class="block">{kindsOf(a.id)[k]}: <span class="ltr whitespace-nowrap">{money(`alt.${a.id}.amount_${k + 1}`)}</span>, <span class="ltr">{f.plain(`alt.${a.id}.rate_${k + 1}`)}%</span>, {f.plain(`alt.${a.id}.years_${k + 1}`)} שנה</span>
+            ))}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} אחוז הריבית בצמוד הוא לפני ההצמדה. המסלולים המשתנים מתעדכנים כל 5 שנים (הנחה של הקורס).</p>
+</div>
+
+<Section kind="חלק 1">
+
+## תקופות נפרדות
+
+</Section>
+
+לכל מסלול יכולה להיות תקופה משלו (החלטה של Mogi, אילון, 2026-08-03; שיעור 3.7). חלופה ב׳ היא שני מסלולים לא צמודים ל־25 שנה כל אחד. מה קורה כשנותנים להם תקופות שונות? שלוש אפשרויות, תמיד על אותו סכום (משתנה {f.whole("alt.short.amount_1")}, קבועה {f.whole("alt.short.amount_2")}):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התקופות</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">יתרה אחרי 10 שנים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["a", "b", "c"].map((v) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">קבועה <span class="ltr">{f.plain(`term.${v}.fixed_years`)}</span> שנה, משתנה <span class="ltr">{f.plain(`term.${v}.var_years`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(`term.${v}.ratio`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.bal.120`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס.</p>
+</div>
+
+- **התקופה הקבועה קצרה, המשתנה ארוכה (שורה שנייה):** ההחזר הראשון נמוך ב־{f.shekels("term.b_first_gap")} מהשורה הראשונה, וסך התשלומים גבוה ב־{f.shekels("term.b_total_gap")}.
+- **התקופה הקבועה ארוכה, המשתנה קצרה (שורה שלישית):** סך התשלומים נמוך ב־{f.shekels("term.c_total_gap")}, אבל ההחזר הראשון גבוה ב־{f.shekels("term.c_first_gap")}, ויחס ההחזר {f.plain("term.c.ratio")}% — כבר קרוב לגבול של 50%.
+
+אין שורה שמנצחת בשלושה מדדים. **תקופות נפרדות הן ידית נוספת, לא קסם:** הן מחליפות תשלום נמוך עכשיו בסך גבוה, או להפך, כמו כל ידית של שיעור 5.7.
+
+<Section kind="חלק 2">
+
+## שלושה תרחישים
+
+</Section>
+
+כל חלופה נבדקת בשלושה תרחישים להמחשה, לא תחזיות:
+- **{SCENARIO_NAME_HE.base}:** המדד עולה {sc.base.inflation}% בשנה, הפריים והעוגן לא זזים.
+- **{SCENARIO_NAME_HE.stress}:** המדד עולה {sc.stress.inflation}% בשנה, והפריים והעוגן (בכל נקודת עדכון) עולים ב־{sc.stress.primeShift} נקודות אחוז, הפריים מהשנה השנייה.
+- **{SCENARIO_NAME_HE.relief}:** המדד עולה {sc.relief.inflation}% בשנה, והפריים והעוגן יורדים בנקודת אחוז אחת.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התשלום הגבוה ביותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מקל</th>
+        <th class="py-2 pe-3 text-start font-semibold">בסיס</th>
+        <th class="py-2 pe-3 text-start font-semibold">מחמיר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALL.map((a) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.relief.max`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.max`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.max`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">סך התשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">מקל</th>
+        <th class="py-2 pe-3 text-start font-semibold">בסיס</th>
+        <th class="py-2 pe-3 text-start font-semibold">מחמיר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALL.map((a) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.relief.total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.total`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} שלושה תרחישים להמחשה, לא תחזיות.</p>
+</div>
+
+מה רואים:
+
+1. **הטווח של כל חלופה.** ב״קבועה בלבד״ שלושת התרחישים נותנים אותו מספר: הפער בסך בין מחמיר למקל הוא {f.shekels("cmp.fixed_swing")}. ב״25 שנה״ הוא {f.shekels("cmp.short_swing")}. ב״צמוד״ הוא {f.shekels("cmp.linked_swing")}. זו החשיפה של שיעור 5.6 על פני כל ההלוואה.
+2. **הסדר בין החלופות משתנה עם התרחיש.** בתרחיש מקל, ״צמוד״ זול מ״קבועה בלבד״ בסך התשלומים: {f.shekels("alt.linked.relief.total")} מול {f.shekels("alt.fixed.relief.total")}. בבסיס ובמחמיר הסדר הפוך. מי שבחר לפי תרחיש אחד בחר לפי הנחה על העתיד.
+3. **אסור להשוות בין תרחישים.** ״{ALTS[1].name}״ בתרחיש מקל, {f.shekels("alt.short.relief.total")}, מול ״{ALTS[2].name}״ בתרחיש מחמיר, {f.shekels("alt.fixed.stress.total")}: ההפרש, {f.shekels("cmp.err_mixed")}, אינו מחיר של שום דבר. הוא תערובת של הבדל בין התמהילים והבדל בין התרחישים. משווים רק באותו תרחיש, ועל אותה הלוואה (כפי שמלמד שיעור 5.3).
+
+<Section kind="חלק 3">
+
+## יתרת חוב בנקודות זמן
+
+</Section>
+
+<Term t="יתרת חוב" lesson="2.11">יתרת החוב</Term> היא מה שעוד חייבים אחרי תשלום מסוים. היא חשובה ברגע שאפשר לשנות את התוכנית: מוכרים את הדירה, מקבלים כסף ורוצים לפרוע, או מחזרים. נועם ושירה אולי יעברו דירה אחרי 7 שנים; לכן בודקים את היתרה לא רק בסוף ההלוואה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">יתרת החוב</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחרי 5 שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחרי 7</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחרי 10</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחרי 15</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALL.map((a) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          {balMonths.map((m) => (<td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.bal.${m}`)}</span></td>))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס. יתרה: מה שעוד חייבים אחרי התשלום של אותו חודש; במסלול צמוד היא כוללת את הפרשי ההצמדה.</p>
+</div>
+
+- **״צמוד״ כמעט לא מקטין את החוב בהתחלה.** אחרי 5 שנים נשארו {f.shekels("alt.linked.bal.60")} מתוך {f.shekels("a.loan")}: הצמדה מוסיפה לחוב כמעט כמו התשלומים שמורידים ממנו. אחרי 10 שנים הוא עדיין {f.shekels("alt.linked.bal.120")}: נפרעו רק {f.shekels("alt.linked.principal_120")}, מול {f.shekels("alt.short.principal_120")} ב״{ALTS[1].name}״.
+- **״{ALTS[1].name}״ מקטינה את החוב הכי מהר,** והיא נפרעת לגמרי אחרי 25 שנים. אחרי 10 שנים יתרתה {f.shekels("alt.short.bal.120")}.
+- **״{ALTS[2].name}״ והראשוני כמעט זהות:** {f.shekels("alt.fixed.bal.120")} מול {f.shekels("alt.initial.bal.120")} אחרי 10 שנים.
+
+<Section kind="חלק 4">
+
+## הגבולות והטבלה
+
+</Section>
+
+עכשיו כל חלופה מול חמשת הקווים של הוראה 329 כפי שהצוות תעתק אותה (לא אומת; שיעור 4.4). יחס ההחזר נמדד על התשלום הראשון של כל מסלול על הסכומו, בלי הצמדה, מול ההכנסה הפנויה, {f.shekels("a.disposable")}:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">החלופה</th>
+        <th class="py-2 pe-3 text-start font-semibold">שיעור מימון (עד 75%)</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר (עד 50%)</th>
+        <th class="py-2 pe-3 text-start font-semibold">מעל 40%?</th>
+        <th class="py-2 pe-3 text-start font-semibold">משתנה (עד שני שלישים)</th>
+        <th class="py-2 pe-3 text-start font-semibold">תקופה (עד 360)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALL.map((a) => {
+        const rows = Object.fromEntries(f.rows(`alt.${a.id}.check`).map((r) => [r.id, r]));
+        return (
+          <tr class="border-b border-n100">
+            <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+            <td class="py-2 pe-3"><span class="ltr">{pc(rows.ltv.actual)}</span></td>
+            <td class="py-2 pe-3"><span class="ltr">{pc(rows.pti.actual)}</span></td>
+            <td class="py-2 pe-3">{rows.capital.status === "above" ? "כן" : "לא"}</td>
+            <td class="py-2 pe-3"><span class="ltr">{pc(rows.variable.actual)}</span></td>
+            <td class="py-2 pe-3"><span class="ltr">{rows.term.actual}</span></td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">הגבולות לפי תעתיק הצוות של הוראה 329 (לא אומת). שלוש החלופות עוברות את כל האיסורים. מעל 40% אינו איסור: הוא סף הון, שמשפיע על המחיר (לא אומת).</p>
+</div>
+
+שלוש החלופות עוברות. שתיים מהן, ״{ALTS[1].name}״ ו״{ALTS[2].name}״, וגם הראשוני, חוצות את סף ההון: {f.plain("alt.short.ratio")}%, {f.plain("alt.fixed.ratio")}% ו־{f.plain("alt.initial.ratio")}%. הקורס לא יודע איך בנק מתמחר את זה: **שאלה פתוחה לאילון**, ומשפיעה על הסדר בין החלופות בשלב 6. ״{ALTS[0].name}״ נמצאת מתחת ל־40%, עם {f.plain("alt.linked.ratio")}%.
+
+ועוד נקודה: בכל החלופות שיעור המימון זהה, {f.plain("a.ltv")}%, והמרווח עד התקרה של 75% הוא {formatShekels(ltvRoom)} בלבד.
+
+הנה הטבלה המלאה, שהיא תוצר השלב. לצד כל מספר כתוב ההפרש מהתמהיל הראשוני:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">החלופה</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר במחמיר</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">חוב אחרי 10 שנים</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 text-n700">
+        <td class="py-2 pe-3 font-semibold">הראשוני</td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.base.first")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.stress.max")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.base.total")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.bal.120")}</span></td>
+        <td class="py-2 pe-3"><span class="ltr">{pc(f.plain("alt.initial.ratio"))}</span></td>
+      </tr>
+      {ALTS.map((a) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{a.letter} ״{a.name}״<br /><span class="text-caption font-normal text-n600">{a.goal}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.first`)}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.max`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.total`)}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.bal.120`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(`alt.${a.id}.ratio`))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש בסיס, חוץ מהעמודה ״הגבוה ביותר במחמיר״. מבחר קבוע של שבעה תמהילים; הרשימה כולה בשיעור 5.6.</p>
+</div>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## בונים את החלופות
+
+</Section>
+
+הבונה מתחיל מחלופה ב׳, ״{ALTS[1].name}״. הוא נותן את ההחזר הראשון, את התשלום הגבוה ביותר בתרחיש ואת הסך; את היתרה בנקודות זמן ואת הגבולות אתם לוקחים מהטבלאות למעלה.
+
+<MixBuilder
+  client:visible
+  loan={1640000}
+  tracks={builderStart}
+  scenario={{ inflation: Number(sc.base.inflation), primeShift: Number(sc.base.primeShift), primeFromYear: 2, anchorShift: Number(sc.base.anchorShift) }}
+  amountStep={1000}
+  labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
+/>
+
+נסו את שלוש אלה:
+1. **בנו את חלופה א׳.** שנו את מסלול 1 ל״משתנה צמודה״, {f.plain("alt.linked.rate_1")}%, ואת מסלול 2 ל״קבועה צמודה״, {f.plain("alt.linked.rate_2")}%, ושתי התקופות ל־30 שנה. הסכומים: {f.whole("alt.linked.amount_1")} ו־{f.whole("alt.linked.amount_2")}. השוו את שלושת המספרים לטבלה.
+2. **בנו את חלופה ג׳.** מסלול אחד, ״קבועה לא צמודה״, {f.plain("alt.fixed.rate_1")}%, 30 שנה. (הסירו את המסלולים האחרים.)
+3. **תקופות נפרדות.** חזרו לחלופה ב׳ והעלו את המשתנה ל־30 שנה ואת הקבועה הורידו ל־20. השוו את השורה השנייה בחלק 1.
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>חלופה א׳: החזר ראשון {f.shekels("alt.linked.base.first")}, התשלום הגבוה ביותר {f.shekels("alt.linked.base.max")} (בחודש {f.plain("alt.linked.base.max_month")}) וסך תשלומים {f.shekels("alt.linked.base.total")}.</li>
+    <li>חלופה ג׳: {f.shekels("alt.fixed.base.first")} בכל חודש, והסך {f.shekels("alt.fixed.base.total")}. שינוי של המדד או הפריים לא זז כלום.</li>
+    <li>ההחזר הראשון {f.shekels("term.b.first")} והסך {f.shekels("term.b.total")}: {delta("term.b_first_gap")} פחות בחודש מהשורה הראשונה, וסך גבוה ב־{f.shekels("term.b_total_gap")}.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="5.8"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    `לא: ״${ALTS[1].name}״ היא החלופה עם החוב הנמוך ביותר אחרי 10 שנים, ${money("alt.short.bal.120")}. תקופה קצרה פורעת מהר.`,
+    `היא קרובה לראשוני, ${money("alt.initial.bal.120")}, אבל לא החלופה עם החוב הגבוה: אחרי 10 שנים ${money("alt.fixed.bal.120")}.`,
+    `לא: הפער בין החלופות גדול. אחרי 10 שנים החוב נע בין ${money("alt.short.bal.120")} ל־${money("alt.linked.bal.120")}.`,
+  ]}
+>
+  אחרי 10 שנים נשאר חוב של {f.shekels("alt.linked.bal.120")} ב״{ALTS[0].name}״, גבוה מכל חלופה אחרת. ההחזר הנמוך הוא גם החוב הנמוך בתשלום, אבל לא החוב הנמוך בקרן: ההצמדה מוסיפה לחוב כמעט כמו התשלומים שמורידים ממנו, ולכן כמעט לא נפרעת קרן. מי שחושב ש״תשלום נמוך = חוב נמוך״ מתבלבל בין כמה משלמים לכמה חייבים.
+</PredictionReveal>
+
+<Section kind="ההמלצה">
+
+## איך כותבים המלצה שמציגה גם את החסרונות
+
+</Section>
+
+אין חלופה אחת שנכונה לכל משפחה, והקורס לא יודע מה נועם ושירה היו בוחרים. אבל אפשר לכתוב **המלצה מותנית**: מה כל חלופה נותנת, למי היא מתאימה, ומה המחיר. לכל חלופה בטבלה שלוש הפסקאות האלה:
+
+<div class="my-6 grid gap-4 sm:grid-cols-3">
+  {ALTS.map((a) => (
+    <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+      <p class="!mt-0 text-body-l font-semibold text-n900">{a.letter} ״{a.name}״: {a.goal}</p>
+      <p class="mt-2 text-body-m text-n700">
+        {a.id === "linked" && "מתאימה למי שהחודשים הראשונים הם מה שחשוב, ומוכן לחשיפה."}
+        {a.id === "short" && "מתאימה למי שמוכן לתשלום גבוה יותר עכשיו, כדי לשלם פחות בסך הכול ולפרוע מהר."}
+        {a.id === "fixed" && "מתאימה למי שחשוב לו לדעת מראש מה ישלם."}
+      </p>
+      <p class="mt-2 text-body-m text-n700"><strong>המחיר:</strong>{" "}
+        {a.id === "linked" && <span>התשלום עולה לאורך השנים עד <span class="ltr whitespace-nowrap">{money("alt.linked.base.max")}</span> (ובמחמיר עד <span class="ltr whitespace-nowrap">{money("alt.linked.stress.max")}</span>); הסך גבוה ב־<span class="ltr whitespace-nowrap">{money("alt.linked.d_total")}</span> מהראשוני; אחרי 10 שנים החוב עדיין <span class="ltr whitespace-nowrap">{money("alt.linked.bal.120")}</span>.</span>}
+        {a.id === "short" && <span>החזר ראשון גבוה ב־<span class="ltr whitespace-nowrap">{money("alt.short.d_first")}</span> מהראשוני, יחס החזר <span class="ltr">{pc(f.plain("alt.short.ratio"))}</span> (מעל 40%, וסף ההון משפיע על המחיר, לא ידוע כמה).</span>}
+        {a.id === "fixed" && <span>החזר ראשון גבוה ב־<span class="ltr whitespace-nowrap">{money("alt.fixed.d_first")}</span> מהראשוני וסך גבוה ב־<span class="ltr whitespace-nowrap">{money("alt.fixed.d_total")}</span>, ויחס החזר <span class="ltr">{pc(f.plain("alt.fixed.ratio"))}</span>, מעל 40%.</span>}
+      </p>
+    </div>
+  ))}
+</div>
+
+ובכל המלצה צריך גם: **מה לא ידוע** (הריביות האמיתיות, תקציב המחיה, איך בנק מתמחר יחס החזר מעל 40%), ו**מה היה משנה את ההמלצה** (הצעה אחרת מבנק, שינוי בהכנסה, עיתוי מכירה).
+
+<Section kind="דוגמה פתורה">
+
+## חלופה ג׳, שורה אחר שורה
+
+</Section>
+
+נועם ושירה אמרו: ״אנחנו לא רוצים הפתעות, וחשוב לנו לדעת כמה נשלם כל חודש״. זו הנחה של הסדנה על מה שחשוב להם, לא נתון של התיק. נכתוב את ההמלצה ל״{ALTS[2].name}״:
+
+**צעד 1 — החזר ראשון.** {f.shekels("alt.fixed.base.first")} בכל חודש, והוא לא משתנה בשום תרחיש: בתרחיש מקל, בבסיס ובמחמיר. זה {f.shekels("alt.fixed.d_first")} יותר מהראשוני.
+
+**צעד 2 — חודשים 1–{f.plain("a.car_months")}.** בחודש הראשון נשארים להם לחיות אחרי כל התשלומים {f.shekels("alt.fixed.left_1")}, ובחודש 27, אחרי שהלוואת הרכב נגמרה, {f.shekels("alt.fixed.left_27")}. את התקציב שלהם הקורס לא יודע, ולכן לא קובע אם זה מספיק.
+
+**צעד 3 — סך ויתרה.** סך התשלומים {f.shekels("alt.fixed.base.total")}, {f.shekels("alt.fixed.d_total")} יותר מהראשוני וגבוה ב־{f.shekels("cmp.gap_same")} מ״{ALTS[1].name}״. אחרי 10 שנים החוב {f.shekels("alt.fixed.bal.120")}, אחרי 7 שנים {f.shekels("alt.fixed.bal.84")}.
+
+**צעד 4 — גבולות.** יחס החזר {f.plain("alt.fixed.ratio")}%: מעל סף ההון ומתחת ל־50%. אין חלק משתנה, ולכן יש מרווח מלא מול גבול שני השלישים. הוא עובר.
+
+**צעד 5 — ההמלצה.** ״אם חשוב לכם לדעת מראש מה תשלמו, אנחנו ממליצים על קבועה לא צמודה בלבד. החסרונות: החזר ראשון קצת גבוה מהתמהיל הראשוני, סך תשלומים גבוה יותר, ויחס החזר מעל 40%, שאולי יעלה את המחיר שהבנק מציע (לא ידוע). מה שלא יודעים: הריבית שבנק יציע לתמהיל כזה. מה היה משנה את ההמלצה: אם הבנק יציע קבועה יקרה יותר מרשימת המחירים כאן, הפער לטובת חלופות אחרות יגדל.״
+
+<Section kind="דוגמה חצי פתורה">
+
+## כמה כבר נפרע?
+
+</Section>
+
+חלופה ב׳, ״{ALTS[1].name}״: בכל נקודת זמן כתובה היתרה. השלימו כמה מההלוואה כבר נפרע, בשקלים: ההלוואה, {f.shekels("a.loan")}, פחות היתרה. השורה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="5.8-half"
+  periodLabel="אחרי"
+  columns={[
+    { key: "balance", label: "יתרה" },
+    { key: "repaid", label: "נפרע עד עכשיו" },
+  ]}
+  rows={halfRows}
+  blanks={["10 שנים.repaid", "15 שנים.repaid"]}
+  success={`נכון. אחרי 15 שנים נפרע יותר ממחצית ההלוואה: ${f.shekels("alt.short.principal_180")}. בחלופה א׳, אחרי אותן 15 שנים, נפרעו ${f.shekels("alt.linked.principal_180")}.`}
+  hint="ההלוואה פחות היתרה: 1,640,000 פחות היתרה בטבלה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והתרחישים בתרגילים הם הנחות של הקורס, לא נתוני שוק ולא הצעת בנק. התרגילים מסודרים מהקל אל המאתגר, וכולם נשענים על הטבלאות של הסדנה.
+
+<ChoiceExercise
+  client:visible
+  id="5.8-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: `״25 שנה״ בתרחיש מקל מול ״קבועה בלבד״ בתרחיש מקל`, correct: true, feedback: "נכון. אותו תרחיש לשתי החלופות, אותה הלוואה: הפער בסך התשלומים הוא הפער בין התמהילים." },
+    { text: `״25 שנה״ בתרחיש מקל מול ״קבועה בלבד״ בתרחיש מחמיר`, feedback: "הפער כאן הוא תערובת של הבדל בין התמהילים והבדל בין התרחישים: אי אפשר לדעת מה גרם למה." },
+    { text: `״צמוד״ בתרחיש מחמיר מול ״הראשוני״ בתרחיש מקל`, feedback: "שני התרחישים שונים, ולכן ההפרש לא אומר דבר על ההבדל בין התמהילים." },
+    { text: `כל זוג, כל עוד מדובר באותה הלוואה`, feedback: "אותה הלוואה לא מספיקה: גם התרחיש צריך להיות אותו תרחיש." },
+  ]}
+>
+  איזו השוואה בין חלופות היא הוגנת?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.8-2"
+  n={2}
+  level="קל"
+  answer={f.raw("alt.short.principal_120")}
+  errors={[
+    { value: f.raw("alt.short.bal.120"), message: "זו היתרה, מה שעוד חייבים. השאלה היא כמה כבר נפרע: ההלוואה פחות היתרה." },
+  ]}
+>
+  ב״{ALTS[1].name}״ היתרה אחרי 10 שנים היא {f.shekels("alt.short.bal.120")}, מתוך הלוואה של {f.shekels("a.loan")}. כמה מההלוואה כבר נפרע?
+</NumericExercise>
+
+<Solution for="5.8-2">
+<M>{n("a.loan")} − {n("alt.short.bal.120")} = {n("alt.short.principal_120")}</M> ₪. בחלופה א׳ באותו זמן נפרעו רק {f.shekels("alt.linked.principal_120")}, ובראשוני {f.shekels("alt.initial.principal_120")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.8-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("cmp.gap_same")}
+  errors={[
+    { value: f.raw("cmp.err_mixed"), message: "השתמשתם בתרחישים שונים: ״25 שנה״ בתרחיש מקל מול ״קבועה בלבד״ בתרחיש מחמיר. משווים באותו תרחיש." },
+    { value: f.raw("alt.fixed.d_first"), message: "זה ההפרש בהחזר הראשון של ״קבועה בלבד״ מהראשוני. השאלה על סך התשלומים של שתי חלופות, בתרחיש הבסיס." },
+  ]}
+>
+  בתרחיש הבסיס סך התשלומים של ״{ALTS[2].name}״ הוא {f.shekels("alt.fixed.base.total")} ושל ״{ALTS[1].name}״ {f.shekels("alt.short.base.total")}. בכמה שקלים הראשונה יקרה יותר?
+</NumericExercise>
+
+<Solution for="5.8-3">
+<M>{n("alt.fixed.base.total")} − {n("alt.short.base.total")} = {n("cmp.gap_same")}</M> ₪. זה המחיר של היציבות המלאה לעומת 5 שנים פחות, באותו תרחיש. בתרחיש מחמיר ההפרש גדל: הסך של ״{ALTS[1].name}״ עולה ל־{f.shekels("alt.short.stress.total")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="5.8-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("ex4.paid_down")}
+  errors={[
+    { value: f.raw("alt.linked.bal.84"), message: "זו היתרה אחרי 7 שנים, מה שעוד חייבים. השאלה היא כמה נפרע: ההלוואה פחות היתרה." },
+  ]}
+>
+  נועם ושירה מוכרים את הדירה אחרי 7 שנים (84 תשלומים) וביניהם בחרו בחלופה א׳, ״{ALTS[0].name}״. היתרה אז {f.shekels("alt.linked.bal.84")}, מתוך הלוואה של {f.shekels("a.loan")}. כמה מהקרן נפרע בשבע שנים?
+</NumericExercise>
+
+<Solution for="5.8-4">
+<M>{n("a.loan")} − {n("alt.linked.bal.84")} = {n("ex4.paid_down")}</M> ₪, פחות מ־5% מההלוואה אחרי שבע שנים של תשלומים. ההצמדה מוסיפה לחוב כמעט כמו מה שהתשלומים מורידים.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.8-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "החלק המשתנה: יותר משני שלישים מההלוואה", correct: true, feedback: `נכון. בתמהיל הזה ${f.plain("lh.variable_share")}% מההלוואה משתנה, ומותר לכל היותר שני שלישים (לפי התעתיק של 329, לא אומת).` },
+    { text: "שיעור המימון", feedback: "שיעור המימון הוא אותו שיעור בכל החלופות, 74.55%, והוא עובר." },
+    { text: "יחס ההחזר, מעל 50%", feedback: "יחס ההחזר של התמהיל הצמוד נמוך, מתחת ל־40%." },
+    { text: "התקופה: יותר מ־30 שנה", feedback: "כל התמהילים ל־30 שנה, ולא יותר." },
+  ]}
+>
+  חלופה א׳ היא {f.whole("alt.linked.amount_1")} במשתנה צמודה ו־{f.whole("alt.linked.amount_2")} בקבועה צמודה. יועץ מציע לנועם ושירה במקומה {f.whole("lh.amount_1")} במשתנה צמודה ו־{f.whole("lh.amount_2")} בקבועה צמודה, כי ההחזר הראשון נמוך עוד יותר, {f.shekels("lh.first")}. איזה קו של הוראה 329 נשבר?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.8-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("term.b_total_gap")}
+  errors={[
+    { value: f.raw("term.b_first_gap"), message: "זה ההפרש בהחזר הראשון. השאלה על סך התשלומים." },
+  ]}
+>
+  חלופה ב׳ עם שתי תקופות של 25 שנה: החזר ראשון {f.shekels("term.a.first")}, סך תשלומים {f.shekels("term.a.total")}. מנסים תקופות נפרדות: הקבועה ל־20 שנה והמשתנה ל־30. ההחזר הראשון: {f.shekels("term.b.first")}, והסך {f.shekels("term.b.total")}. בכמה שקלים הסך גבוה יותר?
+</NumericExercise>
+
+<Solution for="5.8-6">
+<M>{n("term.b.total")} − {n("term.a.total")} = {n("term.b_total_gap")}</M> ₪. בתמורה, ההחזר הראשון נמוך ב־{f.shekels("term.b_first_gap")}. תקופות נפרדות הן ידית כמו כל ידית: הן מחליפות תשלום נמוך בסך גבוה.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.8-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: `״ממליצים על חלופה ג׳. היא הכי טובה.״`, feedback: "אין כאן יעד, תרחיש, מחיר או מה שלא ידוע. ״הכי טובה״ בלי יעד הוא לא מספר." },
+    { text: `״חלופה ג׳: ההחזר ${f.whole("alt.fixed.base.first")} בכל חודש.״`, feedback: "יש מספר נכון, אבל אין חסרונות ואין מה לא ידוע: ההמלצה מציגה רק את הצד היפה." },
+    { text: `״אם חשוב לכם לדעת מראש מה תשלמו: חלופה ג׳, ${f.whole("alt.fixed.base.first")} בחודש בכל תרחיש. המחיר: ${f.whole("alt.fixed.d_total")} יותר בסך התשלומים מהראשוני, ויחס החזר ${f.plain("alt.fixed.ratio")}%, מעל 40%. לא ידוע: איך בנק יתמחר את זה. הצעה אחרת תשנה את ההמלצה.״`, correct: true, feedback: "נכון. יש יעד, מספרים בתרחיש, מחיר, ומה שלא ידוע, ומה ישנה את ההמלצה." },
+    { text: `״ממליצים על חלופה א׳: ההחזר הנמוך ביותר, ולכן הזולה ביותר.״`, feedback: "החזר ראשון נמוך אינו סך תשלומים נמוך: בחלופה א׳ הסך גבוה, והתשלום עולה. זה בדיוק מה שהסדנה מלמדת לא לעשות." },
+  ]}
+>
+  איזו מההמלצות הבאות היא ההמלצה המנומקת, שמציגה גם את החסרונות?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על סדנת שלוש החלופות">
+<p><strong>מה זה?</strong> שלושה תמהילים לתיק אחד, כל אחד בנוי ליעד אחר, כשכל אחד נבדק בתקופות נפרדות, בכמה תרחישים, ביתרת חוב בנקודות זמן ומול הגבולות. התוצר: טבלת השוואה והמלצה שמציגה גם את החסרונות.</p>
+<p><strong>למה זה קיים?</strong> כי המשפחה בוחרת לפי מה שחשוב לה, ולכן צריך להראות לה את האפשרויות ואת מחירן, לא להכריע בשבילה. זה גם מה שהמערכת של Mogi אמורה לעשות: לבנות תמהילים לפי יעדים, ולהסביר את הבחירה.</p>
+<p><strong>איך זה עובד?</strong> אותה הלוואה, אותה רשימת מחירים ואותם תרחישים לכל החלופות; כל חלופה עוברת את איסורי 329; לכל חלופה: החזר ראשון, התשלום הגבוה ביותר, סך, יתרה ויחס החזר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הבחירה קובעת כמה תשלמו בחודשים הראשונים, כמה תהיו חשופים, כמה תשלמו בסך הכול וכמה תחייבו אם תמכרו אחרי כמה שנים.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים את המשפחה מה חשוב לה, ובוחרים את החלופה ששואפת לשם, מציגים לה את המחיר, ומה לא ידוע. בשלב 6 מבקשים הצעות אמיתיות מבנקים, ומחשבים מחדש את הטבלה על הריביות שהם מציעים; יתכן שהסדר ישתנה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהסדנה
+
+</Section>
+
+- **שלוש חלופות לשלושה יעדים:** ״{ALTS[0].name}״ (החזר ראשון נמוך), ״{ALTS[1].name}״ (סך נמוך) ו״{ALTS[2].name}״ (יציבה). כולן עוברות את האיסורים של 329.
+- **תקופות נפרדות הן ידית** שמחליפה תשלום נמוך בסך גבוה, או להפך, ולא קסם.
+- **שלושה תרחישים באותם כללים:** הטווח של כל חלופה הוא החשיפה שלה, והסדר ביניהן יכול להשתנות עם התרחיש. משווים רק באותו תרחיש.
+- **יתרת חוב בנקודות זמן:** תשלום נמוך אינו חוב נמוך; בצמוד הקרן כמעט לא יורדת בשנים הראשונות.
+- **המלצה מנומקת:** יעד, מספרים בתרחיש, המחיר, מה שלא ידוע, ומה ישנה את ההמלצה. ההנחות כאן הן של הקורס; ההצעות האמיתיות מגיעות בשלב 6.
+
+**בשיעור הבא — 5.9, <Later lesson="5.9" quiet>האם התמהיל טוב?</Later>** בודקים תמהיל מול היעדים ומול מה שקורה בשוק.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "בניית תמהיל מייצרת שלושה תמהילים לפי שלושה יעדים: החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית. זה תכנון של Mogi (J-090), לא עובדה על השוק. לפי דף J-090 ב־Brain (דף 7503881, עודכן ב־2026-10-08), כפי שנרשם בצוות ב־research/notes; הדף לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "לכל מסלול בתמהיל תקופה משלו (אילון, 2026-08-03; לפי Brain, דף 16646263, כפי שנרשם בצוות).", date: "2026-08-03" },
+    { kind: "ידע מהשטח", text: "FK-H-057: שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע; הנתונים הציבוריים הם ממוצעים ולא מחיר שבנק יאשר. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "מגבלות הוראה 329: שיעור מימון עד 75% לדירה יחידה, יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה. איך בנק מתמחר יחס החזר מעל 40%: לא ידוע; שאלה פתוחה לאילון.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות ב־Brain (דף 67436545), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "תיק A: מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים (scripts/case_sketch.py). רשימת המחירים לכל סוג מסלול, התמהיל הראשוני ושלוש החלופות הם הנחות של הקורס ב־src/data/case-a-mix.ts; לא הצעת בנק ולא נתוני שוק. אותו אחוז ריבית לכל סוג מסלול בכל חלופה, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
+    { kind: "הנחת חישוב", text: "שלושת התרחישים הם תרחישים להמחשה, לא תחזיות: בסיס — המדד עולה 2% בשנה, הפריים והעוגן לא זזים; מחמיר — 4% בשנה, והפריים והעוגן עולים 2 נקודות אחוז (הפריים מהשנה השנייה, העוגן בכל נקודת עדכון, כל 5 שנים); מקל — 1% בשנה, והם יורדים נקודת אחוז. יתרת חוב: מה שנשאר אחרי התשלום של החודש, כולל הפרשי הצמדה, בתרחיש הבסיס. כלל העיגול של הקורס (שיעור 3.8). ״החלופות המנצחות במבחר קבוע של שבעה תמהילים״ הוא כלי הוראה: תמהיל טוב יותר יכול להיות מחוץ למבחר." },
+    { kind: "הנחת חישוב", text: "הנחה של הסדנה על מה שחשוב לנועם ושירה (״אנחנו לא רוצים הפתעות״): נבנתה כדי להדגים כתיבת המלצה. אינה נתון של התיק." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (balances, goals) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-8.ts and data/lessons/5-8.json, rechecked by checks/kinds/sensitivity.py (with schedule.py and regulation.py). Illustration: src/components/MixBuilder.vue (props only; it has no comparison, no balance at chosen months and no ratio — see the report). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-8.html. */}

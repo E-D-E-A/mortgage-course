@@ -1,0 +1,271 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.5 — "ארבעה מספרים שנראים אותו דבר".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
+  for each time t (seconds) and photographs the page. render(t) depends only on t.
+  Every number comes from data/lessons/5-5.json (all rates invented for teaching:
+  not market data, not a bank's quote, not a Bank of Israel average). The subtitle
+  cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: a rate in a sentence can be one of four different numbers):
+  1. Title.
+  2. The four numbers: the Bank of Israel's average, an estimate, a personal offer, an executed
+     deal — each answers a different question.
+  3. An average is not a price: three profiles with fixed prices, two months with a different
+     mix of borrowers; the average moves although no price moved; nobody got the average.
+  4. Two languages: a contract rate and the effective rate of the same loan.
+  5. What a tenth of a point is worth, on one loan: estimate, offer, neighbour's deal.
+  6. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.5 · ממוצע, אומדן, הצעה ועסקה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/5-5.json")).json();
+      const factOf = (id) => data.facts.find((f) => f.id === id);
+      const fact = (id) => factOf(id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      const pl = (v) => String(v);
+      const monthX = factOf("m.x_avg").inputs.rates.split(",");
+      const monthY = factOf("m.y_avg").inputs.rates.split(",");
+
+      const V = {
+        predOffer: pl(fact("pred.offer")), offerEff: pl(fact("pred.offer_eff")), avg: pl(fact("n.avg")),
+        est: pl(fact("n.est")), offer: pl(fact("n.offer")), deal: pl(fact("n.deal")),
+        loan: num(fact("n.loan")),
+        pS: pl(fact("m.price_s")), pM: pl(fact("m.price_m")), pW: pl(fact("m.price_w")),
+        xAvg: pl(fact("m.x_avg")), yAvg: pl(fact("m.y_avg")), gap: pl(fact("m.gap")), yBelow: pl(fact("m.y_below")), yCount: pl(fact("m.y_count")),
+        payOffer: fact("v.offer"), payEst: fact("v.est"), payDeal: fact("v.deal"), payGap: fact("v.pay_gap"), dealGap: fact("v.deal_gap"), totGap: fact("v.total_gap"),
+        estGap: pl(fact("n.est_gap")),
+      };
+
+      // Timeline (seconds). Each scene owns a window; render(t) draws whatever is on screen at t.
+      const S = { title: [0, 8], four: [8, 50], mix: [50, 100], lang: [100, 128], worth: [128, 162], end: [162, 176] };
+      window.duration = 176;
+      window.cues = [
+        [1, 5, `ריבית של ${V.predOffer}%: איזה מספר זה?`],
+        [5, 8, "ארבעה מספרים שנראים אותו דבר."],
+        [9, 17, "ריבית ממוצעת: הלוואות שניתנו לאנשים רבים."],
+        [17, 25, "אומדן: חישוב לפני שבנק ענה."],
+        [25, 34, "הצעה אישית: תשובה של בנק לתיק שלכם."],
+        [34, 43, "עסקה שבוצעה: מה נחתם במקרה אחד, בעבר."],
+        [43, 49, "כל אחד עונה על שאלה אחרת."],
+        [51, 59, "שלושה פרופילים של לווים, שלושה מחירים קבועים."],
+        [59, 67, `בחודש הראשון הממוצע ${V.xAvg}%.`],
+        [67, 76, "בחודש השני באו יותר לווים חלשים. המחירים זהים."],
+        [76, 84, `הממוצע עלה ל־${V.yAvg}%, בלי שמחיר אחד זז.`],
+        [84, 99, `ו־${V.yBelow} מתוך ${V.yCount} הלוואות היו מתחת לו.`],
+        [101, 108, "עוד מלכודת: שתי שפות לאותה ריבית."],
+        [108, 116, `${V.predOffer}% חוזית הן ${V.offerEff}% אפקטיבית.`],
+        [116, 122, `הממוצע, ${V.avg}% אפקטיבית, הוא אותו מספר.`],
+        [122, 127, "ההפרש הוא בין שפות, לא בין הצעות."],
+        [129, 136, `${V.loan} ₪ ל־25 שנה: מה שווה עשירית נקודת אחוז?`],
+        [136, 144, `אומדן ${V.est}%, הצעה ${V.offer}%: ${V.estGap} נקודות אחוז.`],
+        [144, 152, `בחודש: ${num(V.payGap)} ₪. בסך הכול: ${num(V.totGap)} ₪.`],
+        [152, 161, "עסקה של שכנים היא רמז, לא זכות."],
+        [163, 169, "לפני שמשווים: איזה מספר זה, ועל מי?"],
+        [169, 175, "רק הצעה אישית היא בסיס להחלטה."],
+      ];
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      function eqn(x, y, parts, size, opts = {}) {
+        const e = el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 600, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: "ltr", "unicode-bidi": "bidi-override" });
+        const ns = "http://www.w3.org/2000/svg";
+        for (const p of typeof parts === "string" ? [parts] : parts) {
+          if (typeof p === "string") {
+            const s = document.createElementNS(ns, "tspan");
+            s.textContent = p;
+            e.appendChild(s);
+          } else {
+            const b = document.createElementNS(ns, "tspan");
+            b.textContent = p[0];
+            e.appendChild(b);
+            const sup = document.createElementNS(ns, "tspan");
+            sup.setAttribute("dy", String(-size * 0.42));
+            sup.setAttribute("font-size", String(Math.round(size * 0.62)));
+            sup.textContent = p[1];
+            e.appendChild(sup);
+            const back = document.createElementNS(ns, "tspan");
+            back.setAttribute("dy", String(size * 0.42));
+            back.textContent = " ";
+            e.appendChild(back);
+          }
+        }
+        return e;
+      }
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+      const note = (o) => txt(640, 566, "כל המספרים בדויים, להמחשה", 17, { fill: C.n600, o });
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "ארבעה מספרים", 76, { w: 700, o });
+          const o2 = after(t, S.title, 3, o);
+          txt(640, 360, "ממוצע · אומדן · הצעה אישית · עסקה שבוצעה", 30, { fill: C.n600, o: o2 });
+        }
+        // Scene 2 — the four numbers
+        if (inScene(t, S.four)) {
+          const o = vis(t, S.four);
+          txt(640, 124, "ארבעה מספרים, ארבע שאלות", 40, { w: 700, o });
+          const cards = [
+            { x: 660, y: 170, name: "ריבית ממוצעת", ask: "מה נתנו הבנקים, בממוצע?", num: `${V.avg}%`, sub: "בנק ישראל · חודש שעבר", from: 1, c: C.n600 },
+            { x: 180, y: 170, name: "אומדן", ask: "מה אפשר להעריך לפני שבנק ענה?", num: `${V.est}%`, sub: "חישוב · בלי תשובה של בנק", from: 8.5, c: C.tq2 },
+            { x: 660, y: 340, name: "הצעה אישית", ask: "מה בנק נותן לתיק הזה?", num: `${V.offer}%`, sub: "בנק א׳ · בתוקף 24 יום", from: 16.5, c: C.teal },
+            { x: 180, y: 340, name: "עסקה שבוצעה", ask: "מה נחתם, במקרה אחד?", num: `${V.deal}%`, sub: "הלוואה שהועמדה · בעבר", from: 25.5, c: C.navy },
+          ];
+          for (const c of cards) {
+            const oc = after(t, S.four, c.from, o);
+            box(c.x, c.y, 440, 150, oc);
+            txt(c.x + 415, c.y + 40, c.name, 30, { anchor: "start", w: 700, o: oc });
+            txt(c.x + 415, c.y + 76, c.ask, 20, { anchor: "start", fill: C.n700, o: oc });
+            txt(c.x + 25, c.y + 126, c.num, 34, { anchor: "start", w: 700, fill: c.c === C.tq2 ? C.teal : c.c, o: oc, ltr: true });
+            txt(c.x + 415, c.y + 126, c.sub, 18, { anchor: "start", fill: C.n600, o: oc });
+          }
+          note(after(t, S.four, 3, o));
+        }
+        // Scene 3 — an average is not a price
+        if (inScene(t, S.mix)) {
+          const o = vis(t, S.mix);
+          txt(640, 124, "ממוצע אינו מחיר", 40, { w: 700, o });
+          const price = [`${V.pS}%`, `${V.pM}%`, `${V.pW}%`];
+          const col = [C.teal, C.tq2, C.navy];
+          const prof = (r) => (r === fact("m.price_s") ? 0 : r === fact("m.price_m") ? 1 : 2);
+          const o1 = after(t, S.mix, 1, o);
+          [0, 1, 2].forEach((k) => {
+            el("circle", { cx: 1060 - k * 150, cy: 176, r: 11, fill: col[k], opacity: o1 });
+            txt(1040 - k * 150, 183, price[k], 20, { anchor: "end", o: o1, ltr: true });
+          });
+          const months = [
+            { x: 1050, head: "חודש ראשון", rates: monthX, avg: V.xAvg, from: 8, avgFrom: 9 },
+            { x: 570, head: "חודש שני", rates: monthY, avg: V.yAvg, from: 17, avgFrom: 26 },
+          ];
+          months.forEach((m) => {
+            const om = after(t, S.mix, m.from, o);
+            box(m.x - 440, 214, 440, 270, om);
+            txt(m.x - 25, 252, m.head, 26, { anchor: "start", w: 700, o: om });
+            m.rates.forEach((r, i) => {
+              const cx = m.x - 60 - (i % 5) * 76;
+              const cy = 312 + Math.floor(i / 5) * 62;
+              el("circle", { cx, cy, r: 20, fill: col[prof(r)], opacity: om });
+            });
+            const oa = after(t, S.mix, m.avgFrom, o);
+            txt(m.x - 25, 452, `הממוצע: ${m.avg}%`, 28, { anchor: "start", w: 700, o: oa, ltr: false });
+          });
+          const o4 = after(t, S.mix, 31, o);
+          box(250, 504, 780, 44, o4 * 0.7, C.mint);
+          txt(640, 534, `עלייה של ${V.gap} נקודות אחוז, ואף מחיר לא זז`, 22, { w: 700, o: o4 });
+        }
+        // Scene 4 — two languages
+        if (inScene(t, S.lang)) {
+          const o = vis(t, S.lang);
+          txt(640, 124, "אותה ריבית, שתי שפות", 40, { w: 700, o });
+          const o1 = after(t, S.lang, 2, o);
+          box(660, 190, 440, 140, o1);
+          txt(1075, 230, "ריבית חוזית", 22, { anchor: "start", fill: C.n600, o: o1 });
+          txt(1075, 292, `${V.predOffer}%`, 54, { anchor: "end", w: 700, o: o1, ltr: true });
+          const o2 = after(t, S.lang, 8, o);
+          eqn(640, 266, "←", 34, { o: o2, fill: C.n600 });
+          box(180, 190, 440, 140, o2);
+          txt(595, 230, "ריבית אפקטיבית", 22, { anchor: "start", fill: C.n600, o: o2 });
+          txt(595, 292, `${V.offerEff}%`, 54, { anchor: "end", w: 700, fill: C.teal, o: o2, ltr: true });
+          const o3 = after(t, S.lang, 13, o);
+          box(250, 362, 780, 100, o3);
+          txt(1005, 404, "ממוצע שפורסם", 22, { anchor: "start", fill: C.n600, o: o3 });
+          txt(1005, 446, `${V.avg}% אפקטיבית`, 36, { anchor: "start", w: 700, o: o3, ltr: false });
+          const o4 = after(t, S.lang, 19, o);
+          txt(640, 512, "אותו מספר: ההפרש הוא בין שפות, לא בין הצעות", 24, { w: 700, fill: C.n700, o: o4 });
+        }
+        // Scene 5 — what a tenth of a point is worth
+        if (inScene(t, S.worth)) {
+          const o = vis(t, S.worth);
+          txt(640, 124, "מה שווה עשירית נקודת אחוז", 40, { w: 700, o });
+          txt(640, 168, `${V.loan} ₪ · 25 שנה · קבועה לא צמודה · שפיצר`, 22, { fill: C.n600, o });
+          const rows = [
+            { y: 250, a: "אומדן", r: V.est, pay: V.payEst, from: 2, c: C.tq2 },
+            { y: 324, a: "הצעה אישית", r: V.offer, pay: V.payOffer, from: 5, c: C.teal },
+            { y: 398, a: "עסקה של שכנים", r: V.deal, pay: V.payDeal, from: 20, c: C.navy },
+          ];
+          rows.forEach((r) => {
+            const or = after(t, S.worth, r.from, o);
+            box(210, r.y - 38, 860, 56, or);
+            el("circle", { cx: 1040, cy: r.y - 10, r: 10, fill: r.c, opacity: or });
+            txt(1015, r.y, r.a, 26, { anchor: "start", w: 700, o: or });
+            txt(700, r.y, `${r.r}%`, 26, { anchor: "start", o: or, ltr: true });
+            txt(520, r.y, `${shek(r.pay)} בחודש`, 26, { anchor: "start", w: 700, o: or, ltr: false });
+          });
+          const o4 = after(t, S.worth, 10, o);
+          eqn(640, 466, `${num(V.payOffer)} − ${num(V.payEst)} = ${num(V.payGap)}`, 30, { o: o4, fill: C.teal });
+          txt(640, 510, `בכל התקופה: ${shek(V.totGap)} · האומדן אינו הבטחה`, 22, { fill: C.n700, o: after(t, S.worth, 14, o) });
+          note(o);
+        }
+        // Scene 6 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [
+            { y: 240, a: "ממוצע", b: "הקשר לשוק, לא מחיר", from: 0.5 },
+            { y: 306, a: "אומדן", b: "לתכנן, לא להבטיח", from: 2 },
+            { y: 372, a: "הצעה אישית", b: "הבסיס היחיד להחלטה", from: 3.5 },
+            { y: 438, a: "עסקה שבוצעה", b: "רמז, לא זכות", from: 5 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.end, r.from, o);
+            txt(1060, r.y, r.a, 34, { anchor: "start", w: 700, o: or });
+            txt(660, r.y, r.b, 28, { anchor: "start", fill: C.teal, o: or });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

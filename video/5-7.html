@@ -1,0 +1,296 @@
+<!doctype html>
+<!--
+  Video scene for lesson 5.7 — "מזיזים דבר אחד בכל פעם".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t
+  (seconds) and photographs the page. render(t) depends only on t. Every number comes from
+  data/lessons/5-7.json. The subtitle cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: sensitivity — move ONE lever by a known step and see what moves; five levers
+  (percent of the loan in a track, amount, term, rate, index); the same lever can move nothing in
+  one mix and a lot in another; levers run into limits; two levers together do not add up exactly):
+  1. Title.
+  2. Case A's initial mix: first payment, ratio; one lever at a time.
+  3. Percent: money between tracks moves the payment by the rate gap only; but fixed -> variable
+     crosses the two-thirds line.
+  4. Amount and term: 100,000 less loan; five years shorter: payment up, total down.
+  5. Rate: 0.25 point on every track; the market (prime and anchors) moves only the highest payment
+     and the total, never the first.
+  6. Index: nothing in the initial mix; thousands in a mix with a linked track.
+  7. Limits: which one step crosses 40%, and where a lever hits a ban.
+  8. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 5.7 · רגישות</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/5-7.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Money with agorot when there are any: "1,493.74", "2,400".
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      // A count, a rate or a factor as written in the data, without trailing zeros: "0.50" → "0.5".
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      // 0 → 1 over d seconds from s seconds into a scene (for drawing a line or growing a bar).
+      const grow = (t, sc, s, d) => clamp((t - sc[0] - s) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)", n400: "var(--mogi-n400)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+
+      const F = (id) => fact(id);
+      const sign = (v) => (Number(v) > 0 ? "+" : Number(v) < 0 ? "−" : "") + num(Math.abs(Number(v)).toFixed(2));
+      const V = {
+        first: num(F("init.first")), ratio: pl(F("init.ratio")), total: num(F("init.total")),
+        shift: num(F("ex1.shift")),
+        pf: sign(F("lv.pct_pf.d_first")), pv: sign(F("lv.pct_pv.d_first")),
+        shareFv: pl(F("lv.pct_fv.variable_share")),
+        per100: num(F("ex2.per_100k")),
+        termFirst: sign(F("lv.term.d_first")), termTotal: num(Math.abs(Number(F("lv.term.d_total"))).toFixed(2)),
+        rate: sign(F("lv.rate_all.d_first")), rateTotal: sign(F("lv.rate_all.d_total")),
+        mktMax: sign(F("lv.market.d_max")), mktTotal: sign(F("lv.market.d_total")),
+        lkMax: sign(F("lk.index_up.d_max")), lkTotal: sign(F("lk.index_up.d_total")),
+        ratioTerm10: pl(F("lv.term10.ratio")), ratioAmount: pl(F("lv.amount40.ratio")), ratioRateDown: pl(F("lv.rate_down.ratio")),
+      };
+
+      const S = { title: [0, 9], mix: [9, 36], pct: [36, 68], amt: [68, 104], rate: [104, 138], idx: [138, 166], lim: [166, 192], end: [192, 206] };
+      window.duration = 206;
+      window.cues = [
+        [1, 5, "רגישות: כמה זז כשמזיזים ידית אחת."],
+        [5, 8.5, "אחוז, סכום, תקופה, ריבית ומדד."],
+        [10, 17, `התמהיל הראשוני של נועם ושירה: ${V.first} ₪.`],
+        [17, 26, "מזיזים ידית אחת בכל פעם, ורואים מה זז."],
+        [26, 35, "ככה יודעים מי הזיז את התשלום."],
+        [37, 44, `אחוז: מעבירים ${V.shift} ₪ בין מסלולים.`],
+        [44, 52, `מהפריים לקבועה, ההחזר הראשון ${V.pf} ₪.`],
+        [52, 60, `מהפריים למשתנה: ${V.pv} ₪. הפער גדול יותר.`],
+        [60, 67, `מהקבועה למשתנה: ${V.shareFv}% משתנה. מעל שני שלישים.`],
+        [69, 77, `סכום: כל 100,000 ₪ הם כ־${V.per100} ₪ בחודש.`],
+        [77, 86, `תקופה: חמש שנים פחות, ${V.termFirst} ₪ בחודש הראשון.`],
+        [86, 96, `והסך יורד ב־${V.termTotal} ₪.`],
+        [96, 103, "תשלום גבוה יותר, סך נמוך יותר."],
+        [105, 113, `ריבית ועוד 0.25 בכל המסלולים: ${V.rate} ₪.`],
+        [113, 121, `בסך הכול ${V.rateTotal} ₪.`],
+        [121, 130, "ריבית השוק: החזר ראשון לא זז, והגבוה ביותר כן."],
+        [130, 137, `הגבוה ביותר ${V.mktMax} ₪, הסך ${V.mktTotal} ₪.`],
+        [139, 147, "מדד: בתמהיל הראשוני אין מסלול צמוד."],
+        [147, 155, "העלאה של נקודת אחוז לא מזיזה שקל."],
+        [155, 165, `ב״צמוד״ אותה ידית: ${V.lkMax} ₪ בתשלום הגבוה.`],
+        [167, 172, "מה מוריד את היחס מתחת ל־40%?"],
+        [172, 179, `הלוואה קטנה ב־40,000 ₪: ${V.ratioAmount}%.`],
+        [179, 186, `תקופה קצרה ב־10 שנים: ${V.ratioTerm10}%, מעל 50%.`],
+        [186, 191.5, "ידיות מגיעות לגבולות. בודקים אחרי כל הזזה."],
+        [193, 199, "ידית אחת בכל פעם."],
+        [199, 205, "רגישות היא תכונה של התמהיל, לא של הידית."],
+      ];
+
+      // A horizontal bar with its value; value labels sit left of the bar's end (RTL: bars grow leftwards).
+      function bar(rightX, y, width, h, color, o, label, value, vsize = 22) {
+        if (width > 0) el("rect", { x: rightX - width, y, width, height: h, rx: 8, fill: color, opacity: o });
+        txt(rightX + 270, y + h / 2 + 8, label, 22, { anchor: "start", w: 700, o });
+        txt(rightX - width - 12, y + h / 2 + 8, value, vsize, { anchor: "end", w: 700, o, ltr: true });
+      }
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        // Scene 1 — title
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "רגישות", 84, { w: 700, o });
+          txt(640, 366, "מזיזים דבר אחד בכל פעם", 46, { w: 700, o: after(t, S.title, 1, o) });
+          txt(640, 436, "אחוז · סכום · תקופה · ריבית · מדד", 30, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        // Scene 2 — the initial mix and the five levers
+        if (inScene(t, S.mix)) {
+          const o = vis(t, S.mix);
+          txt(640, 130, "התמהיל הראשוני של נועם ושירה", 38, { w: 700, o });
+          const o1 = after(t, S.mix, 1, o);
+          box(240, 175, 800, 120, o1);
+          txt(1010, 222, "החזר ראשון", 22, { anchor: "start", fill: C.n600, o: o1 });
+          txt(1010, 272, `${V.first} ₪`, 44, { anchor: "end", w: 700, o: o1, ltr: true });
+          txt(560, 222, "יחס החזר", 22, { anchor: "start", fill: C.n600, o: o1 });
+          txt(560, 272, `${V.ratio}%`, 44, { anchor: "end", w: 700, o: o1, ltr: true });
+          const levers = ["אחוז", "סכום", "תקופה", "ריבית", "מדד"];
+          levers.forEach((name, k) => {
+            const ok = after(t, S.mix, 6 + k * 2.5, o);
+            const x = 1000 - k * 190;
+            box(x - 150, 340, 170, 90, ok);
+            txt(x - 65, 395, name, 30, { w: 700, o: ok });
+          });
+          txt(640, 490, "ידית אחת זזה. כל השאר נשאר.", 26, { fill: C.teal, w: 700, o: after(t, S.mix, 20, o) });
+        }
+        // Scene 3 — percent
+        if (inScene(t, S.pct)) {
+          const o = vis(t, S.pct);
+          txt(640, 130, `אחוז: ${V.shift} ₪ בין מסלולים`, 38, { w: 700, o });
+          const o1 = after(t, S.pct, 8, o);
+          bar(960, 190, Math.abs(Number(F("lv.pct_pf.d_first"))) * 9, 52, C.teal, o1, "פריים ← קבועה", `${V.pf} ₪`);
+          const o2 = after(t, S.pct, 16, o);
+          bar(960, 270, Math.abs(Number(F("lv.pct_pv.d_first"))) * 9, 52, C.tq2, o2, "פריים ← משתנה", `${V.pv} ₪`);
+          // the variable share gauge
+          const o3 = after(t, S.pct, 24, o);
+          txt(640, 392, "החלק במסלולים משתנים", 22, { fill: C.n600, o: o3 });
+          el("rect", { x: 240, y: 410, width: 800, height: 26, rx: 13, fill: C.n100, opacity: o3 });
+          const share = Number(F("lv.pct_fv.variable_share"));
+          el("rect", { x: 1040 - (share / 100) * 800, y: 410, width: (share / 100) * 800, height: 26, rx: 13, fill: C.navy, opacity: o3 });
+          const lx = 1040 - (200 / 3 / 100) * 800;
+          el("line", { x1: lx, x2: lx, y1: 398, y2: 448, stroke: C.teal, "stroke-width": 4, opacity: o3 });
+          txt(lx, 480, "שני שלישים", 20, { fill: C.teal, w: 700, o: o3 });
+          txt(1040 - (share / 100) * 800 - 14, 460, `${V.shareFv}%`, 24, { anchor: "end", w: 700, o: o3, ltr: true });
+          txt(640, 530, "מהקבועה למשתנה: מעל הקו", 22, { fill: C.n700, w: 600, o: after(t, S.pct, 26, o) });
+        }
+        // Scene 4 — amount and term
+        if (inScene(t, S.amt)) {
+          const o = vis(t, S.amt);
+          txt(640, 130, "סכום ותקופה", 40, { w: 700, o });
+          const cols = [
+            { x: 1060, head: "הלוואה קטנה ב־100,000 ₪", a: sign(F("lv.amount.d_first")), b: sign(F("lv.amount.d_total")), from: 6 },
+            { x: 560, head: "תקופה קצרה ב־5 שנים", a: sign(F("lv.term.d_first")), b: sign(F("lv.term.d_total")), from: 24 },
+          ];
+          for (const c of cols) {
+            const oc = after(t, S.amt, c.from, o);
+            box(c.x - 480, 180, 460, 300, oc);
+            txt(c.x - 40, 225, c.head, 24, { anchor: "start", w: 700, o: oc });
+            txt(c.x - 40, 290, "החזר ראשון", 20, { anchor: "start", fill: C.n600, o: oc });
+            txt(c.x - 440, 300, `${c.a} ₪`, 32, { anchor: "start", w: 700, o: oc, ltr: true });
+            const ob = after(t, S.amt, c.from + 5, o);
+            txt(c.x - 40, 380, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: ob });
+            txt(c.x - 440, 390, `${c.b} ₪`, 32, { anchor: "start", w: 700, fill: C.teal, o: ob, ltr: true });
+          }
+          txt(640, 540, "תשלום גבוה יותר, סך נמוך יותר — ולא בקו ישר", 24, { fill: C.n700, w: 600, o: after(t, S.amt, 31, o) });
+        }
+        // Scene 5 — rate and market
+        if (inScene(t, S.rate)) {
+          const o = vis(t, S.rate);
+          txt(640, 130, "ריבית: במסלול, ובשוק", 40, { w: 700, o });
+          const o1 = after(t, S.rate, 1, o);
+          box(660, 180, 500, 230, o1);
+          txt(1140, 222, "אחוז הריבית במסלולים", 24, { anchor: "start", w: 700, o: o1 });
+          txt(1140, 262, "+0.25 נקודת אחוז בכולם", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(1140, 318, "החזר ראשון", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(700, 322, `${V.rate} ₪`, 32, { anchor: "start", w: 700, o: o1, ltr: true });
+          txt(1140, 378, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(700, 382, `${V.rateTotal} ₪`, 32, { anchor: "start", w: 700, fill: C.teal, o: o1, ltr: true });
+          const o2 = after(t, S.rate, 17, o);
+          box(120, 180, 500, 230, o2);
+          txt(600, 222, "ריבית השוק: פריים ועוגן", 24, { anchor: "start", w: 700, o: o2 });
+          txt(600, 262, "+1 נקודת אחוז, מהשנה השנייה", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(600, 318, "החזר ראשון: לא זז", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(600, 358, "הגבוה ביותר", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(160, 362, `${V.mktMax} ₪`, 30, { anchor: "start", w: 700, o: after(t, S.rate, 22, o), ltr: true });
+          txt(600, 398, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(160, 400, `${V.mktTotal} ₪`, 30, { anchor: "start", w: 700, fill: C.teal, o: after(t, S.rate, 22, o), ltr: true });
+          txt(640, 480, "רק הפריים והמשתנה מרגישים את השוק", 24, { fill: C.n700, w: 600, o: after(t, S.rate, 26, o) });
+        }
+        // Scene 6 — index
+        if (inScene(t, S.idx)) {
+          const o = vis(t, S.idx);
+          txt(640, 130, "מדד: נקודת אחוז אחת יותר", 40, { w: 700, o });
+          const o1 = after(t, S.idx, 1, o);
+          box(660, 190, 500, 250, o1);
+          txt(1140, 232, "התמהיל הראשוני", 24, { anchor: "start", w: 700, o: o1 });
+          txt(1140, 270, "אין מסלול צמוד", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(1140, 340, "הגבוה ביותר", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(700, 344, "0 ₪", 40, { anchor: "start", w: 700, o: o1, ltr: true });
+          txt(1140, 400, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: o1 });
+          txt(700, 404, "0 ₪", 40, { anchor: "start", w: 700, o: o1, ltr: true });
+          const o2 = after(t, S.idx, 17, o);
+          box(120, 190, 500, 250, o2);
+          txt(600, 232, "״צמוד״ — משתנה צמודה וקבועה צמודה", 22, { anchor: "start", w: 700, o: o2 });
+          txt(600, 340, "הגבוה ביותר", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(160, 344, `${V.lkMax} ₪`, 34, { anchor: "start", w: 700, o: after(t, S.idx, 20, o), ltr: true });
+          txt(600, 400, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: o2 });
+          txt(160, 404, `${V.lkTotal} ₪`, 34, { anchor: "start", w: 700, fill: C.teal, o: after(t, S.idx, 20, o), ltr: true });
+          txt(640, 510, "אותה ידית: אפס כאן, אלפי שקלים שם", 24, { fill: C.n700, w: 600, o: after(t, S.idx, 23, o) });
+        }
+        // Scene 7 — limits
+        if (inScene(t, S.lim)) {
+          const o = vis(t, S.lim);
+          txt(640, 130, "ידיות מגיעות לגבולות", 40, { w: 700, o });
+          txt(640, 172, "יחס החזר אחרי הזזה אחת, מול 40% ו־50%", 22, { fill: C.n600, o });
+          const rows = [
+            { y: 215, label: "התחלה", v: F("init.ratio"), from: 1 },
+            { y: 280, label: "הלוואה קטנה ב־40,000 ₪", v: F("lv.amount40.ratio"), from: 5 },
+            { y: 345, label: "אחוז הריבית 0.15 פחות", v: F("lv.rate_down.ratio"), from: 9 },
+            { y: 410, label: "תקופה קצרה ב־5 שנים", v: F("lv.term.ratio"), from: 15 },
+            { y: 475, label: "תקופה קצרה ב־10 שנים", v: F("lv.term10.ratio"), from: 19 },
+          ];
+          const X0 = 940, W = 600, MAX = 55;
+          const X = (p) => X0 - (p / MAX) * W;
+          for (const r of rows) {
+            const oa = after(t, S.lim, r.from, o);
+            el("rect", { x: X(Number(r.v)), y: r.y, width: X0 - X(Number(r.v)), height: 40, rx: 8, fill: Number(r.v) > 50 ? C.navy : Number(r.v) > 40 ? C.tq2 : C.teal, opacity: oa });
+            txt(1240, r.y + 28, r.label, 20, { anchor: "start", w: 600, o: oa });
+            txt(X(Number(r.v)) - 10, r.y + 28, `${pl(r.v)}%`, 22, { anchor: "end", w: 700, o: oa, ltr: true });
+          }
+          for (const [p, name] of [[40, "סף הון"], [50, "איסור"]]) {
+            el("line", { x1: X(p), x2: X(p), y1: 200, y2: 525, stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
+            txt(X(p), 548, `${p}% · ${name}`, 20, { fill: C.n700, w: 700, o, ltr: false });
+          }
+        }
+        // Scene 8 — takeaway
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [
+            { y: 250, a: "ידית אחת", b: "בכל פעם", from: 0.5 },
+            { y: 320, a: "רגישות", b: "הפרש ÷ גודל הצעד", from: 2.5 },
+            { y: 390, a: "תכונה של התמהיל", b: "לא של הידית", from: 5 },
+          ];
+          for (const r of rows) {
+            const or = after(t, S.end, r.from, o);
+            txt(1060, r.y, r.a, 36, { anchor: "start", w: 700, o: or });
+            txt(620, r.y, r.b, 30, { anchor: "start", fill: C.teal, o: or });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

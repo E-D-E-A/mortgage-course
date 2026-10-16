@@ -1,0 +1,497 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "5.3"
+minutes: 35
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import OfferCompare from "../../components/OfferCompare.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { EXAMPLE_LABEL } from "../../data/offer-examples.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("5.3");
+// An amount inside an equation, without ₪. Formatting only — the value is the fact's.
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const ids = ["a", "b", "c"];
+export const bankName = { a: "בנק א׳", b: "בנק ב׳", c: "בנק ג׳" };
+export const names = (id) => f.raw(id).join(" ו");
+export const diffHe = { amount: "הסכום", mix: "התמהיל", month: "החודש", forecast: "התחזית" };
+export const diffs = (id) => (f.raw(id).length === 0 ? "אין הבדל" : f.raw(id).map((d) => diffHe[d]).join(" ו"));
+export const scen = [
+  { label: "אותו בסיס", change: "אין", rate: "base.a.rate", total: "base.a.total", lowRate: "base.lowest_rate", basis: "base.basis" },
+  { label: "תחזית אחרת", change: "בנק א׳ חושב על תחזית ב׳", rate: "fc.a.rate", total: "fc.a.total", lowRate: "fc.lowest_rate", basis: "fc.basis" },
+  { label: "חודש אחר", change: "בנק א׳ חושב על נובמבר", rate: "mo.a.rate", total: "mo.a.total", lowRate: "mo.lowest_rate", basis: "mo.basis" },
+  { label: "סכום אחר", change: "בנק א׳ על סכום קטן יותר", rate: "am.a.rate", total: "am.a.total", lowRate: "am.lowest_rate", basis: "am.basis", lowTotal: "am.lowest_total" },
+  { label: "תמהיל אחר", change: "בנק א׳ בסל 2 במקום סל 3", rate: "mx.a.rate", total: "mx.a.total", lowRate: "mx.lowest_rate", basis: "mx.basis" },
+];
+export const predictionOptions = [
+  `בנק א׳ זול יותר, בלי תנאי: ${f.plain("base.a.rate")} קטן מ־${f.plain("base.b.rate")}`,
+  "בנק א׳ זול יותר רק אם שני האישורים נמדדו על אותו סכום, אותו תמהיל, אותו חודש ואותה תחזית",
+  "אי אפשר להשוות ריבית כוללת חזויה בין בנקים בכלל",
+  "ההפרש קטן מדי כדי ללמוד ממנו משהו",
+];
+
+בשיעור 5.1 קראתם אישור עקרוני אחד. בשיעור 5.2 ראיתם שלושה סלים אחידים, שמאפשרים להשוות אישורים של בנקים שונים. נשארו שתי שאלות: **מה מודדים**, ו**מתי מותר להשוות**.
+לפי התעתיק של הצוות מ<Term t="הוראה 451" lesson="5.3">הוראה 451</Term>, האישור מציג שלושה מספרים שמודדים הצעה. שניים מהם כבר מכירים משלב 3. היום נראה איך הם נקראים באישור, ומה צריך להיות זהה בין שתי הצעות כדי שהשוואה ביניהן תהיה הוגנת.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="5.3"
+  question={`שני אישורים לאותה בקשה. בנק א׳ מציג ״ריבית כוללת חזויה״ של ${f.plain("base.a.rate")}%, ובנק ב׳ מציג ${f.plain("base.b.rate")}%. מה אפשר להסיק על איזה בנק זול יותר?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלושה מדדים, ארבעה תנאים
+
+</Section>
+
+<LessonVideo lesson="5-3" />
+
+<Section kind="ההסבר">
+
+## שלושה מספרים לכל הצעה
+
+</Section>
+
+הנה שלוש הצעות של שלושה בנקים בדויים לאותו סל אחיד 3, על {f.shekels("explain.loan")} ל־{f.plain("explain.years")} שנה, באותו חודש ועל אותה תחזית (תחזית להמחשה, לא של בנק ישראל):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[30rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית כוללת חזויה</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים חזוי</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההחזר המרבי החזוי</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ids.map((k) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 text-n900">{bankName[k]}</td>
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{f.plain(`base.${k}.rate`)}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(f.raw(`base.${k}.total`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(f.raw(`base.${k}.highest`))}</span> (חודש {f.plain(`base.${k}.highest_month`)})</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+אלה שלושת המספרים. לפי התעתיק של הצוות, האישור מציג אותם כך:
+
+1. <Term t="ריבית כוללת חזויה" lesson="5.3">ריבית כוללת חזויה</Term>. זו העלות הממשית של האשראי משיעור 3.10, לפי נספח 4 בהוראה: האחוז האחד, לשנה, שמסביר את כל התשלומים החזויים מול מה שקיבלתם בפועל. היא כוללת את העמלות שנגבות ביום ההעמדה (אילו עמלות — שאלה משפטית פתוחה), ואת התחזית.
+2. <Term t="סך תשלומים חזוי" lesson="5.3">סך תשלומים חזוי</Term>. הסכום הכולל שצפוי להיות משולם: סכום כל התשלומים החזויים, כמו בשיעור 3.9. האישור מציג אותו לפי סעיף 4ג(ב4).
+3. **<Term t="החזר מרבי חזוי" lesson="5.3">ההחזר המרבי החזוי</Term>**. החודש הגבוה ביותר בתחזית, כמו בשיעור 3.8. לצידו האישור מציג גם את ההחזר הראשון.
+
+שימו לב לשני דברים בטבלה. הראשון: בנק ב׳ ובנק ג׳ קרובים מאוד: {f.plain("base.b.rate")}% ו־{f.plain("base.c.rate")}%. שנייה: החודש של ההחזר המרבי הוא {f.plain("base.a.highest_month")} אצל בנק א׳ ו־{f.plain("base.b.highest_month")} אצל בנק ב׳. במסלול הפריים הריבית בתחזית עולה ואז עומדת, ולכן ההחזר עולה בשנים הראשונות; החודש האחרון מוסיף עוד כמה אגורות של עיגול (כלל העיגול של הקורס, שיעור 3.8).
+
+### מה כל מספר אומר, ומה לא
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[32rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המדד</th>
+        <th class="py-2 pe-3 text-start font-semibold">עונה על</th>
+        <th class="py-2 pe-3 text-start font-semibold">לא עונה על</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">ריבית כוללת חזויה</td>
+        <td class="py-2 pe-3">כמה עולה כל שקל לכל חודש, אחרי עמלות ותחזית</td>
+        <td class="py-2 pe-3">כמה שקלים תשלמו בסך הכול, וכמה גבוה ההחזר</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">סך תשלומים חזוי</td>
+        <td class="py-2 pe-3">כמה שקלים יצאו מהחשבון עד הסוף</td>
+        <td class="py-2 pe-3">כמה זה שווה היום (שיעור 3.10), ומה גובה ההחזר</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">ההחזר המרבי החזוי</td>
+        <td class="py-2 pe-3">עד כמה החודש הכבד ביותר בתחזית יכביד</td>
+        <td class="py-2 pe-3">המחיר הכולל. וגם: הוא תחזית, לא תקרה</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+שלושת המספרים עונים על שלוש שאלות שונות, ולכן הם יכולים לדרג אחרת (שיעור 3.11). ההוראה, כפי שהצוות תעתק אותה, קובעת **מה להציג**. בתעתיק אין כלל שאומר איזו הצעה לבחור לפי מספר אחד.
+
+<Callout title="מה קורה כשלמסלול אין תחזית" tone="info">
+<p>לפי התעתיק, מסלול שאין לו תחזית בטבלה של ההוראה, למשל במט״ח (שיעור 2.8), לא נכנס לחישוב, והאישור חייב להגיד זאת בבירור. בהצעות שלפניכם לכל המסלולים יש תחזית.</p>
+</Callout>
+
+<Section kind="ההסבר">
+
+## מתי מותר להשוות
+
+</Section>
+
+המספרים בטבלה למעלה ניתנים להשוואה כי **ארבעה דברים זהים** בשלוש ההצעות:
+
+1. **הסכום.** אותה הלוואה. הצעה על סכום קטן יותר יוצאת בסך תשלומים נמוך יותר, בלי להיות זולה יותר.
+2. **התמהיל.** אותם מסלולים, באותה חלוקה ובאותן תקופות. לכן משווים סל אחיד, ולא סל מוצע.
+3. **התאריך.** לפי התעתיק (נספח 4, הכללים), מחשבים כאילו ההלוואה ניתנה בתחילת החודש שבו האישור ניתן. מסלולים שנמשכו בתאריכים שונים מחושבים כאילו כל ההלוואה נמשכה ביום החישוב.
+4. **התחזית.** אותן תחזיות לעוגנים ולמדד. לפי התעתיק, הן מגיעות מפרסום של בנק ישראל, והפרסום מתעדכן פעמיים בחודש. אם הפרסום לא יצא, משתמשים בתחזית האחרונה שיצאה. תחזית אחרת מחזירה מספרים אחרים.
+
+מה קורה כשאחד מהם נשבר? בכל שורה, בנק א׳ משתנה והשניים האחרים נשארים. הטבלה מראה את הריבית הכוללת החזויה של בנק א׳, את סך התשלומים החזוי שלו, מה שונה בבסיס, ומי נמוך ביותר בריבית:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה שונה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ריבית של א׳</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים של א׳</th>
+        <th class="py-2 pe-3 text-start font-semibold">בדיקת הבסיס</th>
+        <th class="py-2 pe-3 text-start font-semibold">נמוך בריבית</th>
+      </tr>
+    </thead>
+    <tbody>
+      {scen.map((s) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 text-n900">{s.change}</td>
+          <td class="py-2 pe-3"><span class="ltr">{f.plain(s.rate)}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{formatShekels(f.raw(s.total))}</span></td>
+          <td class="py-2 pe-3">{diffs(s.basis)}</td>
+          <td class="py-2 pe-3">{names(s.lowRate)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+כל שורה שבורה נותנת מספר, אבל לא השוואה:
+- **תחזית אחרת:** בנק א׳ קפץ מ־{f.plain("base.a.rate")}% ל־{f.plain("fc.a.rate")}%, בלי ששום ריבית בהצעה השתנתה. השתנתה רק התחזית, ובאה איתה הבדל. בנק א׳ מופיע אחרון, וזה לא מחיר.
+- **חודש אחר:** בנק א׳ יוצא {f.plain("mo.a.rate")}%, קרוב למה שהיה. כשהחודש שונה גם התחזית שונה, ולכן הבדיקה מציינת שניהם.
+- **סכום אחר:** הריבית של בנק א׳ כמעט לא זזה ({f.plain("am.a.rate")}%), אבל סך התשלומים ירד ל־{f.shekels("am.a.total")}. נמוך יותר בסך התשלומים, כי ההלוואה קטנה.
+- **תמהיל אחר:** בסל 2 בנק א׳ יוצא {f.plain("mx.a.rate")}%: מסלול משתנה צמוד במקום חצי מהפריים, וחלוקה אחרת. זה תמהיל אחר, לא מחיר אחר.
+
+<Callout title="התחזיות בשיעור הזה הן בדויות" tone="warning">
+<p>שלוש התחזיות כאן הן מסלולים שהקורס המציא, עם אינפלציה קבועה לשנה, כדי שיהיה מה לחשב. הן לא התחזית של בנק ישראל, וההפשטה הזו אינה דרך עבודה: ב־Mogi הוחלט להשתמש רק בנתוני התחזית שבנק ישראל מפרסם לצורך ההוראה, ולא להחליף אותם בהנחת אינפלציה קבועה (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). בשיעור 5.4 נראה איך מחשבים תחזית מעקום האפס.</p>
+<p>ובאותה החלטה נאמר, לגבי השוואה של החישוב למספרים של בנק: קודם מתאימים את סכומי ההלוואה, את תאריכי החישוב ואת גרסת התחזית, ורק אז משווים. זה אותו עיקרון.</p>
+</Callout>
+
+ארבעה התנאים הם מה שהקורס בנה, לפי התעתיק של הכללים בנספח 4. איזו בדיקה בנקים עושים בפועל כשהם מציגים אישור, ואם הם מציגים מספרים של בנקים אחרים לצידם — לא ידוע.
+
+<Callout title="הצעות בתמהילים שונים" tone="warning">
+<p>גם הסלים המוצעים של שלושת הבנקים אפשר לחשב באותה צורה, וזה מה שהכלי למטה עושה. אבל כאן בדיקת הבסיס מוצאת הבדל: {diffs("prop.basis")}. בהצעות האלה, הריבית הכוללת החזויה הנמוכה ביותר היא של {names("prop.lowest_rate")}, סך התשלומים הנמוך ביותר של {names("prop.lowest_total")}, וההחזר המרבי הנמוך ביותר של {names("prop.lowest_highest")}. שלושה מדדים, שני בנקים נמוכים. ובתחזית ב׳ הנמוך בריבית הוא כבר {names("propB.lowest_rate")}. תמהילים שונים מדרגים אחרת תחת תחזיות שונות.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## משווה הצעות
+
+</Section>
+
+שלושה בנקים בדויים, שלוש הצעות. למעלה מצבים מוכנים; בכל הצעה אפשר גם לשנות את התמהיל, הסכום והתחזית. המשווה מחשב את שלושת המספרים, מסמן מי נמוך ביותר, ואומר אם ההצעות על אותו בסיס.
+
+<OfferCompare client:visible />
+
+נסו ארבעה דברים:
+1. התחילו ב״אותו בסיס״. מי נמוך ביותר בכל אחד משלושת המספרים?
+2. עברו ל״תחזית אחרת להצעה אחת״. מה קרה לבנק א׳, ולמה?
+3. עברו ל״סכום אחר להצעה אחת״. איזה מספר השתנה הכי הרבה, ואיזה כמעט לא?
+4. עברו ל״שלושה סלים מוצעים״. מי נמוך ביותר בכל מספר, ומה אומרת שורת הסטטוס?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{names("base.lowest_rate")} נמוך ביותר בריבית ({f.plain("base.a.rate")}%), בסך התשלומים ({f.shekels("base.a.total")}) ובהחזר המרבי ({f.shekels("base.a.highest")}). שורת הסטטוס אומרת ״אפשר להשוות״.</li>
+    <li>בנק א׳ יוצא {f.plain("fc.a.rate")}% ונשאר אחרון, למרות שהריביות שלו לא השתנו. השורה אומרת ״לא להשוות מחיר״ ומציינת שהתחזית שונה.</li>
+    <li>סך התשלומים של בנק א׳ ירד ל־{f.shekels("am.a.total")}, והריבית כמעט לא זזה ({f.plain("am.a.rate")}%). ההלוואה קטנה, לא זולה.</li>
+    <li>בריבית נמוך {names("prop.lowest_rate")}; בסך התשלומים {names("prop.lowest_total")}; בהחזר המרבי {names("prop.lowest_highest")}. הסטטוס אומר שהתמהיל שונה.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="5.3"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "ההפרש בין שני המספרים הוא של הבנקים רק כשהבסיס זהה. אם שני האישורים חושבו על סכומים, תמהילים או תחזיות שונים, ההפרש הוא גם של ההבדלים האלה.",
+    "",
+    "אפשר להשוות, ולשם כך נועדו הסלים האחידים והבסיס המשותף. הכלל הוא שיש להשוות רק על אותו בסיס, לא שאסור.",
+    `ההפרש בין ${f.plain("base.b.rate")}% ל־${f.plain("base.a.rate")}% נראה קטן, אבל הלוואה גדולה וארוכה הופכת אותו לכסף: בין בנק א׳ לבנק ב׳ סך התשלומים נבדל ב־${f.shekels("ex2.answer")}. השאלה אינה אם ההפרש גדול, אלא אם הבסיס זהה.`,
+  ]}
+>
+  ההצעה זולה יותר רק בתנאי שהבסיס זהה. על אותו סכום, אותו תמהיל, אותו חודש ואותה תחזית, ההפרש בין שני המספרים הוא של הבנקים. כשאחד מהארבעה שונה, המספר השתנה גם בגללו.
+</PredictionReveal>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## איך מחשבים את שלושת המספרים
+
+</Section>
+
+בנק א׳, סל 3, {f.shekels("base.a.loan")}. את שלושת המספרים מחשבים מאותם תשלומים חזויים, בשלושה צעדים.
+
+**צעד 1 — התשלום של כל חודש.** מחברים את התשלום של כל המסלולים באותו חודש: זה <M>C<sub>k</sub></M>. בחודש הראשון: <M>{nv(f.rows("base.a.tracks")[0].first)} + {nv(f.rows("base.a.tracks")[1].first)} = {n("base.a.first")}</M>. סך התשלומים החזוי הוא סכום כל ה־<M>C<sub>k</sub></M>, וההחזר המרבי החזוי הוא הגדול ביניהם.
+
+**צעד 2 — הריבית האחת.** מחפשים את <M>r</M>, הריבית החודשית שבה הערך הנוכחי של כל התשלומים שווה למה שקיבלתם (זו הנוסחה מ־3.10): ב־{f.plain("base.a.irr")}% לחודש.
+
+**צעד 3 — לשנה.** בחזקת 12, כמו בשיעור 0.4: <M>(1 + {f.plain("base.a.irr")}/100)<sup>12</sup> − 1</M>, כלומר {f.plain("base.a.rate4")}%. זו הריבית הכוללת החזויה.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-h3 text-navy" dir="ltr">
+    <span class="whitespace-nowrap">P − T = C<sub>1</sub> ÷ (1 + r)<sup>1</sup></span>
+    <span class="whitespace-nowrap ps-8">+ C<sub>2</sub> ÷ (1 + r)<sup>2</sup></span>
+    <span class="whitespace-nowrap ps-8">+ … + C<sub>n</sub> ÷ (1 + r)<sup>n</sup></span>
+  </div>
+  <p class="ltr mt-3 text-h3 text-navy">e = (1 + r)<sup>12</sup> − 1</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">P</dt><dd>סכום ההלוואה כולה: סכום המסלולים, בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">T</dt><dd>תשלומים שנגבים ביום שההלוואה ניתנת, בשקלים (כמו בשיעור 3.10; בנספח של בנק ישראל מסמנים אותם באות אחרת, והאות A שמורה בקורס לעוגן). בלי עמלה — 0</dd>
+    <dt class="ltr font-semibold text-n900">C<sub>k</sub></dt><dd>התשלום של כל המסלולים יחד בסוף חודש k: התשלום החזוי</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>מספר החודשים עד שההלוואה האחרונה נסגרת</dd>
+    <dt class="ltr font-semibold text-n900">r</dt><dd>הריבית החודשית שמחפשים, כמספר עשרוני</dd>
+    <dt class="ltr font-semibold text-n900">e</dt><dd>אותה ריבית לשנה, אפקטיבית, כמספר עשרוני. כפול 100, זו הריבית הכוללת החזויה באחוזים</dd>
+  </dl>
+</div>
+
+**מתי הנוסחה נכונה?**
+1. לכל מסלול יש תחזית, והתחזית אחת לכל ההצעות שמשווים.
+2. T הוא רק מה שנגבה ביום הראשון. מה שמשולם אחר כך נמצא בתוך התשלומים.
+3. יש תשלום אחד בחודש, בסוף החודש.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה של התשלום הכולל בכל חודש (סכום עמודות המסלולים), ומעליה, בתא הראשון, מה שקיבלתם עם מינוס. אחרי זה <span class="ltr">=IRR(A1:A301)</span>, ו־<span class="ltr">=(1+IRR(A1:A301))^12-1</span> לשנה. סך התשלומים: <span class="ltr">=SUM</span> של העמודה, וההחזר המרבי: <span class="ltr">=MAX</span>. ביד אי אפשר: זה 300 תשלומים.</p>
+<p><strong>ב־Mogi:</strong> חישוב לפי ההוראה הוא קוד שאפשר לבדוק, לא מודל שפה (החלטה של Mogi, ישיבת הצוות ב־29 ביולי 2026). מודל שפה מסביר, ולא מחשב.</p>
+</Callout>
+
+<Section kind="דוגמה פתורה">
+
+## דנה ויואב משווים שלוש הצעות
+
+</Section>
+
+דנה ויואב קיבלו מכל אחד משלושת הבנקים הצעה בסל אחיד 3, על {f.shekels("explain.loan")} ל־{f.plain("explain.years")} שנה. הבנקים חישבו אותן באותו חודש ועל אותה תחזית. הם רוצים לדעת מה אפשר להגיד.
+
+**צעד 1 — בודקים את הבסיס.** סכום: אותו סכום. תמהיל: אותו סל. חודש: אותו חודש. תחזית: אותה תחזית. בדיקת הבסיס: {diffs("base.basis")}. אפשר להשוות מחיר.
+
+**צעד 2 — קוראים את שלושת המספרים.** בריבית כוללת חזויה: בנק א׳ {f.plain("base.a.rate")}%, בנק ב׳ {f.plain("base.b.rate")}%, בנק ג׳ {f.plain("base.c.rate")}%. בסך התשלומים: {f.shekels("base.a.total")}, {f.shekels("base.b.total")} ו־{f.shekels("base.c.total")}. בהחזר המרבי: {f.shekels("base.a.highest")}, {f.shekels("base.b.highest")} ו־{f.shekels("base.c.highest")}.
+
+**צעד 3 — מה אפשר להגיד.** {names("base.lowest_rate")} נמוך ביותר בשלושת המספרים. בנק ב׳ ובנק ג׳ קרובים מאוד ({f.plain("base.b.rate")}% לשניהם, בעיגול לשתי ספרות), והפרש סך התשלומים ביניהם הוא רק {f.shekels("base.gap_bc")}.
+
+**צעד 4 — מוסיפים עמלה.** נניח שבנק ג׳ גובה עמלה של {f.shekels("fee.amount")} ביום ההעמדה, ושהיא נכנסת לחישוב (אילו עמלות נכנסות — שאלה משפטית פתוחה). אז מה שדנה ויואב מקבלים הוא {f.shekels("fee.c.received")}, והתשלומים לא משתנים ({f.shekels("fee.c.total")}). הריבית הכוללת החזויה של בנק ג׳ עולה מ־{f.plain("base.c.rate")}% ל־{f.plain("fee.c.rate")}%. עמלה קטנה מייקרת גם בלי לשנות שום ריבית.
+
+**צעד 5 — מה עדיין לא נכנס.** כל זה על נתונים שנמסרו ועוד לא נבדקו (שיעור 5.1), ועל תחזית אחת. מה שיתברר בשמאות ובחיתום עלול לשנות את התנאים. והוראה 451 לא אומרת, לפי התעתיק, איזו הצעה לבחור.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מה שונה בין שתי ההצעות?
+
+</Section>
+
+לכל זוג הצעות, בחרו מה שונה ביניהן ומונע השוואת מחיר. הזוג הראשון כבר מלא.
+
+<MatchTable
+  client:visible
+  id="5.3-half"
+  promptLabel="זוג הצעות"
+  answerLabel="מה שונה"
+  options={["הכול זהה", "הסכום", "התמהיל", "החודש", "התחזית"]}
+  rows={[
+    { prompt: "שני בנקים, שניהם סל אחיד 3, שניהם על אותו סכום, באותו חודש ועל אותה תחזית.", answer: "הכול זהה", why: "אין הבדל בבסיס: זו השוואת מחיר.", given: true },
+    { prompt: `בנק א׳ הציע ${formatShekels(f.raw("half.loan_a"))} ובנק ב׳ ${formatShekels(f.raw("half.loan_b"))}. הכול אחר זהה.`, answer: "הסכום", why: "סכום שונה מייצר סך תשלומים שונה גם בלי הבדל במחיר." },
+    { prompt: "בנק א׳ הציע סל אחיד 2 ובנק ב׳ סל אחיד 3, על אותו סכום, חודש ותחזית.", answer: "התמהיל", why: "ההרכב שונה: שלישים מול חצאים, ומסלול משתנה צמוד שיש רק באחד." },
+    { prompt: "שני הבנקים חישבו על אותו חודש, אבל בנק א׳ חישב לפי תחזית אחת ובנק ב׳ לפי תחזית אחרת.", answer: "התחזית", why: "אותו חודש, תחזית שונה: המספרים של שני הבנקים נשענים על הנחות שונות." },
+    { prompt: "ההצעה של בנק א׳ ניתנה באוקטובר ושל בנק ב׳ בנובמבר, וכל אחד חישב לפי התחזית של החודש שלו.", answer: "החודש", why: "חודש שונה, ולכן גם תחזית שונה. הבדיקה של הקורס מציינת את שניהם; הסיבה הראשונה היא החודש." },
+  ]}
+  success="לפני שמשווים: סכום, תמהיל, חודש, תחזית. אם אחד שונה, המספרים לא ניתנים להשוואת מחיר."
+  hint="שאלו ארבע שאלות: האם הסכום זהה? התמהיל? החודש? התחזית?"
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הסכומים, אחוזי הריבית והבנקים בתרגילים הם מספרים להמחשה, לא נתוני שוק ולא הצעות של בנק.
+התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="5.3-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "כמה שקלים תשלמו בסך הכול", feedback: "זה סך התשלומים החזוי, מספר אחר. הריבית הכוללת החזויה היא אחוז לשנה." },
+    { text: "העלות הממשית של האשראי: האחוז האחד, לשנה, שמסביר את כל התשלומים החזויים מול מה שקיבלתם בפועל", correct: true, feedback: "נכון. זה ה־IRR משיעור 3.10, בחזקת 12, לפי נספח 4 (תעתיק של הצוות; לא נבדק)." },
+    { text: "אחוז הריבית שכתוב בחוזה", feedback: "אחוז הריבית בחוזה הוא רק חלק. הריבית הכוללת החזויה כוללת גם תחזית ועמלות." },
+    { text: "ההחזר החודשי הגבוה ביותר", feedback: "זה ההחזר המרבי החזוי. הריבית הכוללת החזויה היא אחוז, לא סכום חודשי." },
+  ]}
+>
+  מה מודדת ״ריבית כוללת חזויה״?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.3-2"
+  n={2}
+  level="קל"
+  answer={f.raw("ex2.answer")}
+  errors={[
+    { value: f.raw("ex2.err_first"), message: "זה ההפרש בהחזר הראשון. השאלה היא על סך התשלומים החזוי." },
+  ]}
+>
+  באותו סל אחיד 3, סך התשלומים החזוי של בנק ב׳ הוא {f.shekels("base.b.total")} ושל בנק א׳ {f.shekels("base.a.total")}. בכמה שקלים סך התשלומים של בנק ב׳ גבוה יותר?
+</NumericExercise>
+
+<Solution for="5.3-2">
+<M>{n("base.b.total")} − {n("base.a.total")} = {n("ex2.answer")}</M>. ההחזר הראשון שונה רק ב־{f.shekels("ex2.err_first")}, אבל זה נמשך 300 חודשים והתחזית מגדילה אותו.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.3-3"
+  ordered
+  n={3}
+  level="בינוני"
+  options={[
+    { text: "הסכום", feedback: "הסכום זהה: שתי ההצעות על אותה הלוואה." },
+    { text: "התחזית", correct: true, feedback: `נכון. בנק א׳ ירד מ־${f.plain("base.a.rate")}% ל־${f.plain("fc.a.rate")}%, בלי ששום ריבית בהצעה השתנתה: התחזית שונה.` },
+    { text: "הסל", feedback: "הסל זהה: סל 3 בשתי ההצעות." },
+    { text: "כלום: ההבדל הוא במחיר", feedback: "הריביות של הבנק לא השתנו. מה שהשתנה הוא התחזית." },
+  ]}
+>
+  בנק א׳ הציג בסל אחיד 3 ריבית כוללת חזויה של {f.plain("base.a.rate")}%. בנק ב׳ הציג {f.plain("base.b.rate")}%. מתברר שבנק א׳ חישב על תחזית אחת, ובנק ב׳ על תחזית אחרת, ושאר הדברים זהים. מה שונה בין ההצעות?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="5.3-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "היא יורדת, כי קיבלתם פחות כסף", feedback: "קיבלתם פחות ואתם מחזירים אותו דבר. כל שקל שקיבלתם עולה יותר." },
+    { text: "היא עולה, כי המחשבון מתייחס למה שקיבלתם בפועל", correct: true, feedback: `נכון. אצל בנק ג׳ ${f.plain("base.c.rate")}% עולים ל־${f.plain("fee.c.rate")}% בעמלה של ${f.shekels("fee.amount")}, בלי לשנות ריבית אחת (שיעור 3.10).` },
+    { text: "היא לא משתנה: עמלה אינה ריבית", feedback: "עמלה שנגבית ביום הראשון מקטינה את מה שקיבלתם, ולכן מעלה את הריבית האחת שמסבירה את התשלומים." },
+    { text: "סך התשלומים עולה בעמלה, והריבית נשארת", feedback: `סך התשלומים נשאר ${f.shekels("fee.c.total")}. העמלה לא מוסיפה תשלום, היא מקטינה את מה שקיבלתם.` },
+  ]}
+>
+  בנק ג׳ גובה עמלה של {f.shekels("fee.amount")} ביום שההלוואה ניתנת, והעמלה נכנסת לחישוב. מה קורה לריבית הכוללת החזויה שלו?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="5.3-5"
+  n={5}
+  level="בינוני"
+  unit="%"
+  tolerance={0.05}
+  near={0.15}
+  answer={f.raw("ex5.answer")}
+  errors={[
+    { value: f.raw("ex5.err_of_highest"), tolerance: 0.05, message: "חילקתם את ההפרש בהחזר המרבי. כמה המרבי מעל הראשון: מחלקים בהחזר הראשון." },
+  ]}
+>
+  בסל אחיד 2 אצל בנק א׳, ההחזר הראשון הוא {f.shekels("mx.a.first")} וההחזר המרבי החזוי {f.shekels("mx.a.highest")} (בחודש {f.plain("mx.a.highest_month")}). בכמה אחוזים המרבי גבוה מהראשון? (ספרה אחת אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="5.3-5">
+ההפרש: <M>{n("mx.a.highest")} − {n("mx.a.first")} = {n("ex5.gap")}</M>. מחלקים בהחזר הראשון: <M>{n("ex5.gap")} ÷ {n("mx.a.first")}</M>, כפול 100: {f.plain("ex5.answer")}%. זה הרבה מעל 10%, הסף ש־Mogi משתמשת בו להדגשה (שיעור 3.8). כאן הוא נובע מהמסלול הצמוד והמשתנה שבסל 2.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="5.3-6"
+  ordered
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: `בנק ג׳ הוא הזול ביותר: הוא נמוך בריבית (${f.plain("prop.c.rate")}%)`, feedback: "בריבית כוללת חזויה הוא אכן נמוך, אבל בסך התשלומים נמוך בנק ב׳, וההצעות בתמהילים שונים." },
+    { text: "בנק ב׳ הוא הזול ביותר: סך התשלומים שלו הנמוך ביותר", feedback: "סך התשלומים נמוך אצלו כי אחד המסלולים שלו קצר יותר. ההצעות בתמהילים שונים, ולכן אי אפשר להשוות מחיר." },
+    { text: "אי אפשר לקבוע: התמהילים שונים, ושלושת המספרים נותנים שני בנקים נמוכים", correct: true, feedback: `נכון. הבדיקה מציינת תמהיל שונה. הנמוך בריבית: ${names("prop.lowest_rate")}; בסך התשלומים: ${names("prop.lowest_total")}; בהחזר המרבי: ${names("prop.lowest_highest")}.` },
+    { text: "בנק א׳ הוא הזול ביותר: ההחזר הראשון שלו הוא הנמוך ביותר", feedback: `ההחזר הראשון של בנק א׳ (${f.shekels("prop.a.first")}) נמוך מהשניים האחרים, אבל זה מספר אחד, והתמהילים שונים.` },
+  ]}
+>
+  שלושת הבנקים הציעו סל מוצע, ובכל אחד התמהיל שלו. ההחזר הראשון: בנק א׳ {f.shekels("prop.a.first")}, בנק ב׳ {f.shekels("prop.b.first")}, בנק ג׳ {f.shekels("prop.c.first")}. מי הזול ביותר?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="5.3-7"
+  ordered
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: `בנק ג׳ נמוך בשתי התחזיות, ולכן ההצעה שלו זולה יותר`, feedback: `בתחזית ב׳ הנמוך בריבית הוא ${names("propB.lowest_rate")}, לא בנק ג׳. בתחזית א׳ הנמוך הוא ${names("prop.lowest_rate")}.` },
+    { text: "הנמוך בריבית משתנה עם התחזית: בתחזית א׳ הוא בנק ג׳, ובתחזית ב׳ בנק ב׳. לכן משווים תמהילים שונים רק על תחזית אחת, וגם אז זה לא מחיר", correct: true, feedback: `נכון. הסל המוצע של בנק ב׳ כבד פחות על פריים לאורך זמן, ולכן התחזית ב׳ (שבה הפריים עולה יותר) פוגעת בו פחות: ${f.plain("propB.b.rate")}% מול ${f.plain("propB.c.rate")}% אצל בנק ג׳.` },
+    { text: "התחזית לא משפיעה על הסלים המוצעים, רק על האחידים", feedback: "התחזית משפיעה על כל מסלול שתשלומיו תלויים בעוגן או במדד, בכל סל." },
+    { text: "בנק א׳ הוא הנמוך בשתי התחזיות", feedback: `בתחזית א׳ בנק א׳ יוצא ${f.plain("prop.a.rate")}%, ובתחזית ב׳ ${f.plain("propB.a.rate")}%. בשתיהן יש נמוך ממנו.` },
+  ]}
+>
+  בתחזית להמחשה א׳ הנמוך בריבית בין שלושת הסלים המוצעים הוא {names("prop.lowest_rate")}. מחשבים אותם שוב בתחזית ב׳. מה נכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על מדדי ההשוואה">
+<p><strong>מה זה?</strong> שלושה מספרים שהאישור העקרוני מציג לכל הצעה: ריבית כוללת חזויה (אחוז לשנה), סך תשלומים חזוי (שקלים), והחזר מרבי חזוי (שקלים לחודש).</p>
+<p><strong>למה זה קיים?</strong> לפי התעתיק של הצוות, בנק ישראל קבע את המדדים ואת התחזית שלהם כדי שאפשר יהיה להשוות הצעות על אותה שיטה (לא נבדק מול ההוראה).</p>
+<p><strong>איך זה עובד?</strong> הבנק מחשב את התשלומים לפי תחזית, מחבר אותם, ומחפש את הריבית האחת שמסבירה אותם מול מה שקיבלתם בפועל.</p>
+<p><strong>איך זה משפיע עליכם?</strong> שני אישורים שמציגים את אותם שלושה מספרים לא בהכרח ניתנים להשוואה. הסכום, התמהיל, החודש והתחזית צריכים להיות זהים.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> קודם בודקים את הבסיס. רק אם הוא זהה, ההפרש הוא של הבנקים. ואז מסתכלים על שלושת המספרים יחד: כל אחד עונה על שאלה אחרת, ואף אחד מהם לבדו לא קובע.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שלושה מספרים לכל הצעה** (לפי תעתיק של הצוות, לא נבדק מול ההוראה): ריבית כוללת חזויה, סך תשלומים חזוי, והחזר מרבי חזוי.
+- **ריבית כוללת חזויה** = העלות הממשית של האשראי (3.10): ה־IRR החודשי של התשלומים החזויים מול ההלוואה פחות מה שנגבה ביום ההעמדה, בחזקת 12.
+- **סך תשלומים חזוי** = סכום התשלומים לפי תחזית. הוא לא ערך נוכחי.
+- **מותר להשוות מחיר** רק על אותו סכום, אותו תמהיל, אותו חודש ואותה תחזית.
+- **משברים בבסיס:** תחזית אחרת הפכה בנק נמוך לגבוה, סכום קטן הוריד את סך התשלומים, ותמהילים שונים נתנו שני בנקים נמוכים.
+- **אילו עמלות נכנסות לחישוב** (T): שאלה משפטית פתוחה. המדד חזוי ותלוי בתחזית אחת.
+
+**בשיעור הבא — 5.4, תחזית לפי הוראה 451:** איך מחשבים את העוגנים העתידיים מעקום האפס ואת האינפלציה הצפויה. כאן התחזיות היו נתון.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "העלות הממשית של האשראי לפי נספח 4 בהוראת בנק ישראל 451: שיעור התשואה הפנימי החודשי, שבו הערך הנוכחי של התשלומים העתידיים שווה לסכום האשראי פחות A (התשלומים שנגבים ביום העמדת האשראי), ומומר לשנה כ־((1 + IRR)^12 − 1) × 100. A הוא ״תוספת״ כהגדרתה בחוק אשראי הוגן. לפי תעתיק של הצוות ב־Brain (דף 7733250, מגרסה 22 מ־19.7.2023, שהורדה ב־2026-08-03), ממתין לבדיקה מול ההוראה.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "האישור העקרוני מציג את הריבית הכוללת החזויה, את הסכום הכולל הצפוי להיות משולם (סכום כל התשלומים החזויים) ואת ההחזר החודשי הראשון וההחזר החודשי הגבוה ביותר הצפוי (סעיף 4ג(ב4)). לפי אותו תעתיק.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "כללי החישוב בנספח 4: התחזיות הן מפרסום בנק ישראל; מחשבים כאילו ההלוואה ניתנה בתחילת החודש שבו האישור ניתן; מסלולים שנמשכו בתאריכים שונים מחושבים כאילו כל ההלוואה נמשכה ביום החישוב; אם בנק ישראל לא פרסם, משתמשים בתחזית האחרונה שפורסמה. מסלול בלי תחזית: האישור מציין שהעלות הממשית לא כוללת אותו. לפי אותו תעתיק.", date: "2026-08-03" },
+    { kind: "לא אומת", text: "הפרסום של בנק ישראל מתעדכן פעמיים בחודש, ויש בו שני סוגי ממוצע (קלנדרי ומדדי): לפי הערת הצוות ב־Brain (דף 67469313, אוגוסט 2026), ממתין לבדיקה מול הפרסום.", date: "2026-08-03" },
+    { kind: "החלטה של Mogi", text: "חישוב לפי הוראה 451 הוא קוד שאפשר לבדוק; מודל שפה מסביר ומסווג ואינו מחשב. הוחלט בישיבת הצוות ב־2026-07-29 (Brain, דף 16515075).", date: "2026-07-29" },
+    { kind: "מחקר / הצעה", text: "אילו עמלות נכנסות ל־A: שאלה משפטית שהצוות סימן כפתוחה (Brain, דף 7733250, אוגוסט 2026). בקורס עמלה של 3,000 ₪ בדוגמה נחשבת כהנחת חישוב. איך בנקים מציגים את שלושת המספרים בפועל, ואם ביניהם מציגים מספרים של בנקים אחרים — לא ידוע.", date: "2026-08-17" },
+    { kind: "הנחת חישוב", text: "שלושת הבנקים, הריביות, שלוש התחזיות (עוגן פריים, עוגנים ריאליים ואינפלציה קבועה לשנה, ותחזית של חודש אחר), דנה ויואב והעמלה בדויים, להמחשה: לא הצעות של בנק ולא תחזית של בנק ישראל. ריבית חודשית = אחוז הריבית לשנה חלקי 12. הלוחות לפי כלל העיגול של הקורס (הריבית של כל חודש מעוגלת לאגורה, התשלום האחרון סוגר את היתרה); בנק יכול לעגל אחרת. ארבעת התנאים להשוואה הם בנייה של הקורס מכללי הנספח, לא ניסוח של ההוראה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript (הריבית בחצייה) ובנפרד ב־Python (בשיטת ניוטון). גם בדיקת הבסיס ובחירת ההצעה הנמוכה נבדקו בנפרד.", date: "2026-10-16" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/offers.ts (measureOffer, basisDifferences, compareOffers; schedules via metrics.ts) and src/data/offer-examples.ts (invented banks and forecasts) via scripts/lessons/lesson-5-3.ts and data/lessons/5-3.json, rechecked by checks/kinds/offers.py. Illustration: src/components/OfferCompare.vue. Video: video/5-3.html. */}

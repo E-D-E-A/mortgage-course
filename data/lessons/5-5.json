@@ -1,0 +1,487 @@
+{
+  "lesson": "5.5",
+  "title": "ממוצע שוק, אומדן, הצעה אישית ועסקה שבוצעה",
+  "note": "All rates are invented for teaching: not market data, not a bank's quote, not a Bank of Israel average. Contract rates are nominal annual rates; monthly = annual ÷ 12; the effective rate is the twelfth-root conversion of lesson 0.4. Schedules follow the statement convention.",
+  "facts": [
+    {
+      "id": "pred.avg",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.80"
+    },
+    {
+      "id": "pred.offer",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.7"
+    },
+    {
+      "id": "pred.offer_eff",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "4.7",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "4.8"
+    },
+    {
+      "id": "pred.naive_gap",
+      "kind": "fcast_points",
+      "inputs": {
+        "op": "minus",
+        "a": "pred.avg",
+        "b": "pred.offer",
+        "decimals": 2
+      },
+      "value": "0.1"
+    },
+    {
+      "id": "n.avg",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.80"
+    },
+    {
+      "id": "n.bank_b_avg",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.85"
+    },
+    {
+      "id": "n.offer",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.65"
+    },
+    {
+      "id": "n.quote",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.58"
+    },
+    {
+      "id": "n.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.55"
+    },
+    {
+      "id": "n.calc",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.6"
+    },
+    {
+      "id": "n.deal",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.45"
+    },
+    {
+      "id": "n.neighbor",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "n.offer_eff",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "4.65",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "4.75"
+    },
+    {
+      "id": "n.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "500000.00"
+    },
+    {
+      "id": "n.avg_gap",
+      "kind": "fcast_points",
+      "inputs": {
+        "op": "minus",
+        "a": "n.avg",
+        "b": "n.offer_eff",
+        "decimals": 2
+      },
+      "value": "0.05"
+    },
+    {
+      "id": "n.est_gap",
+      "kind": "fcast_points",
+      "inputs": {
+        "op": "minus",
+        "a": "n.offer",
+        "b": "n.est",
+        "decimals": 2
+      },
+      "value": "0.1"
+    },
+    {
+      "id": "v.offer",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.65|300|300|0|0|statement"
+      },
+      "value": "2821.90"
+    },
+    {
+      "id": "v.est",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.55|300|300|0|0|statement"
+      },
+      "value": "2793.37"
+    },
+    {
+      "id": "v.deal",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|500000|4.45|300|300|0|0|statement"
+      },
+      "value": "2764.99"
+    },
+    {
+      "id": "v.pay_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "v.offer",
+        "subtrahend": "v.est"
+      },
+      "value": "28.53"
+    },
+    {
+      "id": "v.deal_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "v.offer",
+        "subtrahend": "v.deal"
+      },
+      "value": "56.91"
+    },
+    {
+      "id": "v.total_offer",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.65|300|300|0|0|statement"
+      },
+      "value": "846571.92"
+    },
+    {
+      "id": "v.total_est",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|500000|4.55|300|300|0|0|statement"
+      },
+      "value": "838011.83"
+    },
+    {
+      "id": "v.total_gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "v.total_offer",
+        "subtrahend": "v.total_est"
+      },
+      "value": "8560.09"
+    },
+    {
+      "id": "m.price_s",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "m.price_m",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.7"
+    },
+    {
+      "id": "m.price_w",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.4"
+    },
+    {
+      "id": "m.x_avg",
+      "kind": "fcast_average",
+      "inputs": {
+        "rates": "4.2,4.2,4.2,4.2,4.2,4.2,4.7,4.7,4.7,5.4",
+        "decimals": 2
+      },
+      "value": "4.47"
+    },
+    {
+      "id": "m.y_avg",
+      "kind": "fcast_average",
+      "inputs": {
+        "rates": "4.2,4.2,4.2,4.7,4.7,4.7,5.4,5.4,5.4,5.4",
+        "decimals": 2
+      },
+      "value": "4.83"
+    },
+    {
+      "id": "m.gap",
+      "kind": "fcast_points",
+      "inputs": {
+        "op": "minus",
+        "a": "m.y_avg",
+        "b": "m.x_avg",
+        "decimals": 2
+      },
+      "value": "0.36"
+    },
+    {
+      "id": "m.y_below",
+      "kind": "fcast_count_below",
+      "inputs": {
+        "rates": "4.2,4.2,4.2,4.7,4.7,4.7,5.4,5.4,5.4,5.4",
+        "than": "m.y_avg"
+      },
+      "value": 6
+    },
+    {
+      "id": "m.y_count",
+      "kind": "fcast_count",
+      "inputs": {
+        "rates": "4.2,4.2,4.2,4.7,4.7,4.7,5.4,5.4,5.4,5.4"
+      },
+      "value": 10
+    },
+    {
+      "id": "m.x_below",
+      "kind": "fcast_count_below",
+      "inputs": {
+        "rates": "4.2,4.2,4.2,4.2,4.2,4.2,4.7,4.7,4.7,5.4",
+        "than": "m.x_avg"
+      },
+      "value": 6
+    },
+    {
+      "id": "w.simple",
+      "kind": "fcast_average",
+      "inputs": {
+        "rates": "4.3,4.7,5.4",
+        "decimals": 2
+      },
+      "value": "4.8"
+    },
+    {
+      "id": "w.size",
+      "kind": "fcast_weighted_average",
+      "inputs": {
+        "rates": "4.3,4.7,5.4",
+        "amounts": "800000,400000,200000",
+        "decimals": 2
+      },
+      "value": "4.57"
+    },
+    {
+      "id": "w.gap",
+      "kind": "fcast_points",
+      "inputs": {
+        "op": "minus",
+        "a": "w.simple",
+        "b": "w.size",
+        "decimals": 2
+      },
+      "value": "0.23"
+    },
+    {
+      "id": "w.amount1",
+      "kind": "given",
+      "inputs": {},
+      "value": "800000.00"
+    },
+    {
+      "id": "w.amount2",
+      "kind": "given",
+      "inputs": {},
+      "value": "400000.00"
+    },
+    {
+      "id": "w.amount3",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000.00"
+    },
+    {
+      "id": "w.rate1",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.3"
+    },
+    {
+      "id": "w.rate2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.7"
+    },
+    {
+      "id": "w.rate3",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.4"
+    },
+    {
+      "id": "w.total_amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "1400000.00"
+    },
+    {
+      "id": "eff.4.2",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "4.2",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "4.28"
+    },
+    {
+      "id": "eff.4.7",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "4.7",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "4.8"
+    },
+    {
+      "id": "eff.5.1",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "5.1",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "5.22"
+    },
+    {
+      "id": "eff.5.6",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "5.6",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "5.75"
+    },
+    {
+      "id": "nom.4.2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.2"
+    },
+    {
+      "id": "nom.4.7",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.7"
+    },
+    {
+      "id": "nom.5.1",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.1"
+    },
+    {
+      "id": "nom.5.6",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.6"
+    },
+    {
+      "id": "ex3.nominal",
+      "kind": "given",
+      "inputs": {},
+      "value": "5.1"
+    },
+    {
+      "id": "ex3.answer",
+      "kind": "effective_annual_rate",
+      "inputs": {
+        "annual_percent": "5.1",
+        "periods_per_year": 12,
+        "decimals": 2
+      },
+      "value": "5.22"
+    },
+    {
+      "id": "ex4.answer",
+      "kind": "fcast_weighted_average",
+      "inputs": {
+        "rates": "4.1,4.9,5.5",
+        "amounts": "600000,300000,100000",
+        "decimals": 2
+      },
+      "value": "4.48"
+    },
+    {
+      "id": "ex4.err_simple",
+      "kind": "fcast_average",
+      "inputs": {
+        "rates": "4.1,4.9,5.5",
+        "decimals": 2
+      },
+      "value": "4.83"
+    },
+    {
+      "id": "ex6.pay_high",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|5|360|360|0|0|statement"
+      },
+      "value": "3220.93"
+    },
+    {
+      "id": "ex6.pay_low",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|600000|4.9|360|360|0|0|statement"
+      },
+      "value": "3184.36"
+    },
+    {
+      "id": "ex6.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.pay_high",
+        "subtrahend": "ex6.pay_low"
+      },
+      "value": "36.57"
+    },
+    {
+      "id": "ex6.total_high",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|5|360|360|0|0|statement"
+      },
+      "value": "1159534.64"
+    },
+    {
+      "id": "ex6.total_low",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|600000|4.9|360|360|0|0|statement"
+      },
+      "value": "1146369.98"
+    },
+    {
+      "id": "ex6.err_total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ex6.total_high",
+        "subtrahend": "ex6.total_low"
+      },
+      "value": "13164.66"
+    }
+  ]
+}
