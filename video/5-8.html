@@ -171,10 +171,10 @@
             const oc = after(t, S.terms, r.from, o);
             box(160, r.y, 960, 84, oc);
             txt(1100, r.y + 50, r.head, 26, { anchor: "start", w: 700, o: oc });
-            txt(560, r.y + 36, "החזר ראשון", 17, { anchor: "start", fill: C.n600, o: oc });
-            txt(560, r.y + 70, `${num(r.f)} ₪`, 28, { anchor: "end", w: 700, o: oc, ltr: true });
-            txt(330, r.y + 36, "סך תשלומים", 17, { anchor: "start", fill: C.n600, o: oc });
-            txt(330, r.y + 70, `${num(r.tot)} ₪`, 28, { anchor: "end", w: 700, fill: C.teal, o: oc, ltr: true });
+            txt(780, r.y + 36, "החזר ראשון", 17, { anchor: "start", fill: C.n600, o: oc });
+            txt(780, r.y + 70, `${num(r.f)} ₪`, 28, { anchor: "end", w: 700, o: oc, ltr: true });
+            txt(500, r.y + 36, "סך תשלומים", 17, { anchor: "start", fill: C.n600, o: oc });
+            txt(500, r.y + 70, `${num(r.tot)} ₪`, 28, { anchor: "end", w: 700, fill: C.teal, o: oc, ltr: true });
           }
           txt(640, 520, "תשלום נמוך עכשיו = סך גבוה · ולהפך", 24, { fill: C.n700, w: 600, o: after(t, S.terms, 26, o) });
         }
@@ -199,6 +199,7 @@
             });
             const oj = after(t, S.scen, 12 + k * 6, o);
             txt(X(F(`alt.${a.id}.stress.max`)) - 6, y - 24, `${num(F(`alt.${a.id}.stress.max`))} ₪`, 20, { w: 700, anchor: "end", o: oj, ltr: true });
+            if (k === 0) [["relief", "מקל"], ["base", "בסיס"], ["stress", "מחמיר"]].forEach(([s2, name], j) => txt(X(F(`alt.${a.id}.${s2}.max`)), y + 40, name, 17, { fill: C.n600, o: after(t, S.scen, 8 + j * 1.5, o) }));
           });
           txt(640, 560, "מקל · בסיס · מחמיר — משווים רק באותו תרחיש", 20, { fill: C.n700, w: 600, o: after(t, S.scen, 26, o) });
         }
@@ -226,7 +227,10 @@
           const o10 = after(t, S.bal, 22, o);
           el("line", { x1: X(120), x2: X(120), y1: 180, y2: G.base, stroke: C.n600, "stroke-width": 2, "stroke-dasharray": "6 5", opacity: o10 });
           txt(X(120) + 12, 176, `אחרי 10 שנים · ${V.linkedBal10} ₪ מול ${V.shortBal10} ₪`, 20, { anchor: "end", w: 700, o: o10 });
-          ALT.forEach((a, k) => txt(1240, 230 + k * 40, `${a.letter} ״${a.name}״`, 22, { anchor: "start", w: 700, fill: a.color === C.tq2 ? C.teal : a.color, o }));
+          ALT.forEach((a, k) => {
+            el("line", { x1: 1010, x2: 1050, y1: 238 + k * 40, y2: 238 + k * 40, stroke: a.color, "stroke-width": 6, opacity: o });
+            txt(1240, 245 + k * 40, `${a.letter} ״${a.name}״`, 22, { anchor: "start", w: 700, o });
+          });
         }
         // Scene 6 — limits
         if (inScene(t, S.lim)) {
@@ -246,10 +250,10 @@
             txt(1240, r.y + 32, `${r.a.letter} ״${r.a.name}״`, 22, { anchor: "start", w: 700, o: oa });
             txt(X(Number(r.r)) - 10, r.y + 32, `${pl(r.r)}%`, 24, { anchor: "end", w: 700, o: oa, ltr: true });
           }
-          for (const [p, name] of [[40, "סף הון"], [50, "איסור"]]) {
-            el("line", { x1: X(p), x2: X(p), y1: 195, y2: 440, stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
-            txt(X(p), 468, `${p}% · ${name}`, 20, { fill: C.n700, w: 700, o });
-          }
+          [[40, "סף הון"], [50, "איסור"]].forEach(([p, name], j) => {
+            el("line", { x1: X(p), x2: X(p), y1: 195, y2: 440 + j * 30, stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
+            txt(X(p), 468 + j * 30, `${p}% · ${name}`, 20, { fill: C.n700, w: 700, o });
+          });
         }
         // Scene 7 — the recommendation
         if (inScene(t, S.rec)) {

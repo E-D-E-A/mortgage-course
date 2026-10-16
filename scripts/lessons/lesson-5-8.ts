@@ -19,6 +19,7 @@ import type { TrackSpec } from "../../src/lib/calc/schedule.ts";
 import { ALTERNATIVE_IDS, CANDIDATES, CASE_A, GOAL_CONTEXT, INITIAL_MIX, PRICE_LIST, SCENARIOS, candidate, caseAPasses } from "../../src/data/case-a-mix.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given, givenMoney, type Mix, mixFact, rankFact } from "./_sensitivity-facts.ts";
+import { share } from "./lesson-3-8.ts";
 import { check } from "./regulation-facts.ts";
 
 export const MONTHS = [60, 84, 120, 180, 240, 300] as const;
@@ -149,7 +150,8 @@ export default function lesson58(): LessonData {
 
   // ── Exercises ──
   // 4: what is still owed after 7 years in the linked alternative, against the loan
-  add(difference("ex4.paid_down", loan, get("alt.linked.bal.84")));
+  const paidDown = add(difference("ex4.paid_down", loan, get("alt.linked.bal.84")));
+  add(share("ex4.share", paidDown, loan, 1));
 
   return {
     lesson: "5.8",

@@ -17,6 +17,7 @@ import { maxPaymentAt, maxVariable } from "../../src/lib/calc/regulation.ts";
 import { applyLever, type Lever } from "../../src/lib/calc/sensitivity.ts";
 import { CASE_A, INITIAL_MIX, PRICE_LIST, SCENARIOS, candidate } from "../../src/data/case-a-mix.ts";
 import type { Fact, LessonData } from "../build-data.ts";
+import { share } from "./lesson-3-8.ts";
 import { difference, given, givenMoney, leverFact, type Mix, mixFact, perStep, sumOf } from "./_sensitivity-facts.ts";
 
 const base = SCENARIOS.base;
@@ -166,6 +167,7 @@ export default function lesson57(): LessonData {
   add(difference("ex3.err_naive", loan, paid));
   const principal60 = add(difference("ex3.principal_60", loan, bal60));
   add(difference("ex3.interest_in_60", paid, principal60));
+  add(share("ex3.principal_share", principal60, loan, 1));
   // 4: what 0.25 points on every track add to the total, and the slip of "monthly difference × 360".
   const dFirst = facts.find((f) => f.id === "lv.rate_all.d_first") as Fact;
   add({ id: "ex4.err_times", kind: "met_times", inputs: { of: dFirst.id, count: 360 }, value: moneyString(new Decimal(dFirst.value as string).mul(360)) } as Fact);

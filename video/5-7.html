@@ -267,10 +267,10 @@
             txt(1240, r.y + 28, r.label, 20, { anchor: "start", w: 600, o: oa });
             txt(X(Number(r.v)) - 10, r.y + 28, `${pl(r.v)}%`, 22, { anchor: "end", w: 700, o: oa, ltr: true });
           }
-          for (const [p, name] of [[40, "סף הון"], [50, "איסור"]]) {
-            el("line", { x1: X(p), x2: X(p), y1: 200, y2: 525, stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
-            txt(X(p), 548, `${p}% · ${name}`, 20, { fill: C.n700, w: 700, o, ltr: false });
-          }
+          [[40, "סף הון"], [50, "איסור"]].forEach(([p, name], j) => {
+            el("line", { x1: X(p), x2: X(p), y1: 200, y2: 525 + j * 28, stroke: C.n600, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o });
+            txt(X(p), 548 + j * 28, `${p}% · ${name}`, 20, { fill: C.n700, w: 700, o });
+          });
         }
         // Scene 8 — takeaway
         if (inScene(t, S.end)) {
