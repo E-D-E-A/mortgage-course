@@ -134,7 +134,7 @@ function lineText(l: Verdict["lines"][number]): string {
           @click="go(i)"
         >
           {{ f.title }}
-          <span v-if="answers[i].checked" class="ms-1 text-caption" :class="isRight(i) ? 'text-success' : 'text-n700'">{{ isRight(i) ? "(נכון)" : "(לא מדויק)" }}</span>
+          <span v-if="answers[i].checked" class="ms-1 text-caption" :class="isRight(i) ? 'font-semibold text-n800' : 'text-n700'">{{ isRight(i) ? "(נכון)" : "(לא מדויק)" }}</span>
         </button>
       </li>
     </ol>
