@@ -115,7 +115,7 @@ const verdict = computed(() => {
         <ul class="list-reset mt-1 grid gap-0.5 text-caption text-n700">
           <li v-for="s in side.list" :key="s.kind" class="flex items-center gap-2">
             <span class="inline-block h-3 w-3 shrink-0 rounded-sm border border-n300" :style="{ background: kindColour[s.kind].bg }"></span>
-            {{ KIND_HE[s.kind] }}: <span class="ltr">{{ formatShekelsText(s.amount) }}</span>, <span class="ltr">{{ s.rate }}%</span>
+            <span>{{ KIND_HE[s.kind] }}: <span class="ltr">{{ formatShekelsText(s.amount) }} · {{ s.rate }}%</span></span>
           </li>
         </ul>
       </div>
@@ -131,11 +131,11 @@ const verdict = computed(() => {
     <div class="mt-3 grid gap-2" aria-live="polite">
       <div v-for="r in rows" :key="r.key" class="rounded-md border p-3" :class="r.key === goalKey ? 'border-navy bg-n50' : 'border-n200'">
         <p class="text-caption font-semibold text-n600">{{ r.label }}<span v-if="r.unit" class="font-normal"> · {{ r.unit }}</span></p>
-        <div class="mt-1 grid grid-cols-[1fr_1fr_auto] items-center gap-3">
-          <p class="text-body-m text-n900"><span class="block text-caption text-n600">מה שביקשתם</span><span class="ltr font-semibold">{{ r.a }}</span></p>
-          <p class="text-body-m text-n900"><span class="block text-caption text-n600">ההצעה הנגדית</span><span class="ltr font-semibold">{{ r.b }}</span></p>
-          <p class="rounded-pill px-3 py-1 text-caption font-semibold text-n900" :class="whoTone(who(r.key))">{{ whoWord(who(r.key)) }}</p>
+        <div class="mt-1 grid grid-cols-2 gap-3">
+          <p class="text-body-m text-n900"><span class="block text-caption text-n600">מה שביקשתם</span><span class="ltr font-semibold whitespace-nowrap">{{ r.a }}</span></p>
+          <p class="text-body-m text-n900"><span class="block text-caption text-n600">ההצעה הנגדית</span><span class="ltr font-semibold whitespace-nowrap">{{ r.b }}</span></p>
         </div>
+        <p class="mt-2 inline-block rounded-pill px-3 py-1 text-caption font-semibold text-n900" :class="whoTone(who(r.key))">{{ who(r.key) === "same" ? "אין הבדל" : `טוב יותר: ${whoWord(who(r.key))}` }}</p>
       </div>
       <div class="rounded-md border border-n200 p-3">
         <p class="text-caption font-semibold text-n600">מגבלות הוראה 329</p>
@@ -153,10 +153,10 @@ const verdict = computed(() => {
 
     <div class="mt-4 rounded-md border border-dashed border-n300 p-3">
       <p class="text-body-m font-semibold text-n900">מבט של הבנק: תרגיל, עם עלויות מומצאות</p>
-      <p class="mt-1 text-caption text-n700">
-        הבנק מרוויח מההפרש בין הריבית שהוא גובה למה שהכסף עולה לו, והוא שונה בכל סוג מסלול. את העלויות שלו אנחנו לא יודעים, וכאן הן מומצאות:
-        <span v-for="(v, k) in costs" :key="k"><span> {{ KIND_HE[k] }} <span class="ltr">{{ v }}%</span>;</span></span>
-      </p>
+      <p class="mt-1 text-caption text-n700">הבנק מרוויח מההפרש בין הריבית שהוא גובה למה שהכסף עולה לו, והוא שונה בכל סוג מסלול. את העלויות שלו אנחנו לא יודעים, וכאן הן מומצאות:</p>
+      <ul class="list-reset mt-1 grid gap-0.5 text-caption text-n700">
+        <li v-for="(v, k) in costs" :key="k">{{ KIND_HE[k] }}: <span class="ltr">{{ v }}%</span></li>
+      </ul>
       <p class="mt-2 text-body-m text-n800">
         לפי הכללים האלה, ההפרש בשנה הראשונה (בלי להתחשב בקרן שמוחזרת): <span class="ltr font-semibold">{{ money(marginA) }}</span> במה שביקשתם, ו־<span class="ltr font-semibold">{{ money(marginB) }}</span> בהצעה הנגדית.
       </p>

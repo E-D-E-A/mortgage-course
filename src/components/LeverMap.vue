@@ -5,6 +5,7 @@
 // each statement is. The text is the data file's (src/data/lever-map.ts); the case-A line under each lever is
 // passed by the lesson page, computed in code. Nothing here is ever "free": every card has a cost line.
 import { computed, ref } from "vue";
+import BidiText from "./BidiText.vue";
 import { EFFECT_COLUMNS, EFFECT_TEXT, type Effect, GROUP_NAME, type LeverCard, LEVERS } from "../data/lever-map.ts";
 
 const props = withDefaults(
@@ -52,9 +53,9 @@ const effectMark = (e: Effect) => ({ better: "✓", worse: "✗", none: "—", d
       <p class="text-h3 text-navy">{{ current.name }}</p>
       <p class="mt-1 text-body-m text-n800">{{ current.what }}</p>
       <dl class="mt-3 grid gap-3 text-body-m text-n800">
-        <div><dt class="text-caption font-semibold text-n600">מה זה משפר</dt><dd>{{ current.improves }}</dd></div>
-        <div><dt class="text-caption font-semibold text-n600">מה זה עולה</dt><dd>{{ current.costs }}</dd></div>
-        <div><dt class="text-caption font-semibold text-n600">מתי לא להפעיל</dt><dd>{{ current.whenNot }}</dd></div>
+        <div><dt class="text-caption font-semibold text-n600">מה זה משפר</dt><dd><BidiText :text="current.improves" /></dd></div>
+        <div><dt class="text-caption font-semibold text-n600">מה זה עולה</dt><dd><BidiText :text="current.costs" /></dd></div>
+        <div><dt class="text-caption font-semibold text-n600">מתי לא להפעיל</dt><dd><BidiText :text="current.whenNot" /></dd></div>
       </dl>
 
       <p class="mt-4 text-caption font-semibold text-n600">מה זה עושה לארבעה דברים</p>
@@ -66,10 +67,10 @@ const effectMark = (e: Effect) => ({ better: "✓", worse: "✗", none: "—", d
       </ul>
 
       <p v-if="notes[current.id]" class="mt-4 rounded-md bg-info-bg p-3 text-body-m text-n900">
-        <span class="font-semibold">{{ caseName }}:</span> {{ notes[current.id] }}
+        <span class="font-semibold">{{ caseName }}:</span> <BidiText :text="notes[current.id]" />
       </p>
 
-      <p class="mt-3 text-caption text-n600"><span class="rounded-pill bg-n100 px-2 py-0.5 font-semibold text-n800">{{ current.basis.kind }}</span> {{ current.basis.text }}</p>
+      <p class="mt-3 text-caption text-n600"><span class="rounded-pill bg-n100 px-2 py-0.5 font-semibold text-n800">{{ current.basis.kind }}</span> <BidiText :text="current.basis.text" /></p>
     </div>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">

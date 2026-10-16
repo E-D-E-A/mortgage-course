@@ -146,7 +146,7 @@ const limit = (id: string) => (answered[id] > ANSWER_DAYS ? ANSWER_DAYS_EXTENDED
               <p class="mb-1 flex flex-wrap items-center gap-2 text-caption text-n800">
                 <span class="font-semibold text-n900">{{ c.name }}</span>
                 <span v-if="k === governing" class="rounded-pill bg-navy px-2 py-0.5 text-micro font-semibold text-n0">הקובע</span>
-                <span>{{ short(c.approved) }} → <span class="font-semibold">{{ short(c.validUntil) }}</span> · {{ leftText(left(c)) }}</span>
+                <span>{{ short(c.approved) }} ← <span class="font-semibold">{{ short(c.validUntil) }}</span> · {{ leftText(left(c)) }}</span>
               </p>
               <div class="relative h-6 rounded-sm bg-n100">
                 <span class="absolute inset-y-0 rounded-sm border-2 border-dashed border-n600" :style="seg(request, c.approved)"></span>

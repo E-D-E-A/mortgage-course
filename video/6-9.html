@@ -175,6 +175,8 @@
           dots.forEach((d) => {
             const od = after(t, S.axis, d.at, o);
             if (od <= 0) return;
+            const below = d.y > y0;
+            el("line", { x1: X(d.r), x2: X(d.r), y1: below ? y0 + 40 : y0 + 14, y2: below ? d.y - 28 : d.y + 12, stroke: C.n500, "stroke-width": 2, opacity: od });
             el("circle", { cx: X(d.r), cy: y0 + 27, r: 12, fill: C.navy, opacity: od });
             txt(X(d.r), d.y, d.l, 24, { w: 600, o: od });
           });

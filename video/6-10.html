@@ -1,0 +1,254 @@
+<!doctype html>
+<!--
+  Video scene for lesson 6.10 — "חמש שיחות".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t
+  (seconds) and photographs the page. render(t) depends only on t. Every number comes from
+  data/lessons/6-10.json. The subtitle cues (window.cues) carry the explanatory sentences.
+
+  Script (one idea: five conversations along a case, and in each one you ask before you assume and say only what is true):
+  1. Title.
+  2. The five stations on one line.
+  3. Station 1: the idea of closing the car loan from the equity breaks the financing ceiling; the savings and the plan.
+  4. Station 2: an offer arrives with its own validity; waiting inside it costs nothing.
+  5. Station 3: a refusal on the financing ceiling that no lever of the case reaches.
+  6. Station 4: the prime moves; only that track moves by definition.
+  7. Station 5: a competing offer is a written, real offer on the same request.
+  8. Takeaway. Every outcome after a choice is the exercise's assumption; the scene says so.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 6.10 · סימולציות תיק</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/6-10.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const nw = new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 });
+      const shek = (v) => `${nf.format(Number(v))} ₪`;
+      const shekW = (v) => `${nw.format(Math.round(Number(v)))} ₪`;
+
+      const lr = (x) => `\u2066${x}\u2069`;
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n50: "var(--mogi-n50)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+        danger: "var(--mogi-danger)", dangerBg: "var(--mogi-danger-bg)", warning: "var(--mogi-warning)", warningBg: "var(--mogi-warning-bg)",
+        success: "var(--mogi-success)", successBg: "var(--mogi-success-bg)", infoBg: "var(--mogi-info-bg)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+
+
+      const dt = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+      const V = {
+        carLtv: fact("t.carE.ltv"), carRatio: fact("t.carE.ratio"), payoff: fact("t.payoff"), reserve: fact("a.reserve"), afterCar: fact("t.reserve_after_car"),
+        equity: fact("t.equity"), afterEq: fact("t.reserve_after"), planRatio: fact("t.p.a.ratio"), baseRatio: fact("t.base.ratio"),
+        rates: [fact("t.p.a.rate_1"), fact("t.p.a.rate_2"), fact("t.p.a.rate_3")], first: fact("t.p.a.first"),
+        aApproved: fact("t.a.approved"), aUntil: fact("t.a.valid_until"), bApproved: fact("t.b.approved"), cApproved: fact("t.c.approved"), dApproved: fact("t.d.approved"),
+        dLtv: fact("t.p.d.ltv"), dMax: fact("t.d.max_loan"), dShort: fact("t.d.short"), dShortAfter: fact("t.d.short_after"),
+        decision: fact("t.decision"), primeFirst: fact("t.move.prime.first"), allFirst: fact("t.move.all.first"), simple: fact("t.move.simple"), primeShare: fact("t.prime_share"),
+        totals: { a: fact("t.p.a.total"), b: fact("t.p.b.total"), c: fact("t.p.c.total") }, gapB: fact("t.gap_b"), gapC: fact("t.gap_c"),
+      };
+
+      const S = { title: [0, 9], map: [9, 40], s1: [40, 78], s2: [78, 108], s3: [108, 136], s4: [136, 168], s5: [168, 198], end: [198, 214] };
+      window.duration = 214;
+      window.cues = [
+        [1, 5, "חמש שיחות לאורך תהליך אחד."],
+        [5, 8.5, "הבנקים והכללים בדויים. התוצאות הן בהנחת התרגיל."],
+        [10, 18, "היכרות, הצעה, סירוב, ריבית שזזה, הצעה מתחרה."],
+        [18, 29, "בכל תחנה שאלה אחרת, ושלוש בחירות."],
+        [29, 39, "בחירה טובה, בחירה עם מחיר, ובחירה שפוגעת."],
+        [41, 50, "נועם: נסגור את הלוואת הרכב מההון העצמי?"],
+        [50, 60, `אז שיעור המימון עולה ל־${V.carLtv}%: מעל 75%.`],
+        [60, 69, `מהחסכונות: נשארות ${shekW(V.afterCar)} בלבד.`],
+        [69, 77, `תוכנית אחרת: ${shekW(V.equity)} נוספים, ונשארות ${shekW(V.afterEq)}.`],
+        [79, 88, "בנק א׳ עונה ראשון, ויש לו תוקף משלו."],
+        [88, 98, "הבנקים האחרים עונים אחריו, בתוך התוקף."],
+        [98, 107, "ההמתנה בתוך התוקף לא עולה כלום."],
+        [109, 118, "בנק ד׳ מסרב: שיעור המימון מעל התקרה."],
+        [118, 128, `לא משנה איזה תמהיל: אותם ${V.dLtv}%.`],
+        [128, 135, `חסרים ${shekW(V.dShortAfter)} גם אחרי החסכונות.`],
+        [137, 146, "בנק ישראל מעלה את הריבית לפני החתימה."],
+        [146, 156, "הפריים זז בהגדרה. ושאר ההצעה?"],
+        [156, 167, "לא ידוע. שואלים בכתב מה מוחזק."],
+        [169, 178, "שלוש הצעות על אותה בקשה, אותו חודש."],
+        [178, 188, "אפשר להציג לבנק הצעה כתובה של בנק אחר."],
+        [188, 197, "ולא לומר שיש הצעה כשאין."],
+        [199, 206, "שואלים לפני שמניחים."],
+        [206, 213, "ואומרים רק מה שנכון."],
+      ];
+
+      const card = (x, y, w, h, o) => el("rect", { x: x - w / 2, y, width: w, height: h, rx: 18, fill: C.n0, stroke: C.n200, "stroke-width": 2, opacity: o });
+      const stationNames = ["היכרות", "הצעה שמגיעה", "בנק שמסרב", "ריבית שזזה", "הצעה מתחרה"];
+      const headline = (t, sc, n, o) => {
+        txt(1190, 122, `תחנה ${n}: ${stationNames[n - 1]}`, 46, { anchor: "start", w: 700, o });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 290, "חמש שיחות", 84, { w: 700, o });
+          txt(640, 370, "מההיכרות ועד ההצעה המתחרה", 40, { fill: C.n600, o });
+          txt(640, 440, "בנקים, כללים ותוצאות בדויים. דוגמה לימודית, לא נתוני שוק", 24, { fill: C.n500, o: after(t, S.title, 4, o, 0.8) });
+        }
+        if (inScene(t, S.map)) {
+          const o = vis(t, S.map);
+          txt(640, 100, "חמש תחנות", 46, { w: 700, o });
+          el("line", { x1: 160, x2: 1120, y1: 300, y2: 300, stroke: C.n300, "stroke-width": 6, opacity: o });
+          stationNames.forEach((name, i) => {
+            const x = 1120 - i * 240;
+            const oi = after(t, S.map, 1 + i * 3, o);
+            if (oi <= 0) return;
+            el("circle", { cx: x, cy: 300, r: 34, fill: C.teal, opacity: oi });
+            txt(x, 313, String(i + 1), 36, { w: 700, fill: C.n0, o: oi });
+            txt(x, 380, name, 28, { w: 700, o: oi });
+          });
+          const og = after(t, S.map, 20, o);
+          [["טוב", C.successBg, 960], ["יש לו מחיר", C.warningBg, 640], ["פוגע", C.dangerBg, 320]].forEach(([s, fill, x]) => {
+            el("rect", { x: x - 120, y: 450, width: 240, height: 56, rx: 28, fill, opacity: og });
+            txt(x, 487, s, 28, { w: 600, o: og });
+          });
+        }
+        if (inScene(t, S.s1)) {
+          const o = vis(t, S.s1);
+          headline(t, S.s1, 1, o);
+          const rows = [
+            { at: 1, h: "סגירה מההון העצמי", a: `שיעור מימון ${lr(V.carLtv + "%")}`, b: "מעל 75%: סירוב", bad: true },
+            { at: 20, h: "סגירה מהחסכונות", a: `עולה ${lr(shekW(V.payoff))}`, b: `נשארות ${lr(shekW(V.afterCar))}`, bad: false },
+            { at: 28, h: "הון עצמי נוסף", a: `${lr(shekW(V.equity))} מהחסכונות`, b: `נשארות ${lr(shekW(V.afterEq))}, יחס ${lr(V.planRatio + "%")}`, bad: false, good: true },
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, S.s1, r.at, o);
+            if (oi <= 0) return;
+            const y = 170 + i * 120;
+            card(640, y, 1000, 100, oi);
+            el("rect", { x: 1126, y, width: 14, height: 100, rx: 7, fill: r.bad ? C.danger : r.good ? C.teal : C.n300, opacity: oi });
+            txt(1100, y + 42, r.h, 30, { anchor: "start", w: 700, o: oi });
+            txt(1100, y + 80, `${r.a} · ${r.b}`, 24, { anchor: "start", fill: C.n700, o: oi });
+          });
+        }
+        if (inScene(t, S.s2)) {
+          const o = vis(t, S.s2);
+          headline(t, S.s2, 2, o);
+          const oa = after(t, S.s2, 1, o);
+          card(640, 160, 1000, 150, oa);
+          txt(1100, 205, `בנק א׳, אישור ב־${dt(V.aApproved)}, בתוקף עד ${dt(V.aUntil)}`, 30, { anchor: "start", w: 700, o: oa });
+          txt(1100, 250, `פריים ${lr(V.rates[0] + "%")} · משתנה ${lr(V.rates[1] + "%")} · קבועה ${lr(V.rates[2] + "%")}`, 28, { anchor: "start", o: oa, fill: C.n700 });
+          txt(1100, 290, `החזר ראשון ${lr(shek(V.first))}`, 28, { anchor: "start", o: oa, fill: C.n700 });
+          const ob = after(t, S.s2, 12, o);
+          const ans = [["בנק ב׳", V.bApproved], ["בנק ג׳", V.cApproved], ["בנק ד׳", V.dApproved]];
+          ans.forEach(([n, d], i) => {
+            card(960 - i * 320, 360, 290, 100, ob);
+            txt(960 - i * 320, 402, n, 28, { w: 700, o: ob });
+            txt(960 - i * 320, 440, `עונה ב־${dt(d)}`, 24, { o: ob, fill: C.n700 });
+          });
+          txt(640, 530, "ממתינים בתוך התוקף, ואז משווים על אותו בסיס", 30, { w: 600, o: after(t, S.s2, 20, o), fill: C.teal });
+        }
+        if (inScene(t, S.s3)) {
+          const o = vis(t, S.s3);
+          headline(t, S.s3, 3, o);
+          const o1 = after(t, S.s3, 1, o);
+          card(640, 160, 1000, 130, o1);
+          txt(1100, 210, `בנק ד׳: שיעור מימון ${lr(V.dLtv + "%")}, מעל התקרה שלו`, 32, { anchor: "start", w: 700, o: o1 });
+          txt(1100, 258, "אותו מספר בכל תמהיל: הלוואה חלקי שווי הנכס", 26, { anchor: "start", o: o1, fill: C.n700 });
+          const o2 = after(t, S.s3, 10, o);
+          card(640, 330, 1000, 130, o2);
+          txt(1100, 380, `ההלוואה המרבית אצלו ${lr(shekW(V.dMax))}: חסרים ${lr(shekW(V.dShort))}`, 30, { anchor: "start", w: 600, o: o2 });
+          txt(1100, 428, `אחרי כל החסכונות עדיין חסרים ${lr(shekW(V.dShortAfter))}`, 26, { anchor: "start", o: o2, fill: C.n700 });
+          txt(640, 530, "אין מנוף שמגיע לשם: ממשיכים בלעדיו", 32, { w: 700, o: after(t, S.s3, 18, o), fill: C.teal });
+        }
+        if (inScene(t, S.s4)) {
+          const o = vis(t, S.s4);
+          headline(t, S.s4, 4, o);
+          txt(1190, 172, `בנק ישראל, ${dt(V.decision)}: בהנחת התרגיל עולה ב־0.25 נקודת אחוז`, 28, { anchor: "start", fill: C.n700, o: after(t, S.s4, 1, o) });
+          const bars = [
+            { l: "רק מסלול הפריים", v: V.primeFirst, at: 8, fill: C.teal },
+            { l: "כל המסלולים", v: V.allFirst, at: 14, fill: C.n300 },
+          ];
+          const max = Number(V.allFirst);
+          bars.forEach((b, i) => {
+            const oi = after(t, S.s4, b.at, o);
+            if (oi <= 0) return;
+            const y = 240 + i * 110;
+            txt(1190, y + 30, b.l, 30, { anchor: "start", w: 700, o: oi });
+            const w = 440 * (Number(b.v) / max);
+            el("rect", { x: 880 - w, y: y + 4, width: w, height: 44, rx: 8, fill: b.fill, opacity: oi });
+            txt(864 - w, y + 38, `${lr(shek(b.v))} בחודש`, 28, { anchor: "start", w: 700, o: oi });
+          });
+          txt(640, 500, "הפריים זז בהגדרה. מה מוחזק בשאר ההצעה — שואלים בכתב", 30, { w: 600, o: after(t, S.s4, 22, o), fill: C.teal });
+        }
+        if (inScene(t, S.s5)) {
+          const o = vis(t, S.s5);
+          headline(t, S.s5, 5, o);
+          const rows = [
+            { n: "בנק א׳", v: `${lr(shekW(V.totals.a))}`, d: "ההצעה הטובה ביותר", at: 1 },
+            { n: "בנק ב׳", v: `${lr(shekW(V.totals.b))}`, d: `יקר ב־${lr(shekW(V.gapB))}`, at: 5 },
+            { n: "בנק ג׳", v: `${lr(shekW(V.totals.c))}`, d: `יקר ב־${lr(shekW(V.gapC))}`, at: 9 },
+          ];
+          rows.forEach((r, i) => {
+            const oi = after(t, S.s5, r.at, o);
+            if (oi <= 0) return;
+            const y = 170 + i * 100;
+            card(640, y, 1000, 84, oi);
+            txt(1100, y + 52, r.n, 32, { anchor: "start", w: 700, o: oi });
+            txt(800, y + 52, `סך תשלומים ${r.v}`, 26, { anchor: "start", o: oi, fill: C.n700 });
+            txt(480, y + 52, r.d, 26, { anchor: "start", o: oi, w: 600 });
+          });
+          const og = after(t, S.s5, 14, o);
+          el("rect", { x: 140, y: 490, width: 460, height: 66, rx: 16, fill: C.successBg, opacity: og });
+          txt(370, 533, "הצעה כתובה שקיימת: מותר", 28, { w: 700, o: og });
+          el("rect", { x: 680, y: 490, width: 460, height: 66, rx: 16, fill: C.dangerBg, opacity: after(t, S.s5, 20, o) });
+          txt(910, 533, "הצעה שאין: מידע לא נכון", 28, { w: 700, o: after(t, S.s5, 20, o) });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 250, "שואלים לפני שמניחים", 64, { w: 700, o });
+          txt(640, 345, "ואומרים רק מה שנכון", 52, { fill: C.n700, o: after(t, S.end, 1.5, o) });
+          txt(640, 470, "הבנקים, הכללים והתוצאות בשיעור בדויים, להמחשה בלבד.", 24, { fill: C.n500, o: after(t, S.end, 7, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

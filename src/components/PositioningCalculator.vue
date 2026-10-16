@@ -13,6 +13,7 @@
 // positioning.ts (on regulation.ts, affordability.ts and sensitivity.ts); the page passes the file and the caption.
 import { computed, ref } from "vue";
 import Decimal from "decimal.js";
+import BidiText from "./BidiText.vue";
 import { overMonthsLine, paymentToIncome } from "../lib/calc/affordability.ts";
 import { formatShekels, formatShekelsText } from "../lib/calc/money.ts";
 import { percentString } from "../lib/calc/percent.ts";
@@ -75,6 +76,8 @@ const monthsLeft = computed(() => (props.car ? props.car.monthsLeft - wait.value
 const carCounts = computed(() => !!props.car && !close.value && overMonthsLine(monthsLeft.value));
 const disposable = computed(() => new Decimal(props.recognised).plus(income.value).minus(carCounts.value && props.car ? props.car.monthly : 0));
 const payment = computed(() => qualifyingTotal(tracksNow.value));
+// The payment the page shows is rounded to the agora; the distances are measured from that figure, as the lesson's facts are.
+const shownPayment = computed(() => payment.value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP));
 const loan = computed(() => loanOf(tracksNow.value));
 const ratio = computed(() => paymentToIncome(payment.value, disposable.value));
 const ltv = computed(() => ltvPercentOf(loan.value, props.price));
@@ -119,10 +122,10 @@ function rowOf(t: Threshold): Row {
       over,
       at: s.status === "at",
       points: s.points,
-      room: paymentRoom(disposable.value, payment.value, t.percent),
+      room: paymentRoom(disposable.value, shownPayment.value, t.percent),
       equityNeeded: eq,
-      incomeNeeded: over ? incomeRoom(disposable.value, payment.value, t.percent) : null,
-      paymentCut: over ? paymentCut(disposable.value, payment.value, t.percent) : null,
+      incomeNeeded: over ? incomeRoom(disposable.value, shownPayment.value, t.percent) : null,
+      paymentCut: over ? paymentCut(disposable.value, shownPayment.value, t.percent) : null,
     };
   }
   return { t, over, at: s.status === "at", points: s.points, room: loanRoom(props.price, loan.value, t.percent), equityNeeded: over ? equityToReach(props.price, loan.value, t.percent) : null, incomeNeeded: null, paymentCut: null };
@@ -166,7 +169,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
 
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
-    <p class="text-caption text-n600">{{ source }}</p>
+    <p class="text-caption text-n600"><BidiText :text="source" /></p>
 
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label v-if="has('equity')" class="flex flex-col gap-1">
@@ -200,7 +203,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
     <!-- The two ratios under the sliders; on a phone they stick to the bottom of the screen while a slider moves. -->
     <p class="sticky bottom-2 z-10 mt-4 rounded-md border border-n200 bg-n50 p-3 text-body-m text-n800 shadow-md sm:static sm:shadow-none" role="status">
       יחס ההחזר <span class="ltr font-semibold">{{ actualText("pti", ptiRows) }}%</span> · שיעור המימון <span class="ltr font-semibold">{{ actualText("ltv", ltvRows) }}%</span>
-      <span class="text-n600"> · החזר <span class="ltr">{{ formatShekelsText(payment.toDecimalPlaces(2)) }}</span> על הכנסה פנויה <span class="ltr">{{ formatShekelsText(disposable) }}</span></span>
+      <span class="text-n600"> · החזר <span class="ltr">{{ formatShekelsText(shownPayment) }}</span> על הכנסה פנויה <span class="ltr">{{ formatShekelsText(disposable) }}</span></span>
     </p>
 
     <ul class="list-reset mt-4 flex flex-wrap gap-x-5 gap-y-2 text-caption text-n700" aria-label="מקרא">
@@ -215,7 +218,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
         {{ metricName(l.metric) }}: <span class="ltr">{{ actualText(l.metric, l.rows) }}%</span>
         <span class="text-caption font-normal text-n600"> · נחצו {{ crossedCount(l.rows) }} מתוך {{ l.rows.length }} קווים</span>
       </p>
-      <div class="relative mt-14" role="img" :aria-label="`${metricName(l.metric)} ${actualText(l.metric, l.rows)}%. קווים: ${l.rows.map((r) => r.t.percent + '%').join(', ')}.`">
+      <div class="relative mt-20" role="img" :aria-label="`${metricName(l.metric)} ${actualText(l.metric, l.rows)}%. קווים: ${l.rows.map((r) => r.t.percent + '%').join(', ')}.`">
         <div class="h-4 w-full overflow-hidden rounded-sm bg-n50">
           <div class="h-full" :style="{ width: pos(actualOf(l.metric), l.scale), background: 'var(--mogi-navy)' }"></div>
         </div>
@@ -235,7 +238,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
       <li v-for="r in rows" :key="r.t.id" class="rounded-md border border-n200 p-3">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <p class="text-body-m font-semibold text-n900">
-            {{ r.t.label }}
+            <BidiText :text="r.t.label" />
             <span class="text-caption font-normal text-n600">· {{ KIND_INFO[r.t.kind].name }}</span>
           </p>
           <span class="rounded-pill px-2 py-0.5 text-caption text-n900" :class="statusClass(r)">{{ statusText(r) }}</span>
@@ -260,7 +263,7 @@ const outcome = computed(() => `יחס ההחזר ${percentString(ratio.value)}%
             מקום: אפשר להלוות עוד <span class="ltr whitespace-nowrap font-semibold">{{ money(r.room) }}</span> עד הקו.
           </template>
         </p>
-        <p class="mt-1 text-caption text-n600">{{ KIND_INFO[r.t.kind].crossing }} · {{ r.t.source }}</p>
+        <p class="mt-1 text-caption text-n600"><BidiText :text="`${KIND_INFO[r.t.kind].crossing} · ${r.t.source}`" /></p>
       </li>
     </ol>
 

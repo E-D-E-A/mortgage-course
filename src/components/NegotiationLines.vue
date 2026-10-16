@@ -105,7 +105,7 @@ const short = (iso: string) => dateShort.format(new Date(`${iso}T12:00:00Z`));
 const money = (v: Decimal) => formatShekelsText(v.toString());
 const gapText = (total: Decimal) => {
   const gap = total.minus(competitorTotal.value);
-  return gap.isNegative() ? { word: "זולה מההצעה המתחרה ב־", amount: gap.abs().toString() } : { word: "יקרה מההצעה המתחרה ב־", amount: gap.toString() };
+  return gap.isNegative() ? { word: "זולה ב־", amount: gap.abs().toString() } : { word: "יקרה ב־", amount: gap.toString() };
 };
 const advice: Record<string, string> = { continue: "אפשר להמשיך", small_gain: "עצרו: חסך מעט", time: "עצרו: אין זמן" };
 const showTable = ref(false);
@@ -119,26 +119,16 @@ const showTable = ref(false);
       <span class="text-caption font-semibold text-n600">צעד: <span class="ltr">{{ notch }}</span> נקודות אחוז פחות</span>
       <input v-model.number="notch" type="range" min="0.05" max="0.25" step="0.05" aria-label="גודל הצעד בנקודות אחוז" />
     </label>
-    <div class="mt-3 overflow-x-auto">
-      <table class="w-full min-w-[26rem] border-collapse text-caption sm:text-body-m">
-        <thead>
-          <tr class="border-b border-n200 text-caption text-n600">
-            <th class="py-2 pe-2 text-start">מסלול</th>
-            <th class="py-2 pe-2 text-start">ריבית</th>
-            <th class="py-2 pe-2 text-start">חיסכון בהחזר הראשון</th>
-            <th class="py-2 text-start">חיסכון בסך התשלומים</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in rows" :key="r.name" class="border-b border-n100">
-            <td class="py-1 pe-2 font-semibold text-n900">{{ r.name }}<span class="block text-caption font-normal text-n600"><span class="ltr">{{ formatShekelsText(r.amount) }}</span></span></td>
-            <td class="py-1 pe-2"><span v-if="r.rate" class="ltr">{{ r.rate }}%</span><span v-else>—</span></td>
-            <td class="py-1 pe-2"><span class="ltr">{{ formatShekelsText(r.first) }}</span> בחודש</td>
-            <td class="py-1"><span class="ltr">{{ formatShekelsText(r.total) }}</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <ul class="list-reset mt-3 grid gap-2 sm:grid-cols-2" aria-label="מה שווה צעד, לכל מסלול">
+      <li v-for="r in rows" :key="r.name" class="rounded-md border border-n200 p-3">
+        <p class="flex flex-wrap items-baseline justify-between gap-x-3">
+          <span class="text-body-m font-semibold text-n900">{{ r.name }}</span>
+          <span class="text-caption text-n600"><span class="ltr">{{ formatShekelsText(r.amount) }}</span><template v-if="r.rate"> · <span class="ltr">{{ r.rate }}%</span></template></span>
+        </p>
+        <p class="mt-1 text-body-m text-n800">חיסכון בהחזר הראשון: <span class="ltr font-semibold">{{ formatShekelsText(r.first) }}</span> בחודש</p>
+        <p class="text-body-m text-n800">חיסכון בסך התשלומים: <span class="ltr font-semibold">{{ formatShekelsText(r.total) }}</span></p>
+      </li>
+    </ul>
 
     <ul class="list-reset mt-4 grid gap-2">
       <li v-for="l in lines" :key="l.line" class="rounded-md border border-n200 p-3">
@@ -190,7 +180,7 @@ const showTable = ref(false);
           <tbody>
             <tr v-for="r in run" :key="r.round" class="border-b border-n100 align-top">
               <td class="py-1 pe-2 font-semibold text-n900">{{ r.round }}</td>
-              <td class="py-1 pe-2">{{ short(r.start) }} → {{ short(r.answer) }}<span v-if="!r.fits" class="block text-n700">לא נכנס: אין הצעה</span></td>
+              <td class="py-1 pe-2">{{ short(r.start) }} ← {{ short(r.answer) }}<span v-if="!r.fits" class="block text-n700">לא נכנס: אין הצעה</span></td>
               <td class="py-1 pe-2"><span class="ltr">{{ money(r.gainTotal) }}</span></td>
               <td class="py-1 pe-2">{{ gapText(r.totalAfter).word }}<span class="ltr">{{ formatShekelsText(gapText(r.totalAfter).amount) }}</span></td>
               <td class="py-1">{{ advice[r.advice] }}</td>
@@ -199,7 +189,7 @@ const showTable = ref(false);
         </table>
       </div>
       <p class="mt-2 text-caption text-n700">
-        בלי סבבים: ההצעה של {{ bankName }} {{ gapText(ownTotalStart).word }}<span class="ltr">{{ formatShekelsText(gapText(ownTotalStart).amount) }}</span>.
+        בלי סבבים: ההצעה של {{ bankName }} {{ gapText(ownTotalStart).word }}<span class="ltr">{{ formatShekelsText(gapText(ownTotalStart).amount) }}</span> מההצעה של {{ competitor.name }}, בסך התשלומים.
         <template v-if="lastRun">אחרי הסבב האחרון שנכנס: ההחזר הראשון <span class="ltr">{{ money(lastRun.firstAfter) }}</span>.</template>
       </p>
 
@@ -215,6 +205,24 @@ const showTable = ref(false);
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-x-auto">
+      <table class="mb-4 w-full min-w-[26rem] border-collapse text-caption sm:text-body-m">
+        <thead>
+          <tr class="border-b border-n200 text-caption text-n600">
+            <th class="py-2 pe-2 text-start">מסלול</th>
+            <th class="py-2 pe-2 text-start">ריבית</th>
+            <th class="py-2 pe-2 text-start">חיסכון בהחזר הראשון</th>
+            <th class="py-2 text-start">חיסכון בסך התשלומים</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="r in rows" :key="r.name" class="border-b border-n100">
+            <td class="py-1 pe-2 font-semibold text-n900">{{ r.name }}</td>
+            <td class="py-1 pe-2"><span v-if="r.rate" class="ltr">{{ r.rate }}%</span><span v-else>—</span></td>
+            <td class="py-1 pe-2"><span class="ltr">{{ formatShekelsText(r.first) }}</span></td>
+            <td class="py-1"><span class="ltr">{{ formatShekelsText(r.total) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
       <table class="w-full min-w-[26rem] border-collapse text-caption sm:text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
