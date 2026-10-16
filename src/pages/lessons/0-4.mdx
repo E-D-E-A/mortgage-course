@@ -27,7 +27,7 @@ export const explain = f.rows("explain.table");
 export const first = f.rows("worked.first_month");
 export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%", "קצת פחות מ־6%", "זה תלוי בגודל ההלוואה"];
 
-בשיעור הקודם ראינו <Term t="ריבית דריבית" lesson="0.4">ריבית דריבית</Term>: בכל <Term t="תקופה" lesson="0.4">תקופה</Term> הריבית מצטרפת ל<Term t="יתרה" lesson="0.4">יתרה</Term>, ומהתקופה הבאה מרוויחה ריבית בעצמה.
+בשיעור הקודם ראינו <Term t="ריבית דריבית" client:visible lesson="0.4">ריבית דריבית</Term>: בכל <Term t="תקופה" client:visible lesson="0.4">תקופה</Term> הריבית מצטרפת ל<Term t="יתרה" client:visible lesson="0.4">יתרה</Term>, ומהתקופה הבאה מרוויחה ריבית בעצמה.
 ראינו גם תנאי אחד: הריבית ומספר התקופות צריכים לדבר על אותה תקופה.
 בשיעור הזה נראה מה עושים כשהריבית נאמרת לשנה, אבל מצטרפת כל חודש — ולמה יש לזה שתי דרכים, שנותנות שני מספרים שונים.
 
@@ -58,7 +58,7 @@ export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%",
 
 </Section>
 
-נתחיל מהשאלה: <Term t="הלוואה" lesson="0.4">הלוואה</Term> של 10,000 ₪, בריבית של 6% לשנה. המספר הזה, ״6% לשנה״, נקרא <Term t="ריבית שנתית" lesson="0.4">ריבית שנתית</Term>.
+נתחיל מהשאלה: <Term t="הלוואה" client:visible lesson="0.4">הלוואה</Term> של 10,000 ₪, בריבית של 6% לשנה. המספר הזה, ״6% לשנה״, נקרא <Term t="ריבית שנתית" client:visible lesson="0.4">ריבית שנתית</Term>.
 
 בהלוואה שלנו הריבית לא מחכה לסוף השנה. היא מחושבת ומצטרפת לחוב כל חודש. אז איזה אחוז ריבית לוקחים בכל חודש?
 
@@ -68,7 +68,7 @@ export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%",
   <M>6% ÷ 12 = {f.plain("rate.monthly_6")}%</M>
 </div>
 
-זו <Term t="ריבית חודשית" lesson="0.4">הריבית החודשית</Term>: {f.plain("rate.monthly_6")}% בכל חודש.
+זו <Term t="ריבית חודשית" client:visible lesson="0.4">הריבית החודשית</Term>: {f.plain("rate.monthly_6")}% בכל חודש.
 
 **החודש הראשון.** {f.plain("rate.monthly_6")}% מ־10,000 ₪ הם {T(explain[0].interest)}. בסוף החודש החוב הוא {T(explain[0].closing)}.
 
@@ -105,7 +105,7 @@ export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%",
 החוב גדל יותר מ־6%, כי בכל חודש נוספה גם ריבית על הריבית של החודשים הקודמים.
 
 בכמה אחוזים הוא גדל? נוספו {f.shekels("explain.table_interest")} ריבית. {f.shekels("explain.table_interest")} מתוך 10,000 ₪ הם {f.plain("explain.table_percent")}%.
-לזה קוראים <Term t="ריבית אפקטיבית" lesson="0.4">ריבית אפקטיבית</Term>: כמה הסכום גדל בפועל בשנה שלמה, כשהריבית מצטרפת אליו כמה פעמים בשנה.
+לזה קוראים <Term t="ריבית אפקטיבית" client:visible lesson="0.4">ריבית אפקטיבית</Term>: כמה הסכום גדל בפועל בשנה שלמה, כשהריבית מצטרפת אליו כמה פעמים בשנה.
 
 ### הדרך השנייה: השורש ה־12
 
@@ -113,7 +113,7 @@ export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%",
 
 {f.plain("rate.monthly_6")}% גדולה מדי: ראינו שהיא מביאה ל־{f.plain("rate.effective_6")}%. צריך ריבית חודשית קצת קטנה יותר.
 להוסיף 6% זה להכפיל ב־1.06 (ראינו את זה בשיעור הקודם). אז מחפשים מספר שאם מכפילים אותו בעצמו 12 פעמים, פעם לכל חודש, יוצא בדיוק 1.06.
-מספר כזה נקרא <Term t="שורש" lesson="0.4">השורש ה־12</Term> של 1.06. הוא {f.plain("rate.root_factor_6")} (ויש לו עוד ספרות אחרי אלה).
+מספר כזה נקרא <Term t="שורש" client:visible lesson="0.4">השורש ה־12</Term> של 1.06. הוא {f.plain("rate.root_factor_6")} (ויש לו עוד ספרות אחרי אלה).
 כלומר, הריבית החודשית היא {f.plain("rate.root_6")}% — קצת פחות מ־{f.plain("rate.monthly_6")}%.
 
 בדיקה: 10,000 ₪ שגדלים 12 חודשים בריבית הזו, בלי לעגל אותה, מגיעים בדיוק ל־{f.shekels("explain.root_after_12")}.
@@ -188,7 +188,7 @@ export const predictionOptions = ["בדיוק ב־6%", "קצת יותר מ־6%",
 
 **צעד 1 — חלוקה.** הריבית החודשית היא הריבית השנתית חלקי 12: <M>6% ÷ 12 = {f.plain("rate.monthly_6")}%</M>. נסמן את הריבית השנתית ב־r ואת החודשית ב־m.
 
-**צעד 2 — 12 חודשים של ריבית דריבית.** מהשיעור הקודם: להוסיף {f.plain("rate.monthly_6")}% זה להכפיל ב־{f.plain("base.monthly_6")}. אחרי 12 חודשים מכפילים 12 פעמים, כלומר ב־<Term t="חזקה" lesson="0.4">חזקת</Term> 12:
+**צעד 2 — 12 חודשים של ריבית דריבית.** מהשיעור הקודם: להוסיף {f.plain("rate.monthly_6")}% זה להכפיל ב־{f.plain("base.monthly_6")}. אחרי 12 חודשים מכפילים 12 פעמים, כלומר ב־<Term t="חזקה" client:visible lesson="0.4">חזקת</Term> 12:
 
 <div class="my-4 grid justify-items-end gap-1 text-body-l" dir="ltr">
   <M>{f.plain("base.monthly_6")}<sup>12</sup> = {f.plain("rate.factor_6")}</M>

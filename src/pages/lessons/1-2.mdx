@@ -39,7 +39,7 @@ export const predictionOptions = [
   pct("pred.loan_over_equity"),
 ];
 
-בשיעור הקודם ראינו ש<Term t="משכנתא" lesson="1.2">משכנתא</Term> היא הלוואה שהדירה היא ה<Term t="בטוחה" lesson="1.2">בטוחה</Term> שלה, וש<Term t="מלווה" lesson="1.2">המלווה</Term> מוגן כל עוד יש כרית: חוב קטן ביחס לשווי הדירה.
+בשיעור הקודם ראינו ש<Term t="משכנתא" client:visible lesson="1.2">משכנתא</Term> היא הלוואה שהדירה היא ה<Term t="בטוחה" client:visible lesson="1.2">בטוחה</Term> שלה, וש<Term t="מלווה" client:visible lesson="1.2">המלווה</Term> מוגן כל עוד יש כרית: חוב קטן ביחס לשווי הדירה.
 בשיעור הזה נפרק את מחיר הדירה לשני חלקים — הכסף שלכם וההלוואה — ונראה איזה חלק מותר לממן בהלוואה.
 
 <Section kind="לפני שמתחילים: נחשו">
@@ -71,9 +71,9 @@ export const predictionOptions = [
 
 נחזור לשאלה. הדירה עולה {f.shekels("explain.price")}.
 
-**החלק שלכם.** {f.shekels("explain.equity")} אתם מביאים משלכם: חסכונות, מתנה מהמשפחה, או כסף מדירה שמכרתם. הכסף שאתם מביאים לעסקה משלכם, ולא מהלוואה, נקרא <Term t="הון עצמי" lesson="1.2">הון עצמי</Term>.
+**החלק שלכם.** {f.shekels("explain.equity")} אתם מביאים משלכם: חסכונות, מתנה מהמשפחה, או כסף מדירה שמכרתם. הכסף שאתם מביאים לעסקה משלכם, ולא מהלוואה, נקרא <Term t="הון עצמי" client:visible lesson="1.2">הון עצמי</Term>.
 
-**החלק של המלווה.** את השאר מממנת ה<Term t="הלוואה" lesson="1.2">הלוואה</Term>: <M>{n("explain.price")} − {n("explain.equity")} = {f.shekels("explain.loan")}</M>.
+**החלק של המלווה.** את השאר מממנת ה<Term t="הלוואה" client:visible lesson="1.2">הלוואה</Term>: <M>{n("explain.price")} − {n("explain.equity")} = {f.shekels("explain.loan")}</M>.
 
 כלומר, מחיר הדירה הוא ההון העצמי ועוד ההלוואה. כל שקל במחיר בא מאחד משני המקורות.
 
@@ -90,7 +90,7 @@ export const predictionOptions = [
 </Section>
 
 **איזה חלק מהדירה ממומן בהלוואה?** {f.shekels("explain.loan")} מתוך {f.shekels("explain.price")}. כמו בשיעור 0.1, מחלקים ומכפילים ב־100: <M>{n("explain.loan")} ÷ {n("explain.price")} × 100 = {f.plain("explain.ltv")}</M>.
-ההלוואה מממנת {pct("explain.ltv")} מהדירה. לזה קוראים <Term t="שיעור מימון" lesson="1.2">שיעור מימון</Term>. באנגלית: LTV, מ־Loan To Value — ההלוואה ביחס לשווי.
+ההלוואה מממנת {pct("explain.ltv")} מהדירה. לזה קוראים <Term t="שיעור מימון" client:visible lesson="1.2">שיעור מימון</Term>. באנגלית: LTV, מ־Loan To Value — ההלוואה ביחס לשווי.
 
 **ומה החלק שלכם?** <M>{n("explain.equity")} ÷ {n("explain.price")} × 100 = {f.plain("explain.equity_share")}</M>, כלומר {pct("explain.equity_share")}. שימו לב: שיעור המימון מדבר על **ההלוואה**, לא על הכסף שלכם. מי שמביא {pct("explain.equity_share")} מכספו — מקבל שיעור מימון של {pct("explain.ltv")}.
 
@@ -103,7 +103,7 @@ export const predictionOptions = [
 
 </Section>
 
-מלווה לא מממן כל שיעור מימון שתבקשו. <Term t="בנק ישראל" lesson="1.2">בנק ישראל</Term> קבע תקרות לשיעור המימון בהלוואות לדיור, והתקרה תלויה בסוג העסקה. הכלל הזה הוא חלק מ<Later lesson="4.4">הוראה 329</Later>.
+מלווה לא מממן כל שיעור מימון שתבקשו. <Term t="בנק ישראל" client:visible lesson="1.2">בנק ישראל</Term> קבע תקרות לשיעור המימון בהלוואות לדיור, והתקרה תלויה בסוג העסקה. הכלל הזה הוא חלק מ<Later lesson="4.4">הוראה 329</Later>.
 
 נכון ל־9 באוקטובר 2026, לפי תעתיק של הצוות ב־Brain (לא אומת מול המקור), התקרות הן:
 
@@ -156,7 +156,7 @@ export const predictionOptions = [
 
 עד עכשיו הנחנו שהדירה שווה בדיוק את המחיר שלה. זה לא תמיד כך.
 
-**המחיר** הוא מה שסיכמתם עם המוכר. <Term t="שווי הנכס" lesson="1.2">שווי הנכס</Term> הוא כמה הדירה שווה לפי הערכה בלתי תלויה. המלווה בודק את השווי בעצמו, דרך <Later lesson="1.6">שמאי</Later>, בשלב שנקרא <Later lesson="1.7">שמאות</Later>.
+**המחיר** הוא מה שסיכמתם עם המוכר. <Term t="שווי הנכס" client:visible lesson="1.2">שווי הנכס</Term> הוא כמה הדירה שווה לפי הערכה בלתי תלויה. המלווה בודק את השווי בעצמו, דרך <Later lesson="1.6">שמאי</Later>, בשלב שנקרא <Later lesson="1.7">שמאות</Later>.
 
 **מול מה מחשבים את שיעור המימון כשהשווי והמחיר שונים? זו שאלה פתוחה.** יש לנו שני מקורות, והם מושכים לכיוונים שונים:
 - **לטובת השווי:** בפגישה עם בנקאי נאמר שהמימון נמדד מול השווי שנקבע בהערכה (ידע מהשטח, 2026-08-05, ככל הנראה אילון — בהקלטה לא ברור בוודאות מי הדובר; ממתין לאישור אילון).
@@ -189,7 +189,7 @@ export const predictionOptions = [
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>ההלוואה היא {f.shekels("slider.loan")}, ושיעור המימון {pct("slider.ltv")} — מעל התקרה. צריך לפחות {f.shekels("slider.min_equity_75")} הון עצמי, כלומר עוד {f.shekels("slider.more_75")}.</li>
-    <li>{f.shekels("slider.min_equity_70")}. התקרה ירדה, והחלק שלכם עלה באותו מספר <Term t="נקודת אחוז" lesson="1.2">נקודות אחוז</Term>.</li>
+    <li>{f.shekels("slider.min_equity_70")}. התקרה ירדה, והחלק שלכם עלה באותו מספר <Term t="נקודת אחוז" client:visible lesson="1.2">נקודות אחוז</Term>.</li>
     <li>{f.shekels("slider.min_equity_50")}: {pct("own.investment")} מהמחיר. התקרה היא החלק שמותר לממן; כל השאר — עליכם. תקרה נמוכה משאירה לכם חלק גדול.</li>
   </ol>
 </details>
