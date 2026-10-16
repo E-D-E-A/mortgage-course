@@ -40,6 +40,7 @@ export const ALL = [{ id: "initial", letter: "", goal: "", name: "הראשוני
 export const nTracks = { initial: 3, linked: 2, short: 2, fixed: 1 };
 export const kindsOf = (id) => (id === "initial" ? INITIAL_MIX : candidate(id).tracks).map((t) => KIND_NAME_HE[t.kind]);
 export const builderStart = builderTracks(candidate("short").tracks);
+export const builderInitial = builderTracks(INITIAL_MIX);
 export const predictionOptions = [
   "חלופה א׳: החזר נמוך (צמוד)",
   "חלופה ב׳: סך תשלומים נמוך (25 שנה)",
@@ -351,7 +352,7 @@ export const halfRows = [
 
 </Section>
 
-הבונה מתחיל מחלופה ב׳, ״{ALTS[1].name}״. הוא נותן את ההחזר הראשון, את התשלום הגבוה ביותר בתרחיש ואת הסך; את היתרה בנקודות זמן ואת הגבולות אתם לוקחים מהטבלאות למעלה.
+הבונה מתחיל מחלופה ב׳, ״{ALTS[1].name}״, ומשווה אותה כל הזמן לתמהיל הראשוני: מתחת לכל אחד משלושת המספרים כתוב ההפרש מהראשוני (הקו המקווקו בגרף הוא התשלום של הראשוני). מתחתיו נמצאים יחס ההחזר וחמשת הקווים של הוראה 329, והיתרה אחרי 5, 7, 10 ו־15 שנים, לצד היתרה של הראשוני. את שלושת התרחישים בוחרים בלחיצה. הטבלאות למעלה נשארות כמקום להשוות את כל החלופות יחד.
 
 <MixBuilder
   client:visible
@@ -359,19 +360,24 @@ export const halfRows = [
   tracks={builderStart}
   scenario={{ inflation: Number(sc.base.inflation), primeShift: Number(sc.base.primeShift), primeFromYear: 2, anchorShift: Number(sc.base.anchorShift) }}
   amountStep={1000}
+  scenarioPresets
+  compareTo={{ label: "הראשוני", tracks: builderInitial }}
+  balanceAtYears={[5, 7, 10, 15]}
+  disposableIncome={f.raw("a.disposable")}
+  propertyValue={f.raw("a.price")}
   labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
 />
 
 נסו את שלוש אלה:
-1. **בנו את חלופה א׳.** שנו את מסלול 1 ל״משתנה צמודה״, {f.plain("alt.linked.rate_1")}%, ואת מסלול 2 ל״קבועה צמודה״, {f.plain("alt.linked.rate_2")}%, ושתי התקופות ל־30 שנה. הסכומים: {f.whole("alt.linked.amount_1")} ו־{f.whole("alt.linked.amount_2")}. השוו את שלושת המספרים לטבלה.
-2. **בנו את חלופה ג׳.** מסלול אחד, ״קבועה לא צמודה״, {f.plain("alt.fixed.rate_1")}%, 30 שנה. (הסירו את המסלולים האחרים.)
+1. **בנו את חלופה א׳.** שנו את מסלול 1 ל״משתנה צמודה״, {f.plain("alt.linked.rate_1")}%, ואת מסלול 2 ל״קבועה צמודה״, {f.plain("alt.linked.rate_2")}%, ושתי התקופות ל־30 שנה. הסכומים: {f.whole("alt.linked.amount_1")} ו־{f.whole("alt.linked.amount_2")}. השוו את שלושת ההפרשים, את היחס ואת היתרות לטבלאות. אחר כך לחצו על ״{SCENARIO_NAME_HE.stress}״ וראו מה קרה לתשלום הגבוה ביותר ולסך.
+2. **בנו את חלופה ג׳.** מסלול אחד, ״קבועה לא צמודה״, {f.plain("alt.fixed.rate_1")}%, 30 שנה. (הסירו את המסלולים האחרים.) השוו שוב את ההפרשים, את היחס ואת היתרות.
 3. **תקופות נפרדות.** חזרו לחלופה ב׳ והעלו את המשתנה ל־30 שנה ואת הקבועה הורידו ל־20. השוו את השורה השנייה בחלק 1.
 
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>חלופה א׳: החזר ראשון {f.shekels("alt.linked.base.first")}, התשלום הגבוה ביותר {f.shekels("alt.linked.base.max")} (בחודש {f.plain("alt.linked.base.max_month")}) וסך תשלומים {f.shekels("alt.linked.base.total")}.</li>
-    <li>חלופה ג׳: {f.shekels("alt.fixed.base.first")} בכל חודש, והסך {f.shekels("alt.fixed.base.total")}. שינוי של המדד או הפריים לא זז כלום.</li>
+    <li>חלופה א׳, בתרחיש הבסיס: החזר ראשון {f.shekels("alt.linked.base.first")} ({delta("alt.linked.d_first")} מהראשוני), התשלום הגבוה ביותר {f.shekels("alt.linked.base.max")} (בחודש {f.plain("alt.linked.base.max_month")}; {delta("alt.linked.d_max")}) וסך תשלומים {f.shekels("alt.linked.base.total")} ({delta("alt.linked.d_total")}). יחס ההחזר {f.plain("alt.linked.ratio")}%. היתרה אחרי 5, 7, 10 ו־15 שנים: {f.shekels("alt.linked.bal.60")}, {f.shekels("alt.linked.bal.84")}, {f.shekels("alt.linked.bal.120")} ו־{f.shekels("alt.linked.bal.180")}. בתרחיש מחמיר: התשלום הגבוה ביותר {f.shekels("alt.linked.stress.max")} והסך {f.shekels("alt.linked.stress.total")}.</li>
+    <li>חלופה ג׳: {f.shekels("alt.fixed.base.first")} בכל חודש ({delta("alt.fixed.d_first")} מהראשוני), והסך {f.shekels("alt.fixed.base.total")} ({delta("alt.fixed.d_total")}). יחס ההחזר {f.plain("alt.fixed.ratio")}%. היתרה אחרי 10 שנים {f.shekels("alt.fixed.bal.120")}. שינוי של המדד או הפריים לא זז כלום.</li>
     <li>ההחזר הראשון {f.shekels("term.b.first")} והסך {f.shekels("term.b.total")}: {delta("term.b_first_gap")} פחות בחודש מהשורה הראשונה, וסך גבוה ב־{f.shekels("term.b_total_gap")}.</li>
   </ol>
 </details>
@@ -624,4 +630,4 @@ export const halfRows = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (balances, goals) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-8.ts and data/lessons/5-8.json, rechecked by checks/kinds/sensitivity.py (with schedule.py and regulation.py). Illustration: src/components/MixBuilder.vue (props only; it has no comparison, no balance at chosen months and no ratio — see the report). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-8.html. */}
+{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (balances, goals) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-8.ts and data/lessons/5-8.json, rechecked by checks/kinds/sensitivity.py (with schedule.py and regulation.py). Illustration: src/components/MixBuilder.vue (compareTo, balanceAtYears, scenarioPresets, disposableIncome and propertyValue; the arithmetic is src/lib/calc/mixbuilder.ts and sensitivity.ts balancesAt). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-8.html. */}

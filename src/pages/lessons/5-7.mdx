@@ -225,7 +225,7 @@ export const halfRows = [
 
 </Section>
 
-זה הבונה של שיעור 3.7, והוא מתחיל מהתמהיל הראשוני של נועם ושירה בתרחיש הבסיס. הבונה לא נותן לשנות את סכום ההלוואה כולה: את ידית הסכום ראיתם בטבלה.
+זה הבונה של שיעור 3.7, והוא מתחיל מהתמהיל הראשוני של נועם ושירה בתרחיש הבסיס. הפעם אפשר גם להזיז את **סכום ההלוואה כולה** (המחוון הראשון): כל המסלולים משתנים באותו יחס, כמו בידית הסכום שבטבלה, והמסלול האחרון לוקח את מה שנשאר. מתחת לשלושת המספרים מופיעים יחס ההחזר מול ההכנסה הפנויה וחמשת הקווים של הוראה 329, כך שאפשר לראות איפה כל הזזה פוגשת גבול.
 
 <MixBuilder
   client:visible
@@ -233,19 +233,23 @@ export const halfRows = [
   tracks={builderStart}
   scenario={{ inflation: Number(sc.inflation), primeShift: Number(sc.primeShift), primeFromYear: 2, anchorShift: Number(sc.anchorShift) }}
   amountStep={1000}
+  editableLoan
+  loanStep={10000}
+  disposableIncome={f.raw("a.disposable")}
+  propertyValue={f.raw("a.price")}
   labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
 />
 
 נסו את שלוש אלה. בכל אחת, החזירו קודם את הבונה למצב ההתחלתי:
 1. **אחוז.** קבעו את הסכום של מסלול 1 ל־{f.whole("task1.amount_1")} ושל מסלול 2 ל־{f.whole("task1.amount_2")} (מסלול 3 מקבל את מה שנשאר, {f.whole("task1.amount_3")}). מה קרה לשלושת המספרים ולחלק המשתנה?
-2. **ריבית ותקופה, אחת בכל פעם.** קבעו את אחוז הריבית של מסלול 1 ל־{f.plain("task2.rate_1")}%. אחר כך החזירו, וקבעו את התקופה של שלושת המסלולים ל־25 שנה.
+2. **סכום, ריבית ותקופה, אחת בכל פעם.** הזיזו את סכום ההלוואה ל־{f.whole("lv.amount40.loan")}. אחר כך החזירו, וקבעו את אחוז הריבית של מסלול 1 ל־{f.plain("task2.rate_1")}%. אחר כך החזירו, וקבעו את התקופה של שלושת המסלולים ל־25 שנה.
 3. **שוק ומדד.** קבעו את ״הפריים זזה״ ו״העוגן״ ל־<span class="ltr">+1</span>. אחר כך החזירו, שנו את סוג מסלול 3 ל״קבועה צמודה״ באחוז ריבית של 2.9%, והעלו את המדד ל־3%.
 
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>ההחזר הראשון: {f.shekels("lv.pct_pv.first")} ({delta("lv.pct_pv.d_first")}); התשלום הגבוה ביותר: {delta("lv.pct_pv.d_max")}; סך התשלומים: {delta("lv.pct_pv.d_total")}. החלק במסלולים משתנים (פריים ומשתנה) נשאר {f.plain("lv.pct_pv.variable_share")}%: הכסף עבר בין שני משתנים.</li>
-    <li>אחוז ריבית של {f.plain("task2.rate_1")}% בפריים: ההחזר הראשון {delta("lv.rate_t1.d_first")}, והסך {delta("lv.rate_t1.d_total")}. תקופה של 25 שנה בכל המסלולים: ההחזר הראשון {delta("lv.term.d_first")}, והסך {delta("lv.term.d_total")}.</li>
+    <li>הלוואה של {f.whole("lv.amount40.loan")} (שיעור מימון {f.plain("lv.amount40.ltv")}%): ההחזר הראשון {f.shekels("lv.amount40.first")} ({delta("lv.amount40.d_first")}), התשלום הגבוה ביותר {delta("lv.amount40.d_max")}, הסך {delta("lv.amount40.d_total")}, ויחס ההחזר {f.plain("lv.amount40.ratio")}%. כל המסלולים קטנים באותו יחס, ולכן החלק המשתנה נשאר {f.plain("lv.amount40.variable_share")}%. אחוז ריבית של {f.plain("task2.rate_1")}% בפריים: ההחזר הראשון {delta("lv.rate_t1.d_first")}, והסך {delta("lv.rate_t1.d_total")}. תקופה של 25 שנה בכל המסלולים: ההחזר הראשון {delta("lv.term.d_first")}, והסך {delta("lv.term.d_total")}.</li>
     <li>עם הפריים והעוגן ב־+1: ההחזר הראשון לא זז ({delta("lv.market.d_first")}), התשלום הגבוה ביותר {delta("lv.market.d_max")} והסך {delta("lv.market.d_total")}. אחרי שמסלול 3 נעשה צמוד, והמדד עולה מ־2% ל־3%: התשלום הגבוה ביותר עולה ב־{delta("task3.d_max")} והסך ב־{delta("task3.d_total")}. באותו תמהיל, בלי מסלול צמוד, אותה הזזה לא שינתה כלום.</li>
   </ol>
 </details>
@@ -537,4 +541,4 @@ export const halfRows = [
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (levers) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-7.ts and data/lessons/5-7.json, rechecked by checks/kinds/sensitivity.py (with schedule.py). Illustration: src/components/MixBuilder.vue (props only; the loan amount cannot be moved in it). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-7.html. */}
+{/* Internal note: numbers come from src/lib/calc/sensitivity.ts (levers) on schedule.ts, affordability.ts and regulation.ts, and src/data/case-a-mix.ts, via scripts/lessons/lesson-5-7.ts and data/lessons/5-7.json, rechecked by checks/kinds/sensitivity.py (with schedule.py). Illustration: src/components/MixBuilder.vue (editableLoan moves the amount lever; disposableIncome and propertyValue add the ratio and the five lines, computed by src/lib/calc/mixbuilder.ts). Field knowledge: FK-H-057 (awaiting Eylon). Video: video/5-7.html. */}
