@@ -24,6 +24,7 @@ import { formatShekels } from "../../lib/calc/money.ts";
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("4.7");
 export const p = (id) => f.plain(id);
+export const num = (id) => String(f.shekels(id)).replace(/\s*₪/, "");
 export const at = (id) => new Date(`${f.raw(id)}T12:00:00Z`);
 export const d = (id) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" }).format(at(id));
 export const dw = (id) => new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long" }).format(at(id));
@@ -274,7 +275,7 @@ export const predictionOptions = [
 
 **צעד 2 — ההחזר לכל 1,000 ₪ הלוואה, באותה חלוקה.** מההחזר הידוע, {f.shekels("case.payment")} על {f.shekels("case.loan")}: <M>{f.shekels("case.payment")} ÷ {f.shekels("case.loan")} × 1,000 ≈ {p("demo.per_thousand")}</M> ₪ (מעוגל לארבע ספרות אחרי הנקודה).
 
-**צעד 3 — ההלוואה שההחזר שלה הוא ההחזר המותר.** <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>. מעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. (העיגול לאלף הוא הנחה של הקורס, כדי שההחזר לא יעבור את התקרה.)
+**צעד 3 — ההלוואה שההחזר שלה הוא ההחזר המותר.** <M>{num("demo.allowed_low")} × {num("case.loan")} ÷ {num("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>. מעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. (העיגול לאלף הוא הנחה של הקורס, כדי שההחזר לא יעבור את התקרה.)
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="ltr text-h3 text-navy">P<sub>max</sub> = C<sub>max</sub> × P ÷ C</p>
@@ -454,7 +455,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="4.7-6">
-ההחזר המותר: <M>{f.shekels("case.hh_recognised")} × {p("demo.cap_low")} ÷ 100 = {f.shekels("demo.allowed_low")}</M>. ההחזר לכל 1,000 ₪ הלוואה: בערך {p("demo.per_thousand")} ₪. ההלוואה: <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>, ומעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. פחות מההלוואה המבוקשת ב־{f.shekels("demo.loan_drop_low")}.
+ההחזר המותר: <M>{f.shekels("case.hh_recognised")} × {p("demo.cap_low")} ÷ 100 = {f.shekels("demo.allowed_low")}</M>. ההחזר לכל 1,000 ₪ הלוואה: בערך {p("demo.per_thousand")} ₪. ההלוואה: <M>{num("demo.allowed_low")} × {num("case.loan")} ÷ {num("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>, ומעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. פחות מההלוואה המבוקשת ב־{f.shekels("demo.loan_drop_low")}.
 </Solution>
 
 <NumericExercise
