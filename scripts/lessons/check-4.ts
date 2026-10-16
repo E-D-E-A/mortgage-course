@@ -84,6 +84,14 @@ const mixAt = (id: string, tracks: TrackSpec[], month: number): Fact => ({
   value: moneyString(mixCashFlow(tracks)[month - 1].payment),
 });
 
+/** Lesson 3.7's kind: a sum of payments already rounded to the agora. */
+const schSum = (id: string, terms: string[]): Fact => ({
+  id,
+  kind: "sch_sum",
+  inputs: Object.fromEntries(terms.map((t, k) => [`term_${k + 1}`, t])),
+  value: moneyString(terms.reduce((s, t) => s.plus(t), new Decimal(0))),
+});
+
 /** Lesson 4.13's kinds: how many children a form counts, and how many people live at home. */
 const childrenFact = (id: string, ages: number[], limitAge: number): Fact => ({
   id,
@@ -180,10 +188,11 @@ export default function check4(): LessonData {
   ];
   add(g("r4.amount_1", "380000"));
   add(g("r4.amount_2", "220000"));
-  add(amortPayment("r4.t1", "380000", "5", 240));
-  add(amortPayment("r4.t2", "220000", "4.1", 120));
+  const r4t1 = add(amortPayment("r4.t1", "380000", "5", 240));
+  const r4t2 = add(amortPayment("r4.t2", "220000", "4.1", 120));
   add(mixAt("r4.answer", MIX, 150));
-  add(mixAt("r4.month1", MIX, 1));
+  // Month 1 by the course's statement rule: each track's payment rounded to the agora, then summed (lesson 3.7).
+  add(schSum("r4.month1", [v(r4t1), v(r4t2)]));
 
   // q1 (4.1): three payslips; the monthly income is the average of the net pay (שכר נטו).
   const slips = [

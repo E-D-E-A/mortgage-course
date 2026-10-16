@@ -9,7 +9,7 @@ Conventions: a contract's annual rate ÷ 12 is the monthly rate; payments at the
 of each month; on a rate change the payment is recalculated on the balance left over
 the months left; a linked balance is indexed each month, before the payment.
 """
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 
 from kinds.common import agorot
 
@@ -292,6 +292,13 @@ def payments_value_today(i, _facts=None):
     return str(agorot(Decimal(i["payment"]) * factor_sum(i["rate_percent"], i["months"])))
 
 
+def largest_loan_for_payment(i, _facts=None):
+    """The largest loan a payment suffices for: the value today of the payments, cut down to the
+    agora (a maximum is never rounded up, lesson 4.4)."""
+    exact = Decimal(i["payment"]) * factor_sum(i["rate_percent"], i["months"])
+    return str(exact.quantize(Decimal("0.01"), rounding=ROUND_DOWN))
+
+
 def remaining_balance(i, _facts=None):
     n, k = int(i["months"]), int(i["paid"])
     c = level_payment(i["principal"], i["rate_percent"], n)
@@ -366,6 +373,7 @@ KINDS.update({
     "amort_discount_factor": discount_factor,
     "amort_discount_sum": discount_sum,
     "amort_payments_value_today": payments_value_today,
+    "amort_largest_loan_for_payment": largest_loan_for_payment,
     "amort_remaining_balance": remaining_balance,
     "amort_statement_balance": statement_balance,
     "amort_trial_table": trial_table,

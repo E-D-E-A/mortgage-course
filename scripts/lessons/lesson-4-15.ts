@@ -27,12 +27,13 @@ import { given as givenMoney, ltv, maxLoan, maxPayment, maxVar, minFix, months }
 
 const CAR: Obligation = { kind: "loan", monthly: "1450", monthsLeft: 26 };
 
-/** The loan a monthly payment would carry at a rate for a number of months (lesson 3.1's C × S). */
+/** The largest loan a monthly payment suffices for at a rate for a number of months (lesson 3.1's
+ * C × S), cut down to the agora: a maximum is never rounded up (lesson 4.4). */
 const carried = (id: string, payment: Fact, rate: string, n: number): Fact => ({
   id,
-  kind: "amort_payments_value_today",
+  kind: "amort_largest_loan_for_payment",
   inputs: { payment: payment.value as string, rate_percent: rate, months: n },
-  value: moneyString(paymentsValueToday(payment.value as string, rate, n)),
+  value: moneyString(paymentsValueToday(payment.value as string, rate, n).toDecimalPlaces(2, Decimal.ROUND_DOWN)),
 });
 
 const times = (id: string, of: Fact, count: number): Fact => ({
@@ -74,6 +75,8 @@ export default function lesson(): LessonData {
   // ── The income side: the 18-month rule on the car loan ──
   const dispNow = add(disposable("a.disposable_now", recognised.value as string, [CAR]));
   add(untilDrop("a.until_drop", 26));
+  // If "exactly 18 left" still counted (the open edge, lesson 4.2), the drop would come one payment later.
+  add(givenRaw("a.until_drop_alt", 9));
   const dispAfter = add(disposable("a.disposable_after", recognised.value as string, []));
   const max50 = add(maxPayment("a.max50", dispNow.value as string, "50"));
   const max40 = add(maxPayment("a.max40", dispNow.value as string, "40"));
@@ -135,10 +138,11 @@ export default function lesson(): LessonData {
   // ── Exercises ──
   // 1: recognised income is a2's sum (a.recognised). 2: disposable (a.disposable_now); errors:
   add(sum("ex2.err_added", ["21700", "1450"])); // the car loan added instead of deducted
-  // 3: months until the car loan stops counting (a.until_drop); errors: all the months left (a.car_months),
-  // one payment too many (the loan counts while MORE than 18 are left), and the threshold itself.
-  add(givenRaw("ex3.err_one_more", 9));
-  add(givenRaw("ex3.err_threshold", 18));
+  // 3: the disposable income when 16 payments are left — below 18 under either reading of the
+  // open "exactly 18" edge, so the edge never decides the answer. Errors: the car loan still
+  // deducted (a.disposable_now), and added instead of deducted (ex2.err_added).
+  add(givenRaw("ex3.left", 16));
+  add(disposable("ex3.disposable", recognised.value as string, [{ ...CAR, monthsLeft: 16 }]));
   // 4: the 40% line's payment (a.max40); errors: the 50% line (a.max50), and the 40% of the income after the drop (a.max40_after).
   // 6: the financing ratio at a lower appraisal (a.ltv_low); error: the ratio at the price (a.ltv).
   // 7: the loan 8,100 carries at 4.5% for 360 months (a.carry40_4_5); error: the payments added without discounting.

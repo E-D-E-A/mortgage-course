@@ -89,6 +89,12 @@
       "value": 8
     },
     {
+      "id": "a.until_drop_alt",
+      "kind": "given",
+      "inputs": {},
+      "value": 9
+    },
+    {
       "id": "a.disposable_after",
       "kind": "aff_disposable",
       "inputs": {
@@ -249,23 +255,23 @@
     },
     {
       "id": "a.carry40_4",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8100.00",
         "rate_percent": "4",
         "months": 360
       },
-      "value": "1696636.05"
+      "value": "1696636.04"
     },
     {
       "id": "a.carry50_4",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "10125.00",
         "rate_percent": "4",
         "months": 360
       },
-      "value": "2120795.06"
+      "value": "2120795.05"
     },
     {
       "id": "a.gap40_4",
@@ -274,7 +280,7 @@
         "minuend": "a.carry40_4",
         "subtrahend": "a.loan"
       },
-      "value": "56636.05"
+      "value": "56636.04"
     },
     {
       "id": "a.gap50_4",
@@ -283,7 +289,7 @@
         "minuend": "a.carry50_4",
         "subtrahend": "a.loan"
       },
-      "value": "480795.06"
+      "value": "480795.05"
     },
     {
       "id": "assume.rate_4_5",
@@ -293,17 +299,17 @@
     },
     {
       "id": "a.carry40_4_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8100.00",
         "rate_percent": "4.5",
         "months": 360
       },
-      "value": "1598625.39"
+      "value": "1598625.38"
     },
     {
       "id": "a.carry50_4_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "10125.00",
         "rate_percent": "4.5",
@@ -318,7 +324,7 @@
         "minuend": "a.carry40_4_5",
         "subtrahend": "a.loan"
       },
-      "value": "-41374.61"
+      "value": "-41374.62"
     },
     {
       "id": "a.short40_4_5",
@@ -327,7 +333,7 @@
         "minuend": "a.loan",
         "subtrahend": "a.carry40_4_5"
       },
-      "value": "41374.61"
+      "value": "41374.62"
     },
     {
       "id": "a.gap50_4_5",
@@ -346,17 +352,17 @@
     },
     {
       "id": "a.carry40_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8100.00",
         "rate_percent": "5",
         "months": 360
       },
-      "value": "1508881.10"
+      "value": "1508881.09"
     },
     {
       "id": "a.carry50_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "10125.00",
         "rate_percent": "5",
@@ -371,7 +377,7 @@
         "minuend": "a.carry40_5",
         "subtrahend": "a.loan"
       },
-      "value": "-131118.90"
+      "value": "-131118.91"
     },
     {
       "id": "a.gap50_5",
@@ -384,7 +390,7 @@
     },
     {
       "id": "a.carry40_after_4_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8680.00",
         "rate_percent": "4.5",
@@ -403,13 +409,13 @@
     },
     {
       "id": "a.carry40_after_5",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8680.00",
         "rate_percent": "5",
         "months": 360
       },
-      "value": "1616924.44"
+      "value": "1616924.43"
     },
     {
       "id": "a.gap40_after_5",
@@ -418,7 +424,7 @@
         "minuend": "a.carry40_after_5",
         "subtrahend": "a.loan"
       },
-      "value": "-23075.56"
+      "value": "-23075.57"
     },
     {
       "id": "w.price",
@@ -517,17 +523,17 @@
     },
     {
       "id": "w.carry40",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "6400.00",
         "rate_percent": "4.5",
         "months": 360
       },
-      "value": "1263111.42"
+      "value": "1263111.41"
     },
     {
       "id": "w.carry50",
-      "kind": "amort_payments_value_today",
+      "kind": "amort_largest_loan_for_payment",
       "inputs": {
         "payment": "8000.00",
         "rate_percent": "4.5",
@@ -542,7 +548,7 @@
         "minuend": "w.carry40",
         "subtrahend": "w.loan"
       },
-      "value": "163111.42"
+      "value": "163111.41"
     },
     {
       "id": "ex2.err_added",
@@ -553,16 +559,19 @@
       "value": "23150.00"
     },
     {
-      "id": "ex3.err_one_more",
+      "id": "ex3.left",
       "kind": "given",
       "inputs": {},
-      "value": 9
+      "value": 16
     },
     {
-      "id": "ex3.err_threshold",
-      "kind": "given",
-      "inputs": {},
-      "value": 18
+      "id": "ex3.disposable",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700.00",
+        "obligations": "loan,1450,16"
+      },
+      "value": "21700.00"
     },
     {
       "id": "ex7.err_sum",

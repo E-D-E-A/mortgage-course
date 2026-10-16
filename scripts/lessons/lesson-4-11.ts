@@ -28,6 +28,10 @@ export default function lesson411(): LessonData {
   b.calc("pred.scaled", { op: "divide", a: "pred.scaled_total", b: "card.term_age.m30" });
   b.given("pred.half_percent", "50");
   b.calc("pred.half", { op: "share", amount: "card.term_age.pay20", percent: "pred.half_percent" });
+  // The interest part of the first payment (loan × annual rate ÷ 12): most of it at this rate, not at every rate (3.2).
+  b.calc("pred.year_interest", { op: "share", amount: "card.term_age.loan", percent: "card.term_age.rate" });
+  b.given("pred.months_in_year", "12");
+  b.calc("pred.first_interest", { op: "divide", a: "pred.year_interest", b: "pred.months_in_year", decimals: 2 });
 
   // ── Worked example: ליאור ותמר, the same loan measured two ways ──
   b.given("w.price", "2400000");

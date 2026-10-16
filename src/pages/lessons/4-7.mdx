@@ -35,7 +35,7 @@ export const MARK = "דוגמה לימודית — נתוני הלקוח והר�
 export const predictionOptions = [
   "האישור נשאר כמו שהוא: אישור עקרוני מחייב את הבנק, ופער קטן לא משנה כלום",
   "האישור מתבטל מעצמו, כי יש פער בין מה שהצהירו לבין מה שנמצא במסמכים",
-  "הבנק יכול להמשיך, לבקש עוד מסמכים, לשנות את התנאים או לבטל; מה מכריע בין אלה — אין לנו מקור",
+  "הבנק יכול להמשיך, לבקש מסמכים, לשנות תנאים או לבטל",
   `הבנק חייב להלוות את אותו סכום, כי עדיין לא עברו ${W} יום מהאישור`,
 ];
 
@@ -86,7 +86,7 @@ export const predictionOptions = [
     <tbody>
       <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההכנסה</td><td class="py-2">תלושי שכר (שכיר); שומות מס ותזרים החשבון (עצמאי)</td><td class="py-2">שיעור 4.1</td></tr>
       <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההון העצמי</td><td class="py-2">היתרות בדפי החשבון</td><td class="py-2">שיעור 4.7 (כאן)</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההתחייבויות וההיסטוריה</td><td class="py-2">נתוני אשראי, שהבנק מושך בעצמו</td><td class="py-2">שיעור 4.8</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ההתחייבויות וההיסטוריה</td><td class="py-2">דוח אשראי שהלווים מזמינים על עצמם (את הנתונים הבנק מושך גם בעצמו)</td><td class="py-2">שיעור 4.8</td></tr>
       <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900"><Later lesson="4.8" quiet>התנהלות החשבון</Later></td><td class="py-2">דפי חשבון של כמה חודשים</td><td class="py-2">שיעור 4.8</td></tr>
       <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">הנכס</td><td class="py-2">החוזה, נסח הרישום, ודוח השמאי</td><td class="py-2">שיעור 4.9</td></tr>
       <tr><td class="py-2 font-semibold text-n900">הזהות</td><td class="py-2">תעודת זהות עם ספח</td><td class="py-2">שיעור 1.10</td></tr>
@@ -146,19 +146,19 @@ export const predictionOptions = [
 **כמה זה משנה את ההלוואה?** נניח תקרה ליחס ההחזר, ונבדוק מה ההלוואה הגדולה ביותר שההחזר שלה נכנס בה, באותה חלוקה למסלולים ובאותן תקופות. שלוש תקרות:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[28rem] border-collapse text-body-m">
+  <table class="w-full min-w-[19rem] border-collapse text-body-m">
     <caption class="pb-2 text-start text-caption font-semibold text-n600">הלוואה מרבית לפי יחס ההחזר בלבד (מעוגל כלפי מטה לאלף)</caption>
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 text-start font-semibold">התקרה ליחס ההחזר</th>
-        <th class="py-2 text-start font-semibold">על ההכנסה המוצהרת</th>
         <th class="py-2 text-start font-semibold">על ההכנסה המאומתת</th>
+        <th class="py-2 text-start font-semibold">על ההכנסה המוצהרת</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{CAP}%</span> מגבלה רגולטורית</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_regulatory_declared"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_regulatory"))}</span></td></tr>
-      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_high")}%</span> סף ההון</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_high_declared"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_high"))}</span></td></tr>
-      <tr><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_low")}%</span> להמחשה</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_low_declared"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_low"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{CAP}%</span> מגבלה רגולטורית</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_regulatory"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_regulatory_declared"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_high")}%</span> סף ההון</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_high"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_high_declared"))}</span></td></tr>
+      <tr><td class="py-2 text-n700"><span class="ltr">{p("demo.cap_low")}%</span> להמחשה</td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_low"))}</span></td><td class="py-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw("demo.max_loan_low_declared"))}</span></td></tr>
     </tbody>
   </table>
 </div>
@@ -167,8 +167,8 @@ export const predictionOptions = [
 
 <Callout title="שלושה סוגי מספרים, לא לערבב" tone="warning">
 <p><strong>{CAP}%</strong> הוא מגבלה רגולטורית: בנק ישראל קבע אותה, בנק לא רשאי לעבור אותה (לפי תעתיק של הצוות; לא אומת; שיעורים 4.4 ו־4.5).</p>
-<p><strong>{p("demo.cap_high")}%</strong> הוא סף ההון ({p("demo.cap_high")}%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203). מעליה ההלוואה מותרת, והבנק מחזיק נגדה יותר הון (שיעור 4.5). בשיעור הזה משתמשים בה גם כדוגמה לתקרה שבנק יכול להחיל.</p>
-<p><strong>{p("demo.cap_low")}%</strong> הוא מספר להמחשה בלבד: לא מגבלה רגולטורית, לא מגבלת הון ולא מדיניות של בנק כלשהו. נבחר כדי להראות מה קורה כשתקרה נמוכה יותר מוחלת.</p>
+<p><strong>סף ההון ({p("demo.cap_high")}%)</strong> — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותו לא נקבעה (329 או 203). מעליו ההלוואה מותרת, והבנק מחזיק נגדה יותר הון (שיעור 4.5). בשיעור הזה משתמשים בו גם כדוגמה לתקרה שבנק יכול להחיל.</p>
+<p><strong>{p("demo.cap_low")}%</strong> הוא מספר להמחשה בלבד: לא מגבלה רגולטורית, לא סף הון ולא מדיניות של בנק כלשהו. נבחר כדי להראות מה קורה כשתקרה נמוכה יותר מוחלת.</p>
 <p>אילון אמר ש״הבנקים מחמירים בפועל ל־40%״ (ידע מהשטח, 2026-07-27), אבל באותו משפט אמר גם ״50%״. לפי מחקר הצוות, 40% הוא ״גבול מחיר, לא גבול סירוב״. מה בנק מסוים עושה בפועל — שאלה פתוחה לאילון.</p>
 </Callout>
 
@@ -184,25 +184,14 @@ export const predictionOptions = [
 
 לפי מחקר הצוות (2026-08-04; לא אומת), בסוף הבדיקה הבנק נותן אחת מארבע תשובות. בשיעור 1.8 ראינו אותן בקצרה:
 
-<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full min-w-[34rem] border-collapse text-body-m">
-    <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 text-start font-semibold">התשובה</th>
-        <th class="py-2 text-start font-semibold">מה זה אומר</th>
-        <th class="py-2 text-start font-semibold">איך זה נראה אצל אבי</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">ממשיך</td><td class="py-2">מה שנמסר נמצא נכון, והבנק ממשיך לפי תנאי האישור.</td><td class="py-2">ההכנסה המאומתת הייתה שווה למוצהרת.</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">מבקש עוד מסמכים</td><td class="py-2">חסר לו משהו כדי להחליט. זה לא סירוב: לפי מחקר הצוות, הבנק קובע מה הרשימה.</td><td class="py-2">למשל מסמך שמסביר מאיפה הגיעה הפקדה, או שומה נוספת.</td></tr>
-      <tr class="border-b border-n100"><td class="py-2 font-semibold text-n900">משנה את התנאים</td><td class="py-2">הוא מוכן להלוות, אבל לא באותם תנאים.</td><td class="py-2">למשל הלוואה קטנה יותר, כמו בטבלה למעלה. מה עוד יכול להשתנות — אין לנו פירוט.</td></tr>
-      <tr><td class="py-2 font-semibold text-n900">מבטל את האישור</td><td class="py-2">האישור העקרוני כבר לא מחייב אותו.</td><td class="py-2">פער שהבנק לא מוכן לבנות עליו.</td></tr>
-    </tbody>
-  </table>
+<div class="my-6 grid gap-3 sm:grid-cols-2">
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm text-body-m"><p class="font-semibold text-n900">ממשיך</p><p class="mt-1 text-n700">מה שנמסר נמצא נכון, והבנק ממשיך לפי תנאי האישור.</p><p class="mt-2 text-caption text-n600">אצל אבי (הדגמה): ההכנסה המאומתת הייתה שווה למוצהרת.</p></div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm text-body-m"><p class="font-semibold text-n900">מבקש עוד מסמכים</p><p class="mt-1 text-n700">חסר לו משהו כדי להחליט. זה לא סירוב: לפי מחקר הצוות, הבנק קובע מה הרשימה.</p><p class="mt-2 text-caption text-n600">אצל אבי (הדגמה): למשל מסמך שמסביר מאיפה הגיעה הפקדה, או שומה נוספת.</p></div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm text-body-m"><p class="font-semibold text-n900">משנה את התנאים</p><p class="mt-1 text-n700">הוא מוכן להלוות, אבל לא באותם תנאים.</p><p class="mt-2 text-caption text-n600">אצל אבי (הדגמה): למשל הלוואה קטנה יותר, כמו בטבלה למעלה. מה עוד יכול להשתנות — אין לנו פירוט.</p></div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm text-body-m"><p class="font-semibold text-n900">מבטל את האישור</p><p class="mt-1 text-n700">האישור העקרוני כבר לא מחייב אותו.</p><p class="mt-2 text-caption text-n600">אצל אבי (הדגמה): פער שהבנק לא מוכן לבנות עליו.</p></div>
 </div>
 
-(העמודה האחרונה היא הדגמה של הקורס, לא ידיעה על מה בנק עושה.)
+(השורה ״אצל אבי״ היא הדגמה של הקורס, לא ידיעה על מה בנק עושה.)
 
 **מה מכריע בין התשובות? לא ידוע.** ההוראה, כפי שהצוות העתיק אותה, לא אומרת. לפי הצוות, גם כמה פערים בנקים באמת מוצאים וכמה פעמים לא נמדדו. לכן הקורס לא מלמד כלל מהסוג ״פער של X% גורם לביטול״. הוא מלמד איך לראות את ההשלכות במספרים (כמו בטבלה), ולא איך הבנק יחליט. השאלה מה גורם לכל תשובה ברשימה לאילון.
 
@@ -283,9 +272,9 @@ export const predictionOptions = [
 
 **צעד 1 — ההחזר המותר.** <M>{f.shekels("case.hh_recognised")} × {p("demo.cap_low")} ÷ 100 = {f.shekels("demo.allowed_low")}</M>.
 
-**צעד 2 — ההחזר לכל 1,000 ₪ הלוואה, באותה חלוקה.** מההחזר הידוע, {f.shekels("case.payment")} על {f.shekels("case.loan")}: <M>{f.shekels("case.payment")} ÷ {f.shekels("case.loan")} × 1,000 = {p("demo.per_thousand")}</M> ₪.
+**צעד 2 — ההחזר לכל 1,000 ₪ הלוואה, באותה חלוקה.** מההחזר הידוע, {f.shekels("case.payment")} על {f.shekels("case.loan")}: <M>{f.shekels("case.payment")} ÷ {f.shekels("case.loan")} × 1,000 ≈ {p("demo.per_thousand")}</M> ₪ (מעוגל לארבע ספרות אחרי הנקודה).
 
-**צעד 3 — ההלוואה שההחזר שלה הוא ההחזר המותר.** <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.whole("demo.loan_unrounded")}</M>. מעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. (העיגול לאלף הוא הנחה של הקורס, כדי שההחזר לא יעבור את התקרה.)
+**צעד 3 — ההלוואה שההחזר שלה הוא ההחזר המותר.** <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>. מעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. (העיגול לאלף הוא הנחה של הקורס, כדי שההחזר לא יעבור את התקרה.)
 
 <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
   <p class="ltr text-h3 text-navy">P<sub>max</sub> = C<sub>max</sub> × P ÷ C</p>
@@ -465,7 +454,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="4.7-6">
-ההחזר המותר: <M>{f.shekels("case.hh_recognised")} × {p("demo.cap_low")} ÷ 100 = {f.shekels("demo.allowed_low")}</M>. ההחזר לכל 1,000 ₪ הלוואה: {p("demo.per_thousand")} ₪. ההלוואה: <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.whole("demo.loan_unrounded")}</M>, ומעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. פחות מההלוואה המבוקשת ב־{f.shekels("demo.loan_drop_low")}.
+ההחזר המותר: <M>{f.shekels("case.hh_recognised")} × {p("demo.cap_low")} ÷ 100 = {f.shekels("demo.allowed_low")}</M>. ההחזר לכל 1,000 ₪ הלוואה: בערך {p("demo.per_thousand")} ₪. ההלוואה: <M>{f.shekels("demo.allowed_low")} × {f.shekels("case.loan")} ÷ {f.shekels("case.payment")} = {f.shekels("demo.loan_unrounded")}</M>, ומעגלים כלפי מטה לאלף: {f.shekels("demo.max_loan_low")}. פחות מההלוואה המבוקשת ב־{f.shekels("demo.loan_drop_low")}.
 </Solution>
 
 <NumericExercise
@@ -534,8 +523,8 @@ export const predictionOptions = [
     { kind: "לא אומת", text: "רשימת מסמכים לפתיחת תיק שבנק אחד מפרסם (חוזה, הוכחת בעלות, ת״ז וספח, דוח מס על העסקה); ללא מסמכי הכנסה. לפי תעתיק בצוות ב־Brain (דף 8716289, J-130, 2026-08-13), ממתין לבדיקה.", date: "2026-08-13" },
     { kind: "לא אומת", text: "מגבלת יחס ההחזר של 50% (הוראת בנק ישראל 329, נספח א׳) — לפי תעתיק בצוות ב־Brain (דף 67436545, 2026-10-08), ממתין לבדיקה מול המקור. שיעורים 4.3 ו־4.4.", date: "2026-10-08" },
     { kind: "ידע מהשטח", text: "אילון, 2026-07-27: ״בנק ישראל קבע תקרה של 50%; הבנקים מחמירים בפועל ל־40%״ (FK-H-012); סותר בחלקו את התעתיק של ההוראה (מעל 40% הבנק מחזיק יותר הון, אך זה אינו איסור). ב־Brain: 40% ״גבול מחיר, לא גבול סירוב״ (מחקר). ממתין לאישור אילון.", date: "2026-07-27" },
-    { kind: "לא אומת", text: "סף ההון (40%): מעל 40% יחס החזר ההלוואה מותרת והבנק מחזיק נגדה יותר הון (משקל סיכון); לפי תיעוד הצוות. ההוראה שנושאת אותה לא נקבעה (329 או 203). Brain, דף 67436545 והשיעור 4.5. לא אומת." },
-    { kind: "הנחת חישוב", text: "התקרה 35% בשיעור היא הדגמה בלבד: לא מגבלה רגולטורית, לא מגבלת הון ולא מדיניות של בנק, ולא החלטה של Mogi (ו־40% משמש גם כדוגמה לתקרה שבנק יכול להחיל). ההלוואה המרבית היא ההחזר המותר כפול ההלוואה, חלקי ההחזר שלה, באותה חלוקה, באותן ריביות ובאותן תקופות, מעוגלת כלפי מטה לאלף." },
+    { kind: "לא אומת", text: "סף ההון (40%): מעל 40% יחס החזר ההלוואה מותרת והבנק מחזיק נגדה יותר הון (משקל סיכון); לפי תיעוד הצוות. ההוראה שנושאת אותו לא נקבעה (329 או 203). Brain, דף 67436545 והשיעור 4.5. לא אומת." },
+    { kind: "הנחת חישוב", text: "התקרה 35% בשיעור היא הדגמה בלבד: לא מגבלה רגולטורית, לא סף הון ולא מדיניות של בנק, ולא החלטה של Mogi (ו־40% משמש גם כדוגמה לתקרה שבנק יכול להחיל). ההלוואה המרבית היא ההחזר המותר כפול ההלוואה, חלקי ההחזר שלה, באותה חלוקה, באותן ריביות ובאותן תקופות, מעוגלת כלפי מטה לאלף." },
     { kind: "לא אומת", text: "תקרת שיעור המימון של 75% לדירה יחידה (הוראת בנק ישראל 329), לפי תקצירים ותעתיק בצוות ב־Brain; שיעור 4.4. תקרה נפרדת מיחס ההחזר." },
     { kind: "מחקר / הצעה", text: "שני תיאורים של הצוות למועד משיכת נתוני האשראי: בחיתום (Brain, דף 9863169, J-150, 2026-08-04: הבנק מושך את נתוני האשראי אחרי הודעה), ובבקשה לאישור עקרוני (Brain, דפים 5898285 ו־6455298, אוגוסט 2026: הודעות שבנקים מפרסמים). לא נבדק אם הבנק מושך בשני המקרים. לא אומת.", date: "2026-08-11" },
     { kind: "ידע מהשטח", text: "השאלה אם הבנק סופר ״נטו״ או ״נטו לתשלום״ (FK-H-015, הצוות עם אילון, 2026-09-16, פרפרזה) נותרה פתוחה; ממתין לאישור אילון. שיעור 4.1.", date: "2026-09-16" },
