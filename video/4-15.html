@@ -84,14 +84,15 @@
         [82, 87, "על הקצה של 18 בדיוק: שאלה פתוחה."],
         [89, 97, `ההחזר הגבוה ביותר, בתקרה של 50%: ${V.max50} ₪.`],
         [97, 106, `בסף ההון של 40%: ${V.max40} ₪.`],
-        [106, 116, "התקרה היא איסור. הסף הוא עלות הון, לא איסור."],
+        [106, 111, "מעל התקרה אסור. מעל הסף מותר, ויקר לבנק."],
+        [111, 116, "שניהם לפי תיעוד הצוות. לא אומת."],
         [116, 127, "מדיניות כל בנק מעל זה: לא אומת."],
-        [129, 137, `שיעור המימון: ${V.ltv}%. התקרה: 75%.`],
+        [129, 137, `שיעור המימון: ${V.ltv}%. התקרה: 75%, לא אומת.`],
         [137, 146, `מקום של ${V.room} ₪ של הלוואה, לפני הקו.`],
-        [146, 156, `שמאי שמעריך ב־${V.low} ₪: שיעור המימון ${V.ltvLow}%.`],
-        [156, 163, "מחיר או שווי? שאלה פתוחה לאילון."],
+        [146, 156, `שמאות של ${V.low} ₪, מתחת למחיר: ${V.ltvLow}%.`],
+        [156, 163, "מודדים מול הנמוך מהשניים? לא אומת. שאלה פתוחה."],
         [165, 173, "אין הצעה, אז הנחה של הקורס: 30 שנה, שלוש ריביות."],
-        [173, 182, `איזו הלוואה נושא ההחזר של ${V.max40} ₪?`],
+        [173, 182, `לאיזו הלוואה מספיק ההחזר של ${V.max40} ₪?`],
         [182, 192, "בריבית 4% ההלוואה נכנסת. ב־4.5% וב־5% לא."],
         [192, 205, "אותו תיק, והמסקנה זזה עם ההנחה."],
         [207, 215, "המבנה: לפחות שליש קבוע, ולכל היותר 30 שנה."],
@@ -169,7 +170,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
         // Scene 2 — the case, as the course map gives it
         if (inScene(t, S.inputs)) {
           const o = vis(t, S.inputs);
-          txt(640, 118, "התיק: רק המספרים של המפה", 38, { w: 700, o });
+          txt(640, 118, "נועם ושירה: רק הנתונים של התיק", 38, { w: 700, o });
           const cards = [
             { x: 800, a: "מחיר הדירה", b: `${V.price} ₪`, from: 1 },
             { x: 440, a: "הון עצמי", b: `${V.equity} ₪`, sub: `מתוכו מתנה ${V.gift} ₪`, from: 8 },
@@ -217,6 +218,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           const o = vis(t, S.lines);
           txt(640, 118, "ההחזר הגבוה ביותר", 40, { w: 700, o });
           txt(640, 156, `הכנסה פנויה ${V.disp} ₪`, 22, { fill: C.n600, o });
+          txt(640, 186, "הקווים לפי תיעוד הצוות של הוראה 329 · לא אומת", 16, { fill: C.n600, o });
           const L = 1080, R = 200, top = 250, h = 70;
           const X = (v) => L - (v / Number(fact("a.max50")) / 1.2) * (L - R);
           const lim40 = Number(fact("a.max40")), lim50 = Number(fact("a.max50"));
@@ -228,7 +230,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           el("rect", { x: R, y: top, width: X(lim50) - R, height: h, fill: "var(--mogi-danger-bg)", opacity: c });
           txt((L + X(lim40)) / 2, top + 44, "מתחת לסף", 22, { w: 700, o: a });
           txt((X(lim40) + X(lim50)) / 2, top + 44, "מותר, יקר לבנק", 20, { w: 700, o: b });
-          txt((X(lim50) + R) / 2, top + 44, "אסור", 22, { w: 700, o: c });
+          txt((X(lim50) + R) / 2, top + 44, "מעל התקרה", 22, { w: 700, o: c });
           el("line", { x1: X(lim40), x2: X(lim40), y1: top - 20, y2: top + h + 20, stroke: C.navy, "stroke-width": 3, opacity: a });
           txt(X(lim40), top + h + 58, `סף ההון 40%: ${V.max40} ₪`, 24, { w: 700, o: a });
           el("line", { x1: X(lim50), x2: X(lim50), y1: top - 20, y2: top + h + 20, stroke: C.navy, "stroke-width": 3, opacity: b });
@@ -246,7 +248,8 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           [74, 75, 76, 77].forEach((v) => txt(X(v), y + 40, `${v}%`, 18, { fill: C.n600, o, ltr: true }));
           txt(640, y + 76, "הציר לא מתחיל באפס", 16, { fill: C.n600, o });
           el("line", { x1: X(75), x2: X(75), y1: y - 80, y2: y + 20, stroke: C.navy, "stroke-width": 3, opacity: o });
-          txt(X(75), y - 96, "התקרה: 75%", 22, { w: 700, o });
+          txt(X(75), y - 96, "התקרה: 75% (לא אומת)", 22, { w: 700, o });
+          txt(640, 160, "אין עדיין שמאות, ולכן המחיר והשמאות הם אותו מספר", 18, { fill: C.n600, o });
           const a = after(t, S.ltv, 2, o);
           el("circle", { cx: X(Number(V.ltv)), cy: y, r: 11, fill: C.teal, opacity: a });
           txt(X(Number(V.ltv)), y - 30, `${V.ltv}%`, 24, { w: 700, fill: C.teal, o: a, ltr: true });
@@ -254,12 +257,13 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           const b = after(t, S.ltv, 18, o);
           el("circle", { cx: X(Number(V.ltvLow)), cy: y, r: 11, fill: C.navy, opacity: b });
           txt(X(Number(V.ltvLow)), y - 30, `${V.ltvLow}%`, 24, { w: 700, o: b, ltr: true });
-          txt(640, 490, `שמאי בעריכה של ${V.low} ₪: מעל התקרה`, 24, { fill: C.n700, o: b });
+          txt(640, 490, `שמאות של ${V.low} ₪, נמוכה מהמחיר: מעל התקרה`, 24, { fill: C.n700, o: b });
+          txt(640, 524, "מודדים מול הנמוך מבין המחיר לשמאות · תקציר, לא אומת", 16, { fill: C.n600, o: b });
         }
         // Scene 6 — the loan a payment carries, under the course's assumption
         if (inScene(t, S.carry)) {
           const o = vis(t, S.carry);
-          txt(640, 118, `איזו הלוואה נושא ההחזר של ${V.max40} ₪?`, 38, { w: 700, o });
+          txt(640, 118, `לאיזו הלוואה מספיק ההחזר של ${V.max40} ₪?`, 36, { w: 700, o });
           txt(640, 156, "הנחה של הקורס: 30 שנה · לא הצעת בנק", 20, { fill: C.n600, o });
           const L = 1060, R = 220, lo = 1300000, hi = 1750000;
           const X = (v) => R + ((v - lo) / (hi - lo)) * (L - R); // bigger loans to the left? keep numbers LTR: left small
@@ -276,26 +280,27 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           });
           el("line", { x1: loanX, x2: loanX, y1: 210, y2: 450, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 6", opacity: o });
           txt(loanX, 200, `ההלוואה: ${V.loan}`, 22, { w: 700, o, ltr: true });
-          txt(640, 480, "הציר לא מתחיל באפס · סף 40% מול ההלוואה הנדרשת", 18, { fill: C.n600, o });
-          txt(640, 520, "בהנחות גבוהות יותר, אותו החזר נושא פחות", 22, { w: 700, fill: C.n700, o: after(t, S.carry, 27, o) });
+          txt(640, 480, "הציר לא מתחיל באפס · סף ההון 40% (לא אומת) מול ההלוואה הנדרשת", 18, { fill: C.n600, o });
+          txt(640, 520, "בריבית גבוהה יותר, אותו החזר מספיק להלוואה קטנה יותר", 22, { w: 700, fill: C.n700, o: after(t, S.carry, 27, o) });
         }
         // Scene 7 — the page, line by line
         if (inScene(t, S.sheet)) {
           const o = vis(t, S.sheet);
           txt(640, 118, "דף של שבע שורות", 40, { w: 700, o });
+          txt(640, 152, "הגבולות לפי תיעוד הצוות · לא אומת", 18, { fill: C.n600, o });
           const rows = [
             ["הכנסה פנויה והלוואת הרכב", "נספרת"],
-            ["החזר: התקרה (איסור)", "בפנים"],
-            ["החזר: סף ההון (לא איסור)", "תלוי בהנחה"],
-            ["שיעור מימון (איסור)", "בפנים, מקום קטן"],
-            ["החלק המשתנה (איסור)", `לפחות ${V.minFixed} ₪ קבוע`],
-            ["תקופה (איסור)", "עד 30 שנה"],
+            ["החזר: התקרה (לא אומת)", "בפנים"],
+            ["החזר: סף ההון (לא איסור, לא אומת)", "תלוי בהנחה"],
+            ["שיעור מימון: תקרה (לא אומת)", "בפנים, מקום קטן"],
+            ["החלק המשתנה: תקרה (לא אומת)", `לפחות ${V.minFixed} ₪ קבוע`],
+            ["תקופה: תקרה (לא אומת)", "עד 30 שנה"],
             ["מדיניות כל בנק", "לא אומת"],
           ];
           rows.forEach((r, i) => {
             const orr = after(t, S.sheet, 1 + i * 2.2, o);
-            txt(1100, 190 + i * 46, r[0], 24, { anchor: "start", w: 700, o: orr });
-            txt(560, 190 + i * 46, r[1], 24, { anchor: "start", fill: i === 6 ? C.n600 : C.teal, o: orr });
+            txt(1100, 205 + i * 46, r[0], 24, { anchor: "start", w: 700, o: orr });
+            txt(560, 205 + i * 46, r[1], 24, { anchor: "start", fill: i === 6 ? C.n600 : C.teal, o: orr });
           });
         }
         // Scene 8 — takeaway

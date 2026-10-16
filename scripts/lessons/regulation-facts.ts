@@ -222,7 +222,9 @@ export const livingTable = (id: string, rows: [string, string, number][]): Fact 
   inputs: Object.fromEntries(rows.flatMap(([net, out, people], n) => [[`net_${n + 1}`, net], [`out_${n + 1}`, out], [`people_${n + 1}`, people]])),
   value: rows.map(([net, out, people], n) => {
     const rest = leftForLiving(net, [out]);
-    return { period: n + 1, net: moneyString(net), out: moneyString(out), left: moneyString(rest), people: String(people), per_person: moneyString(perPerson(rest, people)) };
+    const g = (v: string) => Number(v).toLocaleString("en-US");
+    const name = `${g(net)} ₪ נטו · ${g(out)} ₪ תשלומים · ${people} נפשות`;
+    return { period: n + 1, name, net: moneyString(net), out: moneyString(out), left: moneyString(rest), people: String(people), per_person: moneyString(perPerson(rest, people)) };
   }),
 });
 

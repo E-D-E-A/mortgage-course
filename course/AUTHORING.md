@@ -111,6 +111,10 @@ A learner carries the letters from lesson to lesson, so a letter keeps its meani
 | A | an anchor rate (עוגן), as a decimal; a track's rate r = A + s | 2.1 |
 | S | a sum of discount factors (in a worked derivation) | 2.2 |
 | g | grace months (חודשי גרייס) | 3.4 |
+| Y | a household's net income per month (הכנסה נטו), in the living-budget formulas | 4.6 |
+| O | the household's other monthly payments, all of them, whatever the 18-month rule counts | 4.6 |
+| T | the living budget (תקציב מחיה), shekels per month | 4.6 |
+| L | what is left for living each month: Y − C − O | 4.6 |
 
 0.1 works with the percent as a whole number and writes it in words; the letters start in 0.2. For monthly payments the formula box writes r (the rate per period) and says once that it is 0.4's m. A quantity not in the table gets a letter not in the table (a basket's cost: K), or plain words. The market writes prime as P ("P−0.8"); the course quotes that shorthand in words and never uses P for prime in a formula. Never a table letter for something else, not even as a subscript (r_F would reuse F): subscripts are words or numbers defined in the box.
 

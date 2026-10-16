@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // Lesson 4.15's illustration: the feasibility page of a case, checked against the
-// limits only (דף היתכנות). The learner moves four things the case leaves open —
-// the value the financing ratio is measured against, how many payments are left on
-// the car loan, and the course's assumed rate and term — and the page shows each
-// line of the check: the limit, the case, and where it stands.
+// limits only (דף היתכנות). The learner moves four things — an appraisal at or below
+// the price (the lower of the two counts, per 4.9 and 4.11, not verified), how many
+// payments are left on the car loan as time passes, and the course's assumed rate and
+// term — and the page shows each line of the check: the limit, the case, and where it
+// stands. Every limit is the team's transcript of the directive, not verified.
 // The page has no track, mix or offer: where a payment has to become a loan it uses
 // the assumed rate and term (C × S, lesson 3.1). All arithmetic is affordability.ts
 // (4.1–4.3), regulation.ts (4.4–4.6) and amortization.ts; nothing is computed here by hand.
@@ -33,7 +34,13 @@ const carMonths = ref(props.carMonths);
 const rate = ref(props.rate);
 const years = ref(props.years);
 
-const money = (d: Decimal.Value) => formatShekelsText(new Decimal(d).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString()).replace("-", "−");
+// No-break space before ₪ so the sign never wraps alone; "−" for a negative amount.
+const money = (d: Decimal.Value) =>
+  formatShekelsText(new Decimal(d).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString())
+    .replace("-", "−")
+    .replace(/\s₪/, "\u00a0₪");
+const payments = (n: number) => (n === 1 ? "תשלום אחד" : `${n} תשלומים`);
+const LIMIT_KIND = "תקרה לפי תעתיק הצוות של הוראה 329 (לא אומת)";
 const pct = (d: Decimal.Value) => `${percentString(d)}%`;
 
 const recognised = computed(() => props.incomes.reduce((s, x) => s.plus(x), new Decimal(0)));
@@ -57,6 +64,7 @@ const fits40 = computed(() => carry40.value.gte(loan.value));
 
 const fixedAtLeast = computed(() => minFixed(loan.value));
 const termOver = computed(() => months.value > MAX_TERM_MONTHS);
+const termNote = `התקופה בהנחה ארוכה מ־30 שנה, שהיא מעל התקרה, ולכן הדף לא מחשב עליה הלוואה. החזירו את התקופה ל־30 שנה או פחות.`;
 
 type Tone = "ok" | "warn" | "bad";
 const chipClass = (t: Tone) => (t === "ok" ? "bg-success-bg text-success" : t === "warn" ? "bg-warning-bg text-warning" : "bg-danger-bg text-danger");
@@ -65,44 +73,50 @@ const lines = computed(() => [
   {
     id: "ltv",
     title: "שיעור מימון",
-    kind: "מגבלה רגולטורית",
+    kind: LIMIT_KIND,
     tone: (ltvOver.value ? "bad" : "ok") as Tone,
-    status: ltvOver.value ? "מעל התקרה: אסור" : "בתוך התקרה",
+    status: ltvOver.value ? "מעל התקרה (לא אומת)" : "בתוך התקרה",
     text: `ההלוואה ${money(loan.value)} על שווי ${money(value.value)}: ${pct(ltv.value)}, מול תקרה של ${ceiling}% לדירה יחידה. ${
-      ltvOver.value ? `חסרים ${money(loanRoom.value.neg())} של הלוואה כדי לחזור לתקרה: או הון עצמי גדול יותר, או הלוואה קטנה יותר.` : `יש מקום ל־${money(loanRoom.value)} של הלוואה נוספת, לפני שחוצים את התקרה.`
+      ltvOver.value ? `ההלוואה גדולה מדי ב־${money(loanRoom.value.neg())}: צריך הון עצמי גדול יותר או הלוואה קטנה יותר.` : `יש מקום ל־${money(loanRoom.value)} של הלוואה נוספת, לפני שחוצים את התקרה.`
     }`,
   },
   {
     id: "pti50",
     title: "יחס החזר: התקרה",
-    kind: "מגבלה רגולטורית",
-    tone: (fits50.value ? "ok" : "bad") as Tone,
-    status: fits50.value ? "ההלוואה נכנסת" : "ההלוואה לא נכנסת",
-    text: `ההחזר הגבוה ביותר שהתקרה של ${PTI_LIMIT}% מתירה הוא ${money(max50.value)} (מהכנסה פנויה של ${money(disposable.value)}). בהנחה של ${rate.value}% ל־${years.value} שנים הוא נושא הלוואה של ${money(carry50.value)}, ${fits50.value ? "יותר" : "פחות"} מ־${money(loan.value)}.`,
+    kind: LIMIT_KIND,
+    tone: (termOver.value ? "warn" : fits50.value ? "ok" : "bad") as Tone,
+    status: termOver.value ? "לא נבדק" : fits50.value ? "ההלוואה נכנסת" : "ההלוואה לא נכנסת",
+    text: termOver.value
+      ? `ההחזר הגבוה ביותר שהתקרה של ${PTI_LIMIT}% מתירה הוא ${money(max50.value)} (מהכנסה פנויה של ${money(disposable.value)}). ${termNote}`
+      : `ההחזר הגבוה ביותר שהתקרה של ${PTI_LIMIT}% מתירה הוא ${money(max50.value)} (מהכנסה פנויה של ${money(disposable.value)}). בהנחה של ${rate.value}% ל־${years.value} שנים הוא מספיק להלוואה של ${money(carry50.value)}, ${fits50.value ? "יותר" : "פחות"} מ־${money(loan.value)}.`,
   },
   {
     id: "pti40",
     title: "יחס החזר: סף ההון",
-    kind: "סף הון, לא איסור",
-    tone: (fits40.value ? "ok" : "warn") as Tone,
-    status: fits40.value ? "מתחת לסף" : "מעל הסף: מותר, והבנק מחזיק יותר הון",
-    text: `ההחזר הגבוה ביותר מתחת לסף של ${PTI_CAPITAL_THRESHOLD}% הוא ${money(max40.value)}. בהנחה של ${rate.value}% ל־${years.value} שנים הוא נושא הלוואה של ${money(carry40.value)}, ${fits40.value ? "יותר" : "פחות"} מ־${money(loan.value)}.`,
+    kind: `מגבלת ההון (${PTI_CAPITAL_THRESHOLD}%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותה לא נקבעה (329 או 203)`,
+    tone: (termOver.value ? "warn" : fits40.value ? "ok" : "warn") as Tone,
+    status: termOver.value ? "לא נבדק" : fits40.value ? "מתחת לסף" : "מעל הסף: מותר, והבנק מחזיק יותר הון",
+    text: termOver.value
+      ? `ההחזר הגבוה ביותר מתחת לסף של ${PTI_CAPITAL_THRESHOLD}% הוא ${money(max40.value)}. ${termNote}`
+      : `ההחזר הגבוה ביותר מתחת לסף של ${PTI_CAPITAL_THRESHOLD}% הוא ${money(max40.value)}. בהנחה של ${rate.value}% ל־${years.value} שנים הוא מספיק להלוואה של ${money(carry40.value)}, ${fits40.value ? "יותר" : "פחות"} מ־${money(loan.value)}.`,
   },
   {
     id: "car",
     title: "הלוואת הרכב וכלל 18 החודשים",
-    kind: "כלל של הוראה 329 (תעתיק בצוות)",
+    kind: "כלל 18 החודשים לפי תעתיק הצוות של הוראה 329 (לא אומת); להוריד מההכנסה: החלטה של Mogi",
     tone: (verdict.value.placement === "income" ? "warn" : "ok") as Tone,
     status: verdict.value.placement === "income" ? "נספרת" : "לא נספרת",
     text:
       verdict.value.placement === "income"
-        ? `נשארו ${carMonths.value} תשלומים, יותר מ־${OBLIGATION_MONTHS}: ${money(props.carPayment)} מורידים מההכנסה. היא תפסיק להיספר בעוד ${monthsUntilDrop(carMonths.value)} תשלומים.`
-        : `נשארו ${carMonths.value} תשלומים, ${OBLIGATION_MONTHS} או פחות: היא לא נספרת (אבל משלמים אותה עד שהיא נגמרת).`,
+        ? `נשארו ${carMonths.value} תשלומים, יותר מ־${OBLIGATION_MONTHS}: ${money(props.carPayment)} מורידים מההכנסה. היא תפסיק להיספר בעוד ${payments(monthsUntilDrop(carMonths.value))}.`
+        : carMonths.value === 0
+          ? `ההלוואה נגמרה: היא לא נספרת.`
+          : `${carMonths.value === 1 ? "נשאר תשלום אחד" : `נשארו ${carMonths.value} תשלומים`}, ${OBLIGATION_MONTHS} או פחות: היא לא נספרת (אבל משלמים אותה עד שהיא נגמרת).`,
   },
   {
     id: "variable",
     title: "החלק בריבית משתנה",
-    kind: "מגבלה רגולטורית",
+    kind: LIMIT_KIND,
     tone: "ok" as Tone,
     status: "גבול למבנה, לא בדיקה",
     text: `לפחות ${money(fixedAtLeast.value)} מההלוואה חייבים להיות בריבית קבועה (שני שלישים משתנה לכל היותר). את המבנה בונים בשלב 5.`,
@@ -110,9 +124,9 @@ const lines = computed(() => [
   {
     id: "term",
     title: "תקופה",
-    kind: "מגבלה רגולטורית",
+    kind: LIMIT_KIND,
     tone: (termOver.value ? "bad" : "ok") as Tone,
-    status: termOver.value ? "מעל 30 שנה: אסור" : "בתוך הגבול",
+    status: termOver.value ? "מעל 30 שנה (לא אומת)" : "בתוך הגבול",
     text: `תקופה של ${years.value} שנים (${months.value} חודשים), מול 30 שנה (${MAX_TERM_MONTHS} חודשים) לכל היותר.`,
   },
   {
@@ -124,17 +138,22 @@ const lines = computed(() => [
     text: "איפה כל אחד מארבעת הבנקים מחמיר מעל המגבלות: לא ידוע. שאלה פתוחה לאילון.",
   },
 ]);
+
+const crossed = computed(() => {
+  const names = lines.value.filter((l) => l.tone === "bad" || (l.id === "pti40" && !termOver.value && !fits40.value)).map((l) => l.title);
+  return names.length ? names.join(" · ") : "אף אחת";
+});
 </script>
 
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      נועם ושירה, רק עם מספרי המפה: מחיר <span class="ltr">{{ money(price) }}</span>, הון עצמי <span class="ltr">{{ money(equity) }}</span>, הכנסות נטו <span class="ltr">{{ money(incomes[0]) }}</span> ו־<span class="ltr">{{ money(incomes[1]) }}</span>. אין להם עדיין מסלולים או הצעה. הריבית והתקופה הן הנחה של הקורס, לא הצעה.
+      נועם ושירה, רק עם הנתונים של התיק: מחיר <span class="ltr">{{ money(price) }}</span>, הון עצמי <span class="ltr">{{ money(equity) }}</span>, הכנסות נטו <span class="ltr">{{ money(incomes[0]) }}</span> ו־<span class="ltr">{{ money(incomes[1]) }}</span>. אין להם עדיין מסלולים או הצעה. הריבית והתקופה הן הנחה של הקורס, לא הצעה. הגבולות לפי תעתיק הצוות של הוראה 329; לא אומת.
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">השווי שמודדים מולו את שיעור המימון</span>
-        <input v-model.number="value" type="range" min="2100000" max="2300000" step="5000" />
+        <span class="text-caption font-semibold text-n600">שמאות, אם תהיה נמוכה מהמחיר (מודדים מול הנמוך מהשניים; לא אומת)</span>
+        <input v-model.number="value" type="range" min="2100000" :max="price" step="5000" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ money(value) }}</span></span>
       </label>
       <label class="flex flex-col gap-1">
@@ -154,11 +173,18 @@ const lines = computed(() => [
       </label>
     </div>
 
-    <p class="mt-4 rounded-md bg-n50 p-3 text-body-m text-n800" aria-live="polite">
-      הכנסה פנויה: <span class="ltr font-semibold">{{ money(disposable) }}</span>. הלוואה נדרשת: <span class="ltr font-semibold">{{ money(loan) }}</span>.
-    </p>
+    <!-- On a phone this strip stays at the bottom of the screen while the sliders are in view,
+         so the result of a move is visible without scrolling to the rows below. -->
+    <div class="z-10 mt-4 rounded-md border border-n200 bg-n50 p-3 text-body-m text-n800 max-sm:sticky max-sm:bottom-2 max-sm:shadow-md" aria-live="polite" aria-atomic="true">
+      <p>
+        הכנסה פנויה: <span class="ltr font-semibold">{{ money(disposable) }}</span>. הלוואה נדרשת: <span class="ltr font-semibold">{{ money(loan) }}</span>.
+      </p>
+      <p class="mt-1 text-caption">
+        שורות שחוצות קו: <span class="font-semibold">{{ crossed }}</span>
+      </p>
+    </div>
 
-    <ul class="list-reset mt-3 space-y-3" aria-live="polite">
+    <ul class="list-reset mt-3 space-y-3">
       <li v-for="l in lines" :key="l.id" class="rounded-md border border-n200 p-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>

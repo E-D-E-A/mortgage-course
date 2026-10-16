@@ -5,7 +5,7 @@
 // buttons narrow the list. Every threshold carries the kind of its source, and a threshold
 // the course does not know is marked as an open question. Text is passed in, so the
 // lesson's term check and the labels live in one place (src/data/factor-cards.ts).
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import BidiText from "./BidiText.vue";
 
 interface Threshold { text: string; kind: string; source: string; open?: boolean }
@@ -34,7 +34,14 @@ const groups = computed(() => [...new Set(props.cards.map((c) => c.groupLabel))]
 const group = ref<string>("");
 const shown = computed(() => props.cards.filter((c) => !group.value || c.groupLabel === group.value));
 const open = ref<string>(props.initial ?? props.cards[0]?.id ?? "");
-const toggle = (id: string) => (open.value = open.value === id ? "" : id);
+// Opening a card closes the one above it, so the page moves up under the clicked header.
+// After the change, bring that header back into view (scroll-mt keeps it below the sticky header).
+async function toggle(id: string, event: MouseEvent) {
+  const header = event.currentTarget as HTMLElement | null;
+  open.value = open.value === id ? "" : id;
+  await nextTick();
+  header?.scrollIntoView({ block: "nearest" });
+}
 
 const questions = [
   ["1", "מה הגורם?", "what"],
@@ -72,10 +79,10 @@ const questions = [
       <li v-for="c in shown" :key="c.id" class="rounded-md border" :class="open === c.id ? 'border-teal-deep' : 'border-n200'">
         <button
           type="button"
-          class="flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-start"
+          class="flex min-h-11 w-full scroll-mt-24 items-center justify-between gap-3 px-4 py-3 text-start"
           :aria-expanded="open === c.id"
-          :aria-controls="`factor-card-${c.id}`"
-          @click="toggle(c.id)"
+          :aria-controls="open === c.id ? `factor-card-${c.id}` : undefined"
+          @click="toggle(c.id, $event)"
         >
           <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span class="text-caption text-n600">כרטיס <span class="ltr">{{ c.n }}</span></span>

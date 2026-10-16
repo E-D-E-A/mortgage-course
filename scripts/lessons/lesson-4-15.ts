@@ -135,7 +135,10 @@ export default function lesson(): LessonData {
   // ── Exercises ──
   // 1: recognised income is a2's sum (a.recognised). 2: disposable (a.disposable_now); errors:
   add(sum("ex2.err_added", ["21700", "1450"])); // the car loan added instead of deducted
-  // 3: months until the car loan stops counting (a.until_drop); error: all the months left.
+  // 3: months until the car loan stops counting (a.until_drop); errors: all the months left (a.car_months),
+  // one payment too many (the loan counts while MORE than 18 are left), and the threshold itself.
+  add(givenRaw("ex3.err_one_more", 9));
+  add(givenRaw("ex3.err_threshold", 18));
   // 4: the 40% line's payment (a.max40); errors: the 50% line (a.max50), and the 40% of the income after the drop (a.max40_after).
   // 6: the financing ratio at a lower appraisal (a.ltv_low); error: the ratio at the price (a.ltv).
   // 7: the loan 8,100 carries at 4.5% for 360 months (a.carry40_4_5); error: the payments added without discounting.

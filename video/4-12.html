@@ -46,13 +46,13 @@
 
       const V = {
         anchor: fact("tower.anchor"), spread: fact("tower.spread"), rate: fact("tower.rate"),
-        allowed: fact("pred.allowed"), opened: fact("pred.opened"), gap: fact("pred.gap"),
+        allowed: fact("pred.allowed"), opened: fact("pred.opened"), openedLow: fact("pred.opened_low"), gap: fact("pred.gap"),
         rateLow: fact("pred.rate_low"), rateHigh: fact("pred.rate_high"),
         payLow: Number(fact("pred.pay_low")), payHigh: Number(fact("pred.pay_high")),
         monthDiff: shekels("pred.month_diff"), totalDiff: whole("pred.total_diff"), months: fact("pred.months"), loan: whole("pred.loan"),
       };
       const LAYERS = [
-        { id: "cost", name: "עלות המימון", q: "כמה עולה לי הכסף?", who: "טובי זמיר", c: "teal" },
+        { id: "cost", name: "עלות המימון", q: "כמה עולה לי הכסף, מעבר לעוגן?", who: "טובי זמיר", c: "teal" },
         { id: "risk", name: "סיכון", q: "ישלמו, או לא?", who: "", c: "tq2" },
         { id: "capital", name: "דרישות הון", q: "כמה הון להחזיק?", who: "טובי זמיר; לא אומת", c: "tq2" },
         { id: "competition", name: "תחרות", q: "ואם ילכו לבנק אחר?", who: "טובי זמיר", c: "tq2" },
@@ -67,9 +67,9 @@
         [5, 9.5, "אבל יש בה שכבות. ומה ידוע עליהן?"],
         [11, 19, "העוגן בא מהשוק: אותו עוגן אצל כולם."],
         [19, 28, `${V.anchor}% בדוגמה שלנו. מספר להמחשה.`],
-        [28, 37, `המרווח נקבע בהצעה: ${V.spread} נקודות אחוז בדוגמה.`],
-        [39, 47, "בתוך המרווח: שש שאלות של הבנק."],
-        [47, 56, "כמה עולה לי הכסף? זו עלות המימון."],
+        [28, 37, `המרווח נקבע בהצעה: ${V.spread} נקודת אחוז בדוגמה.`],
+        [39, 47, "הקורס מסדר את המרווח בשש שאלות."],
+        [47, 56, "כמה עולה לי הכסף, מעבר לעוגן? עלות המימון."],
         [56, 64, "מה הסיכוי שלא ישלמו? זה הסיכון."],
         [64, 72, "כמה הון להחזיק נגד ההלוואה?"],
         [72, 80, "ואם הלקוח ילך לבנק אחר? זו התחרות."],
@@ -79,7 +79,8 @@
         [107, 116, "אף מקור לא נתן את הגודל של אף שכבה."],
         [116, 126, "בנקאי אחד סיפר על חלק מהשכבות, בשיחה אחת."],
         [126, 137, "ידע מהשטח, ממקור יחיד. ממתין לאישור אילון."],
-        [139, 147, `פקיד פותח ב־${V.opened} כשמותר לו ${V.allowed}. נקרא כנקודות אחוז: הנחה.`],
+        [139, 143, `פקיד פותח בין ${V.openedLow} ל־${V.opened}; נחשב כאן ${V.opened}.`],
+        [143, 147, `מותר לו ${V.allowed}. נקרא כנקודות אחוז: הנחה.`],
         [147, 156, `על ${V.loan} ל־25 שנה: ${V.rateLow}% מול ${V.rateHigh}%.`],
         [156, 165, `ההפרש בחודש: ${V.monthDiff}.`],
         [165, 171, `ובכל התקופה: ${V.totalDiff}.`],
@@ -146,7 +147,7 @@
         // 3 — the six layers of the spread, as a running total
         if (inScene(t, S.tower)) {
           const o = vis(t, S.tower);
-          txt(640, 100, "ששת הרכיבים של המרווח", 40, { w: 700, o });
+          txt(640, 100, "המרווח בשש שאלות, כפי שהקורס מסדר", 40, { w: 700, o });
           txt(640, 138, "מספרים להמחשה: אף מקור לא נתן גודל של רכיב", 22, { fill: C.n600, o });
           const X = (c) => 950 - c * 700;
           let cum = 0;
@@ -168,7 +169,7 @@
           const ot = after(t, S.tower, 50, o);
           el("line", { x1: X(Number(V.spread)), x2: X(Number(V.spread)), y1: 160, y2: 478, stroke: C.navy, "stroke-width": 2, "stroke-dasharray": "4 6", opacity: ot });
           el("rect", { x: 140, y: 488, width: 520, height: 78, rx: 14, fill: C.mint, opacity: ot * 0.8 });
-          txt(400, 520, `המרווח: ${V.spread} נקודות אחוז`, 24, { w: 700, o: ot });
+          txt(400, 520, `המרווח: ${V.spread} נקודת אחוז`, 24, { w: 700, o: ot });
           txt(400, 552, `${V.anchor} + ${V.spread} = ${V.rate}%`, 28, { w: 700, o: ot, ltr: true });
         }
         // 4 — what is known about each layer

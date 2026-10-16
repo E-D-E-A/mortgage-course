@@ -166,7 +166,8 @@ def living_table(i, _facts=None):
     while f"net_{n}" in i:
         net, out, people = Decimal(i[f"net_{n}"]), Decimal(i[f"out_{n}"]), int(i[f"people_{n}"])
         rest = net - out
-        rows.append({"period": n, "net": money(net), "out": money(out), "left": money(rest),
+        name = f"{int(net):,} ₪ נטו · {int(out):,} ₪ תשלומים · {people} נפשות"
+        rows.append({"period": n, "name": name, "net": money(net), "out": money(out), "left": money(rest),
                      "people": str(people), "per_person": money(rest / people)})
         n += 1
     return rows

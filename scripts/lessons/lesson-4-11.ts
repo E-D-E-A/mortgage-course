@@ -40,7 +40,7 @@ export default function lesson411(): LessonData {
   b.calc("w.equity_value", { op: "minus", a: "w.price", b: "w.max_value" });
 
   // ── Half-worked example: the ceiling by type of deal, price 2,000,000 ──
-  b.given("half.price", "2000000");
+  b.given("half.price", "1600000");
   for (const [k, pct] of [["single", "75"], ["replacement", "70"], ["investment", "50"]] as const) {
     b.given(`half.${k}.pct`, pct);
     b.calc(`half.${k}.max`, { op: "share", amount: "half.price", percent: `half.${k}.pct` });

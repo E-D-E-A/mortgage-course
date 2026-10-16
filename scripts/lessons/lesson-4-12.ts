@@ -37,6 +37,8 @@ export default function lesson412(): LessonData {
   b.given("pred.anchor", "4");
   b.given("pred.allowed", "0.5");
   b.given("pred.opened", "0.8");
+  // Tobi said "0.7–0.8"; the lesson computes with the top of the range and says so.
+  b.given("pred.opened_low", "0.7");
   b.given("pred.months", "300");
   b.calc("pred.gap", { op: "minus", a: "pred.opened", b: "pred.allowed" });
   b.calc("pred.rate_low", { op: "sum", of: ["pred.anchor", "pred.allowed"] });
@@ -94,12 +96,23 @@ export default function lesson412(): LessonData {
   b.calc("ex7.answer", { op: "times", a: "ex4.answer", b: "ex4.months" });
   b.calc("ex4.gap", { op: "minus", a: "ex4.high", b: "ex4.low" });
   b.calc("ex7.err_year", { op: "share", amount: "ex4.loan", percent: "ex4.gap" });
-  // 5: what a point of the gap costs a month, per hundred thousand borrowed (from the worked example).
+  // The rule of thumb: what the worked example's gap costs a month, per hundred thousand borrowed.
+  b.given("thumb.unit", "100000");
+  b.calc("thumb.pay_low", { op: "payment", principal: "thumb.unit", rate: "w.rate_low", months: "w.months" });
+  b.calc("thumb.pay_high", { op: "payment", principal: "thumb.unit", rate: "w.rate_high", months: "w.months" });
+  b.calc("thumb.answer", { op: "minus", a: "thumb.pay_high", b: "thumb.pay_low" });
+  b.calc("thumb.times", { op: "divide", a: "w.loan", b: "thumb.unit" });
+  // 5: the same question on other numbers (so the rule of thumb does not print its answer):
+  // 100,000 for 20 years, anchor 3.2, spreads 0.4 and 0.9.
   b.given("ex5.unit", "100000");
-  b.calc("ex5.pay_low", { op: "payment", principal: "ex5.unit", rate: "w.rate_low", months: "w.months" });
-  b.calc("ex5.pay_high", { op: "payment", principal: "ex5.unit", rate: "w.rate_high", months: "w.months" });
+  b.given("ex5.anchor", "3.2");
+  b.given("ex5.low", "0.4");
+  b.given("ex5.high", "0.9");
+  b.calc("ex5.rate_low", { op: "sum", of: ["ex5.anchor", "ex5.low"] });
+  b.calc("ex5.rate_high", { op: "sum", of: ["ex5.anchor", "ex5.high"] });
+  b.calc("ex5.pay_low", { op: "payment", principal: "ex5.unit", rate: "ex5.rate_low", months: "w.months" });
+  b.calc("ex5.pay_high", { op: "payment", principal: "ex5.unit", rate: "ex5.rate_high", months: "w.months" });
   b.calc("ex5.answer", { op: "minus", a: "ex5.pay_high", b: "ex5.pay_low" });
-  b.calc("ex5.times", { op: "divide", a: "w.loan", b: "ex5.unit" });
 
   b.given("data_date", "2026-10-12");
 
