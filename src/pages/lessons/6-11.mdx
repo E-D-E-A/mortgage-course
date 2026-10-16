@@ -179,25 +179,25 @@ export const ptiLines = EXAMPLE_THRESHOLDS.filter((t) => t.metric === "pti");
 
 המנופים הם של שיעור 6.4, ושמונה מהם בטבלה. לכל אחד שלושה מספרים שאי אפשר לחבר יחד: מה הוא נותן (יחס החזר), מה הוא עולה (מזומן, סך תשלומים, כרית) ואם הוא חוצה קו של ההוראה:
 
-<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
   <table class="w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">המנוף</th>
-        <th class="py-2 pe-3 text-start font-semibold">קו שנחצה</th>
-        <th class="py-2 pe-3 text-start font-semibold">יחס אחרי</th>
-        <th class="py-2 pe-3 text-start font-semibold">החסכונות שנשארים, ₪</th>
-        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים, ₪ ביחס להיום</th>
+        <th class="py-2 pe-2 text-start font-semibold">המנוף</th>
+        <th class="py-2 pe-2 text-start font-semibold">קו שנחצה</th>
+        <th class="py-2 pe-2 text-start font-semibold">יחס אחרי</th>
+        <th class="py-2 pe-2 text-start font-semibold">החסכונות שנשארים, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪ ביחס להיום</th>
       </tr>
     </thead>
     <tbody>
       {LEVERS.map((l) => (
         <tr class={`border-b border-n100 align-top ${l.inPlan ? "bg-n50" : ""}`}>
-          <td class="py-2 pe-3 font-semibold text-n900">{l.name}{l.inPlan && <span class="block text-caption font-normal text-n600">בתוכנית</span>}</td>
-          <td class="py-2 pe-3">{wall(l.key)}</td>
-          <td class="py-2 pe-3"><span class="ltr">{pc(`l.${l.key}.ratio`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw(`l.${l.key}.reserve`))}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(f.raw(`l.${l.key}.extra_total`)).replace(" ₪", "")}</span></td>
+          <td class="py-2 pe-2 font-semibold text-n900">{l.name}{l.inPlan && <span class="block text-caption font-normal text-n600">בתוכנית</span>}</td>
+          <td class="py-2 pe-2">{wall(l.key)}</td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(`l.${l.key}.ratio`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(`l.${l.key}.reserve`))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{formatShekels(f.raw(`l.${l.key}.extra_total`)).replace(" ₪", "")}</span></td>
         </tr>
       ))}
     </tbody>
@@ -209,7 +209,7 @@ export const ptiLines = EXAMPLE_THRESHOLDS.filter((t) => t.metric === "pti");
 
 1. **הלוואת הרכב מההון העצמי** נראית כמנוף הכי חזק: היא מורידה את היחס ל־{pc("l.carE.ratio")}. אבל ההלוואה גדלה ב־{f.shekels("in.payoff")}, שיעור המימון הופך ל־{pc("l.carE.ltv")}, מעל התקרה של 75%, והבנק מסרב. **כך מנוף יכול לשפר מספר אחד ולפגוע בשני.**
 2. **הון עצמי נוסף** מהחסכונות הוא הפוך: ההלוואה קטנה, הריבית שמשלמים קטנה (סך התשלומים יורד), והמחיר הוא מזומן שיוצא מהכרית.
-3. **הצעד הקטן ביותר שמגיע לקו, {f.shekels("l.eq17.add")}, מביא את היחס ל־{pc("l.eq17.ratio")}** רק בקושי: מתחת ל־40%, אבל במרחק של {f.shekels("p17.a.room")} בחודש מהקו של בנק א׳. תזוזה קטנה בריבית עלולה להחזיר את התיק מעל הקו. לכן הסדנה מוסיפה מרווח של {f.plain("in.margin")} נקודת אחוז: הצעד הקטן ביותר שמגיע ל־{f.plain("in.plan_ratio")}% הוא {f.shekels("l.eq.add")}, {f.shekels("p.extra_cash")} יותר, והמרווח מתחת לקו {f.shekels("p.a.room")} בחודש. **המרווח הזה קטן, ואין לו כיסוי רחב:** אם הפריים עולה ב־{f.plain("in.move")} נקודת אחוז, כמו בשיעורים 6.6 ו־6.10, היחס של התוכנית עולה ל־{pc("p.mv25.ratio")}, {f.plain("p.mv25.over")} נקודת אחוז מעל הקו (בעלייה של 0.05 נקודת אחוז הוא עוד {pc("p.mv05.ratio")}; בעלייה של 0.10 הוא כבר {pc("p.mv10.ratio")}). מרווח שהיה שורד גם את זה דורש {f.shekels("p.cover.add")} מהחסכונות, {f.shekels("p.cover.extra")} יותר מהתוכנית, ומשאיר רק {f.shekels("p.cover.reserve")} בכרית. הסדנה בוחרת את המרווח הקטן, ואומרת זאת בגלוי: **ההחלטה בין כרית לבין כיסוי מפני תזוזה היא של המשפחה.** אם הבנק קורא את היחס מחדש כשהריבית זזה: לא ידוע.
+3. **הצעד הקטן ביותר שמגיע לקו, {f.shekels("l.eq17.add")}, מביא את היחס ל־{pc("l.eq17.ratio")}** רק בקושי: מתחת ל־40%, אבל במרחק של {f.shekels("p17.a.room")} בחודש מהקו של בנק א׳. תזוזה קטנה בריבית עלולה להחזיר את התיק מעל הקו. לכן הסדנה מוסיפה מרווח של {f.plain("in.margin")} נקודת אחוז: הצעד הקטן ביותר שמגיע ל־{f.plain("in.plan_ratio")}% הוא {f.shekels("l.eq.add")}, {f.shekels("p.extra_cash")} יותר, והמרווח מתחת לקו {f.shekels("p.a.room")} בחודש. **המרווח הזה קטן, ואין לו כיסוי רחב:** אם הפריים עולה ב־{f.plain("in.move")} נקודת אחוז, כמו בשיעורים 6.6 ו־6.10, היחס של התוכנית עולה ל־{pc("p.mv25.ratio")}, {f.plain("p.mv25.over")} נקודת אחוז מעל הקו (בעלייה של 0.05 נקודת אחוז הוא עדיין {pc("p.mv05.ratio")}; בעלייה של 0.10 הוא כבר {pc("p.mv10.ratio")}). מרווח שהיה שורד גם את זה דורש {f.shekels("p.cover.add")} מהחסכונות, {f.shekels("p.cover.extra")} יותר מהתוכנית, ומשאיר רק {f.shekels("p.cover.reserve")} בכרית. הסדנה בוחרת את המרווח הקטן, ואומרת זאת בגלוי: **ההחלטה בין כרית לבין כיסוי מפני תזוזה היא של המשפחה.** אם הבנק קורא את היחס מחדש כשהריבית זזה: לא ידוע.
 
 <Section kind="המחשה: הזיזו בעצמכם">
 

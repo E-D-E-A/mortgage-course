@@ -50,6 +50,7 @@ export default function lesson(): LessonData {
   add(minusWhole("c.until_drop", CASE_A.car.monthsLeft as number, 17));
 
   // ── Closing the car loan from the equity: the loan grows by what leaves the equity ──
+  add(timesFact("c.sum_left", car, CASE_A.car.monthsLeft as number));
   const payoff = add(givenMoney("c.payoff", "36000"));
   const loanClosed = add(sumOf("c.loan_closed", [loan, payoff]));
   const ltvClosed = add(ltv("c.ltv_closed", v(loanClosed), CASE_A.price));

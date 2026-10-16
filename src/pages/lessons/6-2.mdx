@@ -30,6 +30,8 @@ export const n = (id) => nv(f.raw(id));
 export const pct = (id) => `${f.plain(id)}%`;
 export const pts = (id) => eq(f.plain(id).replace("-", "−"));
 // "נקודת אחוז" is singular up to one, plural above it; the number alone, with its sign dropped.
+// A signed number of points with its unit: −0.4 נקודת אחוז, −2 נקודות אחוז.
+export const ps = (id) => { const x = Math.abs(Number(f.plain(id))); return `${pts(id)} ${x <= 1 ? "נקודת אחוז" : "נקודות אחוז"}`; };
 export const pp = (id) => { const x = Math.abs(Number(f.plain(id))); return `${x} ${x <= 1 ? "נקודת אחוז" : "נקודות אחוז"}`; };
 export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
 export const predictionOptions = [
@@ -271,7 +273,7 @@ export const calcSource = "מספרים להמחשה, והמספרים לבדי�
     `זה המחיר של ${pct("l.h35")}, לא של ${pct("l.capital")}.`,
   ]}
 >
-  ההחזר קטן בערך ביחס להלוואה, והמרחק הוא {pts("a.pts40")} נקודות אחוז בלבד: בערך אחוז אחד מההלוואה מספיק. ב־{f.shekels("a.short_cut")} היחס עוד {pct("a.ratio_16")}. הטעות הנפוצה היא להניח שמרחק קטן דורש סכום גדול.
+  ההחזר קטן בערך ביחס להלוואה, והמרחק הוא {ps("a.pts40")} בלבד: בערך אחוז אחד מההלוואה מספיק. ב־{f.shekels("a.short_cut")} היחס עוד {pct("a.ratio_16")}. הטעות הנפוצה היא להניח שמרחק קטן דורש סכום גדול.
 </PredictionReveal>
 
 <Section kind="כלי לראש">
@@ -290,7 +292,7 @@ export const calcSource = "מספרים להמחשה, והמספרים לבדי�
 
 **צעד 1 — היחס.** <M>{n("a.pay")} ÷ {n("a.disp")} × 100 = {f.plain("a.ratio")}</M>.
 
-**צעד 2 — המרחק בנקודות.** הקו {pct("l.capital")} פחות היחס: {pts("a.pts40")} נקודות אחוז, מעל הקו.
+**צעד 2 — המרחק בנקודות.** הקו {pct("l.capital")} פחות היחס: {ps("a.pts40")}, מעל הקו.
 
 **צעד 3 — המרחק בשקלים של ההחזר.** ההחזר הגבוה ביותר שמתחת לקו: <M>{n("a.disp")} × {f.plain("l.capital")} ÷ 100 = {n("a.max.40")}</M>. צריך להוריד <M>{n("a.pay")} − {n("a.max.40")} = {n("a.paycut.40")}</M> בחודש.
 

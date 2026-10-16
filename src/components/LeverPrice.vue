@@ -120,7 +120,7 @@ const shownRatio = (x: Decimal.Value) => new Decimal(percentString(x));
 const gainShown = computed(() => shownRatio(p.value.before.ratio).minus(shownRatio(p.value.after.ratio)));
 const points = (x: Decimal) => percentString(x.abs());
 
-const marks = thresholdsOf("pti").map((t) => ({ at: Number(t.percent), label: t.kind === "field_hypothesis" ? "" : `${t.percent}%`, kind: KIND_INFO[t.kind].name }));
+const marks = thresholdsOf("pti").map((t) => ({ at: Number(t.percent), label: (t.kind === "field_hypothesis" || t.kind === "course_example") ? "" : `${t.percent}%`, kind: KIND_INFO[t.kind].name }));
 const SCALE = 60;
 const bar = (x: Decimal) => `${Math.min(100, (x.toNumber() / SCALE) * 100)}%`;
 
