@@ -57,8 +57,10 @@ const loanRoom = computed(() => maxLoanAt(value.value, "only_home").minus(loan.v
 
 const max50 = computed(() => maxPaymentAt(disposable.value, PTI_LIMIT));
 const max40 = computed(() => maxPaymentAt(disposable.value, PTI_CAPITAL_THRESHOLD));
-const carry50 = computed(() => paymentsValueToday(max50.value, String(rate.value), months.value));
-const carry40 = computed(() => paymentsValueToday(max40.value, String(rate.value), months.value));
+// The largest loan a payment suffices for, cut down to the agora (a maximum is never rounded up, lesson 4.4).
+const largestLoan = (pay: Decimal) => paymentsValueToday(pay, String(rate.value), months.value).toDecimalPlaces(2, Decimal.ROUND_DOWN);
+const carry50 = computed(() => largestLoan(max50.value));
+const carry40 = computed(() => largestLoan(max40.value));
 const fits50 = computed(() => carry50.value.gte(loan.value));
 const fits40 = computed(() => carry40.value.gte(loan.value));
 
@@ -108,10 +110,10 @@ const lines = computed(() => [
     status: verdict.value.placement === "income" ? "נספרת" : "לא נספרת",
     text:
       verdict.value.placement === "income"
-        ? `נשארו ${carMonths.value} תשלומים, יותר מ־${OBLIGATION_MONTHS}: ${money(props.carPayment)} מורידים מההכנסה. היא תפסיק להיספר בעוד ${payments(monthsUntilDrop(carMonths.value))}.`
+        ? `נשארו ${carMonths.value} תשלומים, יותר מ־${OBLIGATION_MONTHS}: ${money(props.carPayment)} מורידים מההכנסה. לפי התעתיק היא תפסיק להיספר בעוד ${payments(monthsUntilDrop(carMonths.value))} (אם 18 בדיוק עוד נספר, תשלום אחד אחר כך; שאלה פתוחה).`
         : carMonths.value === 0
           ? `ההלוואה נגמרה: היא לא נספרת.`
-          : `${carMonths.value === 1 ? "נשאר תשלום אחד" : `נשארו ${carMonths.value} תשלומים`}, ${OBLIGATION_MONTHS} או פחות: היא לא נספרת (אבל משלמים אותה עד שהיא נגמרת).`,
+          : `${carMonths.value === 1 ? "נשאר תשלום אחד" : `נשארו ${carMonths.value} תשלומים`}, ${OBLIGATION_MONTHS} או פחות: היא לא נספרת (אבל משלמים אותה עד שהיא נגמרת).${carMonths.value === OBLIGATION_MONTHS ? " בדיוק 18: כך לפי התעתיק, וזו שאלה פתוחה." : ""}`,
   },
   {
     id: "variable",

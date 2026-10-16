@@ -117,7 +117,7 @@ export default function lesson(): LessonData {
   const c40After5 = add(carried("a.carry40_after_5", max40After, "5", TERM_MONTHS));
   add(difference("a.gap40_after_5", c40After5, loan));
 
-  // ── The worked example: רונית ואלון (invented) ──
+  // ── The worked example: סתיו וערן (invented) ──
   const wPrice = add(givenMoney("w.price", "1500000"));
   const wEquity = add(givenMoney("w.equity", "400000"));
   const wLoan = add(difference("w.loan", wPrice, wEquity));

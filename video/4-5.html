@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Video scene for lesson 4.5 — "שלוש מדרגות".
+  Video scene for lesson 4.5 — "שלושה סוגים על סולם אחד".
   Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
   for each time t (seconds) and photographs the page. render(t) depends only on t.
   Every number comes from data/lessons/4-5.json. The directive numbers (50 and 40) are the team's Brain transcription, not checked against the directive. Bank A's line is invented for teaching and is marked as such in the scene.
@@ -100,7 +100,7 @@
       const xr = (p) => X0 + (Number(p) / MAX) * (X1 - X0);
       const MARKS = [
         { p: V.pol, name: "מדיניות בנק", sub: "בנק א׳ (בדוי)", color: C.teal, bg: C.n0 },
-        { p: V.thr, name: "סף הון", sub: "סף ההון · מותר", color: C.warning, bg: C.warningBg },
+        { p: V.thr, name: "סף הון", sub: "מותר · יותר הון", color: C.warning, bg: C.warningBg },
         { p: V.lim, name: "מגבלה רגולטורית", sub: "אסור · בכל בנק", color: C.danger, bg: C.dangerBg },
       ];
       const BOXX = [300, 640, 980];
@@ -117,7 +117,7 @@
         svg.replaceChildren();
         if (inScene(t, S.title)) {
           const o = vis(t, S.title);
-          txt(640, 290, "שלוש מדרגות", 84, { w: 700, o });
+          txt(640, 290, "שלושה סוגים על סולם אחד", 68, { w: 700, o });
           txt(640, 365, "מי קבע את המספר?", 38, { fill: C.n600, o });
           txt(640, 440, "יחס ההחזר, ושלושה קווים שנשמעים אותו דבר", 26, { fill: C.n500, o: after(t, S.title, 5, o, 0.8) });
         }
