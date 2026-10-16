@@ -61,10 +61,10 @@
       const V = {
         loan: num(g("explain.loan")),
         years: String(g("explain.years")),
-        aRate: pl(g("base.a.rate")), aTotal: num(g("base.a.total")), aHigh: num(g("base.a.highest")), aFirst: num(g("base.a.first")),
+        aRate: Number(g("base.a.rate")).toFixed(2), aTotal: num(g("base.a.total")), aHigh: num(g("base.a.highest")), aFirst: num(g("base.a.first")),
         irr: pl(g("base.a.irr")), rate4: pl(g("base.a.rate4")),
-        fcRate: pl(g("fc.a.rate")), moRate: pl(g("mo.a.rate")), amTotal: num(g("am.a.total")), amRate: pl(g("am.a.rate")), mxRate: pl(g("mx.a.rate")),
-        fee: num(g("fee.amount")), cRate: pl(g("base.c.rate")), cFeeRate: pl(g("fee.c.rate")),
+        fcRate: Number(g("fc.a.rate")).toFixed(2), moRate: Number(g("mo.a.rate")).toFixed(2), amTotal: num(g("am.a.total")), amRate: Number(g("am.a.rate")).toFixed(2), mxRate: Number(g("mx.a.rate")).toFixed(2),
+        fee: num(g("fee.amount")), cRate: Number(g("base.c.rate")).toFixed(2), cFeeRate: Number(g("fee.c.rate")).toFixed(2),
       };
       const lowestBase = g("base.lowest_rate");
       const lowFc = g("fc.lowest_rate");
@@ -89,7 +89,7 @@
         [110, 119, "החודש: מחשבים כאילו ההלוואה ניתנה בתחילתו."],
         [119, 127, "התחזית: אותה תחזית לכל ההצעות."],
         [129, 137, "נשבור תנאי אחד, ונראה מה קורה לבנק א׳."],
-        [137, 146, `תחזית אחרת: ${V.aRate}% קופץ ל־${V.fcRate}%, בלי שינוי בריביות.`],
+        [137, 146, `תחזית אחרת: מ־${V.aRate}% ל־${V.fcRate}%, בלי שינוי בריביות.`],
         [146, 154, "בנק א׳ הפך מנמוך לגבוה, ולא בגלל המחיר."],
         [154, 163, `סכום קטן יותר: סך התשלומים ${V.amTotal} ₪, והריבית ${V.amRate}%.`],
         [163, 172, `חודש אחר: ${V.moRate}%. תמהיל אחר: ${V.mxRate}%.`],
@@ -226,7 +226,7 @@
           const o = vis(t, S.broke);
           const at = (s) => after(t, S.broke, s, o);
           txt(640, 118, "שוברים תנאי אחד, ובנק א׳ משתנה", 38, { w: 700, o });
-          box(160, 160, 960, 330, at(1));
+          box(160, 160, 960, 360, at(1));
           const cols = [{ x: 1090, label: "מה שונה" }, { x: 640, label: "ריבית של א׳" }, { x: 400, label: "נמוך בריבית" }];
           for (const c of cols) txt(c.x, 200, c.label, 18, { anchor: "start", fill: C.n600, w: 600, o: at(1) });
           const rows = [
@@ -242,7 +242,7 @@
             txt(640, r.y, `${r.rate}%`, 28, { anchor: "start", w: 700, fill: C.teal, o: or, ltr: true });
             txt(400, r.y, r.low, 22, { anchor: "start", o: or });
           }
-          txt(640, 530, "המספר נכון. ההשוואה לא", 22, { fill: C.n700, w: 700, o: at(44) });
+          txt(640, 560, "המספר נכון. ההשוואה לא", 22, { fill: C.n700, w: 700, o: at(44) });
         }
         // Scene 6 — a fee on the day of the loan
         if (inScene(t, S.fee)) {

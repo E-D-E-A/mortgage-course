@@ -44,6 +44,7 @@
       };
       const minus = (s) => String(s).replace("-", "−");
 
+      const lr = (x) => `\u2066${x}\u2069`;
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
       const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
       const inScene = (t, [a, b]) => t >= a && t < b;
@@ -81,9 +82,9 @@
         [34, 46, "קנה מידה שלישי: הסל האחיד של אותו בנק."],
         [46, 58, "קנה מידה רביעי: הצעה של בנק אחר."],
         [58, 62, "בכולם: קודם מוודאים שהבסיס זהה."],
-        [63, 74, `ריבית של ${V.nominal}% בחוזה, וממוצע של ${V.avg}%.`],
+        [63, 74, `ריבית של ${lr(String(V.nominal)+"%")} בחוזה, וממוצע של ${lr(String(V.avg)+"%")}.`],
         [74, 84, `נראה ${String(V.gapNom).replace("-", "")} נקודת אחוז לטובתכם.`],
-        [84, 96, `אבל ${V.nominal}% נומינלית הם ${V.eff}% אפקטיבית.`],
+        [84, 96, `אבל ${lr(String(V.nominal)+"%")} נומינלית הם ${lr(String(V.eff)+"%")} אפקטיבית.`],
         [96, 105, "אותו מספר, סימן הפוך: רק בגלל שיטה שונה."],
         [107, 118, "אותו תמהיל אצל שני בנקים, על אותן 300 חודשים."],
         [118, 130, `ההחזר הראשון נמוך ב־${shek(V.yxFirst)}: הפער אמיתי.`],
@@ -134,17 +135,17 @@
           // the average
           const oa = after(t, S.flip, 1, o);
           el("line", { x1: X(V.avg), x2: X(V.avg), y1: 250, y2: 410, stroke: C.navy, "stroke-width": 4, "stroke-dasharray": "8 6", opacity: oa });
-          txt(X(V.avg), 232, `ממוצע: ${V.avg}% (להמחשה)`, 26, { w: 700, o: oa });
+          txt(X(V.avg), 232, `ממוצע: ${lr(String(V.avg)+"%")} (להמחשה)`, 26, { w: 700, o: oa });
           // nominal
           const on = after(t, S.flip, 11, o);
           el("circle", { cx: X(V.nominal), cy: 330, r: 14, fill: C.teal, opacity: on });
-          txt(X(V.nominal), 392, `נומינלית ${V.nominal}%`, 26, { w: 700, o: on });
+          txt(X(V.nominal), 392, `נומינלית ${lr(String(V.nominal)+"%")}`, 26, { w: 700, o: on });
           const og = after(t, S.flip, 14, o);
           txt(X(V.nominal), 452, `${String(V.gapNom).replace("-", "")} נק׳ לטובתכם`, 28, { fill: C.success, w: 700, o: og });
           // effective
           const oe = after(t, S.flip, 23, o);
           el("circle", { cx: X(V.eff), cy: 330, r: 14, fill: C.tq2, opacity: oe });
-          txt(X(V.eff), 392, `אפקטיבית ${V.eff}%`, 26, { w: 700, o: oe });
+          txt(X(V.eff), 392, `אפקטיבית ${lr(String(V.eff)+"%")}`, 26, { w: 700, o: oe });
           const oh = after(t, S.flip, 28, o);
           txt(X(V.eff), 452, `${V.gapEff} נק׳ לרעתכם`, 28, { fill: C.danger, w: 700, o: oh });
           txt(640, 560, "הפער הוא מידע רק כששני הצדדים נמדדו באותה שיטה", 30, { fill: C.n700, o: after(t, S.flip, 33, o) });

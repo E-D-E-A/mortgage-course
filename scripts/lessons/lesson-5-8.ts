@@ -143,6 +143,7 @@ export default function lesson58(): LessonData {
 
   // ── Comparing on one basis, and the slip of comparing across scenarios ──
   add(difference("cmp.gap_same", get("alt.fixed.base.total"), get("alt.short.base.total")));
+  add(difference("cmp.gap_stress", get("alt.fixed.stress.total"), get("alt.short.stress.total")));
   add(difference("cmp.err_mixed", get("alt.fixed.stress.total"), get("alt.short.relief.total")));
   add(difference("cmp.short_swing", get("alt.short.stress.total"), get("alt.short.relief.total")));
   add(difference("cmp.linked_swing", get("alt.linked.stress.total"), get("alt.linked.relief.total")));

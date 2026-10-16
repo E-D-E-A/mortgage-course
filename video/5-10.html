@@ -45,6 +45,7 @@
         months: fact("term.months"),
       };
 
+      const lr = (x) => `\u2066${x}\u2069`;
       const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
       const inScene = (t, [a, b]) => t >= a && t < b;
       const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
@@ -81,8 +82,8 @@
         [34, 46, "מדיניות הבנק: אי אפשר לחשב. לא ידוע."],
         [46, 55, "ובדיקה אחרונה: מי הציע את הריביות."],
         [57, 68, `הלוואה של ${shek(V.loan)} על דירה של ${shek(V.value)}.`],
-        [68, 80, `שיעור מימון ${V.ltv}%, וחלק משתנה ${V.share}%: בפנים.`],
-        [80, 92, `יחס החזר ${V.ratio}%: מעל 40%, אבל מותר.`],
+        [68, 80, `שיעור מימון ${lr(String(V.ltv)+"%")}, וחלק משתנה ${lr(String(V.share)+"%")}: בפנים.`],
+        [80, 92, `יחס החזר ${lr(String(V.ratio)+"%")}: מעל 40%, אבל מותר.`],
         [92, 99, "עמידה בקווים עוד לא אומרת שבנק יאשר."],
         [101, 114, "שתי הצעות על אותו תמהיל: א׳ וב׳."],
         [114, 126, "לוקחים מכל מסלול את הריבית הנמוכה."],
@@ -98,10 +99,10 @@
       ];
 
       const ROWS = [
-        { id: "ltv", label: "שיעור מימון", show: () => `${L.ltv.actual}%`, lim: "עד 75%" },
-        { id: "pti", label: "יחס החזר", show: () => `${L.pti.actual}%`, lim: "עד 50%" },
-        { id: "capital", label: "קו ההון", show: () => `${L.capital.actual}%`, lim: "מעל 40% — מותר" },
-        { id: "variable", label: "ריבית משתנה", show: () => `${V.share}%`, lim: "עד שני שלישים" },
+        { id: "ltv", label: "שיעור מימון", show: () => `${lr(String(L.ltv.actual)+"%")}`, lim: "עד 75%" },
+        { id: "pti", label: "יחס החזר", show: () => `${lr(String(L.pti.actual)+"%")}`, lim: "עד 50%" },
+        { id: "capital", label: "קו ההון", show: () => `${lr(String(L.capital.actual)+"%")}`, lim: "מעל 40% — מותר" },
+        { id: "variable", label: "ריבית משתנה", show: () => `${lr(String(V.share)+"%")}`, lim: "עד שני שלישים" },
         { id: "term", label: "תקופה", show: () => `${L.term.actual} חודשים`, lim: "עד 360 חודשים" },
       ];
 
@@ -165,7 +166,7 @@
             txt(c.x, 170, c.h, 30, { w: 700, o: oc, fill: c.c });
             c.r.forEach((rate, k) => {
               const best = ci === 2 ? 1 : 0;
-              txt(c.x, 220 + k * 62, `${rate}%`, 30, { w: best ? 700 : 400, o: oc, fill: c.c });
+              txt(c.x, 220 + k * 62, `${lr(String(rate)+"%")}`, 30, { w: best ? 700 : 400, o: oc, fill: c.c });
             });
           });
           const oT = after(t, S.cherry, 26, o);

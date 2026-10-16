@@ -8,7 +8,11 @@
 // The explanations are the course's words about a made-up document; every claim in
 // them is labelled where the lesson cites it (the Sources block of 5.1).
 import { computed, ref } from "vue";
-import { formatShekels, formatWholeShekels } from "../lib/calc/money.ts";
+import { formatShekels as fs, formatWholeShekels as fw } from "../lib/calc/money.ts";
+// Money inside running text is isolated left to right, so the shekel sign sits where the other tables put it.
+const isolate = (x: string) => `\u2066${x}\u2069`;
+const formatShekels = (v: string | number) => isolate(fs(v));
+const formatWholeShekels = (v: string | number) => isolate(fw(v));
 
 interface TrackLine {
   kindHe: string;

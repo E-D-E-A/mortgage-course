@@ -30,6 +30,7 @@ export const MARK = "דוגמה לימודית — נתוני הלקוח והר�
 export const pc = (v) => `${v}%`;
 export const delta = (id) => { const v = f.raw(id); return eq(`${Number(v) > 0 ? "+" : ""}${formatShekels(v)}`); };
 export const money = (id) => formatShekels(f.raw(id));
+export const w = (id) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(Math.round(Number(f.raw(id))));
 export const sc = SCENARIOS;
 export const ALTS = [
   { id: "linked", letter: "א׳", goal: "החזר נמוך", name: "צמוד" },
@@ -59,7 +60,7 @@ export const halfRows = [
 
 <Callout title="מה הסדנה הזו לא אומרת">
 <p><strong>{MARK}</strong></p>
-<p>לנועם ושירה אין הצעות של בנקים: את אלה בוחנים בשלב 6. אחוזי הריבית כאן הם רשימת המחירים של הקורס, אותה רשימה לכל החלופות, כדי שאפשר יהיה להשוות. בשוק, כשמשנים תמהיל הבנק יכול לשנות את הריביות (ידע מהשטח, FK-H-057, אילון, 2026-10-08; ממתין לאישור אילון), ולכן הצעה אמיתית עשויה לשנות את הסדר בין החלופות. שלושת היעדים הם תכנון של Mogi (J-090), לא עובדה על השוק. וגם: הקורס לא קובע מה נועם ושירה צריכים: תקציב המחיה שלהם ומה שחשוב להם אינם נתונים של התיק.</p>
+<p>לנועם ושירה אין הצעות של בנקים: את אלה בוחנים בשלב 6. אחוזי הריבית כאן הם רשימת המחירים של הקורס, אותה רשימה לכל החלופות, כדי שאפשר יהיה להשוות. בשוק, כשמשנים תמהיל הבנק יכול לשנות את הריביות (ידע מהשטח, FK-H-057, אילון, 2026-10-08; ממתין לאישור אילון), ולכן הצעה של בנק עשויה לשנות את הסדר בין החלופות. שלושת היעדים הם תכנון המוצר של Mogi, לא עובדה על השוק. וגם: הקורס לא קובע מה נועם ושירה צריכים: תקציב המחיה שלהם ומה שחשוב להם אינם נתונים של התיק.</p>
 </Callout>
 
 <Section kind="לפני שמתחילים: נחשו">
@@ -71,7 +72,7 @@ export const halfRows = [
 <Prediction
   client:visible
   id="5.8"
-  question={`נועם ושירה לוקחים הלוואה של ${f.whole("a.loan")} בשלוש חלופות: אחת עם החזר ראשון נמוך (צמוד), אחת עם סך תשלומים נמוך (תקופה של 25 שנה), ואחת יציבה (קבועה לא צמודה בלבד). אחרי 10 שנים הם מוכרים את הדירה. באיזו חלופה הם עדיין חייבים הכי הרבה לבנק?`}
+  question={`נועם ושירה לוקחים הלוואה של ${f.whole("a.loan")} בשלוש חלופות: אחת עם החזר ראשון נמוך (צמוד), אחת עם סך תשלומים נמוך (תקופה של 25 שנה), ואחת יציבה (קבועה לא צמודה בלבד). נניח שאחרי 10 שנים הם מוכרים את הדירה (הנחה של הסדנה). באיזו חלופה הם עדיין חייבים הכי הרבה לבנק?`}
   options={predictionOptions}
 />
 
@@ -138,22 +139,15 @@ export const halfRows = [
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">התקופות</th>
-        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
-        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
-        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
-        <th class="py-2 pe-3 text-start font-semibold">יתרה אחרי 10 שנים</th>
-      </tr>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">התקופות</th><th class="py-2 pe-2 text-start font-semibold">החזר ראשון, ₪</th><th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th><th class="py-2 pe-2 text-start font-semibold">יחס החזר</th></tr>
     </thead>
     <tbody>
       {["a", "b", "c"].map((v) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3 font-semibold">קבועה <span class="ltr">{f.plain(`term.${v}.fixed_years`)}</span> שנה, משתנה <span class="ltr">{f.plain(`term.${v}.var_years`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.first`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.total`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(`term.${v}.ratio`))}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`term.${v}.bal.120`)}</span></td>
+          <td class="py-2 pe-2 font-semibold">קבועה <span class="ltr">{f.plain(`term.${v}.fixed_years`)}</span>, משתנה <span class="ltr">{f.plain(`term.${v}.var_years`)}</span> שנה</td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(`term.${v}.first`))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`term.${v}.total`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(f.plain(`term.${v}.ratio`))}</span></td>
         </tr>
       ))}
     </tbody>
@@ -180,20 +174,15 @@ export const halfRows = [
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">התשלום הגבוה ביותר</th>
-        <th class="py-2 pe-3 text-start font-semibold">מקל</th>
-        <th class="py-2 pe-3 text-start font-semibold">בסיס</th>
-        <th class="py-2 pe-3 text-start font-semibold">מחמיר</th>
-      </tr>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">הגבוה ביותר, ₪</th><th class="py-2 pe-2 text-start font-semibold">מחמיר</th><th class="py-2 pe-2 text-start font-semibold">בסיס</th><th class="py-2 pe-2 text-start font-semibold">מקל</th></tr>
     </thead>
     <tbody>
       {ALL.map((a) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.relief.max`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.max`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.max`)}</span></td>
+          <td class="py-2 pe-2 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.stress.max`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.base.max`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.relief.max`)}</span></td>
         </tr>
       ))}
     </tbody>
@@ -203,25 +192,20 @@ export const halfRows = [
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">סך התשלומים</th>
-        <th class="py-2 pe-3 text-start font-semibold">מקל</th>
-        <th class="py-2 pe-3 text-start font-semibold">בסיס</th>
-        <th class="py-2 pe-3 text-start font-semibold">מחמיר</th>
-      </tr>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">סך התשלומים, ₪</th><th class="py-2 pe-2 text-start font-semibold">מחמיר</th><th class="py-2 pe-2 text-start font-semibold">בסיס</th><th class="py-2 pe-2 text-start font-semibold">מקל</th></tr>
     </thead>
     <tbody>
       {ALL.map((a) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.relief.total`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.total`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.total`)}</span></td>
+          <td class="py-2 pe-2 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.stress.total`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.base.total`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.relief.total`)}</span></td>
         </tr>
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} שלושה תרחישים להמחשה, לא תחזיות.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} שלושה תרחישים להמחשה, לא תחזיות. שקלים שלמים, בעיגול.</p>
 </div>
 
 מה רואים:
@@ -236,29 +220,23 @@ export const halfRows = [
 
 </Section>
 
-<Term t="יתרת חוב" lesson="2.11">יתרת החוב</Term> היא מה שעוד חייבים אחרי תשלום מסוים. היא חשובה ברגע שאפשר לשנות את התוכנית: מוכרים את הדירה, מקבלים כסף ורוצים לפרוע, או מחזרים. נועם ושירה אולי יעברו דירה אחרי 7 שנים; לכן בודקים את היתרה לא רק בסוף ההלוואה:
+<Term t="יתרת חוב" lesson="2.11">יתרת החוב</Term> היא מה שעוד חייבים אחרי תשלום מסוים. היא חשובה ברגע שאפשר לשנות את התוכנית: מוכרים את הדירה, מקבלים כסף ורוצים לפרוע, או מחזרים. בסדנה נניח שנועם ושירה מוכרים אחרי 7 או 10 שנים (הנחה של הסדנה); לכן בודקים את היתרה לא רק בסוף ההלוואה:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">יתרת החוב</th>
-        <th class="py-2 pe-3 text-start font-semibold">אחרי 5 שנים</th>
-        <th class="py-2 pe-3 text-start font-semibold">אחרי 7</th>
-        <th class="py-2 pe-3 text-start font-semibold">אחרי 10</th>
-        <th class="py-2 pe-3 text-start font-semibold">אחרי 15</th>
-      </tr>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">יתרת החוב, ₪</th><th class="py-2 pe-2 text-start font-semibold">אחרי 10 שנים</th><th class="py-2 pe-2 text-start font-semibold">אחרי 5</th><th class="py-2 pe-2 text-start font-semibold">אחרי 7</th></tr>
     </thead>
     <tbody>
       {ALL.map((a) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
-          {balMonths.map((m) => (<td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.bal.${m}`)}</span></td>))}
+          <td class="py-2 pe-2 font-semibold">{a.letter ? `${a.letter} ` : ""}״{a.name}״</td>
+          {[120, 60, 84].map((m) => (<td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.bal.${m}`)}</span></td>))}
         </tr>
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס. יתרה: מה שעוד חייבים אחרי התשלום של אותו חודש; במסלול צמוד היא כוללת את הפרשי ההצמדה.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס, שקלים שלמים. יתרה: מה שעוד חייבים אחרי התשלום של אותו חודש; במסלול צמוד היא כוללת את הפרשי ההצמדה.</p>
 </div>
 
 - **״צמוד״ כמעט לא מקטין את החוב בהתחלה.** אחרי 5 שנים נשארו {f.shekels("alt.linked.bal.60")} מתוך {f.shekels("a.loan")}: הצמדה מוסיפה לחוב כמעט כמו התשלומים שמורידים ממנו. אחרי 10 שנים הוא עדיין {f.shekels("alt.linked.bal.120")}: נפרעו רק {f.shekels("alt.linked.principal_120")}, מול {f.shekels("alt.short.principal_120")} ב״{ALTS[1].name}״.
@@ -282,7 +260,7 @@ export const halfRows = [
         <th class="py-2 pe-3 text-start font-semibold">יחס החזר (עד 50%)</th>
         <th class="py-2 pe-3 text-start font-semibold">מעל 40%?</th>
         <th class="py-2 pe-3 text-start font-semibold">משתנה (עד שני שלישים)</th>
-        <th class="py-2 pe-3 text-start font-semibold">תקופה (עד 360)</th>
+        <th class="py-2 pe-3 text-start font-semibold">תקופה (עד 360 חודשים)</th>
       </tr>
     </thead>
     <tbody>
@@ -313,37 +291,50 @@ export const halfRows = [
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
     <thead>
-      <tr class="border-b border-n200 text-caption text-n600">
-        <th class="py-2 pe-3 text-start font-semibold">החלופה</th>
-        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
-        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר במחמיר</th>
-        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
-        <th class="py-2 pe-3 text-start font-semibold">חוב אחרי 10 שנים</th>
-        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
-      </tr>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">החלופה</th><th class="py-2 pe-2 text-start font-semibold">החזר ראשון, ₪</th><th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th></tr>
     </thead>
     <tbody>
       <tr class="border-b border-n100 text-n700">
-        <td class="py-2 pe-3 font-semibold">הראשוני</td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.base.first")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.stress.max")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.base.total")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("alt.initial.bal.120")}</span></td>
-        <td class="py-2 pe-3"><span class="ltr">{pc(f.plain("alt.initial.ratio"))}</span></td>
+        <td class="py-2 pe-2 font-semibold">הראשוני</td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw("alt.initial.base.first"))}</span></td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w("alt.initial.base.total")}</span></td>
       </tr>
       {ALTS.map((a) => (
         <tr class="border-b border-n100">
-          <td class="py-2 pe-3 font-semibold">{a.letter} ״{a.name}״<br /><span class="text-caption font-normal text-n600">{a.goal}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.first`)}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_first`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.stress.max`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.base.total`)}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_total`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money(`alt.${a.id}.bal.120`)}</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{pc(f.plain(`alt.${a.id}.ratio`))}</span></td>
+          <td class="py-2 pe-2 font-semibold">{a.letter} ״{a.name}״<br /><span class="text-caption font-normal text-n600">{a.goal}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(`alt.${a.id}.base.first`))}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_first`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.base.total`)}</span><br /><span class="ltr text-caption text-n600">{delta(`alt.${a.id}.d_total`)}</span></td>
         </tr>
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} תרחיש בסיס, חוץ מהעמודה ״הגבוה ביותר במחמיר״. מבחר קבוע של שבעה תמהילים; הרשימה כולה בשיעור 5.6.</p>
+</div>
+
+ועוד שלוש מדידות של אותן חלופות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600"><th class="py-2 pe-2 text-start font-semibold">החלופה</th><th class="py-2 pe-2 text-start font-semibold">יחס החזר</th><th class="py-2 pe-2 text-start font-semibold">חוב אחרי 10 שנים, ₪</th><th class="py-2 pe-2 text-start font-semibold">הגבוה במחמיר, ₪</th></tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 text-n700">
+        <td class="py-2 pe-2 font-semibold">הראשוני</td>
+        <td class="py-2 pe-2"><span class="ltr">{pc(f.plain("alt.initial.ratio"))}</span></td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w("alt.initial.bal.120")}</span></td>
+        <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w("alt.initial.stress.max")}</span></td>
+      </tr>
+      {ALTS.map((a) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-2 font-semibold">{a.letter} ״{a.name}״</td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(f.plain(`alt.${a.id}.ratio`))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.bal.120`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{w(`alt.${a.id}.stress.max`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש בסיס, חוץ מ״הגבוה במחמיר״. מבחר קבוע של שבעה תמהילים; הרשימה כולה בשיעור 5.6.</p>
 </div>
 
 <Section kind="המחשה: הזיזו בעצמכם">
@@ -378,7 +369,7 @@ export const halfRows = [
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>חלופה א׳, בתרחיש הבסיס: החזר ראשון {f.shekels("alt.linked.base.first")} ({delta("alt.linked.d_first")} מהראשוני), התשלום הגבוה ביותר {f.shekels("alt.linked.base.max")} (בחודש {f.plain("alt.linked.base.max_month")}; {delta("alt.linked.d_max")}) וסך תשלומים {f.shekels("alt.linked.base.total")} ({delta("alt.linked.d_total")}). יחס ההחזר {f.plain("alt.linked.ratio")}%. היתרה אחרי 5, 7, 10 ו־15 שנים: {f.shekels("alt.linked.bal.60")}, {f.shekels("alt.linked.bal.84")}, {f.shekels("alt.linked.bal.120")} ו־{f.shekels("alt.linked.bal.180")}. בתרחיש מחמיר: התשלום הגבוה ביותר {f.shekels("alt.linked.stress.max")} והסך {f.shekels("alt.linked.stress.total")}.</li>
     <li>חלופה ג׳: {f.shekels("alt.fixed.base.first")} בכל חודש ({delta("alt.fixed.d_first")} מהראשוני), והסך {f.shekels("alt.fixed.base.total")} ({delta("alt.fixed.d_total")}). יחס ההחזר {f.plain("alt.fixed.ratio")}%. היתרה אחרי 10 שנים {f.shekels("alt.fixed.bal.120")}. שינוי של המדד או הפריים לא זז כלום.</li>
-    <li>ההחזר הראשון {f.shekels("term.b.first")} והסך {f.shekels("term.b.total")}: {delta("term.b_first_gap")} פחות בחודש מהשורה הראשונה, וסך גבוה ב־{f.shekels("term.b_total_gap")}.</li>
+    <li>ההחזר הראשון {f.shekels("term.b.first")} והסך {f.shekels("term.b.total")}: {f.shekels("term.b_first_gap")} פחות בחודש מהשורה הראשונה, וסך גבוה ב־{f.shekels("term.b_total_gap")}.</li>
   </ol>
 </details>
 
@@ -394,7 +385,7 @@ export const halfRows = [
     `לא: הפער בין החלופות גדול. אחרי 10 שנים החוב נע בין ${money("alt.short.bal.120")} ל־${money("alt.linked.bal.120")}.`,
   ]}
 >
-  אחרי 10 שנים נשאר חוב של {f.shekels("alt.linked.bal.120")} ב״{ALTS[0].name}״, גבוה מכל חלופה אחרת. ההחזר הנמוך הוא גם החוב הנמוך בתשלום, אבל לא החוב הנמוך בקרן: ההצמדה מוסיפה לחוב כמעט כמו התשלומים שמורידים ממנו, ולכן כמעט לא נפרעת קרן. מי שחושב ש״תשלום נמוך = חוב נמוך״ מתבלבל בין כמה משלמים לכמה חייבים.
+  אחרי 10 שנים נשאר חוב של {f.shekels("alt.linked.bal.120")} ב״{ALTS[0].name}״, גבוה מכל חלופה אחרת. החזר חודשי נמוך לא אומר חוב נמוך: ב״צמוד״ ההצמדה מוסיפה לחוב כמעט כמו התשלומים שמורידים ממנו, ולכן כמעט לא נפרעת קרן. מי שחושב ש״תשלום נמוך = חוב נמוך״ מתבלבל בין כמה משלמים בחודש לכמה חייבים.
 </PredictionReveal>
 
 <Section kind="ההמלצה">
@@ -520,7 +511,7 @@ export const halfRows = [
 </NumericExercise>
 
 <Solution for="5.8-3">
-<M>{n("alt.fixed.base.total")} − {n("alt.short.base.total")} = {n("cmp.gap_same")}</M> ₪. זה המחיר של היציבות המלאה לעומת 5 שנים פחות, באותו תרחיש. בתרחיש מחמיר ההפרש גדל: הסך של ״{ALTS[1].name}״ עולה ל־{f.shekels("alt.short.stress.total")}.
+<M>{n("alt.fixed.base.total")} − {n("alt.short.base.total")} = {n("cmp.gap_same")}</M> ₪. זה המחיר של היציבות המלאה לעומת 5 שנים פחות, באותו תרחיש. בתרחיש מחמיר ההפרש קטן: הסך של ״{ALTS[1].name}״ עולה ל־{f.shekels("alt.short.stress.total")}, וההפרש מ״{ALTS[2].name}״ יורד ל־{f.shekels("cmp.gap_stress")}, כי ל״{ALTS[1].name}״ יש שני מסלולים משתנים.
 </Solution>
 
 <NumericExercise
@@ -559,7 +550,7 @@ export const halfRows = [
   client:visible
   id="5.8-6"
   n={6}
-  level="מאתגר"
+  level="בינוני"
   answer={f.raw("term.b_total_gap")}
   errors={[
     { value: f.raw("term.b_first_gap"), message: "זה ההפרש בהחזר הראשון. השאלה על סך התשלומים." },
@@ -592,7 +583,7 @@ export const halfRows = [
 <p><strong>למה זה קיים?</strong> כי המשפחה בוחרת לפי מה שחשוב לה, ולכן צריך להראות לה את האפשרויות ואת מחירן, לא להכריע בשבילה. זה גם מה שהמערכת של Mogi אמורה לעשות: לבנות תמהילים לפי יעדים, ולהסביר את הבחירה. החישוב עצמו נעשה בקוד שאפשר לבדוק; מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
 <p><strong>איך זה עובד?</strong> אותה הלוואה, אותה רשימת מחירים ואותם תרחישים לכל החלופות; כל חלופה עוברת את איסורי 329; לכל חלופה: החזר ראשון, התשלום הגבוה ביותר, סך, יתרה ויחס החזר.</p>
 <p><strong>איך זה משפיע עליכם?</strong> הבחירה קובעת כמה תשלמו בחודשים הראשונים, כמה תהיו חשופים, כמה תשלמו בסך הכול וכמה תחייבו אם תמכרו אחרי כמה שנים.</p>
-<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים את המשפחה מה חשוב לה, ובוחרים את החלופה ששואפת לשם, מציגים לה את המחיר, ומה לא ידוע. בשלב 6 מבקשים הצעות אמיתיות מבנקים, ומחשבים מחדש את הטבלה על הריביות שהם מציעים; יתכן שהסדר ישתנה.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים את המשפחה מה חשוב לה, ובוחרים את החלופה ששואפת לשם, מציגים לה את המחיר, ומה לא ידוע. בשלב 6 מגיעות ההצעות של הבנקים הבדויים של הקורס, ומחשבים מחדש את הטבלה על הריביות שהם מציעים; יתכן שהסדר ישתנה.</p>
 </Callout>
 
 <Section kind="סיכום">
@@ -617,15 +608,15 @@ export const halfRows = [
 
 <Sources
   items={[
-    { kind: "החלטה של Mogi", text: "בניית תמהיל מייצרת שלושה תמהילים לפי שלושה יעדים: החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית. זה תכנון של Mogi (J-090), לא עובדה על השוק. לפי דף J-090 ב־Brain (דף 7503881, עודכן ב־2026-10-08), כפי שנרשם בצוות ב־research/notes; הדף לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
-    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. DEC-1: אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
-    { kind: "החלטה של Mogi", text: "לכל מסלול בתמהיל תקופה משלו (אילון, 2026-08-03; לפי Brain, דף 16646263, כפי שנרשם בצוות).", date: "2026-08-03" },
+    { kind: "החלטה של Mogi", text: "בניית תמהיל מייצרת שלושה תמהילים לפי שלושה יעדים: החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית. זה תכנון המוצר של Mogi (עודכן ב־2026-10-08), לא עובדה על השוק; כפי שנרשם בצוות, ולא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
+    { kind: "החלטה של Mogi", text: "לכל מסלול בתמהיל תקופה משלו (אילון, 2026-08-03; כפי שנרשם בצוות).", date: "2026-08-03" },
     { kind: "ידע מהשטח", text: "FK-H-057: שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע; הנתונים הציבוריים הם ממוצעים ולא מחיר שבנק יאשר. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
-    { kind: "לא אומת", text: "מגבלות הוראה 329: שיעור מימון עד 75% לדירה יחידה, יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות ב־Brain (דף 7503881, עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה. איך בנק מתמחר יחס החזר מעל 40%: לא ידוע; שאלה פתוחה לאילון.", date: "2026-10-08" },
-    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות ב־Brain (דף 67436545), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
-    { kind: "הנחת חישוב", text: "תיק A: מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים (scripts/case_sketch.py). רשימת המחירים לכל סוג מסלול, התמהיל הראשוני ושלוש החלופות הם הנחות של הקורס ב־src/data/case-a-mix.ts; לא הצעת בנק ולא נתוני שוק. אותו אחוז ריבית לכל סוג מסלול בכל חלופה, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
-    { kind: "הנחת חישוב", text: "שלושת התרחישים הם תרחישים להמחשה, לא תחזיות: בסיס — המדד עולה 2% בשנה, הפריים והעוגן לא זזים; מחמיר — 4% בשנה, והפריים והעוגן עולים 2 נקודות אחוז (הפריים מהשנה השנייה, העוגן בכל נקודת עדכון, כל 5 שנים); מקל — 1% בשנה, והם יורדים נקודת אחוז. יתרת חוב: מה שנשאר אחרי התשלום של החודש, כולל הפרשי הצמדה, בתרחיש הבסיס. מסלול משתנה מתעדכן כל 5 שנים: הנחת הקורס לפי DEC-3, החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). כלל העיגול של הקורס (שיעור 3.8). ״החלופות המנצחות במבחר קבוע של שבעה תמהילים״ הוא כלי הוראה: תמהיל טוב יותר יכול להיות מחוץ למבחר." },
-    { kind: "הנחת חישוב", text: "הנחה של הסדנה על מה שחשוב לנועם ושירה (״אנחנו לא רוצים הפתעות״): נבנתה כדי להדגים כתיבת המלצה. אינה נתון של התיק." },
+    { kind: "לא אומת", text: "מגבלות הוראה 329: שיעור מימון עד 75% לדירה יחידה, יחס החזר עד 50%, סף הון 40%, עד שני שלישים בריבית משתנה, עד 30 שנה, לפי תעתיק בצוות (עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה. איך בנק מתמחר יחס החזר מעל 40%: לא ידוע; שאלה פתוחה לאילון.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "חישוב יחס ההחזר: ההחזר הראשון על כל הסכום מול ההכנסה פחות התחייבויות עם יותר מ־18 חודשים (נספח א׳ של הוראה 329). לפי תעתיק בצוות (2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "תיק A: מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים. רשימת המחירים לכל סוג מסלול, התמהיל הראשוני ושלוש החלופות הם הנחות של הקורס; לא הצעת בנק ולא נתוני שוק. אותו אחוז ריבית לכל סוג מסלול בכל חלופה, כלי הוראה. הריבית החודשית היא אחוז הריבית לשנה חלקי 12." },
+    { kind: "הנחת חישוב", text: "שלושת התרחישים הם תרחישים להמחשה, לא תחזיות: בסיס — המדד עולה 2% בשנה, הפריים והעוגן לא זזים; מחמיר — 4% בשנה, והפריים והעוגן עולים 2 נקודות אחוז (הפריים מהשנה השנייה, העוגן בכל נקודת עדכון, כל 5 שנים); מקל — 1% בשנה, והם יורדים נקודת אחוז. יתרת חוב: מה שנשאר אחרי התשלום של החודש, כולל הפרשי הצמדה, בתרחיש הבסיס. מסלול משתנה מתעדכן כל 5 שנים: הנחת הקורס, החלטה של Mogi (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08). כלל העיגול של הקורס (שיעור 3.8). ״החלופות המנצחות במבחר קבוע של שבעה תמהילים״ הוא כלי הוראה: תמהיל טוב יותר יכול להיות מחוץ למבחר." },
+    { kind: "הנחת חישוב", text: "הנחות של הסדנה על נועם ושירה: מכירה אחרי 7 או 10 שנים, ו״אנחנו לא רוצים הפתעות״. נבנו כדי להדגים כתיבת המלצה. אינה נתון של התיק." },
     { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-16" },
   ]}
 />

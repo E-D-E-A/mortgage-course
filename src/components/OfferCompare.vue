@@ -85,7 +85,9 @@ const rows = computed(() => {
     return { ...d, cells: results.value.map((r, i) => ({ text: r.m ? d.show(r.m) : "—", lowest: !Number.isNaN(vals[i]) && Math.abs(vals[i] - min) <= TIE })) };
   });
 });
-const mixText = (o: Offer) => o.tracks.map((t) => `${KIND_HE[t.kind]} ${formatWholeShekels(t.amount)} ל־${t.months / 12} שנה`).join(" · ");
+// Money inside running text is isolated left to right, so the shekel sign sits where the other tables put it.
+const ltr = (x: string) => `\u2066${x}\u2069`;
+const mixText = (o: Offer) => o.tracks.map((t) => `${KIND_HE[t.kind]} ${ltr(formatWholeShekels(t.amount))} ל־${t.months / 12} שנה`).join(" · ");
 const status = computed(() =>
   !complete.value
     ? "אי אפשר לפצל את אחת ההצעות לחלקים שלמים של אגורה."
@@ -145,7 +147,7 @@ const status = computed(() =>
       <strong>{{ sameBasis ? "אפשר להשוות." : "לא להשוות מחיר." }}</strong> {{ status }}
     </p>
 
-    <div class="mt-4 overflow-x-auto">
+    <div class="mt-4 hidden overflow-x-auto sm:block">
       <table class="w-full border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
@@ -159,7 +161,7 @@ const status = computed(() =>
               {{ row.label }}<br /><span class="text-caption text-n600">{{ row.hint }}</span>
             </th>
             <td v-for="(cell, i) in row.cells" :key="i" class="py-2 pe-3">
-              <span class="ltr" :class="cell.lowest ? 'font-semibold text-n900' : 'text-n700'">{{ cell.text }}</span>
+              <span class="ltr whitespace-nowrap" :class="cell.lowest ? 'font-semibold text-n900' : 'text-n700'">{{ cell.text }}</span>
               <span v-if="cell.lowest && complete" class="mt-1 block w-fit rounded-pill px-2 py-0.5 text-caption" :class="sameBasis ? 'bg-mint text-n900' : 'border border-n300 text-n700'">
                 {{ sameBasis ? "נמוך ביותר" : "נמוך, לא להשוות" }}
               </span>
@@ -168,12 +170,29 @@ const status = computed(() =>
         </tbody>
       </table>
     </div>
-    <p class="mt-2 text-caption text-n600">הדירוג נשען על תחזית אחת בכל הצעה. תחזית אחרת יכולה לשנות אותו. בכלי הזה לא נגבות עמלות ביום ההעמדה (A = 0). ההחזר הראשון מופיע בתצוגת הטבלה.</p>
+    <ul class="list-reset mt-4 grid gap-3 sm:hidden" aria-label="שלושת המספרים בכל הצעה">
+      <li v-for="(r, i) in results" :key="r.name" class="rounded-md border border-n200 p-3">
+        <p class="text-body-l font-semibold text-n900">{{ r.name }}</p>
+        <dl class="mt-2 grid gap-2">
+          <div v-for="row in rows" :key="row.key">
+            <dt class="text-caption text-n600">{{ row.label }} · {{ row.hint }}</dt>
+            <dd class="mt-0.5">
+              <span class="ltr whitespace-nowrap" :class="row.cells[i].lowest ? 'font-semibold text-n900' : 'text-n700'">{{ row.cells[i].text }}</span>
+              <span v-if="row.cells[i].lowest && complete" class="ms-1 inline-block rounded-pill px-2 py-0.5 text-caption" :class="sameBasis ? 'bg-mint text-n900' : 'border border-n300 text-n700'">
+                {{ sameBasis ? "נמוך ביותר" : "נמוך, לא להשוות" }}
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </li>
+    </ul>
+    <p class="mt-2 text-caption text-n600">הדירוג נשען על תחזית אחת בכל הצעה. תחזית אחרת יכולה לשנות אותו. בכלי הזה לא נגבות עמלות ביום ההעמדה (העמלות = 0). {{ EXAMPLE_LABEL }}. ההחזר הראשון מופיע בתצוגת הטבלה.</p>
 
     <button type="button" class="mt-3 min-h-11 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
-    <div v-if="showTable" class="mt-2 overflow-x-auto">
+    <p v-if="showTable" class="mt-2 text-caption text-n600 sm:hidden">יש עוד עמודות משמאל: גללו הצידה.</p>
+    <div v-if="showTable" class="mt-2 overflow-x-auto" tabindex="0" role="region" aria-label="טבלת ההצעות, ניתנת לגלילה">
       <table class="w-full min-w-[30rem] border-collapse text-body-m">
         <thead>
           <tr class="border-b border-n200 text-caption text-n600">
