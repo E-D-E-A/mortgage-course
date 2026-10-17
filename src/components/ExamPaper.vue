@@ -185,8 +185,8 @@ const resultId = computed(() => `exam-${props.examId.replace(/\./g, "-")}-result
     <section v-for="s in sections" :key="s.id" class="mt-8" :aria-label="s.title">
       <h3 class="!mt-0 text-h3 text-navy">{{ s.title }}</h3>
       <p v-if="s.note" class="mt-1 text-body-m text-n700">{{ s.note }}</p>
-      <ol class="list-reset mt-4 grid gap-5">
-        <li v-for="q in itemsOf(s)" :key="q.id">
+      <ol class="list-reset mt-4 grid min-w-0 gap-5">
+        <li v-for="q in itemsOf(s)" :key="q.id" class="min-w-0">
           <ExamOpenQuestion
             v-if="q.type === 'open'"
             :exam-id="examId"

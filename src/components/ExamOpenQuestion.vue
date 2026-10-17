@@ -89,7 +89,7 @@ const fieldId = computed(() => `exam-${props.examId}-${props.id}`.replace(/\./g,
 </script>
 
 <template>
-  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
+  <div class="min-w-0 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <div class="flex flex-wrap items-center gap-3">
       <span class="text-body-m font-semibold text-navy">שאלה {{ n }}</span>
       <span class="rounded-pill bg-n100 px-3 py-0.5 text-caption text-n700">שאלה פתוחה</span>
@@ -122,14 +122,14 @@ const fieldId = computed(() => `exam-${props.examId}-${props.id}`.replace(/\./g,
       <p class="mt-1 text-caption text-n600">אחרי הלחיצה אי אפשר לערוך את התשובה. כך הציון נשאר שלכם ולא של תשובת הדוגמה.</p>
     </div>
 
-    <div v-else class="mt-4 grid gap-4">
-      <section class="rounded-md border border-n200 bg-n50 p-3 sm:p-4" aria-label="תשובת דוגמה">
+    <div v-else class="mt-4 grid min-w-0 gap-4">
+      <section class="min-w-0 rounded-md border border-n200 bg-n50 p-3 sm:p-4" aria-label="תשובת דוגמה">
         <h4 class="!mt-0 text-body-m font-semibold text-n900">תשובת דוגמה</h4>
         <p class="mt-1 whitespace-pre-line text-body-m text-n800">{{ model }}</p>
         <p class="mt-2 text-caption text-n600">זו תשובה אחת סבירה, לא התשובה היחידה: ניסוח אחר שעומד בשורות המחוון מקבל את אותן נקודות.</p>
       </section>
 
-      <section aria-label="מחוון">
+      <section class="min-w-0" aria-label="מחוון">
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
           <h4 class="!mt-0 text-body-m font-semibold text-n900">המחוון: {{ points }} מתוך {{ rubric.length }}</h4>
           <button type="button" class="min-h-11 text-body-m text-navy underline" :aria-pressed="asTable" @click="asTable = !asTable">
@@ -139,7 +139,7 @@ const fieldId = computed(() => `exam-${props.examId}-${props.id}`.replace(/\./g,
         <p class="text-caption text-n600">סמנו שורה רק אם התשובה שכתבתם עומדת בה במלואה. הסימון הוא של מי שכתב; אף כלי ואף מודל שפה לא בודקים אותו.</p>
 
         <div v-if="asTable" class="mt-2 overflow-x-auto">
-          <table class="w-full min-w-[30rem] border-collapse text-body-m">
+          <table class="w-full border-collapse text-caption sm:min-w-[30rem] sm:text-body-m">
             <thead>
               <tr class="border-b border-n200 text-caption text-n600">
                 <th class="py-2 pe-3 text-start font-semibold">מה המחוון דורש</th>
