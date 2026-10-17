@@ -1,11 +1,14 @@
 # Hosting on Netlify (decided 2026-10-09). Never Vercel.
 [build]
-  command = "pnpm build"
+  # The data files (data/, src/data/course.json, glossary.json) are committed; recomputing them (pnpm data)
+  # ran out of memory on Netlify. Run `pnpm build` locally before pushing so they are current.
+  command = "pnpm exec astro build"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
   ASTRO_TELEMETRY_DISABLED = "1"
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Every path is gated by netlify/edge-functions/gate.ts (see its config).
 [[headers]]
