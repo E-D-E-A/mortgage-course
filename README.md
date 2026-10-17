@@ -28,3 +28,13 @@
 - הוא שומר רק התקדמות לומדים: מי עבר איזה שיעור ומה ענה בתרגול.
 - אין בו נתוני לקוחות. אין לו קשר לפרויקט של ה־Validator או למערכת היועצים.
 - החריגה לא חלה על שום דבר אחר. **Vercel עדיין אסור.**
+
+## פריסה ידנית (Netlify)
+
+Netlify לא בונה את האתר (מגבלות הבנייה קטנות). בונים מקומית ומעלים את התיקייה:
+
+1. קובץ `.env` מקומי (לא נכנס ל־git) עם `PUBLIC_SUPABASE_URL=https://uppwokxyuwsapzqwtmtq.supabase.co` ו־`PUBLIC_ALLOWED_DOMAIN=first-edea.com`.
+2. `pnpm data && pnpm build`
+3. `netlify deploy --prod --dir=dist` (או `--functions`/edge לפי `netlify.toml`; ה־edge functions נמצאות ב־`netlify/edge-functions/`).
+
+המשתנים `SUPABASE_URL`, `SUPABASE_ANON_KEY` ו־`ALLOWED_DOMAIN` כבר מוגדרים באתר (המפתח הוא מפתח ציבורי). אזור פרויקט Supabase: ap-northeast-1 (דביר, 2026-10-17: דרישת ה־EU לא חלה על קורס פנימי בלי נתוני לקוחות). ענף הפריסה: `main`.

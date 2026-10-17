@@ -1,6 +1,6 @@
--- The course's own Supabase project (EU, course only, no client data).
--- Decided 2026-10-09: per-learner progress in Supabase — an explicit exception
--- for this course only; see README.
+-- The course's own Supabase project (course only, no client data).
+-- Decided 2026-10-09: per-learner progress in Supabase, an explicit exception for this course only; see README.
+-- Region: the project is in ap-northeast-1 (Tokyo). Dvir, 2026-10-17: the EU requirement does not apply, because this is an internal course with no client data.
 
 -- 1. Only company accounts may become users. Wired as a "Before user created"
 --    Auth Hook (Dashboard → Authentication → Hooks). Server-side, so a crafted
