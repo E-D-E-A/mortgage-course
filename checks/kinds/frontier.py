@@ -52,7 +52,7 @@ def fr_front(i, _facts=None):
     return front(parse(i["rows"]), use_of(i))
 
 
-def winner(rows, weights):
+def winner(rows, weights, exact=False):
     feas = [r for r in rows if r[2]] or rows
     k = len(weights)
     total = sum(weights)
@@ -61,7 +61,9 @@ def winner(rows, weights):
         lo = min(r[1][j] for r in feas)
         hi = max(r[1][j] for r in feas)
         for r in rows:
-            n = Decimal(0) if hi == lo else ((r[1][j] - lo) / (hi - lo)).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+            n = Decimal(0) if hi == lo else ((r[1][j] - lo) / (hi - lo))
+            if not exact:
+                n = n.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
             norm[(r[0], j)] = n
     best = None
     for r in rows:
@@ -99,7 +101,7 @@ def fr_reach(i, _facts=None):
     for w in lattice(100 // step, len(rows[0][1]), step):
         if sum(w) == 0:
             continue
-        b = winner(rows, w)
+        b = winner(rows, w, bool(int(i.get("exact", 0))))
         wins[b[0]] = wins.get(b[0], 0) + 1
     return {"wins": [{"id": e, "wins": wins[e]} for e in eff], "never": [e for e in eff if wins[e] == 0]}
 

@@ -131,6 +131,42 @@ export function reachable(rows: Row[], stepPercent: number): Reach {
   return { reached: efficientWins.filter((w) => w.wins > 0).map((w) => w.id), never: efficientWins.filter((w) => w.wins === 0).map((w) => w.id), tried, wins: efficientWins };
 }
 
+/**
+ * The same walk over the weight lattice, but the normalised scores are NOT rounded to four decimals (the course's hand rule):
+ * exact decimal arithmetic. A point that wins a lattice triple only by the rounding shows up here as "never". Ties go to the
+ * earlier row, as in `best`.
+ */
+export function reachableExact(rows: Row[], stepPercent: number): Reach {
+  const front = frontIds(rows);
+  const feas = rows.filter((r) => r.feasible);
+  const k = rows[0]?.values.length ?? 3;
+  const lows = Array.from({ length: k }, (_, j) => D.min(...feas.map((r) => new D(r.values[j]))));
+  const highs = Array.from({ length: k }, (_, j) => D.max(...feas.map((r) => new D(r.values[j]))));
+  const wins = new Map<string, number>(front.map((id) => [id, 0]));
+  let tried = 0;
+  for (const w of weightLattice(stepPercent, k)) {
+    let bestId = "";
+    let bestScore: Decimal | null = null;
+    for (const r of feas) {
+      let score = new D(0);
+      for (let j = 0; j < k; j++) {
+        const span = highs[j].minus(lows[j]);
+        const n = span.isZero() ? new D(0) : new D(r.values[j]).minus(lows[j]).div(span);
+        score = score.plus(new D(w[j]).mul(n));
+      }
+      if (bestScore === null || score.lt(bestScore)) {
+        bestScore = score;
+        bestId = r.id;
+      }
+    }
+    if (!bestId) continue;
+    tried++;
+    wins.set(bestId, (wins.get(bestId) ?? 0) + 1);
+  }
+  const efficientWins = front.map((id) => ({ id, wins: wins.get(id) ?? 0 }));
+  return { reached: efficientWins.filter((x) => x.wins > 0).map((x) => x.id), never: efficientWins.filter((x) => x.wins === 0).map((x) => x.id), tried, wins: efficientWins };
+}
+
 /** The trade-off from one row to another: to − from, per objective (negative: to is better there). */
 export function giveUp(from: Row, to: Row): Decimal[] {
   return to.values.map((v, k) => new D(v).minus(from.values[k]));

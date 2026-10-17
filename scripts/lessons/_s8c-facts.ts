@@ -6,7 +6,7 @@
  */
 import Decimal from "decimal.js";
 import { recalibrate, type ApprovalParams, DEMO_APPROVAL, equalEdges, logistic, reliabilityTable, brierScore, calibrationGap, syntheticApplicants, toScored, applyCalibrator, binCalibrator } from "../../src/lib/calc/calibration.ts";
-import { frontier, pickByWeights, reachable } from "../../src/lib/calc/frontier.ts";
+import { frontier, pickByWeights, reachable, reachableExact } from "../../src/lib/calc/frontier.ts";
 import { type Condition, solveLp, allCrossings, objectiveAt, valleys } from "../../src/lib/calc/lp.ts";
 import type { Row } from "../../src/lib/calc/objectives.ts";
 import { type PricingModel, marginOf, rateOf, stepSize, whatIf, syntheticOffers, fitError, seededInts, type Step } from "../../src/lib/calc/pricingmodel.ts";
@@ -50,6 +50,11 @@ export const frPick = (id: string, rows: Row[], weights: number[]): Fact => {
 export const frReach = (id: string, rows: Row[], step: number): Fact => {
   const r = reachable(rows, step);
   return { id, kind: "fr_reach", inputs: { rows: rowsText(rows), step }, value: { wins: r.wins, never: r.never } };
+};
+
+export const frReachExact = (id: string, rows: Row[], step: number): Fact => {
+  const r = reachableExact(rows, step);
+  return { id, kind: "fr_reach", inputs: { rows: rowsText(rows), step, exact: 1 }, value: { wins: r.wins, never: r.never } };
 };
 
 export const frNeverCount = (id: string, rows: Row[], step: number): Fact => ({ id, kind: "fr_never_count", inputs: { rows: rowsText(rows), step }, value: reachable(rows, step).never.length });

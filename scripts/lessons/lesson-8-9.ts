@@ -61,6 +61,10 @@ export default function lesson89(): LessonData {
       if (s.value !== mix.value) throw new Error(`the mix is not the sum of its tracks at month ${m} (${sid})`);
     }
   }
+  {
+    const g = (id: string) => facts.find((f) => f.id === id) as Fact;
+    add(difference("stress.round_gap", g("pay.stress.mix.360"), g("pay.stress.mix.61")));
+  }
   for (const [sid, sc] of [["base", base], ["stress", stress]] as const) {
     for (const meas of ["first", "max", "max_month", "total", "interest", "loan", "residual"] as const) add(engFact(`init.${sid}.${meas}`, INITIAL_MIX, sc, meas));
   }

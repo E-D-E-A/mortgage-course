@@ -11,7 +11,7 @@ import { moneyString } from "../../src/lib/calc/money.ts";
 import { maxLoanAt, maxPaymentAt, maxVariable } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { feasibleCountFact, measureFact, reasonsFact } from "./_constraints-facts.ts";
-import { given } from "./lesson-3-8.ts";
+import { difference, given } from "./lesson-3-8.ts";
 import { countProduct, intDiff } from "./_stats-facts.ts";
 
 export default function lesson87(): LessonData {
@@ -31,6 +31,8 @@ export default function lesson87(): LessonData {
   push(measureFact("m.c05_ratio", candidateById("c05"), "ratio", 2), measureFact("m.c05_pay", candidateById("c05"), "payment", 0));
   push(measureFact("m.c10_ltv", candidateById("c10"), "ltv", 2));
   push(measureFact("m.c06_ratio", candidateById("c06"), "ratio", 2), measureFact("m.c06_pay", candidateById("c06"), "payment", 0));
+
+  push(difference("m.c07_margin", facts.find((f) => f.id === "k.target") as Fact, facts.find((f) => f.id === "m.c07_ratio") as Fact));
 
   // ── How many pass, as families of constraints are switched on. ──
   push(

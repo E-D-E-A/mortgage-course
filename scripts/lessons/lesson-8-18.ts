@@ -8,15 +8,12 @@
  * 8, 12, 20, 30 and 60 offers, with its interval and the posterior of an invented prior (est_*, checks/kinds/estimate.py,
  * which writes the generator again in Python).
  */
-import { GEN2, ONE_STEP, PRIOR } from "../../src/data/pricing-demo.ts";
+import { GEN2, HAND, HAND_ABOVE, HAND_BELOW, ONE_STEP, PRIOR } from "../../src/data/pricing-demo.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { given as given38 } from "./lesson-3-8.ts";
 import { estLineVsStep, estMean, estPosterior, estSlopeData, estStep, estUpdate, estWidth, pmOffers } from "./_s8c-facts.ts";
 
 export const NS = [8, 12, 20, 30, 60];
-export const HAND = ["0.84", "0.90", "0.88", "0.93", "0.85"];
-export const HAND_BELOW = ["0.80", "0.82", "0.78"];
-export const HAND_ABOVE = ["1.18", "1.22", "1.25"];
 
 export default function lesson818(): LessonData {
   const facts: Fact[] = [];

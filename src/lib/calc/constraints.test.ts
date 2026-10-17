@@ -17,6 +17,10 @@ describe("constraints on the curated candidates (numbers by hand in the comments
   it("c03: every reason is listed, not only the first: law, bank and client at once", () => {
     expect(reasons("c03")).toEqual(["pti", "bank_ratio", "client_max_payment", "client_target_ratio"]);
   });
+  it("c06: 46.41% is visibly over the bank's 45% line (not a boundary case)", () => {
+    expect(measures(candidateById("c06")).ratio?.toFixed(2)).toBe("46.41");
+    expect(reasons("c06")).toEqual(["bank_ratio", "client_max_payment", "client_target_ratio"]);
+  });
   it("c08: spends more than the family has: equity 600,000 > 560,000 + 0 left after the car payoff", () => {
     expect(reasons("c08")).toEqual(["equity_available"]);
   });

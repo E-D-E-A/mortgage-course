@@ -36,7 +36,7 @@
   <body>
     <div id="stage">
       <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
-      <div class="kicker">שיעור 8.15 · חזית הפתרונות היעילים</div>
+      <div class="kicker">שיעור 8.15 · החזית היעילה</div>
       <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
     </div>
     <script type="module">
@@ -51,7 +51,7 @@
       const NAME = {"m01":"קבועה, 20 שנה","m02":"קבועה, 25 שנה","m03":"קבועה, 30 שנה","m04":"קבועה 50% + פריים 50%, 25 שנה","m05":"קבועה 50% + פריים 50%, 30 שנה","m06":"קבועה 40% + משתנה 60%, 25 שנה","m07":"קבועה 40% + משתנה 60%, 30 שנה","m08":"קבועה 60% + משתנה 40%, 25 שנה","m09":"קבועה 60% + משתנה 40%, 30 שנה","m10":"קבועה 40% (20) + פריים 30% (30) + משתנה 30% (30)","m11":"קבועה 70% (25) + פריים 30% (30)","m12":"קבועה 34% + פריים 33% + משתנה 33%, 30 שנה","m13":"קבועה 50% (20) + משתנה 50% (30)","m14":"קבועה 40% (30) + פריים 60% (20)","m15":"קבועה 35% (30) + משתנה 65% (20)"};
       const okClient = (id) => fact(`client.${id}`) === "";
       const V = {
-        n: pl(fact("law.count_feasible")), eff: pl(fact("law.count_efficient")), dom: pl(fact("law.count_dominated")),
+        n: pl(fact("law.count_feasible")), eff: pl(fact("law.count_efficient")), dom: pl(fact("law.count_dominated")), ftEff: pl(fact("law.ft.count_efficient")), ftDom: String(Number(fact("law.count_feasible")) - Number(fact("law.ft.count_efficient"))),
         effFT: pl(fact("law.ft.count_efficient")), clientN: pl(fact("client.count_feasible")), clientEff: pl(fact("client.count_efficient")),
         limit: num(fact("limit.first")), never: pl(fact("law.never_count")),
         gapFirst: num(fact("d.m06_m08.first")), gapTotal: num(fact("d.m08_m06.total")),
@@ -67,7 +67,7 @@
         [30, 37.5, "הוא שולט בשני: אין סיבה לבחור בשני."],
         [39, 46, `עכשיו כל ${V.n} המועמדים, על מישור אחד.`],
         [46, 54, "כל נקודה היא תמהיל אפשרי."],
-        [54, 63, `${V.dom} נשלטים: יש נקודה טובה מהם בשני המספרים.`],
+        [54, 63, `${Number(V.n) - Number(V.effFT)} נשלטים, ${V.effFT} על החזית: יש נקודה טובה מהם בשני המספרים.`],
         [63, 72, "אלה אפשר לזרוק בלי לשאול אף אחד."],
         [72, 79.5, "מי שנשאר הוא החזית: כל שיפור עולה במשהו."],
         [81, 88, "אבל זו תמונה של שני יעדים בלבד."],

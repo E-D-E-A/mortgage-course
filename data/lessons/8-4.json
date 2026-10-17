@@ -342,6 +342,45 @@
       "value": "66.7"
     },
     {
+      "id": "t.rate_avg",
+      "kind": "stats_lin",
+      "inputs": {
+        "a": 1,
+        "b": "4.10",
+        "x": "0.25",
+        "decimals": 2
+      },
+      "value": "4.35"
+    },
+    {
+      "id": "t.pay_avg",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "500000",
+        "rate": "4.35",
+        "months": 240
+      },
+      "value": "3122.91"
+    },
+    {
+      "id": "t.shift_part",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "t.pay_avg",
+        "subtrahend": "t.pay3"
+      },
+      "value": "66.60"
+    },
+    {
+      "id": "t.convex",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "t.exp_fair",
+        "subtrahend": "t.pay_avg"
+      },
+      "value": "4.67"
+    },
+    {
       "id": "t.rate_exp",
       "kind": "stats_expect",
       "inputs": {

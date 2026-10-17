@@ -15,7 +15,7 @@ export default function lesson86(): LessonData {
   const push = (...f: Fact[]) => facts.push(...f);
 
   // ── The data that is NOT a decision: the price, the incomes, the base equity. ──
-  push(given("d.price", S8_CASE.price), given("d.equity", S8_CASE.baseEquity), given("d.income1", S8_CASE.incomes[0]), given("d.income2", S8_CASE.incomes[1]), given("d.car", S8_CASE.car.monthly.toString()));
+  push(given("d.price", S8_CASE.price), given("d.equity", S8_CASE.baseEquity), given("d.income1", S8_CASE.incomes[0]), given("d.income2", S8_CASE.incomes[1]), given("d.car", S8_CASE.car.monthly.toString()), given("d.car_payoff", S8_CASE.carPayoff), given("d.parent", S8_CASE.parentIncome));
   push(given("d.loan", loanOfChoice(BASE_CHOICE).toString()), given("d.extra", "20000"));
   const loan0 = facts.find((f) => f.id === "d.loan") as Fact;
   push(difference("d.loan_after", loan0, facts.find((f) => f.id === "d.extra") as Fact));

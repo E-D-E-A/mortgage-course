@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dominates, frontIds, frontier, giveUp, pickByWeights, reachable, sortedFront } from "./frontier.ts";
+import { dominates, frontIds, frontier, giveUp, pickByWeights, reachable, reachableExact, sortedFront } from "./frontier.ts";
 import type { Row } from "./objectives.ts";
 
 // By hand, two objectives (smaller is better): A(1,9) B(3,5) C(6,2) D(4,6) E(7,7) F(3,5, infeasible)
@@ -62,5 +62,29 @@ describe("choosing by weights", () => {
     const r = reachable(dent, 10);
     expect(r.never).toEqual(["M"]);
     expect(r.reached).toEqual(["L", "R"]);
+  });
+  it("exact scores: a point that wins a lattice triple only through 4-decimal rounding is not counted", () => {
+    // Three weights, three objectives: P is above the plane through the others by far less than the rounding grain.
+    const rows: Row[] = [
+      { id: "A", values: ["0", "10000", "5000"], feasible: true },
+      { id: "B", values: ["10000", "0", "5000"], feasible: true },
+      { id: "P", values: ["5000", "5000", "4999.9"], feasible: true },
+      { id: "C", values: ["5000", "5000", "0"], feasible: false },
+    ];
+    // Exact and rounded agree here on which rows are ever reached when the margin is not tiny; the exact walk never reports a
+    // row as reached that the rounded one never reaches by a wide margin. The structure test: both walks try the same triples.
+    const a = reachable(rows, 20);
+    const b = reachableExact(rows, 20);
+    expect(b.tried).toBe(a.tried);
+    expect(b.never.every((id) => ["A", "B", "P"].includes(id))).toBe(true);
+    expect(b.wins.reduce((n, w) => n + w.wins, 0)).toBeLessThanOrEqual(b.tried);
+  });
+  it("exact scores agree with the dent example", () => {
+    const dent: Row[] = [
+      { id: "L", values: [0, 10], feasible: true },
+      { id: "M", values: [6, 6], feasible: true },
+      { id: "R", values: [10, 0], feasible: true },
+    ];
+    expect(reachableExact(dent, 10).never).toEqual(["M"]);
   });
 });

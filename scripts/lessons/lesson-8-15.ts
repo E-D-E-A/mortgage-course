@@ -17,7 +17,7 @@ import { measuresOf } from "../../src/lib/calc/sensitivity.ts";
 import { scenarioFrom } from "../../src/lib/calc/sensitivity.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { reasonsFact } from "./_constraints-facts.ts";
-import { frCount, frFront, frNeverCount, frPick, frReach, given } from "./_s8c-facts.ts";
+import { frCount, frFront, frNeverCount, frPick, frReach, frReachExact, given } from "./_s8c-facts.ts";
 import { difference, mixFact, tableFact } from "./_sensitivity-facts.ts";
 
 export const WEIGHT_SETS: Record<string, number[]> = { pay: [60, 20, 20], total: [20, 60, 20], exp: [20, 20, 60], even: [1, 1, 1] };
@@ -58,6 +58,7 @@ export default function lesson815(): LessonData {
     frCount("client.count_efficient", client, "efficient"),
     frFront("client.front", client),
     frReach("law.reach", law, 5),
+    frReachExact("law.reach_exact", law, 5),
     frNeverCount("law.never_count", law, 5),
   );
   for (const [k, w] of Object.entries(WEIGHT_SETS)) push(frPick(`pick.${k}`, law, w), frPick(`pick.client.${k}`, client, w));

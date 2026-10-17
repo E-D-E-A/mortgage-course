@@ -23,7 +23,7 @@ weights, prune ("1"/"0"), and for c2f coarse.
 from decimal import ROUND_HALF_UP, Decimal, getcontext
 from math import comb
 
-from kinds import constraints, objectives, schedule
+from kinds import constraints, engine, objectives, schedule
 from kinds.common import agorot
 
 getcontext().prec = 50
@@ -99,8 +99,9 @@ def calculate(i, c):
             flat[f"t{k}_reset"] = 60
     base = dict(flat, inflation_1=str(i["base_inflation"]), prime_shift_1="0", anchor_shift_1=str(i["base_anchor"]))
     stress = dict(flat, inflation_1=str(i["stress_inflation"]), prime_shift_1="0", prime_shift_2=str(i["stress_prime"]), anchor_shift_1=str(i["stress_anchor"]))
-    pb, ps = schedule.flow(base)[0], schedule.flow(stress)[0]
-    first, total, smax = agorot(pb[0]), agorot(sum(pb, Decimal(0))), agorot(max(ps))
+    first = Decimal(engine.measure(base, "first"))
+    total = Decimal(engine.measure(base, "total"))
+    smax = Decimal(engine.measure(stress, "max"))  # the projected highest payment (kinds/engine.py)
     _memo[key] = [first, total, smax - first]
     return _memo[key]
 
