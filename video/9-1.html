@@ -1,0 +1,189 @@
+<!doctype html>
+<!--
+  Video scene for lesson 9.1 — "התיק מגיע כטענות". Every number comes from data/lessons/9-1.json; render(t) depends only on t.
+  Fictional case and documents ("מסמך לדוגמה"); no bank appears. Nothing here says what a bank would do.
+
+  Script (one idea: a file is claims; a document turns a claim into a verified one; count what is proven, not what is declared):
+  1. Title.
+  2. Eight claims, ten documents: five fine, two with a question, two partial, one missing.
+  3. Income: the average of three payslips is not the recognised income when a payment does not repeat.
+  4. Equity: declared 560,000, proven 260,000; what the financing ratio becomes under each count.
+  5. The sheet of feasibility: disposable income, the 40% payment, the starting mix.
+  6. Takeaway: five gaps, each with what to ask.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 9.1 · התיק המסכם, א׳</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("9-1");
+      const { fact, num, shek, lr, inScene, vis, after, grow, clamp, C, el, txt, box, line } = v;
+      const count = fact("st.count");
+      const S = { title: [0, 9], claims: [9, 44], income: [44, 88], equity: [88, 134], sheet: [134, 166], end: [166, 182] };
+      window.duration = 182;
+      const ok = "var(--mogi-success-bg)", warn = "var(--mogi-warning-bg)", info = "var(--mogi-info-bg)", bad = "var(--mogi-danger-bg)";
+      const stamp = (o = 1) => txt(640, 548, "דוגמה לימודית · תיק ומסמכים בדויים · לא הצעת בנק ולא ייעוץ", 18, { fill: C.n600, o });
+      window.cues = [
+        [1, 6, "נועם ושירה: התיק מגיע כטענות."],
+        [6, 8.5, "הכול בדוי, וכל מסמך מסומן."],
+        [10, 18, "שמונה טענות, עשרה מסמכים."],
+        [18, 26, `חמישה מסמכים תקינים, ושניים עם שאלה.`],
+        [26, 35, "שניים חלקיים, ואחד חסר."],
+        [35, 43, "מסמך הופך טענה למאומתת."],
+        [45, 54, "שלושה תלושים לכל אחד, שלושה חודשים."],
+        [54, 63, `בספטמבר לשירה יש שי לחג של ${lr(shek(fact("ps.shira.3.oneoff")))}.`],
+        [63, 72, `ממוצע נאיבי: ${lr(num(fact("inc.shira.naive")))} ₪.`],
+        [72, 81, `בלי החד־פעמי: ${lr(num(fact("inc.shira.recognised")))} ₪.`],
+        [81, 87, "הכנסה מנופחת היא קו אדום."],
+        [89, 98, `הון עצמי מוצהר: ${lr(shek(fact("a.equity")))}.`],
+        [98, 108, `מוכח בחשבון: ${lr(shek(fact("eq.verified")))}.`],
+        [108, 117, "מכתב מתנה אינו כסף בחשבון."],
+        [117, 125, "לקרן ההשתלמות אין מסמך."],
+        [125, 133, `אם סופרים רק מאומת: ${lr(num(fact("ltv.verified")))}%.`],
+        [135, 144, `הכנסה פנויה: ${lr(shek(fact("sh.disposable")))}.`],
+        [144, 153, `ב־40% ההחזר המרבי ${lr(shek(fact("sh.max40")))}.`],
+        [153, 165, `התמהיל ההתחלתי: ${lr(num(fact("mix.ratio")))}% מההכנסה.`],
+        [167, 173, "חמישה פערים, ולכל אחד מה לבקש."],
+        [173, 181, "סופרים מה הוכח, לא מה הוצהר."],
+      ];
+      const label = (x, y, w, h, o, fill, big, small) => {
+        box(x, y, w, h, o, fill);
+        txt(x + w / 2, y + 84, big, 64, { w: 700, o, ltr: true });
+        txt(x + w / 2, y + 130, small, 26, { w: 600, o, fill: C.n700 });
+      };
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "התיק המסכם, א׳", 80, { w: 700, o });
+          txt(640, 360, "נתונים, מסמכים, אימות ויכולת החזר", 44, { fill: C.n600, o });
+          txt(640, 440, "נועם ושירה · תיק בדוי · מסמכים לדוגמה", 24, { fill: C.n600, o: after(t, S.title, 3, o) });
+        }
+        if (inScene(t, S.claims)) {
+          const o = vis(t, S.claims);
+          txt(1190, 122, "שמונה טענות, עשרה מסמכים", 42, { anchor: "start", w: 700, o });
+          const cells = [
+            ["ok", ok, "תקינים", 11],
+            ["question", warn, "תקינים, עם שאלה", 19],
+            ["partial", info, "חלקיים", 27],
+            ["missing", bad, "חסר", 33],
+          ];
+          cells.forEach(([k, fill, name, at], i) => {
+            const x = 960 - i * 290;
+            const oa = after(t, S.claims, at - S.claims[0] - 1, o);
+            label(x, 220, 250, 190, oa, fill, String(count[k]), name);
+          });
+          txt(640, 470, "מצב של טענה: הגרוע מבין המסמכים שלה", 28, { fill: C.teal, w: 700, o: after(t, S.claims, 26, o) });
+          stamp(o);
+        }
+        if (inScene(t, S.income)) {
+          const o = vis(t, S.income);
+          txt(1190, 122, "שירה: שלושה תלושים", 42, { anchor: "start", w: 700, o });
+          const base = 480, scale = 0.012;
+          [["2026-07", "יולי", "ps.shira.1.net", 0], ["2026-08", "אוגוסט", "ps.shira.2.net", 0], ["2026-09", "ספטמבר", "ps.shira.3.net", 1]].forEach(([m, name, id, bonus], i) => {
+            const x = 1030 - i * 190;
+            const net = Number(fact(id));
+            const reg = Number(fact(id.replace(".net", ".regular")));
+            const oa = after(t, S.income, 1 + i * 2, o);
+            const gh = grow(t, S.income, 1 + i * 2, 1.2);
+            el("rect", { x, y: base - reg * scale * gh, width: 120, height: reg * scale * gh, rx: 8, fill: C.teal, opacity: oa });
+            if (bonus) el("rect", { x, y: base - net * scale * gh, width: 120, height: (net - reg) * scale * gh, rx: 8, fill: C.tq2, opacity: oa });
+            txt(x + 60, base + 36, name, 24, { w: 600, o: oa });
+            txt(x + 60, base - net * scale * gh - 14, num(net), 26, { ltr: true, w: 700, o: oa });
+          });
+          const o1 = after(t, S.income, 10, o);
+          txt(320, 260, "שי לחג", 26, { w: 700, fill: C.teal, o: o1 });
+          txt(320, 300, `${num(fact("ps.shira.3.oneoff"))} ₪`, 30, { ltr: true, o: o1 });
+          const o2 = after(t, S.income, 19, o);
+          txt(320, 380, "ממוצע נאיבי", 24, { fill: C.n700, o: o2 });
+          txt(320, 420, `${num(fact("inc.shira.naive"))} ₪`, 34, { ltr: true, w: 700, fill: C.n600, o: o2 });
+          const o3 = after(t, S.income, 28, o);
+          txt(320, 480, "בלי החד־פעמי", 24, { fill: C.n700, o: o3 });
+          txt(320, 520, `${num(fact("inc.shira.recognised"))} ₪`, 34, { ltr: true, w: 700, fill: C.teal, o: o3 });
+          stamp(o);
+        }
+        if (inScene(t, S.equity)) {
+          const o = vis(t, S.equity);
+          txt(1190, 122, "ההון העצמי: מוצהר ומוכח", 42, { anchor: "start", w: 700, o });
+          const x0 = 1090, W = 900, total = Number(fact("a.equity"));
+          const segs = [
+            ["חיסכון בחשבון", Number(fact("eq.savings")), C.teal, "מוכח", 4],
+            ["מתנה", Number(fact("eq.gift")), C.tq2, "מכתב בלבד", 18],
+            ["קרן השתלמות", Number(fact("eq.fund")), C.n200, "אין מסמך", 28],
+          ];
+          let acc = 0;
+          segs.forEach(([name, amount, fill, tag, at]) => {
+            const w = (W * amount) / total;
+            const oa = after(t, S.equity, at - 3, o);
+            el("rect", { x: x0 - acc - w, y: 200, width: w - 4, height: 90, rx: 10, fill, opacity: oa });
+            txt(x0 - acc - w / 2, 340, name, 24, { w: 600, o: oa });
+            txt(x0 - acc - w / 2, 372, `${num(amount)} ₪`, 26, { ltr: true, w: 700, o: oa });
+            txt(x0 - acc - w / 2, 404, tag, 22, { fill: C.n600, o: oa });
+            acc += w;
+          });
+          const rows = [["מה שהוצהר", "a.ltv", 30], ["עם המתנה", "ltv.documented", 36], ["רק מה שאומת", "ltv.verified", 41]];
+          rows.forEach(([name, id, at], i) => {
+            const oa = after(t, S.equity, at, o);
+            txt(1090 - i * 300, 470, name, 24, { fill: C.n700, o: oa });
+            txt(1090 - i * 300, 515, `${num(fact(id))}%`, 38, { ltr: true, w: 700, fill: Number(fact(id)) > 75 ? "var(--mogi-danger)" : C.teal, o: oa });
+          });
+          txt(640, 540, "התקרה: 75% (תעתיק הצוות, לא אומת)", 20, { fill: C.n600, o: after(t, S.equity, 36, o) });
+        }
+        if (inScene(t, S.sheet)) {
+          const o = vis(t, S.sheet);
+          txt(1190, 122, "דף ההיתכנות", 42, { anchor: "start", w: 700, o });
+          const rows = [
+            ["הכנסה מוכרת", `${num(fact("inc.total.recognised"))} ₪`, 1],
+            ["פחות הלוואת הרכב", `${num(fact("a.car"))} ₪`, 4],
+            ["הכנסה פנויה", `${num(fact("sh.disposable"))} ₪`, 8],
+            ["ההחזר המרבי ב־40%", `${num(fact("sh.max40"))} ₪`, 12],
+            ["התמהיל ההתחלתי", `${num(fact("mix.payment"))} ₪ · ${fact("mix.ratio")}%`, 20],
+          ];
+          rows.forEach(([name, val, at], i) => {
+            const oa = after(t, S.sheet, at, o);
+            const y = 190 + i * 70;
+            box(220, y, 840, 56, oa, i === 2 || i === 4 ? C.mint : C.n0);
+            txt(1030, y + 38, name, 26, { anchor: "start", w: 600, o: oa });
+            txt(300, y + 38, val, 28, { anchor: "start", ltr: true, w: 700, o: oa });
+          });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [["הכנסה והתחייבות", "כמעט סגורות"], ["הון עצמי", "עוד לא הוכח"], ["חמישה פערים", "לכל אחד: מה לבקש"]];
+          rows.forEach(([a, b], i) => {
+            const oa = after(t, S.end, 0.3 + i * 2.5, o);
+            txt(1060, 240 + i * 80, a, 34, { anchor: "start", w: 700, o: oa });
+            txt(760, 240 + i * 80, b, 30, { anchor: "start", fill: C.teal, o: oa });
+          });
+          stamp(o);
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

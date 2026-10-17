@@ -55,11 +55,12 @@ const props = withDefaults(
     mark: string;
     alternatives: Option[];
     banks: Option[];
-    /** The table the choice is made from: one row per alternative (id = alternative id) and per bank. */
+    /** The table the choice is made from: one row per alternative (id = alternative id), and one row per bank for EACH alternative. */
     altColumns: Column[];
     altRows: Row[];
     bankColumns: Column[];
-    bankRows: Row[];
+    /** The banks' rows, keyed by the alternative they read (the first alternative's rows show until one is chosen). */
+    bankRows: Record<string, Row[]>;
     sections: Section[];
     checklist: CheckGroup[];
     /** Shown above the choice: what the learner should not forget (the estimate/offer difference, for example). */
@@ -181,6 +182,9 @@ function reset() {
   confirmReset.value = false;
 }
 const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id === id)?.cells[key] ?? "—";
+const shownAlt = computed(() => alt.value ?? props.alternatives[0]?.id ?? "");
+const shownAltName = computed(() => props.alternatives.find((a) => a.id === shownAlt.value)?.name ?? "");
+const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value] ?? [], id, key);
 </script>
 
 <template>
@@ -267,7 +271,7 @@ const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id ===
         </div>
         <div class="overflow-x-auto">
           <table class="w-full border-collapse text-body-m">
-            <caption class="pb-1 text-start text-caption font-semibold text-n600">הבנקים</caption>
+            <caption class="pb-1 text-start text-caption font-semibold text-n600">הבנקים, לפי החלופה: {{ shownAltName }}</caption>
             <thead>
               <tr class="border-b border-n200 text-caption text-n600">
                 <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
@@ -278,7 +282,7 @@ const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id ===
             <tbody>
               <tr v-for="b in banks" :key="b.id" class="border-b border-n100 align-top" :class="bank === b.id ? 'bg-n50' : ''">
                 <td class="py-2 pe-3 font-semibold text-n900">{{ b.name }}</td>
-                <td v-for="c in bankColumns" :key="c.key" class="py-2 pe-3"><span class="ltr">{{ cell(bankRows, b.id, c.key) }}</span></td>
+                <td v-for="c in bankColumns" :key="c.key" class="py-2 pe-3"><span class="ltr">{{ bankCell(b.id, c.key) }}</span></td>
                 <td class="py-2">{{ bank === b.id ? "כן" : "" }}</td>
               </tr>
             </tbody>
@@ -308,7 +312,7 @@ const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id ===
           </div>
         </fieldset>
         <fieldset class="min-w-0">
-          <legend class="text-body-m font-semibold text-n900">הבנק</legend>
+          <legend class="text-body-m font-semibold text-n900">הבנק <span class="text-caption font-normal text-n700">(לפי החלופה: {{ shownAltName }})</span></legend>
           <div class="mt-2 grid gap-2">
             <button
               v-for="b in banks"
@@ -322,7 +326,7 @@ const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id ===
               <span class="block font-semibold text-n900">{{ b.name }}</span>
               <span v-if="b.note" class="block text-caption text-n700">{{ b.note }}</span>
               <span class="mt-1 block text-caption text-n700">
-                <span v-for="c in bankColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span class="ltr">{{ cell(bankRows, b.id, c.key) }}</span></span>
+                <span v-for="c in bankColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span class="ltr">{{ bankCell(b.id, c.key) }}</span></span>
               </span>
             </button>
           </div>

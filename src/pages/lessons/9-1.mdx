@@ -1,0 +1,683 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "9.1"
+minutes: 80
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import DocumentChecker from "../../components/DocumentChecker.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { CLAIMS, DOCUMENTS, EVIDENCE, GAPS, MONTH_HE, PAYSLIPS, STATE_HE, FINAL_LABEL, DOC_MARK, DATA_NOTE, PEOPLE } from "../../data/case-a-final.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("9.1");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pc = (id) => `${f.plain(id)}%`;
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const mon = (m) => MONTH_HE[m];
+export const doc = (id) => DOCUMENTS.find((d) => d.id === id);
+export const sh = (id) => formatShekels(f.raw(id)).replace(" ₪", "");
+export const predictionOptions = [f.shekels("a.equity"), f.shekels("eq.documented"), f.shekels("eq.verified"), "0 ₪"];
+export const viewRows = [
+  { view: "מה שהוצהר", equity: f.raw("a.equity"), loan: f.raw("a.loan"), ltv: f.raw("a.ltv") },
+  { view: "מה שיש עליו מסמך", equity: f.raw("eq.documented"), loan: f.raw("loan.documented"), ltv: f.raw("ltv.documented") },
+  { view: "מה שאומת", equity: f.raw("eq.verified"), loan: f.raw("loan.verified"), ltv: f.raw("ltv.verified") },
+];
+export const STATE_CLASS = { ok: "bg-success-bg", question: "bg-warning-bg", partial: "bg-info-bg", missing: "bg-danger-bg" };
+export const claimDocs = (c) => EVIDENCE.filter((e) => e.claim === c).map((e) => doc(e.doc).name).join(" · ");
+export const amountOf = { equity_fund: "eq.fund", equity_gift: "eq.gift", income_noam: "gap.aug", income_shira: "gap.bonus", property: "a.price" };
+export const amountNote = { equity_fund: "מהון עצמי", equity_gift: "מהון עצמי", income_noam: "בחודש אחד", income_shira: "בחודש, בממוצע", property: "מחיר שמחכה לחוזה" };
+
+בשלבים 1–8 למדתם כל כלי לבד: להבין עסקה, לחשב החזר, לדעת מי בודק מה, להשוות הצעות, למקם תיק, ולהבין איך אלגוריתם מחפש. בשלב הזה תיקחו תיק אחד מהמסמך הראשון ועד ההמלצה, ובסוף תסבירו כל החלטה פעמיים: ללקוח ולבודק מקצועי. השיעור הזה הוא החלק הראשון: <Term t="מוצהר" client:visible lesson="4.7">מוצהר</Term> מול <Term t="מאומת" client:visible lesson="4.7">מאומת</Term> בתיק של נועם ושירה, ומה המשפחה יכולה לעמוד בו. **9.1–9.4 לא מלמדים מונח חדש.** הם משתמשים בכל מה שכבר למדתם.
+
+<Callout title="מה התיק הזה, ומה הוא לא" tone="warning">
+<p><strong>{MARK}</strong> כל המסמכים בדויים, וכל הבנקים בדויים.</p>
+<p>{DATA_NOTE}</p>
+<p>כל מסמך בשיעור מסומן ״{DOC_MARK}״. אילו מסמכים בנק אמיתי מבקש, באיזו צורה ועד כמה הם יכולים להיות ישנים: הם ידע מהשטח או טופס של כל בנק, והקורס לא יודע אותם (ממתין לאישור אילון). זו הערכה, לא הבטחה, ואין כאן ייעוץ ללקוח אמיתי.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="9.1"
+  question={`נועם ושירה מצהירים על הון עצמי של ${f.shekels("a.equity")}. בתיק כבר יש מסמכים: דף חשבון, מכתב מתנה מההורים, ועוד. כמה מההון העצמי המסמכים שבתיק מוכיחים עד הסוף, היום?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## התיק מגיע כטענות
+
+</Section>
+
+<LessonVideo lesson="9-1" />
+
+<Section kind="ההסבר">
+
+## תיק הוא רשימה של טענות
+
+</Section>
+
+כשהלקוחות נכנסים לדלת, התיק שלהם הוא רשימה של דברים שהם **אומרים**: כמה הם מרוויחים, כמה חובות יש להם, כמה כסף יש להם וכמה עולה הנכס. כל אחד מהם הוא <Term t="מוצהר" client:visible lesson="4.7">מוצהר</Term>. מסמך מעביר טענה למצב אחר: ״נבדק מול משהו שמישהו אחר כתב״ (<Term t="מאומת" client:visible lesson="4.7">מאומת</Term>). בתיק של נועם ושירה יש שמונה טענות ועשרה מסמכים. הטבלה שלמטה אומרת, לכל טענה, על אילו מסמכים היא נשענת, ובאיזה מצב היא היום. ארבעה מצבים:
+
+- **תקין:** המסמך התקבל והוא תואם לטענה.
+- **תקין, עם שאלה:** המסמך התקבל והוא תואם, אבל דבר אחד בו דורש בירור.
+- **חלקי:** המסמך התקבל, אבל הוא מוכיח רק חלק ממה שהטענה אומרת.
+- **חסר:** המסמך עוד לא הגיע.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הטענה בתיק</th>
+        <th class="py-2 pe-3 text-start font-semibold">המסמכים שהיא נשענת עליהם</th>
+        <th class="py-2 pe-3 text-start font-semibold">המצב היום</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CLAIMS.map((c) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{c.label}</td>
+          <td class="py-2 pe-3">{claimDocs(c.id)}</td>
+          <td class={`py-2 pe-3 ${STATE_CLASS[f.plain(`st.claim.${c.id}`)]}`}>{STATE_HE[f.plain(`st.claim.${c.id}`)]}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} מסמכים בדויים. המצב של טענה הוא הגרוע מבין המסמכים שנשענת עליהם.</p>
+</div>
+
+מתוך עשרת המסמכים, **חמישה תקינים, שניים תקינים עם שאלה, שניים חלקיים ואחד חסר**. אל תמהרו לחשוב שהתיק ״כמעט מוכן״: שלושה פריטים שאינם תקינים נוגעים בהון העצמי ובמחיר, שהם בדיוק מה שהבנק בודק ראשון.
+
+### למה אוספים מסמכים לפני שהבנק ביקש
+
+אפשר לקבל <Term t="אישור עקרוני" client:visible lesson="1.7">אישור עקרוני</Term> בלי אף מסמך: לפי התעתיק של הצוות להוראה 451 היא לא דורשת מסמכים בשלב הזה (לא אומת), ובפועל יש בנקים וערוצי יועצים שכן מבקשים כבר אז, ולכן ״תלוי בערוץ ובבנק״ (ידע מהשטח, ממתין לאישור אילון). ב־Mogi אוספים את המסמכים כבר בהתחלה (החלטה של Mogi, עדן, 2026-08-04), משלוש סיבות שהצוות כתב (מחקר / הצעה): אישור שניתן על שכר שגוי ״מתאדה״ אחר כך; **רוצים לדעת לפני הבנק**, כי בחיתום הבנק משווה מוצהר מול מאומת, ופער שם יכול לבטל אישור; והמסמכים נדרשים ממילא בפתיחת התיק, בתוך חלון של כ־24 ימים (<Term t="תוקף אישור עקרוני" client:visible lesson="1.8">תוקף האישור</Term>) שהוא הקטע הצפוף ביותר בדרך. המסמכים עצמם נשלחים לבנק רק בפתיחת התיק, ולא באישור העקרוני.
+
+<Section kind="חלק 1">
+
+## הכנסה: מהתלוש להכנסה המוכרת
+
+</Section>
+
+הכנסה מוכרת (<Term t="הכנסה מוכרת" client:visible lesson="4.1">שיעור 4.1</Term>) מתחילה בתלוש. הנה התלוש של נועם מיולי, כמו שהוא בתיק:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="text-caption font-semibold text-n600">{DOC_MARK} · תלוש שכר, {mon("2026-07")} 2026, {PEOPLE.noam.employer}</p>
+  <table class="mt-2 w-full border-collapse text-body-m">
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">סך התשלומים (<Term t="ברוטו" client:visible lesson="4.1">ברוטו</Term>)</td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh("ps.noam.1.gross")}</span></td></tr>
+      {PAYSLIPS.noam[0].mandatory.map((d, j) => (
+        <tr class="border-b border-n100 text-n700"><td class="py-2 pe-3 ps-4">− {d.label}</td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh(`ps.noam.1.m${j + 1}`)}</span></td></tr>
+      ))}
+      <tr class="border-b border-n100"><td class="py-2 pe-3">סך ניכויי החובה</td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh("ps.noam.1.mandatory")}</span></td></tr>
+      <tr class="border-b border-n100 bg-n50 font-semibold"><td class="py-2 pe-3">שכר נטו (<Term t="נטו" client:visible lesson="4.1">נטו</Term>)</td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh("ps.noam.1.net")}</span></td></tr>
+      <tr class="border-b border-n100 text-n700"><td class="py-2 pe-3 ps-4">− דמי חבר ועד</td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh("ps.noam.1.o1")}</span></td></tr>
+      <tr class="bg-n50 font-semibold"><td class="py-2 pe-3"><Term t="נטו לתשלום" client:visible lesson="4.1">נטו לתשלום</Term></td><td class="py-2 text-end"><span class="ltr whitespace-nowrap">{sh("ps.noam.1.pay")}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} המבנה לפי מפרט הצוות לתלוש (ברוטו, ניכויי חובה, שכר נטו, ניכויים אחרים, נטו לתשלום); המספרים בדויים. ״{DOC_MARK}״.</p>
+</div>
+
+**איזה מהשניים הוא ההכנסה?** כלל הקורס (שיעור 4.1, והמפרט הפנימי של הצוות): **שכר נטו**, {f.shekels("ps.noam.1.net")}. נטו לתשלום כבר מנכה דברים אחרים, כמו החזר הלוואה למעסיק, ואלה שייכים להתחייבויות. הם יספרו שם, ולא יספרו פעמיים. אבל זו שאלה פתוחה: בשיחה של הצוות עם אילון נאמר שההכנסה היא ״נטו לתשלום״ בממוצע של שלושה חודשים (ידע מהשטח, 2026-09-16, ממתין לאישור אילון). אצל נועם ההבדל הוא {f.shekels("dep.net_vs_pay")} בחודש. הגיליון בשיעור משתמש בשכר נטו, ושומר את השאלה.
+
+### שלושה חודשים, ותשלום שלא חוזר
+
+הממוצע של שלושה חודשים (ידע מהשטח, ממתין לאישור אילון) מחליק חודש חריג. אבל תשלום שלא חוזר, כמו מענק או שי לחג, מסומן ולא נכנס לממוצע (מפרט הצוות; ממתין לאישור יועצים). בתלושים של נועם ושירה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מי</th>
+        <th class="py-2 pe-3 text-start font-semibold">חודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">שכר נטו, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">תשלום חד־פעמי, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">שכר נטו בלעדיו, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["noam", "shira"].flatMap((p) => PAYSLIPS[p].map((s, k) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{p === "noam" ? "נועם" : "שירה"}</td>
+          <td class="py-2 pe-3">{mon(s.month)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh(`ps.${p}.${k + 1}.net`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{s.oneOffLabel ? sh(`ps.${p}.${k + 1}.oneoff`) : "—"}</span>{s.oneOffLabel && <span class="block text-caption text-n600">{s.oneOffLabel}</span>}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh(`ps.${p}.${k + 1}.regular`)}</span></td>
+        </tr>
+      )))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} שישה תלושים בדויים. ״{DOC_MARK}״.</p>
+</div>
+
+**צעד 1 — נועם.** שלושה חודשים של {f.shekels("ps.noam.1.net")}: הממוצע <M>({n("ps.noam.1.net")} + {n("ps.noam.2.net")} + {n("ps.noam.3.net")}) ÷ 3 = {n("inc.noam.recognised")}</M> ₪, שווה למה שהוא הצהיר.
+
+**צעד 2 — שירה, בלי להבחין.** <M>({n("ps.shira.1.net")} + {n("ps.shira.2.net")} + {n("ps.shira.3.net")}) ÷ 3 = {n("inc.shira.naive")}</M> ₪: {f.shekels("gap.bonus")} יותר ממה שהיא מרוויחה בחודש רגיל.
+
+**צעד 3 — שירה, אחרי שמסמנים את השי לחג.** מוציאים מספטמבר את {f.shekels("ps.shira.3.oneoff")}: <M>({n("ps.shira.1.regular")} + {n("ps.shira.2.regular")} + {n("ps.shira.3.regular")}) ÷ 3 = {n("inc.shira.recognised")}</M> ₪, שווה למה שהיא הצהירה.
+
+**צעד 4 — ההכנסה המוכרת של שניהם.** <M>{n("inc.noam.recognised")} + {n("inc.shira.recognised")} = {n("inc.total.recognised")}</M> ₪ בחודש. הממוצע הנאיבי של שירה היה מוסיף {f.shekels("inc.inflate")} בחודש להכנסה: <M>{n("inc.total.naive")} − {n("inc.total.recognised")} = {n("inc.inflate")}</M>. זו <Term t="מידע לא נכון" client:visible lesson="6.5">הכנסה מנופחת</Term>: אחד מהקווים האדומים של שיעור 6.5, ואסור לעשות את זה גם כשהמספר ״יוצא מהמסמכים״.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">ההכנסה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מוצהר, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">מאומת מהתלושים, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {f.rows("ver.income").map((r) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{r.line}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.declared)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.verified)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.gap)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הכנסה מוכרת = ממוצע שלושה חודשים של שכר נטו, בלי תשלומים חד־פעמיים.</p>
+</div>
+
+### מה דף החשבון מוסיף
+
+התלוש הוא מה שהמעסיק כתב. דף החשבון הוא מה שקרה: האם הכסף הגיע. משווים את **נטו לתשלום** בתלוש (זה מה שהמעסיק מעביר) להפקדה בחשבון:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מי</th>
+        <th class="py-2 pe-3 text-start font-semibold">חודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">נטו לתשלום בתלוש, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">הופקד בחשבון, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["noam", "shira"].flatMap((p) => f.rows(`dep.${p}`).map((r) => (
+        <tr class={`border-b border-n100 align-top ${Number(r.gap) !== 0 ? "bg-warning-bg" : ""}`}>
+          <td class="py-2 pe-3 font-semibold text-n900">{p === "noam" ? "נועם" : "שירה"}</td>
+          <td class="py-2 pe-3">{mon(r.month)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.net)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.deposit)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.gap)}</span></td>
+        </tr>
+      )))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} שורה צבועה: פער. ״{DOC_MARK}״.</p>
+</div>
+
+חמש מתוך שש ההפקדות תואמות לאגורה. **באוגוסט הופקדו לנועם {f.shekels("gap.aug")} פחות** מנטו לתשלום שבתלוש: <M>{n("ps.noam.2.pay")} − {n("dep.noam.2.deposit")} = {n("gap.aug")}</M>. הכסף יכול להיות תיקון בתלוש, ניכוי שלא מופיע בו או טעות: **לא יודעים, ושואלים.** (שימו לב לטעות שקל לעשות: אם מחסרים את ההפקדה משכר הנטו ולא מנטו לתשלום, יוצא {f.shekels("ex.err_net_gap")}, וזה כבר פער שלא קיים.) הפער לא משנה את ההכנסה המוכרת, כי התלוש עקבי; אבל הוא מוצג כשאלה פתוחה, ולא נסגר בשתיקה.
+
+<Section kind="חלק 2">
+
+## התחייבויות: מי יודע על ההלוואה
+
+</Section>
+
+הלוואת הרכב מופיעה בשלושה מסמכים: **דף יתרת הסילוק** (החזר חודשי {f.shekels("a.car")}, עוד {f.plain("a.car_months")} תשלומים ויתרת סילוק {f.shekels("a.car_payoff")}), **סיכום דוח האשראי** (הלוואה אחת רשומה, בלי חיובים שחזרו) ו**דף החשבון** (חיוב של {f.shekels("a.car")} בכל אחד משלושת החודשים). הם מסכימים, ולכן ההתחייבות תקינה. מי שרוצה לדעת **כמה תשלומים נשארו** צריך את דף ההלוואה: דף החשבון מראה רק שהחיוב חוזר.
+
+לפי <Term t="״מעל 18 חודשים״" client:visible lesson="4.2">הכלל של שיעור 4.2</Term> (תעתיק הצוות של הוראה 329, לא אומת), התחייבות עם יותר מ־18 תשלומים נשארת נספרת, ומורידים אותה מההכנסה. נשארו {f.plain("a.car_months")}, ולכן היא נספרת. אחרי {f.plain("ob.until")} תשלומים נשארים 18, והמצב של ״בדיוק 18״ פתוח (שאלה לאילון, מ־4.2). שני דברים שהתיק לא יכול להראות: **התחייבות שלא רשומה בשום מקום**, כמו הלוואה בין אנשים. מי ששותק על התחייבות מסתיר אותה, וזה קו אדום (שיעור 6.5), ולכן שואלים את הלקוחות ישירות, בכתב.
+
+<Section kind="חלק 3">
+
+## הון עצמי: כמה מהסכום כבר הוכח
+
+</Section>
+
+ההון העצמי שהוצהר, {f.shekels("a.equity")}, מורכב משלוש חתיכות. כל אחת נשענת על מסמך אחר (בשאלונים של הבנקים, כפי שהצוות תיעד, כל אחת מהן היא ״מקור״ נפרד להון עצמי; לא נבדק מחדש מול האתרים):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">החתיכה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מוצהר, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">מאומת היום, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">למה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {f.rows("ver.equity").map((r, k) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{r.line}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.declared)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.verified)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.gap)}</span></td>
+          <td class="py-2 pe-3">{["דף החשבון מראה את הסכום", "אין מסמך מהקרן", "יש מכתב מתנה, אבל הכסף עוד לא בחשבון"][k]}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ״מאומת״ כאן: כסף שמסמך מראה שהוא קיים בחשבון. ״{DOC_MARK}״.</p>
+</div>
+
+**החשבון מספיק בדיוק.** היתרה בסוף ספטמבר {f.shekels("st.closing")}, והלקוחות צריכים {f.shekels("eq.savings")} להון העצמי ועוד {f.shekels("a.reserve")} שנשארים מחוץ לו (שיעורים 6.4 ו־6.11): <M>{n("eq.savings")} + {n("a.reserve")} = {n("st.needed")}</M>, וההפרש <M>{n("st.closing")} − {n("st.needed")} = {n("st.slack")}</M>. אין שום חופש בחשבון.
+
+**מכתב מתנה אינו הכסף.** הוא אומר מי נותן, כמה ושזו מתנה ולא הלוואה (ההבדל חשוב: הלוואה מההורים היא התחייבות). הכסף מוכח רק כשהוא מופיע בדף חשבון. הקורס לא יודע איזה נוסח של מכתב בנק דורש, ואם דורש (שאלה לאילון).
+
+### מה קורה לשיעור המימון
+
+<Term t="שיעור מימון" client:visible lesson="1.2">שיעור המימון</Term> הוא ההלוואה חלקי מחיר הנכס, וההון העצמי קובע את ההלוואה. הנה שלוש הדרכים לספור:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה סופרים</th>
+        <th class="py-2 pe-3 text-start font-semibold">הון עצמי, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">הלוואה, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">שיעור מימון</th>
+        <th class="py-2 pe-3 text-start font-semibold">מול התקרה (75%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {viewRows.map((r, k) => (
+        <tr class={`border-b border-n100 align-top ${k > 0 ? "bg-warning-bg" : ""}`}>
+          <td class="py-2 pe-3 font-semibold text-n900">{r.view}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.equity)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.loan)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.ltv}%</span></td>
+          <td class="py-2 pe-3">{k === 0 ? "מתחת, במרווח של " + f.shekels("a.room") : "מעל"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תקרה של 75% לדירה יחידה לפי תעתיק הצוות של הוראה 329 (לא אומת). הדרך השלישית היא השאלה ״מה אפשר להוכיח היום״, לא כלל של בנק.</p>
+</div>
+
+מכאן שתי מסקנות. **הראשונה:** כדי לעמוד בתקרה של 75% צריך הון עצמי של לפחות {f.shekels("eq.min")}, והתיק מצהיר על {f.shekels("a.equity")}, כלומר ״מרווח״ של {f.shekels("a.room")} בהלוואה. בלי הקרן, גם אם המתנה תגיע, ההלוואה גדולה מדי ב־{f.shekels("short.documented")}; בלי שניהם, ב־{f.shekels("short.verified")}. **השנייה:** שני הפריטים האלה, הקרן והמתנה, חשובים יותר מכל שאר הפערים ביחד. הסדר בו הם נסגרים קובע מה אפשר לומר לבנק מתי.
+
+<Section kind="חלק 4">
+
+## הנכס: מה שיש ומה שעוד אין
+
+</Section>
+
+**נסח הטאבו** אומר שהנכס רשום על שם המוכר ושאין עליו משכנתא רשומה (<Term t="טאבו" client:visible lesson="1.6">טאבו</Term>). **החוזה** נותן את המחיר, {f.shekels("a.price")}, אבל הוא טיוטה: עד שחותמים, העסקה לא סגורה. ויש דבר שאי אפשר להשיג מהלקוחות בכלל: **השמאות**. השמאי מגיע מהרשימה של הבנק אחרי האישור העקרוני (ידע מהשטח, ממתין לאישור אילון), ו<Term t="שווי הנכס" client:visible lesson="1.2">שווי הנכס</Term> שהבנק יחשב ממנו הוא **הנמוך** מבין המחיר והשמאות (תעתיק הצוות, לא אומת). לכן התיק לא מחכה לשמאות אלא מתכנן אותה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שמאות, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">השווי לחישוב, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">שיעור מימון של ההלוואה המוצהרת</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההלוואה המרבית, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {f.rows("appr.table").map((r) => (
+        <tr class={`border-b border-n100 align-top ${Number(r.ltv) > 75 ? "bg-warning-bg" : ""}`}>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.appraisal)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.used)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.ltv}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(r.max_loan)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} שורה צבועה: ההלוואה של {f.shekels("a.loan")} מעל התקרה. הערכים של השמאות הם תרחישים לתכנון, לא תחזית לשמאות.</p>
+</div>
+
+שמאות מתחת ל־{f.shekels("appr.breakeven")} (<M>{n("a.loan")} × 100 ÷ 75 = {n("appr.breakeven")}</M>) מעבירה את ההלוואה המוצהרת מעל התקרה. זה {f.shekels("appr.slack")} מתחת למחיר: מרווח קטן מאוד. בשיעור 9.2 תראו מה התוכנית (שיעור 6.11) משנה בזה.
+
+<Section kind="חלק 5">
+
+## דף ההיתכנות
+
+</Section>
+
+כל מה שקודם מתכנס לדף אחד: מה המשפחה יכולה לעמוד בו.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השורה</th>
+        <th class="py-2 pe-3 text-start font-semibold">הערך</th>
+        <th class="py-2 pe-3 text-start font-semibold">איך מגיעים אליו</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הכנסה מוכרת</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("inc.total.recognised")}</span> ₪</td><td class="py-2 pe-3">ממוצע שלושה חודשים של שכר נטו, בלי חד־פעמי</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">התחייבות שנספרת</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("a.car")}</span> ₪</td><td class="py-2 pe-3">הלוואת הרכב: נשארו יותר מ־18 תשלומים</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הכנסה פנויה</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("sh.disposable")}</span> ₪</td><td class="py-2 pe-3">ההכנסה המוכרת פחות ההתחייבות</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">ההחזר המרבי ב־50%</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("sh.max50")}</span> ₪</td><td class="py-2 pe-3">התקרה, לפי תעתיק הצוות של הוראה 329</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">ההחזר ב־40%</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("sh.max40")}</span> ₪</td><td class="py-2 pe-3">סף ההון (<Term t="סף הון" client:visible lesson="4.5">סף</Term> ולא איסור)</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">ההחזר המרבי לפי תקציב המשפחה</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("bud.max")}</span> ₪</td><td class="py-2 pe-3">הכנסה מוכרת, פחות ההלוואה, פחות תקציב מחיה של {f.shekels("bud.value")}</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">שיעור מימון מוצהר</td><td class="py-2 pe-3"><span class="ltr">{pc("a.ltv")}</span></td><td class="py-2 pe-3">הלוואה של {f.shekels("a.loan")} על נכס של {f.shekels("a.price")}</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הון עצמי מינימלי לתקרה</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh("eq.min")}</span> ₪</td><td class="py-2 pe-3">המחיר פחות ההלוואה המרבית</td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הכללים לפי תעתיק הצוות של הוראה 329 (לא אומת). תקציב המחיה הוא הנחה של התיק: לקורס אין מקור לתקציב סביר (שיעור 4.6).</p>
+</div>
+
+**מה יוצא מזה?** שתי מגבלות על ההחזר: הבנק, ב־40%, מגביל ל־{f.shekels("sh.max40")}, ותקציב המשפחה מגביל ל־{f.shekels("bud.max")}. הנמוך מביניהם קובע, וכאן זה הקו של הבנק. ההפרש {f.shekels("bud.vs40")}: ככה אפשר לראות שהמשפחה יכולה לשלם קצת יותר ממה שהקו מרשה, אבל לא ללכת לשם.
+
+**נקודת הפתיחה: התמהיל מהשיעורים 5.8–6.11.** שלושה מסלולים (פריים, משתנה לא צמודה כל 5 שנים וקבועה לא צמודה), 30 שנה: ההחזר הראשון {f.shekels("mix.payment")}, <Term t="יחס החזר" client:visible lesson="4.3">יחס ההחזר</Term> {pc("mix.ratio")}. זה {f.shekels("mix.over40")} מעל קו ה־40%. אחרי ההחזר נשארים {f.shekels("mix.left")} בחודש, שהם {f.shekels("mix.margin")} מעל תקציב המחיה. **התיק עומד על הקצה בשני ספים בבת אחת:** שיעור מימון {pc("a.ltv")} (מרווח של {f.shekels("a.room")}) ויחס החזר קצת מעל 40%. בשיעור 9.2 תראו את התוכנית שמזיזה אותו.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## בודק המסמכים
+
+</Section>
+
+כאן אתם הבודקים. לכל אחד מעשרת המסמכים סמנו באיזה מצב הראיה שלו ואילו טענות הוא יכול לתמוך בהן, ולחצו ״בדיקה״. הכלי אומר מה כתוב במסמך, מה הוא לא מוכיח ומה לבקש, ולא נותן ציון.
+
+<DocumentChecker client:visible id="9.1-checker" />
+
+נסו שלוש משימות:
+1. **סמנו את כל המסמכים לפני שאתם בודקים.** בכמה מסמכים טעיתם במצב? בכמה בטענות?
+2. **הוציאו את הפערים.** אילו חמישה מסמכים אינם תקינים, ומה כל אחד מהם מעכב?
+3. **מה מעכב את התיק מלהגיע לבנק?** אילו שני פריטים, אם לא נסגרים, שומרים את שיעור המימון מעל התקרה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>התיק תקין בחמישה מסמכים (זהות, תלושי נועם, דוח האשראי, דף ההלוואה, הטאבו), עם שאלה בשניים (תלושי שירה, דף החשבון), חלקי בשניים (החוזה, מכתב המתנה) וחסר בקרן ההשתלמות. הטעות הנפוצה היא לסמן את דף החשבון ״תקין״: הוא תומך בהכנסה של שניהם, בחיסכון ובהלוואה, אבל פער של {f.shekels("gap.aug")} באוגוסט מחזיר אותו למצב ״עם שאלה״.</li>
+    <li>החסר: קרן ההשתלמות ({f.shekels("eq.fund")} מההון). החלקיים: החוזה (המחיר) ומכתב המתנה ({f.shekels("eq.gift")}). השאלות: הפער של {f.shekels("gap.aug")} באוגוסט, והשי לחג של שירה ({f.shekels("gap.bonus")} בחודש בממוצע, אם לא מסמנים אותו).</li>
+    <li>הקרן והמתנה. בלי שניהם שיעור המימון {pc("ltv.verified")}; עם המתנה בלבד {pc("ltv.documented")}. רק עם שניהם הוא {pc("a.ltv")}.</li>
+  </ol>
+</details>
+
+<Section kind="רשימת הפערים">
+
+## מה לבקש, ממי, ולמה
+
+</Section>
+
+הרשימה של התיק היא תוצר של השיעור: לכל פריט שאינו תקין, **מה פתוח, מה לבקש ממי, ומה זה מעכב**. בלי זה ״חסרים מסמכים״ הוא משפט שלא אפשר לפעול לפיו.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה פתוח</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה לבקש</th>
+        <th class="py-2 pe-3 text-start font-semibold">ממי</th>
+        <th class="py-2 pe-3 text-start font-semibold">כמה זה מחזיק</th>
+      </tr>
+    </thead>
+    <tbody>
+      {GAPS.map((g) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{g.open}</td>
+          <td class="py-2 pe-3">{g.ask}</td>
+          <td class="py-2 pe-3">{g.from}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{sh(amountOf[g.claim])}</span> ₪ <span class="block text-caption text-n600">{amountNote[g.claim]}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ושורה אחת שלא ברשימה, כי אי אפשר לבקש אותה מהלקוחות: השמאות. הבנק מזמין אותה אחרי האישור העקרוני, והתיק רק מתכנן את הטווח (הטבלה למעלה).</p>
+</div>
+
+<PredictionReveal
+  client:visible
+  id="9.1"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "לא: זה מה שהלקוחות מצהירים. זה לא מה שהמסמכים מוכיחים.",
+    `לא: ${f.shekels("eq.documented")} כולל את מכתב המתנה, אבל מכתב מתנה הוא לא כסף בחשבון.`,
+    "",
+    "לא: יש בתיק מסמך שמוכיח חלק מהסכום: דף החשבון.",
+  ]}
+>
+  רק {f.shekels("eq.verified")}: החיסכון, שדף החשבון מראה. המתנה ({f.shekels("eq.gift")}) מופיעה במכתב אבל הכסף עוד לא בחשבון, והקרן ({f.shekels("eq.fund")}) אין עליה מסמך בכלל. ההבדל חשוב: אם סופרים רק את המאומת, שיעור המימון {pc("ltv.verified")}, הרבה מעל התקרה של 75%. התיק לא נכשל: הוא עוד לא הושלם. ואם אחד מהפערים לא ייסגר, צריך לדעת מה הוא עושה לתיק.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## דף ההיתכנות, שורה אחרי שורה
+
+</Section>
+
+נחשב את הדף מההתחלה, כמו שהוא יוצא בסוף.
+
+**צעד 1 — ההכנסה המוכרת.** שלושה תלושים לכל אחד, בלי חד־פעמי: נועם {f.shekels("inc.noam.recognised")}, שירה {f.shekels("inc.shira.recognised")}. סך הכול <M>{n("inc.noam.recognised")} + {n("inc.shira.recognised")} = {n("inc.total.recognised")}</M> ₪.
+
+**צעד 2 — ההתחייבויות.** הלוואת הרכב: {f.shekels("a.car")} בחודש, {f.plain("a.car_months")} תשלומים, שלושה מסמכים מסכימים, ויותר מ־18 נשארו: היא נספרת.
+
+**צעד 3 — ההכנסה הפנויה.** <M>{n("inc.total.recognised")} − {n("a.car")} = {n("sh.disposable")}</M> ₪.
+
+**צעד 4 — ההחזר המרבי.** ב־50%: <M>{n("sh.disposable")} × 50 ÷ 100 = {n("sh.max50")}</M> ₪. ב־40%: <M>{n("sh.disposable")} × 40 ÷ 100 = {n("sh.max40")}</M> ₪.
+
+**צעד 5 — שיעור המימון, לפי מה שנספר.** <M>{n("a.price")} − {n("a.equity")} = {n("a.loan")}</M>; <M>{n("a.loan")} ÷ {n("a.price")} × 100 = {f.plain("a.ltv")}%</M>. אם סופרים רק את המאומת: <M>{n("a.price")} − {n("eq.verified")} = {n("loan.verified")}</M>, ושיעור המימון {f.plain("ltv.verified")}%.
+
+**צעד 6 — הפערים והמסקנה.** חמישה פריטים פתוחים: הקרן, המתנה, פער של {f.shekels("gap.aug")} באוגוסט, השי לחג והחוזה. **ההכנסה והנכס כמעט נסגרו; ההון העצמי עוד לא.** עד שהקרן והמתנה מוכחות, התיק לא מוכן להגשה כמו שהוא.
+
+<Section kind="דוגמה חצי פתורה">
+
+## שלוש דרכים לספור הון עצמי
+
+</Section>
+
+השלימו את שתי השורות האחרונות: ההלוואה והשיעור לפי כל דרך לספור. השורה הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="9.1-half"
+  rowKey="view"
+  periodLabel="מה סופרים"
+  columns={[
+    { key: "equity", label: "הון עצמי" },
+    { key: "loan", label: "הלוואה" },
+    { key: "ltv", label: "שיעור מימון", format: "percent" },
+  ]}
+  rows={viewRows}
+  blanks={["מה שיש עליו מסמך.loan", "מה שיש עליו מסמך.ltv", "מה שאומת.loan", "מה שאומת.ltv"]}
+  success={`נכון. כל שקל פחות בהון העצמי הוא שקל יותר בהלוואה, ואז שיעור המימון עולה ל־${f.plain("ltv.documented")}% ול־${f.plain("ltv.verified")}%, מעל התקרה.`}
+  hint="הלוואה = מחיר פחות הון עצמי. שיעור המימון = הלוואה ÷ מחיר × 100."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+המספרים והמסמכים בתרגילים בדויים. התרגילים מסודרים מהקל אל המאתגר. אפשר להשתמש במחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="9.1-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "דף החשבון", feedback: "הוא מראה שהחיוב חוזר בכל חודש, אבל לא כמה תשלומים נשארו." },
+    { text: "תלושי השכר", feedback: "התלוש אומר מה המעסיק מנכה. הוא לא אומר כמה תשלומים נשארו בהלוואה של הרכב." },
+    { text: "דף היתרה של ההלוואה", correct: true, feedback: "נכון. הוא היחיד שאומר כמה תשלומים נשארו. דף החשבון מראה רק שהחיוב חוזר." },
+    { text: "נסח הטאבו", feedback: "הטאבו מדבר על הנכס הנרכש, לא על הלוואה של הרכב." },
+  ]}
+>
+  איזה מסמך בתיק אומר כמה תשלומים נשארו בהלוואת הרכב?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="9.1-2"
+  n={2}
+  level="קל"
+  answer={f.raw("inc.shira.recognised")}
+  errors={[
+    { value: f.raw("inc.shira.naive"), message: "זה הממוצע של שלושת הנטו, כולל השי לחג. הוא לא חוזר, ולכן מוציאים אותו לפני הממוצע." },
+    { value: f.raw("ps.shira.3.net"), message: "זה הנטו של ספטמבר בלבד, עם השי לחג. השאלה על ממוצע של שלושה חודשים בלי החד־פעמי." },
+  ]}
+>
+  בתלושים של שירה שכר הנטו הוא {f.shekels("ps.shira.1.net")}, {f.shekels("ps.shira.2.net")} ו־{f.shekels("ps.shira.3.net")}. בספטמבר יש בתלוש שי לחג, ו־{f.shekels("ps.shira.3.oneoff")} מהנטו הם ממנו. מה ההכנסה המוכרת החודשית של שירה?
+</NumericExercise>
+
+<Solution for="9.1-2">
+<M>({n("ps.shira.1.net")} + {n("ps.shira.2.net")} + ({n("ps.shira.3.net")} − {n("ps.shira.3.oneoff")})) ÷ 3 = {n("inc.shira.recognised")}</M> ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="9.1-3"
+  n={3}
+  level="קל"
+  options={[
+    { text: "המכתב מוכיח שהכסף כבר בחשבון של הלקוחות", feedback: "המכתב לא מראה את היתרה. רק דף החשבון מראה אותה." },
+    { text: "המכתב אומר מי נותן וכמה, והכסף מוכח כשהוא בדף חשבון", correct: true, feedback: "נכון. מכתב הוא כוונה ומקור. כסף מוכח בחשבון." },
+    { text: "המכתב מיותר, כי ההורים הם בני משפחה של הלווים", feedback: "הבנק רוצה לדעת אם זו מתנה או הלוואה. הלוואה היא התחייבות, ולכן המכתב חשוב." },
+    { text: "המכתב מחליף את הצורך בדף חשבון של הלקוחות", feedback: "הוא לא מחליף אותו: הוא אומר ממי הכסף, והחשבון אומר שהכסף הגיע." },
+  ]}
+>
+  מה מוכיח מכתב מתנה מההורים, ומה לא?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="9.1-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("eq.verified")}
+  errors={[
+    { value: f.raw("eq.documented"), message: "זה כולל את המתנה, שהכסף שלה עוד לא בחשבון. מאומת הוא כסף שמסמך מראה שהוא קיים." },
+    { value: f.raw("a.equity"), message: "זה כל מה שהוצהר, כולל הקרן שאין עליה מסמך." },
+  ]}
+>
+  ההון העצמי מורכב מ־{f.shekels("eq.savings")} חיסכון, {f.shekels("eq.fund")} קרן השתלמות ו־{f.shekels("eq.gift")} מתנה. כמה הון עצמי מאומת בתיק כפי שהוא היום?
+</NumericExercise>
+
+<Solution for="9.1-4">
+דף החשבון מראה את החיסכון, {f.shekels("eq.savings")}. מכתב המתנה לא מראה כסף בחשבון, ולקרן אין מסמך. לכן המאומת הוא {f.shekels("eq.verified")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.1-5"
+  n={5}
+  level="בינוני"
+  unit="%"
+  tolerance={0.05}
+  answer={f.raw("ltv.verified")}
+  errors={[
+    { value: f.raw("ltv.documented"), message: "זה שיעור המימון כשסופרים גם את המתנה. השאלה: רק המאומת." },
+    { value: f.raw("a.ltv"), message: "זה שיעור המימון לפי מה שהוצהר, כולל מה שעוד לא הוכח." },
+  ]}
+>
+  אם רק ההון העצמי המאומת ({f.shekels("eq.verified")}) נספר, מה שיעור המימון על נכס של {f.shekels("a.price")}?
+</NumericExercise>
+
+<Solution for="9.1-5">
+ההלוואה <M>{n("a.price")} − {n("eq.verified")} = {n("loan.verified")}</M> ₪, ושיעור המימון <M>{n("loan.verified")} ÷ {n("a.price")} × 100 = {f.plain("ltv.verified")}%</M>, מעל התקרה של 75%.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.1-6"
+  n={6}
+  level="בינוני"
+  answer={f.raw("gap.aug")}
+  errors={[
+    { value: f.raw("ex.err_net_gap"), message: "חיסרתם את ההפקדה משכר הנטו. ההפקדה היא מה שנשאר אחרי הניכויים האחרים, ולכן משווים אותה לנטו לתשלום." },
+  ]}
+>
+  בתלוש של נועם מאוגוסט שכר הנטו {f.shekels("ps.noam.2.net")} ונטו לתשלום {f.shekels("ps.noam.2.pay")}. בדף החשבון הופקדו {f.shekels("dep.noam.2.deposit")}. מה הפער שצריך לברר?
+</NumericExercise>
+
+<Solution for="9.1-6">
+<M>{n("ps.noam.2.pay")} − {n("dep.noam.2.deposit")} = {n("gap.aug")}</M> ₪. משווים את ההפקדה לנטו לתשלום, כי זה מה שהמעסיק מעביר.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.1-7"
+  n={7}
+  level="בינוני"
+  answer={f.raw("sh.max40")}
+  errors={[
+    { value: f.raw("sh.max40_after"), message: "זה 40% מההכנסה המוכרת בלי להוריד את הלוואת הרכב. ההכנסה הפנויה היא אחרי ההורדה." },
+    { value: f.raw("sh.max50"), message: "זה ההחזר ב־50%, התקרה. השאלה על 40%." },
+  ]}
+>
+  ההכנסה המוכרת של נועם ושירה {f.shekels("inc.total.recognised")}, ויש הלוואת רכב של {f.shekels("a.car")} ועוד {f.plain("a.car_months")} תשלומים. מהו ההחזר החודשי המרבי ב־40% מההכנסה הפנויה?
+</NumericExercise>
+
+<Solution for="9.1-7">
+ההכנסה הפנויה <M>{n("inc.total.recognised")} − {n("a.car")} = {n("sh.disposable")}</M>, ו־<M>{n("sh.disposable")} × 40 ÷ 100 = {n("sh.max40")}</M> ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="9.1-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: `מדווחים הכנסה מוכרת של ${f.shekels("inc.total.recognised")}, ומצרפים שאלה על השי לחג`, correct: true, feedback: "נכון. מוסרים את המספר שהמסמכים תומכים בו, ושואלים על החד־פעמי. לא מנפחים, לא מסתירים." },
+    { text: `מדווחים ${f.shekels("inc.total.naive")}, כי זה הממוצע של שלושת התלושים`, feedback: "זה ממוצע שכולל תשלום שלא חוזר: הכנסה מנופחת, קו אדום של שיעור 6.5." },
+    { text: "מורידים את הלוואת הרכב מהתיק, כי היא נגמרת בעוד פחות משלוש שנים", feedback: "נשארו יותר מ־18 תשלומים, ולכן היא נספרת. להשמיט התחייבות זה להסתיר אותה: קו אדום." },
+    { text: "מחכים עם הכול עד שהמתנה תגיע ולא אומרים לבנק כלום", feedback: "המתנה היא פער אחד מחמישה. מחכים לקרן ולמתנה, אבל ההכנסה וההתחייבות מוכנות, ואין סיבה להסתיר אותן." },
+  ]}
+>
+  מה נכון לעשות עם התיק של נועם ושירה, בלי לעבור שום קו אדום?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על תיק מסכם">
+<p><strong>מה זה?</strong> תיק שלם: כל מה שהלקוחות אומרים, המסמכים שמוכיחים אותו, המצב של כל פריט (תקין, עם שאלה, חלקי או חסר), רשימת הפערים עם מה לבקש, ודף היתכנות שמראה מה המשפחה יכולה לעמוד בו.</p>
+<p><strong>למה זה קיים?</strong> כי בחיתום הבנק משווה מוצהר מול מאומת. עדיף שהפער יתגלה אצלנו לפני שהוא מתגלה אצלו, כשעוד יש זמן לתקן.</p>
+<p><strong>איך זה עובד?</strong> מסמן כל טענה מול המסמכים שלה, ממצים את הפערים לפי מה שהם מעכבים, ומחשבים את הדף לפי הנתונים שהמסמכים תומכים בהם, בלי נתון מנופח ובלי נתון חסר. החישובים בקוד, ומודל שפה לא מחשב אף מספר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> בתיק הזה, ההכנסה מוכרת ב־{f.shekels("inc.total.recognised")}, אבל ההון העצמי המאומת הוא {f.shekels("eq.verified")} מתוך {f.shekels("a.equity")}. כל עוד הקרן והמתנה לא הוכחו, שיעור המימון בפועל יכול להיות {pc("ltv.verified")}, ולא {pc("a.ltv")}.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפי הרשימה: מה לבקש קודם (מה שמחזיק הכי הרבה), ומה אפשר להגיש כבר. ההחלטה אם להגיש בלי הכול היא של המשפחה, אחרי שיודעים מה כל פער עושה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **תיק הוא טענות ומסמכים.** כל טענה נשענת על מסמך אחד או יותר, והמצב שלה הוא הגרוע מבין מסמכיה.
+- **הכנסה מוכרת:** ממוצע שלושה חודשים של שכר נטו, בלי תשלום חד־פעמי. ממוצע נאיבי מנפח את ההכנסה: {f.shekels("inc.inflate")} בחודש בתיק הזה.
+- **מכתב אינו כסף:** הון עצמי מאומת הוא כסף שמסמך מראה שקיים. מתוך {f.shekels("a.equity")} מאומתים {f.shekels("eq.verified")}.
+- **פער קטן נשאל.** {f.shekels("gap.aug")} באוגוסט לא משנים את ההכנסה, אבל לא נסגרים בשתיקה.
+- **דף ההיתכנות:** הכנסה פנויה {f.shekels("sh.disposable")}, החזר מרבי {f.shekels("sh.max40")} ב־40%, שיעור מימון {pc("a.ltv")} מול תקרה של 75%, והתמהיל ההתחלתי על {pc("mix.ratio")}.
+
+**בשיעור הבא — 9.2, התיק המסכם, ב׳: תוכנית מיצוב, הצעות, שלוש חלופות ותרחישים:** התוכנית של שיעור 6.11 על התיק הזה, ההצעות של ארבעת הבנקים, שלוש חלופות לשלוש מטרות, ותרחישים לכל אחת.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "תיק א׳: מחיר 2,200,000 ₪, הון עצמי 560,000 ₪, הכנסות נטו 12,400 ו־9,300 ₪, הלוואת רכב של 1,450 ₪ ל־26 חודשים (מפת הקורס), חסכונות של 40,000 ₪ מחוץ להון העצמי (שיעור 6.4). החלוקה של ההון העצמי (חיסכון 260,000 ₪, קרן השתלמות 100,000 ₪, מתנה 200,000 ₪), התלושים, דף החשבון, דוח האשראי, דף ההלוואה, הנסח והחוזה הם תיאורים בדויים להמחשה. תקציב מחיה של 11,500 ₪ בחודש הוא הנחה של התיק: לקורס אין מקור לתקציב מחיה סביר." },
+    { kind: "ידע מהשטח", text: "באימות הנתונים בסניף מבקשים שלושה תלושי שכר ושלושה חודשי עו״ש; הבנקים מבקשים תלושים כדי לראות מה מרכיב את הנטו; ההכנסה היא בממוצע של שלושה חודשים (נטו לתשלום, לפי השיחה). אילון, 2026-07-27, 2026-08-26 ו־2026-09-16; עדן, 2026-08-04. ממתין לאישור אילון.", date: "2026-09-16" },
+    { kind: "מחקר / הצעה", text: "מפרט הצוות ״מה כל מסמך נותן לנו״ (2026-10-02): ההכנסה היא שכר נטו; נטו לתשלום כבר מנכה הלוואה ממעביד; שלושה חודשים בממוצע; תשלומים חד־פעמיים מסומנים; הלוואה מזוהה בתיאור שחוזר בשלושת החודשים. הרשימה המלאה של המסמכים נכתבה ״מידע כללי, לא מהרשימה של הצוות״, ויועצים עוד יתקנו אותה. ממתין לאישור אילון ועמית.", date: "2026-10-02" },
+    { kind: "החלטה של Mogi", text: "אוספים את כל המסמכים מהלקוח בתחילת הדרך, ושולחים לבנקים רק בפתיחת התיק (עדן, 2026-08-04 ו־2026-08-13). לא קוראים מסמך לפני שכל החותמים נתנו הסכמה בכתב (2026-09-06).", date: "2026-08-13" },
+    { kind: "לא אומת", text: "לפי תעתיק של הצוות להוראה 451: אישור עקרוני ללא מסמכים, ותוקף של 24 ימי לוח לפחות. לפי תעתיק של הצוות להוראה 329: שיעור מימון עד 75% לדירה יחידה, יחס החזר עד 50% וסף הון ב־40%, התחייבות נספרת כשנשארו יותר מ־18 חודשים. השווי לחישוב הוא הנמוך מבין המחיר והשמאות (לפי תקציר). רשימת מקורות ההון העצמי בשאלוני הבנקים תועדה בריפו של הצוות ב־2026-10, ולא נבדקה מחדש מול האתרים.", date: "2026-10-08" },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/casefile.ts (which composes affordability.ts, regulation.ts, sensitivity.ts) with src/data/case-a-final.ts, through scripts/lessons/lesson-9-1.ts (fact builders in scripts/lessons/_casefile-facts.ts) and data/lessons/9-1.json, rechecked by checks/kinds/casefile.py and, for earlier stages' kinds, affordability.py, regulation.py, ltv.py, underwriting.py, sensitivity.py. Illustration: src/components/DocumentChecker.vue. Field knowledge: FK-H-015, FK-H-029, FK-H-030, FK-H-033, FK-H-034, FK-H-040..042 (awaiting Eylon). Video: video/9-1.html. */}

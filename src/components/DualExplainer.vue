@@ -42,6 +42,8 @@ const props = defineProps<{
   reviewerChecks: Check[];
   /** Words that the client may not know; listed when found in the client's draft. */
   jargon: string[];
+  /** Words that promise something an estimate cannot promise; listed when found in either draft. */
+  promises?: string[];
   modelClient: string;
   modelReviewer: string;
 }>();
@@ -107,6 +109,10 @@ const jargonFound = computed(() => {
   const t = sideText("client");
   return props.jargon.filter((w) => t.includes(w));
 });
+const promisesFound = (side: Side) => {
+  const t = sideText(side);
+  return (props.promises ?? []).filter((w) => t.includes(w));
+};
 const done = (side: Side) => checksOf(side).filter((c) => ticks[`${side}.${c.id}`]).length;
 const sideLabel = (side: Side) => (side === "client" ? "ללקוח" : "לבודק מקצועי");
 const modelOf = (side: Side) => (side === "client" ? props.modelClient : props.modelReviewer);
@@ -197,6 +203,10 @@ const modelOf = (side: Side) => (side === "client" ? props.modelClient : props.m
 
         <p v-if="s === 'client' && jargonFound.length" class="mt-3 rounded-md bg-warning-bg p-2 text-body-m text-n900" role="status">
           מילים שהלקוח אולי לא מכיר: <strong>{{ jargonFound.join(", ") }}</strong>. אפשר להשאיר מילה כזו אם הסברתם אותה במשפט.
+        </p>
+
+        <p v-if="promisesFound(s).length" class="mt-3 rounded-md bg-warning-bg p-2 text-body-m text-n900" role="status">
+          מילים שמבטיחות: <strong>{{ promisesFound(s).join(", ") }}</strong>. אומדן או תרחיש אינם הבטחה: אם המילה מתארת אחד מהם, כדאי לנסח מחדש.
         </p>
 
         <fieldset class="mt-3 rounded-md bg-n50 p-2">

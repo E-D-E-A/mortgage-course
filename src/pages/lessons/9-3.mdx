@@ -1,0 +1,723 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "9.3"
+minutes: 90
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import RecommendationReport from "../../components/RecommendationReport.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { NUMBER_KINDS } from "../../lib/calc/casefile.ts";
+import { DATA_NOTE } from "../../data/case-a-final.ts";
+import { releaseChecklist } from "../../data/case-a-recommendation.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("9.3");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const pc = (id) => `${f.plain(id)}%`;
+export const dt = (iso) => new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long" }).format(new Date(`${iso}T12:00:00Z`));
+export const d = (id) => dt(f.raw(id));
+export const ALT = { payment: "צמוד, שליש קבועה", total: "25 שנה", exposure: "קבועה בלבד" };
+export const BANK = { a: "בנק א׳", b: "בנק ב׳", c: "בנק ג׳", d: "בנק ד׳" };
+export const ALTS = ["payment", "total", "exposure"];
+export const BANKS4 = ["a", "b", "c", "d"];
+export const STAGE = { refused: "הבנק מסרב", budget: "תקציב המחיה נשבר", ok: "עובר את המסננים" };
+export const g = (a, b, w) => `g.${a}.${b}.${w}`;
+export const ok = (a, b) => f.plain(g(a, b, "decision")) === "approve";
+export const ch = "g.exposure.b";
+export const predictionOptions = [
+  "כלום: המחיר בחוזה הוא שקובע, וההלוואה נשארת כמו שהיא",
+  `ההלוואה קטנה ב־${f.whole("ap.2100000.under")} בדיוק, כי הבנק מלווה לפי השווי שהשמאי קבע`,
+  `ההלוואה חייבת לרדת ב־${f.whole("ap.2100000.extra")} כדי להישאר בתקרה, והחסכונות שנשארו לא מספיקים: חסרים ${f.whole("ap.2100000.short")}`,
+  `שיעור המימון עולה ל־${f.plain("ap.2100000.ltv")}%, אבל הבנק מאשר את ההלוואה כפי שהיא ומשאיר את התנאים כמו שהיו, כי הדירה עדיין שווה יותר מההלוואה`,
+];
+export const checklist = releaseChecklist({
+  validUntil: d("o.b.valid_until"),
+  daysLeft: f.plain("o.b.left"),
+  loan: f.whole("in.loan"),
+  ltvCeiling: f.plain("in.ceiling"),
+  breakEven: f.whole("ap.break_even"),
+  reserve: f.whole("in.reserve_after"),
+  ratio: pc(`${ch}.ratio`),
+  roomTo40: f.shekels("ch.room40"),
+  margin: f.shekels(`${ch}.margin60`),
+  carLeft: f.plain("in.car_left"),
+});
+export const candRows = ALTS.flatMap((a) => BANKS4.map((b) => ({ a, b, key: g(a, b, "stage") })));
+export const altRows = ALTS.map((a) => ({
+  id: a,
+  cells: { first: formatShekels(f.raw(g(a, "b", "first"))), total: formatShekels(f.raw(g(a, "b", "total"))), rise: formatShekels(f.raw(g(a, "b", "rise"))), margin: formatShekels(f.raw(g(a, "b", "margin60"))) },
+}));
+export const bankRowsByAlt = Object.fromEntries(
+  ALTS.map((a) => [
+    a,
+    BANKS4.map((b) => ({
+      id: b,
+      cells: ok(a, b)
+        ? { decision: f.plain(g(a, b, "stage")) === "ok" ? "עובר" : STAGE[f.plain(g(a, b, "stage"))], ratio: pc(g(a, b, "ratio")), total: formatShekels(f.raw(g(a, b, "total"))), margin: formatShekels(f.raw(g(a, b, "margin60"))) }
+        : { decision: "מסרב", ratio: pc(g(a, b, "ratio")), total: "—", margin: "—" },
+    })),
+  ]),
+);
+export const halfRows = [
+  { appraisal: "קרובה למחיר", value: f.raw("ap.2175000.value"), max: f.raw("ap.2175000.max_loan"), extra: "0.00", left: f.raw("in.reserve_after") },
+  { appraisal: "בקצה", value: f.raw("ap.2150000.value"), max: f.raw("ap.2150000.max_loan"), extra: f.raw("ap.2150000.extra"), left: f.raw("ap.2150000.left") },
+  { appraisal: "נמוכה", value: f.raw("ap.2100000.value"), max: f.raw("ap.2100000.max_loan"), extra: f.raw("ap.2100000.extra"), left: f.raw("ap.2100000.left") },
+];
+
+בשיעורים 9.1 ו־9.2 בדקתם את התיק של נועם ושירה: מסמכים, אימות ויכולת החזר. אחר כך בניתם תוכנית <Term t="מיצוב" client:visible lesson="6.5">מיצוב</Term>, קיבלתם הצעות מארבעה בנקים בדויים והשוויתם שלוש חלופות בשלושה תרחישים. ביחידה הזו בוחרים: חלופה אחת, בנק אחד, תוכנית למשא ומתן, ורשימה של כל מה שצריך להיות נכון לפני שהכסף עובר.
+
+<Callout title="מה היחידה הזו לא אומרת" tone="warning">
+<p><strong>{MARK}</strong></p>
+<p>הבנקים בדויים, והכללים שלהם (איפה הם מסרבים ואיפה הם נותנים הנחה) הם כללי התרגיל משיעור 6.9. הקורס לא יודע איפה בנק אמיתי שם קווים, ולכן כל מה שכתוב כאן על מה בנק היה עושה הוא <strong>הערכה, לא הבטחה</strong>. ההמלצה היא המלצה אחת סבירה לסדר עדיפויות אחד שהקורס הניח (ידע על נועם ושירה אין לו). משפחה אחרת, או אותה משפחה עם עדיפות אחרת, הייתה יכולה לבחור אחרת ולהיות צודקת. {DATA_NOTE}</p>
+<p><strong>לא ידוע:</strong> מה בנק מחזיק בריבית בזמן ההמתנה, מה הוא עושה בשמאות נמוכה, כמה זמן עובר מהאישור עד העמדת הכסף, ומה מותר ליועץ לגבות ואיך. אלה שאלות לאילון ולעורך הדין (ידע מהשטח, ממתין לאישור אילון). אין כאן ייעוץ ללקוח אמיתי.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="9.3"
+  question={`הבנק אישר את התיק, ונועם ושירה מתכננים הלוואה של ${f.whole("in.loan")} על דירה שמחירה ${f.whole("in.price")}. כשנשארים להם ${f.whole("in.reserve_after")} בחסכונות, השמאי של הבנק מעריך את הדירה ב־${f.whole("ap.2100000.value")}, כלומר ${f.whole("ap.2100000.under")} פחות מהמחיר. מה קורה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מהטבלה להמלצה
+
+</Section>
+
+<LessonVideo lesson="9-3" />
+
+<Section kind="ההסבר">
+
+## שלוש שאלות על שתים עשרה אפשרויות
+
+</Section>
+
+לשלוש החלופות של 9.2 ({ALT.payment}, {ALT.total}, {ALT.exposure}) קראו ארבעה בנקים, וכל קריאה היא אפשרות: <strong>{f.plain("fn.pairs")}</strong> צירופים של חלופה ובנק. הבחירה היא סדר של שלוש שאלות. שתיים הן מסננים שאי אפשר לעבור עליהם, והשלישית היא שאלה על המשפחה.
+
+1. **האם הבנק מאשר?** בנק שמסרב מוריד את הצירוף מהרשימה, בלי קשר למחיר.
+2. **האם תקציב המחיה של המשפחה מחזיק גם בחודש הגרוע?** בודקים את <Term t="תקציב מחיה" client:visible lesson="4.6">תקציב המחיה</Term> של המשפחה, {f.shekels("in.budget")} בחודש, מול ההחזר הגבוה ביותר בחמש השנים הראשונות <Term t="תרחיש לחץ" client:visible lesson="8.10">בתרחיש הלחץ</Term>. מרווח שלילי פירושו שהמשפחה נשברת, וצירוף כזה יוצא.
+3. **מה חשוב למשפחה?** בין מה שנשאר, אין בטבלה תשובה: צריך לדעת מה היא מעדיפה, ולכתוב אותה.
+
+<Callout title="יחס החזר מעל 40% אינו פסילה" tone="info">
+<p><Term t="סף הון" client:visible lesson="4.5">סף ההון</Term> של 40% הוא סף של מחיר, לא של סירוב (לא אומת, לפי תעתיק של הצוות). לכן הוא לא אחד מהמסננים: מי שעובר אותו נושא <strong>דגל</strong>, והדגל נכתב בדוח. הסדר הזה הוא הנחת חישוב של הקורס, לא כלל של בנק ולא החלטה של Mogi. הוא דומה לשלד של האלגוריתם משלב 8 (אילוצים קשיחים, ואחריהם העדפות), אבל <strong>Mogi היום אינה מחשבת תמהיל בקוד</strong>: זה שלב עתידי.</p>
+</Callout>
+
+הנה כל השתים עשרה, כפי ש־9.2 חישבה אותן, עם התוצאה של המסננים:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">החלופה ובנק</th>
+        <th class="py-2 pe-2 text-start font-semibold">תוצאה</th>
+        <th class="py-2 pe-2 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-2 text-start font-semibold">החזר ראשון, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">הגבוה ב־5 שנים בלחץ, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">מעל תקציב המחיה, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {candRows.map((r) => (
+        <tr class={`border-b border-n100 align-top ${r.a === "exposure" && r.b === "b" ? "bg-n50" : ""}`}>
+          <td class="py-2 pe-2 font-semibold text-n900">{ALT[r.a]}, {BANK[r.b]}{r.a === "exposure" && r.b === "b" && <span class="block text-caption font-normal text-n600">ההמלצה</span>}</td>
+          <td class="py-2 pe-2">{STAGE[f.plain(r.key)]}</td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(g(r.a, r.b, "ratio"))}</span>{f.plain(g(r.a, r.b, "flag40")) === "over" && <span class="block text-caption text-n600">מעל 40%</span>}</td>
+          <td class="py-2 pe-2">{ok(r.a, r.b) ? <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "first")))}</span> : "—"}</td>
+          <td class="py-2 pe-2">{ok(r.a, r.b) ? <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "total")))}</span> : "—"}</td>
+          <td class="py-2 pe-2">{ok(r.a, r.b) ? <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "max60")))}</span> : "—"}</td>
+          <td class="py-2 pe-2">{ok(r.a, r.b) ? <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "margin60")))}</span> : "—"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} אומדנים במחירון התרגיל, לא הצעות של בנק. תרחיש הבסיס הוא תחזית <Term t="הוראה 451" client:visible lesson="5.1">הוראה 451</Term> (שיעור 8.10); תרחיש הלחץ הוא ״מה אם״ שנבחר, לא תחזית. הכללים של הבנקים בדויים (שיעור 6.9). מספר שלילי בעמודה האחרונה: התקציב נשבר.</p>
+</div>
+
+מה המסננים עושים:
+
+- **שאלה 1.** מתוך {f.plain("fn.pairs")} הצירופים, {f.plain("fn.approved")} מאושרים. בנק ד׳ מסרב לשלוש החלופות: <Term t="שיעור מימון" client:visible lesson="1.2">שיעור המימון</Term> של הלוואה כזו, {pc("g.exposure.d.ltv")}, מעל התקרה של הבנק הבדוי הזה, {f.plain("rule.d_ceiling")}%. אין חלופה שמשנה את זה בלי להוסיף הון עצמי, ולכן זה לא עניין של בחירה.
+- **שאלה 2.** צירוף אחד נופל על התקציב: 25 שנה אצל בנק ג׳. בחודש הגרוע של הלחץ נשארים למשפחה {f.shekels(g("total", "c", "margin60"))} מעל התקציב, כלומר היא חסרה. אותה חלופה אצל בנק א׳ ואצל בנק ב׳ עוברת, אבל במרווח דק: {f.shekels(g("total", "a", "margin60"))} ו־{f.shekels(g("total", "b", "margin60"))}.
+- **נשארים {f.plain("fn.ok")}:** {f.plain("fn.ok.payment")} של {ALT.payment}, {f.plain("fn.ok.total")} של {ALT.total} ו־{f.plain("fn.ok.exposure")} של {ALT.exposure}.
+
+## שאלה שלישית: מה חשוב למשפחה
+
+הטבלה אומרת מה כל חלופה עושה, ולא מה נועם ושירה רוצים. אין לקורס דרך לדעת. **ההנחה לתרגיל:** זו דירה ראשונה, יש ילד אחד, ותקציב המחיה השאיר מרווח דק בכל חלופה, ולכן הם מעדיפים החזר שאפשר לסמוך עליו על פני החזר ראשון נמוך או סך תשלומים נמוך. זו הנחה, לא עובדה, והיא קובעת את ההמלצה. המדד של העדיפות הזו הוא <strong>העלייה</strong> של ההחזר: כמה גבוה ההחזר הגבוה ביותר בלחץ מעל ההחזר הראשון (שיעור 5.6).
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">החלופה, {BANK.b}</th>
+        <th class="py-2 pe-2 text-start font-semibold">החזר ראשון, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">עלייה בלחץ, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">מעל תקציב המחיה, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">יחס החזר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ALTS.map((a) => (
+        <tr class={`border-b border-n100 align-top ${a === "exposure" ? "bg-n50" : ""}`}>
+          <td class="py-2 pe-2 font-semibold text-n900">{ALT[a]}{a === "exposure" && <span class="block text-caption font-normal text-n600">ההמלצה</span>}</td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(g(a, "b", "first")))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(g(a, "b", "total")))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(g(a, "b", "rise")))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{nv(f.raw(g(a, "b", "margin60")))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{pc(g(a, "b", "ratio"))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} אצל בנק ב׳, הזול ביותר בשלוש החלופות במחירון התרגיל. ״עלייה בלחץ״: ההחזר הגבוה ביותר בתרחיש הלחץ, בכל תקופת ההלוואה, פחות ההחזר הראשון. בתרחיש הבסיס.</p>
+</div>
+
+מי שמעדיף ודאות בוחר את {ALT.exposure}: ההחזר שלה לא זז לעולם, ולכן העלייה {f.shekels(`${ch}.rise`)}. {ALT.payment} נותנת את ההחזר הראשון הנמוך ביותר, אבל הלחץ מעלה אותו בעד {f.shekels("g.payment.b.rise")}. {ALT.total} נמצאת באמצע: סך התשלומים הנמוך ביותר, ומרווח של {f.shekels("g.total.b.margin60")} בלבד מעל התקציב.
+
+### בין שלושת הבנקים: למה בנק ב׳
+
+כל הקבועה בלבד אושרה בשלושה בנקים, והבחירה ביניהם היא לפי סך התשלומים. בנק ב׳ זול ב־{f.shekels("pick.gap_c")} מבנק ג׳ וב־{f.shekels("pick.gap_a")} מבנק א׳. ויש דבר שני: יחס ההחזר אצל בנק א׳ הוא {pc("g.exposure.a.ratio")}, {f.plain("pick.ratio_a_over")} נקודות אחוז מעל הקו של 40%, ואצל בנק ב׳ {pc(`${ch}.ratio`)}, {f.plain("pick.ratio_room")} נקודות אחוז מתחתיו. זה דגל, לא פסילה, אבל כדאי להיות מתחת לקו.
+
+<Callout title="הנחה של הקורס, לא ידיעה" tone="info">
+<p>״בנק ב׳ הוא הזול ביותר בכל שלוש החלופות״ נכון רק במחירון הבדוי של התרגיל. בשוק, ״הבנק הזול ביותר מתחלף לפי ריבעון, לפי עלות הכסף של כל בנק״ (ידע מהשטח, בנקאי בשטח, 2026-08-05; ממתין לאישור אילון). ההצעה האמיתית של בנק מחליפה את האומדן.</p>
+</Callout>
+
+### איזה מספר זה?
+
+כל המספרים שבטבלאות הם אומדן במחירון של התרגיל. לפני שמסתמכים עליהם צריך לדעת איזה סוג של מספר הם, כמו בשיעור 5.5:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">סוג המספר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מי עומד מאחוריו</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה הוא אומר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {NUMBER_KINDS.map((k) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900">{k.he}</td>
+          <td class="py-2 pe-3">{k.who}</td>
+          <td class="py-2 pe-3">{k.note}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+הטבלאות כאן הן אומדן ותרחיש. האישור העקרוני של הבנק ניתן על הבקשה המקורית, לא על {ALT.exposure}: **כל תמהיל הוא הצעה אחרת** (שיעור 6.8), ולכן אחרי ההמלצה פונים לבנק ב׳ ומבקשים הצעה בכתב על התמהיל המדויק. רק היא מחליפה את האומדן. ומה שייחתם בסוף הוא <Term t="עסקה שבוצעה" client:visible lesson="5.5">עסקה שבוצעה</Term>, מספר שלישי ושונה.
+
+## ההמלצה במספרים
+
+המלצה אחת, לעדיפות אחת: **{ALT.exposure} אצל {BANK.b}.** ההלוואה {f.shekels("in.loan")} (<Term t="שיעור מימון" client:visible lesson="1.2">שיעור המימון</Term> {pc(`${ch}.ltv`)}), במסלול אחד קבוע ולא צמוד בריבית {f.plain(`${ch}.rate_1`)}% ל־30 שנה.
+
+<div class="my-6 grid gap-4 sm:grid-cols-2">
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="!mt-0 text-body-l font-semibold text-n900">מה זה עולה</p>
+    <p class="mt-2 text-body-m text-n700">החזר חודשי קבוע: <span class="ltr whitespace-nowrap">{nv(f.raw(`${ch}.first`))}</span> ₪.</p>
+    <p class="mt-2 text-body-m text-n700">סך התשלומים: <span class="ltr whitespace-nowrap">{nv(f.raw(`${ch}.total`))}</span> ₪.</p>
+    <p class="mt-2 text-body-m text-n700">יחס החזר <span class="ltr">{pc(`${ch}.ratio`)}</span>: מתחת לקו של 40% במרווח של <span class="ltr whitespace-nowrap">{nv(f.raw("ch.room40"))}</span> ₪ בחודש.</p>
+    <p class="mt-2 text-body-m text-n700">מעל תקציב המחיה נשארים <span class="ltr whitespace-nowrap">{nv(f.raw(`${ch}.margin60`))}</span> ₪ בחודש.</p>
+    <p class="mt-2 text-body-m text-n700">חסכונות אחרי התוכנית: <span class="ltr whitespace-nowrap">{nv(f.raw("in.reserve_after"))}</span> ₪.</p>
+  </div>
+  <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+    <p class="!mt-0 text-body-l font-semibold text-n900">מה הם משלמים על הוודאות</p>
+    <p class="mt-2 text-body-m text-n700">לעומת {ALT.total}: סך התשלומים גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_total"))}</span> ₪, וההחזר החודשי <em>נמוך</em> ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_total"))}</span> ₪.</p>
+    <p class="mt-2 text-body-m text-n700">לעומת {ALT.payment}: ההחזר הראשון גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_payment"))}</span> ₪, אבל סך התשלומים נמוך ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_payment"))}</span> ₪, ואין עלייה בלחץ.</p>
+    <p class="mt-2 text-body-m text-n700">מה שהם נותנים בפועל: החזר ראשון גבוה מזה של {ALT.payment}, והגבלה למסלול אחד.</p>
+  </div>
+</div>
+
+**חלופה סבירה אחרת.** אם העדיפות של נועם ושירה הייתה ההחזר הראשון הנמוך ביותר, {ALT.payment} אצל {BANK.b} הייתה בחירה סבירה: החזר ראשון {f.shekels("g.payment.b.first")}, יחס {pc("g.payment.b.ratio")} והנחה של {f.plain("g.payment.b.relief")} נקודות אחוז מהמחירון. המחיר הוא חשיפה למדד ולריבית: בלחץ ההחזר עולה בעד {f.shekels("g.payment.b.rise")}, והמשפחה צריכה להסכים לזה מראש. ואם העדיפות הייתה סך תשלומים נמוך, {ALT.total} אצל {BANK.b} חוסכת {f.shekels("pc.total_vs_total")}, במרווח דק של {f.shekels("g.total.b.margin60")} מעל התקציב וביחס החזר {pc("g.total.b.ratio")}, מעל הקו של 40%. שלוש בחירות, שלוש עדיפויות. הדוח שלכם צריך לומר איזו עדיפות הוא מניח.
+
+<Section kind="חלק 2">
+
+## תוכנית המשא ומתן
+
+</Section>
+
+הכלים כאן הם של שיעורים 6.6–6.8, והכללים של הסבבים הם כללי התרגיל (סבב אחד לוקח {f.plain("o.round_days")} ימי עסקים, ואחריו צריכים להישאר {f.plain("o.round_reserve")} ימים; הקורס לא יודע כמה זמן לוקח סבב אצל בנק אמיתי).
+
+### השעון
+
+האישורים ניתנו על הבקשה שנשלחה ב־{d("o.request")}. תוקף כל אישור הוא {f.plain("o.window")} ימי לוח מתאריך האישור (לא אומת, לפי תעתיק של הצוות להוראה 451). אישור בנק ב׳ ניתן ב־{d("o.b.approved")} ותקף עד {d("o.b.valid_until")}: ב־{d("in.today")} נשארו {f.plain("o.b.left")} ימים. התוקף של בנק א׳ נגמר קודם, ב־{d("o.a.valid_until")}, והוא קובע עד מתי אפשר להשאיר אותו כחלופה. ההחלטה של בנק ישראל ב־{d("o.decision")} נופלת בתוך התוקף, בעוד {f.plain("o.decision_in")} ימים; ההמלצה בנויה מסלול אחד קבוע לא צמוד, ולכן המודל לא מזיז אותו בהחלטה הזו. אם בנק משנה גם ריבית קבועה לפני חתימה: לא ידוע, ושואלים בכתב.
+
+### מה מבקשים
+
+1. **הצעה בכתב על התמהיל המדויק** מבנק ב׳, ומבקשים אותה גם מבנקים א׳ ו־ג׳, באותו סכום ובאותה תקופה, כדי שאפשר יהיה להשוות (שיעור 5.3).
+2. **סבב אחד של הנחה בריבית.** בתרגיל הסבב מוריד {f.plain("r1.points")} נקודת אחוז מהריבית: החזר נמוך ב־{f.shekels("r1.first")} בחודש, וסך תשלומים נמוך ב־{f.shekels("r1.total")}. אם הבנק נענה, סבב שני של {f.plain("r2.points")} נקודת אחוז חוסך עוד {f.shekels("r2.total")}.
+3. **שאלות בכתב:** איפה הקו של יחס ההחזר ואם הוא נמדד לפי המחירון או לפי הריבית הסופית; מה מוחזק בריבית ועד מתי; מאיזה תאריך נספר התוקף.
+
+הנתון החשוב: אין בטבלה הצעה זולה יותר מזו של בנק ב׳, ולכן אין <Term t="הצעה מתחרה" client:visible lesson="6.7">הצעה מתחרה</Term> להראות לו כמנוף. המשא ומתן כאן קטן ממה שהיה בשיעור 6.7. אם סבב נוסף משפר הצעה: לא ידוע.
+
+### מתי עוצרים
+
+הכלל של התרגיל (שיעור 6.7): עוצרים כשהסבב הבא לא נכנס בתוקף, או כשהסבב האחרון חסך פחות מקו שהמשפחה קבעה, כאן {f.shekels("o.threshold")} על פני חיי ההלוואה. הסבב הראשון חוסך {f.shekels("r1.total")} והשני {f.shekels("r2.total")}, שניהם מעל הקו; סך שני הסבבים {f.shekels("r.both_total")}. הסבב שמתחיל ב־{d("in.today")} נכנס, ואפשר להתחיל סבב עד {d("o.round.latest")} ועדיין להספיק. בתוך התוקף של בנק ב׳ נכנסים {f.plain("o.rounds_count")} סבבים בסך הכול. הקו הוא בחירה של המשפחה ולא כלל של בנק.
+
+### מה לא מוותרים עליו
+
+- **על ההשוואה.** אם הבנק עונה בהצעה על תמהיל אחר (<Term t="הצעה נגדית" client:visible lesson="6.8">הצעה נגדית</Term>), היא לא נמדדת ברמה של הריבית בלבד: מחשבים מחדש את כל הטבלה לתמהיל החדש. ״הנחה בתמורה למסלול משתנה״ משנה את החשיפה, ואז ההמלצה כבר אחרת.
+- **על ההצעה בכתב.** הבנק שנבחר נותן הצעה על התמהיל המדויק. דברים בעל פה אינם מחליפים אותה.
+- **על התוקף של האחרים.** אישור של בנק שנפסל עדיין תקף, ועלול להיות חלופה אם משהו קורס: לא נותנים לו לפוג בלי לבדוק.
+- **על ביטוח מחוץ לבנק.** הבנק חייב להודיע שמותר לבטח בחוץ (לא אומת, לפי תעתיק של הצוות להוראה 451). משווים לפני שמקבלים חבילה.
+- **על האמת.** שום מיקוח לא כולל מסמך שאינו נכון, הכנסה מנופחת או התחייבות מוסתרת (<Term t="מידע לא נכון" client:visible lesson="6.5">מידע לא נכון</Term>, החלטה של Mogi, 2026-08-31).
+- **על העצמאות של הלקוח.** הלקוח מחליט מתי מספיק, והיועץ מציג מחיר בשקלים. ״אנחנו מחליטים מתי מספיק״ היא עמדה של הצוות מאוגוסט 2026 ולא כלל רשום.
+
+<Section kind="חלק 3">
+
+## בין האישור לבין העמדת הכסף
+
+</Section>
+
+אחרי שבוחרים בנק, מתחיל החצי השני של התהליך. הסדר הוא התיאור של הצוות, ובפועל הוא משתנה בין בנקים ועסקאות (שיעור 1.7). הנה מה שקורה, ומה יכול להשתנות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השלב</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה קורה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה יכול להשתנות</th>
+        <th class="py-2 pe-3 text-start font-semibold">הסטטוס של הידיעה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="פתיחת תיק" client:visible lesson="1.7">פתיחת תיק</Term> וחיתום</td>
+        <td class="py-2 pe-3">הבנק מקבל מסמכים וקורא אותם בפעם הראשונה (<Term t="חיתום" client:visible lesson="1.7">חיתום</Term>): מ־<Term t="מוצהר" client:visible lesson="4.7">מוצהר</Term> ל־<Term t="מאומת" client:visible lesson="4.7">מאומת</Term>.</td>
+        <td class="py-2 pe-3">פער בין מה שנמסר למסמכים. כל פער שנשאל ב־9.1 חייב להיסגר בכתב.</td>
+        <td class="py-2 pe-3">מחקר של הצוות; לפי מה שהצוות מצא באוגוסט 2026, שום הוראה לא קובעת כמה זמן החיתום לוקח (לא אומת).</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="שמאות" client:visible lesson="1.7">שמאות</Term></td>
+        <td class="py-2 pe-3">שמאי מהרשימה של הבנק מעריך את הנכס. מזמינים אותו, והלקוח משלם.</td>
+        <td class="py-2 pe-3">ערך נמוך מהמחיר: הלוואה גדולה מדי לתקרה (למטה).</td>
+        <td class="py-2 pe-3">ידע מהשטח, ממתין לאישור אילון. מה בנק עושה בשמאות נמוכה: לא ידוע.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">עורך דין ו<Term t="טאבו" client:visible lesson="1.6">טאבו</Term></td>
+        <td class="py-2 pe-3">עורך הדין בודק את הנכס והרישום ומקבל הוראה לאן הכסף עובר. לפני העמדה נרשמת <Term t="הערת אזהרה" client:visible lesson="1.7">הערת אזהרה</Term>, ואחר כך המשכנתא.</td>
+        <td class="py-2 pe-3">הערת אזהרה של אחר או נכס שרשום ברשות מקרקעי ישראל: עיכוב של חודשים.</td>
+        <td class="py-2 pe-3">ידע מהשטח, ממתין לאישור אילון. מה עורך הדין בודק ומה הוא חייב: שאלה לעורך הדין.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תוקף האישור</td>
+        <td class="py-2 pe-3">התנאים תקפים עד {d("o.b.valid_until")}; עד אז צריך שהשמאות, החתימה וההעמדה ייכנסו.</td>
+        <td class="py-2 pe-3">עיכוב באחד השלבים שדוחק מעבר לתוקף: מבקשים הארכה או אישור חדש לפני שהוא נגמר.</td>
+        <td class="py-2 pe-3">לא אומת, לפי תעתיק של הצוות. אם הארכה אפשרית ובאילו תנאים: לא ידוע.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">ביטוחים וחתימה</td>
+        <td class="py-2 pe-3"><Term t="ביטוח חיים" client:visible lesson="4.9">ביטוח חיים</Term> וביטוח מבנה, והסכם ההלוואה. הלקוח קורא וחותם בעצמו.</td>
+        <td class="py-2 pe-3">מחיר ביטוח שונה בין הבנק לחוץ.</td>
+        <td class="py-2 pe-3">לא אומת, לפי תעתיק של הצוות להוראה 451; בפועל כמעט כל הבנקים דורשים ביטוח חיים (ידע מהשטח).</td>
+      </tr>
+      <tr class="align-top">
+        <td class="py-2 pe-3 font-semibold text-n900"><Term t="העמדת הלוואה" client:visible lesson="1.7">העמדה</Term></td>
+        <td class="py-2 pe-3">הבנק מעביר את הכסף, בדרך כלל למוכר, לפי ההוראה לעורך הדין.</td>
+        <td class="py-2 pe-3">תנאי אחרון שלא נסגר.</td>
+        <td class="py-2 pe-3">ידע מהשטח, לא נבדק.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+שני דברים בטבלה הם מספרים, ושניהם שייכים לדוח.
+
+### שמאות נמוכה
+
+הבנק מודד את שיעור המימון מול הערך שקבע השמאי, לא מול המחיר (ידע מהשטח, ממתין לאישור אילון; ובעסקה כזו הערך שמשתמשים בו הוא הנמוך מבין השניים, כפי שבשיעור 4.9, לפי תעתיק של הצוות, לא אומת). ההלוואה שהומלצה, {f.shekels("in.loan")}, יושבת על התקרה של {f.plain("in.ceiling")}% כשהשווי {f.shekels("ap.break_even")}. זו הנוסחה מ־1.2, הפוכה:
+
+<M>V = P × 100 ÷ 75 = {n("in.loan")} × 100 ÷ 75 = {n("ap.break_even")}</M>
+
+<dl class="my-4 grid gap-1 text-body-m sm:grid-cols-[auto_1fr] sm:gap-x-4">
+  <dt class="font-semibold text-n900">V</dt><dd>השווי הנמוך ביותר שבו ההלוואה עדיין בתקרה, בשקלים.</dd>
+  <dt class="font-semibold text-n900">P</dt><dd>סכום ההלוואה, בשקלים.</dd>
+  <dt class="font-semibold text-n900">75</dt><dd>התקרה של שיעור המימון לדירה יחידה, באחוזים (לא אומת, לפי תעתיק של הצוות להוראה 329).</dd>
+</dl>
+
+המרווח מהמחיר הוא {f.shekels("ap.margin")}: שמאות שנמוכה מהמחיר ביותר מזה חותכת את התקרה. הטבלה מראה שלוש שמאויות:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שמאות, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">שיעור מימון</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההלוואה המרבית, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">הון נוסף שנדרש, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">נשאר מהחסכונות, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["2175000", "2150000", "2100000"].map((v) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr whitespace-nowrap">{nv(f.raw(`ap.${v}.value`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(`ap.${v}.ltv`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw(`ap.${v}.max_loan`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{v === "2175000" ? "0" : nv(f.raw(`ap.${v}.extra`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{v === "2175000" ? nv(f.raw("in.reserve_after")) : nv(f.raw(`ap.${v}.left`))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההלוואה {nv(f.raw("in.loan"))} ₪, התקרה {f.plain("in.ceiling")}%, החסכונות שנשארו אחרי התוכנית {nv(f.raw("in.reserve_after"))} ₪. מספר שלילי: חסר.</p>
+</div>
+
+בשמאות הנמוכה ביותר חסרים {f.shekels("ap.2100000.short")} גם אחרי שכל החסכונות נכנסים. מה עושים אז: מוסיפים הון ממקור אחר, מקטינים את ההלוואה ומשלימים מחוץ לבנק, מערערים על השמאות, או בודקים בנק אחר שמקבל שמאות שנעשתה לבנק קודם (עד {f.plain("ap.reuse_days")} יום, בתנאים). איזו דרך פתוחה בפועל: לא ידוע, וזו שאלה לאילון.
+
+### ריבית שזזה בזמן ההמתנה
+
+ההמלצה היא מסלול אחד קבוע, ולכן אין בה מסלול פריים שזז. עדיין לא ידוע מה הבנק מחזיק בין האישור לחתימה, ואם ריבית קבועה נשארת כמו שהיא. הטבלה היא ״מה אם״, לא תחזית: מה קורה ליחס ההחזר אם הבנק מעלה את הריבית של המסלול לפני החתימה.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">עלייה בריבית, נקודות אחוז</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מול הקו של 40%</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר חודשי גבוה ב־, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים גבוה ב־, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">0</td>
+        <td class="py-2 pe-3"><span class="ltr">{pc(`${ch}.ratio`)}</span></td>
+        <td class="py-2 pe-3">מתחת, מרווח של <span class="ltr whitespace-nowrap">{nv(f.raw("ch.room40"))}</span> ₪ בחודש</td>
+        <td class="py-2 pe-3">—</td>
+        <td class="py-2 pe-3">—</td>
+      </tr>
+      {[0, 1, 2].map((k) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{f.plain(`mv.${k}.pts`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(`mv.${k}.ratio`)}</span></td>
+          <td class="py-2 pe-3">{f.plain(`mv.${k}.flag`) === "over" ? "מעל" : "מתחת"}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw(`mv.${k}.first_up`))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{nv(f.raw(`mv.${k}.total_up`))}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ״מה אם״ של הקורס: הריביות בטבלה אינן תחזית. המסלול קבוע לא צמוד, בתרחיש הבסיס.</p>
+</div>
+
+המרווח של ההמלצה מהקו הוא {f.shekels("ch.room40")} בחודש, וזה פחות מההחזר הנוסף כבר בעלייה של {f.plain("mv.1.pts")} נקודת אחוז ({f.shekels("mv.1.first_up")}). זה לא סירוב: בכללי התרגיל הקו של 40% הוא דגל, ובנק ב׳ מסרב רק מעל {f.plain("rule.b_ratio_max")}%. אבל זה אומר שהמרווח של ההמלצה דק, ושאלת התוקף והריבית המוחזקת נכנסת לדוח.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## כותבים את הדוח
+
+</Section>
+
+הכלי הבא הוא תבנית של דוח המלצה. בצעד 1 בוחרים חלופה ובנק מהטבלה, בצעד 2 כותבים את שמונת חלקי הדוח (לכל אחד רשימת בדיקה עצמית קצרה), ובצעד 3 עוברים על הבדיקות לפני העמדת ההלוואה. הדוח אינו מקבל ציון. אפשר לבחור חלופה אחרת מזו שבדוגמה: מה שחשוב הוא שכל בחירה מגיעה עם נימוק, מחיר וסיכון בכתב.
+
+<RecommendationReport
+  client:visible
+  id="9.3-report"
+  title="דוח המלצה: נועם ושירה"
+  mark={MARK}
+  alternatives={ALTS.map((a) => ({ id: a, name: ALT[a] }))}
+  banks={BANKS4.map((b) => ({ id: b, name: BANK[b] }))}
+  altColumns={[
+    { key: "first", label: "החזר ראשון, ₪" },
+    { key: "total", label: "סך תשלומים, ₪" },
+    { key: "rise", label: "עלייה בלחץ, ₪" },
+    { key: "margin", label: "מעל התקציב, ₪" },
+  ]}
+  altRows={altRows}
+  bankColumns={[
+    { key: "decision", label: "תוצאה" },
+    { key: "ratio", label: "יחס החזר" },
+    { key: "total", label: "סך תשלומים, ₪" },
+    { key: "margin", label: "מעל התקציב, ₪" },
+  ]}
+  bankRows={bankRowsByAlt}
+  chooseNote="המספרים אומדן במחירון התרגיל. החלופות מוצגות כפי שבנק ב׳ קורא אותן, והבנקים כפי שהם קוראים את החלופה שבחרתם."
+  sections={[
+    { id: "one", title: "ההמלצה בשורה אחת", prompt: "מה נבחר, אצל איזה בנק, ולאיזו עדיפות של המשפחה.", placeholder: "ממליצים על ... אצל ... כי ...", must: ["אומר איזו עדיפות של המשפחה הוא מניח, ושזו הנחה", "מזכיר חלופה אחת סבירה שנפסלה"] },
+    { id: "why", title: "הנימוקים", prompt: "איך הבחירה עברה את המסננים הקשיחים, ומה הכריע בין מה שנשאר.", must: ["אומר אילו בנקים או חלופות נפסלו בגלל סירוב או בגלל התקציב", "מציג לפחות שני מספרים מהטבלה", "אומר שהמספרים אומדן ולא הצעה"] },
+    { id: "price", title: "המחיר", prompt: "מה ההמלצה עולה: החזר ראשון, סך תשלומים, יחס החזר והמרווח מהקו, הכרית שנשארת.", must: ["החזר ראשון וסך תשלומים", "המרווח מקו ה־40% ומתקציב המחיה", "הכרית של החסכונות אחרי התוכנית"] },
+    { id: "rejected", title: "מה לא נבחר ולמה", prompt: "שורה לכל חלופה אחרת: מה היא נותנת ומה גרם לפסילה.", must: ["יש שורה לכל חלופה", "הסיבה מבוססת על מספר ולא על טעם"] },
+    { id: "negotiation", title: "תוכנית המשא ומתן", prompt: "מה מבקשים, כמה סבבים, מתי עוצרים, ומה לא מוותרים עליו.", must: ["תאריכי התוקף וכמה סבבים נכנסים", "קו עצירה בשקלים", "מה לא מוותרים עליו"] },
+    { id: "between", title: "בין האישור להעמדה", prompt: "שמאות, ריבית שזזה, תוקף, תנאים: מה יכול להשתנות ומה עושים.", must: ["השווי שמתחתיו ההלוואה חורגת מהתקרה", "מה עושים אם הריבית או השמאות משתנות", "מה לא ידוע"] },
+    { id: "unknown", title: "מה לא ידוע", prompt: "שאלות פתוחות לבנק, לעורך הדין ולאילון, ואיך שואלים אותן.", must: ["כל שאלה נשאלת כך שהתשובה תהיה בכתב", "לא מוצג ניחוש כידיעה"] },
+    { id: "review", title: "מתי בוחנים מחדש", prompt: "אילו אירועים, או איזה תאריך, יחזירו את ההחלטה לשולחן (9.4 מפתחת את זה).", must: ["לפחות שני אירועים או תאריך אחד", "ההחלטה על התאריך היא של המשפחה"] },
+  ]}
+  checklist={checklist}
+/>
+
+נסו שלוש משימות:
+1. **בחרו ושנו.** בחרו חלופה ובנק וכתבו את החלק הראשון. אחר כך החליפו חלופה: מה בטקסט שלכם כבר לא נכון?
+2. **הצביעו על הסכנה.** בחלק ״בין האישור להעמדה״ כתבו שני סכומים או תאריכים מהדף ומה עושים אם הם משתנים.
+3. **סמנו מה פתוח.** עברו על רשימת הבדיקות וסמנו רק מה שכבר סגור בתיק של נועם ושירה. כמה פתוח, ולפי מה בתיק?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>בחלופה אחרת משתנים העדיפות שהדוח מניח, המחיר והדגל: ב־{ALT.payment} ההחזר הראשון נמוך ({f.shekels("g.payment.b.first")}) אבל העלייה בלחץ גבוהה ({f.shekels("g.payment.b.rise")}); ב־{ALT.total} המרווח מהתקציב דק ({f.shekels("g.total.b.margin60")}). בנק ד׳ מסרב בכל החלופות.</li>
+    <li>למשל: השווי {f.shekels("ap.break_even")} שמתחתיו ההלוואה חורגת, ואם השמאות {f.shekels("ap.2100000.value")} חסרים {f.shekels("ap.2100000.short")}; וגם התוקף של בנק ב׳ עד {d("o.b.valid_until")}.</li>
+    <li>מ־9.1 עדיין פתוחים: דוח קרן ההשתלמות, ההעברה של המתנה, ההפרש בהפקדה של נועם והתשלום החד־פעמי של שירה, והחוזה שעוד לא חתום. אלה סעיפי רשימת הבדיקות על מסמכים, וכדאי שהדוח יכתוב שהם נסגרים לפני ההעמדה.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="9.3"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "לא: הבנק מודד את שיעור המימון מול הערך שהשמאי קבע כשהוא נמוך מהמחיר (לפי תעתיק של הצוות, לא אומת). המחיר בחוזה הוא מה שהמשפחה משלמת, לא הערך שהבנק מלווה מולו.",
+    "זה קרוב, אבל לא נכון: ההלוואה לא יורדת בכל הפער. היא צריכה לרדת רק עד שהיא חוזרת לתקרה, כלומר בפחות מהפער.",
+    "",
+    "לא: בכללי התרגיל בנק מסרב מעל התקרה. מה בנק אמיתי היה עושה: לא ידוע.",
+  ]}
+>
+  שיעור המימון על שמאות של {f.shekels("ap.2100000.value")} הוא {f.plain("ap.2100000.ltv")}%, מעל {f.plain("in.ceiling")}%. כדי לחזור לתקרה ההלוואה צריכה לרדת ל־{f.shekels("ap.2100000.max_loan")}, כלומר ב־{f.shekels("ap.2100000.extra")}, והחסכונות שנשארו הם {f.shekels("in.reserve_after")}. חסרים {f.shekels("ap.2100000.short")}. מי שבדק רק את הפער במחיר ({f.shekels("ap.2100000.under")}) הגזים; מי שחשב שהשמאות לא משנה, טעה. וזה חישוב: מה בנק אמיתי עושה, ומה אפשרי מבחינת פתרון, לא ידוע.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## סבב משא ומתן אחד, שורה אחר שורה
+
+</Section>
+
+בנק ב׳ הציע את ההלוואה על התמהיל המדויק, בריבית {f.plain(`${ch}.rate_1`)}%. המשפחה רוצה לדעת אם כדאי לבקש עוד סבב. כתבו את הרשומה של הסבב.
+
+**צעד 1 — מה מבקשים.** הנחה של {f.plain("r1.points")} נקודת אחוז על הריבית.
+
+**צעד 2 — מה זה שווה.** ההחזר החודשי יורד ב־{f.shekels("r1.first")}, וסך התשלומים על חיי ההלוואה ב־{f.shekels("r1.total")}.
+
+**צעד 3 — האם נכנס בתוקף.** הסבב מתחיל ב־{d("in.today")}, והתשובה מגיעה ב־{d("o.round.answer")} ({f.plain("o.round_days")} ימי עסקים). אחריה צריכים להישאר {f.plain("o.round_reserve")} ימים עד סוף התוקף, {d("o.b.valid_until")}. הסבב נכנס.
+
+**צעד 4 — האם שווה.** החיסכון {f.shekels("r1.total")} גדול מהקו שהמשפחה קבעה, {f.shekels("o.threshold")}, ולכן עושים את הסבב. אם הבנק מאשר, אפשר לבקש עוד {f.plain("r2.points")} נקודת אחוז, ועוד {f.shekels("r2.total")}.
+
+**צעד 5 — הרשומה.** ״מבקשים הנחה של {f.plain("r1.points")} נקודת אחוז מבנק ב׳ ב־{d("in.today")}. תשובה צפויה ב־{d("o.round.answer")}. חיסכון אפשרי: {f.shekels("r1.total")} בסך התשלומים. מתחת לקו של {f.shekels("o.threshold")}: עוצרים. לא ידוע: אם הבנק יענה, ובכמה.״
+
+<Section kind="דוגמה חצי פתורה">
+
+## כמה הון נוסף נדרש
+
+</Section>
+
+הלוואה של {f.shekels("in.loan")}, תקרה של {f.plain("in.ceiling")}%. השלימו לכל שמאות את ההון הנוסף שנדרש ואת מה שנשאר מהחסכונות ({f.shekels("in.reserve_after")}). השורה הראשונה מלאה.
+
+<FillTable
+  client:visible
+  id="9.3-half"
+  rowKey="appraisal"
+  periodLabel="השמאות"
+  columns={[
+    { key: "value", label: "ערך השמאות" },
+    { key: "max", label: "ההלוואה המרבית" },
+    { key: "extra", label: "הון נוסף שנדרש" },
+    { key: "left", label: "נשאר מהחסכונות" },
+  ]}
+  rows={halfRows}
+  blanks={["בקצה.extra", "בקצה.left", "נמוכה.extra"]}
+  success={`נכון. בשמאות שבקצה צריך ${f.shekels("ap.2150000.extra")} ונשארים ${f.shekels("ap.2150000.left")}. בשמאות הנמוכה צריך ${f.shekels("ap.2100000.extra")}, יותר ממה שנשאר, והתיק חסר ${f.shekels("ap.2100000.short")}.`}
+  hint="הון נוסף: ההלוואה פחות ההלוואה המרבית. מה שנשאר: החסכונות פחות ההון הנוסף."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים, הבנקים והכללים בתרגילים בדויים. התרגילים מסודרים מהקל אל המאתגר, וכולם נשענים על הטבלאות של היחידה. בנו אותם בעזרת מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="9.3-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "יחס ההחזר גבוה מהקו של בנק ד׳", feedback: "בנק ד׳ מסרב על שיעור המימון, לא על יחס ההחזר." },
+    { text: `שיעור המימון, ${f.plain("g.exposure.d.ltv")}%, מעל התקרה של בנק ד׳ (${f.plain("rule.d_ceiling")}%), בכל שלוש החלופות`, correct: true, feedback: "נכון. שיעור המימון תלוי בהלוואה ובמחיר, לא בחלופה, ולכן הסירוב זהה בכל החלופות." },
+    { text: "הריבית של בנק ד׳ גבוהה מדי", feedback: "מחיר אינו סיבה לסירוב בכללי התרגיל. בנק ד׳ לא מגיע בכלל לשלב המחיר." },
+    { text: "תקציב המחיה נשבר אצלו", feedback: "תקציב המחיה נבדק רק בצירופים שהבנק מאשר, ובנק ד׳ לא מאשר." },
+  ]}
+>
+  למה בנק ד׳ נפסל בשלושת החלופות?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="9.3-2"
+  n={2}
+  level="קל"
+  unit="₪"
+  answer={f.raw("ch.room40")}
+  errors={[
+    { value: f.raw(`${ch}.margin60`), message: "זה המרווח מעל תקציב המחיה. השאלה היא המרווח מהקו של 40% ביחס ההחזר." },
+    { value: f.raw("ch.line"), message: "זה ההחזר שנמצא בדיוק על הקו. השאלה כמה ההחזר של ההמלצה מתחתיו." },
+  ]}
+>
+  ההחזר שעל הקו של 40% הוא {f.shekels("ch.line")} בחודש, וההחזר שהבנק קורא בהמלצה הוא {f.shekels("ch.qual")}. בכמה שקלים בחודש ההמלצה מתחת לקו?
+</NumericExercise>
+
+<Solution for="9.3-2">
+<M>{n("ch.line")} − {n("ch.qual")} = {n("ch.room40")}</M> ₪ בחודש. זה פחות מההחזר הנוסף בעלייה של {f.plain("mv.1.pts")} נקודת אחוז בריבית ({f.shekels("mv.1.first_up")}).
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.3-3"
+  n={3}
+  level="בינוני"
+  unit="₪"
+  answer={f.raw("pc.total_vs_total")}
+  errors={[
+    { value: f.raw("pc.total_vs_payment"), message: "זה ההפרש מול החלופה הצמודה, בכיוון ההפוך. השאלה היא מול 25 שנה." },
+    { value: f.raw("pc.first_vs_total"), message: "זה ההפרש בהחזר הראשון בחודש. השאלה היא על סך התשלומים." },
+  ]}
+>
+  אצל בנק ב׳ סך התשלומים של {ALT.exposure} הוא {f.shekels(`${ch}.total`)}, ושל {ALT.total} {f.shekels("g.total.b.total")}. בכמה שקלים הקבועה בלבד יקרה יותר בסך הכול?
+</NumericExercise>
+
+<Solution for="9.3-3">
+<M>{n(`${ch}.total`)} − {n("g.total.b.total")} = {n("pc.total_vs_total")}</M> ₪. בתמורה ההחזר החודשי נמוך ב־{f.shekels("pc.first_vs_total")} והמרווח מהתקציב גדול ב־{f.shekels("pc.margin_vs_total")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.3-4"
+  n={4}
+  level="בינוני"
+  unit="₪"
+  answer={f.raw("ap.2150000.extra")}
+  errors={[
+    { value: f.raw("ap.2150000.under"), message: "זה הפער בין המחיר לשמאות. ההון הנוסף הנדרש קטן ממנו: הוא רק מה שצריך כדי לחזור לתקרה." },
+    { value: f.raw("ap.2150000.left"), message: "זה מה שנשאר מהחסכונות אחרי שהוספתם את ההון. השאלה היא כמה להוסיף." },
+  ]}
+>
+  השמאי מעריך את הדירה ב־{f.shekels("ap.2150000.value")}, ולפי התקרה של {f.plain("in.ceiling")}% ההלוואה המרבית היא {f.shekels("ap.2150000.max_loan")}. ההלוואה שהומלצה היא {f.shekels("in.loan")}. כמה הון נוסף צריך להוסיף?
+</NumericExercise>
+
+<Solution for="9.3-4">
+<M>{n("in.loan")} − {n("ap.2150000.max_loan")} = {n("ap.2150000.extra")}</M> ₪. מהחסכונות ({f.shekels("in.reserve_after")}) נשארים {f.shekels("ap.2150000.left")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.3-5"
+  n={5}
+  level="בינוני"
+  unit="ימים"
+  answer={f.raw("o.b.left")}
+  errors={[
+    { value: f.raw("o.a.left"), message: "זה מספר הימים שנשארו בתוקף של בנק א׳. השאלה היא על בנק ב׳." },
+    { value: f.raw("o.window"), message: "זה אורך התוקף כולו, ולא כמה ימים נשארו ממנו." },
+  ]}
+>
+  האישור של בנק ב׳ תקף עד {d("o.b.valid_until")}. כמה ימים נשארו ממנו ב־{d("in.today")}?
+</NumericExercise>
+
+<Solution for="9.3-5">
+מ־{d("in.today")} עד {d("o.b.valid_until")}: {f.plain("o.b.left")} ימים. התוקף של בנק א׳, {d("o.a.valid_until")}, נגמר קודם.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.3-6"
+  n={6}
+  level="בינוני"
+  unit="₪"
+  answer={f.raw("r1.total")}
+  errors={[
+    { value: f.raw("r1.first"), message: "זה החיסכון בהחזר החודשי. השאלה היא על סך התשלומים על פני חיי ההלוואה." },
+    { value: f.raw("r.both_total"), message: "זה החיסכון של שני הסבבים יחד. השאלה היא על הסבב הראשון." },
+  ]}
+>
+  בסבב הראשון הבנק מוריד {f.plain("r1.points")} נקודת אחוז מהריבית של ההמלצה. בכמה שקלים קטן סך התשלומים?
+</NumericExercise>
+
+<Solution for="9.3-6">
+החזר חודשי נמוך ב־{f.shekels("r1.first")}, וסך התשלומים על חיי ההלוואה נמוך ב־{f.shekels("r1.total")}. הוא מעל הקו של {f.shekels("o.threshold")}, ולכן עושים את הסבב.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="9.3-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "מקבלים: הריבית נמוכה יותר, ולכן ההצעה טובה יותר", feedback: "ריבית נמוכה על מסלול אחר אינה שווה לריבית נמוכה על אותו מסלול. מסלול משתנה משנה את החשיפה, והמסנן של ההמלצה." },
+    { text: "מחשבים מחדש את כל הטבלה לתמהיל החדש, כולל העלייה בלחץ והמרווח מהתקציב, ומחליטים אם העדיפות של המשפחה עדיין מתקיימת", correct: true, feedback: "נכון. הצעה על תמהיל אחר היא הצעה אחרת (שיעור 6.8). ההנחה בריבית לא שוקלת את מה שההמלצה נשענת עליו: החשיפה." },
+    { text: "דוחים: בנק ששינה את התמהיל איבד את אמון המשפחה", feedback: "זו אינה בדיקה. ייתכן שההצעה טובה, ומחשבים כדי לדעת." },
+    { text: "מבקשים הנחה גם על התמהיל הקבוע, ומוותרים על הבדיקה", feedback: "ויתור על הבדיקה הוא ויתור על ההשוואה, והיא אחד הדברים שלא מוותרים עליהם." },
+  ]}
+>
+  בנק ב׳ משיב: ״נוריד {f.plain("r1.points")} נקודת אחוז אם תעברו לתמהיל עם מסלול משתנה לא צמוד״. מה עושים?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על דוח המלצה">
+<p><strong>מה זה?</strong> מסמך אחד שאומר מה נבחר, אצל מי, למה, כמה זה עולה, מה נפסל, מה לא ידוע ומה צריך להיות נכון עד שהכסף עובר.</p>
+<p><strong>למה זה קיים?</strong> כי בחירה בלי נימוק כתוב אי אפשר לבדוק, לא על ידי הלקוח, לא על ידי בודק ולא על ידי היועץ עצמו כעבור חודש.</p>
+<p><strong>איך זה עובד?</strong> מסננים קודם מה שהמשפחה לא יכולה לחיות איתו (סירוב, תקציב שנשבר), שואלים מה חשוב לה, בוחרים, ובודקים מחדש כל מספר על ההצעה הסופית. כל המספרים מחושבים בקוד; מודל שפה לא מחשב אף מספר.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההבדל בין {ALT.exposure} ל־{ALT.total} אצל אותו בנק הוא {f.shekels("pc.total_vs_total")} בסך התשלומים מול {f.shekels("pc.first_vs_total")} בחודש ומרווח של {f.shekels("pc.margin_vs_total")} בתקציב. כל אחד מהם נכון למשפחה אחרת.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כותבים את העדיפות, מראים את המחיר ואת מה שלא ידוע, ובודקים את הרשימה לפני שהכסף עובר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהיחידה
+
+</Section>
+
+- **שני מסננים ושאלה אחת:** בנק שמסרב יוצא, תקציב שנשבר בחודש הגרוע יוצא, ואז שואלים מה חשוב למשפחה. יחס החזר מעל 40% הוא דגל, לא פסילה.
+- **ההמלצה היא של העדיפות שהונחה:** {ALT.exposure} אצל {BANK.b}, ואחרות סבירות לעדיפויות אחרות. הדוח אומר איזו עדיפות הוא מניח, ושזו הנחה.
+- **משא ומתן קטן כשאין הצעה זולה יותר,** עם קו עצירה בשקלים וכלל שלא מוותרים על ההשוואה ועל ההצעה בכתב.
+- **בין האישור להעמדה** מה שמתיישן ומה שזז: התוקף, השמאות ({f.shekels("ap.break_even")} הוא הערך שמתחתיו ההלוואה חורגת), והריבית שהבנק מחזיק (לא ידוע מה).
+- **הטבלאות הן אומדן.** רק הצעה בכתב על התמהיל המדויק מחליפה אותו, ורק החוזה הוא עסקה.
+
+**בשיעור הבא — 9.4, הסבר כפול: מה נבחר, מה נפסל, מה המחיר, ומתי לבחון מחדש:** אותה החלטה, מוסברת פעם ללקוח בשפה פשוטה ופעם לבודק מקצועי בראיות.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "התיק של נועם ושירה (מחיר 2,200,000 ₪, הון עצמי, הכנסות, הלוואת רכב), תוכנית המיצוב של שיעור 6.11, שלוש החלופות של 5.8 ו־9.2, ארבעת הבנקים הבדויים ומחירוניהם (6.6–6.8) וכללי הסירוב וההנחה שלהם (6.9), שלושת התרחישים (8.10), תקציב המחיה של התיק (4.6): הכול בדוי, להמחשה, ואינו הצעת בנק או נתוני שוק. עדיפות המשפחה (ודאות) היא הנחה של הקורס. סבב משא ומתן של 3 ימי עסקים, 7 ימים אחריו, קו עצירה של 10,000 ₪, והעלאות הריבית של 0.05, 0.10 ו־0.25 נקודת אחוז הם כללים של התרגיל ו״מה אם״, לא תחזיות." },
+    { kind: "לא אומת", text: "תוקף האישור העקרוני: לפחות 24 ימי לוח מתאריך האישור; שמאות שנעשתה לבנק אחד לא תידחה שלא באופן סביר בבנק אחר עד 90 יום ובתנאים; הבנק מודיע שמותר לבטח בחוץ. לפי תעתיק של הצוות להוראה 451, ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "תקרת שיעור המימון של 75% לדירה יחידה (הוראה 329), והסף של 40% ביחס ההחזר כסף מחיר ולא סירוב (שיעור 4.5). לפי תעתיק של הצוות ב־Brain (עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "ההחלטה של בנק ישראל ב־23 בנובמבר 2026, לפי לוח ההחלטות משיעור 0.10 (תקציר של מקור רשמי; ממתין לבדיקה).", date: "2026-10-09" },
+    { kind: "ידע מהשטח", text: "אחרי בחירת הבנק: פתיחת תיק, שמאות משמאי מהרשימה של הבנק (הלקוח משלם), נסח טאבו, הערת אזהרה או נכס ברשות מקרקעי ישראל שמעכבים תיקים, הכסף עובר בדרך כלל למוכר לפי הוראה לעורך הדין, ביטוח חיים שכמעט כל הבנקים דורשים. טובי זמיר, 2026-08-05; אילון, 2026-07-27 ו־2026-09-16. ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "ידע מהשטח", text: "הבנק הזול ביותר מתחלף לפי ריבעון; כדאי למקד משא ומתן ב־2–3 בנקים; הפקיד לוחץ עם ״תוקף 24 יום״. בנקאי בשטח, 2026-08-05. ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "מחקר / הצעה", text: "תיאור הצוות של התהליך אחרי הבחירה (פתיחת תיק, חיתום, שמאות, ביטוחים, חתימה, העמדה) והמלצה לחכות לרשימות של כל הבנקים לפני שמזמינים שמאי. הסדר משתנה בין בנקים ועסקאות.", date: "2026-08-17" },
+    { kind: "החלטה של Mogi", text: "מיצוב אינו מידע לא נכון: לא מסתירים התחייבות, לא מנפחים הכנסה ולא מגישים מסמך שאינו נכון; נתון שסותר את מה שהלקוח אמר לא נשלח לבנק בלי לשאול אותו (2026-08-31). מודל שפה לא מחשב אף מספר (2026-07-29). אין קריאת מסמך של לקוח אמיתי בלי הסכמה חתומה.", date: "2026-08-31" },
+    { kind: "בדיקת חישוב", text: "כל המספרים ביחידה חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/casefile.ts (author A: offers, readings, plan), with bankpolicy.ts, outreach.ts, ltv.ts, regulation.ts, sensitivity.ts via scripts/lessons/lesson-9-3.ts and _recommend-facts.ts, data/lessons/9-3.json, rechecked by checks/kinds/recommend.py, casefile.py, scenarios.py, engine.py, bankpolicy.py, outreach.py, ltv.py, regulation.py, sensitivity.py, affordability.py. The choice and checklist: src/data/case-a-recommendation.ts. Components: RecommendationReport.vue. Field knowledge: FK-H-005, 027, 040-043, 046, 047, 048, 049, 052, 054, 055, 071, 079 (awaiting Eylon). Video: video/9-3.html. Questions for Eylon: research/stage-9-raw/eylon-9-B.md. */}
