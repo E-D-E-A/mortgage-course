@@ -58,7 +58,7 @@
  *   - Obligations: more than 18 months left → taken off the income; rent counts
  *     whatever is left on the lease when the borrower will not live in the home
  *     bought; an unknown end date counts (and is flagged); never counted twice.
- *     Directive 329, Appendix A, as the team transcribed it (Brain 67436545) —
+ *     Directive 329, Appendix A, as the team transcribed it —
  *     not checked against the directive. Exactly 18 months is NOT counted here
  *     ("more than"); one bank's questionnaire says "a year and a half or more",
  *     so the edge is an open question.
@@ -130,7 +130,7 @@ export function assessmentMonthly(annualNets: Numeric[], method: AssessmentMetho
   return sum(annualNets).div(TWELVE.mul(annualNets.length));
 }
 
-/** Mogi's three statuses for an income (Brain 67436545): counted, needs checking, not counted. */
+/** Mogi's three statuses for an income: counted, needs checking, not counted. */
 export type IncomeStatus = "included" | "review" | "excluded";
 
 /** One monthly income, as Mogi keeps it: what the borrower said, what is recognised, and the status. */
