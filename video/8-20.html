@@ -34,7 +34,7 @@
   <body>
     <div id="stage">
       <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
-      <div class="kicker">שיעור 8.20 · אומדן מול הצעת בנק</div>
+      <div class="kicker">שיעור 8.20 · אומדן מול הצעה</div>
       <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
     </div>
     <script type="module">
@@ -53,7 +53,7 @@
       const S = { title: [0, 7], four: [7, 38], same: [38, 70], reset: [70, 100], pairs: [100, 134], end: [134, 146] };
       window.duration = 146;
       window.cues = [
-        [1, 5.5, "מה בנק אמר, ומה אנחנו חשבנו."],
+        [1, 5.5, "מה בנק אמר, ומה חישב המודל."],
         [8, 15, "הריבית היא 4.4%. אבל איזה מספר זה?"],
         [15, 22, "ממוצע: רבים, בעבר. לא מחיר של בנק."],
         [22, 29, "אומדן: ניחוש של מודל לתיק הזה."],
@@ -64,8 +64,8 @@
         [62, 69.5, "הפערים הלכו לכיוונים הפוכים."],
         [71, 78, "מסלול משתנה: ברירת המחדל היא 5 שנים."],
         [78, 86, `ההצעה אומרת ${V.r2 === "84" ? "7" : V.r2} שנים.`],
-        [86, 93, "הכלל שהוחלט: תנאי ההצעה גוברים."],
-        [93, 99.5, `ברירת המחדל הגזימה ב־${V.resetGap} ₪.`],
+        [86, 93, "הכלל שהוחלט (המימוש לא הושלם): ההצעה גוברת."],
+        [93, 99.5, `בלחץ, ברירת המחדל הגזימה ב־${V.resetGap} ₪.`],
         [101, 108, "כל הצעה היא זוג: אומדן והצעה."],
         [108, 117, "שמונה זוגות: ההפרשים כולם חיוביים."],
         [117, 126, "הטווח של שמונה הזוגות לא כולל אפס."],
@@ -76,7 +76,7 @@
 
       window.render = (t) => {
         svg.replaceChildren();
-        if (inScene(t, S.title)) title(t, S.title, "מה בנק אמר", "ומה אנחנו חשבנו", "אומדן מול הצעת בנק");
+        if (inScene(t, S.title)) title(t, S.title, "מה בנק אמר", "ומה חישב המודל", "אומדן מול הצעת בנק");
         if (inScene(t, S.four)) {
           const o = vis(t, S.four);
           txt(640, 120, "״הריבית היא 4.4%״ — איזה מספר?", 38, { w: 700, o });
@@ -104,14 +104,14 @@
             ["סך תשלומים", `${V.et} ₪`, `${V.ot} ₪`, 22],
           ];
           txt(700, 200, "אומדן", 24, { fill: C.n600, o: after(t, S.same, 0.5, o) });
-          txt(420, 200, "הצעה", 24, { fill: C.teal, w: 700, o: after(t, S.same, 0.5, o) });
+          txt(400, 200, "הצעה", 24, { fill: C.teal, w: 700, o: after(t, S.same, 0.5, o) });
           rows.forEach(([label, a, b, from], k) => {
             const y = 230 + k * 70;
             const oa = after(t, S.same, from, o);
             box(160, y, 960, 56, oa);
             txt(1090, y + 38, label, 26, { anchor: "start", w: 700, o: oa });
-            txt(790, y + 38, a, 26, { anchor: "start", ltr: true, o: oa });
-            txt(490, y + 38, b, 26, { anchor: "start", ltr: true, w: 700, fill: C.teal, o: oa });
+            txt(640, y + 38, a, 26, { anchor: "start", ltr: true, o: oa });
+            txt(340, y + 38, b, 26, { anchor: "start", ltr: true, w: 700, fill: C.teal, o: oa });
           });
           txt(640, 540, "פערים בכיוונים הפוכים, ולכן כמעט לא נראים בסך", 24, { fill: C.n700, o: after(t, S.same, 26, o) });
           stamp(o);
@@ -129,9 +129,10 @@
             el("rect", { x: 1000 - w, y, width: w, height: 56, rx: 8, fill: color, opacity: o });
             if (g > 0.95) txt(1000 - w - 14, y + 40, `${num(val)} ₪`, 26, { anchor: "end", w: 700, ltr: true, o });
           });
+          txt(640, 436, "הכלל הוחלט · המימוש לא הושלם", 22, { fill: C.teal, w: 700, o: after(t, S.reset, 12, o) });
           const ob = after(t, S.reset, 18, o);
           box(250, 470, 780, 60, ob * 0.9, C.mint);
-          txt(640, 510, `הגזמה של ${V.resetGap} ₪ בסך התשלומים`, 28, { w: 700, o: ob });
+          txt(640, 510, `בתרחיש לחץ: הגזמה של ${V.resetGap} ₪`, 28, { w: 700, o: ob });
           stamp(o);
         }
         if (inScene(t, S.pairs)) {

@@ -4,7 +4,7 @@
  * threshold, and above it). Not data, not a finding about any bank. Status: "עתיד".
  */
 import type { LessonData } from "../build-data.ts";
-import { groupFact, percentFact, totalFact } from "./_drift-facts.ts";
+import { groupFact, intervalFact, percentFact, totalFact } from "./_drift-facts.ts";
 
 export const REASONS = { preference: 8, policy: 5, field: 4, mistake: 1, unclear: 2 };
 export const LOW = ["1.10", "1.25", "1.15", "1.30", "1.20", "1.05"];
@@ -21,7 +21,14 @@ export default function lesson825(): LessonData {
     groupFact("g.sd_low", LOW, HIGH, "sd_a"),
     groupFact("g.sd_high", LOW, HIGH, "sd_b"),
     groupFact("g.n_low", LOW, HIGH, "n_a"),
+    groupFact("g.sum_low", LOW, HIGH, "sum_a"),
     groupFact("g.n_high", LOW, HIGH, "n_b"),
+    intervalFact("g.step", LOW, HIGH, "step"),
+    intervalFact("g.se", LOW, HIGH, "se"),
+    intervalFact("g.df", LOW, HIGH, "df"),
+    intervalFact("g.t", LOW, HIGH, "t"),
+    intervalFact("g.low", LOW, HIGH, "low"),
+    intervalFact("g.high", LOW, HIGH, "high"),
   ];
   return {
     lesson: "8.25",

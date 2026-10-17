@@ -117,7 +117,7 @@ def monitor(i):
         if mean(errs[k - window + 1 : k + 1]) > threshold:
             alarm = train_to + 1 + k
             break
-    out = {"spread1": s1, "baseline": baseline, "threshold": threshold, "alarm_month": alarm}
+    out = {"spread1": s1, "baseline": baseline, "baseline6": baseline, "threshold": threshold, "threshold6": threshold, "alarm_month": alarm}
     healthy = [p for p in later if p[0] < sp["change_at"]]
     out["v1_healthy"] = mean([abs(x + s1 - y) for (_, x, y) in healthy]) if healthy else None
     if alarm is None:
@@ -139,6 +139,8 @@ def dr_monitor(i, _facts=None):
         v = monitor(i)[m]
         if m in ("alarm_month", "delay"):
             return v
+        if m.endswith("6"):
+            return str(Decimal(v).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
         return r4(v)
 
 
@@ -210,6 +212,8 @@ def dr_group(i, _facts=None):
         ma, mb = mean(a), mean(b)
         sd = lambda vals, m: mean([(v - m) ** 2 for v in vals]).sqrt()  # noqa: E731
         m = i["measure"]
+        if m == "sum_a":
+            return r4(sum(a, Decimal(0)))
         if m == "n_a":
             return len(a)
         if m == "n_b":
@@ -237,6 +241,29 @@ def dr_diff(i, facts):
         return r4(Decimal(facts[i["minuend"]]["value"]) - Decimal(facts[i["subtrahend"]]["value"]))
 
 
+T95 = {1: "12.706", 2: "4.303", 3: "3.182", 4: "2.776", 5: "2.571", 6: "2.447", 7: "2.365", 8: "2.306", 9: "2.262", 10: "2.228"}
+
+
+def dr_interval(i, _facts=None):
+    """above minus below, a 95% interval by lesson 8.18's method: sample standard deviations (n - 1), the unpooled
+    standard error, degrees of freedom = the smaller group's size minus one, t from the printed table."""
+    with _ctx():
+        lo = [Decimal(v) for v in str(i["below"]).split("|")]
+        hi = [Decimal(v) for v in str(i["above"]).split("|")]
+        ml, mh = mean(lo), mean(hi)
+        var = lambda xs, m: sum(((x - m) ** 2 for x in xs), Decimal(0)) / (len(xs) - 1)  # noqa: E731
+        se = (var(lo, ml) / len(lo) + var(hi, mh) / len(hi)).sqrt()
+        df = min(len(lo), len(hi)) - 1
+        t = Decimal(T95[df])
+        step = mh - ml
+        m = i["measure"]
+        if m == "df":
+            return df
+        if m == "t":
+            return str(t)
+        return r4({"step": step, "se": se, "low": step - se * t, "high": step + se * t}[m])
+
+
 def dr_total(i, _facts=None):
     return sum(int(v) for v in str(i["values"]).split("|"))
 
@@ -254,6 +281,7 @@ KINDS = {
     "dr_lag": dr_lag,
     "dr_group": dr_group,
     "dr_total": dr_total,
+    "dr_interval": dr_interval,
     "dr_diff": dr_diff,
     "dr_errmeasure": dr_errmeasure,
     "dr_percent": dr_percent,

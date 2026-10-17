@@ -11,10 +11,12 @@ import {
   monitorRun,
   type MonitorOptions,
   r4,
+  r6,
   type SeriesSpec,
   syntheticSeries,
 } from "../../src/lib/calc/drift.ts";
 import Decimal from "decimal.js";
+import { stepEstimate } from "../../src/lib/calc/estimate.ts";
 import { errorMeasures, evaluate, groupCompare, randomSplit, timeSplit } from "../../src/lib/calc/splits.ts";
 import type { Fact } from "../build-data.ts";
 
@@ -43,14 +45,16 @@ export const seriesFact = (id: string, t: number, field: "x" | "y"): Fact => ({
   value: SERIES[t - 1][field],
 });
 
-export type MonitorMeasure = "spread1" | "baseline" | "threshold" | "alarm_month" | "delay" | "spread2" | "v1_after" | "v2_after" | "v1_healthy";
+export type MonitorMeasure = "spread1" | "baseline" | "baseline6" | "threshold" | "threshold6" | "alarm_month" | "delay" | "spread2" | "v1_after" | "v2_after" | "v1_healthy";
 
 export function monitorFact(id: string, measure: MonitorMeasure, o: MonitorOptions = DEFAULT_MONITOR): Fact {
   const run = monitorRun(SERIES, SPEC.changeAt, o);
   const pick = {
     spread1: run.v1.spread,
     baseline: run.baseline,
+    baseline6: run.baseline,
     threshold: run.threshold,
+    threshold6: run.threshold,
     alarm_month: run.alarmMonth,
     delay: run.delay,
     spread2: run.v2?.spread,
@@ -59,7 +63,7 @@ export function monitorFact(id: string, measure: MonitorMeasure, o: MonitorOptio
     v1_healthy: run.v1Healthy,
   }[measure];
   if (pick === null || pick === undefined) throw new Error(`${id}: no value`);
-  const value = measure === "alarm_month" || measure === "delay" ? (pick as number) : r4(pick as never);
+  const value = measure === "alarm_month" || measure === "delay" ? (pick as number) : measure.endsWith("6") ? r6(pick as never) : r4(pick as never);
   return {
     id,
     kind: "dr_monitor",
@@ -70,15 +74,16 @@ export function monitorFact(id: string, measure: MonitorMeasure, o: MonitorOptio
 
 export type SplitKind = { split: "random"; seed: number } | { split: "time" };
 
-export function splitFact(id: string, s: SplitKind, model: "spread" | "memory", part: "train" | "test", measure: "mae" | "rmse" | "bias", trainCount = 42, testCount = 18): Fact {
-  const n = SERIES.length;
+export function splitFact(id: string, s: SplitKind, model: "spread" | "memory", part: "train" | "test", measure: "mae" | "rmse" | "bias", trainCount = 42, testCount = 18, spec: SeriesSpec = SPEC): Fact {
+  const series = spec === SPEC ? SERIES : syntheticSeries(spec);
+  const n = series.length;
   const sp = s.split === "random" ? randomSplit(n, testCount, s.seed) : timeSplit(n, trainCount);
-  const ev = evaluate(SERIES, sp, 1);
+  const ev = evaluate(series, sp, 1);
   return {
     id,
     kind: "dr_split",
     inputs: {
-      ...specInputs(),
+      ...specInputs(spec),
       split: s.split,
       split_seed: s.split === "random" ? s.seed : 0,
       test_count: testCount,
@@ -109,10 +114,10 @@ export const lagFact = (id: string, occurred: string, recorded: string): Fact =>
   value: captureLagDays(occurred, recorded),
 });
 
-export type GroupMeasure = "mean_a" | "mean_b" | "sd_a" | "sd_b" | "diff" | "n_a" | "n_b";
+export type GroupMeasure = "mean_a" | "mean_b" | "sd_a" | "sd_b" | "diff" | "n_a" | "n_b" | "sum_a";
 export function groupFact(id: string, a: string[], b: string[], measure: GroupMeasure): Fact {
   const g = groupCompare(a, b);
-  const value = { mean_a: r4(g.a.mean), mean_b: r4(g.b.mean), sd_a: r4(g.a.sd), sd_b: r4(g.b.sd), diff: r4(g.diff), n_a: g.a.n, n_b: g.b.n }[measure];
+  const value = { mean_a: r4(g.a.mean), mean_b: r4(g.b.mean), sd_a: r4(g.a.sd), sd_b: r4(g.b.sd), diff: r4(g.diff), n_a: g.a.n, n_b: g.b.n, sum_a: r4(g.a.mean.mul(g.a.n)) }[measure];
   return { id, kind: "dr_group", inputs: { a: a.join("|"), b: b.join("|"), measure }, value };
 }
 
@@ -145,3 +150,9 @@ export const diffFact = (id: string, a: Fact, b: Fact): Fact => ({
   inputs: { minuend: a.id, subtrahend: b.id },
   value: r4(new Decimal(a.value as string).minus(b.value as string)),
 });
+
+/** The 95% interval of the difference of two group means (estimate.ts, lesson 8.18's method): above − below. */
+export function intervalFact(id: string, below: string[], above: string[], measure: "step" | "se" | "df" | "t" | "low" | "high"): Fact {
+  const e = stepEstimate(below, above);
+  return { id, kind: "dr_interval", inputs: { below: below.join("|"), above: above.join("|"), measure }, value: e[measure] };
+}

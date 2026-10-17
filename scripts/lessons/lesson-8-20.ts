@@ -68,6 +68,8 @@ export default function lesson820(): LessonData {
   push(estMean("pairs.mean", PAIRS.map((_, k) => byId(`pair.${k + 1}.gap`).value as string)));
   // The first three pairs only: with so few, the interval is wide.
   push(estMean("pairs3.mean", [1, 2, 3].map((k) => byId(`pair.${k}.gap`).value as string)));
+  // Without pair 2 (the largest gap): seven pairs, to see whether one pair carries the verdict.
+  push(estMean("pairs7.mean", [1, 3, 4, 5, 6, 7, 8].map((k) => byId(`pair.${k}.gap`).value as string)));
   push(given38("pairs.count", String(PAIRS.length)));
 
   return {

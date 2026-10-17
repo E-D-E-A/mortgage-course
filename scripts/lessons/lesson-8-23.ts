@@ -3,11 +3,15 @@
  * Stage 8, author D. General maths on the synthetic series of drift.ts (60 months; the invented bank's spread jumps at
  * month 37). Status: "עתיד" (design); the maths is general knowledge. Everything is להדגמה.
  */
+import { DEFAULT_SPEC } from "../../src/lib/calc/drift.ts";
 import type { LessonData } from "../build-data.ts";
 import { given } from "./affordability-facts.ts";
 import { diffFact, errFact, seriesFact, splitFact } from "./_drift-facts.ts";
 
 export const ERRORS = ["-0.20", "0.10", "-0.30", "0.20"];
+export const ERRORS2 = ["0.10", "-0.20", "0.30", "-0.10", "0.20", "-0.40"];
+/** The same series with the pricing change moved out of reach: what the two models do when nothing changes. */
+const NOCHANGE = { ...DEFAULT_SPEC, changeAt: 999 };
 
 export default function lesson823(): LessonData {
   const facts = [
@@ -21,6 +25,9 @@ export default function lesson823(): LessonData {
     errFact("e.msq", ERRORS, "msq"),
     errFact("e.bias", ERRORS, "bias"),
     errFact("e.rmse", ERRORS, "rmse"),
+    errFact("e2.msq", ERRORS2, "msq"),
+    errFact("e2.rmse", ERRORS2, "rmse"),
+    errFact("e2.mae", ERRORS2, "mae"),
   ];
   for (const seed of [1, 2, 3, 4, 5]) {
     facts.push(splitFact(`r${seed}.spread`, { split: "random", seed }, "spread", "test", "mae"));
@@ -36,6 +43,10 @@ export default function lesson823(): LessonData {
     splitFact("t.memory.rmse", { split: "time" }, "memory", "test", "rmse"),
     splitFact("t.memory.bias", { split: "time" }, "memory", "test", "bias"),
     splitFact("t.spread.rmse", { split: "time" }, "spread", "test", "rmse"),
+    splitFact("nc.t.memory", { split: "time" }, "memory", "test", "mae", 42, 18, NOCHANGE),
+    splitFact("nc.t.spread", { split: "time" }, "spread", "test", "mae", 42, 18, NOCHANGE),
+    splitFact("nc.r3.memory", { split: "random", seed: 3 }, "memory", "test", "mae", 42, 18, NOCHANGE),
+    splitFact("nc.r3.spread", { split: "random", seed: 3 }, "spread", "test", "mae", 42, 18, NOCHANGE),
   );
   const get = (id: string) => facts.find((x) => x.id === id) as (typeof facts)[number];
   facts.push(diffFact("gap.memory", get("t.memory"), get("r3.memory")), diffFact("gap.spread", get("t.spread"), get("r3.spread")));

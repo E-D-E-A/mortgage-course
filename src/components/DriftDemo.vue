@@ -98,7 +98,7 @@ const rows = computed(() =>
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">ההתראה נשמעת בחודש</p>
         <p class="text-h2 text-navy">{{ run.alarmMonth ?? "אף פעם" }}</p>
-        <p v-if="run.delay !== null" class="text-caption text-n600">{{ run.delay < 0 ? "לפני השינוי: התראת שווא" : run.delay === 0 ? "בחודש השינוי" : `${run.delay} חודשים אחרי השינוי` }}</p>
+        <p v-if="run.delay !== null" class="text-caption text-n600">{{ run.delay < 0 ? "לפני השינוי: התראת שווא (רעש)" : run.delay === 0 ? "בחודש השינוי" : run.delay === 1 ? "חודש אחד אחרי השינוי" : `${run.delay} חודשים אחרי השינוי` }}</p>
       </div>
       <div class="rounded-md bg-n50 p-3">
         <p class="text-caption text-n600">שגיאה ממוצעת בחודשים תקינים</p>

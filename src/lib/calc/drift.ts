@@ -55,6 +55,7 @@ const D = Decimal.clone({ precision: 50, rounding: Decimal.ROUND_HALF_UP });
 type Num = Decimal.Value;
 
 export const r4 = (v: Num): string => new D(v).toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toFixed(4);
+export const r6 = (v: Num): string => new D(v).toDecimalPlaces(6, Decimal.ROUND_HALF_UP).toFixed(6);
 export const r2 = (v: Num): string => new D(v).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2);
 
 /** 32-bit linear congruential generator; mirrored in checks/kinds/drift.py. */

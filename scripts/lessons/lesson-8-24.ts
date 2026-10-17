@@ -19,6 +19,8 @@ export default function lesson824(): LessonData {
     monitorFact("m.spread1", "spread1"),
     monitorFact("m.baseline", "baseline"),
     monitorFact("m.threshold", "threshold"),
+    monitorFact("m.baseline6", "baseline6"),
+    monitorFact("m.threshold6", "threshold6"),
     monitorFact("m.healthy", "v1_healthy"),
     monitorFact("m.alarm", "alarm_month"),
     monitorFact("m.delay", "delay"),

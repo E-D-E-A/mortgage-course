@@ -55,6 +55,12 @@ describe("stage 8 on the big-picture map", () => {
     for (const id of ["prime", "boi_rate", "inflation", "anchor"]) expect(LAYER[id].roles).toEqual(["input"]);
   });
 
+  it("keeps a bank's own answers and acts as inputs or outside, never as the algorithm's output", () => {
+    for (const id of ["approval", "counter_offer", "personal_offer"]) expect(LAYER[id].roles, id).toEqual(["input"]);
+    expect(LAYER.pre_approval.roles).toEqual(["outside"]);
+    expect(LAYER.proposed_basket.control).toBe("bank");
+  });
+
   it("shows no stage-8 node before 8.6", () => {
     expect(mapUpTo("7.8").nodes.some((n) => n.lesson.startsWith("8."))).toBe(false);
   });
