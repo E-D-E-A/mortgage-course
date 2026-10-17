@@ -28,8 +28,8 @@ interface Question {
   explanation: string;
 }
 const props = withDefaults(
-  defineProps<{ stage: number; questions: Question[]; passPercent?: number; nextHref?: string; nextLabel?: string }>(),
-  { passPercent: 80, nextHref: undefined, nextLabel: undefined },
+  defineProps<{ stage: number; questions: Question[]; passPercent?: number; nextHref?: string; nextLabel?: string; passText?: string }>(),
+  { passPercent: 80, nextHref: undefined, nextLabel: undefined, passText: "עברתם את הבדיקה. השלב הבא פתוח." },
 );
 
 const key = `check:${props.stage}`;
@@ -102,7 +102,7 @@ const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
     <div :id="`check-${stage}-result`" aria-live="polite" class="scroll-mt-24">
       <div v-if="submitted" class="mb-6 rounded-lg p-5" :class="passed ? 'bg-success-bg' : 'bg-warning-bg'">
         <p class="text-h2 text-n900">{{ score }} מתוך {{ questions.length }} נכונות</p>
-        <p v-if="passed" class="mt-2 text-body-l text-n800">עברתם את הבדיקה. השלב הבא פתוח.</p>
+        <p v-if="passed" class="mt-2 text-body-l text-n800">{{ passText }}</p>
         <p v-else class="mt-2 text-body-l text-n800">
           כדי לעבור צריך לפחות {{ needed }} תשובות נכונות. ליד כל שאלה מופיעים ההסבר והשיעור שכדאי לחזור אליו. אחר כך נסו שוב.
         </p>
