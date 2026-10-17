@@ -34,8 +34,6 @@ export const okClient = (id) => f.raw(`client.${id}`) === "";
 export const nm = (id) => NAMES[id];
 export const cands = table.map((r) => ({ id: r.id, name: NAMES[r.id], first: r.first, total: r.total, rise: r.rise, clientOk: okClient(r.id) }));
 export const reach = f.raw("law.reach");
-export const reachExact = f.raw("law.reach_exact");
-export const roundingOnly = reach.never.length === reachExact.never.length ? [] : reachExact.never.filter((id) => !reach.never.includes(id));
 export const pickName = (key) => nm(f.raw(`pick.${key}`).id);
 export const pickClientName = (key) => nm(f.raw(`pick.client.${key}`).id);
 export const predictionOptions = [
@@ -266,7 +264,7 @@ export const limitIds = ENTRIES.map((e) => e.id).filter((id) => okClient(id));
   <p class="mt-2 text-caption text-n600">{MARK} משקולות להדגמה. כל הנבחרים על החזית.</p>
 </div>
 
-מה שחשוב כאן: הלקוח לא נשאל "איזה תמהיל", אלא "מה יותר חשוב". והתשובה גם לא תמיד אפשרית לשימוש: ברשת של 5% בין משקולות (כל השלשות של משקולות במרווחים של 5 נקודות אחוז) יש {f.plain("law.never_count")} מועמדים על החזית **שאף קבוצת משקולות לא בוחרת**: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ועדיין תמיד יש שכן שמנצח אותם בציון המשוקלל. זה קורה כשהחזית "שקועה" בין שכניה, כלומר אינה קמורה: נקודה כזו אינה זוכה באף משקולות חיוביות.{roundingOnly.length ? ` הספירה היא לפי ציונים מעוגלים לארבע ספרות, כמו בשיעור 8.8; בחשבון מדויק, בלי עיגול, יש ${reachExact.never.length} כאלה, כי ״${roundingOnly.map(nm).join("״, ״")}״ מנצח בנקודה אחת של הרשת רק בגלל העיגול.` : ""} מי שרוצה גם אותם צריך דרך בחירה אחרת, למשל לקבוע גבול על יעד אחד (חשיפה עד סכום מסוים) ולמזער את האחר. מה Mogi תבחר: **עדיין לא הוחלט** (ממתין לאישור אילון; ראו המקורות).
+מה שחשוב כאן: הלקוח לא נשאל "איזה תמהיל", אלא "מה יותר חשוב". והתשובה גם לא תמיד אפשרית לשימוש: ברשת של 5% בין משקולות (כל השלשות של משקולות במרווחים של 5 נקודות אחוז) יש {f.plain("law.never_count")} מועמדים על החזית **שאף קבוצת משקולות לא בוחרת**: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ועדיין תמיד יש שכן שמנצח אותם בציון המשוקלל. זה קורה כשהחזית "שקועה" בין שכניה, כלומר אינה קמורה: נקודה כזו אינה זוכה באף משקולות חיוביות. גם ברשת עדינה פי חמישה (צעדים של אחוז אחד) אף אחד מהם לא נבחר. מי שרוצה גם אותם צריך דרך בחירה אחרת, למשל לקבוע גבול על יעד אחד (חשיפה עד סכום מסוים) ולמזער את האחר. מה Mogi תבחר: **עדיין לא הוחלט** (ממתין לאישור אילון; ראו המקורות).
 
 <PredictionReveal
   client:visible
@@ -437,7 +435,7 @@ export const limitIds = ENTRIES.map((e) => e.id).filter((id) => okClient(id));
 </NumericExercise>
 
 <Solution for="8.15-7">
-{f.plain("law.never_count")} מועמדים: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ובכל זאת בציון משוקלל תמיד מנצח מישהו אחר. אף משקולות חיוביות לא יבחרו בהם: הם בחזית שאינה קמורה. הרשת בודקת רק משקולות במרווחי 5 נקודות אחוז.{roundingOnly.length ? ` הספירה היא לפי ציונים מעוגלים לארבע ספרות (כמו בשיעור 8.8); בלי עיגול נוסף עוד אחד, ״${roundingOnly.map(nm).join("״, ״")}״, שאינו נבחר.` : ""}
+{f.plain("law.never_count")} מועמדים: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ובכל זאת בציון משוקלל תמיד מנצח מישהו אחר. אף משקולות חיוביות לא יבחרו בהם: הם בחזית שאינה קמורה. הרשת בודקת משקולות במרווחי 5 נקודות אחוז, וברשת עדינה פי חמישה (צעדים של אחוז אחד) התוצאה זהה.
 </Solution>
 
 <ChoiceExercise

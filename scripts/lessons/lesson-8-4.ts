@@ -7,7 +7,7 @@ import Decimal from "decimal.js";
 import { DICE, DIE_RATE_CHANGES } from "../../src/data/s8-datasets.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given } from "./lesson-3-8.ts";
-import { countProduct, lin, expect, factExpect, factProbAbove, percentOf, prob, spitzer } from "./_stats-facts.ts";
+import { countProduct, total, lin, expect, factExpect, factProbAbove, percentOf, prob, spitzer } from "./_stats-facts.ts";
 
 export default function lesson84(): LessonData {
   const facts: Fact[] = [];
@@ -36,7 +36,7 @@ export default function lesson84(): LessonData {
   push(expect("t.rate_exp", DIE_RATE_CHANGES.map((v) => ({ value: v, count: 1 })), 2));
 
   // ── Exercises. ──
-  push(expect("ex.sum_exp", [1, 2, 3, 4].map((value) => ({ value, count: 1 })), 1));
+  push(total("ex.sum_wrong", [1, 2, 3, 4], 0), expect("ex.sum_exp", [1, 2, 3, 4].map((value) => ({ value, count: 1 })), 1));
   push(prob("ex.ge8", two, 8, 12, 1));
   return { lesson: "8.4", title: "הסתברות ותוחלת", note: "General maths: dice, then a toy on a variable track's reset (not a forecast).", facts };
 }

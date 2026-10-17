@@ -45,7 +45,7 @@ export default function lesson83(): LessonData {
   push(percentile("ex.median", ex2, 50, 0), position("ex.pos", 7, 50), mean("x.mean1", [33, 35, 37], 0), mean("x.mean2", [20, 35, 50], 0));
   const ex5 = [2, 4, 4, 4, 5, 5, 7, 9];
   push(mean("ex.mean5", ex5, 0), variance("ex.var5", ex5, 0), std("ex.std5", ex5, 0), std("ex.std5_sample", ex5, 2, true));
-  push(mean("ex.mean_a", [26, 31, 33, 35, 40], 0));
+  push(mean("ex.mean_a", [26, 31, 33, 35, 40], 0), total("ex.sum_a", [26, 31, 33, 35, 40], 0));
 
   return { lesson: "8.3", title: "התפלגות, פיזור ואחוזון", note: "General maths; the ratios are synthetic.", facts };
 }

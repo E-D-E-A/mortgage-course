@@ -50,7 +50,7 @@ export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change
 <Prediction
   client:visible
   id="8.4"
-  question={`חוב של ${f.shekels("t.balance")} שנשארו בו ${p("t.months")} חודשים, בריבית ${p("t.rate")}% לשנה: ההחזר היום ${f.shekels("t.pay3")}. בנקודת העדכון מטילים קובייה הוגנת, ולכל פאה שינוי בריבית: ${p("t.change1")}, ${p("t.change2")}, ${p("t.change3")}, ${p("t.change4")}, ${p("t.change5")} ו־${p("t.change6")} נקודות אחוז. אחרי העדכון ההחזר הוא אחד משישה סכומים. מהו ההחזר שמצפים לו בממוצע, על פני הרבה הטלות?`}
+  question={`חוב של ${f.shekels("t.balance")} שנשארו בו ${p("t.months")} חודשים, בריבית ${p("t.rate")}% לשנה: ההחזר היום ${f.shekels("t.pay3")}. בנקודת העדכון מטילים קובייה הוגנת, ולכל פאה שינוי בריבית: ${eq(p("t.change1"))}, ${eq(p("t.change2"))}, ${eq(p("t.change3"))}, ${eq(p("t.change4"))}, ${eq(p("t.change5"))} ו־${eq(p("t.change6"))} נקודות אחוז. אחרי העדכון ההחזר הוא אחד משישה סכומים. מהו ההחזר שמצפים לו בממוצע, על פני הרבה הטלות?`}
   options={predictionOptions}
 />
 
@@ -116,7 +116,7 @@ export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change
   rows={faceRows}
   blanks={["5.pay", "6.pay"]}
   success="ההחזר עולה עם הריבית, וכל נקודת אחוז נוספת מעלה אותו יותר (כמו בשיעור 8.1)."
-  hint="בגיליון: =PMT(ריבית חדשה/12, 240, -500000)."
+  hint={`בגיליון: ${eq("=PMT(rate/12, 240, -500000)")}, כש־rate הוא הריבית החדשה.`}
 />
 
 ההחזרים נעים בין {f.shekels("t.pay1")} ל־{f.shekels("t.pay6")}: טווח של {f.shekels("t.range")}. עם קובייה הוגנת כל החזר סביר באותה מידה, והתוחלת היא הממוצע שלהם: **{f.shekels("t.exp_fair")}**. היא גבוהה מההחזר היום ({f.shekels("t.pay3")}) ב־{f.shekels("t.exp_minus_now")}, והיא לא אחד מהחזרים האפשריים. שתי סיבות: הפאות לא סימטריות (הן מזיזות את הריבית ב־{p("t.rate_exp")} נקודות אחוז בממוצע, כלפי מעלה), וההחזר עולה בקצב שגדל עם הריבית. אפשר לראות את החלוקה: אילו הריבית הייתה זזה בדיוק בממוצע, ל־{p("t.rate_avg")}%, ההחזר היה {f.shekels("t.pay_avg")}, כלומר {f.shekels("t.shift_part")} מעל היום. את ההפרש הנותר, {f.shekels("t.convex")}, מוסיף הקצב שגדל.
@@ -165,7 +165,7 @@ export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change
   notes={[
     "הפאות לא סימטריות: יש שלוש שמעלות את הריבית (ושתיים שמורידות, אחת שלא משנה), וההחזר גם עולה בקצב שגדל. לכן הממוצע לא שווה להחזר היום.",
     "",
-    `רק שתיים מהפאות מורידות את הריבית (${p("t.change1")} ו־${p("t.change2")}), ושלוש מעלות אותה (${p("t.change4")}, ${p("t.change5")} ו־${p("t.change6")}); העליות מעלות את ההחזר יותר ממה שהירידות מורידות, כי ההחזר עולה בקצב שגדל (שיעור 8.1).`,
+    `רק שתיים מהפאות מורידות את הריבית (${eq(p("t.change1"))} ו־${eq(p("t.change2"))}), ושלוש מעלות אותה (${eq(p("t.change4"))}, ${eq(p("t.change5"))} ו־${eq(p("t.change6"))}); העליות מעלות את ההחזר יותר ממה שהירידות מורידות, כי ההחזר עולה בקצב שגדל (שיעור 8.1).`,
     `התוחלת ${f.shekels("t.exp_fair")} אינה אחד מששת ההחזרים: ${f.shekels("t.pay3")} ו־${f.shekels("t.pay4")} הם השכנים שלה.`,
   ]}
 >
@@ -237,7 +237,7 @@ export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change
   מהי תוחלת?
 </ChoiceExercise>
 
-<NumericExercise client:visible id="8.4-2" n={2} level="קל" answer={f.raw("ex.sum_exp")} errors={[]}>
+<NumericExercise client:visible id="8.4-2" n={2} level="קל" answer={f.raw("ex.sum_exp")} errors={[{ value: f.raw("ex.sum_wrong"), message: "זה סכום הפאות. התוחלת היא הסכום חלקי מספר הפאות, כי כולן סבירות באותה מידה." }]}>
   קובייה בדויה בעלת ארבע פאות, 1, 2, 3 ו־4, כולן סבירות באותה מידה. מהי התוחלת?
 </NumericExercise>
 
@@ -258,7 +258,11 @@ export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change
 </NumericExercise>
 
 <Solution for="8.4-4">
-<M>(3 × {n("t.pay1")} + 2 × {n("t.pay2")} + {n("t.pay3")} + {n("t.pay4")} + {n("t.pay5")} + {n("t.pay6")}) ÷ 9</M> = {f.shekels("t.exp_low")}.
+<M>3 × {n("t.pay1")} + 2 × {n("t.pay2")} + {n("t.pay3")}</M>
+
+<M>+ {n("t.pay4")} + {n("t.pay5")} + {n("t.pay6")}</M>
+
+מחלקים את הסכום ב־9: {f.shekels("t.exp_low")}.
 </Solution>
 
 <NumericExercise client:visible id="8.4-5" n={5} level="בינוני" unit="%" answer={f.raw("t.p_above_high")} errors={[{ value: f.raw("t.p_above_fair"), message: "זה בקובייה ההוגנת. בקובייה המוטה לריביות גבוהות הפאות הגבוהות יוצאות יותר." }]}>

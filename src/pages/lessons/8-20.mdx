@@ -181,7 +181,7 @@ export const predictionOptions = [
   <p class="mt-2 text-caption text-n600">{MARK}</p>
 </div>
 
-כל ההפרשים חיוביים. ממוצע ההפרשים {mean8.mean}, וטווח 95% שלו (שיעור 8.18) מ־{mean8.low} עד {mean8.high}. **הטווח לא כולל אפס:** בשמונה זוגות, האומדן נראה מוטה כלפי מטה, בערך {mean8.mean} נקודת אחוז. אילו היו רק שלושה זוגות הראשונים, הממוצע {mean3.mean} אבל הטווח {mean3.low} עד {mean3.high}: **כן כולל אפס**, ואי אפשר לטעון הטיה.
+כל ההפרשים חיוביים. ממוצע ההפרשים {mean8.mean}, וטווח 95% שלו (שיעור 8.18) מ־{eq(mean8.low)} עד {eq(mean8.high)}. **הטווח לא כולל אפס:** בשמונה זוגות, האומדן נראה מוטה כלפי מטה, בערך {mean8.mean} נקודת אחוז. אילו היו רק שלושה זוגות הראשונים, הממוצע {mean3.mean} אבל הטווח {eq(mean3.low)} עד {eq(mean3.high)}: **כן כולל אפס**, ואי אפשר לטעון הטיה.
 
 מה עושים עם הטיה? מתקנים את המודל: מזיזים את הבסיס שלו (שיעור 8.17) במה שנמדד, ומחזירים את התוצאה לבדיקה. ומה אם אין מספיק זוגות? ממשיכים עם האומדן, ושומרים את הזוגות.
 
@@ -204,7 +204,7 @@ export const predictionOptions = [
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>ההחזר הראשון זז רק ב־{moneyAbs("gap.first")}, אבל זה בגלל שני הפערים של הריבית שהלכו לכיוונים הפוכים (<span class="ltr">{signed(f.raw("gap.rate_1"))}</span> ו־<span class="ltr">{signed(f.raw("gap.rate_2"))}</span>). השוואה רק לפי המדד הכולל מסתירה פערים בכל מסלול.</li>
-    <li>הממוצע ירד ל־{pairs7.mean} אבל נשאר חיובי, והטווח ({pairs7.low} עד {pairs7.high}) עדיין לא כולל אפס: זוג אחד לא נושא את המסקנה. כשיש מעט זוגות הטווח רחב, ולכן הכמות קובעת עד כמה אפשר לטעון הטיה (שיעור 8.18).</li>
+    <li>הממוצע ירד ל־{pairs7.mean} אבל נשאר חיובי, והטווח ({eq(pairs7.low)} עד {eq(pairs7.high)}) עדיין לא כולל אפס: זוג אחד לא נושא את המסקנה. כשיש מעט זוגות הטווח רחב, ולכן הכמות קובעת עד כמה אפשר לטעון הטיה (שיעור 8.18).</li>
     <li>ברירת המחדל הגזימה ב־{f.shekels("reset.gap.total")}.</li>
   </ol>
 </details>
@@ -354,7 +354,7 @@ export const predictionOptions = [
   n={4}
   level="בינוני"
   answer={f.raw("reset.gap.total")}
-  errors={[]}
+  errors={[{ value: f.raw("reset.off.total"), message: "זה סך התשלומים עם עדכון כמו בהצעה. השאלה על ההפרש בין שני הסכומים." }]}
 >
   עם עדכון כל {f.plain("reset.default")} חודשים (ברירת המחדל) סך התשלומים בתרחיש הלחץ הוא {money("reset.sim.total")}, ועם עדכון כל {f.plain("reset.offer")} חודשים (כמו בהצעה) {money("reset.off.total")}. בכמה ברירת המחדל מגזימה?
 </NumericExercise>
@@ -387,13 +387,13 @@ export const predictionOptions = [
   answer={mean8.mean}
   tolerance={0.0005}
   near={0.005}
-  errors={[]}
+  errors={[{ value: mean8.high, tolerance: 0.0005, message: "זה הקצה העליון של הטווח. הממוצע הוא סכום ההפרשים חלקי שמונה." }]}
 >
   ממוצע ההפרשים (הצעה פחות אומדן) בשמונה הזוגות של השיעור, בנקודות אחוז? (ההפרשים בטבלה.)
 </NumericExercise>
 
 <Solution for="8.20-6">
-מסכמים את שמונת ההפרשים ומחלקים בשמונה: {mean8.mean}. סטיית התקן {mean8.sd}, שגיאת התקן {mean8.se}, ו־t לשבע דרגות חופש {mean8.t}: הטווח {mean8.low} עד {mean8.high}.
+מסכמים את שמונת ההפרשים ומחלקים בשמונה: {mean8.mean}. סטיית התקן {mean8.sd}, שגיאת התקן {mean8.se}, ו־t לשבע דרגות חופש {mean8.t}: הטווח {eq(mean8.low)} עד {eq(mean8.high)}.
 </Solution>
 
 <ChoiceExercise

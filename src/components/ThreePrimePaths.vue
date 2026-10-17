@@ -36,9 +36,9 @@ const fmt = (v: string) => new Intl.NumberFormat("he-IL", { minimumFractionDigit
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">הדגמה: עקומים ונתונים מומצאים, לא נתוני שוק ולא תחזית. נתונים סינתטיים.</p>
     <ul class="list-reset mt-3 flex flex-wrap gap-x-5 gap-y-1" aria-label="מקרא">
-      <li v-for="(s, k) in series" :key="s.id" class="flex min-h-[44px] items-center gap-2 text-body-m text-n800">
-        <input :id="`pp-${s.id}`" v-model="on[s.id]" type="checkbox" class="h-5 w-5" />
-        <label :for="`pp-${s.id}`" class="flex items-center gap-2">
+      <li v-for="(s, k) in series" :key="s.id" class="text-body-m text-n800">
+        <label :for="`pp-${s.id}`" class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center gap-2 py-2">
+          <input :id="`pp-${s.id}`" v-model="on[s.id]" type="checkbox" class="h-6 w-6" />
           <svg width="30" height="8" aria-hidden="true"><line x1="0" x2="30" y1="4" y2="4" :stroke="style[k].color" stroke-width="3" :stroke-dasharray="style[k].dash" /></svg>
           {{ s.name }}
         </label>

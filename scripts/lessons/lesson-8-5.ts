@@ -43,6 +43,6 @@ export default function lesson85(): LessonData {
 
   // ── Exercises. ──
   const lineEx = { a: "0.01", b: "0.6" };
-  push(err("ex.mae", P5, lineEx, "mae", 3), err("ex.rmse", P5, lineEx, "rmse", 3), lin("ex.pred", "0.0094", "0.642", 55, 3));
+  push(err("ex.mae", P5, lineEx, "mae", 3), err("ex.rmse", P5, lineEx, "rmse", 3), lin("ex.pred", "0.0094", "0.642", 55, 3), prod("ex.pred_nob", "0.0094", "55", 3), prod("x.pred90_nob", "0.0123", "90", 3));
   return { lesson: "8.5", title: "קו מגמה ושגיאה", note: "General maths on synthetic points; the line describes the points, not banks.", facts };
 }

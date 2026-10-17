@@ -7,7 +7,7 @@
 import { BASE_CHOICE, LEVEL1, LEVEL2, candidateOf, countChoices, countShapes, entryOf, loanOfChoice, S8_CASE } from "../../src/data/case-s8.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { measureFact } from "./_constraints-facts.ts";
-import { countProduct, shapes } from "./_stats-facts.ts";
+import { countProduct, shapes, total } from "./_stats-facts.ts";
 import { difference, given } from "./lesson-3-8.ts";
 
 export default function lesson86(): LessonData {
@@ -44,7 +44,7 @@ export default function lesson86(): LessonData {
   );
 
   // ── Exercises. ──
-  push(countProduct("ex.l1", [2, 2, 2, 3]), shapes("ex.l2", 2, 10, 1, countShapes(2, 10, 1)), given("ex.extra", "30000"));
+  push(total("ex.l1_sum", [2, 2, 2, 3], 0), countProduct("ex.l2_wrong", [9]), countProduct("ex.l1", [2, 2, 2, 3]), shapes("ex.l2", 2, 10, 1, countShapes(2, 10, 1)), given("ex.extra", "30000"));
   push(difference("ex.loan", loan0, facts.find((f) => f.id === "ex.extra") as Fact));
   return { lesson: "8.6", title: "משתני ההחלטה בשתי רמות", note: "A design lesson (future): the formulation of the problem, on the synthetic case.", facts };
 }

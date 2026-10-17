@@ -130,7 +130,7 @@ const stages = ["מיצוב", "תמהיל", "מחיר חזוי", "הסתברות
     </ol>
     <p class="mt-2 text-caption text-n600">לחצו על בנק כדי לראות את כל השלבים שלו. הבנקים פיקטיביים, והמספרים סינתטיים להדגמה; הדירוג הוא של הקורס.</p>
 
-    <button type="button" class="mt-3 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-3 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-auto">

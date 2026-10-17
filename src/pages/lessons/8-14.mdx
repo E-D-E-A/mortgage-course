@@ -270,9 +270,14 @@ export const predictionOptions = [
   tolerance={0}
   near={0}
   answer={String(full.size)}
+  errors={[{ value: "66", message: "זה מספר החלוקות, לפני שבוחרים תקופה לכל תמהיל." }]}
 >
   כמה תמהילים יש ברשת של השיעור (שלושה סוגי מסלול, קפיצות של 10%, שלוש תקופות לכל התמהיל)?
 </NumericExercise>
+
+<Solution for="8.14-2">
+הרשת מחלקת 10 חלקים של 10% בין שלושה סוגים: <M>C(12, 2) = 66</M> חלוקות. כל חלוקה נבדקת בשלוש תקופות: <M>66 × 3 = {full.size}</M>.
+</Solution>
 
 <NumericExercise
   client:visible
@@ -288,6 +293,10 @@ export const predictionOptions = [
   כמה קריאות למנוע בחיפוש עם דילוג על תמהילים אסורים לפני החישוב?
 </NumericExercise>
 
+<Solution for="8.14-3">
+{pruned.pruned} תמהילים נפסלו בבדיקה הזולה ולא הגיעו למנוע, ולכן <M>{full.engine_calls} − {pruned.pruned} = {pruned.engine_calls}</M> קריאות.
+</Solution>
+
 <NumericExercise
   client:visible
   id="8.14-4"
@@ -297,9 +306,14 @@ export const predictionOptions = [
   tolerance={0}
   near={0}
   answer={String(pruned.feasible)}
+  errors={[{ value: String(full.rejected), message: "זה מספר הנפסלים, לא מי שנשאר." }]}
 >
   כמה תמהילים עוברים את כל האילוצים?
 </NumericExercise>
+
+<Solution for="8.14-4">
+מתוך {pruned.engine_calls} התמהילים שהגיעו למנוע, {pruned.rejected} נפסלו באילוצים, ונשארו {pruned.feasible}. כך גם בלי הדילוג: {full.rejected} נפסלו מתוך {full.size}, ונשארו {full.feasible}.
+</Solution>
 
 <ChoiceExercise
   client:visible

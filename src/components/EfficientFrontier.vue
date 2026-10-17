@@ -71,11 +71,19 @@ const py = (c: Cand) => {
   const r = range(yi.value);
   return H - PAD.b - ((new Decimal(valueOf(c, yi.value)).toNumber() - r.lo) / (r.hi - r.lo)) * (H - PAD.t - PAD.b);
 };
-const dots = computed(() =>
+const baseDots = computed(() =>
   props.candidates.map((c) => {
     const f = frontOf(c.id);
     const feasible = rows.value.find((r) => r.id === c.id)!.feasible;
     return { c, x: px(c), y: py(c), feasible, efficient: f.efficient, chosen: picked.value?.id === c.id };
+  }),
+);
+// Each dot's invisible touch circle is as large as it can be (up to 22 units) without reaching a neighbour: in a crowd a click lands
+// on the dot it is nearest to, and the list under the picture reaches every candidate whatever the crowd.
+const dots = computed(() =>
+  baseDots.value.map((d) => {
+    const near = Math.min(...baseDots.value.filter((o) => o !== d).map((o) => Math.hypot(o.x - d.x, o.y - d.y)));
+    return { ...d, hit: Math.max(5, Math.min(22, near / 2 - 0.5)) };
   }),
 );
 const frontLine = computed(() => {
@@ -150,7 +158,7 @@ const selected = computed(() => (sel.value ? candOf(sel.value) : null));
       <svg :viewBox="`0 0 ${W} ${H}`" class="w-full" role="img" :aria-label="`גרף: ${GOALS[xi].label} מול ${GOALS[yi].label} של ${candidates.length} מועמדים`">
         <polyline v-if="frontLine" :points="frontLine" fill="none" stroke="var(--mogi-teal-deep)" stroke-width="1.5" stroke-dasharray="4 3" />
         <g v-for="d in dots" :key="d.c.id" tabindex="0" role="button" :aria-label="`${d.c.name}`" @click="sel = d.c.id" @keydown.enter="sel = d.c.id" @focus="sel = d.c.id">
-          <circle :cx="d.x" :cy="d.y" r="16" fill="transparent" />
+          <circle :cx="d.x" :cy="d.y" :r="d.hit" fill="transparent" />
           <circle
             :cx="d.x"
             :cy="d.y"
@@ -164,6 +172,14 @@ const selected = computed(() => (sel.value ? candOf(sel.value) : null));
       </svg>
       <p class="mt-1 text-center text-caption text-n600">{{ GOALS[xi].label }} ({{ GOALS[xi].unit }}, גדל לכיוון שמאל) · {{ GOALS[yi].label }} ({{ GOALS[yi].unit }}, גדל למעלה). קרוב לפינה הימנית־תחתונה: טוב יותר בשניהם.</p>
     </div>
+
+    <label class="mt-3 flex flex-col gap-1">
+      <span class="text-caption font-semibold text-n600">או בחרו מועמד מהרשימה</span>
+      <select :value="sel ?? ''" class="min-h-11 rounded-md border border-n300 bg-n0 px-3 text-body-m" @change="sel = ($event.target as HTMLSelectElement).value || null">
+        <option value="">בחרו מועמד</option>
+        <option v-for="c in candidates" :key="c.id" :value="c.id">{{ c.name }}</option>
+      </select>
+    </label>
 
     <div class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800" role="status">
       <template v-if="picked">
@@ -183,7 +199,7 @@ const selected = computed(() => (sel.value ? candOf(sel.value) : null));
       <p v-else class="mt-2 text-caption text-n700">לחצו על נקודה כדי לראות מי שולט בה.</p>
     </div>
 
-    <button type="button" class="mt-3 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-3 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 max-h-80 overflow-auto">

@@ -282,7 +282,7 @@ export const predictionOptions = [
   n={2}
   level="קל"
   answer={f.raw("ex.m2")}
-  errors={[{ value: f.raw("ex.m1"), message: "הוספתם גם מדרגה של יחס החזר. יחס ההחזר כאן 38%, מתחת ל־40%." }]}
+  errors={[{ value: f.raw("ex.m2_wrong"), message: "הוספתם גם מדרגה של יחס החזר. יחס ההחזר כאן 38%, מתחת ל־40%." }]}
 >
   מימון 61%, יחס החזר 38%. מה המרווח לפי המודל, בנקודות אחוז?
 </NumericExercise>
@@ -330,13 +330,13 @@ export const predictionOptions = [
   level="בינוני"
   answer={exW.change}
   unit="נקודות אחוז"
-  errors={[]}
+  errors={[{ value: String(Math.abs(Number(exW.change))), message: "הריבית יורדת, ולכן השינוי שלילי: שימו סימן מינוס." }]}
 >
   מימון 70%, יחס החזר 45%: הלקוח מכניס הון עד שהמימון הוא 60%. כמה נקודות אחוז משתנה הריבית? (שלילי: יורדת.)
 </NumericExercise>
 
 <Solution for="8.17-5">
-לפני: <M>{f.plain("base")} + {f.plain("step.60")} + {f.plain("step.pti")} = {exW.before.margin}</M>. אחרי, ב־60%: <M>{f.plain("base")} + {f.plain("step.40")} + {f.plain("step.pti")} = {exW.after.margin}</M>. ההפרש {exW.change} נקודות אחוז.
+לפני: <M>{f.plain("base")} + {f.plain("step.60")} + {f.plain("step.pti")} = {exW.before.margin}</M>. אחרי, ב־60%: <M>{f.plain("base")} + {f.plain("step.40")} + {f.plain("step.pti")} = {exW.after.margin}</M>. ההפרש {eq(exW.change)} נקודות אחוז.
 </Solution>
 
 <NumericExercise

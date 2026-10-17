@@ -49,6 +49,7 @@ import { type DealType, type LineResult, RULES, withMinus } from "../lib/calc/re
 import { percentString } from "../lib/calc/percent.ts";
 import { balancesAt, loanOf } from "../lib/calc/sensitivity.ts";
 import { SCENARIOS, SCENARIO_NAME_HE } from "../data/case-a-mix.ts";
+import { evaluate } from "../lib/calc/engine.ts";
 import {
   DEFAULT_RESET_MONTHS,
   exposure,
@@ -96,6 +97,8 @@ const props = withDefaults(
     compareTo?: { label?: string; tracks: TrackInput[] };
     balanceAtYears?: number[];
     scenarioPresets?: boolean;
+    /** The highest payment is the engine's projected maximum (the clearing payment of a last month left out), as in lesson 8.9. */
+    projectedMax?: boolean;
   }>(),
   {
     loan: 900000,
@@ -196,12 +199,20 @@ const scenarioSpec = computed(() => ({
   rounding: props.rounding,
 }));
 
+// mixSummary, or (projectedMax) with the highest payment the engine's way: the clearing payment of a last month is left out.
+function summaryOf(list: TrackSpec[], flow: ReturnType<typeof mixCashFlow>) {
+  const s = mixSummary(flow);
+  if (!props.projectedMax) return s;
+  const e = evaluate(list, scenarioSpec.value);
+  return { ...s, maxPayment: e.max, maxMonth: e.maxMonth };
+}
+
 // One computation for everything shown. A scenario that pushes a rate below zero is refused with a message.
 const result = computed(() => {
   if (rest.value < 0) return { error: "המסלולים גדולים מההלוואה. הקטינו אחד מהם." };
   try {
     const flow = mixCashFlow(specs.value, scenarioSpec.value);
-    return { flow, summary: mixSummary(flow), exposure: exposure(specs.value) };
+    return { flow, summary: summaryOf(specs.value, flow), exposure: exposure(specs.value) };
   } catch {
     return { error: "בתרחיש הזה אחוז הריבית באחד המסלולים יורד מתחת לאפס. הקטינו את הירידה, או העלו את אחוז הריבית של המסלול." };
   }
@@ -240,7 +251,7 @@ const compare = computed(() => {
   try {
     const specs = toSpecs(props.compareTo.tracks);
     const flow = mixCashFlow(specs, scenarioSpec.value);
-    const summary = mixSummary(flow);
+    const summary = summaryOf(specs, flow);
     return { specs, flow, summary, loan: loanOf(specs), delta: summaryDelta(ok.value.summary, summary) };
   } catch {
     return null;

@@ -157,7 +157,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
   </dl>
 </div>
 
-הקו של חמש הנקודות: <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. השגיאות בכל נקודה: {p("h.resid")} (הערך האמיתי פחות מה שהקו אומר). הטעות הממוצעת {p("h.mae")}, ה־RMSE {p("h.rmse")}. בעשר הנקודות כולן, שני קווים שונים כי הנתונים שונים, הקו הטוב ביותר הוא <M>y = {p("t.a")} × x + {p("t.b")}</M> עם MAE {p("t.mae")} ו־RMSE {p("t.rmse")}.
+הקו של חמש הנקודות: <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. השגיאות בכל נקודה: <span class="ltr">{p("h.resid")}</span> (הערך האמיתי פחות מה שהקו אומר). הטעות הממוצעת {p("h.mae")}, ה־RMSE {p("h.rmse")}. בעשר הנקודות כולן, שני קווים שונים כי הנתונים שונים, הקו הטוב ביותר הוא <M>y = {p("t.a")} × x + {p("t.b")}</M> עם MAE {p("t.mae")} ו־RMSE {p("t.rmse")}.
 
 **מתי הנוסחה נכונה?**
 1. יש לפחות שתי נקודות, ולא כל ערכי x זהים.
@@ -201,7 +201,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 
 **צעד 1 — הקו.** מחמש הנקודות: <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>.
 
-**צעד 2 — חיזוי.** במימון 65%: <M>{p("h.slope")} × 65 + {p("h.icpt")} = {p("h.pred65")}</M>. הנקודה האמיתית בדוגמה היא 1.25, השגיאה {resids[3]}.
+**צעד 2 — חיזוי.** במימון 65%: <M>{p("h.slope")} × 65 + {p("h.icpt")} = {p("h.pred65")}</M>. הנקודה האמיתית בדוגמה היא 1.25, השגיאה <span class="ltr">{resids[3]}</span>.
 
 **צעד 3 — מה אפשר להגיד.** בתוך הטווח (50 עד 70), הקו נותן אומדן סביר. מחוץ לו, אין מידע.
 
@@ -258,7 +258,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
   ערך אמיתי של 1.25, והקו אומר 1.2. מה השגיאה?
 </ChoiceExercise>
 
-<NumericExercise client:visible id="8.5-2" n={2} level="קל" answer={f.raw("ex.pred")} errors={[]}>
+<NumericExercise client:visible id="8.5-2" n={2} level="קל" answer={f.raw("ex.pred")} errors={[{ value: f.raw("ex.pred_nob"), message: "שכחתם להוסיף את נקודת ההתחלה, 0.642: הקו הוא שיפוע כפול x ועוד נקודת ההתחלה." }]}>
   הקו <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. מה הוא אומר במימון 55%? (לשלוש ספרות אחרי הנקודה)
 </NumericExercise>
 
@@ -271,7 +271,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 </NumericExercise>
 
 <Solution for="8.5-3">
-השגיאות: 0.02, −0.01, 0.02, 0, 0. בערך מוחלט: 0.02, 0.01, 0.02, 0, 0, סכום 0.05, חלקי 5: {p("ex.mae")}. (ה־RMSE הוא {p("ex.rmse")}.)
+השגיאות: <span class="ltr">0.02, −0.01, 0.02, 0, 0</span>. בערך מוחלט: <span class="ltr">0.02, 0.01, 0.02, 0, 0</span>, סכום 0.05, חלקי 5: {p("ex.mae")}. (ה־RMSE הוא {p("ex.rmse")}.)
 </Solution>
 
 <NumericExercise client:visible id="8.5-4" n={4} level="בינוני" answer={f.raw("h.fit_mae")} tolerance={0.00005} near={0.0005} errors={[{ value: f.raw("ex.mae"), message: "זה ה־MAE של הקו האחר. הקו הטוב ביותר טועה פחות." }]}>
@@ -279,10 +279,10 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 </NumericExercise>
 
 <Solution for="8.5-4">
-השגיאות {p("h.resid")}: הסכום של הערכים המוחלטים חלקי 5 הוא {p("h.fit_mae")}, קטן מהקו האחר.
+השגיאות <span class="ltr">{p("h.resid")}</span>: הסכום של הערכים המוחלטים חלקי 5 הוא {p("h.fit_mae")}, קטן מהקו האחר.
 </Solution>
 
-<NumericExercise client:visible id="8.5-5" n={5} level="בינוני" answer={f.raw("x.pred90")} tolerance={0.01} near={0.05} errors={[]}>
+<NumericExercise client:visible id="8.5-5" n={5} level="בינוני" answer={f.raw("x.pred90")} tolerance={0.01} near={0.05} errors={[{ value: f.raw("x.pred90_nob"), message: "שכחתם את נקודת ההתחלה b: הקו הוא שיפוע כפול x ועוד b." }]}>
   הקו של עשר הנקודות, <M>y = {p("t.a")} × x + {p("t.b")}</M>, אומר מה במימון 90%? (ובכל זאת: האם אפשר להסתמך על זה?)
 </NumericExercise>
 

@@ -137,7 +137,7 @@ export const predictionOptions = [
           <td class="py-2 pe-3"><span class="ltr">{r.n}</span></td>
           <td class="py-2 pe-3"><span class="ltr">{pc(r.predicted)}</span></td>
           <td class="py-2 pe-3"><span class="ltr">{pc(r.observed)}</span> <span class="text-caption text-n600">({r.happened} מתוך {r.n})</span></td>
-          <td class="py-2 pe-3"><span class="ltr">{gapPts(r.gap)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{eq(gapPts(r.gap))}</span></td>
         </tr>
       ))}
     </tbody>
@@ -181,7 +181,7 @@ export const predictionOptions = [
   <p class="mt-2 text-caption text-n600">{MARK}</p>
 </div>
 
-בפס {rng(thin[2])} יש רק {thin[2].n} מבקשים, ומהם אושרו {pc(thin[2].observed)} כשהמודל אמר {pc(thin[2].predicted)}: פער של {gapPts(thin[2].gap)} נקודות אחוז, בכיוון **הפוך** מהאמת (בטבלה של {f.plain("n")} המבקשים הפער בפס הזה קטן מאוד). בפס עם מעט מבקשים כל מקרה זז את החלק בהרבה: טבלת כיול מעטה מגזימה ברעש. לכן לא סומכים על פס עם פחות ממספר מסוים של מקרים (בשיעור, {f.plain("recal.min")}).
+בפס {rng(thin[2])} יש רק {thin[2].n} מבקשים, ומהם אושרו {pc(thin[2].observed)} כשהמודל אמר {pc(thin[2].predicted)}: פער של {eq(gapPts(thin[2].gap))} נקודות אחוז, בכיוון **הפוך** מהאמת (בטבלה של {f.plain("n")} המבקשים הפער בפס הזה קטן מאוד). בפס עם מעט מבקשים כל מקרה זז את החלק בהרבה: טבלת כיול מעטה מגזימה ברעש. לכן לא סומכים על פס עם פחות ממספר מסוים של מקרים (בשיעור, {f.plain("recal.min")}).
 
 ### תיקון: ללמוד את המפה
 
@@ -199,15 +199,15 @@ export const predictionOptions = [
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recal.trained}</span> מבקשים (בדיקה על <span class="ltr">{recal.tested}</span>)</td><td class="py-2 pe-3"><span class="ltr">{recal.before.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.after.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.after.brier}</span></td></tr>
-      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recalSmall.trained}</span> מבקשים (בדיקה על <span class="ltr">{recalSmall.tested}</span>)</td><td class="py-2 pe-3"><span class="ltr">{recalSmall.before.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.after.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.after.brier}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recal.trained}</span> מבקשים (בדיקה על <span class="ltr">{recal.tested}</span>)</td><td class="py-2 pe-3"><span class="ltr">{eq(recal.before.gap)}</span></td><td class="py-2 pe-3"><span class="ltr">{eq(recal.after.gap)}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.after.brier}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recalSmall.trained}</span> מבקשים (בדיקה על <span class="ltr">{recalSmall.tested}</span>)</td><td class="py-2 pe-3"><span class="ltr">{eq(recalSmall.before.gap)}</span></td><td class="py-2 pe-3"><span class="ltr">{eq(recalSmall.after.gap)}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.after.brier}</span></td></tr>
     </tbody>
   </table>
   <p class="mt-2 text-caption text-n600">{MARK} הכול על המבקשים שהתיקון לא ראה. פס שנלמד ממעט מקרים (פחות מ־{f.plain("recal.min")}) נשאר כמו שהיה.</p>
 </div>
 
 שני דברים:
-1. **עם {recal.trained} מבקשים ללמוד, הפער יורד** מ־{recal.before.gap} ל־{recal.after.gap}, אבל לא נעלם: הערכים בכל פס נלמדו מדגימה, והם עצמם רועשים. ציון בריאר כמעט לא זז ({recal.before.brier} ל־{recal.after.brier}): רוב השגיאה היא רעש שאי אפשר לתקן, לא בעיה של כיול.
+1. **עם {recal.trained} מבקשים ללמוד, הפער יורד** מ־{eq(recal.before.gap)} ל־{eq(recal.after.gap)}, אבל לא נעלם: הערכים בכל פס נלמדו מדגימה, והם עצמם רועשים. ציון בריאר כמעט לא זז ({recal.before.brier} ל־{recal.after.brier}): רוב השגיאה היא רעש שאי אפשר לתקן, לא בעיה של כיול.
 2. **עם {recalSmall.trained} מבקשים ואותם עשרה פסים אין תיקון בכלל:** בכל פס יש פחות מ־{f.plain("recal.min")} מבקשים, ולכן נשארים עם המודל כמו שהוא. אי אפשר לכייל בלי נתונים.
 
 מכאן, הדבר החשוב: הסתברות מכוילת היא **ממצא מנתונים**, לא תכונה של נוסחה. מי שמציג ״90%״ בלי שמישהו בדק אותו מול מה שקרה, מציג מספר שלא ידוע אם הוא נכון.
@@ -218,7 +218,7 @@ export const predictionOptions = [
 
 </Section>
 
-כל נקודה היא פס של תחזיות. אם הנקודות על הקו המקווקו, ״70%״ הוא בערך 7 מתוך 10. מעל הקו, המודל נמוך מדי; מתחתיו, גבוה מדי.
+שימו לב: כשמדליקים את התיקון, הכלי לומד תמיד על המחצית הראשונה של המבקשים ובודק על השנייה (עם 300 מבקשים: 150 ו־150), ולכן אינו משחזר בדיוק את שורת ה־100 מבקשים שבטבלה של התיקון. כל נקודה היא פס של תחזיות. אם הנקודות על הקו המקווקו, ״70%״ הוא בערך 7 מתוך 10. מעל הקו, המודל נמוך מדי; מתחתיו, גבוה מדי.
 
 <CalibrationCurve client:visible seed={APPROVALS.seed} nMax={APPROVALS.n} />
 
@@ -231,7 +231,7 @@ export const predictionOptions = [
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
     <li>עם מעט מבקשים הנקודות קופצות; עם הרבה הן מתייצבות. אבל הן מתייצבות **מתחת לקו** בפסים העליונים: המודל באמת מגזים, והרעש לא הסיבה.</li>
-    <li>הנקודות שאחרי התיקון (תכולות) קרובות יותר לקו, והפער יורד: מ־{recal.before.gap} ל־{recal.after.gap}.</li>
+    <li>הנקודות שאחרי התיקון (תכולות) קרובות יותר לקו, והפער יורד: מ־{eq(recal.before.gap)} ל־{eq(recal.after.gap)}.</li>
     <li>עם מעט מבקשים לא נשאר פס עם מספיק מקרים, ולכן התיקון לא עושה כלום: הנקודות לא זזות.</li>
   </ol>
 </details>
@@ -294,9 +294,9 @@ export const predictionOptions = [
 
 **צעד 1 — הפס של 0.8.** חמישה מבקשים, ממוצע תחזיות {hand[4].predicted}, אושרו {hand[4].happened} מתוך {hand[4].n}: {hand[4].observed}.
 
-**צעד 2 — הפער.** <M>{hand[4].observed} − {hand[4].predicted} = {hand[4].gap}</M>: המודל הבטיח יותר ממה שקרה.
+**צעד 2 — הפער.** <M>{hand[4].observed} − {hand[4].predicted} = {eq(hand[4].gap)}</M>: המודל הבטיח יותר ממה שקרה.
 
-**צעד 3 — הפס של 0.4.** חמישה מבקשים, אושרו {hand[2].happened} מתוך {hand[2].n}: {hand[2].observed}, בדיוק מה שהמודל אמר: פער {hand[2].gap}.
+**צעד 3 — הפס של 0.4.** חמישה מבקשים, אושרו {hand[2].happened} מתוך {hand[2].n}: {hand[2].observed}, בדיוק מה שהמודל אמר: פער {eq(hand[2].gap)}.
 
 **צעד 4 — בריאר.** לכל מבקש מחשבים (תחזית פחות מה שקרה) בריבוע, וממוצע של העשרה: {f.plain("hand.brier")}.
 
@@ -319,7 +319,7 @@ export const predictionOptions = [
   rows={[
     { prompt: `המודל אמר ${pc(hand[2].predicted)}, ואושרו ${pc(hand[2].observed)} מ־${hand[2].n} מבקשים`, answer: "מכוילת", given: true, why: "הממוצע שהמודל אמר שווה למה שקרה." },
     { prompt: `המודל אמר ${pc(hand[4].predicted)}, ואושרו ${pc(hand[4].observed)} מ־${hand[4].n} מבקשים`, answer: "אין מספיק נתונים", why: `עם ${hand[4].n} מבקשים בפס, פער כזה יכול להיות רעש; צריך הרבה יותר מקרים כדי להחליט.` },
-    { prompt: `המודל אמר ${pc(top.predicted)}, ואושרו ${pc(top.observed)} מ־${top.n} מבקשים`, answer: "לא מכוילת", why: `פער של ${gapPts(top.gap)} נקודות אחוז, עם מאות מבקשים בפס: זה לא רעש.` },
+    { prompt: `המודל אמר ${pc(top.predicted)}, ואושרו ${pc(top.observed)} מ־${top.n} מבקשים`, answer: "לא מכוילת", why: `פער של ${eq(gapPts(top.gap))} נקודות אחוז, עם מאות מבקשים בפס: זה לא רעש.` },
     { prompt: `המודל אמר ${pc(thin[2].predicted)}, ואושרו ${pc(thin[2].observed)} מ־${thin[2].n} מבקשים`, answer: "אין מספיק נתונים", why: "פס קטן: כל מקרה זז אותו הרבה." },
   ]}
   success="נכון. כיול נקבע לפי פער, אבל רק כשיש בפס מספיק מקרים."
@@ -382,7 +382,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="8.19-3">
-<M>3 ÷ 5 = {hand[4].observed}</M>. הפער מול 0.8: {hand[4].gap}.
+<M>3 ÷ 5 = {hand[4].observed}</M>. הפער מול 0.8: {eq(hand[4].gap)}.
 </Solution>
 
 <NumericExercise
@@ -445,7 +445,7 @@ export const predictionOptions = [
     { text: "לא: רוב השגיאה היא רעש, ושכיול לא מתקן רעש", correct: true, feedback: "נכון. ציון בריאר כמעט לא ירד, והפער כן." },
   ]}
 >
-  אחרי התיקון בשיעור הפער ירד מ־{recal.before.gap} ל־{recal.after.gap}, וציון בריאר מ־{recal.before.brier} ל־{recal.after.brier}. האם התיקון הפך את המודל למדויק?
+  אחרי התיקון בשיעור הפער ירד מ־{eq(recal.before.gap)} ל־{eq(recal.after.gap)}, וציון בריאר מ־{recal.before.brier} ל־{recal.after.brier}. האם התיקון הפך את המודל למדויק?
 </ChoiceExercise>
 
 <ChoiceExercise

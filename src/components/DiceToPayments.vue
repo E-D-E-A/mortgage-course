@@ -69,7 +69,7 @@ const showTable = ref(false);
     </div>
     <p v-if="note" class="mt-2 text-caption text-n600">{{ note }}</p>
 
-    <button type="button" class="mt-3 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">{{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}</button>
+    <button type="button" class="mt-3 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">{{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}</button>
     <div v-if="showTable" class="mt-2 overflow-auto">
       <table class="w-full border-collapse text-body-m">
         <thead><tr class="border-b border-n200 text-caption text-n600"><th class="py-2 text-start">פאה</th><th class="py-2 text-start">שינוי בריבית</th><th class="py-2 text-start">ריבית חדשה</th><th class="py-2 text-start">החזר</th><th class="py-2 text-start">סיכוי</th></tr></thead>

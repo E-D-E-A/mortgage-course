@@ -26,9 +26,11 @@ const cond = computed<Condition[]>(() => [
   { label: "לפחות 40% בארוכה", a: ["-3", "2"], b: "0" },
   { label: "ההחזר החודשי", a: props.pay, b: String(cap.value) },
 ]);
-const problem = computed(() => ({ c: props.cost, goal: "min" as const, conditions: cond.value, decimals: 4 }));
+// The answer is solved to ten decimals, like the lesson's facts (a shekel amount must not move because of rounding); the crossings table shows two.
+const problem = computed(() => ({ c: props.cost, goal: "min" as const, conditions: cond.value, decimals: 10 }));
 const result = computed(() => solveLp(problem.value));
-const crossings = computed(() => allCrossings(problem.value));
+const crossings = computed(() => allCrossings({ ...problem.value, decimals: 2 }));
+const shek = (x: string) => String(Math.round(Number(x) * 100000));
 
 const M = 14;
 const W = 520;
@@ -81,7 +83,7 @@ const status = computed(() => result.value.status);
     <div v-if="status === 'optimal'" class="mt-4 rounded-md bg-n50 p-3" role="status">
       <p class="text-caption text-n600">הפינה הטובה ביותר (העלות הנמוכה ביותר)</p>
       <p class="text-h3 text-navy">
-        ארוכה (30 שנה) <span class="ltr">{{ money(String(Number(best.x) * 100000)) }} ₪</span> · קצרה (15 שנה) <span class="ltr">{{ money(String(Number(best.y) * 100000)) }} ₪</span>
+        ארוכה (30 שנה) <span class="ltr">{{ money(shek(best.x)) }} ₪</span> · קצרה (15 שנה) <span class="ltr">{{ money(shek(best.y)) }} ₪</span>
       </p>
       <p class="text-caption text-n700">סך התשלומים: <span class="ltr">{{ money(best.value) }} ₪</span></p>
     </div>
@@ -115,7 +117,7 @@ const status = computed(() => result.value.status);
     </svg>
     <p class="text-center text-caption text-n600">הציר האופקי: סכום במסלול הארוך (גדל לשמאל) · האנכי: סכום במסלול הקצר · יחידות של 100,000 ₪</p>
 
-    <button type="button" class="mt-3 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-3 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-auto">

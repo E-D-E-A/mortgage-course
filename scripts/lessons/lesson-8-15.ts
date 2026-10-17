@@ -60,8 +60,12 @@ export default function lesson815(): LessonData {
     frFront("client.front", client),
     frReach("law.reach", law, 5),
     frReachExact("law.reach_exact", law, 5),
+    frReachExact("law.reach_fine", law, 1),
     frNeverCount("law.never_count", law, 5),
   );
+  // The page says: the same rows are never chosen with or without rounding, and on a grid five times finer. Fail the build if that stops being true.
+  const sameNever = (a: string, b: string) => JSON.stringify((byId(a).value as { never: string[] }).never) === JSON.stringify((byId(b).value as { never: string[] }).never);
+  if (!sameNever("law.reach", "law.reach_exact") || !sameNever("law.reach", "law.reach_fine")) throw new Error("lesson 8.15: the never-chosen rows depend on rounding or on the grid; the page text must say so");
   for (const [k, w] of Object.entries(WEIGHT_SETS)) push(frPick(`pick.${k}`, law, w), frPick(`pick.client.${k}`, client, w));
 
   // Hand-sized comparisons for the explanation and the exercises.

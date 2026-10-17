@@ -280,9 +280,14 @@ export const predictionOptions = [
   tolerance={0.05}
   near={0}
   answer={f.raw("m.wild.p_pct")}
+  errors={[{ value: f.raw("m.wild.count_at_least"), message: "זה המספר מתוך 1,000, לא האחוז." }]}
 >
   לפי הטבלה, באיזה אחוז מהעתידים עבר התשלום את {f.whole("t.threshold")} בהנחה ״סוער״?
 </NumericExercise>
+
+<Solution for="8.12-2">
+זו השורה ״סוער״ בטבלה: {f.raw("m.wild.p_pct")}% מהעתידים עברו את {f.whole("t.threshold")}.
+</Solution>
 
 <NumericExercise
   client:visible
@@ -293,9 +298,14 @@ export const predictionOptions = [
   tolerance={0}
   near={0}
   answer={f.raw("m.normal.count_at_least")}
+  errors={[{ value: f.raw("m.normal.p_pct"), message: "זה האחוז. השאלה מבקשת את המספר מתוך 1,000." }]}
 >
   בהנחה ״רגיל״, מתוך 1,000 עתידים, כמה עברו את הסף?
 </NumericExercise>
+
+<Solution for="8.12-3">
+זו השורה ״רגיל״ בטבלה, בעמודה ״כמה זה מתוך 1,000״: {f.raw("m.normal.count_at_least")}.
+</Solution>
 
 <ChoiceExercise
   client:visible

@@ -58,6 +58,7 @@ export default function lesson817(): LessonData {
   push(
     pmMargin("ex.m1", M, 45, 42),
     pmMargin("ex.m2", M, 61, 38),
+    pmMargin("ex.m2_wrong", M, 61, 45),
     pmMargin("ex.m3", M, 60, 40),
     pmRate("ex.r1", v("anchor"), M, 61, 38),
     pmWhatIf("ex.w", v("anchor"), M, { ltv: 70, pti: 45 }, { ltv: 60 }),

@@ -85,7 +85,7 @@ export const predictionOptions = [
 
 ### רווח סמך
 
-<Term t="רווח סמך" client:visible lesson="8.18">רווח סמך</Term> של 95% הוא האומדן, פלוס ומינוס שגיאת התקן כפול מספר שנקרא t. בחמש הצעות t הוא {hand.t}: <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{hand.low} עד {hand.high}. (המכפלה נעשית על הערכים לפני העיגול, ולכן בספרה האחרונה יכול להיות הבדל קל מהמספרים המוצגים.) האות t כאן היא מספר מטבלה, ולא משהו אחר שהיא סימנה קודם.
+<Term t="רווח סמך" client:visible lesson="8.18">רווח סמך</Term> של 95% הוא האומדן, פלוס ומינוס שגיאת התקן כפול מספר שנקרא t. בחמש הצעות t הוא {hand.t}: <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{eq(hand.low)} עד {eq(hand.high)}. (המכפלה נעשית על הערכים לפני העיגול, ולכן בספרה האחרונה יכול להיות הבדל קל מהמספרים המוצגים.) האות t כאן היא מספר מטבלה, ולא משהו אחר שהיא סימנה קודם.
 
 למה t ולא 2? כי עם מעט נתונים גם סטיית התקן עצמה מעורערת, והטווח צריך להיות רחב יותר: עם שלוש הצעות בכל צד t הוא {hstep.t}, כשבקבוצה הקטנה יש {chain[60].estimate.nAbove} הצעות t הוא {chain[60].estimate.t}, ובגבול של הרבה נתונים {f.plain("t.limit")}. את הערכים לוקחים מטבלה (ראו המקורות).
 
@@ -116,7 +116,7 @@ export const predictionOptions = [
 
 ### רגרסיה: קו לנתונים
 
-<Term t="רגרסיה" client:visible lesson="8.18">רגרסיה</Term> היא הדרך למצוא קשר בין מספרים. בשיעור 8.5 התאמתם קו ישר לנקודות בשיטת הריבועים הפחותים. נעשה זאת על ההצעות הסינתטיות: שיעור המימון (אופקי) מול המרווח (אנכי), {f.plain("gen.n")} הצעות. הקו שיוצא: המרווח גדל בערך ב־{slope.slope} נקודות אחוז לכל נקודת אחוז של מימון, עם טווח 95% של {slope.low} עד {slope.high}.
+<Term t="רגרסיה" client:visible lesson="8.18">רגרסיה</Term> היא הדרך למצוא קשר בין מספרים. בשיעור 8.5 התאמתם קו ישר לנקודות בשיטת הריבועים הפחותים. נעשה זאת על ההצעות הסינתטיות: שיעור המימון (אופקי) מול המרווח (אנכי), {f.plain("gen.n")} הצעות. הקו שיוצא: המרווח גדל בערך ב־{eq(slope.slope)} נקודות אחוז לכל נקודת אחוז של מימון, עם טווח 95% של {eq(slope.low)} עד {eq(slope.high)}.
 
 זה נראה מדויק ומועיל. **אבל נתנו לקורס לבנות את הנתונים בעצמו**: יש בהם מדרגה אחת, בסף {f.plain("thr")}%, בגודל {f.plain("truth.step")}, ובכל מקום אחר המרווח שטוח. הקו אומר שהמרווח עולה בהדרגה, מנקודת אחוז לנקודה, וזה לא נכון. הטעות הממוצעת של הקו היא {lvs.lineMae}, והטעות של מודל שמכיר את המדרגה, ממוצע משני צידי הסף, היא {lvs.stepMae}: פחות ממחצית. **מי שמתאים צורה שגויה מקבל טווח צר סביב מספר שאינו קיים.**
 
@@ -124,7 +124,7 @@ export const predictionOptions = [
 
 כדי לאמוד את המדרגה: ממוצע המרווחים מעל הסף, פחות הממוצע עד הסף. לכל ממוצע יש שגיאה, ולהפרש יש שגיאת תקן משלו: <M>√(שונות<sub>1</sub> ÷ כמות<sub>1</sub> + שונות<sub>2</sub> ÷ כמות<sub>2</sub>)</M>.
 
-דוגמה של שלוש הצעות מכל צד (מספרים להמחשה). עד הסף: <span class="ltr">{HAND_BELOW.join(" , ")}</span>; מעל הסף: <span class="ltr">{HAND_ABOVE.join(" , ")}</span>. הממוצעים: עד הסף {hstep.meanBelow}, מעל {hstep.meanAbove}, ההפרש {hstep.step}, שגיאת תקן {hstep.se}. עם 2 דרגות חופש (קטן מבין שתי הכמויות פחות אחד) t הוא {hstep.t}, והטווח {hstep.low} עד {hstep.high}: מרחב גדול, כי יש רק שלוש הצעות בכל צד.
+דוגמה של שלוש הצעות מכל צד (מספרים להמחשה). עד הסף: <span class="ltr">{HAND_BELOW.join(" , ")}</span>; מעל הסף: <span class="ltr">{HAND_ABOVE.join(" , ")}</span>. הממוצעים: עד הסף {hstep.meanBelow}, מעל {hstep.meanAbove}, ההפרש {eq(hstep.step)}, שגיאת תקן {hstep.se}. עם 2 דרגות חופש (קטן מבין שתי הכמויות פחות אחד) t הוא {hstep.t}, והטווח {eq(hstep.low)} עד {eq(hstep.high)}: מרחב גדול, כי יש רק שלוש הצעות בכל צד.
 
 ### מעט נתונים: הנחת פתיחה
 
@@ -148,7 +148,7 @@ export const predictionOptions = [
         <tr class="border-b border-n100 align-top">
           <td class="py-2 pe-2 font-semibold"><span class="ltr">{n}</span></td>
           <td class="py-2 pe-2"><span class="ltr">{chain[n].nBelow} / {chain[n].nAbove}</span></td>
-          <td class="py-2 pe-2">{chain[n].estimate ? <span class="ltr whitespace-nowrap">{chain[n].estimate.step} ({chain[n].estimate.low}–{chain[n].estimate.high})</span> : "אין נתונים"}</td>
+          <td class="py-2 pe-2">{chain[n].estimate ? <span class="ltr whitespace-nowrap">{eq(chain[n].estimate.step)} ({eq(chain[n].estimate.low)}–{eq(chain[n].estimate.high)})</span> : "אין נתונים"}</td>
           <td class="py-2 pe-2"><span class="ltr">{chain[n].posterior.mean}</span></td>
           <td class="py-2 pe-2"><span class="ltr">{pct(chain[n].posterior.priorWeight)}</span></td>
         </tr>
@@ -160,9 +160,9 @@ export const predictionOptions = [
 
 מה רואים:
 1. **ב־{NS[0]} הצעות אין שום הצעה מעל הסף:** אין נתונים על המדרגה, ולכן נשארים עם ההנחה, {chain[8].posterior.mean}. זה מה שהנחת פתיחה נותנת: תשובה, אפילו בלי נתונים, והיא ״אומרת״ במפורש שהיא רק הנחה.
-2. **עם {chain[12].nAbove} הצעות מעל הסף** ({NS[1]} הצעות) האומדן קופץ ל־{chain[12].estimate.step}, עם טווח רחב ({chain[12].estimate.low}–{chain[12].estimate.high}); ההנחה עדיין שוקלת {pct(chain[12].posterior.priorWeight)} ומושכת את התוצאה ל־{chain[12].posterior.mean}.
-3. **ככל שיש יותר נתונים משקל ההנחה יורד:** {pct(chain[12].posterior.priorWeight)}, {pct(chain[20].posterior.priorWeight)}, {pct(chain[30].posterior.priorWeight)}, {pct(chain[60].posterior.priorWeight)}. עם 60 הצעות האומדן ({chain[60].estimate.step}) והתוצאה ({chain[60].posterior.mean}) כמעט זהים.
-4. **הטווח מתכווץ:** מ־{chain[12].estimate.low}–{chain[12].estimate.high} לטווח של {chain[60].estimate.low}–{chain[60].estimate.high}. והמדרגה האמיתית שיצרנו, {f.plain("truth.step")}, בתוך טווח 60 ההצעות, אבל קרוב לקצה: אומדן יכול להיות רחוק קצת מהאמת גם כשהטווח לא מפספס אותה.
+2. **עם {chain[12].nAbove} הצעות מעל הסף** ({NS[1]} הצעות) האומדן קופץ ל־{eq(chain[12].estimate.step)}, עם טווח רחב ({eq(chain[12].estimate.low)}–{eq(chain[12].estimate.high)}); ההנחה עדיין שוקלת {pct(chain[12].posterior.priorWeight)} ומושכת את התוצאה ל־{chain[12].posterior.mean}.
+3. **ככל שיש יותר נתונים משקל ההנחה יורד:** {pct(chain[12].posterior.priorWeight)}, {pct(chain[20].posterior.priorWeight)}, {pct(chain[30].posterior.priorWeight)}, {pct(chain[60].posterior.priorWeight)}. עם 60 הצעות האומדן ({eq(chain[60].estimate.step)}) והתוצאה ({chain[60].posterior.mean}) כמעט זהים.
+4. **הטווח מתכווץ:** מ־{eq(chain[12].estimate.low)}–{eq(chain[12].estimate.high)} לטווח של {eq(chain[60].estimate.low)}–{eq(chain[60].estimate.high)}. והמדרגה האמיתית שיצרנו, {f.plain("truth.step")}, בתוך טווח 60 ההצעות, אבל קרוב לקצה: אומדן יכול להיות רחוק קצת מהאמת גם כשהטווח לא מפספס אותה.
 
 <Callout title="מה יכול להשתבש" tone="warning">
 <p><strong>הנחה לא טובה, מעט נתונים.</strong> אילו הנחת הפתיחה הייתה רחוקה מאוד מהאמת ובטוחה בעצמה (פיזור קטן), היא הייתה מושכת את התוצאה רחוק. לכן בודקים מה קורה אם ההנחה שגויה (הכלי שבהמשך נותן לנסות), ומחליפים אותה בנתונים כשיש.</p>
@@ -188,7 +188,7 @@ export const predictionOptions = [
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>הטווח מתכווץ (מ־{chain[12].estimate.low}–{chain[12].estimate.high} ב־12 הצעות ל־{chain[60].estimate.low}–{chain[60].estimate.high} ב־60), ומשקל ההנחה יורד.</li>
+    <li>הטווח מתכווץ (מ־{eq(chain[12].estimate.low)}–{eq(chain[12].estimate.high)} ב־12 הצעות ל־{eq(chain[60].estimate.low)}–{eq(chain[60].estimate.high)} ב־60), ומשקל ההנחה יורד.</li>
     <li>עם 12 הצעות ו־3 מעל הסף, הנחה חזקה ושגויה מושכת את התוצאה מטה, רחוק מהנתונים; ההנחה מנצחת כי הנתונים מעטים וחסרי דיוק.</li>
     <li>עם 60 הצעות כמעט שום דבר לא משתנה: הנתונים מכריעים. הנחה שגויה פוגעת בעיקר כשיש מעט נתונים.</li>
   </ol>
@@ -261,9 +261,9 @@ export const predictionOptions = [
 
 **צעד 4 — t.** 4 דרגות חופש: {hand.t}.
 
-**צעד 5 — הטווח.** <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{hand.low} עד {hand.high} (מהערכים לפני העיגול).
+**צעד 5 — הטווח.** <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{eq(hand.low)} עד {eq(hand.high)} (מהערכים לפני העיגול).
 
-**מסקנה.** הממוצע של חמש הצעות הוא {hand.mean}, אבל הערך האמיתי יכול, בטווח של 95%, להיות בין {hand.low} ל־{hand.high}. אילו רוצים לדעת עד חצי מזה, צריך כמעט פי ארבעה יותר הצעות.
+**מסקנה.** הממוצע של חמש הצעות הוא {hand.mean}, אבל הערך האמיתי יכול, בטווח של 95%, להיות בין {eq(hand.low)} ל־{eq(hand.high)}. אילו רוצים לדעת עד חצי מזה, צריך כמעט פי ארבעה יותר הצעות.
 
 <Section kind="דוגמה חצי פתורה">
 
@@ -321,7 +321,7 @@ export const predictionOptions = [
   answer={hand.mean}
   tolerance={0.001}
   near={0.01}
-  errors={[]}
+  errors={[{ value: "4.4", tolerance: 0.001, message: "זה הסכום של חמשת המרווחים. הממוצע הוא הסכום חלקי חמש." }]}
 >
   חמש הצעות עם מרווחים 0.84, 0.90, 0.88, 0.93, 0.85. מה הממוצע?
 </NumericExercise>
@@ -363,7 +363,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="8.18-4">
-<M>{hand.mean} + {hand.t} × {hand.se} ≈ {hand.high}</M>, כשהחישוב נעשה מהערכים לפני העיגול (עם המעוגלים אפשר לקבל הבדל של ספרה אחרונה).
+<M>{hand.mean} + {hand.t} × {hand.se} ≈ {eq(hand.high)}</M>, כשהחישוב נעשה מהערכים לפני העיגול (עם המעוגלים אפשר לקבל הבדל של ספרה אחרונה).
 </Solution>
 
 <ChoiceExercise
@@ -378,7 +378,7 @@ export const predictionOptions = [
     { text: "לא: יש בנתונים מדרגה, והקו מציג עלייה שאינה קיימת", correct: true, feedback: "נכון. הקו טועה יותר ממודל שמכיר את המדרגה, וטווח צר סביב קו שגוי לא עוזר." },
   ]}
 >
-  הרגרסיה על ההצעות הסינתטיות נותנת שיפוע {slope.slope} עם טווח {slope.low} עד {slope.high}. האם מותר לומר ״כל נקודת אחוז של מימון מוסיפה {slope.slope} למרווח״?
+  הרגרסיה על ההצעות הסינתטיות נותנת שיפוע {eq(slope.slope)} עם טווח {eq(slope.low)} עד {eq(slope.high)}. האם מותר לומר ״כל נקודת אחוז של מימון מוסיפה {eq(slope.slope)} למרווח״?
 </ChoiceExercise>
 
 <NumericExercise
@@ -396,7 +396,7 @@ export const predictionOptions = [
 </NumericExercise>
 
 <Solution for="8.18-6">
-<M>{chain[60].estimate.meanAbove} − {chain[60].estimate.meanBelow} = {chain[60].estimate.step}</M>. הטווח {chain[60].estimate.low} עד {chain[60].estimate.high}.
+<M>{chain[60].estimate.meanAbove} − {chain[60].estimate.meanBelow} = {eq(chain[60].estimate.step)}</M>. הטווח {eq(chain[60].estimate.low)} עד {eq(chain[60].estimate.high)}.
 </Solution>
 
 <NumericExercise

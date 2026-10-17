@@ -86,7 +86,7 @@ const rows = computed(() =>
       <line :x1="X(lo)" :x2="X(hi)" :y1="130" :y2="130" stroke="var(--mogi-n300)" />
       <g v-for="t in ticks" :key="t">
         <line :x1="X(t)" :x2="X(t)" :y1="130" :y2="136" stroke="var(--mogi-n300)" />
-        <text :x="X(t)" :y="154" text-anchor="middle" font-size="13" fill="var(--mogi-n600)">{{ t.toFixed(1) }}</text>
+        <text :x="X(t)" :y="154" text-anchor="middle" font-size="25" fill="var(--mogi-n600)">{{ t.toFixed(1) }}</text>
       </g>
       <rect :x="X(pm - psd)" :y="28" :width="Math.max(2, X(pm + psd) - X(pm - psd))" height="22" rx="4" fill="var(--mogi-n300)" />
       <line :x1="X(pm)" :x2="X(pm)" :y1="24" :y2="54" stroke="var(--mogi-n600)" stroke-width="2" />
@@ -103,7 +103,7 @@ const rows = computed(() =>
       <span>להראות את המדרגה האמיתית (ידועה כי יצרנו את הנתונים)</span>
     </label>
 
-    <button type="button" class="mt-1 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-1 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-auto">

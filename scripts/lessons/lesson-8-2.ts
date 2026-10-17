@@ -39,7 +39,7 @@ export default function lesson82(): LessonData {
   push(incSum, paySum, factPercent("h.overall", paySum, incSum, 1));
 
   // ── Exercises. ──
-  push(mean("ex.mean", ["4.40", "4.30", "4.35", "4.55"], 2), wmean("ex.w", ["4.2", "4.8"], ["600000", "400000"], 2));
+  push(total("ex.mean_sum", ["4.40", "4.30", "4.35", "4.55"], 2), mean("ex.mean", ["4.40", "4.30", "4.35", "4.55"], 2), wmean("ex.w", ["4.2", "4.8"], ["600000", "400000"], 2));
   push(percentOf("ex.ra", "2400", "8000", 0), percentOf("ex.rb", "16000", "32000", 0));
   const exInc = total("ex.inc", ["8000", "32000"], 0);
   const exPay = total("ex.pay", ["2400", "16000"], 0);

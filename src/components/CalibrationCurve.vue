@@ -34,7 +34,7 @@ const tested = computed(() => (rec.value ? rec.value.tested : n.value));
 
 const W = 420;
 const H = 380;
-const pad = { l: 44, r: 14, t: 14, b: 40 };
+const pad = { l: 54, r: 14, t: 14, b: 44 };
 const X = (p: number) => pad.l + p * (W - pad.l - pad.r);
 const Y = (p: number) => H - pad.b - p * (H - pad.t - pad.b);
 const pts = (rows: typeof tableMain.value) =>
@@ -94,15 +94,15 @@ const sign = (s: string | null) => (s === null ? "—" : `${Number(s) > 0 ? "+" 
       <line :x1="X(0)" :x2="X(1)" :y1="Y(0)" :y2="Y(0)" stroke="var(--mogi-n300)" />
       <line :x1="X(0)" :x2="X(0)" :y1="Y(0)" :y2="Y(1)" stroke="var(--mogi-n300)" />
       <g v-for="t in [0, 0.25, 0.5, 0.75, 1]" :key="t">
-        <text :x="X(t)" :y="H - 18" text-anchor="middle" font-size="13" fill="var(--mogi-n600)">{{ Math.round(t * 100) }}%</text>
-        <text :x="pad.l - 6" :y="Y(t) + 4" text-anchor="end" font-size="13" fill="var(--mogi-n600)">{{ Math.round(t * 100) }}%</text>
+        <text :x="X(t)" :y="H - 20" text-anchor="middle" font-size="16" fill="var(--mogi-n600)">{{ Math.round(t * 100) }}%</text>
+        <text :x="pad.l - 6" :y="Y(t) + 6" text-anchor="end" font-size="16" fill="var(--mogi-n600)">{{ Math.round(t * 100) }}%</text>
       </g>
       <circle v-for="(p, k) in mainPts" :key="`m${k}`" :cx="p.x" :cy="p.y" :r="p.r" :fill="rec ? 'var(--mogi-n400)' : 'var(--mogi-teal-deep)'" fill-opacity="0.75" />
       <circle v-for="(p, k) in afterPts" :key="`a${k}`" :cx="p.x" :cy="p.y" :r="Math.max(3, p.r - 2)" fill="var(--mogi-turquoise-2)" fill-opacity="0.9" />
     </svg>
     <p class="text-center text-caption text-n600">אופקי: מה שהמודל אמר (ממוצע בפס) · אנכי: איזה חלק מהם אושר באמת · גודל הנקודה: כמה מבקשים בפס</p>
 
-    <button type="button" class="mt-3 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-3 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 overflow-auto">

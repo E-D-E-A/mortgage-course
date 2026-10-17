@@ -8,7 +8,7 @@
 import { CANDIDATES, S8_CASE, candidateById } from "../../src/data/case-s8.ts";
 import { evaluate } from "../../src/lib/calc/constraints.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
-import { maxLoanAt, maxPaymentAt, maxVariable } from "../../src/lib/calc/regulation.ts";
+import { maxLoanAt, maxPaymentAt, maxVariable, minFixed } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { feasibleCountFact, measureFact, reasonsFact } from "./_constraints-facts.ts";
 import { difference, given } from "./lesson-3-8.ts";
@@ -52,6 +52,8 @@ export default function lesson87(): LessonData {
   // ── Exercises. ──
   push({ id: "ex.max_loan", kind: "reg_max_loan", inputs: { value: "2000000", deal: "only_home" }, value: moneyString(maxLoanAt("2000000", "only_home")) } as Fact);
   push({ id: "ex.max_var", kind: "reg_max_variable", inputs: { loan: "1200000" }, value: moneyString(maxVariable("1200000")) } as Fact);
+  push({ id: "ex.max_loan_repl", kind: "reg_max_loan", inputs: { value: "2000000", deal: "replacement" }, value: moneyString(maxLoanAt("2000000", "replacement")) } as Fact);
+  push({ id: "ex.min_fixed", kind: "reg_min_fixed", inputs: { loan: "1200000" }, value: moneyString(minFixed("1200000")) } as Fact);
   push(given("ex.price", "2000000"), given("ex.loan", "1200000"));
   return { lesson: "8.7", title: "הנתונים, האילוצים הקשיחים ופתרון אפשרי", note: "A design lesson (future): a teaching model of the filter on the synthetic case.", facts };
 }

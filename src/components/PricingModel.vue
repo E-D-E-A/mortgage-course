@@ -38,8 +38,8 @@ const dealMargin = computed(() => marginOf(model.value, { ltv: dealLtv.value, pt
 
 // Chart (left to right, as numbers are written): financing ratio 30–75 across, margin up.
 const W = 640;
-const H = 320;
-const pad = { l: 44, r: 12, t: 12, b: 34 };
+const H = 336;
+const pad = { l: 60, r: 14, t: 12, b: 44 };
 const X = (v: number) => pad.l + ((v - 30) / 45) * (W - pad.l - pad.r);
 const MAXM = 1.8;
 const Y = (m: number) => H - pad.b - (m / MAXM) * (H - pad.t - pad.b);
@@ -114,11 +114,11 @@ const pp = (s: string) => s;
       <line :x1="pad.l" :x2="W - pad.r" :y1="Y(0)" :y2="Y(0)" stroke="var(--mogi-n300)" />
       <g v-for="t in ticks" :key="t">
         <line :x1="X(t)" :x2="X(t)" :y1="Y(0)" :y2="Y(0) + 5" stroke="var(--mogi-n300)" />
-        <text :x="X(t)" :y="H - 12" text-anchor="middle" font-size="13" fill="var(--mogi-n600)">{{ pct(t) }}</text>
+        <text :x="X(t)" :y="H - 12" text-anchor="middle" font-size="25" fill="var(--mogi-n600)">{{ pct(t) }}</text>
       </g>
       <g v-for="m in [0.5, 1.0, 1.5]" :key="m">
         <line :x1="pad.l" :x2="W - pad.r" :y1="Y(m)" :y2="Y(m)" stroke="var(--mogi-n100)" />
-        <text :x="pad.l - 6" :y="Y(m) + 4" text-anchor="end" font-size="13" fill="var(--mogi-n600)">{{ m.toFixed(1) }}</text>
+        <text :x="pad.l - 6" :y="Y(m) + 8" text-anchor="end" font-size="25" fill="var(--mogi-n600)">{{ m.toFixed(1) }}</text>
       </g>
       <circle v-for="(d, k) in dots" :key="k" :cx="d.x" :cy="d.y" r="4" :fill="d.high ? highColor : lowColor" fill-opacity="0.8" />
       <template v-if="showTruth">
@@ -154,7 +154,7 @@ const pp = (s: string) => s;
       <label class="flex min-h-11 items-center gap-3 text-body-m text-n800"><input v-model="showTruth" type="checkbox" class="h-5 w-5" /><span>להראות את המודל שיצר את הנתונים</span></label>
     </div>
 
-    <button type="button" class="mt-1 text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
+    <button type="button" class="mt-1 inline-flex min-h-11 items-center text-body-m text-navy underline" :aria-expanded="showTable" @click="showTable = !showTable">
       {{ showTable ? "הסתרת הטבלה" : "הצגה כטבלה" }}
     </button>
     <div v-if="showTable" class="mt-2 max-h-72 overflow-auto">
