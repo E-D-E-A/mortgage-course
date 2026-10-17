@@ -172,3 +172,18 @@ export function month61Facts(c: Ctx, p: string, tracks: TrackSpec[]): void {
   add(difference(`${p}.left61`, get("in.recognised"), get(`${p}.p61`)));
   add(difference(`${p}.margin61`, get(`${p}.left61`), get("in.budget")));
 }
+
+/**
+ * A like-for-like reference for the "price of certainty" (author A's 9.2): the same fixed-only loan over 25 years at the chosen bank, offerAt("fixed25").
+ * Facts: `fx.total`, `fx.first` (base scenario), `fx.term` (the fixed-only 30-year total minus the 25-year one: the pure effect of five more years),
+ * `fx.vs_alt` (the 25-year alternative's total minus the fixed 25-year total: what the variable part costs or saves). Needs `g.exposure.<b>.total` and `g.total.<b>.total`.
+ */
+export function fixed25Facts(c: Ctx, bankId: BankId): void {
+  const { add, get } = c;
+  const o = offerAt("fixed25", bankId);
+  if (!o.approved || !o.tracks) throw new Error("the 25-year fixed reference is not approved");
+  add(scnEvalFact("fx.total", "forecast451", o.tracks, "total"));
+  add(scnEvalFact("fx.first", "forecast451", o.tracks, "first"));
+  add(difference("fx.term", get(`g.exposure.${bankId}.total`), get("fx.total")));
+  add(difference("fx.vs_alt", get(`g.total.${bankId}.total`), get("fx.total")));
+}

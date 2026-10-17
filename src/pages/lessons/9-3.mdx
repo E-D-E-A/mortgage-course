@@ -255,6 +255,7 @@ export const halfRows = [
   <div class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
     <p class="!mt-0 text-body-l font-semibold text-n900">מה הם משלמים על הוודאות</p>
     <p class="mt-2 text-body-m text-n700">לעומת {ALT.total}: סך התשלומים גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_total"))}</span> ₪, וההחזר החודשי <em>נמוך</em> ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_total"))}</span> ₪.</p>
+    <p class="mt-2 text-body-m text-n700">הפער כולל חמש שנות תשלום נוספות: אותה קבועה ל־25 שנה עולה {f.shekels("fx.total")}, כלומר התקופה לבדה מוסיפה {f.shekels("fx.term")}, והקבועה ל־25 שנה זולה ב־{f.shekels("fx.vs_alt")} מ{ALT.total}.</p>
     <p class="mt-2 text-body-m text-n700">לעומת {ALT.payment}: ההחזר הראשון גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_payment"))}</span> ₪, אבל סך התשלומים נמוך ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_payment"))}</span> ₪, ואין עלייה בלחץ.</p>
     <p class="mt-2 text-body-m text-n700">ומה שהם מוותרים עליו: ההחזר הראשון הנמוך של {ALT.payment}, ומסלולים אחרים.</p>
   </div>
@@ -614,7 +615,7 @@ export const halfRows = [
 </NumericExercise>
 
 <Solution for="9.3-3">
-<M>{n(`${ch}.total`)} − {n("g.total.b.total")} = {n("pc.total_vs_total")}</M> ₪. בתמורה ההחזר החודשי נמוך ב־{f.shekels("pc.first_vs_total")} והמרווח מהתקציב גדול ב־{f.shekels("pc.margin_vs_total")}.
+<M>{n(`${ch}.total`)} − {n("g.total.b.total")} = {n("pc.total_vs_total")}</M> ₪. בתמורה ההחזר החודשי נמוך ב־{f.shekels("pc.first_vs_total")} והמרווח מהתקציב גדול ב־{f.shekels("pc.margin_vs_total")}. הפער כולל חמש שנות תשלום נוספות: אותה קבועה ל־25 שנה עולה {f.shekels("fx.total")}, כלומר התקופה לבדה מוסיפה {f.shekels("fx.term")}, והקבועה ל־25 שנה זולה ב־{f.shekels("fx.vs_alt")} מ{ALT.total}.
 </Solution>
 
 <NumericExercise
@@ -693,7 +694,7 @@ export const halfRows = [
 <p><strong>מה זה?</strong> מסמך אחד שאומר מה נבחר, אצל מי, למה, כמה זה עולה, מה נפסל, מה לא ידוע ומה צריך להיות נכון עד שהכסף עובר.</p>
 <p><strong>למה זה קיים?</strong> כי בחירה בלי נימוק כתוב אי אפשר לבדוק, לא על ידי הלקוח, לא על ידי בודק ולא על ידי היועץ עצמו כעבור חודש.</p>
 <p><strong>איך זה עובד?</strong> מסננים קודם מה שהמשפחה לא יכולה לחיות איתו (סירוב, תקציב שנשבר), שואלים מה חשוב לה, בוחרים, ובודקים מחדש כל מספר על ההצעה הסופית. כל המספרים מחושבים בקוד; מודל שפה לא מחשב אף מספר.</p>
-<p><strong>איך זה משפיע עליכם?</strong> ההבדל בין החלופה {ALT.exposure} לבין החלופה {ALT.total} אצל אותו בנק הוא {f.shekels("pc.total_vs_total")} בסך התשלומים מול {f.shekels("pc.first_vs_total")} בחודש ומרווח של {f.shekels("pc.margin_vs_total")} בתקציב. כל אחד מהם נכון למשפחה אחרת.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההבדל בין החלופה {ALT.exposure} לבין החלופה {ALT.total} אצל אותו בנק הוא {f.shekels("pc.total_vs_total")} בסך התשלומים מול {f.shekels("pc.first_vs_total")} בחודש ומרווח של {f.shekels("pc.margin_vs_total")} בתקציב. הפער כולל חמש שנות תשלום נוספות: אותה קבועה ל־25 שנה עולה {f.shekels("fx.total")}, כלומר התקופה לבדה מוסיפה {f.shekels("fx.term")}, והקבועה ל־25 שנה זולה ב־{f.shekels("fx.vs_alt")} מ{ALT.total}. כל אחד מהם נכון למשפחה אחרת.</p>
 <p><strong>איך משתמשים בזה בהחלטה?</strong> כותבים את העדיפות, מראים את המחיר ואת מה שלא ידוע, ובודקים את הרשימה לפני שהכסף עובר.</p>
 </Callout>
 

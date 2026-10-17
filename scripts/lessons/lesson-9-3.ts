@@ -23,7 +23,7 @@ import { NEGOTIATION, ROUND_RULE } from "../../src/data/case-a-offers.ts";
 import { ANSWER_AFTER, BANKS, bank, LEFT_OUT, PLAN_BANKS, REQUEST_DATE } from "../../src/data/case-a-positioning.ts";
 import { APPRAISAL_CASES, CHOICE, OTHER_PRIORITY, RATE_MOVES, RUNNER_UP, THRESHOLD_PTI, TODAY } from "../../src/data/case-a-recommendation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { allCandidates, countFact, ctx, month61Facts, rankFact, rateMoveFacts } from "./_recommend-facts.ts";
+import { allCandidates, countFact, ctx, fixed25Facts, month61Facts, rankFact, rateMoveFacts } from "./_recommend-facts.ts";
 import { clocksFact, daysUntilFact, effectFact, eventsInsideFact, governingFact, latestStartFact, roundAnswerFact, roundFitsFact, roundsFitFact } from "./_outreach-facts.ts";
 import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
 import { disposable, ltv as ltvFact, maxLoan, maxPayment } from "./regulation-facts.ts";
@@ -82,6 +82,7 @@ export default function lesson93(): LessonData {
   expect(new Decimal(get("g.total.b.total").value as string).lt(get("g.exposure.b.total").value as string) && new Decimal(get("g.payment.b.total").value as string).gt(get("g.exposure.b.total").value as string), "the 25-year one has the lowest total, the linked one the highest");
 
   month61Facts(c, "g.total.b", cand["total.b"].tracks!);
+  fixed25Facts(c, "b");
 
   // ── The chosen pair, and the numbers of the recommendation ──
   const ch = `g.${CHOICE.alt}.${CHOICE.bank}`;

@@ -16,7 +16,7 @@ import { SCENARIOS } from "../../src/data/case-a-mix.ts";
 import { bank } from "../../src/data/case-a-positioning.ts";
 import { CHOICE, REVIEW_MONTHS, RATE_MOVES, RUNNER_UP, THRESHOLD_PTI } from "../../src/data/case-a-recommendation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { allCandidates, countFact, ctx, month61Facts, rankFact, rateMoveFacts } from "./_recommend-facts.ts";
+import { allCandidates, countFact, ctx, fixed25Facts, month61Facts, rankFact, rateMoveFacts } from "./_recommend-facts.ts";
 import { scnEvalFact } from "./_stage8b-facts.ts";
 import { average, untilDrop } from "./affordability-facts.ts";
 import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
@@ -61,6 +61,7 @@ export default function lesson94(): LessonData {
   expect(stages.filter((s) => s === "refused").length === 3 && stages.filter((s) => s === "budget").length === 1, "three candidates are refused and one breaks the budget");
 
   month61Facts(c, "g.total.b", cand["total.b"].tracks!);
+  fixed25Facts(c, "b");
 
   // ── The chosen pair ──
   const ch = `g.${CHOICE.alt}.${CHOICE.bank}`;
