@@ -6,6 +6,7 @@
 //  3. at phone width, every fill-in table fits, every wider table shows the scroll hint,
 //     and no interactive component reports a hydration mismatch;
 //  4. the site chrome at phone width: a sign-out link in the header, a back link on lesson and check pages,
+//     (and per lesson: no sideways page scroll, every <summary> row at least 44px),
 //     every lesson row on the course map a link at least 44px tall, no sideways scroll, and client-side
 //     navigation that keeps the page (no full load), starts progress sync once, and still sends a signed-out
 //     visitor to the sign-in page (a stand-in for the Netlify gate); signing out removes the saved answers.
@@ -165,9 +166,13 @@ for (const stage of stages) {
           return !(b.previousElementSibling?.classList.contains("scroll-hint") && !b.previousElementSibling.hidden);
         }).length,
         fillTooWide: wide.filter((b) => b.querySelector("input")).length,
+        pageScrolls: document.documentElement.scrollWidth > innerWidth,
+        shortSummaries: [...document.querySelectorAll("main summary")].filter((e) => e.getBoundingClientRect().height > 0 && e.getBoundingClientRect().height < 43.5).length,
       };
     });
     if (r.wideWithoutHint) problems.push(`phone ${lesson}: ${r.wideWithoutHint} wide table(s) without the scroll hint`);
+    if (r.pageScrolls) problems.push(`phone ${lesson}: the page scrolls sideways`);
+    if (r.shortSummaries) problems.push(`phone ${lesson}: ${r.shortSummaries} <summary> row(s) under 44px`);
     if (r.fillTooWide) problems.push(`phone ${lesson}: ${r.fillTooWide} fill-in table(s) wider than the screen`);
   }
   console.log(`phone tables: checked ${lessonFiles.length} lessons`);
