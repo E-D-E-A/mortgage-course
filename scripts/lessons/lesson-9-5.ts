@@ -23,13 +23,13 @@ import { monthsUntilDrop, type Obligation } from "../../src/lib/calc/affordabili
 import { fileOf, householdIncome, incomeSheet, planOf } from "../../src/lib/calc/casefile.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentagePoints, percentOf, percentString, relativeChangePercent } from "../../src/lib/calc/percent.ts";
-import { FILE } from "../../src/data/case-a-final.ts";
+import { FILE, PAYSLIPS } from "../../src/data/case-a-final.ts";
 import { SCENARIOS } from "../../src/data/case-a-mix.ts";
 import { bank } from "../../src/data/case-a-positioning.ts";
 import { CHOICE, THRESHOLD_PTI } from "../../src/data/case-a-recommendation.ts";
 import { CLOSED, OPEN, PASS_PERCENT } from "../../src/data/exam-9-5.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { disposable as disposableFact } from "./affordability-facts.ts";
+import { disposable as disposableFact, net as netFact } from "./affordability-facts.ts";
 import { claimStateFact, countStatesFact, equityFact, incomeFact } from "./_casefile-facts.ts";
 import { monthlyPercent } from "./_earlyrepay-facts.ts";
 import { effectiveOf } from "./_mix-judge.ts";
@@ -81,8 +81,12 @@ export default function lesson95(): LessonData {
   add(incomeFact("a1.answer", "shira", "recognised"));
   add(incomeFact("a1.naive", "shira", "naive"));
   add(givenMoney("a1.declared", FILE.incomes.shira));
-  add(incomeFact("a1.noam", "noam", "recognised"));
-  claim(num("a1.naive").gt(num("a1.answer")) && num("a1.answer").lt(num("a1.declared")), "a1: the one-off lifts the plain average above the recognised income, and the recognised income is under the declared one");
+  {
+    const sep = PAYSLIPS.shira[2];
+    add(givenMoney("a1.sep_gross", sep.gross));
+    add(netFact("a1.sep", sep.gross, sep.mandatory.map((d) => d.amount)));
+  }
+  claim(num("a1.naive").gt(num("a1.answer")) && num("a1.sep").gt(num("a1.naive")), "a1: the one-off lifts the plain average above the recognised income, and the September net above the average");
 
   // a2 (9.1): the state of the evidence for the gift and for the fund
   add(claimStateFact("a2.gift", "equity_gift"));

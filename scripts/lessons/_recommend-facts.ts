@@ -157,3 +157,18 @@ export function rateMoveFacts(c: Ctx, p: string, k: number, points: string, list
   add(effectFact(`${p}.${k}.first_up`, finalTracks, scenario, { target: "all", points }, "first_delta"));
   add(effectFact(`${p}.${k}.total_up`, finalTracks, scenario, { target: "all", points }, "total_delta"));
 }
+
+/**
+ * The first month after the five-year window where a variable track of the 25-year alternative resets (month 61): the stress payment of that month,
+ * what is left of the net income after it (the car loan has ended by then: it has 26 payments), and what is left over the family's budget.
+ * Needs the facts `in.recognised` and `in.budget`. Facts: `<p>.p61`, `<p>.left61`, `<p>.margin61`.
+ */
+export function month61Facts(c: Ctx, p: string, tracks: TrackSpec[]): void {
+  const { add, get } = c;
+  const r = readingOf(tracks, scenarioDef("stress"));
+  if (r.maxMonth !== 61) throw new Error(`the stress maximum of ${p} is in month ${r.maxMonth}, not 61`);
+  if ((FILE.car.monthsLeft as number) >= 61) throw new Error("the car loan still runs in month 61");
+  add(scnEvalFact(`${p}.p61`, "stress", tracks, "payment", 61));
+  add(difference(`${p}.left61`, get("in.recognised"), get(`${p}.p61`)));
+  add(difference(`${p}.margin61`, get(`${p}.left61`), get("in.budget")));
+}
