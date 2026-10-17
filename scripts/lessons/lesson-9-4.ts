@@ -20,7 +20,7 @@ import { allCandidates, countFact, ctx, rankFact, rateMoveFacts } from "./_recom
 import { scnEvalFact } from "./_stage8b-facts.ts";
 import { average, untilDrop } from "./affordability-facts.ts";
 import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
-import { disposable, maxPayment, ratio as ratioFact } from "./regulation-facts.ts";
+import { disposable, maxLoan, maxPayment, ratio as ratioFact } from "./regulation-facts.ts";
 import { totalFact } from "./_bankpolicy-facts.ts";
 
 const BASE = SCENARIOS.base;
@@ -99,6 +99,13 @@ export default function lesson94(): LessonData {
 
   // ── The family's budget: the living budget at which each choice at bank ב׳ breaks ──
   for (const a of ALTS) add({ id: `sens.limit.${a}`, kind: "sum_of_facts", inputs: { terms: `in.budget,g.${a}.${B}.margin60` }, value: moneyString(num("in.budget").plus(num(`g.${a}.${B}.margin60`))) });
+
+  // ── The appraisal: the page names one low appraisal and what is short ──
+  add(givenMoney("ap.2100000.value", "2100000"));
+  add(maxLoan("ap.2100000.max_loan", moneyString("2100000"), "only_home"));
+  add(difference("ap.2100000.extra", get("in.loan"), get("ap.2100000.max_loan")));
+  add(difference("ap.2100000.short", get("ap.2100000.extra"), get("in.reserve_after")));
+  expect(num("ap.2100000.short").gt(0), "a low appraisal leaves the savings short");
 
   // ── The rate: what if the bank raises the fixed rate before signing ──
   RATE_MOVES.forEach((pts, k) => rateMoveFacts(c, "mv", k, pts, chOffer.verdict.listTracks, chOffer.tracks!, BASE));

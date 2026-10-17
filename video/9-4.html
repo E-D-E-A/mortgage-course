@@ -1,0 +1,137 @@
+<!doctype html>
+<!--
+  Video scene for lesson 9.4 (stage 9, author B). Rendered frame by frame by scripts/render-video.mjs:
+  window.render(t) depends only on t. Every number is read from /data/lessons/9-4.json (computed in code, rechecked in Python).
+  One idea: the same decision explained twice, to the client and to a professional reviewer, with what was rejected, what it costs, what moves it and when to look again (case A, synthetic, fictional banks).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 9.4 · הסבר כפול</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/9-4.json")).json();
+      const V = (k) => String(data.facts.find((f) => f.id === k).value);
+      const lr = (x) => `⁦${x}⁩`;
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const vis = (t, sc) => Math.min(clamp((t - sc[0]) / 0.6), clamp((sc[1] - t) / 0.6));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      const C = { navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)", n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", warningBg: "var(--mogi-warning-bg)", successBg: "var(--mogi-success-bg)", infoBg: "var(--mogi-info-bg)", dangerBg: "var(--mogi-danger-bg)", danger: "var(--mogi-danger)" };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, o = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": o.w ?? 400, fill: o.fill ?? C.navy, "text-anchor": o.anchor ?? "middle", opacity: o.o ?? 1, direction: o.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 20, fill, stroke: C.n200, "stroke-width": 2, opacity: o });
+
+      const SCENES = [
+        { type: "title", at: [0, 9], title: "הסבר כפול", sub: "מה נבחר, מה נפסל, מה המחיר, ומתי לבחון מחדש", foot: "תיק סינתטי, בנקים בדויים. אומדנים במחירון התרגיל." },
+        { type: "cards", at: [9, 45], title: "אותה החלטה, שני קוראים", cards: [
+          { h: "ללקוח", s: "מה נבחר, כמה זה עולה", s2: "מה יכול להשתבש, מתי בודקים", from: 1.5 },
+          { h: "לבודק מקצועי", s: "ראיות, מה נפסל, הנחות", s2: "רגישות ושאלות פתוחות", from: 11 },
+        ], foot: "אותם מספרים בשני הנוסחים", footAt: 22 },
+        { type: "cards", at: [45, 82], title: "מה נפסל, ולמה", cards: [
+          { h: "הבנק מסרב", s: "מסנן קשיח", big: { k: "fn.refused" }, from: 1.5 },
+          { h: "התקציב נשבר", s: "מסנן קשיח", big: { k: "fn.budget" }, from: 9 },
+          { h: "עברו את המסננים", s: "ונבחר אחד לפי עדיפות", big: { k: "fn.ok" }, from: 17 },
+        ], foot: "לכל מועמד שנפסל: סיבה ומספר", footAt: 24 },
+        { type: "bars", at: [82, 122], title: "המחיר של הוודאות מול 25 שנה", fmt: "ils", bars: [
+          { k: "sens.gap_stress", label: "בתרחיש לחץ", from: 4 },
+          { k: "sens.gap_base", label: "בתרחיש בסיס", from: 11, hl: true },
+          { k: "sens.gap_macro", label: "במסלול מקרו", from: 18 },
+        ], foot: "מחיר הוודאות הוא טווח, לא מספר אחד", footAt: 26 },
+        { type: "cards", at: [122, 158], title: "מתי בוחנים מחדש", cards: [
+          { h: "הלוואת הרכב", s: "תשלומים עד שלא נספרת", big: { k: "rv.until_drop" }, from: 1.5 },
+          { h: "יחס החזר אז", s: "בלי ההלוואה", big: { k: "rv.ratio_free", suf: "%" }, from: 10 },
+          { h: "בדיקה קבועה", s: "חודשים, אם המשפחה רוצה", big: { k: "rv.months" }, from: 19 },
+        ], foot: "ההחלטה על המרווח היא של המשפחה", footAt: 27 },
+        { type: "cards", at: [158, 182], title: "הקווים האדומים", cards: [{ h: "לא מסתירים התחייבות", s: "לא מנפחים הכנסה", s2: "לא מגישים מסמך שאינו נכון" }], foot: "ניגוד עניינים: שאלה פתוחה, לא פסק", footAt: 6 },
+      ];
+      window.duration = 182;
+      window.cues = [[1,5,"אותה החלטה, שנכתבת פעמיים."],[5,8.5,"התיק בדוי, והבנקים בדויים."],[10,22,"ללקוח: מה נבחר, כמה זה עולה, ומה יכול להשתבש."],[22,34,"לבודק: ראיות, מה נפסל, הנחות ורגישות."],[34,44,"אם שני הנוסחים אומרים דברים שונים, אחד שגוי."],[46,58,"בנק שמסרב יוצא. זה מסנן קשיח."],[58,68,"תקציב שנשבר יוצא. גם זה מסנן קשיח."],[68,81,"השאר נפסלים לפי העדיפות, לא לפי עובדה."],[83,96,"המחיר של הוודאות שונה בכל תרחיש."],[96,110,"בלחץ הוא קטן, ובמקרו גדול."],[110,121,"אין מספר אחד שאפשר להציג כמחיר."],[123,135,"הלוואת הרכב מפסיקה להיספר אחרי כמה תשלומים."],[135,147,"אז יחס ההחזר משתפר, וזה מועד לבדיקה."],[147,157,"ובכל מקרה, תאריך שנקבע מראש."],[159,168,"הקווים האדומים נבדקים ונכתבים."],[168,181,"ניגוד עניינים: שואלים, ולא מניחים שאין."]];
+      const ils = (x) => Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₪";
+      const bigOf = (b) => (b ? lr(b.fmt === "ils" ? ils(V(b.k)) : (b.pre ?? "") + V(b.k) + (b.suf ?? "")) : "");
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        for (const sc of SCENES) {
+          const range = sc.at;
+          if (!inScene(t, range)) continue;
+          const o = vis(t, range);
+          if (sc.type === "title") {
+            txt(640, 270, sc.title, 70, { w: 700, o });
+            txt(640, 350, sc.sub, 38, { fill: C.n600, o });
+            if (sc.foot) txt(640, 430, sc.foot, 24, { fill: C.n500, o: after(t, range, 3, o, 0.8) });
+          } else if (sc.type === "cards") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const n = sc.cards.length;
+            const w = n === 1 ? 700 : n === 2 ? 480 : n === 3 ? 340 : 270;
+            const gap = 30;
+            const total = n * w + (n - 1) * gap;
+            const x0 = 640 + total / 2;
+            sc.cards.forEach((c, i) => {
+              const oi = after(t, range, c.from ?? 1.5 + i * 3.5, o);
+              if (oi <= 0) return;
+              const right = x0 - i * (w + gap);
+              const left = right - w;
+              card(left, 170, w, 290, oi, c.fill ? C[c.fill] : C.n0);
+              el("rect", { x: right - 14, y: 170, width: 14, height: 290, rx: 7, fill: c.bar ? C[c.bar] : C.teal, opacity: oi });
+              txt((left + right) / 2 - 7, 235, c.h, n > 3 ? 30 : 34, { w: 700, o: oi });
+              if (c.s) txt((left + right) / 2 - 7, 285, c.s, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.s2) txt((left + right) / 2 - 7, 322, c.s2, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.big) txt((left + right) / 2 - 7, 405, bigOf(c.big), bigOf(c.big).length > 11 ? 38 : 60, { w: 700, fill: C.teal, ltr: true, o: oi });
+              if (c.big && c.bigLabel) txt((left + right) / 2 - 7, 440, c.bigLabel, 22, { fill: C.n600, o: oi });
+            });
+            if (sc.foot) txt(640, 540, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 580, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          } else if (sc.type === "bars") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const vals = sc.bars.map((b) => Number(V(b.k)));
+            const max = Math.max(...vals) * 1.05;
+            sc.bars.forEach((b, i) => {
+              const oi = after(t, range, b.from ?? 1.5 + i * 3, o);
+              if (oi <= 0) return;
+              const y = 180 + i * 80;
+              const w = 560 * (vals[i] / max) * clamp((t - range[0] - (b.from ?? 1.5 + i * 3)) / 1.2);
+              txt(1140, y + 38, b.label, 28, { anchor: "start", fill: C.n700, o: oi });
+              el("rect", { x: 920 - w, y, width: Math.max(w, 2), height: 56, rx: 10, fill: b.hl ? C.teal : C.tq2, opacity: oi });
+              txt(920 - w - 14, y + 40, lr(sc.fmt === "ils" ? ils(V(b.k)) : V(b.k) + (sc.suf ?? "")), 30, { anchor: "end", w: 700, ltr: true, o: oi });
+            });
+            if (sc.foot) txt(640, 560, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 598, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

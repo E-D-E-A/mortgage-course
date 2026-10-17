@@ -115,6 +115,11 @@ export function candidateFacts(c: Ctx, alt: AltId, bankId: BankId): CaseOffer {
     add(scnEvalFact(`${p}.stress_max`, "stress", o.tracks, "max"));
     add(difference(`${p}.rise`, get(`${p}.stress_max`), get(`${p}.first`)));
   }
+  if (new Decimal(margin).isNeg()) {
+    // how much the budget is short, as a positive number (0 − the negative margin)
+    if (!c.facts.some((f) => f.id === "zero")) add({ id: "zero", kind: "given", inputs: {}, value: "0.00" });
+    add(difference(`${p}.short`, get("zero"), get(`${p}.margin60`)));
+  }
   add(stageFact(`${p}.stage`, String(get(`${p}.decision`).value), margin));
   add(flagFact(`${p}.flag40`, String(get(`${p}.ratio`).value), THRESHOLD_PTI));
   return o;

@@ -1,0 +1,617 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "9.4"
+minutes: 75
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import DualExplainer from "../../components/DualExplainer.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("9.4");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים.";
+export const pc = (id) => `${f.plain(id)}%`;
+export const ALT = { payment: "צמוד, שליש קבועה", total: "25 שנה", exposure: "קבועה בלבד" };
+export const BANK = { a: "בנק א׳", b: "בנק ב׳", c: "בנק ג׳", d: "בנק ד׳" };
+export const ALTS = ["payment", "total", "exposure"];
+export const BANKS4 = ["a", "b", "c", "d"];
+export const g = (a, b, w) => `g.${a}.${b}.${w}`;
+export const ch = "g.exposure.b";
+export const ok = (a, b) => f.plain(g(a, b, "decision")) === "approve";
+export const WIN = { "payment.b": `${ALT.payment}, ${BANK.b}`, "total.b": `${ALT.total}, ${BANK.b}`, "exposure.b": `${ALT.exposure}, ${BANK.b}` };
+export const rejected = ALTS.flatMap((a) => BANKS4.map((b) => ({ a, b }))).filter((r) => !(r.a === "exposure" && r.b === "b"));
+export const predictionOptions = [
+  "קבועה בלבד אצל בנק ב׳, בלי שינוי: ההחלטה לא תלויה בעדיפות, כי זו החלופה הזולה ביותר מבין שלוש החלופות",
+  `צמוד, שליש קבועה אצל בנק ב׳: ההחזר הראשון הנמוך ביותר, ${f.whole(g("payment", "b", "first"))}, והדוח אינו חייב להזכיר חשיפה`,
+  `25 שנה אצל בנק ב׳: סך התשלומים נמוך ב־${f.whole("pc.total_vs_total")}, ועל הדוח לומר שהמרווח מהתקציב דק (${f.whole(g("total", "b", "margin60"))}) ושיחס ההחזר ${pc(g("total", "b", "ratio"))} מעל הקו של 40%`,
+  "25 שנה אצל בנק ג׳, כי הוא הזול ביותר בשלוש החלופות לפי הטבלה, ואין מה להוסיף לדוח",
+];
+export const modelClient = [
+  `מה נבחר: הלוואה אחת של ${f.shekels("in.loan")}, בריבית קבועה של ${f.plain(`${ch}.rate_1`)}% ל־30 שנה, מבנק ב׳.`,
+  `למה: ההחזר החודשי הוא ${f.shekels(`${ch}.first`)} ולא משתנה עם הריבית או עם המדד. אחריו נשארים לכם ${f.shekels(`${ch}.margin60`)} בחודש מעל הסכום שאמרתם שאתם צריכים לחיים. זה סכום קטן, ולכן עדיפה לכם ודאות.`,
+  `כמה זה עולה: בסך הכול תשלמו ${f.shekels(`${ch}.total`)}. הלוואה ל־25 שנה הייתה עולה ${f.shekels("pc.total_vs_total")} פחות, אבל ההחזר החודשי שלה גבוה ב־${f.shekels("pc.first_vs_total")} והמרווח שלכם היה ${f.shekels(g("total", "b", "margin60"))} בלבד. אלה אומדנים לפי מחירון הדוגמה, ולא הצעה של הבנק.`,
+  `מה יכול להשתבש: אם השמאי יעריך את הדירה נמוך מדי, תצטרכו להוסיף הון: אצל שמאות של ${f.whole("ap.2100000.value")} חסרים ${f.whole("ap.2100000.short")}. אם הבנק יעלה את הריבית לפני החתימה ב־${f.plain("mv.1.pts")} נקודת אחוז, ההחזר יעלה ב־${f.shekels("mv.1.first_up")} ויעבור את ${f.plain("in.line40")}% מההכנסה הפנויה, סף שבנקים מסתכלים עליו. מה הבנק מחזיק בינתיים: לא ידוע, ושואלים אותו בכתב.`,
+  `מתי בוחנים מחדש: אם ההכנסה או המשפחה משתנות; כשהלוואת הרכב נגמרת, אחרי ${f.plain("in.car_left")} תשלומים; כשמגיעה הצעה נמוכה בהרבה; ובכל מקרה כל ${f.plain("rv.months")} חודשים, אם תרצו.`,
+].join("\n\n");
+export const modelReviewer = [
+  `ראיות: אומדן במחירון הדוגמה לפי תחזית 451; תרחישי לחץ ומקרו הם ״מה אם״. ההחזר של ${f.shekels(`${ch}.first`)}, הסך ${f.shekels(`${ch}.total`)}, יחס ${pc(`${ch}.ratio`)} (מרווח ${f.shekels("ch.room40")} מהקו של ${f.plain("in.line40")}%), מרווח ${f.shekels(`${ch}.margin60`)} מעל התקציב. עדיין לא הצעה על התמהיל המדויק.`,
+  `נפסלו: ${f.plain("fn.refused")} על סירוב של בנק ד׳ (שיעור מימון ${pc("g.exposure.d.ltv")} מעל ${f.plain("rule.d_ceiling")}%), אחד על שבירת התקציב (25 שנה, בנק ג׳), ושבעה אחרים לפי העדיפות: צמוד (עלייה בלחץ ${f.shekels(g("payment", "b", "rise"))}), 25 שנה (מרווח ${f.shekels(g("total", "b", "margin60"))}, יחס ${pc(g("total", "b", "ratio"))}), וקבועה בלבד אצל בנקים א׳ (${f.shekels("pick.gap_a")} יותר, יחס ${pc(g("exposure", "a", "ratio"))} מעל הקו) ו־ג׳ (${f.shekels("pick.gap_c")} יותר).`,
+  `הנחות: עדיפות המשפחה (ודאות) והתקציב ${f.shekels("in.budget")} הם הנחות של הקורס. הבנקים, הקווים והמחירים בדויים. סף 40% והתקרה של ${f.plain("in.ceiling")}%: לא אומת. מה בנק מחזיק בריבית: לא ידוע.`,
+  `רגישות: תקציב מחיה מעל ${f.shekels("sens.limit.exposure")} שובר את ההמלצה. עלייה של ${f.plain("mv.1.pts")} נקודת אחוז מעבירה את הקו (${pc("mv.1.ratio")}). המחיר של הוודאות מול 25 שנה: ${f.shekels("sens.gap_base")} בבסיס, ${f.shekels("sens.gap_stress")} בלחץ ו־${f.shekels("sens.gap_macro")} במקרו. עדיפות של סך נמוך מביאה ל־25 שנה, ועדיפות של החזר ראשון נמוך לצמוד.`,
+  `שאלות פתוחות: האם הבנק מחזיק ריבית קבועה עד החתימה? מה עושים בשמאות נמוכה? האם משהו בתגמול של היועץ תלוי בבנק או במסלול שנבחרו (לעורך הדין ולמדיניות של Mogi)?`,
+].join("\n\n");
+export const halfRows = ALTS.map((a) => ({ alt: ALT[a], margin: f.raw(g(a, "b", "margin60")), limit: f.raw(`sens.limit.${a}`) }));
+
+אחרי 9.3 יש המלצה: {ALT.exposure} אצל {BANK.b}, לעדיפות של ודאות. אבל דוח אחד לא מתאים לכל מי שקורא אותו. נועם ושירה רוצים לדעת מה יקרה להם, כמה זה יעלה, מה יכול להשתבש ומתי לבדוק מחדש. בודק מקצועי רוצה לראות על מה ההחלטה נשענת, מה נפסל ולמה, אילו הנחות יש בה ואיפה היא נשברת. ביחידה הזו כותבים את אותה החלטה פעמיים, ובודקים כל גרסה ברשימה, לא בציון.
+
+<Callout title="מה היחידה הזו לא אומרת" tone="warning">
+<p><strong>{MARK}</strong></p>
+<p>הבנקים בדויים, והמספרים אומדנים במחירון התרגיל. החלק על <strong>ניגוד עניינים</strong> מלמד שאלות, לא תשובות: מה מותר ליועץ לגבות, מתי חייבים לחשוף ומה דינו של מסמך שאינו נכון הם עניינים משפטיים ומקצועיים־אתיים שהקורס לא בדק (<strong>לא אומת; שאלה לעורך הדין ולמדיניות של Mogi</strong>). זה לא ייעוץ ללקוח אמיתי.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="9.4"
+  question={`הדוח של 9.3 הניח שנועם ושירה מעדיפים ודאות. נניח שבפועל הם מעדיפים סך תשלומים נמוך. איזה צירוף היה נבחר אצל בנק ב׳ אילו הניחו את זה, ומה הדוח היה חייב לומר כדי שהבודק יראה את זה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## אותה החלטה, שני קוראים
+
+</Section>
+
+<LessonVideo lesson="9-4" />
+
+<Section kind="ההסבר">
+
+## שני קוראים, שתי שאלות
+
+</Section>
+
+כותבים את אותה החלטה פעמיים, והמספרים בשתי הגרסאות זהים. מה שמשתנה הוא מה שהקורא צריך:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold"></th>
+        <th class="py-2 pe-3 text-start font-semibold">הלקוח</th>
+        <th class="py-2 pe-3 text-start font-semibold">הבודק המקצועי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">השאלה</td>
+        <td class="py-2 pe-3">מה יקרה לי, כמה זה יעלה, מה יכול להשתבש ומתי בודקים.</td>
+        <td class="py-2 pe-3">על מה זה נשען, מה נפסל ולמה, מה ההנחות, איפה זה נשבר.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">השפה</td>
+        <td class="py-2 pe-3">פשוטה. מילה מקצועית רק עם משפט שמסביר אותה.</td>
+        <td class="py-2 pe-3">מקצועית. כל מספר מסומן לפי סוג: אומדן, תרחיש, הצעה או עסקה.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">מה אסור</td>
+        <td class="py-2 pe-3">להבטיח משהו על אומדן, או לתת מספר בלי להגיד מה הוא.</td>
+        <td class="py-2 pe-3">טענה בלי תווית, או ויתור על מה שנפסל.</td>
+      </tr>
+      <tr class="align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">מה משותף</td>
+        <td class="py-2 pe-3" colspan="2">אותה החלטה ואותם מספרים. אם שני הנוסחים אומרים דברים שונים, אחד מהם שגוי.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### ללקוח: חמישה חלקים
+
+1. **מה נבחר**, במשפט אחד.
+2. **למה**, בשפה של המשפחה: מה יקרה לה בחודש.
+3. **כמה זה עולה**, כולל מה היא משלמת על הבחירה לעומת אפשרות אחרת.
+4. **מה יכול להשתבש**, ומה עושים.
+5. **מתי בוחנים מחדש.**
+
+הנה החמישה על ההמלצה של נועם ושירה, כפי שיועץ כותב אותם:
+
+<div class="my-4 rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="!mt-0 text-body-m text-n800"><strong>מה נבחר.</strong> הלוואה אחת של {f.shekels("in.loan")}, בריבית קבועה של {f.plain(`${ch}.rate_1`)}% ל־30 שנה, מבנק ב׳.</p>
+  <p class="mt-2 text-body-m text-n800"><strong>למה.</strong> ההחזר החודשי הוא {f.shekels(`${ch}.first`)} ולא משתנה עם הריבית או עם המדד. אחריו נשארים {f.shekels(`${ch}.margin60`)} בחודש מעל הסכום שהמשפחה אמרה שהיא צריכה לחיים. זה סכום קטן, ולכן עדיפה לה ודאות.</p>
+  <p class="mt-2 text-body-m text-n800"><strong>כמה זה עולה.</strong> בסך הכול {f.shekels(`${ch}.total`)}. הלוואה ל־25 שנה הייתה עולה {f.shekels("pc.total_vs_total")} פחות, אבל ההחזר החודשי שלה גבוה ב־{f.shekels("pc.first_vs_total")} והמרווח היה {f.shekels(g("total", "b", "margin60"))} בלבד. אלה אומדנים לפי מחירון הדוגמה, לא הצעה של הבנק.</p>
+  <p class="mt-2 text-body-m text-n800"><strong>מה יכול להשתבש.</strong> שמאות נמוכה: אצל שמאות של {f.whole("ap.2100000.value")} חסרים {f.whole("ap.2100000.short")}. עלייה של {f.plain("mv.1.pts")} נקודת אחוז בריבית לפני החתימה מעלה את ההחזר ב־{f.shekels("mv.1.first_up")}, והוא עובר את {f.plain("in.line40")}% מההכנסה הפנויה, סף שבנקים מסתכלים עליו. מה הבנק מחזיק בינתיים: לא ידוע, ושואלים אותו בכתב.</p>
+  <p class="mt-2 text-body-m text-n800"><strong>מתי בוחנים מחדש.</strong> אם ההכנסה או המשפחה משתנות; כשהלוואת הרכב נגמרת; כשמגיעה הצעה נמוכה בהרבה; ובכל מקרה כל {f.plain("rv.months")} חודשים, אם המשפחה רוצה.</p>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+שימו לב מה לא כתוב: שום ״ייתכן שבעתיד...״ בלי מספר, שום שם של מדד או של שיטת החזר בלי הסבר, ושום ״מובטח״. מה שהוא אומדן נקרא אומדן.
+
+### לבודק: שבעה חלקים
+
+1. **ההחלטה והראיות:** מה נבחר, ולכל מספר איזה סוג הוא (<Term t="אומדן" client:visible lesson="5.5">אומדן</Term>, תרחיש, <Term t="הצעה אישית" client:visible lesson="5.5">הצעה</Term> או עסקה שבוצעה).
+2. **מה נפסל ולמה:** כל המועמדים שלא נבחרו, כל אחד עם סיבה ועם מספר.
+3. **ההנחות, עם תווית:** הנחת חישוב, ידע מהשטח, החלטה של Mogi, לא אומת.
+4. **הרגישות:** מה משנה את ההחלטה, ובכמה.
+5. **הקווים האדומים:** מה נבדק ושלא הוסתרה התחייבות, לא נופחה הכנסה ולא הוגש מסמך שאינו נכון.
+6. **ניגוד עניינים:** מה ידוע ומה נשאל.
+7. **שאלות פתוחות.**
+
+החלקים 2 ו־4 מפורטים עכשיו, והחלקים 5 ו־6 אחריהם.
+
+## מה נפסל ולמה
+
+מתוך {f.plain("fn.pairs")} הצירופים נבחר אחד, ו־{f.plain("fn.rejected")} נפסלו. כל אחד צריך שורה: סיבה אחת לפחות, ומספר שמראה אותה.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">המועמד</th>
+        <th class="py-2 pe-2 text-start font-semibold">סוג הסיבה</th>
+        <th class="py-2 pe-2 text-start font-semibold">הסיבה, במספרים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rejected.map((r) => {
+        const st = f.plain(g(r.a, r.b, "stage"));
+        const over = f.plain(g(r.a, r.b, "flag40")) === "over";
+        return (
+          <tr class="border-b border-n100 align-top">
+            <td class="py-2 pe-2 font-semibold text-n900 whitespace-nowrap">{ALT[r.a]}, {BANK[r.b]}</td>
+            <td class="py-2 pe-2">{st === "refused" ? "מסנן קשיח: סירוב" : st === "budget" ? "מסנן קשיח: תקציב" : "עדיפות"}</td>
+            <td class="py-2 pe-2">
+              {st === "refused" && <span>שיעור מימון <span class="ltr">{pc(g(r.a, r.b, "ltv"))}</span> מעל התקרה של הבנק, <span class="ltr">{f.plain("rule.d_ceiling")}%</span>.</span>}
+              {st === "budget" && <span>בחודש הגרוע של הלחץ התקציב חסר <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "short")))}</span> ₪.</span>}
+              {st === "ok" && r.a === "payment" && <span>עלייה בלחץ <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "rise")))}</span> ₪, בהמלצה אפס.</span>}
+              {st === "ok" && r.a === "total" && <span>עלייה בלחץ <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "rise")))}</span> ₪; מרווח מהתקציב <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "margin60")))}</span> ₪; יחס <span class="ltr">{pc(g(r.a, r.b, "ratio"))}</span>, מעל הקו.</span>}
+              {st === "ok" && r.a === "exposure" && <span>סך תשלומים גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw(r.b === "a" ? "pick.gap_a" : "pick.gap_c"))}</span> ₪{over && <span>; יחס <span class="ltr">{pc(g(r.a, r.b, "ratio"))}</span>, מעל הקו של 40%</span>}.</span>}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} אומדנים במחירון התרגיל; הכללים של הבנקים בדויים (שיעור 6.9). ״מסנן קשיח״ מוציא צירוף לפני כל שיקול אחר; ״עדיפות״ אומר שהצירוף עבר את המסננים ונפסל מפני שעדיפות המשפחה (ודאות) מובילה למועמד אחר.</p>
+</div>
+
+הסיבות שייכות לשני סוגים, וכדאי לא לערבב ביניהם. **מסנן קשיח** הוא עובדה על הצירוף: הבנק מסרב, או שהתקציב נשבר. **עדיפות** היא הנחה על המשפחה, ואם ההנחה משתנה, השורות האלה משתנות. הבודק צריך לראות איזו מהשתיים הוציאה כל אחד.
+
+<Callout title="בעיני האלגוריתם" tone="info">
+<p>גם האלגוריתם של שלב 8 נותן לכל מועמד שנפסל <strong>את כל הסיבות</strong> (שיעור 8.7), ולא רק את הראשונה. כאן כל מועמד מקבל סיבה אחת מוצגת. <strong>Mogi היום אינה מחשבת תמהיל בקוד:</strong> זה תכנון לעתיד, והדוח הכפול הוא מה שיועץ עושה ביד.</p>
+</Callout>
+
+## מה משנה את ההחלטה
+
+הרגישות עונה על שאלה אחת: מה צריך להשתנות כדי שההמלצה תהיה אחרת, ובכמה? ארבעה דברים בתיק הזה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה משתנה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה קורה להחלטה</th>
+        <th class="py-2 pe-3 text-start font-semibold">איזו תווית</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">העדיפות של המשפחה</td>
+        <td class="py-2 pe-3">החזר ראשון נמוך: {WIN[f.plain("win.first")]}. סך תשלומים נמוך: {WIN[f.plain("win.total")]}. ודאות: {WIN[f.plain("win.certain")]}.</td>
+        <td class="py-2 pe-3">הנחה של הקורס. היא משנה את הצירוף הנבחר.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תקציב המחיה</td>
+        <td class="py-2 pe-3">ההמלצה נשברת אם התקציב האמיתי מעל <span class="ltr whitespace-nowrap">{nv(f.raw("sens.limit.exposure"))}</span> ₪ (ההנחה היא <span class="ltr whitespace-nowrap">{nv(f.raw("in.budget"))}</span> ₪). ל־{ALT.total}: מעל <span class="ltr whitespace-nowrap">{nv(f.raw("sens.limit.total"))}</span> ₪. לצמוד: מעל <span class="ltr whitespace-nowrap">{nv(f.raw("sens.limit.payment"))}</span> ₪.</td>
+        <td class="py-2 pe-3">הנחת חישוב של התיק, בלי מקור לתקציב סביר (שיעור 4.6).</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">הריבית לפני החתימה</td>
+        <td class="py-2 pe-3">בעלייה של <span class="ltr">{f.plain("mv.0.pts")}</span> נקודת אחוז היחס <span class="ltr">{pc("mv.0.ratio")}</span>, מתחת לקו. בעלייה של <span class="ltr">{f.plain("mv.1.pts")}</span> הוא <span class="ltr">{pc("mv.1.ratio")}</span>, מעליו; ב־<span class="ltr">{f.plain("mv.2.pts")}</span>: <span class="ltr">{pc("mv.2.ratio")}</span>.</td>
+        <td class="py-2 pe-3">״מה אם״. מה בנק מחזיק: לא ידוע.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">התרחיש</td>
+        <td class="py-2 pe-3">הקבועה בלבד עולה אותו דבר בכל תרחיש, ו־{ALT.total} משתנה. המחיר של הוודאות: <span class="ltr whitespace-nowrap">{nv(f.raw("sens.gap_base"))}</span> ₪ בבסיס, <span class="ltr whitespace-nowrap">{nv(f.raw("sens.gap_stress"))}</span> ₪ בלחץ ו־<span class="ltr whitespace-nowrap">{nv(f.raw("sens.gap_macro"))}</span> ₪ במסלול המקרו.</td>
+        <td class="py-2 pe-3">תרחישים הם ״מה אם״ שנבחרו, לא תחזיות (שיעור 8.10). אין הסתברות לשום אחד.</td>
+      </tr>
+      <tr class="align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">הבנק</td>
+        <td class="py-2 pe-3">בנק ג׳ יקר ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pick.gap_c"))}</span> ₪ בהמלצה. הצעה בכתב ממנו שמבטלת את הפער משנה את הבנק, לא את החלופה.</td>
+        <td class="py-2 pe-3">אומדן במחירון הבדוי. ההצעה האמיתית מחליפה אותו.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} בלחץ ההחזרים של חלופות משתנות עולים: בחלופה {ALT.payment} סך התשלומים בלחץ גבוה ב־{nv(f.raw("sens.payment_stress_over"))} ₪ מזה של ההמלצה.</p>
+</div>
+
+הנתון שהכי משנה את הסיפור הוא המחיר של הוודאות. בבסיס הוא {f.shekels("sens.gap_base")}, אבל בלחץ רק {f.shekels("sens.gap_stress")}: מי שחושש מריבית עולה משלם הרבה פחות על הקבועה. במסלול המקרו, שבו הריבית יורדת, הוא {f.shekels("sens.gap_macro")}. זה לא אומר איזה מהם יקרה. זה אומר שהדוח לא יכול להציג מספר אחד כ״מחיר הוודאות״.
+
+<Section kind="חלק 2">
+
+## קווים אדומים וניגוד עניינים
+
+</Section>
+
+### הקווים האדומים על התיק הזה
+
+מיצוב בוחר בין נתונים אמיתיים, ואינו מסתיר התחייבות, מנפח הכנסה או מגיש מסמך שאינו נכון (שיעור 6.5, החלטה של Mogi). בתיק של נועם ושירה שני הנתונים מופיעים:
+
+- **התחייבות שאסור להסתיר.** הלוואת הרכב של {f.shekels("in.car_monthly")} בחודש נספרת עוד {f.plain("rv.until_drop")} תשלומים (כלל 18 החודשים, שיעור 4.2). אם הייתה נעלמת מהטופס, יחס ההחזר היה נראה <span class="ltr">{pc("rv.ratio_free")}</span> במקום <span class="ltr">{pc(`${ch}.ratio`)}</span>, פער של {f.plain("rv.ratio_gain")} נקודות אחוז. אותו מספר יתאים למשפחה אחרי שההלוואה תיגמר, וזה סיפור הגון. היום הוא נייר שאינו המציאות.
+- **הכנסה שאסור לנפח.** בתלוש של שירה בספטמבר יש תשלום חד־פעמי של {f.shekels("rl.oneoff")}. ממוצע של שלושת החודשים עם התשלום הוא {f.shekels("rl.shira_naive")}, ובלעדיו {f.shekels("rl.shira_recognised")}: ההכנסה המוכרת היא השנייה, ופער של {f.shekels("rl.shira_gap")} בחודש הוא ניפוח. גם מסמך שאינו נכון אסור: למשל תלוש שמתוקן בלי שהמעסיק תיקן אותו.
+
+מה בדיקה כזו אומרת בדוח: ״נבדק: ההלוואה בטופס, הכנסה מוכרת בלי תשלום חד־פעמי, המסמכים תואמים את הטופס״. ומה הדין על הפרה: לא ידוע, שאלה לעורך הדין (שיעור 6.5).
+
+### ניגוד עניינים: שאלות
+
+ניגוד עניינים הוא מצב שבו משהו שהיועץ מקבל תלוי בבחירה שהוא ממליץ עליה. אין לקורס תשובה על מה מותר, ולכן הוא מלמד **שאלות**, שכל יועץ שואל לפני שהוא כותב דוח:
+
+1. האם השכר שלי משתנה בין החלופות? ההלוואה זהה בשלוש ({f.shekels("in.loan")}), ולכן שכר שתלוי בגודל ההלוואה לא ישתנה ביניהן.
+2. האם משהו משתנה בין הבנקים: תגמול, נפח, גישה למנהל או הטבה אחרת? אם כן, האם ההמלצה על בנק ב׳ היא על הזול ביותר למשפחה, או על זה ששווה לי יותר?
+3. האם הדוח מציג גם את החלופה שמשתלמת לי הכי פחות, עם מספריה?
+4. האם הלקוח יודע, בכתב, איך אני מתוגמל?
+5. מי בודק את הדוח, ואם הבודק רואה את מה שנפסל, האם הוא יכול לראות ניגוד עניינים בסיבות?
+
+מה ידוע ומה לא, כפי שהצוות תיעד:
+
+- עיסוק יועץ משכנתאות אינו מוסדר בחוק, ללא חובת רישיון (הוראה 329א ודברי ההסבר להצעת חוק מ־2026 אומרים זאת; נכון ל־9 באוקטובר 2026 החוק לא עבר). לפי תקצירי עיתונות, ההצעה מזכירה הימנעות מניגוד עניינים ותיעוד חלופות (לא אומת).
+- אם בנק משלם ליועץ, ובאילו תנאים: לא ידוע.
+- מה Mogi תחליט על תגמול ועל חשיפה: לא נקבע בקורס, והוא שאלה פתוחה.
+
+הדוח הכפול הוא חלק מהתשובה, לא כולה: הלקוח רואה את המחיר של הבחירה, והבודק רואה את מה שנפסל ואת הסיבות. זו הצעה של הקורס, לא כלל.
+
+## מתי בוחנים מחדש
+
+בחירה היא החלטה של היום. הדוח אומר אילו אירועים מחזירים אותה לשולחן:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">האירוע</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה בודקים</th>
+        <th class="py-2 pe-3 text-start font-semibold">איזו תווית</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">שינוי בהכנסה או במשפחה</td>
+        <td class="py-2 pe-3">את המרווח מתקציב המחיה (<span class="ltr whitespace-nowrap">{nv(f.raw(`${ch}.margin60`))}</span> ₪) וחוזרים לשאלה של ההחזר.</td>
+        <td class="py-2 pe-3">הצעה של הקורס.</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">הלוואת הרכב מפסיקה להיספר, ואז נגמרת</td>
+        <td class="py-2 pe-3">אחרי {f.plain("rv.until_drop")} תשלומים היא כבר לא נספרת ביחס ההחזר, שהופך ל־<span class="ltr">{pc("rv.ratio_free")}</span>. אחרי {f.plain("in.car_left")} תשלומים היא נגמרת, ו־{f.shekels("in.car_monthly")} בחודש מתפנים בתקציב. מה עושים בהם: החלטה של המשפחה.</td>
+        <td class="py-2 pe-3">הנחת חישוב (שיעור 4.2).</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">הצעה נמוכה בהרבה</td>
+        <td class="py-2 pe-3">מבחן המחזור של שיעור 7.4, כולל עמלת פירעון מוקדם. תשלום נמוך יותר אינו חיסכון כולל.</td>
+        <td class="py-2 pe-3">לא אומת, לפי תעתיק של הצוות להוראה 451 §15א.</td>
+      </tr>
+      <tr class="align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תאריך קבוע</td>
+        <td class="py-2 pe-3">כל <span class="ltr">{f.plain("rv.months")}</span> חודשים, גם בלי אירוע, אם המשפחה רוצה.</td>
+        <td class="py-2 pe-3">הצעה של הקורס. ההחלטה על המרווח היא של המשפחה.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+בהמלצה אין מסלול משתנה ולכן אין תאריך עדכון ריבית שמחייב בדיקה. אם בחרתם חלופה אחרת, התאריך הזה הוא אחד האירועים החשובים בדוח.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## כותבים פעמיים
+
+</Section>
+
+הכלי מציג את ההחלטה למעלה, ושתי עמודות: הסבר ללקוח והסבר לבודק. בכל שורה כותבים את שתי הגרסאות. מתחת לכל עמודה יש רשימת בדיקה: חלק מהסעיפים הכלי מחפש בטקסט (למשל מספר), וחלק רק אתם יכולים לסמן. אין ציון. כשסיימתם אפשר לפתוח נוסח לדוגמה ולהשוות.
+
+<DualExplainer
+  client:visible
+  id="9.4-dual"
+  title="ההסבר הכפול: נועם ושירה"
+  mark={MARK}
+  decision={[
+    { label: "המלצה", value: `${ALT.exposure}, ${BANK.b}` },
+    { label: "הלוואה", value: f.shekels("in.loan") },
+    { label: "ריבית", value: `${f.plain(`${ch}.rate_1`)}% ל־30 שנה` },
+    { label: "החזר חודשי", value: f.shekels(`${ch}.first`) },
+    { label: "סך תשלומים", value: f.shekels(`${ch}.total`) },
+    { label: "יחס החזר", value: `${pc(`${ch}.ratio`)}, מרווח ${f.shekels("ch.room40")} מהקו` },
+    { label: "מעל תקציב המחיה", value: f.shekels(`${ch}.margin60`) },
+  ]}
+  pairs={[
+    { client: { id: "what", label: "מה נבחר", prompt: "במשפט אחד, בלי מילים מקצועיות." }, reviewer: { id: "evidence", label: "ההחלטה והראיות", prompt: "מה נבחר, ולכל מספר: אומדן, תרחיש, הצעה או עסקה." } },
+    { client: { id: "why", label: "למה", prompt: "מה יקרה למשפחה בכל חודש." }, reviewer: { id: "rejected", label: "מה נפסל ולמה", prompt: "כל מי שלא נבחר, עם סיבה ומספר. מי נפסל בסינון קשיח ומי בגלל עדיפות." } },
+    { client: { id: "cost", label: "כמה זה עולה", prompt: "המחיר של הבחירה לעומת אפשרות אחרת, בשקלים." }, reviewer: { id: "assumptions", label: "ההנחות", prompt: "כל הנחה עם התווית שלה." } },
+    { client: { id: "risk", label: "מה יכול להשתבש", prompt: "שניים או שלושה דברים, ומה עושים בכל אחד." }, reviewer: { id: "sensitivity", label: "הרגישות", prompt: "מה משנה את ההחלטה, ובכמה." } },
+    { client: { id: "review", label: "מתי בוחנים מחדש", prompt: "אירועים, ותאריך אם המשפחה רוצה." }, reviewer: { id: "open", label: "קווים אדומים, ניגוד עניינים ושאלות פתוחות", prompt: "מה נבדק, מה נשאל, למי פונים." } },
+  ]}
+  clientChecks={[
+    { id: "plain", text: "אפשר לקרוא את זה בלי שמישהו יסביר מילה." },
+    { id: "number", text: "יש לפחות סכום אחד בשקלים להחזר החודשי.", auto: { digits: true } },
+    { id: "price", text: "נאמר מה הבחירה עולה לעומת אפשרות אחרת.", auto: { words: ["לעומת", "במקום", "פחות", "יותר"] } },
+    { id: "risk", text: "נאמר מה יכול להשתבש, ומה עושים.", auto: { words: ["אם ", "שמאות", "ריבית"] } },
+    { id: "review", text: "נאמר מתי בוחנים מחדש.", auto: { words: ["חודש", "שנה", "תאריך", "כש"] } },
+    { id: "unknown", text: "נאמר מה לא ידוע.", auto: { words: ["לא ידוע", "לא יודעים"] } },
+    { id: "estimate", text: "נאמר שהמספרים אומדן ולא הצעה.", auto: { words: ["אומדן", "אומדנים", "הערכה"] } },
+  ]}
+  reviewerChecks={[
+    { id: "kinds", text: "כל מספר מסומן לפי סוג: אומדן, תרחיש, הצעה או עסקה.", auto: { words: ["אומדן", "תרחיש", "הצעה"] } },
+    { id: "rejected", text: "לכל מועמד שנפסל יש סיבה ומספר.", auto: { digits: true } },
+    { id: "split", text: "מבחינים בין מסנן קשיח לבין עדיפות.", auto: { words: ["קשיח", "עדיפות"] } },
+    { id: "labels", text: "ההנחות מסומנות: הנחת חישוב, ידע מהשטח, החלטה של Mogi או לא אומת.", auto: { words: ["הנחת חישוב", "ידע מהשטח", "החלטה של", "לא אומת"] } },
+    { id: "sensitivity", text: "יש לפחות מספר אחד שאומר מתי ההחלטה משתנה.", auto: { digits: true } },
+    { id: "redlines", text: "נבדק שלא הוסתרה התחייבות, לא נופחה הכנסה ולא הוגש מסמך שאינו נכון.", auto: { words: ["התחייבות", "הכנסה", "מסמך"] } },
+    { id: "conflict", text: "ניגוד עניינים: נכתב מה ידוע, או שנוסחה שאלה פתוחה.", auto: { words: ["ניגוד", "תגמול", "שכר", "עורך הדין"] } },
+  ]}
+  jargon={["מרווח", "שפיצר", "קרן שווה", "יחס החזר", "שיעור מימון", "מדד", "צמוד", "פריים", "תמהיל", "ריבית משתנה", "לא צמודה", "סף הון", "חיתום", "הערת אזהרה", "תרחיש לחץ"]}
+  promises={["מובטח", "בטוח", "בוודאות", "בלי סיכון", "ללא סיכון", "תמיד", "לעולם"]}
+  modelClient={modelClient}
+  modelReviewer={modelReviewer}
+/>
+
+נסו שלוש משימות:
+1. **שורה אחת בכל צד.** כתבו את ״מה נבחר״ ללקוח ואת ״ההחלטה והראיות״ לבודק. ספרו כמה מספרים יש בכל אחת. האם כל מספר בצד הלקוח נמצא גם בצד הבודק?
+2. **החליפו עדיפות.** שנו את ההנחה לעדיפות של סך תשלומים נמוך, והפכו את ההסבר ללקוח. מה בטבלה של ״מה משנה את ההחלטה״ מופיע עכשיו בשתי העמודות?
+3. **הרשימה.** כתבו את שני הצדדים עד סוף, ובדקו מה הכלי מצא ולא מצא. האם מה שלא מצא באמת חסר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>אצל הלקוח מספרים בודדים (החזר, סך, מרווח); אצל הבודק גם סוג לכל מספר. מספר שנמצא רק בצד אחד הוא סימן לבדוק אם שני הצדדים עדיין אומרים אותו דבר.</li>
+    <li>העדיפות של סך תשלומים נמוך מובילה ל־{ALT.total} אצל בנק ב׳, והדוח צריך להזכיר שהמרווח {f.shekels(g("total", "b", "margin60"))} דק ושהיחס {pc(g("total", "b", "ratio"))} מעל הקו. הלקוח צריך לשמוע גם את זה.</li>
+    <li>הכלי מחפש רמז, לא הוכחה. ייתכן שחסר ״לא ידוע״ ואתם כתבתם ״אין מידע״: מילה אחרת, אותה משמעות. סימון שלכם גובר.</li>
+  </ol>
+</details>
+
+<PredictionReveal
+  client:visible
+  id="9.4"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "לא: הקבועה בלבד אינה הזולה ביותר. סך התשלומים שלה גבוה בהרבה מזה של 25 שנה. ההחלטה תלויה בעדיפות, והדוח צריך לומר איזו עדיפות הוא מניח.",
+    `לא: הצמוד נותן את ההחזר הראשון הנמוך ביותר, אבל זו עדיפות אחרת. ובדוח כן צריך להזכיר חשיפה: בלחץ ההחזר עולה בעד ${f.whole(g("payment", "b", "rise"))}.`,
+    "",
+    "לא: בנק ג׳ נפסל על 25 שנה: התקציב נשבר בלחץ. בדוח חייבת להיות הסיבה.",
+  ]}
+>
+  אם העדיפות היא סך תשלומים נמוך, {ALT.total} אצל {BANK.b} מנצחת: סך התשלומים נמוך ב־{f.shekels("pc.total_vs_total")}. אבל היא עוברת רק בקושי: המרווח מהתקציב {f.shekels(g("total", "b", "margin60"))}, והיחס {pc(g("total", "b", "ratio"))} מעל הקו של 40%. דוח שמזכיר רק את החיסכון, והמרווח הדק נשאר לבדוק בלבד, נותן ללקוח תמונה חלקית. זו ההבחנה בין הסבר שמראה מחיר לבין הסבר שמוכר.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## שורה אחת מהדוח, בשתי גרסאות
+
+</Section>
+
+המועמד: {ALT.total} אצל {BANK.b}. כתבו אותו פעם ללקוח ופעם לבודק.
+
+**צעד 1 — מה העובדות.** סך התשלומים {f.shekels(g("total", "b", "total"))}, החזר ראשון {f.shekels(g("total", "b", "first"))}, יחס {pc(g("total", "b", "ratio"))}, מרווח מהתקציב {f.shekels(g("total", "b", "margin60"))}, עלייה בלחץ {f.shekels(g("total", "b", "rise"))}.
+
+**צעד 2 — ללקוח.** ״הלוואה ל־25 שנה הייתה חוסכת {f.shekels("pc.total_vs_total")} בסך הכול, אבל ההחזר החודשי שלה גבוה, והמרווח שלכם בחודש הגרוע היה {f.shekels(g("total", "b", "margin60"))} בלבד. לכן לא ממליצים עליה, אלא אם הסך הנמוך חשוב לכם יותר.״
+
+**צעד 3 — לבודק.** ״נפסל לפי עדיפות (לא מסנן קשיח): עבר את הסירוב והתקציב. הצדדים: סך נמוך ב־{f.shekels("pc.total_vs_total")}; מרווח מהתקציב {f.shekels(g("total", "b", "margin60"))} (נשבר בתקציב מעל {f.shekels("sens.limit.total")}); יחס {pc(g("total", "b", "ratio"))}, דגל מעל הקו. אומדן במחירון התרגיל. עדיפות המשפחה: הנחה.״
+
+**צעד 4 — בדיקה.** שני הנוסחים אומרים אותו דבר: אותה חלופה, אותו מרווח, אותו סך. מה שנוסף לבודק הוא הסוג של הנפסל, הגבול וההנחה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## באיזה תקציב כל בחירה נשברת
+
+</Section>
+
+לכל חלופה אצל בנק ב׳ יש מרווח מעל תקציב המחיה של {f.shekels("in.budget")}. התקציב האמיתי שמעליו הבחירה נשברת הוא התקציב ועוד המרווח. השלימו את שתי השורות האחרונות. הראשונה כבר מלאה.
+
+<FillTable
+  client:visible
+  id="9.4-half"
+  rowKey="alt"
+  periodLabel="החלופה"
+  columns={[
+    { key: "margin", label: "מרווח מעל התקציב" },
+    { key: "limit", label: "התקציב שמעליו נשברת" },
+  ]}
+  rows={halfRows}
+  blanks={["25 שנה.limit", "קבועה בלבד.limit"]}
+  success={`נכון. הקבועה בלבד נשברת מעל ${f.shekels("sens.limit.exposure")}, ו־25 שנה כבר מעל ${f.shekels("sens.limit.total")}. מי שבטוח שהתקציב שלו נמוך מהסכום הזה יכול לבחור אחרת.`}
+  hint="התקציב ועוד המרווח, בכל שורה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים, הבנקים והכללים בתרגילים בדויים. התרגילים מסודרים מהקל אל המאתגר. בנו אותם בעזרת מחשבון.
+
+<ChoiceExercise
+  client:visible
+  id="9.4-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ללקוח: ״כל מספר מסומן לפי סוג: אומדן, תרחיש, הצעה או עסקה״", feedback: "זו דרישה מהדוח לבודק. ללקוח מספיק לומר שהמספרים אומדן." },
+    { text: "לבודק: ״הלוואה ל־25 שנה הייתה חוסכת לכם כסף, אבל כדאי להישאר עם ודאות״", feedback: "משפט כזה מתאים ללקוח, ויש בו תוכן: מה זה חוסך, ולמה לא. לבודק חסר בו מספר." },
+    { text: "לבודק: ״25 שנה נפסלה לפי עדיפות, לא בסינון קשיח, עם מרווח ויחס כמסומנים בטבלה״", correct: true, feedback: "נכון. הבודק צריך לדעת מאיזה סוג הסיבה, ואיזה מספר מראה אותה." },
+    { text: `ללקוח: ״שיעור המימון הוא מדד התקרה של הוראה 329 והוא עומד על ${pc("g.exposure.d.ltv")}״`, feedback: "מילים מקצועיות בלי הסבר, ובלי מה זה אומר למשפחה." },
+  ]}
+>
+  איזה משפט מתאים לקורא שלו?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="9.4-2"
+  n={2}
+  level="קל"
+  unit="₪"
+  answer={f.raw("sens.limit.exposure")}
+  errors={[
+    { value: f.raw(`${ch}.margin60`), message: "זה המרווח מעל התקציב. השאלה היא איזה תקציב שובר את ההמלצה: התקציב ועוד המרווח." },
+    { value: f.raw("sens.limit.total"), message: "זה התקציב ש־25 שנה נשברת מעליו. השאלה על הקבועה בלבד." },
+  ]}
+>
+  תקציב המחיה שהונח הוא {f.shekels("in.budget")}, והמרווח של ההמלצה מעליו {f.shekels(`${ch}.margin60`)}. מעל איזה תקציב מחיה אמיתי ההמלצה נשברת?
+</NumericExercise>
+
+<Solution for="9.4-2">
+<M>{n("in.budget")} + {n(`${ch}.margin60`)} = {n("sens.limit.exposure")}</M> ₪ בחודש.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.4-3"
+  n={3}
+  level="בינוני"
+  unit="%"
+  answer={f.raw("rv.ratio_free")}
+  errors={[
+    { value: f.raw(`${ch}.ratio`), message: "זה היחס עם הלוואת הרכב. בלעדיה ההכנסה הפנויה גדולה יותר והיחס קטן יותר." },
+  ]}
+>
+  ההחזר של ההמלצה הוא {f.shekels(`${ch}.first`)} וההכנסה המוכרת {f.shekels("in.recognised")}. מה יחס ההחזר כשהלוואת הרכב כבר לא נספרת? (בכמה אחוזים, שתי ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="9.4-3">
+<M>{n(`${ch}.first`)} ÷ {n("in.recognised")} = {n("rv.ratio_free")}%</M>. זה המספר שהיה מופיע אם ההלוואה הייתה מוסתרת (קו אדום) וגם המספר האמיתי אחרי שהיא נגמרת.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.4-4"
+  n={4}
+  level="בינוני"
+  unit="₪"
+  answer={f.raw("rl.shira_gap")}
+  errors={[
+    { value: f.raw("rl.oneoff"), message: "זה התשלום החד־פעמי. הניפוח הוא כמה הוא מעלה את הממוצע החודשי: הוא מתחלק בשלושה חודשים." },
+  ]}
+>
+  הממוצע של שלושת החודשים של שירה, עם התשלום החד־פעמי, הוא {f.shekels("rl.shira_naive")}. ההכנסה המוכרת היא {f.shekels("rl.shira_recognised")}. בכמה שקלים בחודש ההכנסה תנופח אם משתמשים בממוצע הראשון?
+</NumericExercise>
+
+<Solution for="9.4-4">
+<M>{n("rl.shira_naive")} − {n("rl.shira_recognised")} = {n("rl.shira_gap")}</M> ₪ בחודש.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.4-5"
+  n={5}
+  level="בינוני"
+  unit="₪"
+  answer={f.raw("sens.gap_stress")}
+  errors={[
+    { value: f.raw("sens.gap_base"), message: "זה המחיר של הוודאות בתרחיש הבסיס. השאלה היא על תרחיש הלחץ." },
+    { value: f.raw("sens.gap_macro"), message: "זה המחיר במסלול המקרו. השאלה היא על תרחיש הלחץ." },
+  ]}
+>
+  בתרחיש הלחץ סך התשלומים של הקבועה בלבד הוא {f.shekels("sc.exposure.stress_total")}, ושל {ALT.total} {f.shekels("sc.total.stress_total")}. בכמה הקבועה בלבד יקרה יותר?
+</NumericExercise>
+
+<Solution for="9.4-5">
+<M>{n("sc.exposure.stress_total")} − {n("sc.total.stress_total")} = {n("sens.gap_stress")}</M> ₪. בבסיס {f.shekels("sens.gap_base")}, ובמסלול המקרו {f.shekels("sens.gap_macro")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="9.4-6"
+  n={6}
+  level="בינוני"
+  unit="תשלומים"
+  tolerance={0}
+  near={0}
+  answer={f.raw("rv.until_drop")}
+  errors={[
+    { value: f.raw("in.car_left"), message: "זה כל התשלומים שנשארו. ההלוואה מפסיקה להיספר כשנשארים 18 תשלומים." },
+  ]}
+>
+  להלוואת הרכב נשארו {f.plain("in.car_left")} תשלומים, והיא נספרת ביחס ההחזר כל עוד נשארו מעל 18. כמה תשלומים צריכים לעבור עד שהיא כבר לא נספרת?
+</NumericExercise>
+
+<Solution for="9.4-6">
+<M>{f.plain("in.car_left")} − 18 = {f.plain("rv.until_drop")}</M> תשלומים (שיעור 4.2).
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="9.4-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לבדוק אם משהו בתגמול של היועץ תלוי בבנק או בחלופה שנבחרו, לכתוב מה ידוע, ולנסח כשאלה פתוחה מה שלא ידוע", correct: true, feedback: "נכון. הקורס אינו יודע מה מותר, ולכן מה שנדרש הוא לשאול, לכתוב ולא להסתיר." },
+    { text: "לא לכתוב כלום: ניגוד עניינים הוא עניין פרטי של היועץ ושל הבנק, והלקוח לא צריך להעמיס על עצמו את השאלה הזו", feedback: "ללקוח ולבודק יש עניין לדעת. השאלה אינה פרטית." },
+    { text: "לקבוע בדוח שאין ניגוד עניינים בכלל, כי ההלוואה זהה בשלוש החלופות ולכן שום דבר לא משתנה ליועץ", feedback: "ההלוואה זהה בין החלופות, אבל ייתכן שמשהו משתנה בין הבנקים. מה שלא נבדק לא נכתב כידוע." },
+    { text: "לבחור דווקא את החלופה היקרה ביותר ללקוח, כדי שהדוח ייראה הוגן מבחינת הבודק והלקוח", feedback: "זה לא תיקון: זה עיוות לצד השני. הבחירה צריכה להיות מנומקת, לא מוכוונת להיראות." },
+  ]}
+>
+  מה כדאי שהדוח ייעשה בנוגע לניגוד עניינים?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על הסבר כפול">
+<p><strong>מה זה?</strong> אותה החלטה שנכתבת פעמיים: ללקוח בשפה פשוטה (מה נבחר, למה, כמה זה עולה, מה יכול להשתבש, מתי בוחנים) ולבודק מקצועי (ראיות, מה נפסל, הנחות, רגישות, קווים אדומים, ניגוד עניינים, שאלות פתוחות).</p>
+<p><strong>למה זה קיים?</strong> כי לקוח שלא מבין לא יכול להסכים באמת, ובודק שלא רואה מה נפסל לא יכול לבדוק. ואם אחד הנוסחים אומר דבר שהאחר לא אומר, מישהו מוטעה.</p>
+<p><strong>איך זה עובד?</strong> אותם מספרים בשני הנוסחים, מחושבים בקוד (מודל שפה לא מחשב אף מספר). הלקוח מקבל מסקנה, מחיר וסיכונים. הבודק מקבל גם את כל מה שנפסל, מסנן קשיח או עדיפות, ואת מה שמשנה את ההחלטה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> המחיר של הוודאות בתיק הזה הוא {f.shekels("sens.gap_base")} בבסיס, {f.shekels("sens.gap_stress")} בלחץ ו־{f.shekels("sens.gap_macro")} במקרו. דוח שמציג מספר אחד נותן תמונה חלקית.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כותבים את שני הנוסחים לפני שמציגים, בודקים שהם עקביים, ומציגים ללקוח את הראשון ולבודק את השני. מה שלא ידוע נכתב כלא ידוע.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהיחידה
+
+</Section>
+
+- **שני קוראים, אותה החלטה.** הלקוח מקבל מסקנה, מחיר וסיכונים בשפה פשוטה; הבודק מקבל ראיות, מה נפסל והנחות עם תוויות.
+- **כל מועמד שנפסל מקבל סיבה ומספר,** ומבחינים בין מסנן קשיח (סירוב, תקציב) לעדיפות (הנחה על המשפחה).
+- **הרגישות אומרת מה משנה את ההחלטה:** העדיפות, התקציב ({f.shekels("sens.limit.exposure")}), הריבית לפני החתימה והתרחיש. מחיר הוודאות הוא טווח, לא מספר.
+- **הקווים האדומים נבדקים בכתב:** לא מסתירים התחייבות, לא מנפחים הכנסה, לא מגישים מסמך שאינו נכון.
+- **ניגוד עניינים נלמד כשאלה,** ומה שלא ידוע נכתב כלא ידוע. מתי בוחנים מחדש נקבע מראש, ושאר ההחלטה של המשפחה.
+
+**בשיעור הבא — 9.5, המבחן המסכם:** שאלות מכל שלבי הקורס ותיק אחד, עם פתרון ומחוון.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "התיק של נועם ושירה, ההמלצה של 9.3, הבנקים הבדויים ומחירוניהם וכללי הסירוב וההנחה שלהם (6.6–6.9), שלושת התרחישים (8.10) ותקציב המחיה של התיק (4.6): הכול בדוי, להמחשה. עדיפות המשפחה (ודאות) היא הנחה של הקורס. תקופת הבדיקה של 24 חודשים היא הצעה של הקורס. הריביות בטבלת הרגישות הן ״מה אם״, לא תחזיות." },
+    { kind: "החלטה של Mogi", text: "הקו האדום: מיצוב בוחר בין נתונים אמיתיים ואינו מסתיר התחייבות, מנפח הכנסה או מגיש מסמך שאינו נכון; נתון שסותר את מה שהלקוח אמר לא נשלח לבנק בלי לשאול אותו (2026-08-31). לכל הכנסה נשמרים הסכום שהוצהר, הסכום שהוכר והמצב, ובין מוצהר למאומת מבחינים (אילון אישר ב־2026-10-07). מודל שפה לא מחשב אף מספר (2026-07-29). אין קריאת מסמך של לקוח אמיתי בלי הסכמה חתומה.", date: "2026-08-31" },
+    { kind: "לא אומת", text: "עיסוק יועץ משכנתאות אינו מוסדר בחוק ואינו דורש רישיון (הוראה 329א, 2017, ודברי ההסבר להצעת חוק הסדרת העיסוק בייעוץ משכנתאות, 2026; נכון ל־9 באוקטובר 2026 החוק לא עבר). מה מופיע בהצעה לפי תקצירי עיתונות: הימנעות מניגוד עניינים, תיעוד חלופות, קוד אתיקה. לפי תעתיק ותקצירים של הצוות, ממתין לבדיקה מול המקור.", date: "2026-10-09" },
+    { kind: "לא אומת", text: "סף ההון של 40% ביחס ההחזר, תקרת שיעור המימון של 75% (הוראה 329), כלל 18 החודשים וכלל ״אותו נכס״ (חוזר 2852): לפי תעתיק של הצוות, ממתין לבדיקה מול ההוראות.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "מבחן המחזור בהוראה 451 §15א ותוקף האישור העקרוני: לפי תעתיק של הצוות, ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "מה מותר ליועץ לגבות, מתי חייבים לחשוף תגמול, ומה דינו של מסמך שאינו נכון בטופס של בנק: חששות, לא קביעות. הקורס לא בדק חוק או חוזה. שאלות לעורך הדין ולמדיניות של Mogi." },
+    { kind: "ידע מהשטח", text: "כמעט כל אחד יכול לעסוק בייעוץ משכנתאות (״אפס חסמי כניסה״); מה משתנה בין בנקים בתגמול ובגישה: לא ידוע. אילון, 2026-07-27 ו־2026-07-31. ממתין לאישור אילון.", date: "2026-07-27" },
+    { kind: "בדיקת חישוב", text: "כל המספרים ביחידה חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/casefile.ts (author A) with bankpolicy.ts, scenarios.ts, engine.ts, sensitivity.ts, affordability.ts, regulation.ts via scripts/lessons/lesson-9-4.ts and _recommend-facts.ts, data/lessons/9-4.json, rechecked by checks/kinds/recommend.py, casefile.py, scenarios.py, engine.py, bankpolicy.py, affordability.py, regulation.py, sensitivity.py. The choice: src/data/case-a-recommendation.ts. Component: DualExplainer.vue. Field knowledge: FK-H-082 (advisor entry, awaiting Eylon), FK-H-084 to 089 (fees; not taught), FK-H-012, 013 (the 40% and the 18 months). Video: video/9-4.html. Questions for Eylon: research/stage-9-raw/eylon-9-B.md. */}

@@ -1888,6 +1888,21 @@
       "value": "1051.10"
     },
     {
+      "id": "zero",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "g.total.c.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "zero",
+        "subtrahend": "g.total.c.margin60"
+      },
+      "value": "20.90"
+    },
+    {
       "id": "g.total.c.stage",
       "kind": "rec_stage",
       "inputs": {
@@ -3043,6 +3058,39 @@
         "terms": "in.budget,g.exposure.b.margin60"
       },
       "value": "12238.03"
+    },
+    {
+      "id": "ap.2100000.value",
+      "kind": "given",
+      "inputs": {},
+      "value": "2100000.00"
+    },
+    {
+      "id": "ap.2100000.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2100000.00",
+        "deal": "only_home"
+      },
+      "value": "1575000.00"
+    },
+    {
+      "id": "ap.2100000.extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "in.loan",
+        "subtrahend": "ap.2100000.max_loan"
+      },
+      "value": "44000.00"
+    },
+    {
+      "id": "ap.2100000.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "ap.2100000.extra",
+        "subtrahend": "in.reserve_after"
+      },
+      "value": "25000.00"
     },
     {
       "id": "mv.0.pts",

@@ -101,7 +101,7 @@ type Hint = "found" | "missing" | "none";
 function hint(side: Side, c: Check): Hint {
   if (!c.auto) return "none";
   const t = sideText(side);
-  if (t.trim() === "") return "missing";
+  if (t.trim() === "") return "none"; // nothing written yet: no hint, not even a warning
   if ("digits" in c.auto) return /\d/.test(t) ? "found" : "missing";
   return c.auto.words.some((w) => t.includes(w)) ? "found" : "missing";
 }
@@ -126,7 +126,7 @@ const modelOf = (side: Side) => (side === "client" ? props.modelClient : props.m
     <dl class="mt-3 grid gap-x-4 gap-y-1 rounded-md bg-n50 p-3 sm:grid-cols-[auto_1fr]">
       <template v-for="f in decision" :key="f.label">
         <dt class="text-caption font-semibold text-n700">{{ f.label }}</dt>
-        <dd class="text-body-m text-n900"><span class="ltr">{{ f.value }}</span></dd>
+        <dd class="text-body-m text-n900">{{ f.value }}</dd>
       </template>
     </dl>
 
@@ -209,8 +209,8 @@ const modelOf = (side: Side) => (side === "client" ? props.modelClient : props.m
           מילים שמבטיחות: <strong>{{ promisesFound(s).join(", ") }}</strong>. אומדן או תרחיש אינם הבטחה: אם המילה מתארת אחד מהם, כדאי לנסח מחדש.
         </p>
 
-        <fieldset class="mt-3 rounded-md bg-n50 p-2">
-          <legend class="px-1 text-caption font-semibold text-n700">רשימת בדיקה ({{ done(s) }} מתוך {{ checksOf(s).length }}). אינה ציון</legend>
+        <div class="mt-3 rounded-md bg-n50 p-2" role="group" :aria-label="`רשימת בדיקה ${sideLabel(s)}`">
+          <p class="px-1 text-caption font-semibold text-n700">רשימת בדיקה ({{ done(s) }} מתוך {{ checksOf(s).length }}). אינה ציון</p>
           <div v-for="c in checksOf(s)" :key="c.id">
             <label class="flex min-h-11 cursor-pointer items-start gap-3 py-1">
               <input type="checkbox" class="mt-1 h-5 w-5 shrink-0 accent-teal-deep" :checked="!!ticks[`${s}.${c.id}`]" @change="toggle(`${s}.${c.id}`)" />
@@ -221,7 +221,7 @@ const modelOf = (side: Side) => (side === "client" ? props.modelClient : props.m
               </span>
             </label>
           </div>
-        </fieldset>
+        </div>
 
         <div class="mt-3">
           <button type="button" class="min-h-11 text-body-m text-navy underline" :aria-expanded="showModel[s]" @click="showModel[s] = !showModel[s]">

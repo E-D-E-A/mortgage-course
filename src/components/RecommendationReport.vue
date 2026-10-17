@@ -182,6 +182,8 @@ function reset() {
   confirmReset.value = false;
 }
 const cell = (rows: Row[], id: string, key: string) => rows.find((r) => r.id === id)?.cells[key] ?? "—";
+/** A cell that is only a number (digits, separators, a percent sign, a minus) is drawn left to right; words are not. */
+const isNum = (v: string) => /^[−\-]?[\d.,]+%?$/.test(v);
 const shownAlt = computed(() => alt.value ?? props.alternatives[0]?.id ?? "");
 const shownAltName = computed(() => props.alternatives.find((a) => a.id === shownAlt.value)?.name ?? "");
 const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value] ?? [], id, key);
@@ -263,7 +265,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
             <tbody>
               <tr v-for="a in alternatives" :key="a.id" class="border-b border-n100 align-top" :class="alt === a.id ? 'bg-n50' : ''">
                 <td class="py-2 pe-3 font-semibold text-n900">{{ a.name }}</td>
-                <td v-for="c in altColumns" :key="c.key" class="py-2 pe-3"><span class="ltr">{{ cell(altRows, a.id, c.key) }}</span></td>
+                <td v-for="c in altColumns" :key="c.key" class="py-2 pe-3"><span :class="isNum(cell(altRows, a.id, c.key)) ? 'ltr' : ''">{{ cell(altRows, a.id, c.key) }}</span></td>
                 <td class="py-2">{{ alt === a.id ? "כן" : "" }}</td>
               </tr>
             </tbody>
@@ -282,7 +284,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
             <tbody>
               <tr v-for="b in banks" :key="b.id" class="border-b border-n100 align-top" :class="bank === b.id ? 'bg-n50' : ''">
                 <td class="py-2 pe-3 font-semibold text-n900">{{ b.name }}</td>
-                <td v-for="c in bankColumns" :key="c.key" class="py-2 pe-3"><span class="ltr">{{ bankCell(b.id, c.key) }}</span></td>
+                <td v-for="c in bankColumns" :key="c.key" class="py-2 pe-3"><span :class="isNum(bankCell(b.id, c.key)) ? 'ltr' : ''">{{ bankCell(b.id, c.key) }}</span></td>
                 <td class="py-2">{{ bank === b.id ? "כן" : "" }}</td>
               </tr>
             </tbody>
@@ -306,7 +308,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
               <span class="block font-semibold text-n900">{{ a.name }}</span>
               <span v-if="a.note" class="block text-caption text-n700">{{ a.note }}</span>
               <span class="mt-1 block text-caption text-n700">
-                <span v-for="c in altColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span class="ltr">{{ cell(altRows, a.id, c.key) }}</span></span>
+                <span v-for="c in altColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span :class="isNum(cell(altRows, a.id, c.key)) ? 'ltr' : ''">{{ cell(altRows, a.id, c.key) }}</span></span>
               </span>
             </button>
           </div>
@@ -326,7 +328,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
               <span class="block font-semibold text-n900">{{ b.name }}</span>
               <span v-if="b.note" class="block text-caption text-n700">{{ b.note }}</span>
               <span class="mt-1 block text-caption text-n700">
-                <span v-for="c in bankColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span class="ltr">{{ bankCell(b.id, c.key) }}</span></span>
+                <span v-for="c in bankColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span :class="isNum(bankCell(b.id, c.key)) ? 'ltr' : ''">{{ bankCell(b.id, c.key) }}</span></span>
               </span>
             </button>
           </div>
@@ -353,13 +355,13 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
             @input="setText(s.id, ($event.target as HTMLTextAreaElement).value)"
           ></textarea>
           <p class="text-caption text-n600">{{ words(texts[s.id] ?? "") }} מילים</p>
-          <fieldset class="mt-2 rounded-md bg-n50 p-2">
-            <legend class="px-1 text-caption font-semibold text-n700">בדקו שהחלק הזה אומר:</legend>
+          <div class="mt-2 rounded-md bg-n50 p-2" role="group" :aria-label="`בדיקה עצמית: ${s.title}`">
+            <p class="px-1 text-caption font-semibold text-n700">בדקו שהחלק הזה אומר:</p>
             <label v-for="(m, mi) in s.must" :key="mi" class="flex min-h-11 cursor-pointer items-start gap-3 py-1">
               <input type="checkbox" class="mt-1 h-5 w-5 shrink-0 accent-teal-deep" :checked="!!musts[`${s.id}.${mi}`]" @change="toggle(musts, `${s.id}.${mi}`)" />
               <span class="text-body-m text-n800">{{ m }}</span>
             </label>
-          </fieldset>
+          </div>
         </li>
       </ol>
       <p class="mt-1 text-caption text-n600">סימנתם {{ mustDone }} מתוך {{ mustKeys.length }} בדיקות עצמיות בחלקי הדוח. הסימון הוא שלכם: הכלי לא קורא את הטקסט.</p>

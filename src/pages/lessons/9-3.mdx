@@ -18,7 +18,6 @@ import Sources from "../../components/Sources.astro";
 import M from "../../components/M.astro";
 import Solution from "../../components/Solution.astro";
 import { facts } from "../../lib/facts.ts";
-import { formatShekels } from "../../lib/calc/money.ts";
 import { NUMBER_KINDS } from "../../lib/calc/casefile.ts";
 import { DATA_NOTE } from "../../data/case-a-final.ts";
 import { releaseChecklist } from "../../data/case-a-recommendation.ts";
@@ -61,7 +60,7 @@ export const checklist = releaseChecklist({
 export const candRows = ALTS.flatMap((a) => BANKS4.map((b) => ({ a, b, key: g(a, b, "stage") })));
 export const altRows = ALTS.map((a) => ({
   id: a,
-  cells: { first: formatShekels(f.raw(g(a, "b", "first"))), total: formatShekels(f.raw(g(a, "b", "total"))), rise: formatShekels(f.raw(g(a, "b", "rise"))), margin: formatShekels(f.raw(g(a, "b", "margin60"))) },
+  cells: { first: nv(f.raw(g(a, "b", "first"))), total: nv(f.raw(g(a, "b", "total"))), rise: nv(f.raw(g(a, "b", "rise"))), margin: nv(f.raw(g(a, "b", "margin60"))) },
 }));
 export const bankRowsByAlt = Object.fromEntries(
   ALTS.map((a) => [
@@ -69,7 +68,7 @@ export const bankRowsByAlt = Object.fromEntries(
     BANKS4.map((b) => ({
       id: b,
       cells: ok(a, b)
-        ? { decision: f.plain(g(a, b, "stage")) === "ok" ? "עובר" : STAGE[f.plain(g(a, b, "stage"))], ratio: pc(g(a, b, "ratio")), total: formatShekels(f.raw(g(a, b, "total"))), margin: formatShekels(f.raw(g(a, b, "margin60"))) }
+        ? { decision: f.plain(g(a, b, "stage")) === "ok" ? "עובר" : STAGE[f.plain(g(a, b, "stage"))], ratio: pc(g(a, b, "ratio")), total: nv(f.raw(g(a, b, "total"))), margin: nv(f.raw(g(a, b, "margin60"))) }
         : { decision: "מסרב", ratio: pc(g(a, b, "ratio")), total: "—", margin: "—" },
     })),
   ]),
@@ -143,7 +142,7 @@ export const halfRows = [
     <tbody>
       {candRows.map((r) => (
         <tr class={`border-b border-n100 align-top ${r.a === "exposure" && r.b === "b" ? "bg-n50" : ""}`}>
-          <td class="py-2 pe-2 font-semibold text-n900">{ALT[r.a]}, {BANK[r.b]}{r.a === "exposure" && r.b === "b" && <span class="block text-caption font-normal text-n600">ההמלצה</span>}</td>
+          <td class="py-2 pe-2 font-semibold text-n900 whitespace-nowrap">{ALT[r.a]}, {BANK[r.b]}{r.a === "exposure" && r.b === "b" && <span class="block text-caption font-normal text-n600">ההמלצה</span>}</td>
           <td class="py-2 pe-2">{STAGE[f.plain(r.key)]}</td>
           <td class="py-2 pe-2"><span class="ltr">{pc(g(r.a, r.b, "ratio"))}</span>{f.plain(g(r.a, r.b, "flag40")) === "over" && <span class="block text-caption text-n600">מעל 40%</span>}</td>
           <td class="py-2 pe-2">{ok(r.a, r.b) ? <span class="ltr whitespace-nowrap">{nv(f.raw(g(r.a, r.b, "first")))}</span> : "—"}</td>
@@ -160,7 +159,7 @@ export const halfRows = [
 מה המסננים עושים:
 
 - **שאלה 1.** מתוך {f.plain("fn.pairs")} הצירופים, {f.plain("fn.approved")} מאושרים. בנק ד׳ מסרב לשלוש החלופות: <Term t="שיעור מימון" client:visible lesson="1.2">שיעור המימון</Term> של הלוואה כזו, {pc("g.exposure.d.ltv")}, מעל התקרה של הבנק הבדוי הזה, {f.plain("rule.d_ceiling")}%. אין חלופה שמשנה את זה בלי להוסיף הון עצמי, ולכן זה לא עניין של בחירה.
-- **שאלה 2.** צירוף אחד נופל על התקציב: 25 שנה אצל בנק ג׳. בחודש הגרוע של הלחץ נשארים למשפחה {f.shekels(g("total", "c", "margin60"))} מעל התקציב, כלומר היא חסרה. אותה חלופה אצל בנק א׳ ואצל בנק ב׳ עוברת, אבל במרווח דק: {f.shekels(g("total", "a", "margin60"))} ו־{f.shekels(g("total", "b", "margin60"))}.
+- **שאלה 2.** צירוף אחד נופל על התקציב: 25 שנה אצל בנק ג׳. בחודש הגרוע של הלחץ חסרים למשפחה {f.shekels(g("total", "c", "short"))} כדי להגיע לתקציב המחיה שלה. אותה חלופה אצל בנק א׳ ואצל בנק ב׳ עוברת, אבל במרווח דק: {f.shekels(g("total", "a", "margin60"))} ו־{f.shekels(g("total", "b", "margin60"))}.
 - **נשארים {f.plain("fn.ok")}:** {f.plain("fn.ok.payment")} של {ALT.payment}, {f.plain("fn.ok.total")} של {ALT.total} ו־{f.plain("fn.ok.exposure")} של {ALT.exposure}.
 
 ## שאלה שלישית: מה חשוב למשפחה
@@ -249,7 +248,7 @@ export const halfRows = [
     <p class="!mt-0 text-body-l font-semibold text-n900">מה הם משלמים על הוודאות</p>
     <p class="mt-2 text-body-m text-n700">לעומת {ALT.total}: סך התשלומים גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_total"))}</span> ₪, וההחזר החודשי <em>נמוך</em> ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_total"))}</span> ₪.</p>
     <p class="mt-2 text-body-m text-n700">לעומת {ALT.payment}: ההחזר הראשון גבוה ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.first_vs_payment"))}</span> ₪, אבל סך התשלומים נמוך ב־<span class="ltr whitespace-nowrap">{nv(f.raw("pc.total_vs_payment"))}</span> ₪, ואין עלייה בלחץ.</p>
-    <p class="mt-2 text-body-m text-n700">מה שהם נותנים בפועל: החזר ראשון גבוה מזה של {ALT.payment}, והגבלה למסלול אחד.</p>
+    <p class="mt-2 text-body-m text-n700">ומה שהם מוותרים עליו: ההחזר הראשון הנמוך של {ALT.payment}, ומסלולים אחרים.</p>
   </div>
 </div>
 
@@ -309,7 +308,7 @@ export const halfRows = [
     <tbody>
       <tr class="border-b border-n100 align-top">
         <td class="py-2 pe-3 font-semibold text-n900"><Term t="פתיחת תיק" client:visible lesson="1.7">פתיחת תיק</Term> וחיתום</td>
-        <td class="py-2 pe-3">הבנק מקבל מסמכים וקורא אותם בפעם הראשונה (<Term t="חיתום" client:visible lesson="1.7">חיתום</Term>): מ־<Term t="מוצהר" client:visible lesson="4.7">מוצהר</Term> ל־<Term t="מאומת" client:visible lesson="4.7">מאומת</Term>.</td>
+        <td class="py-2 pe-3">הבנק מקבל מסמכים וקורא אותם בפעם הראשונה (<Term t="חיתום" client:visible lesson="1.7">חיתום</Term>): המעבר <Term t="מוצהר" client:visible lesson="4.7">ממוצהר</Term> <Term t="מאומת" client:visible lesson="4.7">למאומת</Term>.</td>
         <td class="py-2 pe-3">פער בין מה שנמסר למסמכים. כל פער שנשאל ב־9.1 חייב להיסגר בכתב.</td>
         <td class="py-2 pe-3">מחקר של הצוות; לפי מה שהצוות מצא באוגוסט 2026, שום הוראה לא קובעת כמה זמן החיתום לוקח (לא אומת).</td>
       </tr>
@@ -353,7 +352,11 @@ export const halfRows = [
 
 הבנק מודד את שיעור המימון מול הערך שקבע השמאי, לא מול המחיר (ידע מהשטח, ממתין לאישור אילון; ובעסקה כזו הערך שמשתמשים בו הוא הנמוך מבין השניים, כפי שבשיעור 4.9, לפי תעתיק של הצוות, לא אומת). ההלוואה שהומלצה, {f.shekels("in.loan")}, יושבת על התקרה של {f.plain("in.ceiling")}% כשהשווי {f.shekels("ap.break_even")}. זו הנוסחה מ־1.2, הפוכה:
 
-<M>V = P × 100 ÷ 75 = {n("in.loan")} × 100 ÷ 75 = {n("ap.break_even")}</M>
+<M>V = P × 100 ÷ 75</M>
+
+<M>V = {n("in.loan")} × 100 ÷ 75</M>
+
+<M>V = {n("ap.break_even")}</M>
 
 <dl class="my-4 grid gap-1 text-body-m sm:grid-cols-[auto_1fr] sm:gap-x-4">
   <dt class="font-semibold text-n900">V</dt><dd>השווי הנמוך ביותר שבו ההלוואה עדיין בתקרה, בשקלים.</dd>
@@ -481,7 +484,7 @@ export const halfRows = [
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>בחלופה אחרת משתנים העדיפות שהדוח מניח, המחיר והדגל: ב־{ALT.payment} ההחזר הראשון נמוך ({f.shekels("g.payment.b.first")}) אבל העלייה בלחץ גבוהה ({f.shekels("g.payment.b.rise")}); ב־{ALT.total} המרווח מהתקציב דק ({f.shekels("g.total.b.margin60")}). בנק ד׳ מסרב בכל החלופות.</li>
+    <li>בחלופה אחרת משתנים העדיפות שהדוח מניח, המחיר והדגל. בחלופה {ALT.payment} ההחזר הראשון נמוך ({f.shekels("g.payment.b.first")}) אבל העלייה בלחץ גבוהה ({f.shekels("g.payment.b.rise")}); בחלופה {ALT.total} המרווח מהתקציב דק ({f.shekels("g.total.b.margin60")}). בנק ד׳ מסרב בכל החלופות.</li>
     <li>למשל: השווי {f.shekels("ap.break_even")} שמתחתיו ההלוואה חורגת, ואם השמאות {f.shekels("ap.2100000.value")} חסרים {f.shekels("ap.2100000.short")}; וגם התוקף של בנק ב׳ עד {d("o.b.valid_until")}.</li>
     <li>מ־9.1 עדיין פתוחים: דוח קרן ההשתלמות, ההעברה של המתנה, ההפרש בהפקדה של נועם והתשלום החד־פעמי של שירה, והחוזה שעוד לא חתום. אלה סעיפי רשימת הבדיקות על מסמכים, וכדאי שהדוח יכתוב שהם נסגרים לפני ההעמדה.</li>
   </ol>
@@ -559,10 +562,10 @@ export const halfRows = [
   n={1}
   level="קל"
   options={[
-    { text: "יחס ההחזר גבוה מהקו של בנק ד׳", feedback: "בנק ד׳ מסרב על שיעור המימון, לא על יחס ההחזר." },
+    { text: "יחס ההחזר גבוה מהקו של בנק ד׳, והבנק לא מוכן להיכנס לתיק שהיחס שלו כל כך קרוב לקו", feedback: "בנק ד׳ מסרב על שיעור המימון, לא על יחס ההחזר." },
     { text: `שיעור המימון, ${f.plain("g.exposure.d.ltv")}%, מעל התקרה של בנק ד׳ (${f.plain("rule.d_ceiling")}%), בכל שלוש החלופות`, correct: true, feedback: "נכון. שיעור המימון תלוי בהלוואה ובמחיר, לא בחלופה, ולכן הסירוב זהה בכל החלופות." },
-    { text: "הריבית של בנק ד׳ גבוהה מדי", feedback: "מחיר אינו סיבה לסירוב בכללי התרגיל. בנק ד׳ לא מגיע בכלל לשלב המחיר." },
-    { text: "תקציב המחיה נשבר אצלו", feedback: "תקציב המחיה נבדק רק בצירופים שהבנק מאשר, ובנק ד׳ לא מאשר." },
+    { text: "הריבית של בנק ד׳ גבוהה מדי ביחס לשלושת הבנקים האחרים, ולכן הוא לא מתחרה בהם באף חלופה", feedback: "מחיר אינו סיבה לסירוב בכללי התרגיל. בנק ד׳ לא מגיע בכלל לשלב המחיר." },
+    { text: "תקציב המחיה של המשפחה נשבר אצלו בחודש הגרוע של הלחץ, בכל אחת מהחלופות", feedback: "תקציב המחיה נבדק רק בצירופים שהבנק מאשר, ובנק ד׳ לא מאשר." },
   ]}
 >
   למה בנק ד׳ נפסל בשלושת החלופות?
@@ -669,10 +672,10 @@ export const halfRows = [
   n={7}
   level="מאתגר"
   options={[
-    { text: "מקבלים: הריבית נמוכה יותר, ולכן ההצעה טובה יותר", feedback: "ריבית נמוכה על מסלול אחר אינה שווה לריבית נמוכה על אותו מסלול. מסלול משתנה משנה את החשיפה, והמסנן של ההמלצה." },
+    { text: "מקבלים: הריבית נמוכה יותר, ולכן ההצעה טובה יותר למשפחה, ואין צורך לבדוק שום דבר נוסף", feedback: "ריבית נמוכה על מסלול אחר אינה שווה לריבית נמוכה על אותו מסלול. מסלול משתנה משנה את החשיפה, והמסנן של ההמלצה." },
     { text: "מחשבים מחדש את כל הטבלה לתמהיל החדש, כולל העלייה בלחץ והמרווח מהתקציב, ומחליטים אם העדיפות של המשפחה עדיין מתקיימת", correct: true, feedback: "נכון. הצעה על תמהיל אחר היא הצעה אחרת (שיעור 6.8). ההנחה בריבית לא שוקלת את מה שההמלצה נשענת עליו: החשיפה." },
-    { text: "דוחים: בנק ששינה את התמהיל איבד את אמון המשפחה", feedback: "זו אינה בדיקה. ייתכן שההצעה טובה, ומחשבים כדי לדעת." },
-    { text: "מבקשים הנחה גם על התמהיל הקבוע, ומוותרים על הבדיקה", feedback: "ויתור על הבדיקה הוא ויתור על ההשוואה, והיא אחד הדברים שלא מוותרים עליהם." },
+    { text: "דוחים מיד: בנק ששינה את התמהיל בלי לשאול איבד את אמון המשפחה, ואין טעם להמשיך איתו", feedback: "זו אינה בדיקה. ייתכן שההצעה טובה, ומחשבים כדי לדעת." },
+    { text: "מבקשים הנחה גם על התמהיל הקבוע שבהצעה המקורית, ומוותרים על בדיקת התמהיל החדש", feedback: "ויתור על הבדיקה הוא ויתור על ההשוואה, והיא אחד הדברים שלא מוותרים עליהם." },
   ]}
 >
   בנק ב׳ משיב: ״נוריד {f.plain("r1.points")} נקודת אחוז אם תעברו לתמהיל עם מסלול משתנה לא צמוד״. מה עושים?
@@ -682,7 +685,7 @@ export const halfRows = [
 <p><strong>מה זה?</strong> מסמך אחד שאומר מה נבחר, אצל מי, למה, כמה זה עולה, מה נפסל, מה לא ידוע ומה צריך להיות נכון עד שהכסף עובר.</p>
 <p><strong>למה זה קיים?</strong> כי בחירה בלי נימוק כתוב אי אפשר לבדוק, לא על ידי הלקוח, לא על ידי בודק ולא על ידי היועץ עצמו כעבור חודש.</p>
 <p><strong>איך זה עובד?</strong> מסננים קודם מה שהמשפחה לא יכולה לחיות איתו (סירוב, תקציב שנשבר), שואלים מה חשוב לה, בוחרים, ובודקים מחדש כל מספר על ההצעה הסופית. כל המספרים מחושבים בקוד; מודל שפה לא מחשב אף מספר.</p>
-<p><strong>איך זה משפיע עליכם?</strong> ההבדל בין {ALT.exposure} ל־{ALT.total} אצל אותו בנק הוא {f.shekels("pc.total_vs_total")} בסך התשלומים מול {f.shekels("pc.first_vs_total")} בחודש ומרווח של {f.shekels("pc.margin_vs_total")} בתקציב. כל אחד מהם נכון למשפחה אחרת.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההבדל בין החלופה {ALT.exposure} לבין החלופה {ALT.total} אצל אותו בנק הוא {f.shekels("pc.total_vs_total")} בסך התשלומים מול {f.shekels("pc.first_vs_total")} בחודש ומרווח של {f.shekels("pc.margin_vs_total")} בתקציב. כל אחד מהם נכון למשפחה אחרת.</p>
 <p><strong>איך משתמשים בזה בהחלטה?</strong> כותבים את העדיפות, מראים את המחיר ואת מה שלא ידוע, ובודקים את הרשימה לפני שהכסף עובר.</p>
 </Callout>
 
