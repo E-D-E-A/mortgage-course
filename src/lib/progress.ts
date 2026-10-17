@@ -1,10 +1,14 @@
 /**
  * Where a learner's answers are kept. Today: this browser's localStorage, so
- * the pilot works without a server. Later: the course's Supabase project,
- * behind the same two functions, so no component changes.
+ * the pilot works without a server. Also mirrored, per learner, to the course's
+ * Supabase project (progress-sync.ts), behind the same two functions.
  * Storage can be unavailable (private window, blocked site data); every
  * access is guarded and the page works without it.
  */
+import { recordSave } from "./progress-sync.ts";
+
+export { pullProgress, pullProgressWithTimeout } from "./progress-sync.ts";
+
 const PREFIX = "mogi-course:";
 
 export function load<T>(key: string): T | null {
@@ -22,6 +26,7 @@ export function save(key: string, value: unknown): void {
   } catch {
     /* progress is a convenience here; the lesson still works */
   }
+  recordSave(key, value); // mirrored to Supabase, debounced and best-effort (see progress-sync.ts)
 }
 
 /**

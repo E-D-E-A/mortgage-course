@@ -4,7 +4,8 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
 
 <PublicLayout title="נכנסים…">
   <p id="status" class="mt-6 text-body-l text-n700" role="status">נכנסים לקורס…</p>
-  <script is:inline>
+  <script>
+    import { pullProgressWithTimeout } from "../../../lib/progress-sync.ts";
     // Supabase returns the session in the URL fragment, which never reaches a server.
     // The server checks it (token and company domain) and sets the course's cookies.
     (async () => {
@@ -25,6 +26,8 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
       if (!res.ok) return location.replace("/login/?error=1");
       // The progress store talks to Supabase from the browser under row-level security.
       try { localStorage.setItem("mogi-course:sb-session", JSON.stringify({ access_token, refresh_token })); } catch {}
+      // Bring this learner's saved answers from other devices before the first lesson loads (never longer than 4 s).
+      await pullProgressWithTimeout(4000);
       let next = "/";
       try { next = sessionStorage.getItem("mogi-course:next") || "/"; } catch {}
       location.replace(next.startsWith("/") && !next.startsWith("//") ? next : "/");

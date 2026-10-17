@@ -33,7 +33,7 @@
 
 Netlify לא בונה את האתר (מגבלות הבנייה קטנות). בונים מקומית ומעלים את התיקייה:
 
-1. קובץ `.env` מקומי (לא נכנס ל־git) עם `PUBLIC_SUPABASE_URL=https://uppwokxyuwsapzqwtmtq.supabase.co` ו־`PUBLIC_ALLOWED_DOMAIN=first-edea.com`.
+1. קובץ `.env` מקומי (לא נכנס ל־git) עם `PUBLIC_SUPABASE_URL=https://uppwokxyuwsapzqwtmtq.supabase.co` ו־`PUBLIC_ALLOWED_DOMAIN=first-edea.com` ו־`PUBLIC_SUPABASE_ANON_KEY=<המפתח הציבורי (publishable) של הפרויקט>`. המשתנה האחרון נדרש לסנכרון ההתקדמות מהדפדפן ל־Supabase; בלעדיו הקורס עובד מקומית בלבד.
 2. `pnpm data && pnpm build`
 3. `netlify deploy --prod --dir=dist` (או `--functions`/edge לפי `netlify.toml`; ה־edge functions נמצאות ב־`netlify/edge-functions/`).
 
