@@ -96,7 +96,7 @@ export default function lesson52(): LessonData {
   return {
     lesson: "5.2",
     title: "הסלים האחידים והסל המוצע",
-    note: "Three fictional banks with invented rates, an invented forecast (not the Bank of Israel's), and a fictional borrower couple. The three baskets follow the team's transcription of Directive 451 appendix 5 (Brain 7733250), not checked against the directive. 'The actual cost of credit' is lesson 3.10's measure, computed on the forecast payments and the loan (no up-front charges here). Schedules follow the statement convention; the IRR is found by bisection (TypeScript) and Newton's method (Python).",
+    note: "Three fictional banks with invented rates, an invented forecast (not the Bank of Israel's), and a fictional borrower couple. The three baskets follow the team's transcription of Directive 451 appendix 5, not checked against the directive. 'The actual cost of credit' is lesson 3.10's measure, computed on the forecast payments and the loan (no up-front charges here). Schedules follow the statement convention; the IRR is found by bisection (TypeScript) and Newton's method (Python).",
     facts,
   };
 }

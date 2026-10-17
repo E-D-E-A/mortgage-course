@@ -207,7 +207,7 @@ const VAR = "variable_unlinked" as const;
  * Which fails what is NOT typed anywhere: constraints.ts computes it.
  */
 const ENTRIES: Entry[] = [
-  { id: "c01", name: "שליש־שליש, כמו שביקשו", choice: BASE_CHOICE, shape: [part(PRIME, 33), part(VAR, 33), part(FIXED, 34)] },
+  { id: "c01", name: "בערך שליש־שליש (33%, 33%, 34%), כמו שביקשו", choice: BASE_CHOICE, shape: [part(PRIME, 33), part(VAR, 33), part(FIXED, 34)] },
   { id: "c02", name: "הרבה משתנה", choice: BASE_CHOICE, shape: [part(PRIME, 40), part(VAR, 30), part(FIXED, 30)] },
   { id: "c03", name: "קבועה בלבד ל־20 שנה", choice: BASE_CHOICE, shape: [part(FIXED, 100, 20)] },
   { id: "c04", name: "קבועה בלבד ל־25 שנה", choice: BASE_CHOICE, shape: [part(FIXED, 100, 25)] },

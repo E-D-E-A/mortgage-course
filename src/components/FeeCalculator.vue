@@ -93,7 +93,7 @@ const noticeText = computed(() => {
   if (s.status === "none") return "לא נמסרה הודעה: עמלת אי־הודעה חלה.";
   if (s.status === "ok") return `הודעה ${s.days} ימים מראש, בין 10 ל־45: עמלת אי־הודעה לא חלה.`;
   if (s.status === "short") return `הודעה ${s.days} ימים מראש, פחות מ־10: עמלת אי־הודעה חלה.`;
-  return `הודעה ${s.days} ימים מראש, יותר מ־45 (קריאה שלנו: היא לא נחשבת): עמלת אי־הודעה חלה.`;
+  return `הודעה ${s.days} ימים מראש, יותר מ־45 (קריאה של הקורס: היא לא נחשבת): עמלת אי־הודעה חלה.`;
 });
 
 interface Step {
@@ -128,11 +128,11 @@ const steps = computed<Step[]>(() => {
       n: 3,
       title: "שלוש ריביות חודשיות: לא מערבבים",
       lines: [
-        { label: `הריבית בחוזה (חוזית ${rate.value.toFixed(2)}%, שווה ל־${contractEff.value}% אפקטיבית): חלקי 12`, value: monthlyContract.value },
+        { label: `ריבית חוזית (${rate.value.toFixed(2)}% לשנה, שווה ל־${contractEff.value}% אפקטיבית): חלקי 12`, value: monthlyContract.value },
         { label: `הממוצע ביום הפירעון (אפקטיבי ${avgToday.value}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyToday.value },
         { label: `הממוצע בהעמדה (אפקטיבי ${hasGrant.value ? avgGrant.value : "—"}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyGrant.value },
       ],
-      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית בחוזה חוזית: משווים רק ריביות חודשיות. הטווח בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה טווח הוא שייך)" : ""}.`,
+      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית החוזית אינה אפקטיבית: משווים רק ריביות חודשיות. הטווח בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה טווח הוא שייך)" : ""}.`,
     },
   ];
   if (d) {
@@ -142,7 +142,7 @@ const steps = computed<Step[]>(() => {
         title: "הערך הנוכחי של התשלומים שנשארו",
         lines: [
           { label: "בריבית הממוצעת ביום הפירעון", value: m(d.pvToday) },
-          { label: "בריבית של החוזה (שווה ליתרה)", value: m(d.pvContract) },
+          { label: "בריבית החוזית (שווה ליתרה)", value: m(d.pvContract) },
           { label: "בריבית הממוצעת של יום ההעמדה", value: m(d.pvGrant) },
         ],
       },
@@ -150,15 +150,15 @@ const steps = computed<Step[]>(() => {
         n: 5,
         title: "שתי הנוסחאות",
         lines: [
-          { label: d.v1Applies ? "נוסחה ראשונה: ביום הפירעון פחות החוזה" : "נוסחה ראשונה: לא חלה (הממוצע ביום הפירעון לא נמוך מהחוזה)", value: d.v1Applies ? m(d.v1) : "—" },
-          { label: d.v2Applies ? "נוסחה שנייה: ביום הפירעון פחות ההעמדה" : hasGrant.value ? "נוסחה שנייה: לא חלה (הממוצע בהעמדה לא נמוך מהחוזה)" : "נוסחה שנייה: לא קיימת (לא פורסם ממוצע בהעמדה)", value: d.v2Applies ? m(d.v2) : "—" },
+          { label: d.v1Applies ? "נוסחה ראשונה: ביום הפירעון פחות הריבית החוזית" : "נוסחה ראשונה: לא חלה (הממוצע ביום הפירעון לא נמוך מהריבית החוזית)", value: d.v1Applies ? m(d.v1) : "—" },
+          { label: d.v2Applies ? "נוסחה שנייה: ביום הפירעון פחות ההעמדה" : hasGrant.value ? "נוסחה שנייה: לא חלה (הממוצע בהעמדה לא נמוך מהריבית החוזית)" : "נוסחה שנייה: לא קיימת (לא פורסם ממוצע בהעמדה)", value: d.v2Applies ? m(d.v2) : "—" },
         ],
       },
       {
         n: 6,
         title: "הנמוכה מבין השתיים",
         lines: [{ label: d.binding === "v2" ? "הנמוכה: הנוסחה השנייה" : d.binding === "v1" ? "הנמוכה: הנוסחה הראשונה" : "אין נוסחה שחלה: אין עמלת היוון", value: m(x.lower), strong: true }],
-        note: x.lower && x.lower.lt(0) ? "תוצאה שלילית: מקזזים אותה מהעמלות האחרות. הצו לא אומר אם הסכום הכולל יכול לרדת מתחת לאפס; הקריאה שלנו: לא (לא אומת)." : undefined,
+        note: x.lower && x.lower.lt(0) ? "תוצאה שלילית: מקזזים אותה מהעמלות האחרות. הצו לא אומר אם הסכום הכולל יכול לרדת מתחת לאפס; הקריאה של הקורס: לא (לא אומת)." : undefined,
       },
       {
         n: 7,
@@ -191,7 +191,7 @@ const steps = computed<Step[]>(() => {
         { label: "סכום העמלות", value: m(x.sum) },
         { label: "מה שמשלמים", value: m(x.total), strong: true },
       ],
-      note: x.floored ? "הסכום היה שלילי, והקורס מציג אפס (הקריאה שלנו; הצו לא אומר)." : undefined,
+      note: x.floored ? "הסכום היה שלילי, והקורס מציג אפס (הקריאה של הקורס; הצו לא אומר)." : undefined,
     },
   );
   return out;
@@ -211,8 +211,8 @@ const steps = computed<Step[]>(() => {
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekels(principal) }}</span></span>
       </label>
       <label class="flex flex-col">
-        <span class="text-caption font-semibold text-n600">הריבית בחוזה (חוזית, לשנה)</span>
-        <input v-model.number="rate" type="range" min="3" max="8" step="0.01" aria-label="הריבית בחוזה" />
+        <span class="text-caption font-semibold text-n600">ריבית חוזית (לשנה)</span>
+        <input v-model.number="rate" type="range" min="3" max="8" step="0.01" aria-label="ריבית חוזית" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ rate.toFixed(2) }}%</span></span>
       </label>
       <label class="flex flex-col">

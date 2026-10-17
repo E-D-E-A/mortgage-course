@@ -93,7 +93,7 @@ const termText = computed(() => {
   const m = fMonths.value.value;
   const y = Math.floor(m / 12);
   const r = m % 12;
-  const years = y === 1 ? "שנה" : `${y} שנים`;
+  const years = y === 1 ? "שנה" : `${y} ${y > 10 ? "שנה" : "שנים"}`;
   if (y === 0) return m === 1 ? "חודש אחד" : `${m} חודשים`;
   if (r === 0) return years;
   return `${years} ו־${r === 1 ? "חודש" : `${r} חודשים`}`;

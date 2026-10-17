@@ -13,8 +13,6 @@ interface Step {
   title: string;
   who: string;
   what: string;
-  /** The journey stages of the Brain this step covers ("J-050"). */
-  journey: string;
 }
 interface Clock {
   id: string;
@@ -121,7 +119,6 @@ const why = (iso: string) => (when(iso).getUTCDay() === 6 ? "שבת" : when(iso)
         <div v-if="open === i" class="mt-2 rounded-md bg-n50 p-3 text-body-m text-n800">
           <p>{{ s.what }}</p>
           <p v-for="c in startsAt(i + 1)" :key="`d-${c.id}`" class="mt-2"><strong>{{ c.label }}:</strong> {{ c.detail }}</p>
-          <p class="mt-2 text-caption text-n600">בשלבי המסע ב־Brain: {{ s.journey }}</p>
         </div>
       </li>
       <li

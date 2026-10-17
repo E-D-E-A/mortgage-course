@@ -155,7 +155,7 @@ const tableRows = computed(() => {
       <label class="flex flex-col">
         <span class="text-caption font-semibold text-n600">תקופה</span>
         <input v-model.number="years" type="range" min="5" max="30" step="1" aria-label="תקופה בשנים" />
-        <span class="text-body-l font-semibold text-n900">{{ years }} שנים (<span class="ltr">{{ months }}</span> חודשים)</span>
+        <span class="text-body-l font-semibold text-n900">{{ years }} {{ years > 10 ? "שנה" : "שנים" }} (<span class="ltr">{{ months }}</span> חודשים)</span>
       </label>
       <label v-if="mode === 'grace'" class="flex flex-col">
         <span class="text-caption font-semibold text-n600">חודשי גרייס, בתוך התקופה</span>

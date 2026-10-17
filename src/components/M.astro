@@ -2,6 +2,10 @@
 // An equation inside Hebrew text. Math reads left to right, so it is isolated
 // as an LTR run that does not wrap: "72 ÷ 6 = 12" never shows as "12 = 6 ÷ 72",
 // and a line never starts with "×".
+// A long formula (wider than a phone line) gets its own box that scrolls sideways
+// inside itself, so it never widens the page; a short one stays plain inline text.
+const html = await Astro.slots.render("default");
+const long = html.replace(/<[^>]*>/g, "").replace(/&[a-z#0-9]+;/gi, "x").length > 26;
 ---
 
-<span class="ltr whitespace-nowrap" dir="ltr"><slot /></span>
+<span class:list={["ltr whitespace-nowrap", long && "formula"]} dir="ltr" tabindex={long ? 0 : undefined}><Fragment set:html={html} /></span>

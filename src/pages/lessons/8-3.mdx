@@ -269,7 +269,7 @@ export const devRows = [0, 1, 2, 3, 4].map((k) => ({ x: String(["30", "34", "35"
   בנתונים שבהם יש כמה ערכים גבוהים מאוד, איזה מרכז מייצג את התיק ״הטיפוסי״ טוב יותר?
 </ChoiceExercise>
 
-<NumericExercise client:visible id="8.3-2" n={2} level="קל" answer={f.raw("ex.mean_a")} errors={[{ value: f.raw("ex.sum_a"), message: "זה הסכום של חמשת היחסים. הממוצע הוא הסכום חלקי 5." }]}>
+<NumericExercise client:visible id="8.3-2" unit="%" n={2} level="קל" answer={f.raw("ex.mean_a")} errors={[{ value: f.raw("ex.sum_a"), message: "זה הסכום של חמשת היחסים. הממוצע הוא הסכום חלקי 5." }]}>
   חמישה תיקים בדויים עם יחסי החזר 26, 31, 33, 35 ו־40 אחוז. מהו הממוצע, באחוזים?
 </NumericExercise>
 
@@ -277,7 +277,7 @@ export const devRows = [0, 1, 2, 3, 4].map((k) => ({ x: String(["30", "34", "35"
 <M>(26 + 31 + 33 + 35 + 40) ÷ 5 = {p("ex.mean_a")}</M>. {p("ex.mean_a")}%.
 </Solution>
 
-<NumericExercise client:visible id="8.3-3" n={3} level="בינוני" answer={f.raw("r.p75")} errors={[{ value: f.raw("r.p75_nearest"), message: "זה אחוזון 75 בשיטת הדרגה הקרובה. הקורס משתמש בשיטת הגיליון, שבה המקום 8.5 דורש חישוב בין הנתון השמיני לתשיעי." }]}>
+<NumericExercise client:visible id="8.3-3" unit="%" n={3} level="בינוני" answer={f.raw("r.p75")} errors={[{ value: f.raw("r.p75_nearest"), message: "זה אחוזון 75 בשיטת הדרגה הקרובה. הקורס משתמש בשיטת הגיליון, שבה המקום 8.5 דורש חישוב בין הנתון השמיני לתשיעי." }]}>
   אחד־עשר התיקים: {p("r.sorted")}. מהו אחוזון 75, בשיטת הגיליון (PERCENTILE.INC)?
 </NumericExercise>
 
@@ -285,7 +285,7 @@ export const devRows = [0, 1, 2, 3, 4].map((k) => ({ x: String(["30", "34", "35"
 המקום: <M>1 + 10 × 75 ÷ 100 = {p("r.pos75")}</M>, בין הנתון השמיני (38) לתשיעי (40): באמצע, {p("r.p75")}. (בגיליון יש גם PERCENTILE.EXC, שמחשב מקום אחר; כאן משתמשים ב־PERCENTILE.INC.)
 </Solution>
 
-<NumericExercise client:visible id="8.3-4" n={4} level="בינוני" answer={f.raw("ex.std5")} errors={[{ value: f.raw("ex.var5"), message: "זו השונות. סטיית התקן היא השורש שלה." }, { value: f.raw("ex.std5_sample"), message: "זו סטיית התקן של מדגם (חלוקה ב־n פחות 1). בקורס מחלקים ב־n." }]}>
+<NumericExercise client:visible id="8.3-4" unit="אלפי ₪" n={4} level="בינוני" answer={f.raw("ex.std5")} errors={[{ value: f.raw("ex.var5"), message: "זו השונות. סטיית התקן היא השורש שלה." }, { value: f.raw("ex.std5_sample"), message: "זו סטיית התקן של מדגם (חלוקה ב־n פחות 1). בקורס מחלקים ב־n." }]}>
   שמונה החזרים בדויים, באלפי שקלים: 2, 4, 4, 4, 5, 5, 7, 9. מהי סטיית התקן? (הממוצע {p("ex.mean5")}; חלקו ב־n.)
 </NumericExercise>
 
@@ -348,7 +348,7 @@ export const devRows = [0, 1, 2, 3, 4].map((k) => ({ x: String(["30", "34", "35"
   items={[
     { kind: "ידע מתמטי כללי", text: "היסטוגרמה, ממוצע, חציון, שונות, סטיית תקן ואחוזון: מתמטיקה כללית. שיטת האחוזון בקורס היא החישוב של PERCENTILE.INC בגיליונות (פנימית בין שני נתונים); שיטת הדרגה הקרובה מוזכרת כדי להבדיל. סטיית התקן של הקורס היא של אוכלוסייה (חלוקה ב־n)." },
     { kind: "הנחת חישוב", text: "שלושים ואחד־עשר יחסי ההחזר סינתטיים, מומצאים להמחשה. הם אינם נתונים של לקוחות, של יועץ או של בנק. נתונים סינתטיים." },
-    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
   ]}
 />
 

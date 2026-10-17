@@ -68,7 +68,7 @@ const money = (v: Decimal.Value) => withMinus(formatShekelsText(v));
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
     <p class="text-caption text-n600">
-      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת. סף ההון (40%) — לפי תיעוד הצוות, לא אומת; ההוראה שנושאת אותו לא נקבעה (329 או 203).
+      מספרים להמחשה: משפחה בדויה. תקציב המחיה הוא הנחה שלכם, לא נתון סטטיסטי. 50% לפי תיעוד הצוות להוראה 329, נכון ל־2026-10-09, לא אומת. סף ההון (40%) — לא אומת.
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">

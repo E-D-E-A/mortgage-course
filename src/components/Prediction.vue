@@ -1,10 +1,13 @@
 <script setup lang="ts">
 // "Guess first": the learner commits to an answer before the explanation.
 // The guess is kept and shown again by <PredictionReveal> at the end.
-import { nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { load, save } from "../lib/progress.ts";
+import { shuffledWithIndex } from "../lib/shuffle.ts";
 
-const props = defineProps<{ id: string; question: string; options: string[] }>();
+const props = defineProps<{ id: string; question: string; options: string[]; ordered?: boolean }>();
+// Shown in an order mixed by the id; the saved choice stays the authored index.
+const shown = computed(() => shuffledWithIndex(props.options, props.id, props.ordered));
 const choice = ref<number | null>(null);
 const locked = ref(false);
 // The button that locked the guess disappears, and focus would fall to <body>: it moves to the line that replaces it.
@@ -32,7 +35,7 @@ function lock() {
     <fieldset class="mt-4 grid gap-2" :disabled="locked">
       <legend class="sr-only">{{ question }}</legend>
       <label
-        v-for="(option, i) in options"
+        v-for="[option, i] in shown"
         :key="i"
         class="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-4 py-2 text-body-m transition-colors duration-fast ease-out"
         :class="choice === i ? 'border-turquoise-2 bg-mint/30 text-n900' : 'border-n200 text-n700 hover:bg-n50'"

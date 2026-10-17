@@ -95,7 +95,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "4.5",
     title: "שלושה סוגי מספרים",
-    note: "The directive numbers are the team's transcription (Brain 7503881), not checked against the directive. Every bank-policy number here is invented for teaching. Amounts invented.",
+    note: "The directive numbers are the team's transcription, not checked against the directive. Every bank-policy number here is invented for teaching. Amounts invented.",
     facts,
   };
 }

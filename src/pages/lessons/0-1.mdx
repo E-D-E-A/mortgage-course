@@ -253,7 +253,7 @@ export const predictionOptions = [
     `הסדר לא משנה. ירידה קודם: ${f.shekels("pred.down")}, ואז עלייה של 10% — ${f.shekels("pred.down_rise")} — נותנת שוב ${f.shekels("pred.down_then_up")}. בשני הסדרים מכפילים ב־${f.plain("explain.factor_up_10")} וב־${f.plain("explain.factor_down_10")}.`,
   ]}
 >
-  <M>200 × {f.plain("explain.factor_up_10")} = {f.shekels("pred.up")}</M>, ואז <M>{f.shekels("pred.up")} × {f.plain("explain.factor_down_10")} = {f.shekels("pred.after")}</M>. המחיר נגמר {f.shekels("pred.lost")} מתחת למחיר ההתחלתי — {P("pred.total_fall")} ממנו.
+  <M>200 × {f.plain("explain.factor_up_10")} = {f.shekels("pred.up")}</M>, ואז <M>{f.shekels("pred.up")} × {f.plain("explain.factor_down_10")} = {f.shekels("pred.after")}</M>. המחיר יוצא {f.shekels("pred.lost")} מתחת למחיר ההתחלתי — {P("pred.total_fall")} ממנו.
 </PredictionReveal>
 
 <Section kind="כלי לראש">
@@ -333,7 +333,7 @@ export const predictionOptions = [
   id="0.1-1"
   n={1}
   level="קל"
-  answer={f.raw("ex1.answer")}
+  answer={f.raw("ex1.answer")} near={0}
   errors={[
     { value: f.raw("ex1.err_thirty"), message: "חילקתם ב־10 במקום ב־100. ריבוע אחד הוא חלק אחד מתוך 100: ‏400 חלקי 100." },
     { value: f.raw("ex1.err_total"), message: "זה המחיר אחרי שמוסיפים 3%. השאלה שואלת כמה הם ה־3% עצמם." },
@@ -354,8 +354,8 @@ export const predictionOptions = [
   n={2}
   level="קל"
   options={[
-    { text: "שיעור המס עלה ב־1%", feedback: "המשפט הזה מבלבל: 1% מ־4% הוא שינוי זעיר. כדאי לומר ״נקודת אחוז אחת״." },
-    { text: `שיעור המס עלה בנקודת אחוז אחת, שהיא עלייה של ${P("pp.relative")} ביחס ל־4%`, correct: true, feedback: `בדיוק. ${eq(`5 − 4 = ${f.plain("pp.points")}`)} נקודת אחוז, וביחס למה שהיה: ריבוע אחד על 4 — ${P("pp.relative")}.` },
+    { text: "שיעור המס עלה ב־1%, כי 5% פחות 4% הם 1%", feedback: "המשפט הזה מבלבל: 1% מ־4% הוא שינוי זעיר. כדאי לומר ״נקודת אחוז אחת״." },
+    { text: `שיעור המס עלה בנקודת אחוז אחת, שהיא ${P("pp.relative")} ביחס ל־4%`, correct: true, feedback: `בדיוק. ${eq(`5 − 4 = ${f.plain("pp.points")}`)} נקודת אחוז, וביחס למה שהיה: ריבוע אחד על 4 — ${P("pp.relative")}.` },
     { text: `שיעור המס עלה ב־${f.plain("pp.relative")} נקודות אחוז`, feedback: `${f.plain("pp.relative")} הוא השינוי היחסי, באחוזים. בנקודות אחוז השינוי הוא ${eq("5 − 4")}: נקודה אחת.` },
     { text: `שיעור המס עלה ב־${P("pp.one_of_five")} ביחס ל־4%`, feedback: `${P("pp.one_of_five")} הם נקודה אחת מתוך 5 — מדדתם מהשיעור החדש. שינוי נמדד ממה שהיה קודם: נקודה אחת מתוך 4.` },
   ]}
@@ -389,7 +389,7 @@ export const predictionOptions = [
   id="0.1-4"
   n={4}
   level="בינוני"
-  answer={f.raw("ex4.answer")}
+  answer={f.raw("ex4.answer")} near={0}
   errors={[
     { value: f.raw("ex4.points"), tolerance: 0, message: "זה השינוי בנקודות אחוז. השאלה היא בכמה שקלים גדל התשלום." },
     { value: f.raw("ex4.relative"), tolerance: 0.1, message: "זה השינוי היחסי, באחוזים. השאלה היא בשקלים: כמה יותר תשלמו." },

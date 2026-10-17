@@ -90,7 +90,7 @@ export default function lesson48(): LessonData {
   return {
     lesson: "4.8",
     title: "נתוני אשראי והתנהלות החשבון",
-    note: "The joint account of case B is invented; deposits follow lessons 4.1 (assessments, payslips). The 60-day and 3-year rules are summaries of the Credit Data Law and the team's Brain notes, not verified.",
+    note: "The joint account of case B is invented; deposits follow lessons 4.1 (assessments, payslips). The 60-day and 3-year rules are summaries of the Credit Data Law and the team's notes, not verified.",
     facts,
   };
 }

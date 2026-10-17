@@ -114,6 +114,15 @@
     direction: ltr;
     unicode-bidi: isolate;
   }
+  /* A disclosure row is a touch target: at least 44px tall, whatever the text inside. */
+  summary {
+    cursor: pointer;
+    padding-block: 12px;
+  }
+  /* A radio or checkbox sits in a label that is at least 44px tall (the label is the target). */
+  label:has(> input[type="radio"], > input[type="checkbox"]) {
+    min-height: 44px;
+  }
   :focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(3, 7, 30, 0.15);
@@ -209,6 +218,16 @@ input[type="range"]::-moz-range-thumb {
 }
 input[type="range"]:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 0 0 3px rgba(0, 206, 203, 0.18);
+}
+
+/* A formula (<M>) that is wider than its column scrolls inside its own box, never the page. */
+.formula {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: bottom;
+  scrollbar-width: thin;
 }
 
 /* A list that a component lays out itself (cards, legends): no prose markers or indent. */

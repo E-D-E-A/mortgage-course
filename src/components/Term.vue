@@ -43,7 +43,7 @@ onBeforeUnmount(() => {
   <span ref="root" class="relative inline">
     <button
       type="button"
-      class="cursor-help border-b border-dotted border-teal-deep font-medium text-n900 hover:bg-mint/40"
+      class="relative cursor-help border-b border-dotted border-teal-deep font-medium after:absolute after:inset-x-[-4px] after:inset-y-[-8px] after:content-[''] text-n900 hover:bg-mint/40"
       :aria-expanded="open"
       :aria-controls="id"
       @click="open = !open"

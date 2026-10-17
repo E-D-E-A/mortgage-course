@@ -212,7 +212,7 @@ export const questions = [
     id: "c5.q11",
     lesson: "5.6",
     type: "choice",
-    prompt: `נועם ושירה (תיק A; הסכומים והריביות הם הנחות של הקורס, לא הצעה של בנק) בוחנים ארבעה תמהילים של אותה הלוואה. כולם עוברים את הגבולות, ובתרחיש הבסיס: ${FOUR.map(mixLine).join("; ")}. הם רוצים שהתשלום הגבוה ביותר שייצא להם אי פעם יהיה הנמוך ביותר, ולא רק התשלום הראשון. איזה תמהיל מנצח ביעד הזה?`,
+    prompt: `נועם ושירה (תיק א׳; הסכומים והריביות הם הנחות של הקורס, לא הצעה של בנק) בוחנים ארבעה תמהילים של אותה הלוואה. כולם עוברים את הגבולות, ובתרחיש הבסיס: ${FOUR.map(mixLine).join("; ")}. הם רוצים שהתשלום הגבוה ביותר שייצא להם אי פעם יהיה הנמוך ביותר, ולא רק התשלום הראשון. איזה תמהיל מנצח ביעד הזה?`,
     options: FOUR.map((id) => ({ text: `״${cname[id]}״`, correct: id === winnerHighest })),
     explanation: `ביעד הזה מודדים את החודש הגבוה ביותר, ולא את הראשון. ״${cname[winnerHighest]}״ מנצח: ${f.shekels(`q11.${winnerHighest}.max`)}. ל״${cname.linked}״ ההחזר הראשון הנמוך ביותר (${f.shekels("q11.linked.first")}), אבל ההצמדה מעלה אותו עד ${f.shekels("q11.linked.max")}. ל״${cname.short}״ סך התשלומים הנמוך ביותר (${f.shekels("q11.short.total")}), אבל כל תשלום בו גבוה יותר. כל יעד מנצח תמהיל אחר, ולכן יעד נכתב תמיד עם החודש והתרחיש שבהם מודדים אותו (שיעור 5.6).`,
   },
@@ -223,7 +223,7 @@ export const questions = [
     unit: "%",
     tolerance: 0.05,
     near: 0.1,
-    prompt: `נועם ושירה (תיק A; הנחות של הקורס) שוקלים את התמהיל ״${cname.half}״: ${f.shekels("q12.amount_1")} בקבועה לא צמודה ב־${p("q12.rate_1")}% ו־${f.shekels("q12.amount_2")} במשתנה לא צמודה ב־${p("q12.rate_2")}%, שניהם ל־30 שנה. ההחזר הראשון, שנכנס ליחס ההחזר, הוא ${f.shekels("q12.qualifying")}. ההכנסה המוכרת שלהם ${f.shekels("a.recognised")}, והם משלמים גם הלוואת רכב של ${f.shekels("a.car")} שנשארו בה ${p("a.car_months")} תשלומים. מה יחס ההחזר, באחוזים? (שתי ספרות אחרי הנקודה.)`,
+    prompt: `נועם ושירה (תיק א׳; הנחות של הקורס) שוקלים את התמהיל ״${cname.half}״: ${f.shekels("q12.amount_1")} בקבועה לא צמודה ב־${p("q12.rate_1")}% ו־${f.shekels("q12.amount_2")} במשתנה לא צמודה ב־${p("q12.rate_2")}%, שניהם ל־30 שנה. ההחזר הראשון, שנכנס ליחס ההחזר, הוא ${f.shekels("q12.qualifying")}. ההכנסה המוכרת שלהם ${f.shekels("a.recognised")}, והם משלמים גם הלוואת רכב של ${f.shekels("a.car")} שנשארו בה ${p("a.car_months")} תשלומים. מה יחס ההחזר, באחוזים? (שתי ספרות אחרי הנקודה.)`,
     answer: f.raw("q12.answer"),
     errors: [
       { value: f.raw("q12.err_recognised"), tolerance: 0.05, message: `חילקתם בכל ההכנסה המוכרת. ביחס ההחזר מחלקים בהכנסה הפנויה: ההכנסה פחות הלוואת הרכב, כי נשארו בה יותר מ־${p("rule.months_line")} תשלומים (כלל 18 החודשים, שיעור 4.2).` },
@@ -247,6 +247,7 @@ export const questions = [
     id: "c5.q14",
     lesson: "5.7",
     type: "numeric",
+    near: 0.5,
     prompt: `ב״${cname.half}״ ההחזר הראשון הוא ${f.shekels("q13.first")}. העלאת אחוז הריבית בכל המסלולים ב־0.25 נקודת אחוז מעלה אותו ב־${f.shekels("q14.rate_d_first")}. קיצור כל המסלולים ב־5 שנים מעלה אותו ב־${f.shekels("q13.term_d_first")}. כשעושים את שתי ההזזות יחד ההחזר הראשון הוא ${f.shekels("q14.combo_first")}, כלומר ${f.shekels("q14.combo_d")} יותר מההתחלה. בכמה שקלים סכום שני השינויים לחוד גדול מהשינוי של שתי ההזזות יחד?`,
     answer: f.raw("q14.answer"),
     errors: [
@@ -259,7 +260,7 @@ export const questions = [
     id: "c5.q15",
     lesson: "5.8",
     type: "numeric",
-    prompt: `אותה הלוואה של נועם ושירה (תיק A; הנחות של הקורס), בשני תמהילים ובשלושה תרחישים לימודיים: בסיס, מחמיר ומקל (לא תחזיות). סך התשלומים של ״${cname.linked}״: ${f.shekels("q15.linked.base.total")} בבסיס, ${f.shekels("q15.linked.stress.total")} במחמיר ו־${f.shekels("q15.linked.relief.total")} במקל. סך התשלומים של ״${cname.short}״: ${f.shekels("q15.short.base.total")} בבסיס, ${f.shekels("q15.short.stress.total")} במחמיר ו־${f.shekels("q15.short.relief.total")} במקל. בכמה שקלים ״${cname.linked}״ יקר יותר מ״${cname.short}״ בתרחיש המחמיר?`,
+    prompt: `אותה הלוואה של נועם ושירה (תיק א׳; הנחות של הקורס), בשני תמהילים ובשלושה תרחישים לימודיים: בסיס, מחמיר ומקל (לא תחזיות). סך התשלומים של ״${cname.linked}״: ${f.shekels("q15.linked.base.total")} בבסיס, ${f.shekels("q15.linked.stress.total")} במחמיר ו־${f.shekels("q15.linked.relief.total")} במקל. סך התשלומים של ״${cname.short}״: ${f.shekels("q15.short.base.total")} בבסיס, ${f.shekels("q15.short.stress.total")} במחמיר ו־${f.shekels("q15.short.relief.total")} במקל. בכמה שקלים ״${cname.linked}״ יקר יותר מ״${cname.short}״ בתרחיש המחמיר?`,
     answer: f.raw("q15.answer"),
     errors: [
       { value: f.raw("q15.err_mixed"), message: `השוויתם את ״${cname.linked}״ במחמיר ל״${cname.short}״ במקל. משווים באותו תרחיש בשני הצדדים.` },
@@ -271,7 +272,7 @@ export const questions = [
     id: "c5.q16",
     lesson: "5.8",
     type: "choice",
-    prompt: `יועץ מציע לנועם ושירה (תיק A; הנחות של הקורס) תמהיל במקום ״${cname.linked}״: ${f.shekels("q16.amount_1")} במשתנה צמודה (${p("q16.rate_1")}%) ו־${f.shekels("q16.amount_2")} בקבועה צמודה (${p("q16.rate_2")}%), שניהם ל־30 שנה. ההחזר הראשון שלו ${f.shekels("q16.first")}, נמוך מזה של ״${cname.linked}״ (${f.shekels("q16.linked_first")}). לפי תעתיק הצוות של הוראה 329 (לא אומת) יש חמישה קווים. איזה קו מהרשימה התמהיל הזה חוצה?`,
+    prompt: `יועץ מציע לנועם ושירה (תיק א׳; הנחות של הקורס) תמהיל במקום ״${cname.linked}״: ${f.shekels("q16.amount_1")} במשתנה צמודה (${p("q16.rate_1")}%) ו־${f.shekels("q16.amount_2")} בקבועה צמודה (${p("q16.rate_2")}%), שניהם ל־30 שנה. ההחזר הראשון שלו ${f.shekels("q16.first")}, נמוך מזה של ״${cname.linked}״ (${f.shekels("q16.linked_first")}). לפי תעתיק הצוות של הוראה 329 (לא אומת) יש חמישה קווים. איזה קו מהרשימה התמהיל הזה חוצה?`,
     options: [
       { text: "החלק בריבית משתנה: יותר משני שלישים מההלוואה", correct: true },
       { text: "שיעור המימון: ההלוואה גבוהה מדי ביחס למחיר הדירה" },

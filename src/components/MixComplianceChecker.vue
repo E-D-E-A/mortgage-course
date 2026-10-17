@@ -68,7 +68,7 @@ const ratio = computed(() => lines.value.find((l) => l.id === "pti")!.actual);
 const ruleOf = (l: LineResult) => RULES.find((r) => r.id === l.id)!;
 
 const isTerm = (l: LineResult) => l.id === "term";
-const statusText = (l: LineResult) => (l.status === "over" ? "חוצה — אסור" : l.status === "above" ? "מעל קו ההון — מותר" : "בתוך הקו");
+const statusText = (l: LineResult) => (l.status === "over" ? "חוצה — אסור" : l.status === "above" ? "מעל סף ההון — מותר" : "בתוך הקו");
 const statusClass = (l: LineResult) => (l.status === "over" ? "bg-danger-bg" : l.status === "above" ? "bg-warning-bg" : "bg-success-bg");
 const actualText = (l: LineResult) => (isTerm(l) ? `${l.actual.toNumber() / 12} שנים` : `${percentString(l.actual)}%`);
 const limitText = (l: LineResult) => (isTerm(l) ? `עד ${l.limit.toNumber() / 12} שנה` : l.id === "variable" ? "עד שני שלישים" : `${percentString(l.limit)}%`);
@@ -79,8 +79,8 @@ const typeLabel = (t: TrackType) =>
 const verdict = computed(() => {
   if (crossed.value.length) return { tone: "bg-danger-bg", text: `התמהיל חוצה ${crossed.value.length === 1 ? "איסור אחד" : `${crossed.value.length} איסורים`}: ${crossed.value.map((l) => ruleOf(l).label).join(", ")}. בנק לא יכול לאשר אותו כך, ולכן הוא לא ריאלי.` };
   if (source.value === "mixed") return { tone: "bg-warning-bg", text: "התמהיל עומד בחמשת הקווים, אבל הריביות בו נלקחו מכמה הצעות. אף בנק לא הציע אותו, ולכן הוא לא ריאלי כמו שהוא." };
-  if (source.value === "assumed") return { tone: "bg-n50", text: `התמהיל לא חוצה איסור${above.value ? ", והחזר מעל קו ההון הוא מותר אבל הבנק מחזיק יותר הון" : ""}. הריביות בו הן הנחה של הקורס, ועוד אין הצעה של בנק: בלי הצעה אי אפשר לדעת אם הוא ריאלי.` };
-  return { tone: "bg-n50", text: `התמהיל לא חוצה אף איסור${above.value ? ", והחזר מעל קו ההון הוא מותר אבל הבנק מחזיק יותר הון" : ""}. מדיניות הבנק עוד לא ידועה, ולכן ריאלי לא אומר מאושר.` };
+  if (source.value === "assumed") return { tone: "bg-n50", text: `התמהיל לא חוצה איסור${above.value ? ", והחזר מעל סף ההון הוא מותר אבל הבנק מחזיק יותר הון" : ""}. הריביות בו הן הנחה של הקורס, ועוד אין הצעה של בנק: בלי הצעה אי אפשר לדעת אם הוא ריאלי.` };
+  return { tone: "bg-n50", text: `התמהיל לא חוצה אף איסור${above.value ? ", והחזר מעל סף ההון הוא מותר אבל הבנק מחזיק יותר הון" : ""}. מדיניות הבנק עוד לא ידועה, ולכן ריאלי לא אומר מאושר.` };
 });
 </script>
 
@@ -196,7 +196,7 @@ const verdict = computed(() => {
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <p class="text-body-m font-semibold text-n900">
             {{ ruleOf(l).label }}
-            <span class="text-caption font-normal text-n600">· {{ l.kind === "capital_threshold" ? "קו הון, לא איסור" : "איסור" }}</span>
+            <span class="text-caption font-normal text-n600">· {{ l.kind === "capital_threshold" ? "סף הון, לא איסור" : "איסור" }}</span>
           </p>
           <span class="rounded-pill px-2 py-0.5 text-caption text-n900" :class="statusClass(l)">{{ statusText(l) }}</span>
         </div>

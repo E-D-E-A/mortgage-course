@@ -180,7 +180,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "4.4",
     title: "הוראה 329",
-    note: "Directive 329's limits as the team transcribed them (Brain 7503881, 2026-10-08), not checked against the directive. Amounts invented for teaching.",
+    note: "Directive 329's limits as the team transcribed them (2026-10-08), not checked against the directive. Amounts invented for teaching.",
     facts,
   };
 }

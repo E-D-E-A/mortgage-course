@@ -77,6 +77,13 @@ export default function lesson57(): LessonData {
     add(given(`init.rate_${k + 1}`, t.rate as string));
   });
 
+  // ── The size of each step on the page, as the lesson names it ──
+  add(givenMoney("step.amount", "100000"));
+  add(givenMoney("step.amount2", "200000"));
+  add(given("step.term_years", 5));
+  add(given("step.rate", "0.25"));
+  add(given("step.pct", "10"));
+
   // ── Every lever alone, on the initial mix ──
   for (const { id, lever } of LEVERS) {
     const first = add(leverFact(`lv.${id}.first`, init, lever, "first"));

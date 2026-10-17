@@ -87,7 +87,7 @@ export default function lesson51(): LessonData {
   return {
     lesson: "5.1",
     title: "מה כתוב באישור העקרוני",
-    note: "A fictional pre-approval of בנק א׳ for דנה ויואב: invented rates, an invented forecast (not the Bank of Israel's), an invented opening fee as the up-front charge A (which charges count is an open legal question). Figures follow the team's transcription of Directive 451 section 4ג(ב4) and appendix 4 (Brain 7733250), not checked against the directive. Schedules follow the statement convention (agorot, the last payment closes the balance); the IRR is found by bisection (TypeScript) and by Newton's method (Python).",
+    note: "A fictional pre-approval of בנק א׳ for דנה ויואב: invented rates, an invented forecast (not the Bank of Israel's), an invented opening fee as the up-front charge A (which charges count is an open legal question). Figures follow the team's transcription of Directive 451 section 4ג(ב4) and appendix 4, not checked against the directive. Schedules follow the statement convention (agorot, the last payment closes the balance); the IRR is found by bisection (TypeScript) and by Newton's method (Python).",
     facts,
   };
 }

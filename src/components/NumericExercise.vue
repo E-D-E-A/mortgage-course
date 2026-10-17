@@ -62,7 +62,7 @@ function check() {
   const known = exactHit ? undefined : props.errors.find((e) => close(value, Number(e.value), e.tolerance ?? props.tolerance));
   if (exactHit || (!known && close(value, Number(props.answer), near))) {
     const precision = props.unit === "₪" ? ", עד האגורה" : "";
-    nearNote.value = exactHit ? "" : `נכון בקירוב. התשובה המדויקת${precision}: ${exact} ${props.unit}.`;
+    nearNote.value = exactHit ? "" : `נכון בקירוב. התשובה המדויקת${precision}: ${exact}${props.unit ? ` ${props.unit}` : ""}.`;
     state.value = "correct";
     save(`exercise:${props.id}`, { text: text.value, correct: true });
     unlockSolution();
@@ -90,7 +90,7 @@ function unlockSolution() {
     <div class="mt-3 text-body-l text-n800"><slot /></div>
     <form class="mt-4 flex flex-wrap items-end gap-3" @submit.prevent="check">
       <label :for="inputId" class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">התשובה שלכם ({{ unit }})</span>
+        <span class="text-caption font-semibold text-n600">התשובה שלכם<template v-if="unit"> ({{ unit }})</template></span>
         <input
           :id="inputId"
           v-model="text"

@@ -17,13 +17,13 @@ For lesson `X.Y`, all yours, nobody else edits them:
 | `src/pages/lessons/X-Y.mdx` | The lesson |
 | `video/X-Y.html` | The video scene (copy `video/0-3.html`'s structure) |
 
-Shared files — **do not edit**: `course/*`, `src/components/*`, `src/layouts/*`, `src/lib/calc/money.ts`, `src/lib/facts.ts`, `scripts/build-*.{ts,mjs}`, `scripts/check-terms.mjs`, `checks/independent_check.py`, `checks/kinds/common.py`, `package.json`. If you need a change there, say so in your report with the exact change.
+Shared files — **do not edit**: `course/*`, `src/components/*` (except a component named for your stage), `src/layouts/*`, `src/lib/calc/money.ts`, `src/lib/facts.ts`, `scripts/build-*.{ts,mjs}`, `scripts/check-*.mjs`, `checks/independent_check.py`, `checks/kinds/common.py`, `package.json`. If you need a change there, say so in your report with the exact change.
 
 Do not run `pnpm build`, `pnpm screens` or git. The coordinator does.
 
 ## Done means
 
-- `pnpm data`, `pnpm check:python`, `pnpm check:terms` and `pnpm test` all pass.
+- `pnpm data`, `pnpm check:python`, `pnpm check:terms`, `pnpm check:units` and `pnpm test` all pass. After a build, `pnpm check:refs` finds no learner-visible internal reference in your pages. `pnpm check:all` runs the whole chain (data, check:python, check:terms, check:units, test, build, check:refs).
 - `pnpm video X-Y` renders; you looked at the key frames in `qa/video/X-Y-t*.png` (direction, nothing clipped, numbers right).
 - Your report lists: the terms the lesson introduces; any shared-file change you need; every claim that is not general math, with its source, kind and whether it was checked against a primary source.
 
@@ -46,6 +46,19 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 13. **`סיכום`** — bullets, then **`בשיעור הבא — X.Y+1, title:`** one sentence.
 14. **`מקורות`** — `<Sources>`; then an MDX comment naming the code paths (never shown to learners).
 
+## Nothing internal is visible to a learner
+
+A learner sees a course, not how it was built. These never appear in text a learner can read (lessons, exercises, solutions, checks, glossary, components, video scenes and subtitles, data files that carry learner text): Brain page numbers or the word "Brain" (also "ב־Brain"), FK- ids, J-codes, DEC-n, BIR_MRTG series ids, ENG-n tickets, the words "ריפו" / "repo" / "commit", file paths and file names (`research/…`, `src/…`, `context/…`, `course/…`, anything ending `.md` `.ts` `.pdf` `.json`), build tools (LibreOffice, TypeScript, Python as the way the course was made), internal-document names ("הבריף", "מפת הקורס מבטיחה", "טבלת האותיות של הקורס") and process talk ("ברשימה לאילון", "שאלה לאילון", "האתר חסום בסביבה שבה נכתב השיעור"). Where learner text used to say "ENG-223", say "כלל החישוב של הצוות". Code comments and the `research/` files may keep the ids; the page may not. **Enforcement:** `pnpm check:refs` scans the text of the built HTML (not scripts, styles, comments or attribute values) of every lesson, check, the glossary and the home page, and fails with the file, the surrounding words and a count per stage.
+
+**How provenance is written.** In `<Sources>`: the kind (from the list below), the date, and plain words about where it came from, with no ids. Examples: "החלטה של Mogi, 2026-08-31"; "ידע מהשטח, ממתין לאישור אילון"; "לפי תעתיק של הצוות מההוראה, לא אומת"; "תיעוד הצוות, 2026-10-08"; "ממקור משני (אתר הבנק), 2026-10-09". The helpers that build Sources lines (`brainRule`, `fk` and similar) print no ids.
+
+## Decisions of 2026-10-17 (the course follows them)
+
+- The rate written in the contract is **"ריבית חוזית"** (say "ריבית חוזית (הריבית השנתית שכתובה בחוזה)" at first use). "נומינלית" appears only for "before inflation" (0.8) and in the explanation of the two meanings. A lesson before 5.5 that needs it says "ריבית חוזית" with a `<Later lesson="5.5">` where check:terms requires.
+- The banker from outside the team is only **"בנקאי בשטח"**: no name, never "בנקאי חיצוני" or "בנקאי שאינו בצוות". Invented couples keep their names.
+- No lock, no pass mark, no "next stage opens": every page is open; a check shows a score only.
+- **"החלטה של Mogi, 2026-08-31"** is only the rule for a contradiction between a document and what the client says. The course's own red line (never hide an obligation, inflate an income, or submit a wrong document) is labelled **"הקו האדום של הקורס (שיעור 6.5)"**. The LLM rule (2026-07-29), the income-state split (Eylon, 2026-10-07) and the consent rule each get their own `<Sources>` entry with their own date and kind (the consent rule: "ללא תאריך ברשומה" where the date is unknown).
+
 ## Language (brief §2, and what the review taught)
 
 - Plain Hebrew, short sentences, **plural address** (הפקדתם, נסו, שימו לב). Glossary definitions too.
@@ -60,7 +73,7 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - **Tables:** a fill-in table must fit 340px (FillTable does). A wide reading table may scroll; the layout adds a "יש עוד עמודות משמאל" hint on its own. Still, keep the column the text talks about early (on the right).
 - **Every regular lesson has a video** (Dvir, 2026-10-10), even where the map's video column says "—": the column names only the standout ideas. Write `video/X-Y.html`, render with `pnpm video X-Y`, review key frames, and add the lesson's video section.
 - **The three cases follow the map's timeline.** Case A (נועם ושירה) gets its mix in stage 5 and its bank offers in stage 6; before that it appears only with the numbers already given (price, equity, loan, incomes). A lesson that needs a track, an offer or a mix before then uses other invented people, or says plainly "תרגיל נפרד, לא התיק של נועם ושירה". In stage 4 its feasibility page checks it against the limits only (the largest payment allowed, the 18-month rule, the financing ratio); a payment shown there rests on a stated calculation assumption, never a track or a mix (coordinator, 2026-10-10, following this rule).
-- **Mogi decisions** (DEC-1…DEC-4 in `research/field-knowledge.md`) are marked `החלטה של Mogi`, with who and when; they do not wait for Eylon. Field claims (FK-H-…) do.
+- **Mogi decisions** are marked `החלטה של Mogi`, with who and when (no ids); they do not wait for Eylon. Field knowledge does.
 - **Live official data** (a rate, a date) is written with its date in the text: "נכון ל־9 באוקטובר 2026, … (לא אומת)". Never "היום", never "תמיד".
 - Exercise wording always has the actor and the verb: "הפקדתם 30,000 ₪ ל־10 שנים…", not "30,000 ₪ ל־10 שנים".
 - Keep the brief's distinctions exact. 5% → 6% is **one percentage point** (נקודת אחוז), not "one percent". Name two near-identical terms apart when both appear (ריבית דריבית is the method; ריבית על ריבית is the extra amount).
@@ -81,7 +94,7 @@ Each part opens with `<Section kind="…">` and an `##` heading, exactly as in 0
 - **No arithmetic in MDX or in the scene** — not even a subtraction. Add a `difference` fact instead (`kind: "difference"`, inputs `{minuend, subtrahend}` fact ids; both must be facts, use a `given` fact for a principal).
 - Formatting: in running text `T(...)` / `f.shekels(id)` (no ".00" on whole amounts); in tables `formatShekels` (always agorot); `f.whole` for rounded display; `f.plain` for counts and factors.
 - Teaching tables follow the statement convention: each period's interest rounded to the agora, then added. On a linked track the opening balance is indexed and rounded to the agora each month, and the payment is the set payment × M_k ÷ M_0, rounded to the agora — set in month 1 and again only at a rate change, never recalculated from the indexed balance (`schedule.ts`, `rounding: "statement"`). Every equality printed on a page must hold on the printed numbers. Formulas round once at the end. Exercises accept both: answers within `tolerance` (default 0.05 ₪) are exact, within `near` (default 1 ₪) are "נכון בקירוב" with the exact value shown. For whole-number answers set `tolerance={0} near={0}`.
-- Rates: contract rates are nominal annual; monthly = annual ÷ 12 (verified against Leumi and Discount tables, Brain ENG-223). Effective conversion uses the twelfth root. Never mix them silently.
+- Rates: contract rates ("ריבית חוזית") are annual; monthly = annual ÷ 12 (checked against the Leumi and Discount tables the team holds; say "כלל החישוב של הצוות", never a ticket). Effective conversion uses the twelfth root. Never mix them silently.
 
 ## Letters in formulas — one table for the whole course
 
@@ -120,18 +133,18 @@ A learner carries the letters from lesson to lesson, so a letter keeps its meani
 
 ## Equations and direction
 
-- Inline equations: `<M>10,000 × 1.05<sup>10</sup> = {f.shekels("…")}</M>` — an LTR isolate that does not wrap. Keep each `<M>` short (fits 340px). A long derivation goes on separate lines, one equality per line (see 0.3 "צעד 1").
+- Inline equations: `<M>10,000 × 1.05<sup>10</sup> = {f.shekels("…")}</M>` — an LTR isolate that does not wrap. Keep each `<M>` short (fits 340px); a formula longer than about 26 characters is put by `M` in its own box that scrolls sideways inside itself (keyboard-focusable), never the page. No Hebrew words inside `<M>`. A long derivation goes on separate lines, one equality per line (see 0.3 "צעד 1").
 - Never name an MDX export `partial`, `prerender` or `getStaticPaths`: Astro reads them as page options (`partial` strips the page's CSS). `pnpm check:terms` fails on them.
 - Equations inside JS strings (exercise messages): `${eq("100 ÷ 6")}`.
 - Numbers in table cells: `<span class="ltr">…</span>` inside the cell, never `ltr` on the cell.
 
 ## Components available (`src/components/`)
 
-`Term`, `Later`, `Callout` (tone info / warning), `Section`, `Prediction`, `PredictionReveal` (`notes`), `CompoundGrowth` (0.3 only), `FillTable` (any columns: `columns`, `rows`, `blanks`, `success`, `hint`; see 0.11 for a total row), `NumericExercise` (`errors`, `tolerance`, `near`, `unit`), `ChoiceExercise`, `Solution`, `M`, `LessonVideo`, `Sources` (`kind`, `text`, `code`, `date`, `href`).
+`Term`, `Later`, `Callout` (tone info / warning), `Section`, `Prediction`, `PredictionReveal` (`notes`), `CompoundGrowth` (0.3 only), `FillTable` (any columns: `columns`, `rows`, `blanks`, `success`, `hint`; see 0.11 for a total row), `NumericExercise` (`errors`, `tolerance`, `near`, **`unit` always given**: `₪`, `%`, `חודשים`…, never absent and never `""`; `pnpm check:units` fails otherwise), `ChoiceExercise`, `Solution`, `M`, `LessonVideo`, `Sources` (`kind`, `text`, `code`, `date`, `href`).
 
 Built in stage 1, for reuse: `CardSort` (sort cards into piles), `DealTree` (a decision tree), `MixSlices` (a loan in tracks), `MatchTable` (pick-from-list fill-in), `ProcessTimeline` (the 12 steps and their clocks), `BankCommitment` (what binds the bank when), `DiyChecklist` (a saved, printable checklist), and **`BigPictureMap`** — the course's big-picture map. Its data lives in `src/components/big-picture/` (one `stage-N.ts` per stage; `mapUpTo(lesson)` shows what the learner has met). A later stage extends the map by adding its `stage-N.ts`, importing it in `index.ts` and adding it to `STAGES` there.
 
-A lesson that needs a **new interactive illustration**: write it as `src/components/<Name>.vue` (yours to own, name it after the lesson's idea), following `CompoundGrowth.vue`: tokens only (Tailwind theme names or `var(--mogi-…)`), logical properties, Hebrew labels, sliders with no native fill (the global CSS styles them), every number through the calc module, a legend, a "הצגה כטבלה" table view, labels in HTML rather than SVG `<text>` where they must stay readable on phone. Lesson prose styles (paragraph margins, list bullets) do not reach inside an interactive component, except its slot; style a component's own text with utility classes. Sliders are 44px tall for touch. Chart colours: teal-deep `#0A9396` and turquoise-2 `#00CECB` as the two series (validated pair), N300 grey for a neutral base, navy dashed line for a reference level; never status colours for series. Small text never in teal (contrast 3.7:1) — N600 or darker.
+A lesson that needs a **new interactive illustration**: write it as `src/components/<Name>.vue` (yours to own, name it after the lesson's idea), following `CompoundGrowth.vue`: tokens only (Tailwind theme names or `var(--mogi-…)`), logical properties, Hebrew labels, sliders with no native fill (the global CSS styles them), every number through the calc module, a legend, a "הצגה כטבלה" table view, labels in HTML rather than SVG `<text>` where they must stay readable on phone. Lesson prose styles (paragraph margins, list bullets) do not reach inside an interactive component, except its slot; style a component's own text with utility classes. Sliders are 44px tall for touch; every button, `<summary>` row, radio/checkbox label and inline `Term` is at least 44px at 390px (a `min-h-11`, padding, or an `::after` hit area; the global CSS already covers `summary` and labels around radios/checkboxes). Chart colours: teal-deep `#0A9396` and turquoise-2 `#00CECB` as the two series (validated pair), N300 grey for a neutral base, navy dashed line for a reference level; never status colours for series. Small text never in teal (contrast 3.7:1) — N600 or darker.
 
 ## Video (brief §7)
 
@@ -144,10 +157,12 @@ A lesson that needs a **new interactive illustration**: write it as `src/compone
 
 ## Sources and reliability (brief §9)
 
-`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב`.
+`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב` · `שאלה פתוחה` (a question no source answered; says who it waits for, with no internal list name).
 
-- **The official sites are blocked in this environment** (Bank of Israel, CBS, gov.il, Knesset). Nothing official may be marked `עובדה מאומתת` until someone opens the primary document. Facts that come from the team's transcription in the Brain: kind `לא אומת`, text "לפי תעתיק בצוות ב־Brain (דף N, תאריך), ממתין לבדיקה מול המקור". From search summaries only: `לא אומת`, "לפי תקציר של מקור רשמי; ממתין לבדיקה". Always date the data (for example "ריבית בנק ישראל 3.25%, מ־2026-09-03").
-- **What a bank's public form asks** (the questionnaire records in the team's repo) is a team record, not something this course opened: kind `לא אומת`, text "כפי שתועד בריפו של הצוות ב־<תאריך>; לא נבדק מחדש מול האתר של הבנק". `עובדה מאומתת` is only for what the author of the page actually opened and read at its primary source (coordinator, 2026-10-12).
+**Choice components shuffle.** `ChoiceExercise`, `Prediction` and the stage-check questions show their options in an order fixed by a seeded hash of the exercise id (the same on server and browser); `correct` and the saved answer keep meaning the position the author wrote, so keys never change. Position therefore gives nothing away, so balance the **length** and plausibility of the options: the right one is not the longest more than about a third of the time. `ordered` keeps the written order for options that form a scale.
+
+- **The official sites are blocked in this environment** (Bank of Israel, CBS, gov.il, Knesset). Nothing official may be marked `עובדה מאומתת` until someone opens the primary document. Facts that come from the team's transcription of a rule: kind `לא אומת`, text "לפי תעתיק של הצוות מההוראה, <תאריך>, ממתין לבדיקה מול המקור". From a secondary source (a bank's site, an article, a guide): "ממקור משני (אתר הבנק / מאמר / מדריך)", never "official" or "נבדק מול ההוראה" unless a primary text was read. From search summaries only: `לא אומת`, "לפי תקציר של מקור רשמי; ממתין לבדיקה". Always date the data (for example "ריבית בנק ישראל 3.25%, מ־2026-09-03").
+- **What a bank's public form asks** (the questionnaire records the team holds) is a team record, not something this course opened: kind `לא אומת`, text "תיעוד הצוות, <תאריך>; לא נבדק מחדש מול האתר של הבנק". `עובדה מאומתת` is only for what the author of the page actually opened and read at its primary source (coordinator, 2026-10-12).
 - Field knowledge (`research/field-knowledge.md`): kind `ידע מהשטח`, text names who said it and when, plus "ממתין לאישור אילון". Never the do-not-teach items.
 - No real client data, ever. No real bank's branding in examples; examples use "בנק א׳".
 - The LLM never computes: you may write sentences, never numbers that a calculation produces.

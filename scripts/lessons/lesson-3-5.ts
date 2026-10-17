@@ -288,6 +288,9 @@ export default function lesson35(): LessonData {
     // Exercise 2: §17 — paid out on 16 March 2027 (and the 15th, for the error message).
     ...startFacts("ex2", "2027-03-16"),
     ...startFacts("ex2b", "2027-03-15"),
+    // Two wrong first-payment dates the exercise offers as options.
+    given("ex2.alt_a", "2027-04-16"),
+    given("ex2.alt_b", "2027-03-01"),
     // Exercise 3: payment C × M ÷ M₀ with a base index of 104.2.
     indexed("ex3.answer", "3100", "104.2", "105"),
     indexed("ex3.wrong_100", "3100", "100", "105"),

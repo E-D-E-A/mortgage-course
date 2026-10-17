@@ -38,7 +38,7 @@ export const five = [["50", "1.12"], ["55", "1.14"], ["60", "1.22"], ["65", "1.2
 export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), dy: f.raw(`h.dy${k}`), dxy: f.raw(`h.dxy${k}`), dxx: f.raw(`h.dxx${k}`) }));
 
 <Callout title="איזה סוג שיעור זה" tone="info">
-<p><strong>עתיד (מתמטיקה כללית)</strong>, לא מערכת של Mogi. הנקודות סינתטיות: עשר הצעות בדויות של בנק בדוי. הקו מתאר את הנקודות האלה, <strong>לא את מה שבנקים עושים</strong>: איך בנקים מתמחרים בפועל לא ידוע לנו, והשאלה נשארת פתוחה: זו שאלה פתוחה שהצוות עוד לא בירר.</p>
+<p><strong>עתיד (מתמטיקה כללית)</strong>, לא מערכת של Mogi. הנקודות סינתטיות: עשר הצעות בדויות של בנק בדוי. הקו מתאר את הנקודות האלה, <strong>לא את מה שבנקים עושים</strong>: איך בנקים מתמחרים בפועל לא ידוע לקורס, והשאלה נשארת פתוחה: זו שאלה פתוחה שהצוות עוד לא בירר.</p>
 </Callout>
 
 יש לכם שני נתונים לכל מקרה, ורוצים לתאר את הקשר ביניהם בקו אחד: כשאחד גדל, מה קורה לשני? זה <Term t="קו מגמה" client:visible lesson="8.5">קו מגמה</Term>. ואחרי שמציירים קו, שואלים כמה הוא טועה: זו ה<Term t="שגיאה" client:visible lesson="8.5">שגיאה</Term>.
@@ -171,7 +171,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 <Callout title="שלושה דברים שהקו לא אומר" tone="warning">
 <p><strong>מחוץ לטווח.</strong> הנקודות כאן הן מ־{p("x.lo")}% עד {p("x.hi")}% מימון. הקו אומר שב־90% המרווח {p("x.pred90")}, אבל אין בנתונים אף נקודה שם, וזו לא ידיעה.</p>
 <p><strong>קיצוני.</strong> הצעה אחת חריגה (במימון 78% מרווח 2.5) מזיזה את השיפוע מ־{p("t.a")} ל־{p("o.a")} ומעלה את ה־RMSE מ־{p("t.rmse")} ל־{p("o.rmse")}.</p>
-<p><strong>סיבה ותוצאה.</strong> קו מגמה לא אומר שהמימון הוא שגורם למרווח. הוא מתאר שתי עמודות. ובמציאות לא ידוע לנו איך בנקים מתמחרים, ואם הקשר הוא קו: בשיעור <Later lesson="8.17" quiet>8.17</Later> נראה צורה שונה, מדרגות, גם היא על נתונים סינתטיים.</p>
+<p><strong>סיבה ותוצאה.</strong> קו מגמה לא אומר שהמימון הוא שגורם למרווח. הוא מתאר שתי עמודות. ובמציאות לא ידוע לקורס איך בנקים מתמחרים, ואם הקשר הוא קו: בשיעור <Later lesson="8.17" quiet>8.17</Later> נראה צורה שונה, מדרגות, גם היא על נתונים סינתטיים.</p>
 </Callout>
 
 <PredictionReveal
@@ -258,7 +258,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
   ערך אמיתי של 1.25, והקו אומר 1.2. מה השגיאה?
 </ChoiceExercise>
 
-<NumericExercise client:visible id="8.5-2" n={2} level="קל" answer={f.raw("ex.pred")} errors={[{ value: f.raw("ex.pred_nob"), message: "שכחתם להוסיף את נקודת ההתחלה, 0.642: הקו הוא שיפוע כפול x ועוד נקודת ההתחלה." }]}>
+<NumericExercise client:visible id="8.5-2" unit="נקודות אחוז" n={2} level="קל" answer={f.raw("ex.pred")} tolerance={0.0005} near={0.005} errors={[{ value: f.raw("ex.pred_nob"), message: "שכחתם להוסיף את נקודת ההתחלה, 0.642: הקו הוא שיפוע כפול x ועוד נקודת ההתחלה." }]}>
   הקו <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. מה הוא אומר במימון 55%? (לשלוש ספרות אחרי הנקודה)
 </NumericExercise>
 
@@ -266,7 +266,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 <M>{p("h.slope")} × 55 + {p("h.icpt")} = {p("ex.pred")}</M>.
 </Solution>
 
-<NumericExercise client:visible id="8.5-3" n={3} level="בינוני" answer={f.raw("ex.mae")} tolerance={0.0005} near={0.002} errors={[{ value: f.raw("ex.rmse"), message: "זה ה־RMSE: ריבועים, ממוצע ושורש. ב־MAE מוחקים סימנים ומחשבים ממוצע." }]}>
+<NumericExercise client:visible id="8.5-3" unit="נקודות אחוז" n={3} level="בינוני" answer={f.raw("ex.mae")} tolerance={0.0005} near={0.002} errors={[{ value: f.raw("ex.rmse"), message: "זה ה־RMSE: ריבועים, ממוצע ושורש. ב־MAE מוחקים סימנים ומחשבים ממוצע." }]}>
   קו בדוי <M>y = 0.01 × x + 0.6</M> על חמש הנקודות של השיעור. מה הטעות הממוצעת בערך מוחלט (MAE), לשלוש ספרות?
 </NumericExercise>
 
@@ -274,7 +274,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 השגיאות: <span class="ltr">0.02, −0.01, 0.02, 0, 0</span>. בערך מוחלט: <span class="ltr">0.02, 0.01, 0.02, 0, 0</span>, סכום 0.05, חלקי 5: {p("ex.mae")}. (ה־RMSE הוא {p("ex.rmse")}.)
 </Solution>
 
-<NumericExercise client:visible id="8.5-4" n={4} level="בינוני" answer={f.raw("h.fit_mae")} tolerance={0.00005} near={0.0005} errors={[{ value: f.raw("ex.mae"), message: "זה ה־MAE של הקו האחר. הקו הטוב ביותר טועה פחות." }]}>
+<NumericExercise client:visible id="8.5-4" unit="נקודות אחוז" n={4} level="בינוני" answer={f.raw("h.fit_mae")} tolerance={0.00005} near={0.0005} errors={[{ value: f.raw("ex.mae"), message: "זה ה־MAE של הקו האחר. הקו הטוב ביותר טועה פחות." }]}>
   הקו הטוב ביותר של חמש הנקודות (<M>y = {p("h.slope")} × x + {p("h.icpt")}</M>): מה ה־MAE שלו? (בארבע ספרות: השתמשו בגיליון.)
 </NumericExercise>
 
@@ -282,7 +282,7 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
 השגיאות <span class="ltr">{p("h.resid")}</span>: הסכום של הערכים המוחלטים חלקי 5 הוא {p("h.fit_mae")}, קטן מהקו האחר.
 </Solution>
 
-<NumericExercise client:visible id="8.5-5" n={5} level="בינוני" answer={f.raw("x.pred90")} tolerance={0.01} near={0.05} errors={[{ value: f.raw("x.pred90_nob"), message: "שכחתם את נקודת ההתחלה b: הקו הוא שיפוע כפול x ועוד b." }]}>
+<NumericExercise client:visible id="8.5-5" unit="נקודות אחוז" n={5} level="בינוני" answer={f.raw("x.pred90")} tolerance={0.01} near={0.05} errors={[{ value: f.raw("x.pred90_nob"), message: "שכחתם את נקודת ההתחלה b: הקו הוא שיפוע כפול x ועוד b." }]}>
   הקו של עשר הנקודות, <M>y = {p("t.a")} × x + {p("t.b")}</M>, אומר מה במימון 90%? (ובכל זאת: האם אפשר להסתמך על זה?)
 </NumericExercise>
 
@@ -337,8 +337,8 @@ export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), 
   items={[
     { kind: "ידע מתמטי כללי", text: "קו מגמה בשיטת הריבועים הפחותים, שגיאה, MAE ו־RMSE, אקסטרפולציה: מתמטיקה כללית, בלי מקור מסוים." },
     { kind: "הנחת חישוב", text: "עשר ההצעות (שיעור מימון ומרווח מעל העוגן) סינתטיות, מומצאות להמחשה. הן אינן הצעות של בנק, ואינן מראות איך בנק מתמחר. נתונים סינתטיים." },
-    { kind: "לא אומת", text: "איך בנקים מתמחרים בפועל, והאם המרווח עולה בקו או במדרגות: לא ידוע לנו; שאלה פתוחה, שהצוות לא בירר." },
-    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+    { kind: "לא אומת", text: "איך בנקים מתמחרים בפועל, והאם המרווח עולה בקו או במדרגות: לא ידוע לקורס; שאלה פתוחה, שהצוות לא בירר." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
   ]}
 />
 

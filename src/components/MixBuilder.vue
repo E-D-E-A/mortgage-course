@@ -283,7 +283,7 @@ const ruleOf = (l: LineResult) => RULES.find((r) => r.id === l.id)!;
 const isTerm = (l: LineResult) => l.id === "term";
 const lineStatus = (l: LineResult) => (l.status === "over" ? "חוצה: אסור" : l.status === "above" ? "מעל קו ההון: מותר" : "בתוך הקו");
 const lineClass = (l: LineResult) => (l.status === "over" ? "bg-danger-bg" : l.status === "above" ? "bg-warning-bg" : "bg-success-bg");
-const lineActual = (l: LineResult) => (isTerm(l) ? `${l.actual.toNumber() / 12} שנים` : `${percentString(l.actual)}%`);
+const lineActual = (l: LineResult) => (isTerm(l) ? `${l.actual.toNumber() / 12} ${l.actual.toNumber() / 12 > 10 ? "שנה" : "שנים"}` : `${percentString(l.actual)}%`);
 const lineLimit = (l: LineResult) => (isTerm(l) ? `עד ${l.limit.toNumber() / 12} שנה` : l.id === "variable" ? "עד שני שלישים" : `${percentString(l.limit)}%`);
 const lineRoom = (l: LineResult) => (isTerm(l) ? `${withMinus(String(l.room.toNumber()))} חודשים` : withMinus(formatShekels(l.room)));
 
@@ -319,7 +319,7 @@ const shareOf = (i: number) => pct(new Decimal(amounts.value[i]).div(loanNow.val
 const whenText = (month: number) => `חודש ${month} (שנה ${Math.ceil(month / 12)})`;
 const trackName = (i: number) => `מסלול ${i + 1} · ${KIND_NAMES[rows[i].kind]}`;
 // "שנה" for one year, "N שנים" otherwise ("2.5 שנים").
-const yearsText = (m: number) => (m === 12 ? "שנה" : `${new Decimal(m).div(12).toString()} שנים`);
+const yearsText = (m: number) => (m === 12 ? "שנה" : `${new Decimal(m).div(12).toString()} ${m / 12 > 10 ? "שנה" : "שנים"}`);
 
 // Add and remove, with focus kept on something sensible.
 const addButton = ref<HTMLButtonElement | null>(null);
@@ -450,7 +450,7 @@ const yearRows = computed(() => {
         </label>
 
         <label class="mt-2 flex flex-col">
-          <span class="text-body-m text-n800">התקופה: <span class="font-semibold">{{ r.years }} שנים</span></span>
+          <span class="text-body-m text-n800">התקופה: <span class="font-semibold">{{ r.years }} {{ r.years > 10 ? "שנה" : "שנים" }}</span></span>
           <input v-model.number="r.years" type="range" min="4" max="30" step="1" :aria-label="`התקופה של מסלול ${i + 1}, בשנים`" />
         </label>
 
@@ -636,7 +636,7 @@ const yearRows = computed(() => {
             </thead>
             <tbody>
               <tr v-for="b in balanceRows" :key="b.years" class="border-b border-n100">
-                <td class="py-1 pe-3">{{ b.years === 1 ? "שנה" : `${b.years} שנים` }}</td>
+                <td class="py-1 pe-3">{{ b.years === 1 ? "שנה" : `${b.years} ${b.years > 10 ? "שנה" : "שנים"}` }}</td>
                 <td class="py-1 pe-3"><span class="ltr whitespace-nowrap font-semibold">{{ formatShekels(b.mine) }}</span></td>
                 <template v-if="compare && b.other && b.delta">
                   <td class="py-1 pe-3"><span class="ltr whitespace-nowrap">{{ formatShekels(b.other) }}</span></td>

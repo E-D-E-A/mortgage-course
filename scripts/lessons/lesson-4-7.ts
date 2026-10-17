@@ -150,7 +150,7 @@ export default function lesson47(): LessonData {
   return {
     lesson: "4.7",
     title: "חיתום: איך הבנק בודק",
-    note: "Case B (אבי ומיכל): incomes from lesson 4.1, mix from the case sketch; caps of 40% and 35% are demonstration numbers, not rules or policy. Dates invented. The 50% limit and the 24 days are the team's Brain transcription, not verified.",
+    note: "Case B (אבי ומיכל): incomes from lesson 4.1, mix from the case sketch; caps of 40% and 35% are demonstration numbers, not rules or policy. Dates invented. The 50% limit and the 24 days are the team's transcription, not verified.",
     facts,
   };
 }

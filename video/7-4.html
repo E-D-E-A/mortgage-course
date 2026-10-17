@@ -180,6 +180,13 @@
           const o = vis(t, S.old);
           const at = (s) => after(t, S.old, s, o);
           txt(640, 118, `תיק ג׳: ${lr(V.loan)} ₪, ${lr(V.nominal + "%")}, ${lr(V.months)} תשלומים נשארו`, 34, { w: 700, o });
+          const pre = Math.min(at(1), 1 - clamp((t - S.old[0] - 7.5) / 0.6));
+          if (pre > 0) {
+            box(180, 170, 920, 210, pre);
+            txt(640, 236, `הלוואה של ${lr(V.loan)} ₪`, 40, { w: 700, o: pre });
+            txt(640, 296, `ריבית חוזית ${lr(V.nominal + "%")} · ${lr(V.months)} תשלומים נשארו`, 28, { fill: C.n700, o: pre });
+            txt(640, 350, "שני נתונים מסבירים אותה: עם עמלה ובלי", 24, { fill: C.n600, o: pre });
+          }
           box(180, 170, 400, 210, at(8));
           txt(380, 214, "ריבית כוללת חזויה", 24, { w: 600, o: at(8) });
           txt(380, 246, "בלי עמלה", 19, { fill: C.n600, o: at(8) });

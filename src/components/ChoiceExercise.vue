@@ -6,6 +6,7 @@
 import { computed, ref } from "vue";
 import { splitVerdict } from "../lib/bidi.ts";
 import { save } from "../lib/progress.ts";
+import { shuffledWithIndex } from "../lib/shuffle.ts";
 import BidiText from "./BidiText.vue";
 
 interface Option {
@@ -17,17 +18,7 @@ const props = defineProps<{ id: string; n: number; level: "קל" | "בינוני
 const picked = ref<number | null>(null);
 
 // [option, its index as written]; the index is what is saved and compared.
-const shown = computed(() => {
-  const opts = props.options.map((o, i) => [o, i] as [Option, number]);
-  if (props.ordered) return opts;
-  let seed = [...props.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-  const next = () => (seed = (seed * 1103515245 + 12345) >>> 0) / 2 ** 32;
-  for (let i = opts.length - 1; i > 0; i--) {
-    const k = Math.floor(next() * (i + 1));
-    [opts[i], opts[k]] = [opts[k], opts[i]];
-  }
-  return opts;
-});
+const shown = computed(() => shuffledWithIndex(props.options, props.id, props.ordered));
 
 // The verdict word in front of the feedback; a feedback that opens with its own is not given a second one.
 const verdict = computed(() => (picked.value === null ? null : splitVerdict(props.options[picked.value].feedback, !!props.options[picked.value].correct)));

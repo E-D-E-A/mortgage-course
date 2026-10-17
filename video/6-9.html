@@ -192,10 +192,12 @@
             { x: 340, h: "נועם ושירה", rows: [["הבקשה", V.ratioA, V.rel.a], [`עם ${shekW(V.equity)} נוספים`, V.paRatio, V.rel.pa]], gain: ["ההנחה בלבד", V.paGain], at: 22 },
           ];
           panels.forEach((p) => {
+            const frame = after(t, S.cliff, 1, o);
             const op = after(t, S.cliff, p.at, o);
-            if (op <= 0) return;
-            el("rect", { x: p.x - 300, y: 150, width: 600, height: 360, rx: 20, fill: C.n0, stroke: C.n200, "stroke-width": 2, opacity: op });
-            txt(p.x + 270, 205, p.h, 34, { anchor: "start", w: 700, o: op });
+            if (frame <= 0) return;
+            el("rect", { x: p.x - 300, y: 150, width: 600, height: 360, rx: 20, fill: C.n0, stroke: C.n200, "stroke-width": 2, opacity: frame });
+            txt(p.x + 270, 205, p.h, 34, { anchor: "start", w: 700, o: frame });
+            if (op <= 0) txt(p.x, 330, "ממשיכים בעוד רגע", 26, { fill: C.n600, o: frame });
             p.rows.forEach(([label, ratio, rel], i) => {
               const y = 270 + i * 90;
               txt(p.x + 270, y, label, 26, { anchor: "start", fill: C.n700, o: op });

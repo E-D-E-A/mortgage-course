@@ -38,11 +38,11 @@ export default function lesson(): LessonData {
   add(varShare("x.changing_share", "700000", "1200000"));
   adds(measureFacts("x", MIX_A));
 
-  // A small example with numbers for the head: 12% nominal against an average of 12.5% (effective).
-  add(given("mini.nominal", "12"));
-  add(given("mini.avg", "12.5"));
-  add(monthlyOf("mini.monthly", "12", 4));
-  add(effectiveOf("mini.eff", "12", 4));
+  // A small example with numbers for the head: 6% contract rate against an average of 6.05% (effective).
+  add(given("mini.nominal", "6"));
+  add(given("mini.avg", "6.05"));
+  add(monthlyOf("mini.monthly", "6", 4));
+  add(effectiveOf("mini.eff", "6", 4));
   add(pointsGap("mini.gap_nom", get("mini.nominal"), get("mini.avg"), 2));
   add(pointsGap("mini.gap_eff", get("mini.eff"), get("mini.avg"), 4));
 

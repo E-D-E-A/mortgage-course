@@ -137,7 +137,7 @@ export default function lesson56(): LessonData {
   return {
     lesson: "5.6",
     title: "שלושת יעדי התמהיל",
-    note: "Case A's mix: src/data/case-a-mix.ts. Teaching numbers: the rates are the course's price list, an assumption (not market data, not an offer); the scenarios are teaching scenarios (base: the index rises 2% a year; stress: 4% a year, prime and every anchor +2 points from year 2; never forecasts). The three goals are Mogi's design (Brain J-090), not a fact about the market. Monthly rate = annual ÷ 12; schedules follow the statement convention.",
+    note: "Case A's mix: src/data/case-a-mix.ts. Teaching numbers: the rates are the course's price list, an assumption (not market data, not an offer); the scenarios are teaching scenarios (base: the index rises 2% a year; stress: 4% a year, prime and every anchor +2 points from year 2; never forecasts). The three goals are Mogi's design, not a fact about the market. Monthly rate = annual ÷ 12; schedules follow the statement convention.",
     facts,
   };
 }
