@@ -9,7 +9,7 @@ import { PRICE_LIST } from "../../src/data/case-a-mix.ts";
 import { DEFAULT_MODEL, type FutureModel } from "../../src/lib/calc/montecarlo.ts";
 import type { TrackSpec } from "../../src/lib/calc/schedule.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { given, givenMoney } from "./_sensitivity-facts.ts";
+import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
 import { mcFact, mcRngFact, mcStepsFact } from "./_stage8b-facts.ts";
 
 export const TRACK: TrackSpec = { kind: "prime", amount: "300000", rate: PRICE_LIST.prime, months: 180 };
@@ -41,7 +41,9 @@ export default function lesson811(): LessonData {
   for (const m of ["mean_max", "p5_max", "p50_max", "p95_max", "min_max", "max_max"] as const) add(mcFact(`k.${m}`, [TRACK], 1, 1000, MODEL, m));
 
   // The same question again: other seeds.
-  add(mcFact("k2.p_pct", [TRACK], 2, 1000, MODEL, "p_pct", THRESHOLD));
+  const k1p = facts.find((x) => x.id === "k.p_pct")!;
+  const k2p = add(mcFact("k2.p_pct", [TRACK], 2, 1000, MODEL, "p_pct", THRESHOLD));
+  add(difference("k.gap_pct", k1p, k2p));
   for (let seed = 1; seed <= 8; seed++) add(mcFact(`h.seed${seed}.p_pct`, [TRACK], seed, 100, MODEL, "p_pct", THRESHOLD));
 
   return {

@@ -9,7 +9,7 @@
 import { BRAIN_SPACE, countLegalSplits, countSpace, yearsToCheck } from "../../src/lib/calc/search.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { given } from "./_sensitivity-facts.ts";
-import { countFact, legalFact, minutesFact, powFact, yearsFact } from "./_stage8b-facts.ts";
+import { countFact, legalFact, minutesFact, powFact, shareFact, yearsFact } from "./_stage8b-facts.ts";
 
 const FIVE = ["fixed_unlinked", "fixed_linked", "prime", "variable_unlinked", "variable_linked"] as const;
 
@@ -41,7 +41,11 @@ export default function lesson813(): LessonData {
   const fine = add(countFact("brain.fine_per_track", { ...BRAIN_SPACE, stepPercent: 1 }));
 
   // How much of it is already illegal (the one-third-fixed rule).
-  add(legalFact("brain.legal", [...FIVE], BRAIN_SPACE.stepPercent, countLegalSplits([...FIVE], BRAIN_SPACE.stepPercent)));
+  const lg = countLegalSplits([...FIVE], BRAIN_SPACE.stepPercent);
+  add(legalFact("brain.legal", [...FIVE], BRAIN_SPACE.stepPercent, lg));
+  add(shareFact("brain.legal_share", lg.legal, lg.all));
+  // The team measured about 137 seconds for the one-term space: per check, in milliseconds (course arithmetic on the team's measurement).
+  add(given("team.ms_per_check", "0.48"));
 
   // Time, at an assumed millisecond a candidate.
   const MS = 1;

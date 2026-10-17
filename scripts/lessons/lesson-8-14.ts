@@ -6,8 +6,9 @@
  * means the best weighted score among the feasible candidates THE GRID CONTAINS. Numbers: src/lib/calc/search.ts over engine.ts and
  * constraints.ts (stage-8 author A); rechecked by checks/kinds/search.py (with schedule.py and constraints.py).
  */
-import { GOAL_CONTEXT } from "../../src/data/case-a-mix.ts";
-import { BASE_CHOICE, LEVEL2, loanOfChoice, requestOf, s8Bank } from "../../src/data/case-s8.ts";
+import Decimal from "decimal.js";
+import { CASE_A, GOAL_CONTEXT } from "../../src/data/case-a-mix.ts";
+import { BASE_CHOICE, LEVEL2, S8_CASE, loanOfChoice, requestOf, s8Bank } from "../../src/data/case-s8.ts";
 import { rejectionReasons } from "../../src/lib/calc/constraints.ts";
 import type { GridSpec, SearchContext } from "../../src/lib/calc/search.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -31,6 +32,10 @@ export default function lesson814(): LessonData {
   const cand = { id: "case", request, tracks: [] };
 
   add(givenMoney("loan", loanOfChoice(choice).toFixed(2)));
+  // The ratio limit in shekels: the target ratio of the disposable income (recognised income less the car loan's monthly payment).
+  const disposable = new Decimal(CASE_A.recognisedIncome).minus(CASE_A.car.monthly);
+  add(givenMoney("cap.disposable", disposable.toFixed(2)));
+  add(givenMoney("cap.ratio_limit", disposable.mul(S8_CASE.targetRatio).div(100).toFixed(2)));
   add(gridFact("full", spec(10), cand, ctx, false));
   add(gridFact("pruned", spec(10), cand, ctx, true));
   add(gridFact("s20", spec(20), cand, ctx, true));

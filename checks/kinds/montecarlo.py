@@ -16,7 +16,7 @@ mc_run: simulates the flat mix t{k}_* and answers `measure` about the highest pa
 """
 from decimal import ROUND_HALF_UP, Decimal, getcontext
 
-from kinds import schedule
+from kinds import engine, schedule
 from kinds.common import agorot
 
 getcontext().prec = 50
@@ -82,10 +82,10 @@ def run(i):
             j[f"prime_shift_{y}"] = str(s)
             j[f"anchor_shift_{y}"] = str(s)
             j[f"inflation_{y}"] = str(f)
-        payments, _ = schedule.flow(j)
-        cents = [agorot(p) for p in payments]
+        payments, tracks = engine.evaluate_flat(j)
+        cents = [agorot(p) for p in engine.projected(j, tracks, len(payments))]
         maxes.append(max(cents))
-        firsts.append(cents[0])
+        firsts.append(agorot(payments[0]))
         totals.append(agorot(sum(payments, Decimal(0))))
     return maxes, totals, firsts
 
