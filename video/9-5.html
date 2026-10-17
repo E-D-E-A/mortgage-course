@@ -1,0 +1,137 @@
+<!doctype html>
+<!--
+  Video scene for unit 9.5, the final exam (stage 9, author C). Rendered frame by frame by scripts/render-video.mjs:
+  window.render(t) depends only on t. Every number is read from /data/lessons/9-5.json (computed in code, rechecked in Python).
+  One idea: how the exam works: two parts, points for closed questions (graded by code) and for rubric lines (ticked by the learner), a proposed pass mark. The exam has no calculation of its own (case A, synthetic, fictional banks).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .mark { position: absolute; top: 40px; left: 40px; font-size: 16px; font-weight: 600; color: var(--mogi-n600); }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="mark">דוגמה לימודית: נתונים להמחשה בלבד</div>
+      <div class="kicker">יחידה 9.5 · המבחן המסכם</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/9-5.json")).json();
+      const V = (k) => String(data.facts.find((f) => f.id === k).value);
+      const lr = (x) => `⁦${x}⁩`;
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const vis = (t, sc) => Math.min(clamp((t - sc[0]) / 0.6), clamp((sc[1] - t) / 0.6));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      const C = { navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)", n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", warningBg: "var(--mogi-warning-bg)", successBg: "var(--mogi-success-bg)", infoBg: "var(--mogi-info-bg)", dangerBg: "var(--mogi-danger-bg)", danger: "var(--mogi-danger)" };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, o = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": o.w ?? 400, fill: o.fill ?? C.navy, "text-anchor": o.anchor ?? "middle", opacity: o.o ?? 1, direction: o.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 20, fill, stroke: C.n200, "stroke-width": 2, opacity: o });
+
+      const SCENES = [
+        { type: "title", at: [0, 10], title: "המבחן המסכם", sub: "תיק אחד ושאלות מכל השלבים", foot: "תיק סינתטי, בנקים בדויים. אומדנים במחירון התרגיל." },
+        { type: "cards", at: [10, 38], title: "שני חלקים", cards: [
+          { h: "חלק א׳", s: "התיק של נועם ושירה", s2: "סגורות ופתוחות", from: 1.5 },
+          { h: "חלק ב׳", s: "שאלות קצרות מכל שלב", s2: "שלבים 0 עד 8", from: 11 },
+        ], foot: "אין חומר חדש במבחן", footAt: 21 },
+        { type: "cards", at: [38, 70], title: "איך סופרים נקודות", cards: [
+          { h: "שאלות סגורות", s: "נקודה לכל שאלה", big: { k: "exam.closed" }, from: 1.5 },
+          { h: "שורות מחוון", s: "נקודה לכל שורה", big: { k: "exam.open_lines" }, from: 10 },
+          { h: "סך הנקודות", s: "הציון נספר מהכול", big: { k: "exam.total" }, from: 19 },
+        ], foot: "שאלה פתוחה: קודם כותבים, אחר כך רואים", footAt: 25 },
+        { type: "cards", at: [70, 102], title: "מי בודק", cards: [
+          { h: "שאלה סגורה", s: "בודק קוד", s2: "מספר או בחירה", from: 1.5 },
+          { h: "שאלה פתוחה", s: "בודקים אתם", s2: "מול המחוון", from: 11 },
+        ], foot: "מודל שפה לא בודק ולא מחשב", footAt: 21 },
+        { type: "cards", at: [102, 130], title: "הסף המוצע", cards: [
+          { h: "אחוזים", s: "מכל הנקודות", big: { k: "exam.pass_percent", suf: "%" }, from: 1.5 },
+          { h: "נקודות", s: "מעוגל כלפי מעלה", big: { k: "exam.pass" }, from: 9 },
+        ], foot: "הצעה, ממתינה לאישור של דביר", footAt: 17 },
+        { type: "cards", at: [130, 152], title: "אחרי המבחן", cards: [{ h: "הציון הוא מפה", s: "חוזרים לשיעור שליד השאלה", s2: "ולא מסיקים מסקנה על יכולת" }], foot: "לא נעול ולא נפתח לפי הציון", footAt: 7 },
+      ];
+      window.duration = 152;
+      window.cues = [[1,5,"המבחן המסכם של הקורס."],[5,9,"התיק בדוי, והבנקים בדויים."],[11,22,"חלק א׳: התיק של נועם ושירה."],[22,36,"חלק ב׳: שאלות קצרות מכל שלב."],[39,50,"שאלה סגורה שווה נקודה אחת."],[50,60,"שאלה פתוחה: נקודה לכל שורה במחוון."],[60,69,"הציון נספר מכל הנקודות יחד."],[71,84,"את השאלות הסגורות בודק קוד."],[84,96,"את הפתוחות בודקים אתם, מול מחוון."],[96,101,"מודל שפה לא בודק, ולא מחשב."],[103,115,"הסף המוצע הוא אחוז מכל הנקודות."],[115,128,"זו הצעה, וממתינה לאישור של דביר."],[131,141,"הציון הוא מפה של מה לחזור אליו."],[141,151,"הוא לא נועל ולא פותח שום דבר."]];
+      const ils = (x) => Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₪";
+      const bigOf = (b) => (b ? lr(b.fmt === "ils" ? ils(V(b.k)) : (b.pre ?? "") + V(b.k) + (b.suf ?? "")) : "");
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        for (const sc of SCENES) {
+          const range = sc.at;
+          if (!inScene(t, range)) continue;
+          const o = vis(t, range);
+          if (sc.type === "title") {
+            txt(640, 270, sc.title, 70, { w: 700, o });
+            txt(640, 350, sc.sub, 38, { fill: C.n600, o });
+            if (sc.foot) txt(640, 430, sc.foot, 24, { fill: C.n500, o: after(t, range, 3, o, 0.8) });
+          } else if (sc.type === "cards") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const n = sc.cards.length;
+            const w = n === 1 ? 700 : n === 2 ? 480 : n === 3 ? 340 : 270;
+            const gap = 30;
+            const total = n * w + (n - 1) * gap;
+            const x0 = 640 + total / 2;
+            sc.cards.forEach((c, i) => {
+              const oi = after(t, range, c.from ?? 1.5 + i * 3.5, o);
+              if (oi <= 0) return;
+              const right = x0 - i * (w + gap);
+              const left = right - w;
+              card(left, 170, w, 290, oi, c.fill ? C[c.fill] : C.n0);
+              el("rect", { x: right - 14, y: 170, width: 14, height: 290, rx: 7, fill: c.bar ? C[c.bar] : C.teal, opacity: oi });
+              txt((left + right) / 2 - 7, 235, c.h, n > 3 ? 30 : 34, { w: 700, o: oi });
+              if (c.s) txt((left + right) / 2 - 7, 285, c.s, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.s2) txt((left + right) / 2 - 7, 322, c.s2, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.big) txt((left + right) / 2 - 7, 405, bigOf(c.big), bigOf(c.big).length > 11 ? 38 : 60, { w: 700, fill: C.teal, ltr: true, o: oi });
+              if (c.big && c.bigLabel) txt((left + right) / 2 - 7, 440, c.bigLabel, 22, { fill: C.n600, o: oi });
+            });
+            if (sc.foot) txt(640, 540, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 580, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          } else if (sc.type === "bars") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const vals = sc.bars.map((b) => Number(V(b.k)));
+            const max = Math.max(...vals) * 1.05;
+            sc.bars.forEach((b, i) => {
+              const oi = after(t, range, b.from ?? 1.5 + i * 3, o);
+              if (oi <= 0) return;
+              const y = 180 + i * 80;
+              const w = 560 * (vals[i] / max) * clamp((t - range[0] - (b.from ?? 1.5 + i * 3)) / 1.2);
+              txt(1140, y + 38, b.label, 28, { anchor: "start", fill: C.n700, o: oi });
+              el("rect", { x: 920 - w, y, width: Math.max(w, 2), height: 56, rx: 10, fill: b.hl ? C.teal : C.tq2, opacity: oi });
+              txt(920 - w - 14, y + 40, lr(sc.fmt === "ils" ? ils(V(b.k)) : V(b.k) + (sc.suf ?? "")), 30, { anchor: "end", w: 700, ltr: true, o: oi });
+            });
+            if (sc.foot) txt(640, 560, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 598, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

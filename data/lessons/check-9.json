@@ -1,0 +1,3332 @@
+{
+  "lesson": "check-9",
+  "title": "בדיקת סיום שלב 9",
+  "note": "The completion check of stage 9: questions about the content of units 9.1-9.5 (documents and what they prove, the largest payment, the three goals, the scenarios, the appraisal, a round of negotiation, the two versions of the explanation, conflict of interest as a question, how the exam is graded). Case A, its banks, their lines and prices, the scenarios and the family's living budget are the course's own invented or illustrative assumptions; nothing says what a bank would do. The advisor's fee and conflicts of interest are questions for the lawyer and for Mogi's policy, not decided here.",
+  "facts": [
+    {
+      "id": "in.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000.00"
+    },
+    {
+      "id": "in.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1619000.00"
+    },
+    {
+      "id": "in.reserve_after",
+      "kind": "given",
+      "inputs": {},
+      "value": "19000.00"
+    },
+    {
+      "id": "in.recognised",
+      "kind": "given",
+      "inputs": {},
+      "value": "21700.00"
+    },
+    {
+      "id": "in.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450.00"
+    },
+    {
+      "id": "in.budget",
+      "kind": "given",
+      "inputs": {},
+      "value": "11500.00"
+    },
+    {
+      "id": "in.line40",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "in.ceiling",
+      "kind": "given",
+      "inputs": {},
+      "value": "75"
+    },
+    {
+      "id": "in.ceiling_pti",
+      "kind": "given",
+      "inputs": {},
+      "value": "50"
+    },
+    {
+      "id": "g.payment.a.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.50",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.90",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.payment.a.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.payment.a.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.50",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.90",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "32.15"
+    },
+    {
+      "id": "g.payment.a.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "32.15",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.payment.a.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "32.15",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0.15"
+    },
+    {
+      "id": "g.payment.a.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "2.50",
+        "relief": "0.15"
+      },
+      "value": "2.35"
+    },
+    {
+      "id": "g.payment.a.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "2.90",
+        "relief": "0.15"
+      },
+      "value": "2.75"
+    },
+    {
+      "id": "g.payment.a.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.75",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "6394.09"
+    },
+    {
+      "id": "g.payment.a.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.75",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "3418141.54"
+    },
+    {
+      "id": "g.payment.a.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.75",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "7767.33"
+    },
+    {
+      "id": "g.payment.a.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.75",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "2432.67"
+    },
+    {
+      "id": "g.payment.a.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.75",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "23971.92"
+    },
+    {
+      "id": "g.payment.a.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.payment.a.stress_max",
+        "subtrahend": "g.payment.a.first"
+      },
+      "value": "17577.83"
+    },
+    {
+      "id": "g.payment.a.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "2432.67"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.payment.a.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "32.15",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.payment.b.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.85",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.payment.b.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.payment.b.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.85",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "32.22"
+    },
+    {
+      "id": "g.payment.b.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "32.22",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.payment.b.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "32.22",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "35",
+        "ratio_relief_points": "0.25",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0.25"
+    },
+    {
+      "id": "g.payment.b.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "2.55",
+        "relief": "0.25"
+      },
+      "value": "2.30"
+    },
+    {
+      "id": "g.payment.b.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "2.85",
+        "relief": "0.25"
+      },
+      "value": "2.60"
+    },
+    {
+      "id": "g.payment.b.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.60",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "6323.65"
+    },
+    {
+      "id": "g.payment.b.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.60",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "3381542.12"
+    },
+    {
+      "id": "g.payment.b.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.60",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "7681.76"
+    },
+    {
+      "id": "g.payment.b.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.60",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "2518.24"
+    },
+    {
+      "id": "g.payment.b.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.60",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "23730.62"
+    },
+    {
+      "id": "g.payment.b.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.payment.b.stress_max",
+        "subtrahend": "g.payment.b.first"
+      },
+      "value": "17406.97"
+    },
+    {
+      "id": "g.payment.b.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "2518.24"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.payment.b.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "32.22",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.payment.c.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "3.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.payment.c.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.payment.c.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "3.00",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "32.16"
+    },
+    {
+      "id": "g.payment.c.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "32.16",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.payment.c.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "32.16",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "38",
+        "ratio_relief_points": "0.20",
+        "ltv_relief_line": "72",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0.2"
+    },
+    {
+      "id": "g.payment.c.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "2.45",
+        "relief": "0.2"
+      },
+      "value": "2.25"
+    },
+    {
+      "id": "g.payment.c.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "3.00",
+        "relief": "0.2"
+      },
+      "value": "2.80"
+    },
+    {
+      "id": "g.payment.c.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.25",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "6353.13"
+    },
+    {
+      "id": "g.payment.c.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.25",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "3395860.50"
+    },
+    {
+      "id": "g.payment.c.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.25",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "7717.56"
+    },
+    {
+      "id": "g.payment.c.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.25",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "2482.44"
+    },
+    {
+      "id": "g.payment.c.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.25",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "23812.96"
+    },
+    {
+      "id": "g.payment.c.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.payment.c.stress_max",
+        "subtrahend": "g.payment.c.first"
+      },
+      "value": "17459.83"
+    },
+    {
+      "id": "g.payment.c.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "2482.44"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.payment.c.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "32.16",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.payment.d.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.payment.d.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.payment.d.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_linked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "2.60",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_linked",
+        "t2_amount": "540000.00",
+        "t2_rate": "2.80",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "32.29"
+    },
+    {
+      "id": "g.payment.d.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "32.29",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70"
+      },
+      "value": "refuse"
+    },
+    {
+      "id": "g.payment.d.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "32.29",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.10",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.payment.d.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "refuse",
+        "margin": "0.00"
+      },
+      "value": "refused"
+    },
+    {
+      "id": "g.payment.d.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "32.29",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.total.a.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.total.a.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.total.a.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "43.09"
+    },
+    {
+      "id": "g.total.a.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "43.09",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.total.a.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "43.09",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.total.a.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.10",
+        "relief": "0"
+      },
+      "value": "4.10"
+    },
+    {
+      "id": "g.total.a.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.40",
+        "relief": "0"
+      },
+      "value": "4.40"
+    },
+    {
+      "id": "g.total.a.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8726.04"
+    },
+    {
+      "id": "g.total.a.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2742531.94"
+    },
+    {
+      "id": "g.total.a.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8726.04"
+    },
+    {
+      "id": "g.total.a.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "23.96"
+    },
+    {
+      "id": "g.total.a.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.10",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.40",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "9770.63"
+    },
+    {
+      "id": "g.total.a.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.total.a.stress_max",
+        "subtrahend": "g.total.a.first"
+      },
+      "value": "1044.59"
+    },
+    {
+      "id": "g.total.a.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "23.96"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.total.a.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "43.09",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "g.total.b.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.total.b.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.total.b.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "42.65"
+    },
+    {
+      "id": "g.total.b.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "42.65",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.total.b.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "42.65",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "35",
+        "ratio_relief_points": "0.25",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.total.b.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.00",
+        "relief": "0"
+      },
+      "value": "4.00"
+    },
+    {
+      "id": "g.total.b.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.30",
+        "relief": "0"
+      },
+      "value": "4.30"
+    },
+    {
+      "id": "g.total.b.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8635.88"
+    },
+    {
+      "id": "g.total.b.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2714656.03"
+    },
+    {
+      "id": "g.total.b.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8635.88"
+    },
+    {
+      "id": "g.total.b.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "114.12"
+    },
+    {
+      "id": "g.total.b.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "9673.96"
+    },
+    {
+      "id": "g.total.b.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.total.b.stress_max",
+        "subtrahend": "g.total.b.first"
+      },
+      "value": "1038.08"
+    },
+    {
+      "id": "g.total.b.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "114.12"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.total.b.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "42.65",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "g.total.c.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.total.c.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.total.c.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "43.31"
+    },
+    {
+      "id": "g.total.c.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "43.31",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.total.c.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "43.31",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "38",
+        "ratio_relief_points": "0.20",
+        "ltv_relief_line": "72",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.total.c.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.20",
+        "relief": "0"
+      },
+      "value": "4.20"
+    },
+    {
+      "id": "g.total.c.rate_2",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.35",
+        "relief": "0"
+      },
+      "value": "4.35"
+    },
+    {
+      "id": "g.total.c.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8770.90"
+    },
+    {
+      "id": "g.total.c.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2756821.78"
+    },
+    {
+      "id": "g.total.c.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8770.90"
+    },
+    {
+      "id": "g.total.c.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "-20.90"
+    },
+    {
+      "id": "g.total.c.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.20",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.35",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "9822.00"
+    },
+    {
+      "id": "g.total.c.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.total.c.stress_max",
+        "subtrahend": "g.total.c.first"
+      },
+      "value": "1051.10"
+    },
+    {
+      "id": "zero",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.00"
+    },
+    {
+      "id": "g.total.c.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "zero",
+        "subtrahend": "g.total.c.margin60"
+      },
+      "value": "20.90"
+    },
+    {
+      "id": "g.total.c.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "-20.90"
+      },
+      "value": "budget"
+    },
+    {
+      "id": "g.total.c.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "43.31",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "g.total.d.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.15",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.45",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.total.d.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.total.d.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.15",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.45",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "43.32"
+    },
+    {
+      "id": "g.total.d.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "43.32",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70"
+      },
+      "value": "refuse"
+    },
+    {
+      "id": "g.total.d.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "43.32",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.10",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.total.d.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "refuse",
+        "margin": "0.00"
+      },
+      "value": "refused"
+    },
+    {
+      "id": "g.total.d.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "43.32",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "g.exposure.a.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.exposure.a.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.exposure.a.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.04"
+    },
+    {
+      "id": "g.exposure.a.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "40.04",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.exposure.a.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "40.04",
+        "ltv": "73.59",
+        "ratio_max": "45",
+        "ltv_max": "75",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.15",
+        "ltv_relief_line": "70",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.exposure.a.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.40",
+        "relief": "0"
+      },
+      "value": "4.40"
+    },
+    {
+      "id": "g.exposure.a.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8107.32"
+    },
+    {
+      "id": "g.exposure.a.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2918634.57"
+    },
+    {
+      "id": "g.exposure.a.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8107.32"
+    },
+    {
+      "id": "g.exposure.a.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "642.68"
+    },
+    {
+      "id": "g.exposure.a.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.40",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "8107.32"
+    },
+    {
+      "id": "g.exposure.a.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.exposure.a.stress_max",
+        "subtrahend": "g.exposure.a.first"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "g.exposure.a.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "642.68"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.exposure.a.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "40.04",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "g.exposure.b.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.exposure.b.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.exposure.b.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.57"
+    },
+    {
+      "id": "g.exposure.b.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "39.57",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.exposure.b.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "39.57",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "35",
+        "ratio_relief_points": "0.25",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.exposure.b.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.30",
+        "relief": "0"
+      },
+      "value": "4.30"
+    },
+    {
+      "id": "g.exposure.b.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8011.97"
+    },
+    {
+      "id": "g.exposure.b.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2884308.34"
+    },
+    {
+      "id": "g.exposure.b.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8011.97"
+    },
+    {
+      "id": "g.exposure.b.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "738.03"
+    },
+    {
+      "id": "g.exposure.b.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "8011.97"
+    },
+    {
+      "id": "g.exposure.b.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.exposure.b.stress_max",
+        "subtrahend": "g.exposure.b.first"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "g.exposure.b.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "738.03"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.exposure.b.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "39.57",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.exposure.c.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.exposure.c.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.exposure.c.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.8"
+    },
+    {
+      "id": "g.exposure.c.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "39.8",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75"
+      },
+      "value": "approve"
+    },
+    {
+      "id": "g.exposure.c.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "39.8",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "75",
+        "ratio_relief_line": "38",
+        "ratio_relief_points": "0.20",
+        "ltv_relief_line": "72",
+        "ltv_relief_points": "0.10"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.exposure.c.rate_1",
+      "kind": "bp_rate",
+      "inputs": {
+        "list_rate": "4.35",
+        "relief": "0"
+      },
+      "value": "4.35"
+    },
+    {
+      "id": "g.exposure.c.first",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "8059.57"
+    },
+    {
+      "id": "g.exposure.c.total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "forecast451",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2901447.27"
+    },
+    {
+      "id": "g.exposure.c.max60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "max"
+      },
+      "value": "8059.57"
+    },
+    {
+      "id": "g.exposure.c.margin60",
+      "kind": "cf_window",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "window": 60,
+        "net": "21700",
+        "budget": "11500",
+        "car_monthly": "1450",
+        "car_months": 26,
+        "measure": "margin_max"
+      },
+      "value": "690.43"
+    },
+    {
+      "id": "g.exposure.c.stress_max",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "max"
+      },
+      "value": "8059.57"
+    },
+    {
+      "id": "g.exposure.c.rise",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.exposure.c.stress_max",
+        "subtrahend": "g.exposure.c.first"
+      },
+      "value": "0.00"
+    },
+    {
+      "id": "g.exposure.c.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "approve",
+        "margin": "690.43"
+      },
+      "value": "ok"
+    },
+    {
+      "id": "g.exposure.c.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "39.8",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "g.exposure.d.loan",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "loan"
+      },
+      "value": "1619000.00"
+    },
+    {
+      "id": "g.exposure.d.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2200000"
+      },
+      "value": "73.59"
+    },
+    {
+      "id": "g.exposure.d.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.45",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.27"
+    },
+    {
+      "id": "g.exposure.d.decision",
+      "kind": "bp_decision",
+      "inputs": {
+        "ratio": "40.27",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70"
+      },
+      "value": "refuse"
+    },
+    {
+      "id": "g.exposure.d.relief",
+      "kind": "bp_relief",
+      "inputs": {
+        "ratio": "40.27",
+        "ltv": "73.59",
+        "ratio_max": "50",
+        "ltv_max": "70",
+        "ratio_relief_line": "40",
+        "ratio_relief_points": "0.10",
+        "ltv_relief_line": "none",
+        "ltv_relief_points": "0"
+      },
+      "value": "0"
+    },
+    {
+      "id": "g.exposure.d.stage",
+      "kind": "rec_stage",
+      "inputs": {
+        "decision": "refuse",
+        "margin": "0.00"
+      },
+      "value": "refused"
+    },
+    {
+      "id": "g.exposure.d.flag40",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "40.27",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "q2.answer",
+      "kind": "reg_budget_max_payment",
+      "inputs": {
+        "net": "21700",
+        "out_1": "1450",
+        "budget": "11500"
+      },
+      "value": "8750.00"
+    },
+    {
+      "id": "q2.disp",
+      "kind": "aff_disposable",
+      "inputs": {
+        "recognised": "21700",
+        "obligations": "loan,1450,26"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "q2.line40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
+        "percent": "40"
+      },
+      "value": "8100.00"
+    },
+    {
+      "id": "q2.err_nocar",
+      "kind": "reg_left",
+      "inputs": {
+        "net": "21700",
+        "out_1": "11500"
+      },
+      "value": "10200.00"
+    },
+    {
+      "id": "q3.gross",
+      "kind": "given",
+      "inputs": {},
+      "value": "16500.00"
+    },
+    {
+      "id": "q3.net",
+      "kind": "aff_payslip_net",
+      "inputs": {
+        "gross": "16500",
+        "mandatory": "1950|610|480|1060"
+      },
+      "value": "12400.00"
+    },
+    {
+      "id": "q3.answer",
+      "kind": "aff_net_to_pay",
+      "inputs": {
+        "net": "12400.00",
+        "other": "60"
+      },
+      "value": "12340.00"
+    },
+    {
+      "id": "q3.deposit",
+      "kind": "given",
+      "inputs": {},
+      "value": "12100.00"
+    },
+    {
+      "id": "q3.union",
+      "kind": "given",
+      "inputs": {},
+      "value": "60.00"
+    },
+    {
+      "id": "q7.appraisal",
+      "kind": "given",
+      "inputs": {},
+      "value": "2100000.00"
+    },
+    {
+      "id": "q7.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2100000.00",
+        "deal": "only_home"
+      },
+      "value": "1575000.00"
+    },
+    {
+      "id": "q7.extra",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "in.loan",
+        "subtrahend": "q7.max_loan"
+      },
+      "value": "44000.00"
+    },
+    {
+      "id": "q7.short",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q7.extra",
+        "subtrahend": "in.reserve_after"
+      },
+      "value": "25000.00"
+    },
+    {
+      "id": "q7.ltv",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1619000.00",
+        "value": "2100000.00"
+      },
+      "value": "77.1"
+    },
+    {
+      "id": "q9.points",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.1"
+    },
+    {
+      "id": "q9.answer",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "total_gain"
+      },
+      "value": "34121.29"
+    },
+    {
+      "id": "q9.first_gain",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "-0.10",
+        "measure": "first_gain"
+      },
+      "value": "94.78"
+    },
+    {
+      "id": "q9.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "10000.00"
+    },
+    {
+      "id": "q11.total.stress_total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 2,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "1079000.00",
+        "t1_rate": "4.00",
+        "t1_months": 300,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "t2_kind": "fixed_unlinked",
+        "t2_amount": "540000.00",
+        "t2_rate": "4.30",
+        "t2_months": 300,
+        "t2_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2839905.74"
+    },
+    {
+      "id": "q11.exposure.stress_total",
+      "kind": "scn_eval",
+      "inputs": {
+        "scenario": "stress",
+        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
+        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
+        "reset_years": 5,
+        "stress_inflation": "4",
+        "stress_prime_shift": "2",
+        "stress_anchor_shift": "2",
+        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
+        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
+        "tracks": 1,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "measure": "total"
+      },
+      "value": "2884308.34"
+    },
+    {
+      "id": "q11.answer",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "q11.exposure.stress_total",
+        "subtrahend": "q11.total.stress_total"
+      },
+      "value": "44402.60"
+    },
+    {
+      "id": "q11.base",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "g.exposure.b.total",
+        "subtrahend": "g.total.b.total"
+      },
+      "value": "169652.31"
+    },
+    {
+      "id": "q13.0.pts",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.05"
+    },
+    {
+      "id": "q13.0.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "39.8"
+    },
+    {
+      "id": "q13.0.flag",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "39.8",
+        "line": "40"
+      },
+      "value": "under"
+    },
+    {
+      "id": "q13.0.first_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.05",
+        "measure": "first_delta"
+      },
+      "value": "47.60"
+    },
+    {
+      "id": "q13.0.total_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.05",
+        "measure": "total_delta"
+      },
+      "value": "17138.93"
+    },
+    {
+      "id": "q13.1.pts",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
+    },
+    {
+      "id": "q13.1.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.4",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.04"
+    },
+    {
+      "id": "q13.1.flag",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "40.04",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "q13.1.first_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.10",
+        "measure": "first_delta"
+      },
+      "value": "95.35"
+    },
+    {
+      "id": "q13.1.total_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.10",
+        "measure": "total_delta"
+      },
+      "value": "34326.23"
+    },
+    {
+      "id": "q13.2.pts",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "q13.2.ratio",
+      "kind": "sens_mix",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.55",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "ratio",
+        "income": "21700",
+        "obligation_monthly": "1450",
+        "obligation_months": 26
+      },
+      "value": "40.75"
+    },
+    {
+      "id": "q13.2.flag",
+      "kind": "rec_flag",
+      "inputs": {
+        "ratio": "40.75",
+        "line": "40"
+      },
+      "value": "over"
+    },
+    {
+      "id": "q13.2.first_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.25",
+        "measure": "first_delta"
+      },
+      "value": "239.43"
+    },
+    {
+      "id": "q13.2.total_up",
+      "kind": "out_effect",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "1619000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "edit_target": "all",
+        "edit_points": "0.25",
+        "measure": "total_delta"
+      },
+      "value": "86198.72"
+    }
+  ]
+}
