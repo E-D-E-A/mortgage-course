@@ -47,7 +47,7 @@ export const CLOSED: { id: string; section: SectionId }[] = [
 
 /** Open questions: the learner writes, then reads the model answer and ticks the rubric lines the answer meets. `lines` = rubric lines = points. */
 export const OPEN: { id: string; section: SectionId; lines: number }[] = [
-  { id: "o1", section: "A", lines: 4 },
+  { id: "o1", section: "A", lines: 5 },
   { id: "o2", section: "A", lines: 4 },
   { id: "o3", section: "A", lines: 4 },
   { id: "o4", section: "5", lines: 4 },

@@ -445,6 +445,11 @@ export function originalRequest(): TrackShape[] {
   return INITIAL_MIX.map((t) => ({ kind: t.kind, amount: String(t.amount), months: t.months }));
 }
 
+/** A like-for-like reference for the "stability" alternative: the same fixed track, 25 years like the "total" alternative (a measure for 9.2's comparison only). */
+export function fixed25Request(): TrackShape[] {
+  return [{ kind: "fixed_unlinked", amount: planOf().loan.toString(), months: 300 }];
+}
+
 /**
  * The whole-thousand cuts of a loan that the request and the alternatives use: `third` is the largest whole thousand within a third
  * of the loan, `rest` is half of what remains (so the request is third · rest · rest); `variable` is the largest whole thousand
@@ -459,7 +464,7 @@ export function shapesOf(loan: Decimal.Value) {
 
 export type GoalId = "payment" | "total" | "exposure";
 export type AltId = GoalId;
-export type OfferSource = AltId | "request" | "original";
+export type OfferSource = AltId | "request" | "original" | "fixed25";
 
 export interface Alternative {
   id: AltId;
@@ -623,7 +628,7 @@ export function offerAt(source: OfferSource, bank: BankId): CaseOffer {
   const key = `${source}/${bank}`;
   const hit = cache.get(key);
   if (hit) return hit;
-  const asked = source === "request" ? planOf().request : source === "original" ? originalRequest() : alternative(source).tracks;
+  const asked = source === "request" ? planOf().request : source === "original" ? originalRequest() : source === "fixed25" ? fixed25Request() : alternative(source).tracks;
   const verdict = policyEvaluate(bankPolicy(bank), fileOf(asked));
   const approved = verdict.decision === "approve";
   const tracks = approved ? verdict.finalTracks : null;

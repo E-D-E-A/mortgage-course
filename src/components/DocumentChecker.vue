@@ -112,7 +112,8 @@ const dateHe = (iso: string | null) => (iso ? new Intl.DateTimeFormat("he-IL", {
       <article v-for="d in DOCUMENTS" :key="d.id" class="rounded-md border border-n200 p-3" :aria-labelledby="`${id}-${d.id}`">
         <h3 :id="`${id}-${d.id}`" class="!mt-0 text-body-l font-semibold text-n900">{{ d.name }}</h3>
         <p class="text-caption text-n600">{{ d.received ? `תאריך: ${dateHe(d.date)}` : "המסמך לא התקבל" }}</p>
-        <p class="mt-1 text-body-m text-n800">{{ seen[d.id] }}</p>
+        <p v-if="marks[d.id].state !== '' || checked" class="mt-1 text-body-m text-n800"><strong class="text-n900">מה כתוב בו:</strong> {{ seen[d.id] }}</p>
+        <p v-else class="mt-1 text-caption text-n600">בחרו קודם מצב, ואז יוצג מה כתוב במסמך.</p>
 
         <fieldset class="mt-3">
           <legend class="text-caption font-semibold text-n600">באיזה מצב הראיה?</legend>
@@ -209,12 +210,13 @@ const dateHe = (iso: string | null) => (iso ? new Intl.DateTimeFormat("he-IL", {
         בדיקה
       </button>
       <button type="button" class="min-h-11 text-body-m text-navy underline" @click="showTable = !showTable">{{ showTable ? "חזרה לסימון" : "הצגה כטבלה" }}</button>
+      <span v-if="showTable" class="text-caption text-n600">בטבלה אין סימון ואין בדיקה: חזרו לסימון כדי לבדוק.</span>
     </div>
 
     <div v-if="checked && !showTable" class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800" aria-live="polite">
       <p>
         <strong class="text-n900">רשימת בדיקה, לא ציון.</strong>
-        מצב הראיה: {{ stateHits }} מתוך {{ DOCUMENTS.length }} מסמכים מתאימים לתיק. הטענות: {{ claimHits }} מתוך {{ DOCUMENTS.length }}.
+        מסמכים שהסימון שלהם שונה מהתיק: מצב הראיה — {{ DOCUMENTS.length - stateHits }}, טענות — {{ DOCUMENTS.length - claimHits }}. כל אחד מהם מסומן למעלה.
       </p>
       <p class="mt-2">
         מה זה עושה להון העצמי: אם סופרים את כל מה שהוצהר, שיעור המימון <span class="ltr">{{ pct(equity.declared.ltv) }}</span>. אם סופרים גם את מה שיש עליו מסמך אבל הכסף עוד לא בחשבון, <span class="ltr">{{ pct(equity.documented.ltv) }}</span>. אם סופרים רק מה שאומת, <span class="ltr">{{ pct(equity.verified.ltv) }}</span>, מעל התקרה של <span class="ltr">{{ equity.declared.ceiling }}%</span>.

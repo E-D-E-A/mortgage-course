@@ -23,19 +23,20 @@ import { monthsUntilDrop, type Obligation } from "../../src/lib/calc/affordabili
 import { fileOf, householdIncome, incomeSheet, planOf } from "../../src/lib/calc/casefile.ts";
 import { moneyString } from "../../src/lib/calc/money.ts";
 import { percentagePoints, percentOf, percentString, relativeChangePercent } from "../../src/lib/calc/percent.ts";
-import { FILE, PAYSLIPS } from "../../src/data/case-a-final.ts";
+import { FILE, PAYSLIPS, STATEMENT } from "../../src/data/case-a-final.ts";
 import { SCENARIOS } from "../../src/data/case-a-mix.ts";
 import { bank } from "../../src/data/case-a-positioning.ts";
+import { PTI_CAPITAL_THRESHOLD, PTI_LIMIT } from "../../src/lib/calc/regulation.ts";
 import { CHOICE, THRESHOLD_PTI } from "../../src/data/case-a-recommendation.ts";
 import { CLOSED, OPEN, PASS_PERCENT } from "../../src/data/exam-9-5.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { disposable as disposableFact, net as netFact } from "./affordability-facts.ts";
+import { disposable as disposableFact, net as netFact, netToPay as netToPayFact } from "./affordability-facts.ts";
 import { claimStateFact, countStatesFact, equityFact, incomeFact } from "./_casefile-facts.ts";
 import { monthlyPercent } from "./_earlyrepay-facts.ts";
 import { effectiveOf } from "./_mix-judge.ts";
 import { allCandidates, countFact, ctx } from "./_recommend-facts.ts";
 import { difference, given, givenMoney } from "./_sensitivity-facts.ts";
-import { wmean, mean } from "./_stats-facts.ts";
+import { wmean, mean, intDiff } from "./_stats-facts.ts";
 import { totalFact } from "./_bankpolicy-facts.ts";
 import { untilDrop } from "./affordability-facts.ts";
 import { budgetMax, left as leftFact, ltv as ltvFact, maxLoan, maxPayment } from "./regulation-facts.ts";
@@ -81,10 +82,11 @@ export default function lesson95(): LessonData {
   add(incomeFact("a1.answer", "shira", "recognised"));
   add(incomeFact("a1.naive", "shira", "naive"));
   add(givenMoney("a1.declared", FILE.incomes.shira));
-  {
-    const sep = PAYSLIPS.shira[2];
-    add(givenMoney("a1.sep_gross", sep.gross));
-    add(netFact("a1.sep", sep.gross, sep.mandatory.map((d) => d.amount)));
+  add(incomeFact("a1.oneoffs", "shira", "oneoffs"));
+  for (const [k, id] of [[0, "jul"], [1, "aug"], [2, "sep"]] as const) {
+    const slip = PAYSLIPS.shira[k];
+    add(givenMoney(`a1.${id}_gross`, slip.gross));
+    add(netFact(`a1.${id}`, slip.gross, slip.mandatory.map((d) => d.amount)));
   }
   claim(num("a1.naive").gt(num("a1.answer")) && num("a1.sep").gt(num("a1.naive")), "a1: the one-off lifts the plain average above the recognised income, and the September net above the average");
 
@@ -159,14 +161,32 @@ export default function lesson95(): LessonData {
   claim(monthsUntilDrop(FILE.car.monthsLeft as number) === Number(get("rv.until_drop").value), "rv.until_drop agrees with affordability.ts");
 
   // the model answers of the open questions
+  add(givenMoney("eq.savings", "260000"));
   add(givenMoney("eq.fund", "100000"));
   add(givenMoney("eq.gift", "200000"));
   add(countStatesFact("st.count"));
+  add(given("st.docs", 10));
+  add(intDiff("st.not_ok", 10, (get("st.count").value as { ok: number }).ok));
+  add(given("in.years", plan.request[0].months / 12));
   diff("pc.total_vs_total", `${ch}.total`, `g.total.${B}.total`);
   diff("pc.first_vs_total", `g.total.${B}.first`, `${ch}.first`);
   diff("pc.margin_vs_total", `${ch}.margin60`, `g.total.${B}.margin60`);
   diff("pc.total_vs_payment", `g.payment.${B}.total`, `${ch}.total`);
-  claim(num("pc.total_vs_payment").gt(0), "the linked alternative costs more in total than the fixed one");
+  diff("pc.first_vs_payment", `${ch}.first`, `g.payment.${B}.first`);
+  claim(num("pc.total_vs_payment").gt(0) && num("pc.first_vs_payment").gt(0), "the linked alternative has the lower first payment and the higher total");
+  add(givenMoney("in.budget", sheet.livingBudget.toString()));
+  add({ id: "sens.limit.exposure", kind: "sum_of_facts", inputs: { terms: `in.budget,${ch}.margin60` }, value: moneyString(num("in.budget").plus(num(`${ch}.margin60`))) });
+  add(intDiff("fn.priority", Number(get("fn.ok").value) as number, 1));
+  // Noam's August deposit against the net to pay on his payslip (the open item of 9.1)
+  {
+    const slip = PAYSLIPS.noam[1];
+    add(givenMoney("o3.aug_gross", slip.gross));
+    add(netFact("o3.aug_net", slip.gross, slip.mandatory.map((d) => d.amount)));
+    add(netToPayFact("o3.aug_pay", String(get("o3.aug_net").value), slip.other.map((d) => d.amount)));
+    add(givenMoney("o3.aug_deposit", STATEMENT[1].deposit.noam));
+    diff("o3.aug_gap", "o3.aug_pay", "o3.aug_deposit");
+    claim(num("o3.aug_gap").eq(240), "the August deposit is 240 under the net to pay");
+  }
   claim(get(`g.exposure.a.flag40`).value === "over" && get(`${ch}.flag40`).value === "under", "only the fixed alternative at bank א׳ is over the 40% line");
   void fileOf;
 
@@ -202,6 +222,7 @@ export default function lesson95(): LessonData {
   add(givenMoney("s3a.principal", "250000"));
   add(given("s3a.rate", "3.9"));
   add(given("s3a.years", "15"));
+  add(given("s3a.months", "180"));
   add(M.total("s3a.total", [loan3]));
   add(M.first("s3a.first", [loan3]));
   add(M.difference("s3a.answer", get("s3a.total"), get("s3a.principal")));
@@ -218,6 +239,12 @@ export default function lesson95(): LessonData {
   add(disposableFact("s4a.err_both", "19500", [car4, { ...study4, monthsLeft: 24 }]));
   add(disposableFact("s4a.err_none", "19500", []));
   claim(num("s4a.answer").lt(num("s4a.err_none")) && num("s4a.answer").gt(num("s4a.err_both")), "s4a: only the car loan comes off");
+
+  // The caps of the team's transcription of Directive 329 (the course marks them "לא אומת"): the ratio no loan may cross, and the capital threshold
+  add(given("s4b.ratio", "44"));
+  add(given("s4b.limit", PTI_LIMIT));
+  add(given("s4b.threshold", PTI_CAPITAL_THRESHOLD));
+  claim(num("s4b.ratio").gt(num("s4b.threshold")) && num("s4b.ratio").lt(num("s4b.limit")), "s4b: the ratio is between the capital threshold and the limit");
 
   // Stage 5 (5.9 / 0.4): a contract rate is nominal: the effective annual rate is higher
   add(given("s5a.nominal", "3.8"));

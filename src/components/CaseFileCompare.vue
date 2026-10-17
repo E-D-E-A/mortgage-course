@@ -107,14 +107,14 @@ const kindTag = "inline-block rounded-pill bg-n100 px-2 py-0.5 text-caption font
       <div class="mt-4 rounded-md border p-4" :class="offer.approved ? 'border-n200 bg-n50' : 'border-danger bg-danger-bg'" aria-live="polite">
         <p class="!mt-0 text-body-l font-semibold text-n900">
           {{ BANK_NAME[bank] }}: {{ offer.approved ? "מאשר" : "מסרב" }}
-          <span v-if="offer.approved && !offer.verdict.relief.isZero()"> · הנחה של <span class="ltr">{{ offer.verdict.relief.toString() }}</span> נקודות אחוז</span>
+          <span v-if="offer.approved && !offer.verdict.relief.isZero()"> · הנחה של <span class="ltr">{{ offer.verdict.relief.toString() }}</span> {{ offer.verdict.relief.lt(1) ? "נקודת אחוז" : "נקודות אחוז" }}</span>
           <span v-else-if="offer.approved"> · לפי המחירון</span>
         </p>
         <p v-if="!offer.approved" class="mt-1 text-body-m text-n800">הסיבה: {{ refuseWhy.join(" וגם ") }}. בנק שמסרב לא נותן מחיר, ולכן אין כאן מספרים.</p>
 
         <template v-else-if="reading">
           <p class="mt-2 text-body-m text-n800">
-            <span :class="kindTag">הצעה בדויה</span>
+            <span :class="kindTag">אומדן</span>
             הריביות:
             <template v-for="(t, k) in offer.tracks" :key="k">
               <span v-if="k > 0"> · </span>{{ KIND_NAME_HE[t.kind] }} <span class="ltr">{{ t.rate }}%</span> על <span class="ltr">{{ whole(t.amount) }}</span>, {{ t.months / 12 }} שנה
@@ -159,7 +159,7 @@ const kindTag = "inline-block rounded-pill bg-n100 px-2 py-0.5 text-caption font
       </div>
 
       <p class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800">
-        הכלי לא בוחר. ״הטוב ביותר״ תלוי במה שחשוב למשפחה: החזר חודשי נמוך, סך נמוך או שקט. אותם מספרים, והחלטה אחרת.
+        יחס ההחזר נמדד על הריביות במחירון, לפני ההנחה, וההחזר הראשון מחושב אחריה: כשיש הנחה, ההחזר הראשון חלקי ההכנסה הפנויה נמוך מהיחס. הכלי לא בוחר. ״הטוב ביותר״ תלוי במה שחשוב למשפחה: החזר חודשי נמוך, סך נמוך או שקט. אותם מספרים, והחלטה אחרת.
       </p>
     </div>
 
@@ -181,7 +181,7 @@ const kindTag = "inline-block rounded-pill bg-n100 px-2 py-0.5 text-caption font
           <tr v-for="r in rows" :key="`${r.source.id}-${r.bank}`" class="border-b border-n100 align-top" :class="!r.o.approved ? 'bg-danger-bg' : ''">
             <td class="py-2 pe-3 font-semibold text-n900">{{ r.source.name }}</td>
             <td class="py-2 pe-3">{{ BANK_NAME[r.bank] }}</td>
-            <td class="py-2 pe-3">{{ r.o.approved ? (r.o.verdict.relief.isZero() ? "מאשר" : `מאשר, הנחה ${r.o.verdict.relief.toString()}`) : "מסרב" }}</td>
+            <td class="py-2 pe-3">{{ r.o.approved ? (r.o.verdict.relief.isZero() ? "מאשר" : `מאשר, הנחה של ${r.o.verdict.relief.toString()} נקודת אחוז`) : "מסרב" }}</td>
             <td class="py-2 pe-3"><span class="ltr">{{ pct(r.o.verdict.ratio) }}</span></td>
             <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{{ r.r ? money(r.r.first) : "—" }}</span></td>
             <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{{ r.r ? money(r.r.total) : "—" }}</span></td>

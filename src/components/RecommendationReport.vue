@@ -308,7 +308,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
               <span class="block font-semibold text-n900">{{ a.name }}</span>
               <span v-if="a.note" class="block text-caption text-n700">{{ a.note }}</span>
               <span class="mt-1 block text-caption text-n700">
-                <span v-for="c in altColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span :class="isNum(cell(altRows, a.id, c.key)) ? 'ltr' : ''">{{ cell(altRows, a.id, c.key) }}</span></span>
+                <span v-for="c in altColumns" :key="c.key" class="block">{{ c.label }}: <span :class="isNum(cell(altRows, a.id, c.key)) ? 'ltr' : ''">{{ cell(altRows, a.id, c.key) }}</span></span>
               </span>
             </button>
           </div>
@@ -328,7 +328,7 @@ const bankCell = (id: string, key: string) => cell(props.bankRows[shownAlt.value
               <span class="block font-semibold text-n900">{{ b.name }}</span>
               <span v-if="b.note" class="block text-caption text-n700">{{ b.note }}</span>
               <span class="mt-1 block text-caption text-n700">
-                <span v-for="c in bankColumns" :key="c.key" class="me-3 inline-block">{{ c.label }}: <span :class="isNum(bankCell(b.id, c.key)) ? 'ltr' : ''">{{ bankCell(b.id, c.key) }}</span></span>
+                <span v-for="c in bankColumns" :key="c.key" class="block">{{ c.label }}: <span :class="isNum(bankCell(b.id, c.key)) ? 'ltr' : ''">{{ bankCell(b.id, c.key) }}</span></span>
               </span>
             </button>
           </div>

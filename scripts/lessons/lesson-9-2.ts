@@ -130,6 +130,15 @@ export default function lesson92(): LessonData {
 
   diff("req.b_over_a", "o.request.b.base.total", "o.request.a.base.total");
   diff("req.c_over_a", "o.request.c.base.total", "o.request.a.base.total");
+  // Like for like: the fixed track over 25 years, as the "total" alternative's term, at bank ב׳.
+  {
+    const o = offerAt("fixed25", "b");
+    readOffer("fixed25", "b", o, false);
+    add(windowFact("o.fixed25.b.base.m1", o.tracks!, "forecast451", "margin_first"));
+    diff("fx.vs_total", "o.fixed25.b.base.total", "o.total.b.base.total");
+    diff("fx.term_effect", "o.exposure.b.base.total", "o.fixed25.b.base.total");
+    diff("fx.term_gap", "o.total.b.base.total", "o.fixed25.b.base.total");
+  }
   // What the plan buys at bank א׳, on the stage-9 base scenario.
   diff("gain.total", "o.original.a.base.total", "o.request.a.base.total");
   diff("gain.first", "o.original.a.base.first", "o.request.a.base.first");

@@ -25,6 +25,22 @@ import { BANKS } from "../../data/case-a-positioning.ts";
 import { APPRAISALS } from "../../data/case-a-final.ts";
 import { ALTERNATIVES, NUMBER_KINDS } from "../../lib/calc/casefile.ts";
 
+<style is:global>{`
+@media (max-width: 639px) {
+  .stack-table thead { display: none; }
+  .stack-table, .stack-table tbody { display: block; }
+  .stack-table tr { display: block; margin: 10px 0; padding: 6px 4px; border: 1px solid var(--mogi-n200); border-radius: 10px; }
+  .stack-table td { display: flex; justify-content: space-between; gap: 12px; padding: 4px 8px !important; border: 0 !important; }
+  .stack-table td::before { content: attr(data-label); color: var(--mogi-n600); font-size: 12px; font-weight: 600; flex: none; max-width: 45%; }
+}
+`}</style>
+<script is:inline>{`
+document.querySelectorAll("table.stack-table").forEach((t) => {
+  const heads = [...t.querySelectorAll("thead th")].map((h) => h.textContent.trim());
+  t.querySelectorAll("tbody tr").forEach((r) => [...r.children].forEach((c, i) => { if (heads[i]) c.setAttribute("data-label", heads[i]); }));
+});
+`}</script>
+
 {/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
 export const eq = (x) => `⁦${x}⁩`;
 export const f = facts("9.2");
@@ -57,8 +73,9 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 <Callout title="מה השיעור הזה לא אומר" tone="warning">
 <p><strong>{MARK}</strong> כל הבנקים בדויים וכל המסמכים בדויים.</p>
-<p>הכללים של ארבעת הבנקים, כלומר הקווים והנחות המחיר, הם כללי התרגיל של שיעור 6.9: הקורס לא יודע איפה בנקים אמיתיים שמים קווים, ולא אם שינוי בתמהיל משנה את הריביות שבנק נותן (ידע מהשטח, ממתין לאישור אילון). כאן המחירון של כל בנק נשאר גם לתמהילים שלא ביקשו בו, וזו הנחה מפשטת. התרחישים הם של שיעור 8.10: התחזית לפי הוראה 451 היא חישוב שנקבע מראש, תרחיש הלחץ הוא ״מה אם״ שבחרנו, ותחזית המקרו היא טבלה מומצאת. אף אחד מהם לא נבא מה יקרה. זו הערכה, לא הבטחה.</p>
-<p>בשלבים 5–6 הבסיס היה תרחיש פשוט (הפריים לא זז, המדד עולה 2% בשנה). כאן הבסיס הוא התחזית לפי הוראה 451, ולכן הסכומים שונים מאלה של שיעור 6.11. היחסים, ההלוואה ושיעור המימון לא תלויים בתרחיש, ולכן נשארו כמו שהיו. <strong>ב־Mogi היום אין חישוב תמהילים בקוד</strong>: מה שנעשה כאן בכלי הקורס הוא מה שהאלגוריתם של שלב 8 אמור לעשות בשיטתיות בעתיד.</p>
+<p>הכללים של ארבעת הבנקים, כלומר הקווים והנחות המחיר, הם כללי התרגיל של שיעור 6.9: הקורס לא יודע איפה בנקים אמיתיים שמים קווים, ולא אם שינוי בתמהיל משנה את הריביות שבנק נותן (ידע מהשטח, ממתין לאישור אילון). כאן המחירון של כל בנק נשאר גם לתמהילים שלא ביקשו בו, וזו הנחה מפשטת. התרחישים הם של שיעור 8.10: התחזית לפי הוראה 451 היא חישוב שנקבע מראש, תרחיש הלחץ הוא ״מה אם״ שבוחרים לבדוק, ותחזית המקרו היא טבלה מומצאת. אף אחד מהם לא נבא מה יקרה. זו הערכה, לא הבטחה.</p>
+<p>בשלבים 5–6 הבסיס היה תרחיש פשוט (הפריים לא זז, המדד עולה 2% בשנה). כאן הבסיס הוא התחזית לפי הוראה 451, ולכן הסכומים שונים מאלה של שיעור 6.11. היחסים, ההלוואה ושיעור המימון לא תלויים בתרחיש, ולכן נשארו כמו שהיו. </p>
+<p><strong>מה קיים ומה לא:</strong> <strong>Mogi היום:</strong> אין חישוב תמהילים בקוד; הכלי כאן הוא כלי של הקורס. <strong>הוחלט:</strong> מודל שפה מסביר ומסווג, ולעולם לא מחשב אף מספר (2026-07-29), וחמישה עשר כללי החישוב של אילון (2026-10-07; ההטמעה לא הושלמה). <strong>עתיד:</strong> האלגוריתם של שלב 8 יעשה בשיטתיות את מה שנעשה כאן בכלי הקורס.</p>
 </Callout>
 
 <Section kind="לפני שמתחילים: נחשו">
@@ -70,7 +87,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 <Prediction
   client:visible
   id="9.2"
-  question="לנועם ושירה שלוש חלופות לאותה הלוואה, כל אחת לטובת מטרה אחרת: החזר חודשי נמוך (צמודה), סך תשלומים נמוך (25 שנה) ויציבות (קבועה בלבד). איזו חלופה נותנת את הסך הנמוך ביותר, ומה המחיר שלה?"
+  question="לנועם ושירה שלוש חלופות לאותו סכום הלוואה (שתיים ל־30 שנה ואחת ל־25), כל אחת לטובת מטרה אחרת: החזר חודשי נמוך (צמודה), סך תשלומים נמוך (25 שנה) ויציבות (קבועה בלבד). איזו חלופה נותנת את הסך הנמוך ביותר, ומה המחיר שלה?"
   options={predictionOptions}
 />
 
@@ -91,7 +108,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 התוכנית של שיעור 6.11 בוחרת מנוף אחד: **הון עצמי נוסף מהחסכונות**. היא מוסיפה {f.shekels("plan.extra")} (הצעד הקטן ביותר, בשלמי אלף, שמוריד את <Term t="יחס החזר" client:visible lesson="4.3">יחס ההחזר</Term> לפחות מעשירית נקודת אחוז מתחת לקו ה־40%). ההון העצמי הופך ל־{f.shekels("plan.equity")}, ההלוואה {f.shekels("plan.loan")}, <Term t="שיעור מימון" client:visible lesson="1.2">שיעור המימון</Term> {pc("plan.ltv")}, ובחסכונות נשארים {f.shekels("plan.reserve")}. הבקשה: שלושה מסלולים, 30 שנה, ללא שינוי בתמהיל: <span class="ltr whitespace-nowrap">{nv(shape.third)}</span> בפריים, <span class="ltr whitespace-nowrap">{nv(shape.rest)}</span> במשתנה לא צמודה, <span class="ltr whitespace-nowrap">{nv(shape.rest)}</span> בקבועה לא צמודה (סכומים עגולים באלפים).
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-3 text-start font-semibold">בבנק א׳</th>
@@ -110,7 +127,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
   <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס: התחזית לפי הוראה 451. כללי הבנק בדויים. ההחזר הראשון נמוך ב־{f.shekels("gain.first")}, והסך נמוך ב־{f.shekels("gain.total")}: חלק מהלוואה קטנה, וחלק מהנחה שהתיק קיבל כי עבר את הקו.</p>
 </div>
 
-**התוכנית עולה {f.shekels("plan.extra")} במזומן, והכרית היא {f.shekels("plan.reserve")}.** יש לה נקודת חולשה אחת שהתיק עוד לא ראה: **השמאות** (שיעור 9.1). השווי לחישוב הוא הנמוך מבין המחיר והשמאות, ושמאות מתחת ל־{f.shekels("apr.breakeven")} (<M>{n("plan.loan")} × 100 ÷ 75 = {n("apr.breakeven")}</M>) מעבירה גם את ההלוואה של התוכנית מעל התקרה של 75%. מרווח של {f.shekels("apr.slack")} מתחת למחיר. אם השמאות {f.shekels("apr.max2150")} בהלוואה מרבית, ההלוואה גדולה מדי ב־{f.shekels("apr.short")}, ואז המשפחה צריכה {f.shekels("apr.short")} הון עצמי נוסף, וכרית של {f.shekels("apr.reserve_after")}. אלה תרחישים לתכנון, לא תחזית לשמאות.
+**התוכנית עולה {f.shekels("plan.extra")} במזומן, והכרית היא {f.shekels("plan.reserve")}.** יש לה נקודת חולשה אחת שהתיק עוד לא ראה: **השמאות** (שיעור 9.1). השווי לחישוב הוא הנמוך מבין המחיר והשמאות, ושמאות מתחת ל־{f.shekels("apr.breakeven")} (<M>{n("plan.loan")} × 100 ÷ 75 = {n("apr.breakeven")}</M>) מעבירה גם את ההלוואה של התוכנית מעל התקרה של 75%. מרווח של {f.shekels("apr.slack")} מתחת למחיר. אם השמאות יוצאת {formatShekels(APPRAISALS[2])}, ההלוואה המרבית היא {f.shekels("apr.max2150")}, וההלוואה של התוכנית גדולה מדי ב־{f.shekels("apr.short")}. אז המשפחה צריכה {f.shekels("apr.short")} הון עצמי נוסף, וכרית של {f.shekels("apr.reserve_after")}. אלה תרחישים לתכנון, לא תחזית לשמאות.
 
 <Section kind="חלק 2">
 
@@ -121,7 +138,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 הבקשה של התוכנית יוצאת לארבעת הבנקים הבדויים: אותו סכום, אותו תמהיל, אותו חודש (שיעור 6.6). הנה מה שכל בנק עושה, לפי כללי התרגיל של שיעור 6.9:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
@@ -145,10 +162,10 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} כללי הבנקים בדויים (שיעור 6.9). הסכומים: תרחיש הבסיס, התחזית לפי הוראה 451. בנק ד׳ מסרב: התקרה שלו {BANKS[3].ltvMax}%, והבקשה על {pc("o.request.d.ltv")}, כלומר {f.plain("o.request.d.short")} נקודות אחוז מעל.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} כללי הבנקים בדויים (שיעור 6.9). הסכומים: תרחיש הבסיס, התחזית לפי הוראה 451. יחס ההחזר נמדד על הריביות במחירון, לפני ההנחה; ההחזר הראשון מחושב אחרי ההנחה, ולכן ההחזר הראשון חלקי ההכנסה הפנויה ({n("a.disposable")} ₪) נמוך מהיחס כשיש הנחה. בנק ד׳ מסרב: התקרה שלו {BANKS[3].ltvMax}%, והבקשה על {pc("o.request.d.ltv")}, כלומר {f.plain("o.request.d.short")} נקודות אחוז מעל.</p>
 </div>
 
-**הזול ביותר הוא בנק {BANK_NAME[f.plain("best.request")]}**, בזכות ההנחה שהתיק קיבל כי יחס ההחזר שלו, {pc("o.request.a.ratio")}, מתחת לקו של 40%. בנק ב׳ יקר ממנו ב־{f.shekels("req.b_over_a")} ובנק ג׳ ב־{f.shekels("req.c_over_a")}: אצלם אין הנחה, כי הקווים שלהם נמוכים ({BANKS[1].ratioReliefLine}% ו־{BANKS[2].ratioReliefLine}%). **אלה אומדנים לפי כללי תרגיל**: אף בנק עוד לא ראה את הבקשה הזו, והמחיר שלו יהיה ״הצעה אישית״ רק כשיחזור בכתב.
+**הזול ביותר, לפי כללי התרגיל, הוא {BANK_NAME[f.plain("best.request")]}**, בזכות ההנחה שהתיק קיבל כי יחס ההחזר שלו, {pc("o.request.a.ratio")}, מתחת לקו של 40%. בנק ב׳ יקר ממנו ב־{f.shekels("req.b_over_a")} ובנק ג׳ ב־{f.shekels("req.c_over_a")}: אצלם אין הנחה, כי הקווים שלהם נמוכים ({BANKS[1].ratioReliefLine}% ו־{BANKS[2].ratioReliefLine}%). **אלה אומדנים לפי כללי תרגיל**: אף בנק עוד לא ראה את הבקשה הזו, והמחיר שלו יהיה ״הצעה אישית״ רק כשיחזור בכתב.
 
 <Section kind="חלק 3">
 
@@ -159,7 +176,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 התוכנית משאירה את התמהיל כמו שהוא. אבל המשפחה יכולה לרצות דברים אחרים מההלוואה, ושלושה יעדים מושכים לכיוונים שונים (שיעור 5.6): <Term t="החזר ראשון" client:visible lesson="3.8">החזר חודשי</Term> נמוך, <Term t="סך תשלומים" client:visible lesson="3.9">סך תשלומים</Term> נמוך ו<Term t="יציבות" client:visible lesson="5.6">יציבות</Term>. לכל יעד חלופה מהשיעורים 5.6–5.8, על ההלוואה של התוכנית. הסכומים של שלוש החלופות מחוברים ל־{f.shekels("plan.loan")}, והחלק המשתנה הוא הגבוה ביותר בשלמי אלף שנשאר בתוך שני שלישים מההלוואה (<Term t="הוראה 329" client:visible lesson="4.4">הוראה 329</Term>, לפי תעתיק הצוות; לא אומת).
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-2 text-start font-semibold">החלופה</th>
@@ -176,7 +193,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
         <tr class="border-b border-n100 align-top">
           <td class="py-2 pe-2 font-semibold text-n900">{a.nameHe}<span class="block text-caption font-normal text-n600">{a.goalHe}</span></td>
           <td class="py-2 pe-2">{a.desc}</td>
-          <td class="py-2 pe-2">{BANK_NAME[a.bank]}{relief(a.id, a.bank) !== "0" && <span class="block text-caption text-n600">הנחה {relief(a.id, a.bank)}</span>}</td>
+          <td class="py-2 pe-2">{BANK_NAME[a.bank]}{relief(a.id, a.bank) !== "0" && <span class="block text-caption text-n600">הנחה של {relief(a.id, a.bank)} נקודת אחוז</span>}</td>
           <td class="py-2 pe-2"><span class="ltr">{pc(q(a.id, a.bank, "ratio"))}</span></td>
           <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, "base.first"))}</span></td>
           <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, "base.total"))}</span></td>
@@ -185,14 +202,14 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} כל חלופה אצל הבנק הזול לה, בתרחיש הבסיס (התחזית לפי הוראה 451). ״חשיפה״: בכמה ההחזר הגבוה ביותר בתרחיש הלחץ גבוה מההחזר הראשון בבסיס (שיעור 5.6). הריביות הן מחירון הבנק, בהנחה שהמחירון נשאר גם לתמהיל שלא ביקשו בו.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} כל חלופה אצל הבנק הזול לה, בתרחיש הבסיס (התחזית לפי הוראה 451). ״חשיפה״: בכמה ההחזר הגבוה ביותר בתרחיש הלחץ גבוה מההחזר הראשון בבסיס (שיעור 5.6). הריביות הן מחירון הבנק, בהנחה שהמחירון נשאר גם לתמהיל שלא ביקשו בו. יחס ההחזר נמדד על הריביות במחירון, לפני ההנחה, וההחזר הראשון אחריה, ולכן אצל חלופה עם הנחה ההחזר הראשון חלקי ההכנסה הפנויה נמוך מהיחס.</p>
 </div>
 
 כל חלופה זכתה ביעד שלה: **חלופת ה{WIN.payment} נותנת את ההחזר הנמוך ביותר, חלופת ה{WIN.total} את הסך הנמוך, וחלופת ה{WIN.exposure} את החשיפה הנמוכה** (זה מחושב, לא הוכרז: הכלי בודק איזו חלופה הכי נמוכה בכל יעד). ו**לכל יעד מחיר** שאי אפשר לדלג עליו:
 
 - **ההחזר הנמוך של הצמודה** חוסך {f.shekels("price.first_total")} בחודש הראשון לעומת ה־25 שנה, אבל הסך שלה גבוה ב־{f.shekels("cost.payment")}, והחשיפה שלה {f.shekels("o.payment.b.rise")}.
-- **הסך הנמוך של ה־25 שנה** בא עם החזר ראשון של {f.shekels("o.total.b.base.first")} ויחס החזר {pc("o.total.b.ratio")}, {f.plain("o.total.b.pts40")} נקודות אחוז מעל הקו של 40%: בנק ב׳ לא נותן לה הנחה, ושום בנק אצלנו לא נותן. מה בנק אמיתי עושה מעל 40% — לא ידוע, ועולה לו בהון (שיעור 4.5).
-- **היציבות של הקבועה** עולה {f.shekels("cost.exposure")} בסך הכול לעומת ה־25 שנה: מי שמשלם על ודאות משלם עליה.
+- **הסך הנמוך של ה־25 שנה** בא עם החזר ראשון של {f.shekels("o.total.b.base.first")} ויחס החזר {pc("o.total.b.ratio")}, {f.plain("o.total.b.pts40")} נקודות אחוז מעל הקו של 40%: בנק ב׳ לא נותן לה הנחה, ושום בנק מבין הארבעה בקורס לא נותן. מה בנק אמיתי עושה מעל 40% — לא ידוע, ועולה לו בהון (שיעור 4.5).
+- **היציבות של הקבועה:** הקבועה ל־30 שנה גבוהה ב־{f.shekels("cost.exposure")} מה־25 שנה, אבל **רוב ההפרש הוא חמש שנות התשלום הנוספות**. קבועה ל־25 שנה, באותה ריבית ({rate("fixed25", "b", 1)}%), הייתה עולה {f.shekels("o.fixed25.b.base.total")} בבסיס, כלומר {f.shekels("fx.term_gap")} פחות מחלופת ה־25 שנה, עם החזר ראשון של {f.shekels("o.fixed25.b.base.first")} ומרווח של {f.shekels("o.fixed25.b.base.m1")} מתקציב המשפחה (מינוס: התקציב נשבר). המחיר האמיתי של היציבות הוא ההחזר החודשי הגבוה, לא הסך.
 
 אפשר להוסיף שורה לכל אחד מהבנקים: לאותה חלופה, ההפרש בין הבנק הזול לבנק היקר הוא {f.shekels("spread.payment")} בצמודה, {f.shekels("spread.total")} ב־25 שנה ו־{f.shekels("spread.exposure")} בקבועה. לכן בחירת הבנק היא החלטה אמיתית, לא פרט.
 
@@ -202,16 +219,17 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 </Section>
 
-כל תרחיש הוא <Term t="תרחיש" client:visible lesson="8.9">הנחה על העתיד</Term>, ולא יותר: **בסיס** (התחזית לפי הוראה 451, חישוב שנקבע מראש), <Term t="תרחיש לחץ" client:visible lesson="8.10">לחץ</Term> (״מה אם זה הולך רע״, שבחרנו) ו<Term t="תחזית מקרו" client:visible lesson="8.10">מקרו</Term> (טבלה מומצאת). הנה כל חלופה אצל הבנק הזול לה:
+כל תרחיש הוא <Term t="תרחיש" client:visible lesson="8.9">הנחה על העתיד</Term>, ולא יותר: **בסיס** (התחזית לפי הוראה 451, חישוב שנקבע מראש), <Term t="תרחיש לחץ" client:visible lesson="8.10">לחץ</Term> (״מה אם זה הולך רע״, שבוחרים לבדוק) ו<Term t="תחזית מקרו" client:visible lesson="8.10">מקרו</Term> (טבלה מומצאת). הנה כל חלופה אצל הבנק הזול לה:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-2 text-start font-semibold">החלופה</th>
         <th class="py-2 pe-2 text-start font-semibold">התרחיש</th>
         <th class="py-2 pe-2 text-start font-semibold">הגבוה ביותר ב־5 שנים, ₪</th>
         <th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">מעל התקציב בחודש הראשון, ₪</th>
         <th class="py-2 pe-2 text-start font-semibold">מעל התקציב בחודש הכבד, ₪</th>
       </tr>
     </thead>
@@ -222,12 +240,13 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
           <td class="py-2 pe-2">{name}</td>
           <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, `${sid}.max60`))}</span></td>
           <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, `${sid}.total`))}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, `${sid}.m1`))}</span></td>
           <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{n(q(a.id, a.bank, `${sid}.m60`))}</span></td>
         </tr>
       )))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} כל חלופה אצל הבנק הזול לה. ״מעל התקציב״: מה שנשאר אחרי ההחזר והלוואת הרכב, פחות תקציב מחיה של {f.shekels("bud.value")} (הנחה של התיק), בחודש הכבד ביותר ב־5 השנים הראשונות; מספר שלילי פירושו שהתקציב נשבר. ההכנסה נשארת קבועה: הנחת חישוב קשה.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} כל חלופה אצל הבנק הזול לה. ״מעל התקציב״: ההכנסה המוכרת פחות ההחזר, פחות הלוואת הרכב כל עוד היא משולמת (26 החודשים הראשונים), פחות תקציב מחיה של {f.shekels("bud.value")} (הנחה של התיק). העמודה הראשונה היא החודש הראשון, והשנייה החודש שבו ההחזר גבוה ביותר ב־5 השנים הראשונות: אם הוא אחרי חודש 26, הלוואת הרכב כבר לא מנוכה, ולכן המרווח שם יכול להיות גדול מהראשון. מספר שלילי פירושו שהתקציב נשבר. ההכנסה נשארת קבועה, כלומר בלי עליית שכר: הנחת חישוב קשה.</p>
 </div>
 
 כמה דברים שרואים:
@@ -246,7 +265,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 בטבלה יש הרבה מספרים, והם לא מאותו סוג. מי שמציג אותם בלי להגיד איזה סוג הם מטעה, גם בלי כוונה (שיעור 5.5). ארבעה סוגים, ומה הם בתיק הזה:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-3 text-start font-semibold">הסוג</th>
@@ -264,10 +283,10 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
   <p class="mt-2 text-caption text-n600">הגדרות לפי שיעורים 5.5 ו־8.9. {MARK}</p>
 </div>
 
-**ההשוואה לפי הוראה 451** (שיעור 5.3) מותרת רק על אותו בסיס: אותו סכום, אותו תמהיל, אותו חודש ואותה תחזית. נבדוק את זה בשלושה זוגות:
+**ההשוואה לפי הוראה 451** (שיעור 5.3) מותרת רק על אותו בסיס: אותו סכום, אותו תמהיל, אותו חודש ואותה תחזית. בדקו את זה בשלושה זוגות:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-3 text-start font-semibold">מה משווים</th>
@@ -276,8 +295,8 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold text-n900">אותה בקשה אצל בנקים א׳, ב׳ ו־ג׳</td><td class="py-2 pe-3">{f.raw("basis.request").length === 0 ? "כלום" : f.raw("basis.request").join(", ")}</td><td class="py-2 pe-3">כן: אותה בסיס, והמחיר הוא מה שמשווים</td></tr>
-      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold text-n900">שתי חלופות אצל אותו בנק</td><td class="py-2 pe-3">התמהיל</td><td class="py-2 pe-3">לא: שופטים לפי המטרות והמדדים, לא לפי מי זול</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold text-n900">אותה בקשה אצל בנקים א׳, ב׳ ו־ג׳</td><td class="py-2 pe-3">{f.raw("basis.request").length === 0 ? "כלום" : f.raw("basis.request").join(", ")}</td><td class="py-2 pe-3">כן: אותו בסיס, והמחיר הוא מה שמשווים</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold text-n900">שתי חלופות אצל אותו בנק</td><td class="py-2 pe-3">התמהיל והתקופה</td><td class="py-2 pe-3">לא: שופטים לפי המטרות והמדדים, לא לפי מי זול</td></tr>
       <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold text-n900">הבקשה לפני התוכנית ואחריה</td><td class="py-2 pe-3">הסכום והתמהיל</td><td class="py-2 pe-3">לא כהשוואה של הצעות: זה ״מה התוכנית משנה״, חישוב ולא השוואה</td></tr>
     </tbody>
   </table>
@@ -290,7 +309,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 </Section>
 
-הכלי מחבר את כל מה שבנינו: בקשה או חלופה, בנק, ותרחיש. הוא מראה מה הבנק עושה, ובכל מספר איזה סוג הוא. אין בו כפתור ״הטוב ביותר״: הכול תלוי במה שחשוב למשפחה.
+הכלי מחבר את כל מה שלמדתם: בקשה או חלופה, בנק, ותרחיש. הוא מראה מה הבנק עושה, ובכל מספר איזה סוג הוא. אין בו כפתור ״הטוב ביותר״: הכול תלוי במה שחשוב למשפחה.
 
 <CaseFileCompare client:visible id="9.2-compare" />
 
@@ -302,7 +321,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>בנק ד׳ מסרב לכל החלופות, על שיעור המימון ({pc("plan.ltv")}, מעל {BANKS[3].ltvMax}%). בנקים א׳, ב׳ וג׳ מאשרים. הזול לכל שלוש החלופות הוא בנק {BANK_NAME[f.plain("best.payment")]}; בבקשה של התוכנית הזול הוא בנק {BANK_NAME[f.plain("best.request")]}, כי רק לו יש הנחה על יחס של {pc("o.request.a.ratio")}.</li>
+    <li>בנק ד׳ מסרב לכל החלופות, על שיעור המימון ({pc("plan.ltv")}, מעל {BANKS[3].ltvMax}%). בנקים א׳, ב׳ וג׳ מאשרים. הזול לכל שלוש החלופות הוא {BANK_NAME[f.plain("best.payment")]}; בבקשה של התוכנית הזול הוא {BANK_NAME[f.plain("best.request")]}, כי רק לו יש הנחה על יחס של {pc("o.request.a.ratio")}.</li>
     <li>ה־25 שנה: ההחזר הראשון, {f.shekels("o.total.b.base.first")}, אותו דבר בשלושת התרחישים, והמרווח {f.shekels("o.total.b.base.m1")} לא זז. מה שזז הוא הסך ({f.shekels("o.total.b.macro.total")} במקרו, {f.shekels("o.total.b.stress.total")} בלחץ): כי החלק המשתנה מתעדכן אחרי חמש שנים.</li>
     <li>בצמודה ההחזר הגבוה ביותר עולה מ־{f.shekels("o.payment.b.base.max")} בבסיס ל־{f.shekels("o.payment.b.stress.max")} בלחץ, והסך מ־{f.shekels("o.payment.b.base.total")} ל־{f.shekels("o.payment.b.stress.total")}. בחמש השנים הראשונות: מ־{f.shekels("o.payment.b.base.max60")} ל־{f.shekels("o.payment.b.stress.max60")}. עיקר הסיכון נמצא רחוק.</li>
   </ol>
@@ -317,7 +336,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 התוצר של השיעור הוא **טבלת השוואה ושלוש חלופות עם המחיר של כל אחת**. הטבלה, עם כל חלופה אצל הבנק הזול לה, והבקשה של התוכנית לצדן:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 px-2 py-4 shadow-sm sm:px-4">
-  <table class="w-full border-collapse text-body-m">
+  <table class="stack-table w-full border-collapse text-body-m">
     <thead>
       <tr class="border-b border-n200 text-caption text-n600">
         <th class="py-2 pe-2 text-start font-semibold">האפשרות</th>
@@ -364,9 +383,9 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
   options={predictionOptions}
   correct={1}
   notes={[
-    `לא: ההחזר הראשון של הצמודה נמוך, אבל הסך שלה גבוה ב־${f.whole("cost.payment")} מה־25 שנה. הצמדה מוסיפה לחוב לאורך השנים.`,
+    `לא: ההחזר הראשון של הצמודה נמוך, אבל הסך שלה גבוה ב־${f.whole("cost.payment")} מה־25 שנה. הצמדה מוסיפה לחוב לאורך השנים, והתקופה שלה ארוכה.`,
     "",
-    "לא: הקבועה יציבה, אבל יציבות עולה כסף: הסך שלה גבוה ב־" + f.whole("cost.exposure") + " מה־25 שנה.",
+    "לא: הקבועה יציבה, אבל היא ל־30 שנה: הסך שלה גבוה ב־" + f.whole("cost.exposure") + " מה־25 שנה, בעיקר בגלל חמש השנים הנוספות. ל־25 שנה היא הייתה זולה ב־" + f.whole("fx.term_gap") + " מחלופת ה־25 שנה, אבל עם החזר ראשון של " + f.whole("o.fixed25.b.base.first") + ".",
     "לא: הסכומים שווים, אבל התקופה, הריבית וההצמדה שונות, ולכן הסך שונה.",
   ]}
 >
@@ -379,7 +398,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 </Section>
 
-נחשב את ה־25 שנה אצל בנק ב׳, כמו שהיא נכנסת לטבלה.
+חשבו את ה־25 שנה אצל בנק ב׳, כמו שהיא נכנסת לטבלה.
 
 **צעד 1 — הבקשה.** ההלוואה של התוכנית: <M>{n("a.price")} − {n("plan.equity")} = {n("plan.loan")}</M>. החלק המשתנה: {nv(shape.variable)} ₪, והשאר ({nv(shape.fixed)} ₪) קבועה. שניהם ל־25 שנה.
 
@@ -399,7 +418,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 </Section>
 
-הסך הכי נמוך הוא של ה־25 שנה. השלימו, לשתי החלופות האחרות, בכמה הסך שלהן גבוה ממנו. השורה הראשונה כבר מלאה.
+הסך הכי נמוך הוא של ה־25 שנה. השלימו, לשתי החלופות האחרות, בכמה הסך שלהן גבוה ממנו. שימו לב: שתיהן ל־30 שנה, והפער כולל את חמש השנים הנוספות. השורה הראשונה כבר מלאה.
 
 <FillTable
   client:visible
@@ -412,7 +431,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
   ]}
   rows={halfRows}
   blanks={ALTS.filter((a) => a.id !== "total").map((a) => `${a.nameHe}.extra`)}
-  success={`נכון. הצמודה יקרה ב־${f.shekels("cost.payment")}, והקבועה ב־${f.shekels("cost.exposure")}: כל אחת קונה משהו (החזר נמוך, יציבות) ומשלמת עליו.`}
+  success={`נכון. הצמודה יקרה ב־${f.shekels("cost.payment")}, והקבועה ב־${f.shekels("cost.exposure")}: חלק מההפרש הוא חמש שנות התשלום הנוספות, וחלק הוא מה שכל חלופה קונה (החזר נמוך, יציבות).`}
   hint="הסך של החלופה פחות הסך של ה־25 שנה."
 />
 
@@ -480,17 +499,17 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
   id="9.2-4"
   n={4}
   level="בינוני"
-  answer={f.raw("cost.exposure")}
+  answer={f.raw("fx.term_effect")}
   errors={[
-    { value: f.raw("cost.payment"), message: "זה ההפרש של הצמודה מול ה־25 שנה. השאלה על הקבועה." },
-    { value: f.raw("o.exposure.b.base.total"), message: "זה הסך של הקבועה עצמה. השאלה כמה הוא גבוה מהסך של ה־25 שנה." },
+    { value: f.raw("cost.exposure"), message: "זה ההפרש מול חלופת ה־25 שנה, שבה גם החלק המשתנה שונה. כאן משווים קבועה לקבועה, ל־30 שנה מול 25." },
+    { value: f.raw("o.exposure.b.base.total"), message: "זה הסך של הקבועה ל־30 שנה עצמה, לא ההפרש." },
   ]}
 >
-  סך התשלומים של הקבועה אצל בנק ב׳ בבסיס {f.shekels("o.exposure.b.base.total")}, ושל ה־25 שנה {f.shekels("o.total.b.base.total")}. בכמה הקבועה יקרה יותר?
+  סך התשלומים של הקבועה ל־30 שנה אצל בנק ב׳ בבסיס {f.shekels("o.exposure.b.base.total")}, ושל אותה קבועה, באותה ריבית, ל־25 שנה {f.shekels("o.fixed25.b.base.total")}. בכמה ההפרש בתקופה מייקר את הסך?
 </NumericExercise>
 
 <Solution for="9.2-4">
-<M>{n("o.exposure.b.base.total")} − {n("o.total.b.base.total")} = {n("cost.exposure")}</M> ₪: המחיר של היציבות.
+<M>{n("o.exposure.b.base.total")} − {n("o.fixed25.b.base.total")} = {n("fx.term_effect")}</M> ₪: רוב ההפרש בין הקבועה לחלופת ה־25 שנה הוא התקופה, לא היציבות.
 </Solution>
 
 <ChoiceExercise
@@ -502,7 +521,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
     { text: "כי הסכומים של שלוש החלופות שונים זה מזה", feedback: "הסכום זהה בשלוש: ההלוואה של התוכנית. מה שונה הוא התמהיל." },
     { text: "כי כל חלופה מוצעת אצל בנק אחר, ואי אפשר להשוות בנקים", feedback: "בשלוש החלופות אפשר להשוות אותו בנק. הבעיה אינה הבנק." },
     { text: "כי החלופות בדויות, ולכן אין להן מחיר שאפשר להשוות", feedback: "הן בדויות, אבל זו לא הסיבה: גם בתיק אמיתי אי אפשר להשוות לפי מחיר תמהילים שונים." },
-    { text: "כי התמהיל שונה: השוואה לפי מחיר מותרת רק על אותו סכום, תמהיל, חודש ותחזית", correct: true, feedback: "נכון. שלוש החלופות הן אותה הלוואה בתמהילים שונים, ולכן שופטים לפי המטרות והמדדים." },
+    { text: "כי התמהילים שונים, וההשוואה לפי מחיר מותרת רק על אותו בסיס", correct: true, feedback: "נכון. שלוש החלופות הן אותה הלוואה בתמהילים שונים, ולכן שופטים לפי המטרות והמדדים." },
   ]}
 >
   למה אי אפשר לבחור בין שלוש החלופות לפי מי זולה, כמו בהשוואת הצעות לפי הוראה 451?
@@ -579,7 +598,7 @@ export const WIN = Object.fromEntries(["payment", "total", "exposure"].map((g) =
 
 - **התוכנית עוברת בדיקת שמאות:** אחרי {f.shekels("plan.extra")} הלוואה של {f.shekels("plan.loan")}, אבל שמאות מתחת ל־{f.shekels("apr.breakeven")} מעבירה אותה מעל התקרה.
 - **בקשה אחת, ארבעה בנקים:** בנק א׳ הזול בזכות ההנחה, בנק ד׳ מסרב. אלה אומדנים לפי כללי תרגיל, עד שמגיעה הצעה בכתב.
-- **שלוש חלופות, שלוש מטרות, שלושה מחירים:** צמודה (החזר נמוך), 25 שנה (סך נמוך), קבועה (יציבות). כל אחת קונה משהו ומשלמת עליו.
+- **שלוש חלופות, שלוש מטרות, שלושה מחירים:** צמודה (החזר נמוך), 25 שנה (סך נמוך), קבועה (יציבות). כל אחת קונה משהו ומשלמת עליו, אבל חלק מההפרשים בסך הוא ההפרש בשנים: הקבועה ל־30 שנה מול ה־25.
 - **שלושה תרחישים לכל חלופה:** בסיס, לחץ ומקרו. הקבועה לא זזה; הצמודה זזה הכי הרבה, והסיכון שלה רחוק בזמן.
 - **איזה מספר זה:** אומדן, תרחיש, הצעה אישית, עסקה שבוצעה. בין חלופות לא משווים לפי מחיר.
 
