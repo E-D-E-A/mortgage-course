@@ -259,7 +259,7 @@ export const predictionOptions = [
 
 ### שלב 7: הצעה אמיתית
 
-{BANK_HE.c} שולח הצעה (מומצאת): {f.plain("offer.rate")}% בקבועה, במקום מה שהאומדן אמר. (זו הצעה מומצאת אחרת מזו של שיעור 8.20: בנק אחר ומסלול אחר.) ההחזר הראשון שלה {money("offer.first")} וסך התשלומים {money("offer.total")}, פחות ב־{f.shekels("offer.gap_total").replace("-", "")} מהאומדן. בצנרת מניחים שהצעה תקפה היא אישור: ההסתברות נקבעת ל־100%, והמחיר הוא מה שהבנק כתב. הדירוג נקרא שוב:
+{BANK_HE.c} שולח הצעה (מומצאת): {f.plain("offer.rate")}% בקבועה, במקום מה שהאומדן אמר. (זו הצעה מומצאת אחרת מזו של שיעור 8.20: בנק אחר ומסלול אחר.) ההחזר הראשון שלה {money("offer.first")} וסך התשלומים {money("offer.total")}, פחות ב־{formatShekels(f.raw("offer.gap_total").replace("-", ""))} מהאומדן. בצנרת מניחים שהצעה תקפה היא אישור: ההסתברות נקבעת ל־100%, והמחיר הוא מה שהבנק כתב. הדירוג נקרא שוב:
 
 <div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
   <table class="w-full border-collapse text-body-m">
@@ -352,7 +352,7 @@ explain(rank)                                                   # text from numb
     "אין כלל כזה. הצעה יכולה להיות גבוהה או נמוכה מהאומדן; כאן היא נמוכה.",
   ]}
 >
-  {BANK_HE.c} עלה ממקום {rankOf("rank.estimate", "c")} למקום {rankOf("rank.offer", "c")}, וההסבר שלו השתנה. {BANK_HE[off[0]]} נשאר ראשון: ההצעה חסכה {f.shekels("offer.gap_total").replace("-", "")} מול האומדן, ופער המחיר מהראשון היה גדול יותר.
+  {BANK_HE.c} עלה ממקום {rankOf("rank.estimate", "c")} למקום {rankOf("rank.offer", "c")}, וההסבר שלו השתנה. {BANK_HE[off[0]]} נשאר ראשון: ההצעה חסכה {formatShekels(f.raw("offer.gap_total").replace("-", ""))} מול האומדן, ופער המחיר מהראשון היה גדול יותר.
 </PredictionReveal>
 
 <Section kind="דוגמה פתורה">
