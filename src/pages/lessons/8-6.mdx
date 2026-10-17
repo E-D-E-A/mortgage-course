@@ -1,0 +1,361 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.6"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import DecisionTree from "../../components/DecisionTree.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { S8_LABEL } from "../../data/case-s8.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.6");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const fmt = (id) => new Intl.NumberFormat("he-IL").format(Number(f.raw(id)));
+export const MARK = `${S8_LABEL}`;
+export const predictionOptions = [
+  "כמה מאות: יש רק כמה בנקים וכמה מסלולים",
+  "כמה אלפים",
+  `כמעט מאה אלף (${fmt("s.total")})`,
+  "כמה מיליארדים, כבר במרחב הקטן הזה",
+];
+export const rows = [
+  { kind: "הון עצמי נוסף", level: "1", opts: f.raw("s.l1_0") },
+  { kind: "סגירת הלוואת הרכב", level: "1", opts: f.raw("s.l1_1") },
+  { kind: "הורה כלווה", level: "1", opts: f.raw("s.l1_2") },
+  { kind: "בנק", level: "1", opts: f.raw("s.l1_3") },
+];
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>עתיד.</strong> השיעור מנסח את הבעיה שאלגוריתם צריך לפתור. אין היום חישוב תמהיל בקוד של Mogi, והקריאה למנוע החישוב מוקפאת. יש <strong>הוחלט</strong> אחד שנשען עליו השיעור: חמישה עשר כללי החישוב של אילון (ראו להלן). כל מספר כאן הוא <strong>להדגמה</strong> והנתונים סינתטיים.</p>
+</Callout>
+
+עד עכשיו למדתם כלים: פונקציה, ממוצע, התפלגות, הסתברות וקו מגמה. מכאן מנסחים את הבעיה של Mogi: לכל לקוח, למצוא הצעה טובה ותמהיל טוב. ניסוח בעיה מתחיל מהשאלה: **מה מותר לשנות?** התשובה היא <Term t="משתנה החלטה" client:visible lesson="8.6">משתני החלטה</Term>, והם בשתי רמות: מיצוב הבקשה (שיעור 6.3) ומבנה התמהיל (שיעור 5.8).
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.6"
+  question={`נועם ושירה (תיק א׳, בדויים). הם יכולים לבחור: כמה הון עצמי נוסף להכניס (${p("s.l1_0")} אפשרויות, מ־0 עד 40,000 ₪), האם לסגור את הלוואת הרכב (${p("s.l1_1")}), האם הורה מצטרף כלווה (${p("s.l1_2")}), ולאיזה אחד מ־${p("s.l1_3")} בנקים לפנות. ואז בוחרים תמהיל: אילו מסלולים (${p("s.kinds")} סוגים), איזה חלק מההלוואה בכל אחד (בצעדים של ${p("s.step")}%), ואיזו תקופה לכל מסלול (${p("s.terms")} אפשרויות). כמה מועמדים שונים יש בסך הכול?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מה מותר לשנות
+
+</Section>
+
+<LessonVideo lesson="8-6" />
+
+<Section kind="ההסבר">
+
+## ארבעה סוגים של דברים בבעיה
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+כשמנסחים בעיה לאלגוריתם, מחלקים כל דבר שקשור אליה לאחד מארבעה סוגים:
+
+| סוג | מה זה | בתיק א׳ |
+|---|---|---|
+| **נתון** | מה שנתון, ואי אפשר לבחור | מחיר הנכס {f.shekels("d.price")}, הכנסות {f.shekels("d.income1")} ו־{f.shekels("d.income2")}, הלוואת רכב של {f.shekels("d.car")} בחודש, מחירון של כל בנק |
+| **משתנה החלטה** | מה שאפשר לבחור | נושא השיעור הזה |
+| **<Later lesson="8.7" quiet>אילוץ</Later>** | מה שחייב להתקיים | נושא שיעור <Later lesson="8.7" quiet>8.7</Later> |
+| **יעד** | מה שרוצים שיהיה טוב | נושא שיעור <Later lesson="8.8" quiet>8.8</Later> |
+
+הכלל: **משתנה החלטה הוא דבר שמישהו יכול לבחור, ושהבחירה בו משנה את התוצאה.** מחיר הנכס אינו משתנה החלטה (כבר חתמו, או שמחירו קבוע בעסקה). ריבית הפריים של היום היא נתון של השוק. ההחזר החודשי אינו משתנה החלטה: הוא תוצאה של בחירות אחרות, ולכן מחשבים אותו.
+
+### רמה 1: מיצוב הבקשה
+
+הרמה הראשונה היא מה שהלקוח והיועץ מחליטים לפני שפונים לבנק (שיעור 6.3, שנקרא שם ״מנופים״, ושיעור 6.5):
+- סכום ההלוואה, וההון העצמי שמכניסים. **בקנייה הם אותו משתנה אחד**: סכום ההלוואה הוא מחיר הנכס פחות ההון העצמי, ולכן אי אפשר לבחור שניהם בנפרד. (במחזור, סכום ההלוואה כבר אינו מחיר פחות הון, ושני המשתנים שונים.)
+- התקופה.
+- יעד יחס ההחזר.
+- חובות לסגור לפני הבקשה.
+- הרכב הלווים: מי חותם ומה הכנסתו נספרת.
+- לאיזה בנק פונים, ומתי.
+
+### רמה 2: מבנה התמהיל
+
+הרמה השנייה מחלקת את מה שהרמה הראשונה השאירה (שיעור 5.8):
+- איזה חלק מההלוואה בכל מסלול.
+- תקופה ושיטת החזר לכל מסלול (לפי הנחת העבודה של Mogi, לכל מסלול תקופה משלו).
+- גרייס.
+
+### הרמה השנייה תלויה בראשונה
+
+בלי לדעת מה הרמה הראשונה בחרה, אין מה לחלק. שלוש דוגמאות, על אותו תמהיל (חצי קבועה וחצי פריים, 30 שנה):
+
+<FillTable
+  client:visible
+  id="8.6-table"
+  rowKey="move"
+  periodLabel="מה בחרו ברמה 1"
+  columns={[
+    { key: "loan", label: "ההלוואה לחלוקה" },
+    { key: "disp", label: "ההכנסה הפנויה" },
+    { key: "ratio", label: "יחס ההחזר (%)", format: "number" },
+  ]}
+  rows={[
+    { move: "כלום", loan: f.raw("c.none_loan"), disp: f.raw("c.none_disp"), ratio: f.raw("c.none_ratio") },
+    { move: "40,000 ₪ הון נוסף", loan: f.raw("c.eq_loan"), disp: f.raw("c.eq_disp"), ratio: f.raw("c.eq_ratio") },
+    { move: "סגירת הלוואת הרכב", loan: f.raw("c.car_loan"), disp: f.raw("c.car_disp"), ratio: f.raw("c.car_ratio") },
+    { move: "הורה כלווה", loan: f.raw("c.parent_loan"), disp: f.raw("c.parent_disp"), ratio: f.raw("c.parent_ratio") },
+  ]}
+  blanks={["סגירת הלוואת הרכב.ratio", "הורה כלווה.ratio"]}
+  success="אותו תמהיל, ארבע בקשות, ארבעה יחסי החזר."
+  hint={`ההחזר הוא ${f.shekels("c.none_pay")} בשורות של כלום, של סגירת הרכב ושל הורה כלווה, ויחס ההחזר הוא ההחזר חלקי ההכנסה הפנויה.`}
+/>
+
+הון עצמי נוסף של 40,000 ₪ מוריד את היחס ב־{p("c.eq_gain")} נקודות אחוז, סגירת הלוואת הרכב ב־{p("c.car_gain")}, והורה כלווה ב־{p("c.parent_gain")}. (הנתונים של הדוגמה: הכנסה פנויה {f.shekels("c.none_disp")} לפני, והורה מוסיף הכנסה שנספרת; ההון הנוסף מקטין את ההלוואה, ולכן את ההחזר, ואילו שני האחרים מגדילים את ההכנסה הפנויה.) כל אחד מהם הוא בחירה ברמה 1 ששינתה מה שהרמה 2 מקבלת.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## עץ ההחלטות
+
+</Section>
+
+<DecisionTree client:visible note="הכול כאן הדגמה על תיק סינתטי." />
+
+נסו את אלה:
+1. הוסיפו 40,000 ₪ הון נוסף. מה קרה להלוואה לחלוקה?
+2. החליפו את החלוקה ל״קבועה בלבד״ ואת התקופה ל־20 שנה. מה קורה לפסק?
+3. בחרו את בנק ד׳. מה משתנה בלי שנגעתם ברמה 2?
+4. כמה מועמדים יש בסך הכול, ומה זה אומר על בדיקה ביד?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההלוואה לחלוקה קטנה ב־40,000 ₪, אבל סכומי המסלולים כולם מתחלקים מחדש.</li>
+    <li>החזר גבוה בהרבה, כי קבועה ל־20 שנה יקרה לחודש. המועמד נפסל על יותר מסיבה אחת, ואת המשמעות של הפסילה נראה בשיעור הבא.</li>
+    <li>המחירון (הריביות של כל מסלול) והקווים של הבנק משתנים. הרמה השנייה לא השתנתה, אבל התוצאה כן.</li>
+    <li>{fmt("s.total")} מועמדים במרחב הקטן הזה בלבד: {fmt("s.level1")} צירופים ברמה 1 כפול {fmt("s.level2")} מבנים ברמה 2. אי אפשר לבדוק ביד.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## איך סופרים מועמדים
+
+</Section>
+
+**צעד 1 — סופרים אפשרויות לכל משתנה ברמה 1.** {p("s.l1_0")} רמות של הון נוסף, {p("s.l1_1")} של הרכב, {p("s.l1_2")} של הורה, {p("s.l1_3")} בנקים.
+
+**צעד 2 — מכפילים.** כל צירוף של בחירות הוא בקשה אחרת: <M>{p("s.l1_0")} × {p("s.l1_1")} × {p("s.l1_2")} × {p("s.l1_3")} = {p("s.level1")}</M>.
+
+**צעד 3 — סופרים מבנים של תמהיל ברמה 2.** נבחרים מסלולים מתוך {p("s.kinds")} סוגים, חלק של כל אחד בצעדים של {p("s.step")}% (בסך 100%), ותקופה לכל מסלול מ־{p("s.terms")} אפשרויות: {fmt("s.level2")} מבנים.
+
+**צעד 4 — מכפילים רמה בקצה השני.** <M>{p("s.level1")} × {fmt("s.level2")} = {fmt("s.total")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">N = N<sub>1</sub> × N<sub>2</sub></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">N</dt><dd>מספר המועמדים: כל זוג של בקשה ותמהיל</dd>
+    <dt class="ltr font-semibold text-n900">N<sub>1</sub></dt><dd>מספר הבקשות האפשריות (רמה 1): מכפלת מספר האפשרויות של כל משתנה</dd>
+    <dt class="ltr font-semibold text-n900">N<sub>2</sub></dt><dd>מספר המבנים של תמהיל (רמה 2), לכל בקשה כאן אותו מספר</dd>
+  </dl>
+</div>
+
+האות N כאן היא ספירה (באותיות גדולות); היא אינה אחת מאותיות הקורס הקבועות. **מתי הנוסחה נכונה?** כשכל בחירה ברמה 1 מאפשרת את אותו מרחב ברמה 2. אם בחירה ברמה 1 מצמצמת את המרחב (למשל בנק שלא נותן קבועה ל־30 שנה), המספר קטן.
+
+<Callout title="החלק שהוחלט: חמישה עשר כללי החישוב" tone="info">
+<p>המיצוב והתמהיל מוגדרים רק כשידוע איך מחשבים תוצאה. לפי הרישום של הצוות (תשובותיו של אילון, 7.10.2026; עדן אישר ב־8.10.2026; ההטמעה לא הושלמה), יש חמישה עשר כללים מוסכמים. השיעור נשען על חלק מהם: ההחזר שמוצג הוא ההחזר החודשי בתנאים הנוכחיים, לפי שפיצר כשזו השיטה, לצד ההחזר הראשון והמרבי החזוי; התחזיות הן אלה של בנק ישראל להוראה 451; בהדמיה ראשונית מניחים עדכון ריבית כל חמש שנים, והנחה זו מסומנת כהנחה; יחס ההחזר הוא ההחזר הרלוונטי חלקי ההכנסה הפנויה המוכרת; גרייס נכלל בתקופה. מה שלא נקרא כאן, הקורס לא ראה, וזו שאלה לאילון.</p>
+</Callout>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> ספירה פשוטה: <span class="ltr">=PRODUCT(5, 2, 2, 4)</span>. מספר צירופים של חלקים שסכומם קבוע מחשבים עם <span class="ltr">=COMBIN(n, k)</span> (בקורס מכאן ועד שיעור 8.13).</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.6"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `זה מספר הצירופים ברמה 1 בלבד, ${fmt("s.level1")}, ועוד כל התמהילים שמעליו.`,
+    `${fmt("s.level2")} המבנים של התמהיל בלבד כבר חורגים מכמה אלפים, ועוד הבקשות.`,
+    "",
+    `גם עם שלב של 10% בלבד לא מגיעים לשם: ${fmt("s.total")}. מספר גדול בהרבה מופיע רק בשיעור 8.13, כשהשלב קטן ויש עוד משתנים.`,
+  ]}
+>
+  {fmt("s.level1")} בקשות כפול {fmt("s.level2")} מבנים: {fmt("s.total")} מועמדים. ועדיין זה מרחב קטן: שלב של 10%, שלושה סוגי מסלול, בלי גרייס.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## ההלוואה אחרי הון נוסף
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+**צעד 1 — הנתונים.** מחיר {f.shekels("d.price")}, הון עצמי {f.shekels("d.equity")}, ולכן הלוואה של {f.shekels("d.loan")}.
+
+**צעד 2 — בחירה ברמה 1.** נועם ושירה מוסיפים {f.shekels("d.extra")} מהחסכונות.
+
+**צעד 3 — מה שנשאר לרמה 2.** ההלוואה היא {f.shekels("d.loan_after")}. התמהיל שמחלקים הוא רק של הסכום הזה.
+
+**צעד 4 — מה למדנו.** משתנה החלטה אחד של רמה 1 שינה את הקלט של רמה 2. אלגוריתם שמחפש יחד בשתי הרמות חייב לדעת את התלות הזו.
+
+<Section kind="דוגמה חצי פתורה">
+
+## ספירה
+
+</Section>
+
+הלקוח יכול לבחור שניים מהמשתנים: הון נוסף (שתי רמות) והרכב (שתי אפשרויות), ובנק מתוך שלושה, בלי הורה (אפשרות אחת). השלימו.
+
+<FillTable
+  client:visible
+  id="8.6-half"
+  rowKey="what"
+  periodLabel="מה סופרים"
+  columns={[{ key: "v", label: "מספר", format: "number" }]}
+  rows={[
+    { what: "הון נוסף", v: "2" },
+    { what: "הרכב", v: "2" },
+    { what: "בנק", v: "3" },
+    { what: "הורה", v: "1" },
+    { what: "סך הבקשות (המכפלה)", v: f.raw("ex.l1") },
+  ]}
+  blanks={["סך הבקשות (המכפלה).v"]}
+  success="מכפילים את מספר האפשרויות של כל משתנה."
+  hint="2 כפול 2 כפול 3 כפול 1."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים להמחשה בלבד.
+
+<ChoiceExercise
+  client:visible
+  id="8.6-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "כמה הון עצמי נוסף להכניס", correct: true, feedback: "נכון: אפשר לבחור, והבחירה משנה את התוצאה." },
+    { text: "מחיר הנכס שנקבע בחוזה", feedback: "זה נתון: אי אפשר לבחור אותו." },
+    { text: "הריבית של הפריים היום", feedback: "זה נתון של השוק." },
+    { text: "ההחזר החודשי", feedback: "זו תוצאה: מחשבים אותה מהבחירות." },
+  ]}
+>
+  איזה מאלה הוא משתנה החלטה?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.6-2" n={2} level="קל" answer={f.raw("ex.loan")} errors={[{ value: f.raw("d.loan"), message: "זו ההלוואה לפני ההון הנוסף. מפחיתים ממנה את ההון." }]}>
+  ההלוואה היא {f.shekels("d.loan")}, והלקוח מוסיף {f.shekels("ex.extra")} הון עצמי. מהי ההלוואה שנשארת לחלוקה בתמהיל?
+</NumericExercise>
+
+<Solution for="8.6-2">
+<M>{n("d.loan")} − {n("ex.extra")} = {n("ex.loan")}</M>. {f.shekels("ex.loan")}.
+</Solution>
+
+<NumericExercise client:visible id="8.6-3" n={3} level="בינוני" answer={f.raw("ex.l1")} tolerance={0} near={0} errors={[]}>
+  שתי רמות של הון נוסף, שתי אפשרויות לסגירת הרכב, שתי אפשרויות להורה ושלושה בנקים. כמה בקשות אפשריות יש?
+</NumericExercise>
+
+<Solution for="8.6-3">
+<M>2 × 2 × 2 × 3 = {p("ex.l1")}</M>.
+</Solution>
+
+<NumericExercise client:visible id="8.6-4" n={4} level="בינוני" answer={f.raw("ex.l2")} tolerance={0} near={0} errors={[]} hint="חלקים של 10% בין שני מסלולים: 0/100, 10/90, … , 100/0.">
+  שני סוגי מסלול בלבד ותקופה אחת, חלקים בצעדים של 10% (סכום 100%), ואפשר להשאיר מסלול בחוץ. כמה מבנים של תמהיל יש? (חלק 0 פירושו שהמסלול בחוץ.)
+</NumericExercise>
+
+<Solution for="8.6-4">
+מסלול אחד בלבד: 2 אפשרויות (איזה מהשניים). שני מסלולים: החלק של הראשון 10%, 20%, … , 90%: 9 אפשרויות. ביחד {p("ex.l2")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.6-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "כי הרמה הראשונה קובעת כמה כסף יש לחלק, מה ההכנסה ולאיזה בנק פונים", correct: true, feedback: "נכון." },
+    { text: "כי הרמה השנייה לא חשובה", feedback: "היא חשובה: יחס ההחזר והסך הכולל תלויים בתמהיל." },
+    { text: "כי אפשר לבחור את שתיהן בלי קשר", feedback: "אי אפשר: הרמה השנייה מקבלת את הסכום מהראשונה." },
+    { text: "כי הרמה הראשונה היא נתון", feedback: "היא בחירה, לא נתון." },
+  ]}
+>
+  למה אי אפשר לחפש תמהיל לפני שמחליטים על מיצוב הבקשה?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.6-6" n={6} level="מאתגר" unit="נקודות אחוז" answer={f.raw("c.car_gain")} errors={[{ value: f.raw("c.eq_gain"), message: "זה השיפור מהון עצמי נוסף. כאן שואלים על סגירת הלוואת הרכב." }]}>
+  בתמהיל של חצי קבועה וחצי פריים, יחס ההחזר הוא {p("c.none_ratio")}%. אחרי סגירת הלוואת הרכב מהחסכונות (ההכנסה הפנויה {f.shekels("c.car_disp")}) הוא {p("c.car_ratio")}%. בכמה נקודות אחוז הוא ירד?
+</NumericExercise>
+
+<Solution for="8.6-6">
+<M>{p("c.none_ratio")} − {p("c.car_ratio")} = {p("c.car_gain")}</M> נקודות אחוז.
+</Solution>
+
+<Callout title="חמש שאלות על משתני החלטה">
+<p><strong>מה זה?</strong> משתנה החלטה הוא דבר שאפשר לבחור, ושהבחירה בו משנה את התוצאה. הוא שונה מנתון (נתון לנו) ומתוצאה (מחושבת).</p>
+<p><strong>למה זה קיים?</strong> אלגוריתם מחפש ערכים טובים רק למה שמותר לשנות. בלי הגדרה ברורה, הוא ״משנה״ גם עובדות.</p>
+<p><strong>איך זה עובד?</strong> שתי רמות: מיצוב הבקשה, ואחריו מבנה התמהיל. הרמה השנייה תלויה בראשונה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> חלק ממה שנראה כנתון (כמה הון להכניס, אם לסגור הלוואה) הוא בחירה שלכם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני שמחפשים תמהיל טוב, מחליטים על המיצוב. ואחרי כל בחירה ברמה 1 בודקים מחדש מה אפשר ברמה 2.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- בעיה מנוסחת מארבעה סוגים: **נתונים**, **משתני החלטה**, **<Later lesson="8.7" quiet>אילוצים</Later>**, **יעדים**.
+- **רמה 1, מיצוב הבקשה:** סכום ההלוואה והון עצמי (אחד בקנייה), תקופה, יעד יחס החזר, חובות לסגור, הרכב הלווים, בנק ומועד.
+- **רמה 2, התמהיל:** חלק לכל מסלול, תקופה ושיטת החזר לכל מסלול, גרייס.
+- הרמה השנייה תלויה בראשונה, ולכן מחפשים אותן יחד.
+- מספר המועמדים הוא מכפלה: במרחב קטן של הדגמה כבר כמעט מאה אלף.
+- זו הגדרה של בעיה (עתיד), לא מערכת שקיימת היום.
+
+**בשיעור הבא — 8.7, הנתונים, <Later lesson="8.7" quiet>האילוצים</Later> הקשיחים ו<Later lesson="8.7" quiet>פתרון אפשרי</Later>:** מתוך כל המועמדים, אילו עומדים בכללים, ולמה מועמד נפסל.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "מחקר / הצעה", text: "החלוקה לשתי רמות של משתני החלטה (מיצוב הבקשה ומבנה התמהיל) והרשימה של כל רמה: מהגדרת השלב בבריף הקורס. זו הצעה לניסוח הבעיה, לא מערכת קיימת (עתיד)." },
+    { kind: "החלטה של Mogi", text: "חמישה עשר כללי החישוב: תשובותיו של אילון ב־2026-10-07, עדן אישר ב־2026-10-08, לפי הרישום של הצוות; ההטמעה לא הושלמה. הקורס לא ראה את כל הכללים, וקורא רק את מה שנרשם בתיעוד של הצוות.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "לכל מסלול בתמהיל תקופה משלו: הנחת עבודה של Mogi (אילון, 2026-08-03), שאין בקוד הנחה של תקופה אחת. לפי אילון, זו עובדה על השוק ולא העדפה.", date: "2026-08-03" },
+    { kind: "הנחת חישוב", text: "מרחב ההדגמה (ארבעה בנקים בדויים, חמש רמות של הון נוסף, שלושה סוגי מסלול, שלב של 10%, שלוש תקופות) מומצא כדי שאפשר יהיה לספור. הוא אינו המרחב של Mogi. תיק א׳ בדוי. נתונים סינתטיים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/constraints.ts (measures), src/data/case-s8.ts (spaces, counts) and stats.ts via scripts/lessons/lesson-8-6.ts, _constraints-facts.ts, _stats-facts.ts and data/lessons/8-6.json, rechecked by checks/kinds/constraints.py and stats.py. Illustration: src/components/DecisionTree.vue. Video: video/8-6.html. Mogi decision DEC-2 (per-track term, Eylon 2026-08-03). No FK ids. The 15 rules: research/notes/brain-calculation.md section 2 (Brain 67436545). */}

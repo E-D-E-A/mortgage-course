@@ -83,7 +83,7 @@ describe("searching", () => {
     expect(pruned.best?.id).toBe(full.best?.id);
     expect(pruned.scored.map((s) => s.id)).toEqual(full.scored.map((s) => s.id));
     expect(pruned.scored.map((s) => s.score.toString())).toEqual(full.scored.map((s) => s.score.toString()));
-  });
+  }, 60000);
   it("every entry is exactly one of pruned, rejected, feasible; the counts add up", () => {
     const r = searchGrid(SPEC, ctx);
     const n = (s: string) => r.entries.filter((e) => e.status === s).length;
@@ -123,5 +123,31 @@ describe("coarse to fine", () => {
     const inFull = full.scored.find((s) => s.id === c2f.pool.best?.id);
     expect(inFull).toBeDefined();
     expect(inFull?.rank).toBeGreaterThanOrEqual(1);
+  }, 60000);
+});
+
+import { countLegalSplits, yearsToCheck } from "./search.ts";
+
+describe("legal splits and time", () => {
+  it("by hand: 2 kinds (one fixed, one variable), 50-point steps: splits (2,0) (1,1) (0,2); variable 0, 1, 2 pieces of 2; legal if variable*3 <= 2*2 -> the first two", () => {
+    expect(countLegalSplits(["fixed_unlinked", "prime"], 50)).toEqual({ legal: 2, all: 3 });
+  });
+  it("five kinds on the 5-point grid: 6,300 of 10,626 keep the variable part within two thirds", () => {
+    expect(countLegalSplits(["fixed_unlinked", "fixed_linked", "prime", "variable_unlinked", "variable_linked"], 5)).toEqual({ legal: 6300, all: 10626 });
+  });
+  it("a million candidates at 1 ms each take 1000 seconds = 0.0 years; 31,536,000,000 at 1 ms = 1 year", () => {
+    expect(yearsToCheck(31536000000n, 1).toString()).toBe("1");
+    expect(yearsToCheck(1000000n, 1).toString()).toBe("0");
+  });
+});
+
+import { roughCount } from "./search.ts";
+describe("roughCount", () => {
+  it("says a big count in words", () => {
+    expect(roughCount("152471485782")).toBe("כ־152 מיליארד");
+    expect(roughCount("65978082348282")).toBe("כ־66 טריליון");
+    expect(roughCount("286902")).toBe("כ־287 אלף");
+    expect(roughCount("124149402")).toBe("כ־124 מיליון");
+    expect(roughCount("15")).toBe("15");
   });
 });

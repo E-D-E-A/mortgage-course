@@ -84,6 +84,33 @@ def cal_gap(i, _facts=None):
     return four(sum((abs(r["observed"] - r["predicted"]) * r["n"] for r in used), Decimal(0)) / total)
 
 
+def cal_recal(i, _facts=None):
+    """Learn the bin map on the first `train` cases and judge it on the others (generated data)."""
+    data = _data(i)
+    train_n = int(i["train"])
+    edges = edges_of(i)
+    min_n = int(i["min_per_bin"])
+    train, test = data[:train_n], data[train_n:]
+    rows = bins(train, edges)
+
+    def fix(p):
+        for k, r in enumerate(rows):
+            last = k + 1 == len(rows)
+            if p >= edges[k] and (p <= edges[k + 1] if last else p < edges[k + 1]):
+                return r["observed"] if r["n"] >= min_n else p
+        raise ValueError("outside 0..1")
+
+    def scores(d):
+        used = [r for r in bins(d, edges) if r["n"] > 0]
+        total = sum(r["n"] for r in used)
+        gap = sum((abs(r["observed"] - r["predicted"]) * r["n"] for r in used), Decimal(0)) / total
+        brier = sum(((p - o) ** 2 for p, o in d), Decimal(0)) / len(d)
+        return {"gap": four(gap), "brier": four(brier)}
+
+    fixed = [(Decimal(four(fix(p))), o) for p, o in test]
+    return {"trained": len(train), "tested": len(test), "before": scores(test), "after": scores(fixed)}
+
+
 def cal_apply(i, _facts=None):
     """The calibrated value of one prediction, from the bins of the data set."""
     edges = edges_of(i)
@@ -98,8 +125,31 @@ def cal_apply(i, _facts=None):
     raise ValueError("outside 0..1")
 
 
+def applicants(i):
+    """n synthetic applicants: ltv, pti, outcome drawn in that order from the course's seeded generator."""
+    from kinds import rng
+
+    r = rng.Rng(int(i["seed"]))
+    a, b, c, k = (Decimal(str(i.get(x, d))) for x, d in (("a", "0.4"), ("b", "0.5"), ("c", "0.3"), ("k", "1.6")))
+    out = []
+    for _ in range(int(i["n"])):
+        ltv = 30 + r.below(46)
+        pti = 20 + r.below(31)
+        x = r.next32()
+        z = a + b * (40 - pti) / 10 + c * (60 - ltv) / 10
+        truth = Decimal(cal_logistic({"z": z}))
+        p = Decimal(cal_logistic({"z": z * k}))
+        out.append((p, 1 if Decimal(x) < truth * 4294967296 else 0, ltv, pti, truth))
+    return out
+
+
 def seeded_data(i):
-    raise NotImplementedError("filled in with the generator")
+    return [(p, o) for p, o, _l, _t, _tr in applicants(i)]
+
+
+def cal_applicants(i, _facts=None):
+    """The first `show` applicants, as the lesson prints them."""
+    return [{"ltv": l, "pti": t, "truth": format(tr, "f"), "p": format(p, "f"), "outcome": o} for p, o, l, t, tr in applicants(i)][: int(i.get("show", 5))]
 
 
 KINDS = {
@@ -108,4 +158,6 @@ KINDS = {
     "cal_brier": cal_brier,
     "cal_gap": cal_gap,
     "cal_apply": cal_apply,
+    "cal_recal": cal_recal,
+    "cal_applicants": cal_applicants,
 }

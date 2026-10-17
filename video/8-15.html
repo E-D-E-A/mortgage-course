@@ -1,0 +1,216 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.15 — "אין טוב בלי ויתור".
+  Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t) for each time t (seconds) and photographs
+  the page. render(t) depends only on t. Every number comes from data/lessons/8-15.json. The subtitle cues (window.cues)
+  carry the explanatory sentences. Synthetic data, for illustration (the stamp says so on every picture).
+
+  Script (one idea: a candidate that another beats on every goal can be dropped without asking anyone; the rest are the
+  frontier, where every gain costs something):
+  1. Title.
+  2. Two mixes: the first is better than the second on payment and on total. It dominates.
+  3. All fifteen mixes on a plane (first payment against total): the dominated grey, the frontier teal.
+  4. A third goal brings a dominated point back.
+  5. The client's own limit cuts the frontier.
+  6. Weights choose a point on the frontier. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.15 · חזית הפתרונות היעילים</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("8-15");
+      const { fact, num, whole, shek, pl, lr, clamp, inScene, vis, after, grow, C, el, txt, box, line, dot, stamp, title } = v;
+      const T = Object.fromEntries(fact("cand.table").map((r) => [r.id, r]));
+      const LAW = Object.fromEntries(fact("law.front").map((r) => [r.id, r]));
+      const FT = Object.fromEntries(fact("law.ft.front").map((r) => [r.id, r]));
+      const CL = Object.fromEntries(fact("client.front").map((r) => [r.id, r]));
+      const ids = Object.keys(T);
+      const NAME = {"m01":"קבועה, 20 שנה","m02":"קבועה, 25 שנה","m03":"קבועה, 30 שנה","m04":"קבועה 50% + פריים 50%, 25 שנה","m05":"קבועה 50% + פריים 50%, 30 שנה","m06":"קבועה 40% + משתנה 60%, 25 שנה","m07":"קבועה 40% + משתנה 60%, 30 שנה","m08":"קבועה 60% + משתנה 40%, 25 שנה","m09":"קבועה 60% + משתנה 40%, 30 שנה","m10":"קבועה 40% (20) + פריים 30% (30) + משתנה 30% (30)","m11":"קבועה 70% (25) + פריים 30% (30)","m12":"קבועה 34% + פריים 33% + משתנה 33%, 30 שנה","m13":"קבועה 50% (20) + משתנה 50% (30)","m14":"קבועה 40% (30) + פריים 60% (20)","m15":"קבועה 35% (30) + משתנה 65% (20)"};
+      const okClient = (id) => fact(`client.${id}`) === "";
+      const V = {
+        n: pl(fact("law.count_feasible")), eff: pl(fact("law.count_efficient")), dom: pl(fact("law.count_dominated")),
+        effFT: pl(fact("law.ft.count_efficient")), clientN: pl(fact("client.count_feasible")), clientEff: pl(fact("client.count_efficient")),
+        limit: num(fact("limit.first")), never: pl(fact("law.never_count")),
+        gapFirst: num(fact("d.m06_m08.first")), gapTotal: num(fact("d.m08_m06.total")),
+      };
+
+      const S = { title: [0, 7], dom: [7, 38], plane: [38, 80], third: [80, 108], limit: [108, 134], weights: [134, 152], end: [152, 164] };
+      window.duration = 164;
+      window.cues = [
+        [1, 5.5, "אין טוב בלי ויתור."],
+        [8, 14, "שני תמהילים של נועם ושירה, בשני מספרים."],
+        [14, 22, `הראשון נמוך ב־${V.gapFirst} ₪ בהחזר הראשון.`],
+        [22, 30, `ונמוך ב־${V.gapTotal} ₪ בסך התשלומים.`],
+        [30, 37.5, "הוא שולט בשני: אין סיבה לבחור בשני."],
+        [39, 46, `עכשיו כל ${V.n} המועמדים, על מישור אחד.`],
+        [46, 54, "כל נקודה היא תמהיל אפשרי."],
+        [54, 63, `${V.dom} נשלטים: יש נקודה טובה מהם בשני המספרים.`],
+        [63, 72, "אלה אפשר לזרוק בלי לשאול אף אחד."],
+        [72, 79.5, "מי שנשאר הוא החזית: כל שיפור עולה במשהו."],
+        [81, 88, "אבל זו תמונה של שני יעדים בלבד."],
+        [88, 98, "ביעד שלישי, חשיפה, נקודה נשלטת חוזרת."],
+        [98, 107, `בשלושה יעדים על החזית ${V.eff} מתוך ${V.n}.`],
+        [109, 116, "נועם ושירה קבעו גבול להחזר הראשון."],
+        [116, 125, `מעל ${V.limit} ₪ אין תמהיל אפשרי.`],
+        [125, 133, `נשארו ${V.clientN} מועמדים, ו־${V.clientEff} על החזית.`],
+        [135, 143, "עכשיו שואלים מה חשוב, ומשקולות בוחרות."],
+        [143, 151, "הנבחר הוא תמיד על החזית."],
+        [153, 158, "קודם זורקים את הנשלטים."],
+        [158, 163, "אחר כך הלקוח בוחר ויתור."],
+      ];
+
+      // The plane of the first payment (x, rightwards = lower) against the total (y, upwards = higher).
+      const G = { l: 250, r: 1010, top: 150, bot: 500 };
+      const xs = ids.map((i) => Number(T[i].first));
+      const ys = ids.map((i) => Number(T[i].total));
+      const X = (id) => G.r - ((Number(T[id].first) - Math.min(...xs)) / (Math.max(...xs) - Math.min(...xs))) * (G.r - G.l);
+      const Y = (id) => G.bot - ((Number(T[id].total) - Math.min(...ys)) / (Math.max(...ys) - Math.min(...ys))) * (G.bot - G.top);
+      const axes = (o, lx, ly) => {
+        line(G.l - 20, G.bot + 24, G.r + 20, G.bot + 24, o);
+        line(G.r + 24, G.top - 20, G.r + 24, G.bot + 24, o);
+        txt(640, G.bot + 56, lx, 20, { fill: C.n600, o });
+        txt(1050, G.top - 4, ly, 20, { fill: C.n600, o, anchor: "start" });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) title(t, S.title, "אין טוב בלי ויתור", "החזית של הפתרונות היעילים", "שליטה · חזית · בחירה");
+        // Scene 2 — domination between two mixes
+        if (inScene(t, S.dom)) {
+          const o = vis(t, S.dom);
+          txt(640, 124, "מי שולט במי", 40, { w: 700, o });
+          const rows = [
+            { y: 190, id: "m06", from: 1, win: true },
+            { y: 330, id: "m08", from: 3, win: false },
+          ];
+          for (const r of rows) {
+            const oa = after(t, S.dom, r.from, o);
+            box(160, r.y, 960, 118, oa);
+            txt(1090, r.y + 40, NAME[r.id], 24, { anchor: "start", w: 700, o: oa });
+            txt(1090, r.y + 86, "החזר ראשון", 20, { anchor: "start", fill: C.n600, o: oa });
+            txt(820, r.y + 86, `${num(T[r.id].first)} ₪`, 30, { anchor: "start", w: 700, ltr: true, o: after(t, S.dom, r.from + 6, o) });
+            txt(760, r.y + 86, "סך תשלומים", 20, { anchor: "start", fill: C.n600, o: oa });
+            txt(420, r.y + 86, `${num(T[r.id].total)} ₪`, 30, { anchor: "start", w: 700, ltr: true, o: after(t, S.dom, r.from + 12, o) });
+          }
+          const ow = after(t, S.dom, 20, o);
+          box(280, 480, 720, 64, ow * 0.9, C.mint);
+          txt(640, 522, "הראשון טוב יותר בשני המספרים: הוא שולט בשני", 26, { w: 700, o: ow });
+          stamp(o);
+        }
+        // Scene 3 — the plane
+        if (inScene(t, S.plane)) {
+          const o = vis(t, S.plane);
+          txt(640, 110, `${V.n} תמהילים אפשריים`, 38, { w: 700, o });
+          axes(o, "החזר ראשון, ₪ (ימינה: נמוך יותר)", "סך תשלומים ↑");
+          const shown = (k) => grow(t, S.plane, 1 + k * 0.25, 0.5);
+          ids.forEach((id, k) => dot(X(id), Y(id), 9, C.n400, o * shown(k)));
+          const o2 = after(t, S.plane, 17, o);
+          if (o2 > 0) {
+            ids.filter((id) => !FT[id].efficient).forEach((id) => dot(X(id), Y(id), 9, C.n300, o2));
+            ids.filter((id) => FT[id].efficient).forEach((id) => dot(X(id), Y(id), 10, C.teal, o2));
+          }
+          const o3 = after(t, S.plane, 28, o);
+          if (o3 > 0) {
+            const pts = ids.filter((id) => FT[id].efficient).sort((a, b) => X(b) - X(a));
+            el("polyline", { points: pts.map((i) => `${X(i)},${Y(i)}`).join(" "), fill: "none", stroke: C.teal, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: o3 });
+            txt(300, 215, "החזית של שני היעדים", 24, { anchor: "start", w: 700, fill: C.teal, o: o3 });
+          }
+          stamp(o);
+        }
+        // Scene 4 — a third goal
+        if (inScene(t, S.third)) {
+          const o = vis(t, S.third);
+          txt(640, 124, "יעד שלישי: חשיפה", 40, { w: 700, o });
+          const rows = [["m06", 1], ["m08", 6]];
+          for (const [id, from] of rows) {
+            const k = id === "m06" ? 0 : 1;
+            const y = 215 + k * 110;
+            const g = grow(t, S.third, from, 3);
+            const w = (Number(T[id].rise) / 1300) * 560 * g;
+            txt(1100, y - 10, NAME[id], 22, { anchor: "start", w: 700, o });
+            el("rect", { x: 1100 - w, y, width: w, height: 48, rx: 8, fill: id === "m08" ? C.teal : C.tq2, opacity: o });
+            if (g > 0.95) txt(1100 - w - 12, y + 36, `${num(T[id].rise)} ₪`, 24, { anchor: "end", w: 700, ltr: true, o });
+          }
+          const o2 = after(t, S.third, 12, o);
+          box(240, 440, 800, 90, o2 * 0.9, C.mint);
+          txt(640, 480, `במחיר נמוך יותר של חשיפה, ״${NAME.m08}״ חוזר`, 24, { w: 700, o: o2 });
+          txt(640, 516, `בשני יעדים על החזית ${V.effFT}, בשלושה ${V.eff}`, 24, { w: 700, o: after(t, S.third, 16, o) });
+          stamp(o);
+        }
+        // Scene 5 — the client's limit
+        if (inScene(t, S.limit)) {
+          const o = vis(t, S.limit);
+          txt(640, 110, "הגבול של הלקוח", 38, { w: 700, o });
+          axes(o, "החזר ראשון, ₪ (ימינה: נמוך יותר)", "סך תשלומים ↑");
+          const lim = G.l + (G.r - G.l) * 0.5;
+          const xLimit = (() => { const lo = Math.min(...xs), hi = Math.max(...xs); return G.r - ((Number(fact("limit.first")) - lo) / (hi - lo)) * (G.r - G.l); })();
+          ids.forEach((id) => {
+            const ok = okClient(id);
+            const cut = after(t, S.limit, 9, o);
+            dot(X(id), Y(id), ok ? 10 : 9, ok ? (CL[id].efficient ? C.teal : C.n300) : C.n300, ok ? o : o * (1 - 0.65 * (cut / Math.max(o, 0.001))));
+          });
+          const oLine = after(t, S.limit, 4, o);
+          if (oLine > 0) {
+            line(xLimit, G.top - 30, xLimit, G.bot + 24, oLine, C.navy, 3, "8 6");
+            txt(xLimit - 8, G.top - 38, `${V.limit} ₪`, 24, { anchor: "start", w: 700, ltr: true, o: oLine });
+          }
+          void lim;
+          const o2 = after(t, S.limit, 16, o);
+          box(250, 540, 780, 48, o2 * 0.9, C.mint);
+          txt(640, 572, `אפשריים: ${V.clientN} · על החזית: ${V.clientEff}`, 26, { w: 700, o: o2 });
+        }
+        // Scene 6 — weights choose
+        if (inScene(t, S.weights)) {
+          const o = vis(t, S.weights);
+          txt(640, 124, "משקולות בוחרות נקודה על החזית", 38, { w: 700, o });
+          const sets = [["החזר ראשון חשוב יותר", "pay"], ["סך תשלומים חשוב יותר", "total"], ["חשיפה חשובה יותר", "exp"]];
+          sets.forEach(([label, k], i) => {
+            const y = 200 + i * 100;
+            const oa = after(t, S.weights, 1 + i * 3, o);
+            box(160, y, 960, 80, oa);
+            txt(1090, y + 50, label, 26, { anchor: "start", w: 700, o: oa });
+            txt(1090, y + 50, "", 1, { anchor: "start", fill: C.n600, o: oa });
+            txt(700, y + 50, NAME[fact(`pick.${k}`).id], 24, { anchor: "start", w: 700, fill: C.teal, o: oa });
+          });
+          stamp(o);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [["קודם", "זורקים את הנשלטים"], ["אחר כך", "הלקוח בוחר ויתור"]];
+          rows.forEach(([a, b], i) => {
+            const oa = after(t, S.end, 0.5 + i * 2, o);
+            txt(1000, 270 + i * 90, a, 36, { anchor: "start", w: 700, o: oa });
+            txt(680, 270 + i * 90, b, 34, { anchor: "start", fill: C.teal, o: oa });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

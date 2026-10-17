@@ -1,0 +1,211 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.16 — "הפתרון יושב בפינה". Every number comes from data/lessons/8-16.json; render(t) depends only on t.
+  Synthetic data, for illustration.
+
+  Script (one idea: when the goal and every condition are straight lines, the best answer is at a corner of the allowed
+  region; change the data and the corner changes; a curve with two valleys can trap a walk downhill):
+  1. Title.
+  2. The little problem: two tracks, three conditions.
+  3. The allowed region (a triangle), its three corners, the infeasible crossings, the best corner.
+  4. Same conditions, a harsher variable track: another corner.
+  5. A cost with two valleys: the walk stops at the near one.
+  6. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.16 · תכנון לינארי</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("8-16");
+      const { fact, num, whole, shek, pl, lr, clamp, inScene, vis, after, grow, C, el, txt, box, line, dot, stamp, title } = v;
+      const flat = fact("a");
+      const harsh = fact("b");
+      const cross = fact("cross");
+      const u2 = (x) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(x));
+      const CURVE = [100, 92, 85, 83, 88, 94, 90, 84, 79, 82, 91];
+      const V = {
+        loan: num(fact("loan")), cap: num(fact("cap")), cap2: num(fact("cap2")), lgCost: num(fact("lg.cost")), shCost: num(fact("sh.cost")),
+        bx: num(fact("a.long_shek")), by: num(fact("a.short_shek")), hx: num(fact("b.long_shek")), hy: num(fact("b.short_shek")),
+        saving: num(fact("b.saving_vs_a")), morePay: num(fact("b.more_pay")), over: num(fact("c40.over")), feas: pl(fact("cross.feasible")),
+        local: pl(fact("curve.local")), global: pl(fact("curve.global")), gap: pl(fact("curve.gap")),
+      };
+
+      const S = { title: [0, 7], prob: [7, 36], region: [36, 82], harsh: [82, 108], valley: [108, 138], end: [138, 150] };
+      window.duration = 150;
+      window.cues = [
+        [1, 5.5, "הפתרון יושב בפינה."],
+        [8, 15, `נועם ושירה צריכים ${V.loan} ₪ משני מסלולים.`],
+        [15, 22, "ארוך ל־30 שנה, וקצר ל־15 שנה."],
+        [22, 29, "שלושה תנאים, כל אחד קו ישר."],
+        [29, 35.5, "והמטרה: לשלם כמה שפחות בסך הכול."],
+        [37, 44, "כל תנאי חותך חלק מהמישור."],
+        [44, 52, "מה שנשאר הוא אזור מותר: משולש."],
+        [52, 60, "הפתרון הטוב ביותר נמצא באחת הפינות."],
+        [60, 68, `מהחיתוכים רק ${V.feas} עומדים בכל התנאים.`],
+        [68, 75, `פינה אחת עוברת את התקרה ב־${V.over} ₪.`],
+        [75, 81.5, "הזולה: על התקרה, בנקודת החיתוך."],
+        [83, 90, `עכשיו התקרה עולה ל־${V.cap2} ₪.`],
+        [90, 98, "התנאים האחרים והמטרה זהים."],
+        [98, 107, "הפינה הטובה עברה לפינה אחרת."],
+        [109, 117, "עלות שלא ישרה, עם שני עמקים."],
+        [117, 125, "הליכה מטה מ־0% נעצרת בעמק הקרוב."],
+        [125, 132, `אופטימום מקומי: ${V.local} במקום ${V.global}.`],
+        [132, 137.5, "בבעיה לינארית אין עמקים כאלה."],
+        [139, 144, "אופטימלי הוא ביחס לנתונים ולתנאים."],
+        [144, 149, "ולמרחב שנבדק."],
+      ];
+
+      // The plane: x (the fixed amount) runs leftward from the right edge, y upward; 12 units each way.
+      const P = { r: 900, l: 380, top: 150, bot: 500, M: 14 };
+      const X = (x) => P.r - (Number(x) / P.M) * (P.r - P.l);
+      const Y = (y) => P.bot - (Number(y) / P.M) * (P.bot - P.top);
+      const lineXY = (a1, a2, b, o, color, w, dash) => {
+        // The line a1*x + a2*y = b inside the box.
+        const pts = [];
+        for (const x of [0, P.M]) if (a2 !== 0) pts.push([x, (b - a1 * x) / a2]);
+        if (a2 === 0) { pts.push([b / a1, 0], [b / a1, P.M]); }
+        line(X(pts[0][0]), Y(pts[0][1]), X(pts[1][0]), Y(pts[1][1]), o, color, w, dash);
+      };
+      const place = (o, label = true) => {
+        line(P.l - 20, P.bot + 20, P.r + 20, P.bot + 20, o);
+        line(P.r + 20, P.top - 20, P.r + 20, P.bot + 20, o);
+        if (label) txt(640, P.bot + 52, "סכום בארוך (ימינה: פחות), ביחידות של 100,000 ₪", 18, { fill: C.n600, o });
+        txt(P.r + 34, P.top - 8, "קצר ↑", 18, { fill: C.n600, o, anchor: "start" });
+      };
+      const polyOf = () => {
+        const f = flat.corners.map((c) => [Number(c.x), Number(c.y)]);
+        const cx = f.reduce((s, p) => s + p[0], 0) / f.length, cy = f.reduce((s, p) => s + p[1], 0) / f.length;
+        return f.sort((p, q) => Math.atan2(p[1] - cy, p[0] - cx) - Math.atan2(q[1] - cy, q[0] - cx));
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) title(t, S.title, "הפתרון יושב בפינה", "תכנון לינארי במבט ראשון", "תנאים ישרים · פינות · האופטימום תלוי בנתונים");
+        // Scene 2 — the problem
+        if (inScene(t, S.prob)) {
+          const o = vis(t, S.prob);
+          txt(640, 124, "בעיה קטנה של שני מסלולים", 40, { w: 700, o });
+          const cards = [
+            { y: 180, a: "ארוך · 4.40% · 30 שנה", b: `x · עלות ליחידה ${V.lgCost} ₪`, from: 2 },
+            { y: 280, a: "קצר · 4.40% · 15 שנה", b: `y · עלות ליחידה ${V.shCost} ₪`, from: 5 },
+          ];
+          for (const c of cards) {
+            const oa = after(t, S.prob, c.from, o);
+            box(160, c.y, 960, 84, oa);
+            txt(1090, c.y + 52, c.a, 26, { anchor: "start", w: 700, o: oa });
+            txt(640, c.y + 52, c.b, 24, { anchor: "start", fill: C.n700, o: oa, ltr: false });
+          }
+          const conds = [["לכסות את ההלוואה", 14], ["לפחות 40% בארוך", 17], [`החזר חודשי עד ${V.cap} ₪`, 20]];
+          conds.forEach(([c, from], i) => {
+            const oc = after(t, S.prob, from - 7, o);
+            txt(1090, 440 + i * 44, `${i + 1}. ${c}`, 26, { anchor: "start", w: 700, fill: C.teal, o: oc });
+          });
+          stamp(o);
+        }
+        // Scene 3 — the region
+        if (inScene(t, S.region)) {
+          const o = vis(t, S.region);
+          txt(640, 110, "האזור המותר והפינות שלו", 38, { w: 700, o });
+          place(o);
+          const o1 = after(t, S.region, 1, o);
+          lineXY(1, 1, 10, o1, C.n400, 2, "6 5");
+          const o2 = after(t, S.region, 4, o);
+          lineXY(3, -2, 0, o2, C.n400, 2, "6 5");
+          const o3 = after(t, S.region, 7, o);
+          lineXY(Number(fact("lg.pay")), Number(fact("sh.pay")), Number(fact("cap")), o3, C.n400, 2, "6 5");
+          const o4 = after(t, S.region, 12, o);
+          if (o4 > 0) el("polygon", { points: polyOf().map(([x, y]) => `${X(x)},${Y(y)}`).join(" "), fill: C.tq2, "fill-opacity": 0.35 * o4 });
+          const o5 = after(t, S.region, 20, o);
+          cross.filter((c) => !c.feasible && Number(c.x) <= P.M && Number(c.y) <= P.M).forEach((c) => dot(X(c.x), Y(c.y), 6, C.n300, o5));
+          const o6 = after(t, S.region, 15, o);
+          cross.filter((c) => c.feasible).forEach((c) => dot(X(c.x), Y(c.y), 8, C.teal, o6));
+          const o7 = after(t, S.region, 28, o);
+          const b = flat.best[0];
+          if (o7 > 0) {
+            el("circle", { cx: X(b.x), cy: Y(b.y), r: 16, fill: "none", stroke: C.navy, "stroke-width": 4, opacity: o7 });
+            txt(X(b.x) + 28, Y(b.y) - 24, `${V.bx} ₪ בארוך · ${V.by} ₪ בקצר`, 22, { anchor: "start", w: 700, o: o7 });
+          }
+          stamp(o);
+        }
+        // Scene 4 — a harsher variable track
+        if (inScene(t, S.harsh)) {
+          const o = vis(t, S.harsh);
+          txt(640, 110, "אותה מטרה, תקרה אחרת", 38, { w: 700, o });
+          place(o, false);
+          lineXY(1, 1, 10, o, C.n400, 2, "6 5");
+          lineXY(3, -2, 0, o, C.n400, 2, "6 5");
+          lineXY(Number(fact("lg.pay")), Number(fact("sh.pay")), Number(fact("cap")), o, C.n400, 2, "6 5");
+          lineXY(Number(fact("lg.pay")), Number(fact("sh.pay")), Number(fact("cap2")), o, C.teal, 2, "6 5");
+          el("polygon", { points: polyOf().map(([x, y]) => `${X(x)},${Y(y)}`).join(" "), fill: C.tq2, "fill-opacity": 0.35 * o });
+          flat.corners.forEach((c) => dot(X(c.x), Y(c.y), 8, C.teal, o));
+          const oOld = after(t, S.harsh, 1, o);
+          const b = flat.best[0], h = harsh.best[0];
+          el("circle", { cx: X(b.x), cy: Y(b.y), r: 16, fill: "none", stroke: C.n400, "stroke-width": 4, "stroke-dasharray": "5 4", opacity: oOld });
+          const oNew = after(t, S.harsh, 10, o);
+          el("circle", { cx: X(h.x), cy: Y(h.y), r: 16, fill: "none", stroke: C.navy, "stroke-width": 4, opacity: oNew });
+          txt(X(h.x) - 28, Y(h.y) + 40, `${V.hx} ₪ בארוך · ${V.hy} ₪ בקצר`, 22, { anchor: "end", w: 700, o: oNew });
+          const oBox = after(t, S.harsh, 15, o);
+          box(250, 530, 780, 46, oBox * 0.9, C.mint);
+          txt(640, 561, `החזר גבוה ב־${V.morePay} ₪, וסך נמוך ב־${V.saving} ₪`, 24, { w: 700, o: oBox });
+        }
+        // Scene 5 — two valleys
+        if (inScene(t, S.valley)) {
+          const o = vis(t, S.valley);
+          txt(640, 110, "עלות עם שני עמקים", 38, { w: 700, o });
+          const gx = (k) => 1000 - k * 62, gy = (v) => 520 - ((v - 70) / 35) * 330;
+          line(gx(10) - 20, 530, gx(0) + 20, 530, o);
+          [0, 3, 6, 8, 10].forEach((k) => txt(gx(k), 560, `${k * 10}%`, 18, { fill: C.n600, o, ltr: true }));
+          const g = grow(t, S.valley, 1, 8);
+          const pts = CURVE.map((v, k) => [gx(k), gy(v)]);
+          const upto = Math.floor(g * 10), frac = g * 10 - upto;
+          const shown = pts.slice(0, upto + 1);
+          if (upto < 10) shown.push([pts[upto][0] + (pts[upto + 1][0] - pts[upto][0]) * frac, pts[upto][1] + (pts[upto + 1][1] - pts[upto][1]) * frac]);
+          el("polyline", { points: shown.map((p) => p.join(",")).join(" "), fill: "none", stroke: C.navy, "stroke-width": 5, opacity: o });
+          pts.forEach((p, k) => dot(p[0], p[1], 7, C.navy, o * (g * 10 > k ? 1 : 0)));
+          const w = grow(t, S.valley, 10, 8);
+          if (w > 0) {
+            const stop = Math.min(3, Math.floor(w * 3.999));
+            dot(pts[stop][0], pts[stop][1], 14, C.teal, o);
+          }
+          const o2 = after(t, S.valley, 19, o);
+          txt(pts[3][0], pts[3][1] - 30, `${V.local}`, 26, { w: 700, o: o2, ltr: true });
+          const o3 = after(t, S.valley, 22, o);
+          txt(pts[8][0], pts[8][1] - 30, `${V.global}`, 26, { w: 700, fill: C.teal, o: o3, ltr: true });
+          stamp(o);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = ["אופטימלי: לפי הנתונים", "לפי התנאים והמטרה", "ולפי המרחב שנבדק"];
+          rows.forEach((r, i) => txt(1000, 250 + i * 70, r, 36, { anchor: "start", w: 700, fill: i === 0 ? C.navy : C.teal, o: after(t, S.end, 0.5 + i * 2.5, o) }));
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

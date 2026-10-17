@@ -1,0 +1,358 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.1"
+minutes: 35
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FunctionMachine from "../../components/FunctionMachine.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { S8_LABEL } from "../../data/case-s8.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.1");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = `${S8_LABEL}`;
+export const predictionOptions = [
+  "ההחזר עולה באותו סכום בכל נקודת אחוז: כמו מ־3% ל־4%, כך מ־5% ל־6%",
+  `העלייה גדולה יותר ככל שהריבית כבר גבוהה: מ־5% ל־6% (${f.shekels("rate.d56")}) יותר מאשר מ־3% ל־4% (${f.shekels("rate.d34")})`,
+  "העלייה קטנה יותר ככל שהריבית כבר גבוהה: הרבה פחות ממה שהיא מ־3% ל־4%",
+  "אי אפשר לדעת בלי לחשב כל מקרה מחדש",
+];
+export const tableRows = [
+  { rate: "3%", pay: f.raw("rate.p3"), gap: "" },
+  { rate: "4%", pay: f.raw("rate.p4"), gap: f.raw("rate.d34") },
+  { rate: "5%", pay: f.raw("rate.p5"), gap: f.raw("rate.d45") },
+  { rate: "6%", pay: f.raw("rate.p6"), gap: f.raw("rate.d56") },
+];
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>מתמטיקה כללית.</strong> שיעורים 8.1 עד 8.5 מלמדים כלים שנכונים בכל מקום, מאפס, על דוגמאות משכנתא. הם לא מערכת של Mogi: בקוד של Mogi היום אין חישוב תמהיל, והקריאה למנוע החישוב מוקפאת. הסוגים בשלב כולו: <strong>Mogi היום</strong> (מה שקיים), <strong>הוחלט</strong> (15 כללי החישוב של אילון, ומצבי השכבה: כבוי, צל, מסייע, אוטומטי), <strong>עתיד</strong> (כל השאר). כל מספר בשלב הזה הוא <strong>להדגמה</strong>, והנתונים סינתטיים.</p>
+</Callout>
+
+בשלבים 5 ו־6 בנייתם תמהיל וקבעתם מיצוב, צעד אחרי צעד, בידיים. בשלב הזה לומדים איך בונים אלגוריתם שעושה את זה באופן שיטתי. לפני שמדברים על אלגוריתם צריך כמה מילים של מתמטיקה, וכאן מתחילים מהמילה הראשונה: מה זה <Term t="משתנה" client:visible lesson="8.1">משתנה</Term>, ומה זו <Term t="פונקציה" client:visible lesson="8.1">פונקציה</Term>. תצטרכו רק את מה שלמדתם בשלב 0.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.1"
+  question={`משכנתא של מיליון שקלים ל־25 שנה, בשיטת שפיצר. ההחזר החודשי ב־3% לשנה הוא ${f.shekels("rate.p3")}, וב־4% הוא ${f.shekels("rate.p4")}: ${f.shekels("rate.d34")} יותר. מה קורה להחזר כשהריבית עוברת מ־5% ל־6%?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## קלט, כלל, פלט
+
+</Section>
+
+<LessonVideo lesson="8-1" />
+
+<Section kind="ההסבר">
+
+## כלל שמקבל קלט ונותן פלט
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+נתחיל מכלל אחד פשוט, שאפשר לחשב בראש. ריבית של {p("rate.year")}% לשנה היא {p("rate.month_pct")}% לחודש (שיעור 0.4: מחלקים ב־12), כלומר {p("rate.month")} כמספר עשרוני. הריבית שמשלמים בחודש הראשון על הלוואה היא הסכום כפול {p("rate.month")}:
+- על {f.shekels("f.in_a")} משלמים בחודש הראשון {f.shekels("f.out_a")} ריבית.
+- על {f.shekels("f.in_b")}, כפול {f.shekels("f.out_b")}.
+- על {f.shekels("f.in_d")}, שהיא ההלוואה של נועם ושירה (תיק א׳, בדויים), {f.shekels("f.out_d")}.
+
+בכל שורה יש שלושה חלקים: משהו נכנס, כלל עובד עליו, ומשהו יוצא. **קלט ← כלל ← פלט.**
+
+<Callout title="מונחים">
+<p><strong>משתנה</strong> הוא כמות שיכולה לקבל ערכים שונים. כאן יש שניים: סכום ההלוואה, שנסמן בו P (כמו בשיעור 0.2: סכום היום), והריבית שמשלמים בחודש הראשון, שנסמן בו I. P הוא <strong>קלט</strong>, I הוא <strong>פלט</strong>.</p>
+<p><strong>פונקציה</strong> היא הכלל שמחבר ביניהם. כותבים <M>I = f(P)</M> וקוראים ״I הוא f של P״. בפונקציה כל קלט נותן פלט אחד בלבד, ואותו קלט נותן תמיד אותו פלט.</p>
+</Callout>
+
+הכלל כאן הוא <M>f(P) = P × {p("rate.month")}</M>. המספר {p("rate.month")} אינו משתנה בדוגמה הזו: הוא קבוע, כל עוד אחוז הריבית נשאר {p("rate.year")}%. אם הריבית משתנה, מקבלים פונקציה אחרת. לכן מי שמדבר על פונקציה אומר תמיד גם מה נשאר קבוע.
+
+האותיות כאן הן של הקורס: P הוא סכום ההלוואה, I הוא סכום הריבית בשקלים (כמו בשיעור 0.2). האות f היא שם של פונקציה ולא כמות.
+
+### פונקציה היא לא תמיד קו ישר
+
+נבדוק פונקציה מורכבת יותר: ההחזר החודשי בשיטת שפיצר (<Term t="שפיצר" client:visible lesson="2.9">שפיצר</Term>), כשהסכום, הריבית והתקופה הם הקלט.
+
+**כשמשנים רק את הסכום.** ב־4% ל־25 שנה, מיליון שקלים נותנים החזר של {f.shekels("loan.p1")}, ושני מיליון נותנים {f.shekels("loan.p2")}: פי {p("loan.ratio")}. כאן הפונקציה היא קו ישר: סכום כפול נותן החזר כפול. (בכל הפונקציות כאן ההחזר מעוגל לאגורה, ולכן יחס שמוצג כ־2 מדויק עד אגורה.)
+
+**כשמשנים רק את הריבית.** באותם מיליון שקלים ל־25 שנה, ההחזר הוא {f.shekels("rate.p3")} ב־3%, {f.shekels("rate.p4")} ב־4%, {f.shekels("rate.p5")} ב־5% ו־{f.shekels("rate.p6")} ב־6%.
+
+<FillTable
+  client:visible
+  id="8.1-table"
+  rowKey="rate"
+  periodLabel="ריבית"
+  columns={[
+    { key: "pay", label: "ההחזר החודשי" },
+    { key: "gap", label: "עלייה מהשורה שמעל" },
+  ]}
+  rows={tableRows}
+  blanks={["5%.gap", "6%.gap"]}
+  success="העלייה גדלה עם כל נקודת אחוז: הפונקציה אינה קו ישר, ולכן לא מספיק לחשב פעם אחת ולהכפיל."
+  hint="העלייה היא ההחזר בשורה פחות ההחזר בשורה שמעליה."
+/>
+
+העלייה מ־3% ל־4% היא {f.shekels("rate.d34")}, מ־4% ל־5% {f.shekels("rate.d45")}, ומ־5% ל־6% {f.shekels("rate.d56")}. הפונקציה עולה, והעלייה עצמה גדלה. זו התשובה לשאלת החיזוי.
+
+**כשמשנים רק את התקופה.** באותם מיליון ב־4%: {f.shekels("term.p240")} ל־20 שנה, {f.shekels("term.p300")} ל־25 שנה ו־{f.shekels("term.p360")} ל־30 שנה. תקופה ארוכה יותר מורידה את ההחזר, והירידה קטנה ככל שהתקופה כבר ארוכה.
+
+לפונקציה אחת יכולים להיות כמה קלטים: ההחזר הוא פונקציה של סכום, ריבית ותקופה יחד. כותבים <M>C = f(P, r, n)</M> (האותיות P, C, r ו־n הן של שיעורים 0.2 ו־0.6). מה שחשוב: כשמשנים קלט אחד ומחזיקים את האחרים קבועים, רואים איך הוא משפיע לבדו.
+
+### שרשרת של פונקציות
+
+הפלט של פונקציה אחת יכול להיות הקלט של הבאה. סכום ההלוואה נכנס לכלל ההחזר, וההחזר נכנס לכלל היחס:
+- תיק א׳: הלוואה של {f.shekels("chain.loan")} ב־4.40% ל־360 חודשים נותנת החזר של {f.shekels("chain.pay")}.
+- ההכנסה הפנויה של הבית היא {f.shekels("chain.income")} (שיעור 4.2: ההכנסה פחות הלוואת הרכב). יחס ההחזר הוא {p("chain.ratio")}% (שיעור 4.3).
+- אם ההלוואה הייתה ל־300 חודשים, ההחזר היה {f.shekels("chain.pay_300")}, והיחס {p("chain.ratio_300")}%.
+
+מנוע חישוב הוא בסך הכול שרשרת כזו, ארוכה. בהמשך השלב תראו אותה כשרשרת אחת מקצה לקצה.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## קלט ← כלל ← פלט
+
+</Section>
+
+<FunctionMachine client:visible note="הסכום, האחוז והחודשים הם הקלט. שני הכללים הם מהשיעורים הקודמים." />
+
+נסו את אלה:
+1. הכפילו את הסכום (למשל מ־{formatShekels(800000)} ל־{formatShekels(1600000)}) בלי לגעת בשאר. מה קורה להחזר וליחס?
+2. החזירו את הסכום והעלו את הריבית נקודת אחוז אחת, פעמיים. האם שתי העליות שוות?
+3. קצרו את התקופה ב־60 חודשים. מי משפיע יותר על היחס: 60 חודשים פחות, או נקודת אחוז יותר?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר והיחס מוכפלים בדיוק (עד אגורה): הפונקציה לפי הסכום היא קו ישר.</li>
+    <li>העלייה השנייה גדולה מהראשונה, כמו בטבלה למעלה.</li>
+    <li>התשובה תלויה בנקודת ההתחלה: הפונקציה אינה קו ישר, ולכן אין תשובה אחת לכל מקרה. זו בדיוק הסיבה שמחשבים במקום להעריך.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## איך כותבים פונקציה
+
+</Section>
+
+**צעד 1 — נותנים שמות לכמויות.** P סכום ההלוואה, r הריבית, n מספר החודשים, C ההחזר.
+
+**צעד 2 — כותבים מה נכנס ומה יוצא.** <M>C = f(P, r, n)</M>.
+
+**צעד 3 — כותבים את הכלל.** לפונקציה הפשוטה: <M>f(P) = P × {p("rate.month")}</M>. להחזר בשפיצר הכלל כבר ידוע לכם משיעור 2.9; כאן חשוב רק שהוא כלל אחד שמקבל שלושה קלטים.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">y = f(x)</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">x</dt><dd>הקלט: הכמות שנותנים לכלל. אפשר כמה קלטים: f(x₁, x₂)</dd>
+    <dt class="ltr font-semibold text-n900">f</dt><dd>שם הכלל. אותו קלט נותן תמיד אותו פלט</dd>
+    <dt class="ltr font-semibold text-n900">y</dt><dd>הפלט: מה שיוצא. במקום y כותבים לפעמים אות עם משמעות, כמו C להחזר</dd>
+  </dl>
+</div>
+
+<p>כאן x ו־y הן אותיות כלליות של מתמטיקה. y אינו כאן תשואה של אג״ח כמו בשיעור 0.11: בדוגמאות של המשכנתא משתמשים באותיות הקבועות של הקורס (P, r, n, C).</p>
+
+**מתי הנוסחה נכונה?** פונקציה מוגדרת רק על קלטים שיש להם משמעות. סכום הלוואה חיובי; תקופה במספר שלם של חודשים; לפי התעתיק של הצוות להוראה 329 (לא אומת) עד 360 חודשים. מחוץ לתחום הזה הכלל עדיין נותן מספר, אבל המספר אינו הלוואה.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> פונקציה היא נוסחה בתא שמצביעה על תאי הקלט. ההחזר: <span class="ltr">=PMT(r/12, n, -P)</span>, כש־r הוא הריבית לשנה כמספר עשרוני. מי שמשנה תא קלט רואה את הפלט משתנה, וזה מה שהמחשבון למעלה עושה.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.1"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `זה מה שמתקבל אילו ההחזר היה קו ישר לפי הריבית. הוא לא: מ־3% ל־4% העלייה ${f.shekels("rate.d34")}, ומ־4% ל־5% ${f.shekels("rate.d45")}.`,
+    "",
+    `ההפך מהמתרחש: העלייה גדלה עם הריבית (${f.shekels("rate.d34")}, ${f.shekels("rate.d45")}, ${f.shekels("rate.d56")}).`,
+    "אפשר לדעת: זו תכונה של הפונקציה, ואפשר לראות אותה בטבלה של ארבע שורות.",
+  ]}
+>
+  העלייה מ־5% ל־6% היא {f.shekels("rate.d56")}, והעלייה מ־3% ל־4% היא {f.shekels("rate.d34")}. ההחזר כפונקציה של הריבית עולה בקצב שגדל, ולכן אי אפשר להכפיל עלייה אחת ולקבל את השאר.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## מהסכום ליחס ההחזר, בשני כללים
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+נועם ושירה (תיק א׳) שוקלים הלוואה של {f.shekels("chain.loan")} ב־4.40% ל־300 חודשים.
+
+**צעד 1 — הכלל הראשון, ההחזר.** הקלט: {f.shekels("chain.loan")}, 4.40%, 300 חודשים. הפלט: {f.shekels("chain.pay_300")}.
+
+**צעד 2 — הכלל השני, היחס.** הקלט: ההחזר ו־{f.shekels("chain.income")}. הכלל: ההחזר חלקי ההכנסה, כפול 100. הפלט: {p("chain.ratio_300")}%.
+
+**צעד 3 — מה למדנו.** שתי פונקציות בשרשרת: אפשר לשאול איזה קלט להזיז כדי שהפלט האחרון ירד. זו בדיוק השאלה שהאלגוריתם שואל, בקנה מידה גדול (שיעור 8.6).
+
+<Section kind="דוגמה חצי פתורה">
+
+## הכלל על סכום אחר
+
+</Section>
+
+הכלל <M>f(P) = P × {p("rate.month")}</M> נותן את הריבית של החודש הראשון. השורה הראשונה כבר מלאה; השלימו את השתיים הבאות.
+
+<FillTable
+  client:visible
+  id="8.1-half"
+  rowKey="loan"
+  periodLabel="סכום ההלוואה"
+  columns={[{ key: "out", label: "ריבית בחודש הראשון" }]}
+  rows={[
+    { loan: "100,000", out: f.raw("f.out_a") },
+    { loan: "200,000", out: f.raw("f.out_b") },
+    { loan: "750,000", out: f.raw("f.out_c") },
+    { loan: "1,640,000", out: f.raw("f.out_d") },
+  ]}
+  blanks={["750,000.out", "1,640,000.out"]}
+  success="הפונקציה כאן היא קו ישר: סכום גדול פי כמה, ריבית גדולה פי כמה."
+  hint="סכום ההלוואה כפול 0.004."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים להמחשה בלבד, וכדאי להשתמש במחשבון או בגיליון בתרגילים 3 ו־5.
+
+<ChoiceExercise
+  client:visible
+  id="8.1-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "הריבית, הסכום ומספר החודשים הם קלט; ההחזר הוא פלט", correct: true, feedback: "נכון. הפונקציה מקבלת שלושה קלטים ונותנת פלט אחד." },
+    { text: "ההחזר הוא קלט, כי הוא מה שהלקוח רוצה לדעת", feedback: "מה שרוצים לדעת הוא הפלט. ההחזר יוצא מהכלל." },
+    { text: "כל המספרים הם פלט, כי כולם מספרים", feedback: "קלט הוא מה שנותנים לכלל לפני שהוא עובד." },
+    { text: "פונקציה יכולה לתת שני פלטים שונים לאותו קלט", feedback: "לא: בפונקציה אותו קלט נותן תמיד אותו פלט." },
+  ]}
+>
+  בחישוב ההחזר החודשי של הלוואה, מה נכון?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.1-2" n={2} level="קל" answer={f.raw("ex.f_out")} errors={[{ value: f.raw("f.out_d"), message: "זה הפלט להלוואה של תיק א׳. כאן הסכום אחר." }]}>
+  הכלל: ריבית החודש הראשון = סכום ההלוואה כפול {p("rate.month")}. מהי הריבית על הלוואה של {f.shekels("ex.loan_f")}?
+</NumericExercise>
+
+<Solution for="8.1-2">
+<M>{n("ex.loan_f")} × {p("rate.month")} = {n("ex.f_out")}</M>. {f.shekels("ex.f_out")}.
+</Solution>
+
+<NumericExercise client:visible id="8.1-3" n={3} level="בינוני" answer={f.raw("ex.pay")} errors={[{ value: f.raw("loan.p1"), message: "זה ההחזר על מיליון שקלים. כאן הסכום גדול יותר." }]}>
+  הלוואה של {f.shekels("ex.loan")} ב־4% ל־25 שנה, בשיטת שפיצר. מהו ההחזר החודשי? (בגיליון, או במחשבון של שיעור 2.9.)
+</NumericExercise>
+
+<Solution for="8.1-3">
+<span class="ltr">=PMT(4%/12, 300, -{n("ex.loan")})</span> נותן {f.shekels("ex.pay")}.
+</Solution>
+
+<NumericExercise client:visible id="8.1-4" n={4} level="בינוני" answer={f.raw("ex.ratio")} unit="%" tolerance={0.05} near={0.2} errors={[{ value: f.raw("ex.pay"), message: "זה ההחזר בשקלים. היחס הוא ההחזר חלקי ההכנסה הפנויה, באחוזים." }]}>
+  ההחזר מתרגיל 3 והכנסה פנויה של {f.shekels("chain.income")}. מהו יחס ההחזר, באחוזים (לספרה אחת אחרי הנקודה)?
+</NumericExercise>
+
+<Solution for="8.1-4">
+<M>{n("ex.pay")} ÷ {n("chain.income")} × 100 = {p("ex.ratio")}</M>%.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.1-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `ההחזר כפונקציה של הריבית עולה בקצב שגדל: ${f.shekels("rate.d34")}, ${f.shekels("rate.d45")}, ${f.shekels("rate.d56")}`, correct: true, feedback: "נכון." },
+    { text: "ההחזר כפונקציה של הריבית הוא קו ישר, כי הוא עולה כל פעם", feedback: "קו ישר פירושו עלייה שווה בכל צעד. כאן העלייה גדלה." },
+    { text: "ההחזר כפונקציה של הסכום עולה בקצב שגדל", feedback: "בסכום סכום כפול נותן החזר כפול: קו ישר." },
+    { text: "ההחזר לא תלוי בריבית אם התקופה קבועה", feedback: "הוא תלוי: זה בדיוק מה שהטבלה מראה." },
+  ]}
+>
+  מה נכון על שתי הפונקציות: ההחזר לפי הסכום, וההחזר לפי הריבית?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.1-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "כי הפלט של הכלל הראשון הוא הקלט של השני: ההחזר", correct: true, feedback: "נכון. זו שרשרת: סכום ← החזר ← יחס." },
+    { text: "כי אפשר לדלג על הכלל הראשון", feedback: "אי אפשר: היחס תלוי בהחזר." },
+    { text: "כי היחס אינו פונקציה", feedback: "הוא פונקציה: ההחזר וההכנסה נותנים יחס אחד." },
+    { text: "כי ההכנסה היא פלט", feedback: "ההכנסה הפנויה כאן נתון, כלומר קלט." },
+  ]}
+>
+  למה אפשר להגיד שיחס ההחזר הוא פונקציה של סכום ההלוואה (כשהריבית, התקופה וההכנסה קבועות)?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על משתנה ופונקציה">
+<p><strong>מה זה?</strong> משתנה הוא כמות שיכולה לקבל ערכים שונים; פונקציה היא כלל שהופך קלטים לפלט, ואותו קלט נותן תמיד אותו פלט.</p>
+<p><strong>למה זה קיים?</strong> כדי לדבר על ״מה יקרה אם״ בלי לחשב הכול מחדש: כותבים כלל אחד, ומכניסים אליו ערכים.</p>
+<p><strong>איך זה עובד?</strong> נותנים שם לקלטים ולפלט, כותבים את הכלל, ובודקים כל קלט לבדו כשהאחרים קבועים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההחזר שלכם הוא פלט של סכום, ריבית ותקופה, ולא קו ישר: נקודת אחוז שמגיעה כשהריבית כבר גבוהה עולה יותר.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מזהים מה אפשר לשנות (קלט) ומה מעניין אותנו (פלט), ושואלים איך השני משתנה כשזזים בראשון. מכאן נבנה האלגוריתם, בשיעורים הבאים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **משתנה** הוא כמות שיכולה להשתנות; **פונקציה** היא כלל שהופך קלט (אחד או יותר) לפלט אחד.
+- אותו קלט נותן תמיד אותו פלט. אם משהו משתנה בלי שהקלט השתנה, הוא קלט נסתר.
+- ההחזר כפונקציה של הסכום הוא קו ישר; כפונקציה של הריבית או התקופה הוא לא.
+- פלט של פונקציה יכול להיות קלט של הבאה: סכום ← החזר ← יחס.
+- בשיעורים 8.1 עד 8.5 אלה כלי מתמטיקה כללית, לא מערכת של Mogi.
+
+**בשיעור הבא — 8.2, סכום וממוצע (גם <Later lesson="8.2" quiet>ממוצע משוקלל</Later>):** איך מסכמים הרבה מספרים למספר אחד, ומתי הממוצע הפשוט טועה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "משתנה, פונקציה, קלט ופלט, פונקציה של כמה משתנים ושרשרת פונקציות: מתמטיקה כללית, בלי מקור מסוים." },
+    { kind: "לא אומת", text: "הוראה 329: תקופה עד 30 שנה לפירעון הסופי, ויחס החזר לפי החישוב של שיעור 4.3: לפי תעתיק של הצוות ב־Brain (דף 7503881, עודכן 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "הריביות, הסכומים והתקופות בטבלאות להמחשה בלבד, אינם נתוני שוק ואינם הצעת בנק. תיק א׳ בדוי; ההכנסה הפנויה היא סכום ההכנסות הנטו פחות הלוואת הרכב שנספרת (שיעור 4.2). נתונים סינתטיים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/stats.ts (a few from schedule.ts via the FunctionMachine.vue illustration) via scripts/lessons/lesson-8-1.ts and _stats-facts.ts and data/lessons/8-1.json, rechecked by checks/kinds/stats.py. Case numbers: src/data/case-s8.ts (case A). Illustration: src/components/FunctionMachine.vue. Video: video/8-1.html. No field knowledge in this lesson. */}

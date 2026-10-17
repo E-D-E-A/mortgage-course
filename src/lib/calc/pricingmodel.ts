@@ -36,6 +36,7 @@
  * point). Recomputed independently in checks/kinds/pricingmodel.py.
  */
 import Decimal from "decimal.js";
+import { makeRng } from "./montecarlo.ts";
 
 export type Numeric = Decimal.Value;
 
@@ -110,6 +111,15 @@ export function whatIf(anchor: Numeric, model: PricingModel, deal: Deal, change:
 /** The random source the generator needs: a whole number from 0 to n − 1. */
 export interface IntSource {
   int(n: number): number;
+}
+
+/**
+ * The course's one seeded generator (montecarlo.ts, mulberry32) as a whole-number source:
+ * int(n) = floor(x × n ÷ 2^32) for the next 32-bit draw x. Integer arithmetic only (n below 2^21).
+ */
+export function seededInts(seed: number): IntSource {
+  const next = makeRng(seed);
+  return { int: (n: number) => Math.floor((next() * n) / 4294967296) };
 }
 
 export interface Offer {

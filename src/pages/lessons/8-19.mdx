@@ -1,0 +1,500 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.19"
+minutes: 55
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import CalibrationCurve from "../../components/CalibrationCurve.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { APPROVALS } from "../../data/pricing-demo.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.19");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const t5 = f.raw("table5");
+export const thin = f.raw("thin5");
+export const hand = f.raw("hand.table");
+export const recal = f.raw("recal");
+export const recalSmall = f.raw("recal_small");
+export const people = f.raw("people");
+export const pc = (s) => `${Math.round(Number(s) * 100)}%`;
+export const rng = (r) => `${pc(r.lo)}–${pc(r.hi)}`;
+export const gapPts = (s) => `${Number(s) > 0 ? "+" : "−"}${Math.abs(Math.round(Number(s) * 100))}`;
+export const top = t5[4];
+export const mid = t5[3];
+export const predictionOptions = [
+  `כמעט כל ה־${f.plain("n")}: 90% פירושו שמאשרים כמעט את כולם`,
+  "בערך 9 מתוך 10, כי זה מה שהמודל אומר",
+  `פחות: מבין מי שהמודל נתן להם 80%–100% אושרו ${pc(top.observed)}`,
+  "בדיוק מה שהמודל אומר, כי המודל נבנה מנתונים",
+];
+
+בשיעור 8.4 למדתם הסתברות ותוחלת, ובשיעורים 8.17–8.18 מודל לאמוד ריבית. עכשיו שאלה אחרת: מודל שנותן **הסתברות לאישור**, ״בנק א׳ יאשר בסיכוי של 90%״. איך יודעים אם 90% הוא באמת 9 מתוך 10? זה <Term t="כיול" client:visible lesson="8.19">כיול</Term>.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>עתיד, ובלי נתונים.</strong> אין היום ב־Mogi אף מודל של הסתברות לאישור, ואין נתוני אישורים. מה שיש, לפי הרישום בצוות: אילון אישר שיש לו גישה למקור שמכיל הרבה אישורים עקרוניים, ו<strong>גודלו, כיסוי הבנקים ושלמותו עוד לא נבדקו</strong> (2026-10-07). לכן כל המבקשים בשיעור הם <strong>סינתטיים</strong>, שנוצרו בגנרטור שהקורס מכיר, והכוונה ללמד מה זה כיול ומה צריך כדי לעשות אותו, לא לטעון שהמספרים האלה נכונים לבנק כלשהו. ״הסתברות מכוילת״ דורשת נתונים ש־Mogi עוד אין לה.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.19"
+  question={`מודל סינתטי נותן לכל אחד מ־${f.plain("n")} מבקשים הסתברות לאישור. ל־${top.n} מהם הוא נותן 80% עד 100% (בממוצע ${pc(top.predicted)}). מה אפשר לצפות, אם המודל נראה סביר, שיקרה לאלה בפועל?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## האם 90% הוא באמת 9 מתוך 10
+
+</Section>
+
+<LessonVideo lesson="8-19" />
+
+<Section kind="ההסבר">
+
+## מהסתברות לטבלת כיול
+
+</Section>
+
+### מודל שנותן הסתברות
+
+מודל הסתברות מקבל מספרים של בקשה (שיעור מימון, יחס החזר) ומחזיר מספר בין 0 ל־1: ״בסיכוי של 0.78 יאשרו״. כדי לקבל מספר כזה מחברים את הנתונים לציון אחד, ועוברים דרך עקומה בצורת S שהופכת כל ציון להסתברות. הנה הדוגמאות: ציון 0 נותן {f.plain("log.0")}, ציון 2 נותן {f.plain("log.2")}, וציון מינוס 2 נותן {f.plain("log.m2")}. **ציון גבוה, הסתברות גבוהה.** (העקומה נקראת לוגיסטית; מותר לכם להתייחס אליה כאל ״מכשיר שהופך ציון להסתברות״.)
+
+הנה מבקש אחד, כדי לראות: שיעור מימון {f.plain("ex.ltv")}%, יחס החזר {f.plain("ex.pti")}%. הסיכוי **האמיתי** לאישור, כפי שהקורס בנה אותו, מתאים לציון {f.plain("ex.z")}, כלומר {f.plain("ex.truth")}. אבל **המודל** שלנו מגזים: הוא מכפיל את הציון ב־{f.plain("k")} (ציון {f.plain("ex.zm")}), ולכן נותן {f.plain("ex.pred")}. המודל מדרג נכון (מי שיותר סיכוי באמת מקבל ציון גבוה יותר), אבל הוא בטוח בעצמו יותר מדי.
+
+### שישה מבקשים
+
+כך נראה הנתון: כל מבקש הוא שיעור מימון, יחס החזר, מה שהמודל אמר, ומה קרה (1: אושר, 0: לא):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">שיעור מימון</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-3 text-start font-semibold">המודל אמר</th>
+        <th class="py-2 pe-3 text-start font-semibold">קרה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {people.map((p) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3"><span class="ltr">{p.ltv}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{p.pti}%</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(p.p)}</span></td>
+          <td class="py-2 pe-3">{p.outcome === 1 ? "אושר" : "לא אושר"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} המבקשים הראשונים מתוך {f.plain("n")}.</p>
+</div>
+
+מבקש אחד לא מלמד כלום. ״32% מימון, 32% יחס החזר: 93%, ואושר״ יכול להיות מזל. כדי לדעת, צריך להסתכל על **הרבה** מבקשים שקיבלו מספר דומה.
+
+### טבלת כיול
+
+מחלקים את התחזיות לפסים (כאן, חמישה פסים של 20 נקודות אחוז), ובכל פס שואלים: מה היה ממוצע התחזיות, וכמה מהמבקשים אושרו **באמת**. הפער ביניהם הוא פער הכיול.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">פס</th>
+        <th class="py-2 pe-3 text-start font-semibold">מבקשים</th>
+        <th class="py-2 pe-3 text-start font-semibold">המודל אמר</th>
+        <th class="py-2 pe-3 text-start font-semibold">אושרו</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער, נקודות אחוז</th>
+      </tr>
+    </thead>
+    <tbody>
+      {t5.filter((r) => r.n > 0).map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold"><span class="ltr">{rng(r)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.n}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(r.predicted)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(r.observed)}</span> <span class="text-caption text-n600">({r.happened} מתוך {r.n})</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{gapPts(r.gap)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} פער: חלק שאושר פחות ממוצע התחזיות (שלילי: המודל הבטיח יותר ממה שקרה). פס ריק לא מופיע.</p>
+</div>
+
+מה רואים:
+- **בפס העליון ({rng(top)})** המודל אמר בממוצע {pc(top.predicted)}, ואושרו {pc(top.observed)}: {top.happened} מתוך {top.n}. הבטחה של יותר מ־9 מתוך 10, מציאות של פחות מ־8.
+- **בפס {rng(mid)}** המודל אמר {pc(mid.predicted)} ואושרו {pc(mid.observed)}.
+- **בפס הנמוך** ({rng(t5[1])}) הפער הפוך: אושרו {pc(t5[1].observed)} כשהמודל אמר {pc(t5[1].predicted)}. המודל לא רק בטוח מדי: הוא גם מקצין לשני הכיוונים.
+- הפער הממוצע, משוקלל במספר המבקשים בכל פס, הוא {f.plain("gap5")}. ציון בריאר, ממוצע של ריבוע ההפרש בין התחזית למה שקרה (0 הוא מושלם), הוא {f.plain("brier")}.
+
+אומרים ש״המודל לא מכויל״. **כיול הוא תכונה של המספרים, לא של הדירוג:** המודל הזה מדרג נכון, ובכל זאת אי אפשר להסתמך על ״90%״ שלו.
+
+### מעט נתונים, טבלה רועשת
+
+אותה טבלה, מ־100 המבקשים הראשונים בלבד:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">פס</th>
+        <th class="py-2 pe-3 text-start font-semibold">מבקשים</th>
+        <th class="py-2 pe-3 text-start font-semibold">המודל אמר</th>
+        <th class="py-2 pe-3 text-start font-semibold">אושרו</th>
+      </tr>
+    </thead>
+    <tbody>
+      {thin.filter((r) => r.n > 0).map((r) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold"><span class="ltr">{rng(r)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{r.n}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(r.predicted)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(r.observed)}</span> <span class="text-caption text-n600">({r.happened} מתוך {r.n})</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+בפס {rng(thin[2])} יש רק {thin[2].n} מבקשים, ומהם אושרו {pc(thin[2].observed)} כשהמודל אמר {pc(thin[2].predicted)}: פער של {gapPts(thin[2].gap)} נקודות אחוז, בכיוון **הפוך** מהאמת (בטבלה של {f.plain("n")} המבקשים הפער בפס הזה קטן מאוד). בפס עם מעט מבקשים כל מקרה זז את החלק בהרבה: טבלת כיול מעטה מגזימה ברעש. לכן לא סומכים על פס עם פחות ממספר מסוים של מקרים (בשיעור, {f.plain("recal.min")}).
+
+### תיקון: ללמוד את המפה
+
+אם המודל מדרג נכון והמספרים לא, אפשר **לתקן** אותם: לומדים מכל פס מה קרה באמת, ומחליפים את תחזית המודל בחלק שאושר בפס. כדי לדעת אם התיקון עובד, בודקים אותו על מבקשים **שהתיקון לא ראה**: לומדים על {recal.trained} הראשונים, ובודקים על {recal.tested} הבאים. כך זה יוצא:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">למידה על</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער לפני</th>
+        <th class="py-2 pe-3 text-start font-semibold">פער אחרי</th>
+        <th class="py-2 pe-3 text-start font-semibold">בריאר לפני</th>
+        <th class="py-2 pe-3 text-start font-semibold">בריאר אחרי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recal.trained}</span> מבקשים</td><td class="py-2 pe-3"><span class="ltr">{recal.before.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.after.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recal.after.brier}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{recalSmall.trained}</span> מבקשים</td><td class="py-2 pe-3"><span class="ltr">{recalSmall.before.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.after.gap}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.before.brier}</span></td><td class="py-2 pe-3"><span class="ltr">{recalSmall.after.brier}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הכול על המבקשים שהתיקון לא ראה. פס שנלמד ממעט מקרים (פחות מ־{f.plain("recal.min")}) נשאר כמו שהיה.</p>
+</div>
+
+שני דברים:
+1. **עם {recal.trained} מבקשים ללמוד, הפער יורד** מ־{recal.before.gap} ל־{recal.after.gap}, אבל לא נעלם: הערכים בכל פס נלמדו מדגימה, והם עצמם רועשים. ציון בריאר כמעט לא זז ({recal.before.brier} ל־{recal.after.brier}): רוב השגיאה היא רעש שאי אפשר לתקן, לא בעיה של כיול.
+2. **עם {recalSmall.trained} מבקשים אין תיקון בכלל:** כל פס קטן מדי, ולכן נשארים עם המודל כמו שהוא. אי אפשר לכייל בלי נתונים.
+
+מכאן, הדבר החשוב: הסתברות מכוילת היא **ממצא מנתונים**, לא תכונה של נוסחה. מי שמציג ״90%״ בלי שמישהו בדק אותו מול מה שקרה, מציג מספר שלא ידוע אם הוא נכון.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## עקומת כיול
+
+</Section>
+
+כל נקודה היא פס של תחזיות. אם הנקודות על הקו המקווקו, ״70%״ הוא בערך 7 מתוך 10. מעל הקו, המודל נמוך מדי; מתחתיו, גבוה מדי.
+
+<CalibrationCurve client:visible seed={APPROVALS.seed} nMax={APPROVALS.n} />
+
+נסו:
+1. שנו את מספר המבקשים מ־100 ל־2000. מה קורה לנקודות: האם הן מתקרבות לקו, או רק מפסיקות לקפוץ?
+2. עם 2000 מבקשים, סמנו ״ללמוד תיקון״. מה קרה לנקודות ולפער?
+3. הורידו ל־100 מבקשים והדליקו את התיקון. מה קרה, ולמה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>עם מעט מבקשים הנקודות קופצות; עם הרבה הן מתייצבות. אבל הן מתייצבות **מתחת לקו** בפסים העליונים: המודל באמת מגזים, והרעש לא הסיבה.</li>
+    <li>הנקודות שאחרי התיקון (תכולות) קרובות יותר לקו, והפער יורד: מ־{recal.before.gap} ל־{recal.after.gap}.</li>
+    <li>עם מעט מבקשים לא נשאר פס עם מספיק מקרים, ולכן התיקון לא עושה כלום: הנקודות לא זזות.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## מה מחשבים
+
+</Section>
+
+**צעד 1 — פסים.** מחלקים את הטווח 0 עד 1 לפסים שווים, למשל חמישה. פס הוא ״מ־0.6 עד 0.8, ולא כולל 0.8״ (הפס האחרון כולל 1).
+
+**צעד 2 — לכל פס, שלושה מספרים.** כמה מבקשים נפלו בו, ממוצע התחזיות, ואיזה חלק מהם אושר:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">שיעור שאושר = כמה אושרו ÷ כמה מבקשים בפס</span></p>
+  <p class="text-h3 text-navy"><span class="ltr">פער = שיעור שאושר − ממוצע התחזיות</span></p>
+  <p class="text-h3 text-navy"><span class="ltr">בריאר = ממוצע של (תחזית − מה שקרה)²</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">מה שקרה</dt><dd>1 אם אושר, 0 אם לא</dd>
+    <dt class="ltr font-semibold text-n900">פער שלילי</dt><dd>המודל הבטיח יותר ממה שקרה</dd>
+    <dt class="ltr font-semibold text-n900">בריאר</dt><dd>0 הוא מושלם; לומר 0.5 תמיד נותן 0.25</dd>
+  </dl>
+</div>
+
+**צעד 3 — פער ממוצע.** ממוצע של הערך המוחלט של הפערים, משוקלל בכמות המבקשים בכל פס.
+
+**מתי זה נכון?**
+1. יש **הרבה** מבקשים בכל פס: מי שבודק פס של 5 מבקשים מקבל רעש.
+2. המבקשים של הבדיקה דומים לאלה שעליהם המודל ישמש. מודל שכוילו על עסקאות של שנה אחת ופועל בשנה אחרת (שיעור 8.24, זליגה) מקבל פער חדש.
+3. ״אישור״ מוגדר אחד: אישור עקרוני? הצעה בפועל? בנק אחד? מי שמערבב מוריד את ערך הבדיקה.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה של התחזית ועמודה של 1 או 0. פס לכל שורה: <span class="ltr">=COUNTIFS(A:A;"&gt;="&amp;0.6;A:A;"&lt;"&amp;0.8)</span> לספירה, <span class="ltr">=AVERAGEIFS(A:A;A:A;"&gt;="&amp;0.6;A:A;"&lt;"&amp;0.8)</span> לממוצע התחזיות, ו־<span class="ltr">=AVERAGEIFS(B:B;A:A;"&gt;="&amp;0.6;A:A;"&lt;"&amp;0.8)</span> לשיעור שאושר. בריאר: <span class="ltr">=SUMPRODUCT((A2:A11-B2:B11)^2)/10</span>.</p>
+<p><strong>במחשבון:</strong> עד עשר שורות, ביד.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.19"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "״90%״ לא פירושו ״כמעט כולם״: זה סיכוי לכל אחד, ובכל קבוצה יהיו גם מי שלא אושרו. וגם הגזמה: כאן אושרו פחות.",
+    "זה מה שהמודל אומר, ולא מה שקרה. מודל שנבנה מנתונים עדיין יכול להגזים בביטחון.",
+    "",
+    "כאן זה לא נכון: המודל נבנה בכוונה להגזים, והטבלה מראה את הפער. מודל לא מכויל אוטומטית.",
+  ]}
+>
+  בפס העליון המודל אמר בממוצע {pc(top.predicted)} ואושרו {pc(top.observed)}: {top.happened} מתוך {top.n}. ההבדל הוא פער הכיול. אילו הוא היה אפס, ״80% עד 100%״ היה אומר בדיוק מה שהוא אומר.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## עשרה מבקשים, ביד
+
+</Section>
+
+עשרה מבקשים (מספרים להמחשה). לחמישה המודל נתן 0.8, ומהם אושרו שלושה. לחמישה אחרים נתן 0.4, ומהם אושרו שניים.
+
+**צעד 1 — הפס של 0.8.** חמישה מבקשים, ממוצע תחזיות {hand[4].predicted}, אושרו {hand[4].happened} מתוך {hand[4].n}: {hand[4].observed}.
+
+**צעד 2 — הפער.** <M>{hand[4].observed} − {hand[4].predicted} = {hand[4].gap}</M>: המודל הבטיח יותר ממה שקרה.
+
+**צעד 3 — הפס של 0.4.** חמישה מבקשים, אושרו {hand[2].happened} מתוך {hand[2].n}: {hand[2].observed}, בדיוק מה שהמודל אמר: פער {hand[2].gap}.
+
+**צעד 4 — בריאר.** לכל מבקש מחשבים (תחזית פחות מה שקרה) בריבוע, וממוצע של העשרה: {f.plain("hand.brier")}.
+
+**מסקנה.** הפס של 0.8 מכויל גרוע, והפס של 0.4 מכויל מצוין, ובדיקה כוללת מראה זאת רק כשמסתכלים על כל פס בנפרד. הפער הממוצע המשוקלל הוא {f.plain("hand.gap")}.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מי מכויל?
+
+</Section>
+
+לכל טענה בחרו: ״מכוילת״, ״לא מכוילת״ או ״אין מספיק נתונים״. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.19-match"
+  promptLabel="הטענה"
+  answerLabel="המצב"
+  options={["מכוילת", "לא מכוילת", "אין מספיק נתונים"]}
+  rows={[
+    { prompt: `המודל אמר ${pc(hand[2].predicted)}, ואושרו ${pc(hand[2].observed)} מ־${hand[2].n} מבקשים`, answer: "מכוילת", given: true, why: "הממוצע שהמודל אמר שווה למה שקרה." },
+    { prompt: `המודל אמר ${pc(hand[4].predicted)}, ואושרו ${pc(hand[4].observed)} מ־${hand[4].n} מבקשים`, answer: "אין מספיק נתונים", why: `עם ${hand[4].n} מבקשים בפס, פער כזה יכול להיות רעש; צריך הרבה יותר מקרים כדי להחליט.` },
+    { prompt: `המודל אמר ${pc(top.predicted)}, ואושרו ${pc(top.observed)} מ־${top.n} מבקשים`, answer: "לא מכוילת", why: `פער של ${gapPts(top.gap)} נקודות אחוז, עם מאות מבקשים בפס: זה לא רעש.` },
+    { prompt: `המודל אמר ${pc(thin[2].predicted)}, ואושרו ${pc(thin[2].observed)} מ־${thin[2].n} מבקשים`, answer: "אין מספיק נתונים", why: "פס קטן: כל מקרה זז אותו הרבה." },
+  ]}
+  success="נכון. כיול נקבע לפי פער, אבל רק כשיש בפס מספיק מקרים."
+  hint="שאלו שתי שאלות: האם יש פער, והאם יש מספיק מקרים בפס כדי שהפער לא יהיה רעש."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+הנתונים הם סינתטיים, והמספרים להדגמה. התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.19-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "בערך 7 מתוך 10 מהמקרים שקיבלו ״70%״ אכן קורים", correct: true, feedback: "נכון. כיול בודק את המספר מול מה שקרה." },
+    { text: "המודל מדרג נכון מי סיכוי יותר", feedback: "זה דירוג, תכונה אחרת: מודל יכול לדרג נכון ובכל זאת לא להיות מכויל." },
+    { text: "המודל נבנה מהרבה נתונים", feedback: "הרבה נתונים לא מבטיחים כיול: צריך לבדוק מה קרה." },
+    { text: "המודל נותן תמיד אותו מספר", feedback: "מודל כזה לא מבחין בין מקרים, ולא הוכח שהוא מכויל." },
+  ]}
+>
+  מה פירוש ״הסתברות מכוילת״?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.19-2"
+  n={2}
+  level="קל"
+  tolerance={0}
+  near={0}
+  answer={String(top.happened)}
+  errors={[{ value: String(top.n), message: "זה מספר המבקשים בפס. השאלה כמה מהם אושרו." }]}
+>
+  בטבלת הכיול של השיעור, בפס העליון ({rng(top)}) יש {top.n} מבקשים. כמה מהם אושרו?
+</NumericExercise>
+
+<Solution for="8.19-2">
+בעמודת ״אושרו״, בשורה של הפס העליון: {top.happened} מתוך {top.n}, כלומר {pc(top.observed)}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.19-3"
+  n={3}
+  level="בינוני"
+  answer={hand[4].observed}
+  tolerance={0.0005}
+  near={0.005}
+  errors={[{ value: hand[4].predicted, tolerance: 0.0005, message: "זה מה שהמודל אמר. השאלה על החלק שאושר באמת." }]}
+>
+  לחמישה מבקשים המודל נתן 0.8, ומהם אושרו שלושה. איזה חלק אושר, כמספר עשרוני?
+</NumericExercise>
+
+<Solution for="8.19-3">
+<M>3 ÷ 5 = {hand[4].observed}</M>. הפער מול 0.8: {hand[4].gap}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.19-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("hand.brier")}
+  tolerance={0.0005}
+  near={0.005}
+  errors={[]}
+>
+  עשרה מבקשים: חמישה עם תחזית 0.8 (אושרו שלושה), חמישה עם תחזית 0.4 (אושרו שניים). מה ציון בריאר: הממוצע של (תחזית פחות מה שקרה) בריבוע?
+</NumericExercise>
+
+<Solution for="8.19-4">
+לכל מבקש: תחזית 0.8 שאושר: <M>(0.8 − 1)² = 0.04</M>, ושלא אושר: <M>(0.8 − 0)² = 0.64</M>. לתחזית 0.4: אושר <M>(0.4 − 1)² = 0.36</M>, לא אושר <M>0.4² = 0.16</M>. הסכום של העשרה, חלקי 10: {f.plain("hand.brier")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.19-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `לא: בפס עם ${thin[2].n} מבקשים הפער יכול להיות רעש, ובפס כזה אין להסתמך על הטבלה`, correct: true, feedback: "נכון. צריך הרבה יותר מקרים כדי לטעון." },
+    { text: "כן: הפער גדול, ולכן המודל שגוי", feedback: "הפער גדול כי המדגם קטן מאוד. בטבלה של 2000 מבקשים הפס הזה קרוב לקו." },
+    { text: `כן: ירידה מ־${pc(thin[2].predicted)} ל־${pc(thin[2].observed)} אינה אפשרית אצל מודל מכויל`, feedback: "בפס עם מעט מבקשים כל מקרה אחד זז את החלק בהרבה, גם אצל מודל מכויל." },
+    { text: "לא: אבל רק כי האחוז שאושר נמוך", feedback: "הגודל של האחוז לא קובע. כמות המקרים בפס היא שקובעת אם הפער רעש." },
+  ]}
+>
+  בטבלה של 100 מבקשים, בפס {rng(thin[2])} אושרו {pc(thin[2].observed)} כשהמודל אמר {pc(thin[2].predicted)}. האם זו הוכחה שהמודל מכויל רע בפס הזה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.19-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "ללמוד תיקון על חלק מהמבקשים ולבדוק אותו על מבקשים שלא ראה", correct: true, feedback: "נכון. תיקון שנבדק על אותם נתונים שלמד מהם נראה טוב תמיד." },
+    { text: "ללמוד ולבדוק על אותם מבקשים", feedback: "כך כל תיקון נראה מצוין, כי הוא כבר ״ראה״ את התשובות." },
+    { text: "לא לבדוק: תיקון מנתונים תמיד נכון", feedback: "התיקון עצמו נלמד מדגימה רועשת, ולכן הוא יכול לטעות." },
+    { text: "לבדוק רק את הפס העליון", feedback: "כיול נבדק בכל הפסים, ובכל פס צריך מספיק מקרים." },
+  ]}
+>
+  איך בודקים אם תיקון כיול באמת עוזר?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.19-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לא: רוב השגיאה של ציון בריאר היא רעש, שכיול לא מתקן. כיול מתקן את המספרים, לא את מה שאי אפשר לדעת מראש", correct: true, feedback: "נכון. ציון בריאר כמעט לא ירד, והפער כן." },
+    { text: "כן: אחרי תיקון הכול מושלם", feedback: "הפער ירד אבל לא נעלם, והרעש נשאר." },
+    { text: "כן: הפער ירד, ולכן ציון בריאר חייב לרדת הרבה", feedback: "אין קשר כזה: כשרוב השגיאה היא רעש, ציון בריאר כמעט לא זז." },
+    { text: "לא: כי התיקון הרס את הדירוג", feedback: "התיקון לא פגע בדירוג: הוא רק מחליף כל תחזית במספר של פס." },
+  ]}
+>
+  אחרי התיקון בשיעור הפער ירד מ־{recal.before.gap} ל־{recal.after.gap}, וציון בריאר מ־{recal.before.brier} ל־{recal.after.brier}. האם התיקון הפך את המודל למדויק?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.19-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: "להגיד שאין עדיין נתונים לכייל, ושהמספר הוא הנחה שלא נבדקה מול אישורים אמיתיים", correct: true, feedback: "נכון. זה המצב ב־Mogi היום, ובדיוק מה שהשיעור מלמד להגיד." },
+    { text: "להציג את המספר של המודל כהסתברות של בנק", feedback: "מודל לא מכויל לא נותן הסתברות שאפשר להתחייב אליה." },
+    { text: "לעגל לאחוזים שלמים, וזה יפתור", feedback: "עיגול לא מתקן כיול." },
+    { text: "להגדיל את המספר, כדי להיות בטוחים", feedback: "הגדלה בלי נתונים היא עוד הנחה." },
+  ]}
+>
+  מישהו מבקש מ־Mogi להציג ללקוח ״הסיכוי שבנק ב׳ יאשר״ כמספר. אין עדיין נתוני אישורים. מה הדבר הנכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על הסתברות וכיול">
+<p><strong>מה זה?</strong> הסתברות לאישור היא מספר בין 0 ל־1 שמודל נותן לבקשה. כיול הוא הבדיקה שהמספר הזה אומר מה שהוא אומר: ״70%״ הוא 7 מתוך 10.</p>
+<p><strong>למה זה קיים?</strong> כדי לדרג בנקים (שיעור 8.21) צריך לדעת כמה לסמוך על ״הסיכוי לאישור״. בלי כיול הוא מספר שנראה מדויק ואינו.</p>
+<p><strong>איך זה עובד?</strong> מחלקים לפסים, בכל פס משווים את מה שהמודל אמר למה שקרה, ובודקים שיש מספיק מקרים. אם יש פער, אפשר ללמוד תיקון, ולבדוק אותו על מקרים חדשים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ״בנק א׳ יאשר בסיכוי של 90%״ הוא אמירה שאפשר לבדוק. אם המודל לא נבדק, כדאי להתייחס אליה כניחוש מנומק.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משתמשים בהסתברות לדרג, מציגים אותה עם ההסבר שהיא אומדן, ומעדכנים אותה כשמגיעות החלטות אמיתיות של בנקים. החישוב נעשה בקוד שאפשר לבדוק: מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הסתברות לאישור:** מספר בין 0 ל־1 שמודל נותן, כשציון גבוה נהפך להסתברות גבוהה.
+- **כיול:** ״70%״ אומר 7 מתוך 10. בודקים בפסים: ממוצע התחזיות מול החלק שאושר, ופער ביניהם.
+- **דירוג וכיול הם שני דברים:** מודל יכול לדרג נכון ולהגזים בביטחון. בשיעור, ״90%״ היה 79%.
+- **מעט מקרים בפס, הרבה רעש.** כדי לכייל צריך הרבה מקרים בכל פס, ואימות על מקרים חדשים.
+- **תיקון עוזר, אבל חלקית:** הפער ירד, ציון בריאר כמעט לא, כי רוב השגיאה היא רעש.
+- **ב־Mogi אין עדיין נתוני אישורים,** ולכן ההסתברות כאן היא מכשיר הוראה, לא מספר שאפשר להסתמך עליו.
+
+**בשיעור הבא — 8.20, <Later lesson="8.20" quiet>אומדן מול הצעת בנק</Later>:** מה ההבדל בין מה שהמודל מעריך ובין מה שבנק באמת אמר, ומי מחליף את מי.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "הסתברות, עקומה לוגיסטית שהופכת ציון להסתברות, טבלת כיול (מהימנות), ציון בריאר, ופער כיול משוקלל; למידת מפה מפסים ובדיקתה על מקרים שלא נראו. ידע כללי של סטטיסטיקה ולמידת מכונה, לא מקור שצוטט." },
+    { kind: "מחקר / הצעה", text: "תכנון האלגוריתם של Mogi (חלק 4 של תוכנית הקורס): הסתברות שבנק X יאשר תמהיל Y, ומה זה כיול של הסתברות. תכנון, לא קוד שקיים; אין נתוני אישורים ב־Mogi." },
+    { kind: "לא אומת", text: "אילון אישר ב־2026-10-07 (בעקבות 15 התשובות) שיש לו גישה למקור שמכיל הרבה אישורים עקרוניים; גודלו, כיסוי הבנקים ושלמותו לא נבדקו, ולא הוסכם סף של סטייה מותרת. נרשם בצוות ב־2026-10-08 לצורכי אימות מול הצעות; לפי הרישום בצוות, לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "המבקשים: 2,000 מבקשים סינתטיים שנוצרו בגנרטור מספרים אקראיים עם גרעין קבוע: שיעור מימון 30%–75% ויחס החזר 20%–50%. הסיכוי האמיתי הוא העקומה הלוגיסטית של ציון שמורכב מהם; המודל מכפיל את הציון הזה ב־1.6 (ביטחון יתר מכוון). הכול מומצא להדגמה: לא מודל של Mogi ולא התנהגות של בנק." },
+    { kind: "לא אומת", text: "אילו נתוני אישורים יהיו זמינים ל־Mogi, בכמה, ובאיזו הסכמה מותר ללמוד מהם: לא הוחלט (שיעור 8.26). שאלה פתוחה לאילון ולעורך הדין." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו בנפרד בפייתון, כולל המבקשים הסינתטיים (אותו גנרטור כתוב פעמיים).", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/calibration.ts (seeded applicants through montecarlo.ts's mulberry32) via scripts/lessons/lesson-8-19.ts and data/lessons/8-19.json; rechecked by checks/kinds/calibration.py and rng.py. Illustration: src/components/CalibrationCurve.vue. Brain: the 15 answers (Q2, validation sample, 2026-10-07/08). Video: video/8-19.html. */}

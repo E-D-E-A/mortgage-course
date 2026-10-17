@@ -1,0 +1,187 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.17 — "עוגן ועוד מרווח, ומדרגות". Every number comes from data/lessons/8-17.json; render(t)
+  depends only on t. Synthetic data, for illustration; the stamp says so on each picture. The model is a SHAPE the course
+  teaches, not a bank's pricing.
+
+  Script (one idea: the rate is an anchor plus a margin, and the margin is flat between thresholds and jumps at them, so a
+  model that knows the steps can answer "what if" - as an estimate):
+  1. Title.
+  2. The rate: anchor 4.20 + margin = rate.
+  3. The margin against the financing ratio: sixty made-up offers, and the staircase through them.
+  4. What if: 64% financing falls to 60%: the margin steps down; the payment falls.
+  5. It is an estimate, not a promise.
+  6. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.17 · מודל תמחור</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("8-17");
+      const { fact, num, whole, shek, pl, lr, clamp, inScene, vis, after, grow, C, el, txt, box, line, dot, stamp, title } = v;
+      const OFFERS = fact("data.offers");
+      const V = {
+        anchor: fact("anchor"), base: fact("base"), s40: fact("step.40"), s60: fact("step.60"), spti: fact("step.pti"),
+        m1: fact("d.margin1"), m2: fact("d.margin2"), r1: fact("d.rate1"), r2: fact("d.rate2"),
+        ltv1: pl(fact("d.ltv1")), ltv2: pl(fact("d.ltv2")), eq: num(fact("d.equity_added")), pay1: num(fact("d.pay1")), pay2: num(fact("d.pay2")),
+        drop: num(fact("d.pay_drop")), dropRate: num(fact("d.pay_drop_rate")), n: pl(fact("gen.n")),
+      };
+      const S = { title: [0, 7], rate: [7, 32], stairs: [32, 78], what: [78, 112], est: [112, 128], end: [128, 140] };
+      window.duration = 140;
+      window.cues = [
+        [1, 5.5, "עוגן ועוד מרווח, ומדרגות."],
+        [8, 15, "אחוז הריבית הוא עוגן ועוד מרווח."],
+        [15, 22, "העוגן אחד לכולם. המרווח משתנה."],
+        [22, 31, "מה קובע אותו? הלקוח, העסקה והבנק."],
+        [33, 40, `${V.n} הצעות שהקורס המציא, להדגמה.`],
+        [40, 48, "אופקי: שיעור המימון. אנכי: המרווח."],
+        [48, 58, "המרווח שטוח בין ספים וקופץ מעליהם."],
+        [58, 68, "מעל 40% מדרגה אחת, מעל 60% עוד אחת."],
+        [68, 77, "גם יחס ההחזר מעל 40% מוסיף מדרגה."],
+        [79, 87, `לקוח במימון של ${V.ltv1}% מכניס עוד הון.`],
+        [87, 96, `המימון יורד ל־${V.ltv2}%: בדיוק על הסף.`],
+        [96, 104, `המרווח יורד מ־${V.m1} ל־${V.m2}.`],
+        [104, 111.5, `החזר חודשי: מ־${V.pay1} ל־${V.pay2} ₪.`],
+        [113, 120, "זו תשובה של מודל: אומדן."],
+        [120, 127.5, "לא הצעה של בנק, ולא הבטחה."],
+        [129, 134, "מודל שמכיר מדרגות עונה על מה אם."],
+        [134, 139, "ובודקים מול הצעה אמיתית."],
+      ];
+      // The staircase plot: financing ratio 30-75 (left to right), margin 0-1.8 (up).
+      const G = { l: 260, r: 1020, top: 160, bot: 500 };
+      const X = (v) => G.l + ((v - 30) / 45) * (G.r - G.l);
+      const Y = (m) => G.bot - (m / 1.8) * (G.bot - G.top);
+      const marginAt = (ltv, high) => Number(V.base) + (ltv > 60 ? Number(V.s60) : ltv > 40 ? Number(V.s40) : 0) + (high ? Number(V.spti) : 0);
+      const stair = (high, o, color, w, upto = 1) => {
+        const pts = [];
+        let prev = null;
+        for (let v = 30; v <= 30 + 45 * upto; v += 0.5) {
+          const m = marginAt(v, high);
+          if (prev !== null && m !== prev) pts.push([X(v - 0.25), Y(prev)], [X(v - 0.25), Y(m)]);
+          if (v === 30) pts.push([X(v), Y(m)]);
+          prev = m;
+        }
+        pts.push([X(30 + 45 * upto), Y(prev)]);
+        el("polyline", { points: pts.map((p) => p.join(",")).join(" "), fill: "none", stroke: color, "stroke-width": w, opacity: o });
+      };
+      const axes = (o) => {
+        line(G.l - 20, G.bot, G.r + 10, G.bot, o);
+        line(G.l - 20, G.top - 20, G.l - 20, G.bot, o);
+        [30, 40, 50, 60, 70].forEach((v) => txt(X(v), G.bot + 30, `${v}%`, 18, { fill: C.n600, o, ltr: true }));
+        [0.5, 1.0, 1.5].forEach((m) => txt(G.l - 32, Y(m) + 6, m.toFixed(1), 18, { fill: C.n600, o, anchor: "end", ltr: true }));
+        txt(640, G.bot + 62, "שיעור מימון", 18, { fill: C.n600, o });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) title(t, S.title, "עוגן ועוד מרווח", "ומדרגות סביב ספים", "מודל תמחור קטן על נתונים סינתטיים");
+        // Scene 2 — the rate
+        if (inScene(t, S.rate)) {
+          const o = vis(t, S.rate);
+          txt(640, 124, "אחוז הריבית", 40, { w: 700, o });
+          const cards = [
+            { x: 960, label: "עוגן", val: `${V.anchor}%`, from: 1 },
+            { x: 640, label: "מרווח", val: `${V.m1}`, from: 8 },
+            { x: 320, label: "אחוז הריבית", val: `${V.r1}%`, from: 16 },
+          ];
+          cards.forEach((c, k) => {
+            const oa = after(t, S.rate, c.from, o);
+            box(c.x - 130, 220, 260, 150, oa);
+            txt(c.x, 270, c.label, 26, { fill: C.n600, o: oa });
+            txt(c.x, 335, c.val, 54, { w: 700, o: oa, ltr: true, fill: k === 2 ? C.teal : C.navy });
+          });
+          txt(800, 310, "+", 56, { fill: C.n600, o: after(t, S.rate, 8, o) });
+          txt(480, 310, "=", 56, { fill: C.n600, o: after(t, S.rate, 16, o) });
+          txt(640, 440, "המרווח: פרופיל הלקוח, העסקה והבנק", 26, { fill: C.n700, o: after(t, S.rate, 14, o) });
+          stamp(o);
+        }
+        // Scene 3 — the staircase
+        if (inScene(t, S.stairs)) {
+          const o = vis(t, S.stairs);
+          txt(640, 110, "המרווח מול שיעור המימון", 38, { w: 700, o });
+          axes(o);
+          const g = grow(t, S.stairs, 1, 6);
+          OFFERS.forEach((p, k) => dot(X(Number(p.ltv)), Y(Number(p.margin)), 5, Number(p.pti) > 40 ? C.tq2 : C.teal, o * (g * OFFERS.length > k ? 0.85 : 0)));
+          const o2 = after(t, S.stairs, 14, o);
+          if (o2 > 0) { stair(false, o2, C.navy, 4, grow(t, S.stairs, 14, 6)); }
+          const o3 = after(t, S.stairs, 30, o);
+          if (o3 > 0) stair(true, o3, C.navy, 4, grow(t, S.stairs, 30, 6));
+          const o4 = after(t, S.stairs, 20, o);
+          [40, 60].forEach((v) => { line(X(v), G.top - 10, X(v), G.bot, o4, C.n400, 2, "6 5"); });
+          txt(X(40), G.top - 20, "40%", 20, { w: 700, o: o4, ltr: true });
+          txt(X(60), G.top - 20, "60%", 20, { w: 700, o: o4, ltr: true });
+          txt(1030, G.top + 40, "יחס החזר מעל 40%", 20, { fill: C.teal, anchor: "start", o: o3 });
+          txt(1030, G.bot - 70, "יחס החזר עד 40%", 20, { fill: C.teal, anchor: "start", o: o2 });
+          stamp(o);
+        }
+        // Scene 4 — what if
+        if (inScene(t, S.what)) {
+          const o = vis(t, S.what);
+          txt(640, 110, "מה אם נכנס עוד הון עצמי?", 38, { w: 700, o });
+          axes(o);
+          stair(false, o, C.n300, 4);
+          const a = after(t, S.what, 1, o);
+          if (a > 0) { dot(X(Number(V.ltv1)), Y(Number(V.m1)), 12, C.navy, a); txt(X(Number(V.ltv1)) + 20, Y(Number(V.m1)) - 18, `${V.ltv1}% · ${V.m1}`, 24, { w: 700, o: a, anchor: "start", ltr: true }); }
+          const b = after(t, S.what, 9, o);
+          if (b > 0) {
+            line(X(Number(V.ltv1)), Y(Number(V.m1)), X(Number(V.ltv2)), Y(Number(V.m2)), b, C.teal, 4, "7 5");
+            dot(X(Number(V.ltv2)), Y(Number(V.m2)), 12, C.teal, b);
+            txt(X(Number(V.ltv2)) - 20, Y(Number(V.m2)) + 36, `${V.ltv2}% · ${V.m2}`, 24, { w: 700, o: b, anchor: "end", ltr: true, fill: C.teal });
+          }
+          const c = after(t, S.what, 18, o);
+          box(160, 530, 960, 56, c * 0.9, C.mint);
+          txt(640, 566, `אחוז הריבית ${V.r1}% ← ${V.r2}% · ההחזר ${V.pay1} ← ${V.pay2} ₪`, 26, { w: 700, o: c });
+        }
+        // Scene 5 — an estimate
+        if (inScene(t, S.est)) {
+          const o = vis(t, S.est);
+          txt(640, 130, "מה זו התשובה?", 40, { w: 700, o });
+          const rows = [["מודל", "אומדן עם אי־ודאות", 1], ["לא", "הצעה של בנק", 4], ["לא", "הבטחה", 6.5]];
+          rows.forEach(([a, b, from], i) => {
+            const oa = after(t, S.est, from, o);
+            box(260, 200 + i * 100, 760, 80, oa);
+            txt(980, 250 + i * 100, a, 30, { anchor: "start", w: 700, fill: i === 0 ? C.teal : C.n600, o: oa });
+            txt(760, 250 + i * 100, b, 30, { anchor: "start", o: oa });
+          });
+          stamp(o);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [["מדרגות", "שטוח בין ספים, קופץ מעליהם"], ["מה אם", "מודל שמכיר מדרגות עונה"], ["בסוף", "הצעה אמיתית מחליפה אומדן"]];
+          rows.forEach(([a, b], i) => {
+            const oa = after(t, S.end, 0.3 + i * 2.5, o);
+            txt(1060, 240 + i * 80, a, 34, { anchor: "start", w: 700, o: oa });
+            txt(760, 240 + i * 80, b, 30, { anchor: "start", fill: C.teal, o: oa });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

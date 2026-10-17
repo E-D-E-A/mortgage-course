@@ -1,0 +1,543 @@
+{
+  "lesson": "8.7",
+  "title": "הנתונים, האילוצים הקשיחים ופתרון אפשרי",
+  "note": "A design lesson (future): a teaching model of the filter on the synthetic case.",
+  "facts": [
+    {
+      "id": "k.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000"
+    },
+    {
+      "id": "k.max_pay",
+      "kind": "given",
+      "inputs": {},
+      "value": "8300"
+    },
+    {
+      "id": "k.target",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "k.n",
+      "kind": "given",
+      "inputs": {},
+      "value": "12"
+    },
+    {
+      "id": "r.c01",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360"
+      },
+      "value": "client_target_ratio"
+    },
+    {
+      "id": "r.c02",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:656000:4.6:360,variable_unlinked:492000:4.1:360,fixed_unlinked:492000:4.4:360"
+      },
+      "value": "variable_share,client_target_ratio"
+    },
+    {
+      "id": "r.c03",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240"
+      },
+      "value": "pti,bank_ratio,client_max_payment,client_target_ratio"
+    },
+    {
+      "id": "r.c04",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:300"
+      },
+      "value": "client_max_payment,client_target_ratio"
+    },
+    {
+      "id": "r.c05",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360"
+      },
+      "value": "client_max_payment,client_target_ratio"
+    },
+    {
+      "id": "r.c06",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240"
+      },
+      "value": "bank_ratio,client_max_payment,client_target_ratio"
+    },
+    {
+      "id": "r.c07",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360"
+      },
+      "value": ""
+    },
+    {
+      "id": "r.c08",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:480000:4.6:360,variable_unlinked:320000:4.1:360"
+      },
+      "value": "equity_available"
+    },
+    {
+      "id": "r.c09",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360"
+      },
+      "value": "variable_share"
+    },
+    {
+      "id": "r.c10",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360"
+      },
+      "value": "bank_ltv,client_target_ratio"
+    },
+    {
+      "id": "r.c11",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360"
+      },
+      "value": ""
+    },
+    {
+      "id": "r.c12",
+      "kind": "cons_reasons",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:656000:4.4:360,prime:656000:4.6:360,variable_unlinked:328000:4.1:360"
+      },
+      "value": "client_target_ratio"
+    },
+    {
+      "id": "m.c01_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "40.4"
+    },
+    {
+      "id": "m.c01_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "8182"
+    },
+    {
+      "id": "m.c01_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "m.c01_var",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "variable_percent",
+        "decimals": 1
+      },
+      "value": "66"
+    },
+    {
+      "id": "m.c01_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "m.c03_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "50.8"
+    },
+    {
+      "id": "m.c03_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "10287"
+    },
+    {
+      "id": "m.c03_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "m.c03_var",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240",
+        "part": "variable_percent",
+        "decimals": 1
+      },
+      "value": "0"
+    },
+    {
+      "id": "m.c03_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "m.c07_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "39.97"
+    },
+    {
+      "id": "m.c07_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "8094"
+    },
+    {
+      "id": "m.c07_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "73.64"
+    },
+    {
+      "id": "m.c07_var",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360",
+        "part": "variable_percent",
+        "decimals": 1
+      },
+      "value": "40"
+    },
+    {
+      "id": "m.c07_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1620000"
+    },
+    {
+      "id": "m.c09_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "33.83"
+    },
+    {
+      "id": "m.c09_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "8204"
+    },
+    {
+      "id": "m.c09_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "m.c09_var",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "variable_percent",
+        "decimals": 1
+      },
+      "value": "70"
+    },
+    {
+      "id": "m.c09_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "m.c11_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "39.43"
+    },
+    {
+      "id": "m.c11_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "7985"
+    },
+    {
+      "id": "m.c11_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "72.73"
+    },
+    {
+      "id": "m.c11_var",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360",
+        "part": "variable_percent",
+        "decimals": 1
+      },
+      "value": "60"
+    },
+    {
+      "id": "m.c11_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1600000"
+    },
+    {
+      "id": "m.c09_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "24250"
+    },
+    {
+      "id": "m.c01_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "20250"
+    },
+    {
+      "id": "m.c05_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "41.04"
+    },
+    {
+      "id": "m.c05_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "payment",
+        "decimals": 0
+      },
+      "value": "8310"
+    },
+    {
+      "id": "m.c10_ltv",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360",
+        "part": "ltv",
+        "decimals": 2
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "m.c06_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "45"
+    },
+    {
+      "id": "f.identity",
+      "kind": "cons_feasible_count",
+      "inputs": {
+        "candidates": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:656000:4.6:360,variable_unlinked:492000:4.1:360,fixed_unlinked:492000:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:300|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240|price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360|price=2200000;equity=600000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:480000:4.6:360,variable_unlinked:320000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360|price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:656000:4.4:360,prime:656000:4.6:360,variable_unlinked:328000:4.1:360",
+        "families": "identity"
+      },
+      "value": 12
+    },
+    {
+      "id": "f.law",
+      "kind": "cons_feasible_count",
+      "inputs": {
+        "candidates": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:656000:4.6:360,variable_unlinked:492000:4.1:360,fixed_unlinked:492000:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:300|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240|price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360|price=2200000;equity=600000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:480000:4.6:360,variable_unlinked:320000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360|price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:656000:4.4:360,prime:656000:4.6:360,variable_unlinked:328000:4.1:360",
+        "families": "identity,law"
+      },
+      "value": 9
+    },
+    {
+      "id": "f.bank",
+      "kind": "cons_feasible_count",
+      "inputs": {
+        "candidates": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:656000:4.6:360,variable_unlinked:492000:4.1:360,fixed_unlinked:492000:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:300|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240|price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360|price=2200000;equity=600000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:480000:4.6:360,variable_unlinked:320000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360|price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:656000:4.4:360,prime:656000:4.6:360,variable_unlinked:328000:4.1:360",
+        "families": "identity,law,bank"
+      },
+      "value": 7
+    },
+    {
+      "id": "f.all",
+      "kind": "cons_feasible_count",
+      "inputs": {
+        "candidates": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:541200:4.6:360,variable_unlinked:541200:4.1:360,fixed_unlinked:557600:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=prime:656000:4.6:360,variable_unlinked:492000:4.1:360,fixed_unlinked:492000:4.4:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:240|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:1640000:4.4:300|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:984000:4.4:360,prime:656000:4.6:240|price=2200000;equity=580000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:972000:4.4:360,prime:324000:4.6:360,variable_unlinked:324000:4.1:360|price=2200000;equity=600000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:480000:4.6:360,variable_unlinked:320000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:492000:4.4:360,prime:656000:4.6:360,variable_unlinked:492000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=50:70:prime=4.65,variable_unlinked=4.15,fixed_unlinked=4.45,fixed_linked=2.80,variable_linked=2.60;tracks=fixed_unlinked:656000:4.45:360,prime:492000:4.65:360,variable_unlinked:492000:4.15:360|price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:640000:4.4:360,prime:480000:4.6:360,variable_unlinked:480000:4.1:360|price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:656000:4.4:360,prime:656000:4.6:360,variable_unlinked:328000:4.1:360",
+        "families": "identity,law,bank,client"
+      },
+      "value": 2
+    },
+    {
+      "id": "f.rejected",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "lim.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2200000",
+        "deal": "only_home"
+      },
+      "value": "1650000.00"
+    },
+    {
+      "id": "lim.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1640000"
+      },
+      "value": "1093333.33"
+    },
+    {
+      "id": "lim.max_pay40",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
+        "percent": "40"
+      },
+      "value": "8100.00"
+    },
+    {
+      "id": "lim.max_pay50",
+      "kind": "reg_max_payment",
+      "inputs": {
+        "income": "20250.00",
+        "percent": "50"
+      },
+      "value": "10125.00"
+    },
+    {
+      "id": "ex.max_loan",
+      "kind": "reg_max_loan",
+      "inputs": {
+        "value": "2000000",
+        "deal": "only_home"
+      },
+      "value": "1500000.00"
+    },
+    {
+      "id": "ex.max_var",
+      "kind": "reg_max_variable",
+      "inputs": {
+        "loan": "1200000"
+      },
+      "value": "800000.00"
+    },
+    {
+      "id": "ex.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000000"
+    },
+    {
+      "id": "ex.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000"
+    }
+  ]
+}

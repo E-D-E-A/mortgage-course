@@ -1,0 +1,136 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.21 — "הצנרת המלאה". Every number comes from data/lessons/8-21.json; render(t) depends only on t.
+  Synthetic data; the banks are fictional; the pipeline is a teaching model of what Mogi plans (future), Mogi has no such code.
+
+  Script (one idea: the stages run one after the other for each bank, the ranking puts the cheapest approved mix above the
+  threshold first, and a real offer from one bank replaces that bank's estimate and can change the order):
+  1. Title.
+  2. Six stages, for each bank.
+  3. The ranking with estimates: b, a, c; d refuses.
+  4. An offer from bank c replaces its estimate; the order changes.
+  5. Takeaway.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.21 · הצנרת המלאה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("8-21");
+      const { fact, num, whole, shek, pl, lr, clamp, inScene, vis, after, grow, C, el, txt, box, line, dot, stamp, title } = v;
+      const BANK = { a: "בנק א׳", b: "בנק ב׳", c: "בנק ג׳", d: "בנק ד׳" };
+      const est = fact("rank.estimate"), off = fact("rank.offer");
+      const tot = { a: fact("a.parent.v.total"), b: fact("b.parent.v.total"), c: fact("c.parent.v.total") };
+      const pr = { a: fact("a.parent.p"), b: fact("b.parent.p"), c: fact("c.parent.p") };
+      const offTotal = fact("offer.total");
+      const order = (r) => [...r].filter((x) => x.rank).sort((x, y) => x.rank - y.rank).map((x) => x.id);
+      const oe = order(est), oo = order(off);
+      const S = { title: [0, 7], stages: [7, 38], rank: [38, 74], offer: [74, 112], end: [112, 124] };
+      window.duration = 124;
+      window.cues = [
+        [1, 5.5, "הצנרת המלאה, משלב לשלב."],
+        [8, 15, "לכל בנק, שישה שלבים בזה אחר זה."],
+        [15, 22, "מיצוב, תמהיל ומחיר חזוי."],
+        [22, 29, "הסתברות לאישור, דירוג והסבר."],
+        [29, 37.5, "המודל מסביר. הוא לא מחשב ולא מחליט."],
+        [39, 46, "ארבעה בנקים פיקטיביים, אותה בקשה."],
+        [46, 54, "מקום ראשון: הזול מבין מי שמעל הסף."],
+        [54, 62, "בנק ד׳ פוסל: אף מועמד לא עבר."],
+        [62, 73, "הסדר מוסבר, לא רק מדורג."],
+        [75, 83, "בנק ג׳ מחזיר הצעה אמיתית."],
+        [83, 92, "ההצעה באה במקום האומדן של בנק ג׳."],
+        [92, 102, "בנק ג׳ עולה למקום השני."],
+        [102, 111, "הצעה אחת שינתה את הסדר."],
+        [113, 118, "כל שלב נקרא בנפרד."],
+        [118, 123, "ושום שלב לא סומך על מודל שפה."],
+      ];
+      const stages = ["מיצוב", "תמהיל", "מחיר חזוי", "הסתברות", "דירוג", "הסבר"];
+      const rowsView = (t, sc, ids, totals, probs, o, tag) => {
+        ids.forEach((id, k) => {
+          const y = 190 + k * 80;
+          const oa = after(t, sc, 0.5 + k * 1.5, o);
+          const first = k === 0;
+          box(220, y, 840, 64, oa, first ? C.mint : C.n0);
+          txt(1030, y + 42, `מקום ${k + 1}`, 24, { anchor: "start", w: 700, o: oa });
+          txt(900, y + 42, BANK[id], 26, { anchor: "start", w: 700, o: oa });
+          txt(560, y + 42, `${num(totals[id])} ₪`, 26, { anchor: "start", ltr: true, o: oa });
+          txt(280, y + 42, tag(id, probs[id]), 22, { anchor: "start", fill: C.n700, ltr: true, o: oa });
+        });
+      };
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) title(t, S.title, "הצנרת המלאה", "משלב לשלב", "מיצוב · תמהיל · מחיר · הסתברות · דירוג");
+        if (inScene(t, S.stages)) {
+          const o = vis(t, S.stages);
+          txt(640, 120, "שישה שלבים, לכל בנק", 38, { w: 700, o });
+          stages.forEach((s, k) => {
+            const x = 1130 - k * 200;
+            const oa = after(t, S.stages, 1 + k * 3.5, o);
+            box(x - 90, 240, 180, 110, oa, k === 5 ? C.mint : C.n0);
+            txt(x, 285, `${k + 1}`, 28, { w: 700, fill: C.teal, o: oa });
+            txt(x, 330, s, 26, { w: 700, o: oa });
+            if (k < 5) txt(x - 100, 300, "←", 30, { fill: C.n600, o: oa });
+          });
+          txt(640, 450, "החיפוש והחישוב בקוד. מודל שפה רק מסביר", 28, { fill: C.teal, w: 700, o: after(t, S.stages, 24, o) });
+          stamp(o);
+        }
+        if (inScene(t, S.rank)) {
+          const o = vis(t, S.rank);
+          txt(640, 120, "הדירוג עם אומדנים", 38, { w: 700, o });
+          rowsView(t, S.rank, oe, tot, pr, o, (id, p) => `סיכוי ${Math.round(Number(p) * 100)}%`);
+          const od = after(t, S.rank, 18, o);
+          box(220, 190 + oe.length * 80, 840, 64, od, C.n100);
+          txt(1030, 190 + oe.length * 80 + 42, "נפסל", 24, { anchor: "start", w: 700, o: od });
+          txt(900, 190 + oe.length * 80 + 42, BANK.d, 26, { anchor: "start", w: 700, o: od });
+          txt(560, 190 + oe.length * 80 + 42, "אין מועמד שעבר את הקווים", 22, { anchor: "start", fill: C.n700, o: od });
+          stamp(o);
+        }
+        if (inScene(t, S.offer)) {
+          const o = vis(t, S.offer);
+          txt(640, 120, "הצעה אמיתית מבנק ג׳", 38, { w: 700, o });
+          const tot2 = { ...tot, c: offTotal };
+          const pr2 = { ...pr, c: "1" };
+          rowsView(t, S.offer, oo, tot2, pr2, o, (id) => (id === "c" ? "הצעה אמיתית" : "אומדן"));
+          const ob = after(t, S.offer, 20, o);
+          txt(640, 530, `האומדן של בנק ג׳ היה ${num(tot.c)} ₪`, 26, { fill: C.n700, ltr: false, o: ob });
+          stamp(o);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [["כל שלב", "נבדק בנפרד"], ["הצעה אמיתית", "מחליפה אומדן"], ["מודל שפה", "מסביר ולא מחשב"]];
+          rows.forEach(([a, b], i) => {
+            const oa = after(t, S.end, 0.3 + i * 2.5, o);
+            txt(1060, 240 + i * 80, a, 34, { anchor: "start", w: 700, o: oa });
+            txt(760, 240 + i * 80, b, 30, { anchor: "start", fill: C.teal, o: oa });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

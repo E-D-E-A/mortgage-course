@@ -1,0 +1,524 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.28"
+minutes: 90
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.28");
+export const p = (id) => f.plain(id);
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const DL = "/downloads/";
+export const CONSTRAINTS = [
+  ["sum_equals_loan", "סכום המסלולים שווה להלוואה"],
+  ["equity_available", "ההון העצמי קיים"],
+  ["ltv", "שיעור מימון עד התקרה"],
+  ["pti", "יחס החזר עד 50%"],
+  ["variable_share", "לפחות שליש בריבית קבועה"],
+  ["term", "עד 30 שנה"],
+  ["bank_ratio", "יחס ההחזר עד קו הסירוב של הבנק"],
+  ["bank_ltv", "שיעור המימון עד קו הסירוב של הבנק"],
+  ["client_max_payment", "ההחזר עד המרבי שהלקוח קבע"],
+  ["client_target_ratio", "יחס ההחזר עד יעד הלקוח"],
+];
+export const frontIds = f.raw("p.front_ids").split("|");
+export const mixText = (id) => { const [a, b, c] = id.slice(1).split("-"); return `${a}% קבועה, ${b}% פריים, ${c}% משתנה`; };
+export const winnerId = f.raw("p.winner_id");
+export const runnerId = f.raw("p.runner_id");
+export const rejId = f.raw("p.rej.id");
+export const predictionOptions = [
+  "כמעט כולם: רוב התמהילים עומדים בכללים",
+  "בערך מחצית",
+  "מיעוט: כחמישית מהם",
+  "אחד או שניים בלבד",
+];
+export const half = [
+  { reason: "variable_share", label: "לפחות שליש בריבית קבועה", count: f.raw("p.reject:variable_share") },
+  { reason: "client_max_payment", label: "ההחזר עד המרבי שהלקוח קבע", count: f.raw("p.reject:client_max_payment") },
+  { reason: "client_target_ratio", label: "יחס ההחזר עד יעד הלקוח", count: f.raw("p.reject:client_target_ratio") },
+];
+
+בשיעורים 8.1 עד 8.27 למדתם את החלקים: מתמטיקה, ניסוח הבעיה, מנוע החישוב, חיפוש, תמחור, הצנרת ואיך אלגוריתם גדל. היום אתם בונים אותם יחד, בגיליון, על תיק סינתטי: **מיצוב ← תזרים ← חיפוש ← סינון לפי אילוצים ← חזית יעילה ← בחירה ← הסבר**, ובודקים אותו מול הצעת בנק לדוגמה. מי שרוצה יכול לראות את אותו מנוע ב־Python, מוסבר שורה אחר שורה.
+
+<Callout title="מה מעמד השיעור הזה" tone="warning">
+<p><strong>{MARK}</strong> כל המשקולות, הצעדים והריביות כאן להדגמה: לא החלטה של Mogi ולא מדיניות של בנק.</p>
+<ul>
+<li><strong>Mogi היום:</strong> אין חישוב תמהיל בקוד, והקריאה למנוע מוקפאת. המנוע שאתם בונים כאן הוא של הקורס.</li>
+<li><strong>הוחלט:</strong> שני כללים מתוך כללי החישוב של אילון נכנסים לחישוב עצמו: התחייבות שנשארו לה יותר מ־18 חודשים מנוכה מההכנסה, וביחס ההחזר נספר ההחזר הראשון על כל הסכום (לפי הסיכום של הצוות, 7.10.2026). ושמות מצבי השכבה.</li>
+<li><strong>עתיד:</strong> כל השאר: הרשת, האילוצים כקוד, החזית, המשקולות, ההסבר.</li>
+</ul>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.28"
+  question={`הרשת של הסדנה מכילה ${p("p.space")} תמהילים אפשריים לבדיקה. אחרי המיצוב (הון עצמי נוסף), כמה מהם יעמדו בכל האילוצים?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## המנוע הקטן מקצה לקצה
+
+</Section>
+
+<LessonVideo lesson="8-28" />
+
+<Section kind="ההסבר">
+
+## שבעה צעדים, וגיליון אחד
+
+</Section>
+
+מה שאתם בונים הוא המנוע של שיעורים 8.6 עד 8.21 בגרסה קטנה. הטבלה אומרת מה כל צעד עושה ואיפה הוא בגיליון:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">צעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה עושים</th>
+        <th class="py-2 pe-3 text-start font-semibold">איפה בגיליון</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">1. מיצוב (8.6)</td><td class="py-2 pe-3">בוחרים הון עצמי נוסף, הלוואת רכב, הורה ובנק</td><td class="py-2 pe-3">תאים B18 עד B21, חישובים בשורות 45 עד 56</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">2. תזרים (8.9)</td><td class="py-2 pe-3">ההחזר של כל מסלול, וההחזר הגבוה בלחץ</td><td class="py-2 pe-3">עמודות H עד O של הרשת</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">3. חיפוש (8.13, 8.14)</td><td class="py-2 pe-3">רשת של כל התמהילים בצעדים של 10%</td><td class="py-2 pe-3">שורות הרשת, מ־89</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">4. אילוצים (8.7)</td><td class="py-2 pe-3">עשר בדיקות לכל מועמד, וכל סיבות הפסילה</td><td class="py-2 pe-3">עמודות R עד AC; סיכום בשורות 72 עד 81</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">5. חזית יעילה (8.15)</td><td class="py-2 pe-3">מי שאף אפשרי לא שולט עליו</td><td class="py-2 pe-3">עמודות AD, AE</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">6. בחירה (8.8)</td><td class="py-2 pe-3">ציון משוקלל, הנמוך מנצח</td><td class="py-2 pe-3">עמודות AF עד AM; הנבחר בשורה 62</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">7. הסבר (8.21, 8.26)</td><td class="py-2 pe-3">משפטים שנבנים ממספרי המנוע</td><td class="py-2 pe-3">שורות 84 עד 86</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<Section kind="חלק 1">
+
+## צעד 1: מיצוב
+
+</Section>
+
+התיק הוא נועם ושירה, מתוך שלבים 5 ו־6, עם ארבעה בנקים בדויים. הבקשה כמות שהיא: הלוואה של <span class="ltr">{f.shekels("b.loan")}</span>, שיעור מימון <span class="ltr">{p("b.ltv")}%</span> וכל החסכונות בצד. בבקשה כזאת עומדים בכל האילוצים רק <span class="ltr">{p("b.feasible")}</span> מתוך <span class="ltr">{p("p.space")}</span> התמהילים.
+
+מיצוב (<Term t="משתנה החלטה" client:visible lesson="8.6">משתנה החלטה</Term> ברמה הראשונה) משנה את הבקשה לפני שמחפשים תמהיל. אם הם מביאים 20,000 ₪ נוספים מהחסכונות, ההלוואה יורדת ל־<span class="ltr">{f.shekels("p.loan")}</span>, שיעור המימון ל־<span class="ltr">{p("p.ltv")}%</span>, וכמות התמהילים האפשריים עולה ל־<span class="ltr">{p("p.feasible")}</span>. זה אותו תיק, בקשה אחרת.
+
+שימו לב לשני כללים שהמנוע מקיים כמו שאילון קבע (לפי הסיכום של הצוות): הלוואת הרכב נשארו לה יותר מ־18 חודשים, ולכן היא מנוכה מההכנסה (הכנסה פנויה: <span class="ltr">{f.shekels("p.disposable")}</span>), וביחס ההחזר נספר ההחזר הראשון של כל מסלול על הסכום המלא.
+
+**מלכודת:** אם סוגרים את הלוואת הרכב מהחסכונות **וגם** מביאים 20,000 ₪ נוספים, החסכונות לא מספיקים, ההון העצמי לא קיים, ובתיק <span class="ltr">{p("o.feasible")}</span> תמהילים אפשריים. מיצוב אחד יכול לבטל את השני.
+
+<Section kind="חלק 2">
+
+## צעדים 2 ו־3: תזרים וחיפוש
+
+</Section>
+
+לכל מועמד המנוע מחשב ארבעה דברים (שיעורים 8.9 ו־8.8): את ההחזר הראשון, את סך התשלומים בתרחיש הבסיס, ואת **החשיפה**: כמה ההחזר הגבוה ביותר בתרחיש הלחץ עולה על ההחזר הראשון. בתרחיש הלחץ הפריים עולה ב־2 נקודות אחוז מהשנה השנייה, והעוגן של המסלול המשתנה עולה ב־2 נקודות בעדכון הריבית (נתוני התרחיש, להדגמה).
+
+הרשת היא **כל** שלישיות של חלק קבועה, פריים ומשתנה, בצעדים של 10%, ולכל המסלולים 30 שנה. מספר המועמדים הוא ספירה (שיעור 8.13): כמה דרכים לחלק 10 יחידות בין 3 מסלולים. בקוד הוא <span class="ltr">{p("p.space")}</span>. הרשת קטנה בכוונה: שלושה סוגי מסלול, צעד גס, תקופה אחת. זה צמצום של מרחב החיפוש, ו״המיטבי״ שייבחר הוא המיטבי **בתוך הרשת**, לא בעולם.
+
+<Section kind="חלק 3">
+
+## צעד 4: אילוצים, וכל סיבות הפסילה
+
+</Section>
+
+עשרה <Term t="אילוץ" client:visible lesson="8.7">אילוצים</Term> בודקים כל מועמד (הקווים של הרגולציה: לפי תעתיק הצוות, לא אומת; קווי הבנק והלקוח: בדויים). מועמד עומד בכולם הוא <Term t="פתרון אפשרי" client:visible lesson="8.7">פתרון אפשרי</Term>. כך נראה מספר המועמדים שנפסלו בכל אילוץ בבקשה הממוצבת:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">האילוץ</th>
+        <th class="py-2 pe-3 text-start font-semibold">כמה מועמדים נפסלו בגללו</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CONSTRAINTS.map(([id, label]) => (
+        <tr class="border-b border-n100"><td class="py-2 pe-3">{label}</td><td class="py-2 pe-3"><span class="ltr">{p(`p.reject:${id}`)}</span></td></tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} מועמד שנכשל בשלושה אילוצים נספר בכל אחד מהם, ולכן הסכום גדול ממספר הנפסלים.</p>
+</div>
+
+המנוע לא עוצר בסיבה הראשונה. המועמד {rejId} נפסל בכל הסיבות האלה: <span class="ltr">{p("p.rej.reasons")}</span>, וההחזר הראשון שלו <span class="ltr">{f.shekels("p.rej.first")}</span>. מי שמתקן מועמד צריך לדעת את כולן.
+
+<Section kind="חלק 4">
+
+## צעדים 5 ו־6: חזית יעילה ובחירה
+
+</Section>
+
+מבין האפשריים, <span class="ltr">{p("p.efficient")}</span> הם <Term t="חזית יעילה" client:visible lesson="8.15">חזית יעילה</Term>: לא ניתן לשפר בהם מדד בלי לפגוע באחר. כך הם נראים (₪, בתרחיש הבסיס; ״החשיפה״ היא מעל ההחזר הראשון):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">חשיפה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ציון</th>
+      </tr>
+    </thead>
+    <tbody>
+      {frontIds.map((id) => (
+        <tr class={"border-b border-n100" + (id === winnerId ? " bg-success-bg font-semibold" : "")}>
+          <td class="py-2 pe-3">{mixText(id)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`p.row.${id}.first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`p.row.${id}.total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`p.row.${id}.exposure`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{p(`p.row.${id}.score`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הציון הוא ממוצע משוקלל של שלושת המדדים המנורמלים בין האפשריים, עם משקולות <span class="ltr">{p("w.0")}, {p("w.1")}, {p("w.2")}</span> (להדגמה). הנמוך מנצח. השורה המסומנת נבחרה.</p>
+</div>
+
+הנבחר הוא {mixText(winnerId)}: ההחזר הראשון <span class="ltr">{f.shekels("p.winner:first")}</span>, סך התשלומים <span class="ltr">{f.shekels("p.winner:total")}</span>, החשיפה <span class="ltr">{f.shekels("p.winner:exposure")}</span>. אם משנים את המשקולות, אפשר שיבחר מישהו אחר מהחזית. הם לא תוצאה של המציאות אלא של מה שהלקוח מעדיף (שיעור 8.8).
+
+<Section kind="חלק 5">
+
+## צעד 7: הסבר, ובדיקה מול הצעת בנק
+
+</Section>
+
+ההסבר בנוי ממספרים של המנוע בלבד: מי נבחר, כמה הוא עולה בכל מדד, כמה נפסלו ולמה. במערכת אמיתית אפשר שמודל שפה ינסח את המשפט, אבל את המספרים הוא לא מחשב ולא משנה (שיעורים 8.21 ו־8.26). בגיליון, שורות 84 עד 86 הן נוסחאות טקסט ולא מודל שפה.
+
+עכשיו הבדיקה. **אומדן** הוא התמהיל במחירון של הבנק; **הצעה** היא מה שהבנק כתב בפועל (שיעור 8.20). בגיליון יש הצעה לדוגמה של בנק בדוי: חצי קבועה וחצי פריים, כמה מאיות נקודה מהמחירון.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold"></th>
+        <th class="py-2 pe-3 text-start font-semibold">אומדן (מחירון)</th>
+        <th class="py-2 pe-3 text-start font-semibold">הצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">הפער</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">ההחזר הראשון</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.offer:estimate_first")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.offer:offer_first")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{p("p.offer:first_gap")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">סך התשלומים</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.offer:estimate_total")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("p.offer:offer_total")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{p("p.offer:total_gap")}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההצעה היא בדויה. הפער הוא ב־₪; מינוס אומר שההצעה זולה מהאומדן.</p>
+</div>
+
+כשמגיעה הצעה אמיתית, היא מחליפה את האומדן במנוע. כאן הצעה כזאת שונה מעט מהמחירון, ולכן מדויק לא להגיד שהאומדן ״שגוי״: הוא אומדן, והוא נשען על מחירון.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## בנו את המנוע
+
+</Section>
+
+הורידו את התבנית, או את הגיליון הפתור אם אתם רוצים לראות איך הוא נראה. התבנית כוללת את שורת הרשת הראשונה כדוגמה, וכל השאר ממלאים אתם.
+
+<ul class="list-reset my-4 space-y-2">
+  <li><a class="inline-flex min-h-11 items-center text-body-m font-semibold text-navy underline" href={`${DL}engine-workshop-template.xlsx`} download>תבנית: המנוע הקטן (xlsx)</a><span class="block text-caption text-n600">התיק, הבחירות וההוראות כבר בפנים; את עמודות הרשת ממלאים אתם.</span></li>
+  <li><a class="inline-flex min-h-11 items-center text-body-m text-navy underline" href={`${DL}engine-workshop-solution.xlsx`} download>הגיליון הפתור (xlsx)</a><span class="block text-caption text-n600">כולל לשונית ״בדיקה״ שמשווה למנוע של הקורס.</span></li>
+  <li><a class="inline-flex min-h-11 items-center text-body-m text-navy underline" href={`${DL}engine-workshop.ipynb`} download>המחברת ב־Python (ipynb)</a><span class="block text-caption text-n600">אותו מנוע, תא אחרי תא, עם הסבר לפני כל תא. רצה ב־Jupyter וב־Google Colab, בלי התקנות.</span></li>
+</ul>
+
+**סדר העבודה בגיליון.**
+1. פתחו את הלשונית ״הוראות״ וקראו אותה.
+2. בלשונית ״מנוע״, בדקו את התאים הירוקים (קלט): שורות 5 עד 24. שנו רק את B18 עד B24 (המיצוב והמשקולות).
+3. בשורה 89, הרשת: כתבו את הנוסחאות של עמודות E עד AM, כפי שבהערות בכותרות. אחר כך העתיקו אותן למטה עד שורה 154.
+4. בדקו את שורות 59 עד 69 (תוצאות), 72 עד 81 (סיבות) ו־84 עד 86 (הסבר).
+5. בלשונית ״בדיקה״, השוו למנוע של הקורס. הגיליון מקרב: הוא לא מעגל כל ריבית חודשית, והמנוע כן. בסך התשלומים הפער עד כמה שקלים, ובחשיפה עד כעשרה, כי במנוע התשלום האחרון סוגר את היתרה והוא גבוה בכמה שקלים מהקבוע. מי נבחר ומי יעיל זהים בשניהם.
+
+**הנוסחאות העיקריות** (כתובות כמחרוזות, כי ״*״ בפסקה הופך לטקסט נטוי):
+
+- ההחזר הראשון של מסלול: {"=ROUND(-PMT(ריבית/1200, חודשים, סכום), 2)"}
+- סכום מסלול: {"=ROUND($B$47*B89/100, 2)"}
+- אילוץ (1 נשבר, 0 נשמר), למשל יחס החזר: {"=IF(Q89>$B$35,1,0)"}
+- אפשרי: {"=IF(AB89=0,1,0)"}
+- ציון משוקלל: {"=(w1*n1+w2*n2+w3*n3)/(w1+w2+w3)"} (שלושת המנורמלים בעמודות AI עד AK)
+
+נסו שלוש משימות:
+1. בגיליון הפתור שנו את B18 ל־0. כמה מועמדים אפשריים? זה המיצוב המקורי.
+2. שנו את הבנק ל־d. מה מתחלף באילוצים?
+3. שנו את המשקולות ל־10, 20, 70 (חשיפה). האם הנבחר מתחלף? האם הוא על החזית?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{p("b.feasible")} מועמדים אפשריים, לעומת {p("p.feasible")} אחרי המיצוב.</li>
+    <li>קו הסירוב של בנק ד׳ בשיעור מימון נמוך משיעור המימון של הבקשה, ולכן כל המועמדים נפסלים בגלל אילוץ הבנק: אפס אפשריים. אותה בקשה, בנק אחר.</li>
+    <li>הנבחר מתחלף ל־{mixText(f.raw("x.winner_id"))}: החזר ראשון {f.shekels("x.winner:first")} וחשיפה {f.shekels("x.winner:exposure")}. הוא עדיין על החזית, כי כל המשקולות חיוביות (שיעור 8.15): שינוי משקולות מזיז את הנבחר לאורך החזית, לא מחוצה לה.</li>
+  </ol>
+</details>
+
+הלשונית ״בדיקה״ נכונה לקלט ההתחלתי בלבד: אם שניתם בחירה, ההפרשים צפויים.
+
+<Section kind="מהדוגמה לנוסחה">
+
+## מהגיליון לקוד
+
+</Section>
+
+המחברת ב־Python עושה את מה שעשיתם בגיליון, בתשעה תאים, ובכל אחד הסבר שורה אחר שורה:
+
+1. **עזרים:** עיגול לאגורה (`agorot`) והחזר חודשי (`pmt`).
+2. **תזרים של מסלול:** ריבית חודשית מעוגלת, ההחזר נקבע מחדש כשהריבית משתנה, והחודש האחרון סוגר.
+3. **תמהיל ומדדים:** סכום המסלולים, ההחזר הראשון, סך התשלומים והחשיפה.
+4. **מיצוב:** הלוואה, הכנסה פנויה, הון עצמי זמין.
+5. **חיפוש:** הרשת.
+6. **אילוצים:** פונקציה שמחזירה את **כל** הסיבות.
+7. **חזית ובחירה:** שליטה, נורמליזציה, ציון ודירוג.
+8. **הרצה והסבר:** כל השרשרת, והמשפטים.
+9. **בדיקה מול הצעה:** האומדן מול ההצעה.
+
+התא האחרון בודק שהמחברת מגיעה לאותם מספרים שהאתר מציג: <span class="ltr">{p("p.feasible")}</span> אפשריים, <span class="ltr">{p("p.efficient")}</span> יעילים, והנבחר {mixText(winnerId)}.
+
+הקוד שבמחברת הוא אותו קוד שבודק את מספרי השיעור בעצמו: בלי העתקה ובלי מספר שהוקלד ביד.
+
+<PredictionReveal
+  client:visible
+  id="8.28"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "רבים נפסלים: הרבה מהם מרוכזים במסלולים משתנים, או בהחזר שגבוה מהמרבי.",
+    "רחוק מהמספר: בבקשה המאוזנת נשארים מעט יותר מכחמישית.",
+    "",
+    "יותר מאחד או שניים: יש כמה תמהילים שעומדים בכל האילוצים.",
+  ]}
+>
+  מתוך <span class="ltr">{p("p.space")}</span> מועמדים נשארו <span class="ltr">{p("p.feasible")}</span>. רוב הפסילות הן של שלושה אילוצים: חלק הריבית המשתנה, ההחזר המרבי שהלקוח קבע ויעד יחס ההחזר שלו.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## עוברים על השרשרת כולה
+
+</Section>
+
+**צעד 1 — מיצוב.** הלוואה <span class="ltr">{f.shekels("p.loan")}</span>, שיעור מימון <span class="ltr">{p("p.ltv")}%</span>, הכנסה פנויה <span class="ltr">{f.shekels("p.disposable")}</span>.
+
+**צעד 2 — חיפוש.** <span class="ltr">{p("p.space")}</span> מועמדים ברשת.
+
+**צעד 3 — סינון.** <span class="ltr">{p("p.feasible")}</span> אפשריים; כל השאר נפסלו בסיבה אחת או יותר.
+
+**צעד 4 — חזית.** <span class="ltr">{p("p.efficient")}</span> מהאפשריים יעילים.
+
+**צעד 5 — בחירה.** {mixText(winnerId)} עם המשקולות <span class="ltr">{p("w.0")}, {p("w.1")}, {p("w.2")}</span>.
+
+**צעד 6 — הסבר.** ההחזר הראשון <span class="ltr">{f.shekels("p.winner:first")}</span>, סך התשלומים <span class="ltr">{f.shekels("p.winner:total")}</span>, החשיפה <span class="ltr">{f.shekels("p.winner:exposure")}</span>; המקום השני {mixText(runnerId)}.
+
+**צעד 7 — בדיקה מול הצעה.** פער של <span class="ltr">{p("p.offer:first_gap")}</span> ₪ בהחזר הראשון ושל <span class="ltr">{p("p.offer:total_gap")}</span> ₪ בסך התשלומים.
+
+<Section kind="דוגמה חצי פתורה">
+
+## הסיבות הנפוצות לפסילה
+
+</Section>
+
+שלוש הסיבות הנפוצות ביותר מופיעות בטבלה. השורה הראשונה מלאה. השלימו את חלקן מתוך כל המועמדים.
+
+<FillTable
+  client:visible
+  id="8.28-half"
+  rowKey="reason"
+  periodLabel="האילוץ"
+  columns={[
+    { key: "count", label: "נפסלו", format: "number" },
+    { key: "all", label: "מתוך", format: "number" },
+    { key: "share", label: "אחוז", format: "percent" },
+  ]}
+  rows={[
+    { reason: "חלק משתנה", count: f.raw("p.reject:variable_share"), all: f.raw("p.space"), share: f.raw("s.variable") },
+    { reason: "החזר מרבי", count: f.raw("p.reject:client_max_payment"), all: f.raw("p.space"), share: f.raw("s.max") },
+    { reason: "יעד היחס", count: f.raw("p.reject:client_target_ratio"), all: f.raw("p.space"), share: f.raw("s.target") },
+  ]}
+  blanks={["החזר מרבי.share", "יעד היחס.share"]}
+  success="יעד היחס של הלקוח (40%) פוסל הרבה: זה אילוץ של הלקוח, לא של הרגולציה. הבדל בין השניים חשוב בהסבר."
+  hint="אחוז = נפסלו ÷ מתוך × 100."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים בתרגילים באים מהמנוע. תרגילים 2 ו־3 צריכים מחשבון. התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.28-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "החזרה לצעד המיצוב: הבקשה משתנה לפני שמחפשים תמהיל", correct: true, feedback: "נכון. מיצוב הוא הרמה הראשונה של משתני ההחלטה." },
+    { text: "הרחבת הרשת", feedback: "הרשת נשארת, והבקשה משתנה." },
+    { text: "הורדת האילוצים", feedback: "אילוץ הוא קיר ולא מחיר: לא מורידים אותו." },
+    { text: "שינוי המשקולות", feedback: "משקולות משנות את הבחירה בין אפשריים, לא את מי שאפשרי." },
+  ]}
+>
+  אין מועמד שעומד בכל האילוצים. מה עושים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.28-2"
+  n={2}
+  level="קל"
+  answer={String(f.raw("p.feasible"))}
+  tolerance={0}
+  near={0}
+  errors={[{ value: String(f.raw("b.feasible")), message: "זה מספר האפשריים לפני המיצוב." }]}
+>
+  אחרי המיצוב (20,000 ₪ הון עצמי נוסף), כמה מועמדים אפשריים יש ברשת?
+</NumericExercise>
+
+<Solution for="8.28-2">
+הגיליון הפתור מראה <span class="ltr">{p("p.feasible")}</span> בתא B60. לפני המיצוב היו <span class="ltr">{p("b.feasible")}</span>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.28-3"
+  n={3}
+  level="קל"
+  answer={f.raw("p.winner:first")}
+  unit="₪"
+  errors={[{ value: f.raw("p.winner:exposure"), message: "זו החשיפה של הנבחר. השאלה על ההחזר הראשון." }]}
+>
+  מה ההחזר הראשון של הנבחר?
+</NumericExercise>
+
+<Solution for="8.28-3">
+{f.shekels("p.winner:first")}: בתא B63 בגיליון.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.28-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "כל מועמד שנפסל מקבל את כל הסיבות שלו, כדי שמי שמתקן ידע מה לתקן", correct: true, feedback: "נכון." },
+    { text: "כדי שהחישוב יהיה מהיר יותר", feedback: "הפוך: זה עולה יותר חישוב." },
+    { text: "כי הסיבה הראשונה תמיד הכי חשובה", feedback: "אין סדר חשיבות כזה." },
+    { text: "כי הבנק דורש", feedback: "אין דרישה כזאת בקורס." },
+  ]}
+>
+  למה המנוע מחזיר את כל סיבות הפסילה ולא רק את הראשונה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.28-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "אומדן נשען על מחירון, והצעה היא מה שהבנק כתב; כשמגיעה הצעה, היא מחליפה את האומדן", correct: true, feedback: "נכון." },
+    { text: "אומדן ושגיאה זהים", feedback: "אומדן אינו שגיאה." },
+    { text: "הצעה היא תמיד זולה מהאומדן", feedback: "בדוגמה כן, אבל אין כלל כזה." },
+    { text: "אין צורך להשוות", feedback: "ההשוואה היא הבדיקה." },
+  ]}
+>
+  מה ההבדל בין אומדן להצעה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.28-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("p.offer:first_gap")}
+  unit="₪"
+  tolerance={0.05}
+  near={0.5}
+  errors={[{ value: f.raw("p.offer:total_gap"), message: "זה הפער בסך התשלומים. כאן שואלים על ההחזר הראשון." }]}
+>
+  מה הפער בהחזר הראשון בין ההצעה לאומדן (הצעה פחות אומדן)? מינוס אומר שההצעה זולה יותר.
+</NumericExercise>
+
+<Solution for="8.28-6">
+הצעה פחות אומדן: <M>{p("p.offer:offer_first")} − {p("p.offer:estimate_first")} = {p("p.offer:first_gap")}</M> ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.28-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "הנבחר הוא המיטבי בתוך הרשת, ביחס לאילוצים ולמשקולות שהוגדרו, ולא בעולם", correct: true, feedback: "נכון. זו ההגדרה של ״מיטבי״ בשיעור 8.16." },
+    { text: "הנבחר הוא הזול ביותר שאפשר לקבל בכל בנק", feedback: "הרשת מכילה מעט סוגי מסלול, והמחירון בדוי." },
+    { text: "הנבחר מובטח ללקוח", feedback: "אומדן אינו הבטחה." },
+    { text: "הנבחר הוא ההמלצה של Mogi", feedback: "המנוע הוא של הקורס. Mogi היום לא מחשבת תמהיל בקוד." },
+  ]}
+>
+  מה אפשר לומר על התמהיל שנבחר?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על המנוע הקטן">
+<p><strong>מה זה?</strong> שרשרת שלוקחת בקשה, בונה ובודקת תמהילים, ובוחרת אחד ומסבירה למה.</p>
+<p><strong>למה זה קיים?</strong> כדי שהבחירה בתמהיל תהיה שיטתית, ניתנת לבדיקה ולהסבר, ולא רק ניסיון של אדם.</p>
+<p><strong>איך זה עובד?</strong> מיצוב, תזרים, חיפוש, אילוצים, חזית, בחירה בקירוב משקולות, והסבר ממספרים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מיצוב טוב מגדיל את מספר האפשרויות, ואילוצים קובעים אילו אפשרויות בכלל קיימות.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים מה אפשרי, מה בחזית, ומה המשקולות שהוגדרו, ובודקים מול הצעה אמיתית. הכול כאן עתיד ולהדגמה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהיום
+
+</Section>
+
+- **בניתם מנוע קטן:** מיצוב ← תזרים ← חיפוש ← אילוצים ← חזית ← בחירה ← הסבר.
+- **מיצוב משנה כמה אפשרויות יש** לפני שמחפשים תמהיל, ויכול גם לבטל אפשרויות.
+- **המנוע מחזיר את כל סיבות הפסילה.**
+- **״מיטבי״ הוא בתוך הרשת,** ביחס לאילוצים ולמשקולות, והכול להדגמה.
+- **אומדן מוחלף בהצעה אמיתית** כשהיא מגיעה.
+- **Mogi היום לא מחשבת תמהיל בקוד:** המנוע הוא של הקורס, והמחברת והגיליון נבנו מאותם נתונים.
+
+**בשיעור הבא — בדיקת סיום שלב 8:** שאלות על כל מה שבנתם.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "הנחת חישוב", text: "התיק (מחיר, הון עצמי, הכנסות, הלוואת רכב), ארבעת הבנקים הבדויים ומחירוניהם, קווי הלקוח, תרחיש הלחץ, הרשת בצעדים של 10%, המשקולות והצעת הבנק לדוגמה: כולם של הקורס, להמחשה. נתונים סינתטיים." },
+    { kind: "החלטה של Mogi", text: "שני כללי חישוב מתוך כללי החישוב של אילון (התחייבות מעל 18 חודשים מנוכה; ביחס ההחזר נספר ההחזר הראשון על כל הסכום): אילון אישר ב־7.10.2026, עדן קיבל ב־8.10.2026. כפי שסוכם אצל הצוות; הרשימה המלאה לא נראתה.", date: "2026-10-07" },
+    { kind: "לא אומת", text: "קווי הרגולציה (תקרת מימון 75%, יחס החזר עד 50%, שני שלישים לכל היותר בריבית משתנה, 30 שנה): לפי תעתיק הצוות; ממתין לבדיקה מול ההוראה." },
+    { kind: "ידע מתמטי כללי", text: "חזית יעילה, ציון משוקלל, נורמליזציה, החזר חודשי קבוע (שפיצר)." },
+    { kind: "מחקר / הצעה", text: "המנוע, הרשת והמשקולות הם הצעה של הקורס לאיך אפשר לבנות את זה, לא קוד של Mogi ולא החלטה." },
+    { kind: "לא אומת", text: "איך בנקים מתמחרים בפועל (ספים, מדרגות, קווי סירוב): לא ידוע לקורס. כל קווי הבנק כאן בדויים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות. הגיליון הפתור נבדק בשלוש בחירות שונות מול המנוע, והמחברת מגיעה לאותם מספרים.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers from src/lib/calc/ws8.ts (composing engine.ts, constraints.ts, objectives.ts, frontier.ts, search.ts and src/data/case-s8.ts) through scripts/lessons/lesson-8-28.ts and _ws8-facts.ts, data/lessons/8-28.json, rechecked by checks/kinds/ws8.py through checks/ws8_engine.py (also the notebook's code). Downloads: scripts/build-engine-workshop.py writes public/downloads/engine-workshop-template.xlsx, -solution.xlsx and engine-workshop.ipynb from the data file; `python3 scripts/build-engine-workshop.py --verify` recalculates the solution in LibreOffice in five input sets and runs the notebook. Cell addresses in the page (B18-B24, rows 45-86, grid from row 89, columns A-AM) are the script's layout: change both together. FK ids: none. Video: video/8-28.html. */}

@@ -1,0 +1,496 @@
+{
+  "lesson": "8.24",
+  "title": "תחזוקה: זליגה כשמשטר הריבית משתנה, אימון מחדש, גרסאות וניטור",
+  "note": "Synthetic: one invented bank, one model with one number (the spread), one jump at month 37. Alarm factor 3, rolling window 6, retraining windows 3/6/12/24 are the illustration's choices, not Mogi's.",
+  "facts": [
+    {
+      "id": "spec.before",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.00"
+    },
+    {
+      "id": "spec.after",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.25"
+    },
+    {
+      "id": "spec.change",
+      "kind": "given",
+      "inputs": {},
+      "value": "37"
+    },
+    {
+      "id": "spec.train_to",
+      "kind": "given",
+      "inputs": {},
+      "value": "24"
+    },
+    {
+      "id": "spec.factor",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "spec.window",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    },
+    {
+      "id": "m.spread1",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "spread1"
+      },
+      "value": "0.9892"
+    },
+    {
+      "id": "m.baseline",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "baseline"
+      },
+      "value": "0.0492"
+    },
+    {
+      "id": "m.threshold",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "threshold"
+      },
+      "value": "0.1475"
+    },
+    {
+      "id": "m.healthy",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "v1_healthy"
+      },
+      "value": "0.0400"
+    },
+    {
+      "id": "m.alarm",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "alarm_month"
+      },
+      "value": 39
+    },
+    {
+      "id": "m.delay",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "delay"
+      },
+      "value": 2
+    },
+    {
+      "id": "m.spread2",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "spread2"
+      },
+      "value": "1.1083"
+    },
+    {
+      "id": "m.v1after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "v1_after"
+      },
+      "value": "0.2608"
+    },
+    {
+      "id": "m.v2after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "v2_after"
+      },
+      "value": "0.1417"
+    },
+    {
+      "id": "k3.spread",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 3,
+        "measure": "spread2"
+      },
+      "value": "1.2767"
+    },
+    {
+      "id": "k3.after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 3,
+        "measure": "v2_after"
+      },
+      "value": "0.0641"
+    },
+    {
+      "id": "k6.spread",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "spread2"
+      },
+      "value": "1.1083"
+    },
+    {
+      "id": "k6.after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 6,
+        "measure": "v2_after"
+      },
+      "value": "0.1417"
+    },
+    {
+      "id": "k12.spread",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 12,
+        "measure": "spread2"
+      },
+      "value": "1.0508"
+    },
+    {
+      "id": "k12.after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 12,
+        "measure": "v2_after"
+      },
+      "value": "0.1992"
+    },
+    {
+      "id": "k24.spread",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 24,
+        "measure": "spread2"
+      },
+      "value": "1.0179"
+    },
+    {
+      "id": "k24.after",
+      "kind": "dr_monitor",
+      "inputs": {
+        "seed": 20261,
+        "months": 60,
+        "x0": "4.00",
+        "xmin": "3.00",
+        "xmax": "5.00",
+        "change_at": 37,
+        "a1": "1.00",
+        "b1": "1.00",
+        "a2": "1.25",
+        "b2": "1.00",
+        "noise": "0.02",
+        "creep": "0",
+        "train_to": 24,
+        "factor": "3",
+        "window": 6,
+        "retrain_window": 24,
+        "measure": "v2_after"
+      },
+      "value": "0.2321"
+    },
+    {
+      "id": "g3",
+      "kind": "dr_diff",
+      "inputs": {
+        "minuend": "m.v1after",
+        "subtrahend": "k3.after"
+      },
+      "value": "0.1967"
+    },
+    {
+      "id": "g6",
+      "kind": "dr_diff",
+      "inputs": {
+        "minuend": "m.v1after",
+        "subtrahend": "k6.after"
+      },
+      "value": "0.1191"
+    },
+    {
+      "id": "g24",
+      "kind": "dr_diff",
+      "inputs": {
+        "minuend": "m.v1after",
+        "subtrahend": "k24.after"
+      },
+      "value": "0.0287"
+    },
+    {
+      "id": "m.gap",
+      "kind": "dr_diff",
+      "inputs": {
+        "minuend": "m.v1after",
+        "subtrahend": "m.healthy"
+      },
+      "value": "0.2208"
+    },
+    {
+      "id": "m.gain",
+      "kind": "dr_diff",
+      "inputs": {
+        "minuend": "m.v1after",
+        "subtrahend": "m.v2after"
+      },
+      "value": "0.1191"
+    }
+  ]
+}

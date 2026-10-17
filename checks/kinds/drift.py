@@ -22,6 +22,7 @@ Kinds
   dr_agreement   agree, total or rate (percent, two decimals) of "advisor:software" pairs
   dr_lag         whole days between two ISO dates
   dr_group       mean_a, mean_b, sd_a, sd_b, diff (a minus b) or n_a, n_b of two lists; four decimals
+  dr_errmeasure  mae, rmse or bias of a list of signed errors; four decimals
   dr_total       the sum of a list of whole numbers
   dr_percent     part as a percent of whole, two decimals, trailing zeros kept
 """
@@ -216,6 +217,26 @@ def dr_group(i, _facts=None):
         return r4({"mean_a": ma, "mean_b": mb, "sd_a": sd(a, ma), "sd_b": sd(b, mb), "diff": ma - mb}[m])
 
 
+def dr_errmeasure(i, _facts=None):
+    with _ctx():
+        errs = [Decimal(v) for v in str(i["errors"]).split("|")]
+        m = i["measure"]
+        if m == "mae":
+            return r4(mean([abs(e) for e in errs]))
+        if m == "rmse":
+            return r4(mean([e * e for e in errs]).sqrt())
+        if m == "sumabs":
+            return r4(sum((abs(e) for e in errs), Decimal(0)))
+        if m == "msq":
+            return r4(mean([e * e for e in errs]))
+        return r4(mean(errs))
+
+
+def dr_diff(i, facts):
+    with _ctx():
+        return r4(Decimal(facts[i["minuend"]]["value"]) - Decimal(facts[i["subtrahend"]]["value"]))
+
+
 def dr_total(i, _facts=None):
     return sum(int(v) for v in str(i["values"]).split("|"))
 
@@ -233,5 +254,7 @@ KINDS = {
     "dr_lag": dr_lag,
     "dr_group": dr_group,
     "dr_total": dr_total,
+    "dr_diff": dr_diff,
+    "dr_errmeasure": dr_errmeasure,
     "dr_percent": dr_percent,
 }

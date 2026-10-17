@@ -17,6 +17,8 @@
  *   brierScore(...)           the average of (predicted − outcome)², lower is better
  *   calibrationGap(...)       the average |gap|, weighted by the number in each bin (from the unrounded values)
  *   binCalibrator(...)        a map from bin to observed rate; applyCalibrator uses it
+ *   recalibrate(...)          build the map on the first `trainN` cases and judge it on the rest: the gap and the Brier score
+ *                             of the held-out cases before and after
  *
  * A prediction is a decimal string in [0, 1]; an outcome is 0 (did not happen)
  * or 1 (happened). Rates come out as decimal strings at four decimals, half up.
@@ -25,6 +27,7 @@
  * checks/kinds/calibration.py.
  */
 import Decimal from "decimal.js";
+import { makeRng } from "./montecarlo.ts";
 
 export type Numeric = Decimal.Value;
 
@@ -149,4 +152,78 @@ export function applyCalibrator(c: Calibrator, p: Numeric): string {
     if (v.gte(c.edges[k]) && (last ? v.lte(c.edges[k + 1]) : v.lt(c.edges[k + 1]))) return c.rates[k] ?? four(v);
   }
   throw new RangeError(`prediction ${p} is outside 0..1`);
+}
+
+// ── Synthetic applicants (the data of lesson 8.19) ─────────────────────────
+// Mogi has NO approvals data yet. The lessons therefore make up applicants with a seeded generator
+// (montecarlo.ts makeRng): a financing ratio (30–75) and a payment ratio (20–50), whole numbers; a TRUE chance of
+// approval  logistic(a + b·(40 − pti)/10 + c·(60 − ltv)/10); and a MODEL that is over-confident: it predicts
+// logistic(k × that same number) with k above 1, so its 0.9 is really less. The outcome is drawn with the true
+// chance. All parameters are invented, for illustration. Draw order per applicant: ltv, pti, outcome.
+// The three draws are 32-bit numbers x; a whole number from 0 to n−1 is floor(x·n ÷ 2^32); the outcome is 1 when
+// x < truth × 2^32. Recomputed independently in checks/kinds/calibration.py (the Python copy of the generator is
+// checks/kinds/rng.py).
+
+export interface ApprovalParams {
+  a: string;
+  b: string;
+  c: string;
+  /** Over-confidence: the model's score is k times the true score. */
+  k: string;
+}
+
+export const DEMO_APPROVAL: ApprovalParams = { a: "0.4", b: "0.5", c: "0.3", k: "1.6" };
+
+export interface Applicant {
+  ltv: number;
+  pti: number;
+  /** The true chance of approval (six decimals). */
+  truth: string;
+  /** The model's predicted probability (six decimals). */
+  p: string;
+  outcome: 0 | 1;
+}
+
+export function syntheticApplicants(seed: number, n: number, params: ApprovalParams = DEMO_APPROVAL): Applicant[] {
+  const next = makeRng(seed);
+  const whole = (m: number) => Math.floor((next() * m) / 4294967296);
+  const out: Applicant[] = [];
+  for (let i = 0; i < n; i++) {
+    const ltv = 30 + whole(46);
+    const pti = 20 + whole(31);
+    const x = next();
+    const z = new D(params.a).plus(new D(params.b).mul(40 - pti).div(10)).plus(new D(params.c).mul(60 - ltv).div(10));
+    const truth = logistic(z);
+    out.push({ ltv, pti, truth, p: logistic(z.mul(params.k)), outcome: new D(x).lt(new D(truth).mul(4294967296)) ? 1 : 0 });
+  }
+  return out;
+}
+
+export const toScored = (a: Applicant[]): Scored[] => a.map((x) => ({ p: x.p, outcome: x.outcome }));
+
+export interface Recalibration {
+  trained: number;
+  tested: number;
+  before: { gap: string; brier: string };
+  after: { gap: string; brier: string };
+  /** The held-out cases' reliability tables, before and after. */
+  tableBefore: Bin[];
+  tableAfter: Bin[];
+}
+
+/** Learn the bin map from the first `trainN` cases (bins with fewer than `minPerBin` stay as they were) and judge it on the others. */
+export function recalibrate(data: Scored[], trainN: number, edges: string[], minPerBin: number): Recalibration {
+  if (trainN < 1 || trainN >= data.length) throw new RangeError("train on some cases and test on others");
+  const train = data.slice(0, trainN);
+  const test = data.slice(trainN);
+  const map = binCalibrator(reliabilityTable(train, edges), minPerBin);
+  const fixed: Scored[] = test.map((d) => ({ p: applyCalibrator(map, d.p), outcome: d.outcome }));
+  return {
+    trained: train.length,
+    tested: test.length,
+    before: { gap: calibrationGap(test, edges), brier: brierScore(test) },
+    after: { gap: calibrationGap(fixed, edges), brier: brierScore(fixed) },
+    tableBefore: reliabilityTable(test, edges),
+    tableAfter: reliabilityTable(fixed, edges),
+  };
 }

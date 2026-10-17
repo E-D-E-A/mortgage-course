@@ -1,0 +1,136 @@
+{
+  "lesson": "8.14",
+  "title": "חיפוש על רשת וצמצום המרחב",
+  "note": "Synthetic case of stage 8 (src/data/case-s8.ts): the family's own request at the fictional bank א׳; three kinds of track, 10% steps, one term of 20, 25 or 30 years. Constraints from constraints.ts (the client's limits are teaching assumptions). Weights 40/30/30 for illustration.",
+  "facts": [
+    {
+      "id": "loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000.00"
+    },
+    {
+      "id": "full",
+      "kind": "srch_grid",
+      "inputs": {
+        "loan": "1640000",
+        "kinds": "fixed_unlinked|prime|variable_unlinked",
+        "step": 10,
+        "terms": "240|300|360",
+        "mode": "shared",
+        "rates": "fixed_unlinked=4.40|prime=4.60|variable_unlinked=4.10",
+        "request": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50",
+        "base_inflation": "2",
+        "base_anchor": "0",
+        "stress_inflation": "4",
+        "stress_prime": "2",
+        "stress_anchor": "2",
+        "weights": "40,30,30",
+        "prune": "0"
+      },
+      "value": {
+        "size": 198,
+        "engine_calls": 198,
+        "pruned": 0,
+        "rejected": 194,
+        "feasible": 4,
+        "best": "ק40/30 מ60/30",
+        "best_score": "0.276720",
+        "reasons": "bank_ratio=76|client_max_payment=143|client_target_ratio=181|pti=58|variable_share=114"
+      }
+    },
+    {
+      "id": "pruned",
+      "kind": "srch_grid",
+      "inputs": {
+        "loan": "1640000",
+        "kinds": "fixed_unlinked|prime|variable_unlinked",
+        "step": 10,
+        "terms": "240|300|360",
+        "mode": "shared",
+        "rates": "fixed_unlinked=4.40|prime=4.60|variable_unlinked=4.10",
+        "request": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50",
+        "base_inflation": "2",
+        "base_anchor": "0",
+        "stress_inflation": "4",
+        "stress_prime": "2",
+        "stress_anchor": "2",
+        "weights": "40,30,30",
+        "prune": "1"
+      },
+      "value": {
+        "size": 198,
+        "engine_calls": 84,
+        "pruned": 114,
+        "rejected": 80,
+        "feasible": 4,
+        "best": "ק40/30 מ60/30",
+        "best_score": "0.276720",
+        "reasons": "bank_ratio=30|client_max_payment=58|client_target_ratio=80|pti=28|variable_share=114"
+      }
+    },
+    {
+      "id": "s20",
+      "kind": "srch_grid",
+      "inputs": {
+        "loan": "1640000",
+        "kinds": "fixed_unlinked|prime|variable_unlinked",
+        "step": 20,
+        "terms": "240|300|360",
+        "mode": "shared",
+        "rates": "fixed_unlinked=4.40|prime=4.60|variable_unlinked=4.10",
+        "request": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50",
+        "base_inflation": "2",
+        "base_anchor": "0",
+        "stress_inflation": "4",
+        "stress_prime": "2",
+        "stress_anchor": "2",
+        "weights": "40,30,30",
+        "prune": "1"
+      },
+      "value": {
+        "size": 63,
+        "engine_calls": 30,
+        "pruned": 33,
+        "rejected": 28,
+        "feasible": 2,
+        "best": "ק40/30 מ60/30",
+        "best_score": "0.300000",
+        "reasons": "bank_ratio=11|client_max_payment=21|client_target_ratio=28|pti=10|variable_share=33"
+      }
+    },
+    {
+      "id": "c2f",
+      "kind": "srch_c2f",
+      "inputs": {
+        "loan": "1640000",
+        "kinds": "fixed_unlinked|prime|variable_unlinked",
+        "step": 10,
+        "terms": "240|300|360",
+        "mode": "shared",
+        "rates": "fixed_unlinked=4.40|prime=4.60|variable_unlinked=4.10",
+        "request": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50",
+        "base_inflation": "2",
+        "base_anchor": "0",
+        "stress_inflation": "4",
+        "stress_prime": "2",
+        "stress_anchor": "2",
+        "weights": "40,30,30",
+        "prune": "1",
+        "coarse": 20
+      },
+      "value": {
+        "size": 84,
+        "engine_calls": 39,
+        "pruned": 45,
+        "rejected": 35,
+        "feasible": 4,
+        "best": "ק40/30 מ60/30",
+        "best_score": "0.276720",
+        "coarse_calls": 30,
+        "fine_calls": 9,
+        "reasons": "bank_ratio=14|client_max_payment=27|client_target_ratio=35|pti=13|variable_share=45"
+      }
+    }
+  ]
+}

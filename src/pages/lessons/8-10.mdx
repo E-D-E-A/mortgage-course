@@ -1,0 +1,423 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.10"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import ThreePrimePaths from "../../components/ThreePrimePaths.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { CURVE_LABEL } from "../../data/curves.ts";
+import { SCENARIOS } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right. */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.10");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const SIDS = ["forecast451", "stress", "macro"];
+export const NAME = { forecast451: "לפי הוראה 451", stress: "תרחיש לחץ", macro: "תחזית מקרו" };
+export const series = SIDS.map((sid) => ({ id: sid, name: NAME[sid], values: f.raw(`path.prime.${sid}`) }));
+export const P = (sid, y) => `${f.raw(`path.prime.${sid}`)[y - 1]}%`;
+export const predictionOptions = [
+  "כן: תרחיש הלחץ הוא התרחיש הגרוע ביותר שיכול לקרות, ולכן התשלום בו הוא תקרה",
+  "לא: תרחיש הלחץ הוא מצב שנבחר לבדיקה, ויכול להיות גרוע ממנו",
+  "כן, אבל רק אם הוא קרוב לתחזית לפי הוראה 451",
+  "לא: התשלום בתחזית לפי הוראה 451 תמיד גבוה ממנו",
+];
+
+<Callout title="איפה זה עומד: Mogi היום, הוחלט, עתיד">
+<p><strong>Mogi היום:</strong> אין חישוב תמהיל בקוד, וקריאת המנוע מוקפאת. <strong>הוחלט</strong> (אילון, <span class="ltr">2026-10-07</span>; אדן קיבל ב־<span class="ltr">2026-10-08</span>; המימוש לא הושלם): הנתונים של הצעה לפי הוראה 451 נשענים על קלטי התחזית שבנק ישראל פרסם לצורך זה, ולא על תחזית מקרו ולא על הנחת אינפלציה שטוחה. <strong>עתיד:</strong> שאר השיעור. עקומי התשואה, הטבלה של תחזית המקרו ופגיעת תרחיש הלחץ כאן <strong>להדגמה</strong>: לא החלטה של Mogi ולא מדיניות של בנק.</p>
+<p>{MARK} {CURVE_LABEL}.</p>
+</Callout>
+
+בשיעור 8.9 ראיתם שתרחיש הוא קלט למנוע. השאלה עכשיו: מאיפה לוקחים אותו? יש שלוש תשובות שנשמעות דומות ושונות מאוד: <strong>התחזית לפי הוראה 451</strong> שלמדתם בשיעור 5.4, <Term t="תרחיש לחץ" client:visible lesson="8.10">תרחיש לחץ</Term> ו<Term t="תחזית מקרו" client:visible lesson="8.10">תחזית מקרו</Term>. הן לא ״שלוש תחזיות״ במובן אחד, ואם מבלבלים ביניהן אפשר להציג ללקוח מספר שמתיימר להיות מה שהוא לא.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.10"
+  question={`התמהיל הראשוני של נועם ושירה מחושב בתרחיש לחץ (המדד ${f.raw("path.infl.stress")[0]}% בשנה, הפריים ${f.raw("path.prime.stress")[1]}% מהשנה השנייה, והעוגנים עולים גם הם). התשלום הגבוה ביותר שלו שם הוא ${f.whole("initial.stress.max")}. האם זה ״התשלום הכי גבוה שיכול להיות״?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## שלושה מסלולי פריים
+
+</Section>
+
+<LessonVideo lesson="8-10" />
+
+<Section kind="ההסבר">
+
+## שלוש הצהרות שונות על העתיד
+
+</Section>
+
+### מה כל אחת היא
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה זה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מי קובע</th>
+        <th class="py-2 pe-3 text-start font-semibold">לשם מה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה זה לא</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תחזית לפי הוראה 451</td>
+        <td class="py-2 pe-3">חישוב קבוע מעקומי תשואה של אג״ח ממשלתיות, בנפרד לשקל ולצמוד</td>
+        <td class="py-2 pe-3">להשוות הצעות על בסיס זהה</td>
+        <td class="py-2 pe-3">לא ניבוי של מה שיקרה</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תרחיש לחץ</td>
+        <td class="py-2 pe-3">מי שמנתח: בוחר ״מה אם זה הולך רע״</td>
+        <td class="py-2 pe-3">לבדוק עמידות</td>
+        <td class="py-2 pe-3">לא תקרה, לא תחזית</td>
+      </tr>
+      <tr class="border-b border-n100 align-top">
+        <td class="py-2 pe-3 font-semibold text-n900">תחזית מקרו</td>
+        <td class="py-2 pe-3">גוף מחקר, לכלכלה כולה: ריבית, אינפלציה, צמיחה</td>
+        <td class="py-2 pe-3">תמונה כללית של הכלכלה</td>
+        <td class="py-2 pe-3">לא החישוב שההוראה קובעת</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+שלוש הצהרות שונות. הראשונה היא **שיטה**: מי שעוקב אחרי ההוראה מגיע לאותו מספר. השנייה היא **בחירה** של אדם. השלישית היא **דעה** של מומחים. כל אחת עונה על שאלה אחרת, ולכן אי אפשר לבחור ״הטובה ביותר״ ביניהן.
+
+### איך תחזית לפי הוראה 451 נבנית
+
+שיעור 5.4 הראה את המנגנון: מעקום התשואה של אג״ח ממשלתית מחשבים **ריבית עתידית מרומזת**, כלומר איזו ריבית שנתית בין שנה לשנה גורמת לכך ש״להשקיע לתקופה קצרה ואז לחדש״ ישתווה ל״להשקיע לתקופה ארוכה״ (ריבית פורוורד). מעקום האג״ח הצמודות מחשבים כך גם את ההצמדה: אינפלציה צפויה היא הפער **המצטבר** בין העקום הלא צמוד לצמוד, לא ההפרש הפשוט. הריביות העתידיות האלה מוכנסות ללוח של כל מסלול: הפריים עם עוגן של שנה (הנחה של הקורס), מסלול משתנה עם עוגן של תקופת העדכון שלו. כל ההנחות האלה ב־5.4. כאן נשתמש בהן כאחת משלוש דרכים להגדיר תרחיש. לפי הצוות, ההוראה היא שמגדירה אותה והיא נועדה להשוואה בין הצעות, ולכן לא מחליפים אותה בתחזית מקרו ולא בהנחה שהאינפלציה קבועה. (העקומים בקורס מומצאים. נכון לתעתיק הצוות, לא נבדק מול ההוראה.)
+
+### תרחיש לחץ: מה אם
+
+תרחיש הלחץ הוא של השיעורים 5.6–5.8: המדד {f.raw("path.infl.stress")[0]}% בשנה, והפריים והעוגנים <span class="ltr">+{SCENARIOS.stress.primeShift}</span> נקודות אחוז מהשנה השנייה. מישהו בחר את המספרים האלה כי הם ״די קשים״. אפשר לבחור אחרים, וגם גרועים מהם: תרחיש לחץ אומר ״מה קורה אם״, לא ״זה הגרוע ביותר״.
+
+### תחזית מקרו: דעה של גוף מחקר
+
+תחזית מקרו נראית כמו רשימת מספרים: ריבית בנק ישראל, אינפלציה, בכל שנה. היא נבנית בשיטה אחרת (מודל מקרו־כלכלי ושיקול דעת), ולכן שונה מהתחזית לפי 451 גם כשהיא לכאורה על אותה ריבית. בקורס יש טבלה מומצאת: ריבית בנק ישראל מתחילה ב־{f.raw("macro.policy_1")}%, יורדת ל־{f.raw("macro.policy_3")}% בשנה השלישית ועולה חזרה ל־{f.raw("macro.policy_8")}% בשנה השמינית. הפריים זז איתה, והעוגנים של מסלולים משתנים נעים לפי הממוצע של הריבית לחמש השנים הבאות (הנחה של הקורס). אינפלציה: מ־{f.raw("macro.infl_1")}% ל־{f.raw("macro.infl_4")}%.
+
+### שלושה מסלולי פריים
+
+הפריים היום {f.raw("prime.today")}% (חישוב: ריבית בנק ישראל ועוד 1.5 נקודות אחוז, ראו מקורות). הנה איך הוא זז בכל אחד מהתרחישים:
+
+<ThreePrimePaths client:visible series={series} today={f.raw("prime.today")} />
+
+מה רואים:
+1. **לפי 451:** הפריים עולה בהדרגה מ־{P("forecast451", 1)} ל־{P("forecast451", 10)} בשנה העשירית, כי עקום התשואה להמחשה עולה.
+2. **תרחיש לחץ:** קפיצה אחת ל־{P("stress", 2)} מהשנה השנייה ואז שטוח. זו לא תחזית: זו בחירה.
+3. **תחזית מקרו:** יורד ל־{P("macro", 3)} בשנה השלישית ועולה ל־{P("macro", 10)} בשנה העשירית.
+
+אין כאן ״נכון״. השלוש עונות על שאלות שונות.
+
+### אותו תמהיל, שלוש תוצאות
+
+התמהיל הראשוני של נועם ושירה, תחת כל אחד:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התרחיש</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">הגבוה ביותר</th>
+        <th class="py-2 pe-3 text-start font-semibold">בחודש</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {SIDS.map((sid) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold text-n900">{NAME[sid]}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`initial.${sid}.first`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`initial.${sid}.max`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{f.plain(`initial.${sid}.max_month`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact(`initial.${sid}.total`)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+ההחזר הראשון זהה בשלושתם ({f.shekels("initial.forecast451.first")}): עוד לא קרה כלום. הסך ב־451 הוא {f.shekels("initial.forecast451.total")}, ובלחץ {f.shekels("initial.stress.total")}: יותר ב־<M>{n("initial.stress.total")} − {n("initial.forecast451.total")} = {n("initial.total_gap")}</M> ₪. במקרו, הסך נמוך מה־451: {f.shekels("initial.macro.total")}. אין כאן דירוג של ״מי צודק״.
+
+אצל תמהיל עם מסלולים צמודים, ההבדלים גדולים הרבה יותר. ״צמוד״ מ־5.6: סך התשלומים בלחץ גבוה מזה שב־451 ב־{f.shekels("linked.total_gap")}. ההחזר הראשון שלו גם שונה מעט בין התרחישים, כי כבר החודש הראשון נושא חודש של מדד: {f.shekels("linked.forecast451.first")} ב־451, {f.shekels("linked.stress.first")} בלחץ ו־{f.shekels("linked.macro.first")} במקרו.
+
+<Callout title="הכלל של Mogi: לא מערבבים" tone="warning">
+<p>מה שהוחלט: המספרים שמוצגים כהצעה לפי הוראה 451 נשענים על הקלטים של ההוראה בלבד. תרחיש לחץ מוצג <strong>בנפרד</strong>, ומסומן כתרחיש לחץ. אסור להציג תוצאה של תחזית מקרו כאילו היא מספר ההוראה, או להחליף את העקום בהנחת אינפלציה קבועה. ובנוסף, בדף הצוות על קלטי בנק ישראל כתוב: נתיב שנגזר מהשוק ״אינו התפלגות הסתברות ואינו ערובה לתרחיש הגרוע ביותר״. (תיעוד של הצוות, לא נבדק מול המקור.)</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## לסמן ולהשוות
+
+</Section>
+
+בגרף שלמעלה אפשר להדליק ולכבות כל מסלול.
+1. כבו את שני המסלולים האחרים והשאירו רק את תרחיש הלחץ. מה אתם רואים אחרי השנה השנייה?
+2. הדליקו את תחזית המקרו. באיזו שנה היא קרובה ביותר לפריים של היום?
+3. הדליקו את התחזית לפי 451 ואת תרחיש הלחץ. האם הם נפגשים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>קו שטוח ב־{P("stress", 2)}: אחרי הקפיצה הראשונה שום דבר לא זז. זו אחת הסיבות שתרחיש לחץ לא מתיימר לתאר עתיד.</li>
+    <li>בשנה השלישית הפריים במקרו הוא {P("macro", 3)}, מתחת ל־{P("macro", 1)} של היום; בשנים 6 ו־7 הוא חוזר ל־{P("macro", 6)}.</li>
+    <li>לא עד השנה העשירית: לפי 451 הפריים בה {P("forecast451", 10)}, ובלחץ {P("stress", 10)}.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## איך קובעים מה נכנס לאיזה תרחיש
+
+</Section>
+
+**צעד 1 — כל תרחיש נכתב באותו מבנה.** מנוע (שיעור 8.9) צריך שלושה דברים לכל שנה: כמה עלה המדד, כמה זז הפריים (לעומת היום), וכמה זז העוגן של מסלול משתנה בנקודת העדכון שלו. זה כל מה ש״תרחיש״ הוא למנוע. שלוש הדרכים נבדלות רק באיך ממלאים את הטבלה.
+
+**צעד 2 — מי ממלא.** לפי 451: חישוב מהעקומים. לחץ: אדם. מקרו: גוף מחקר.
+
+**צעד 3 — מה עושים עם התוצאה.** מציגים כל אחת עם שמה: ״לפי הוראה 451״, ״בתרחיש לחץ״, ״לפי תחזית מקרו של ...״. מספר בלי שמו של התרחיש אינו מספר.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> טבלת קלט אחת לכל תרחיש, שנה בשורה, ובה שלוש עמודות: מדד, שינוי פריים, שינוי עוגן. הלוח של כל מסלול קורא את העמודות של התרחיש שנבחר (למשל עם <span class="ltr">=INDEX</span>). כדי להשוות, מעתיקים את אותו לוח שלוש פעמים, פעם לכל תרחיש.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.10"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "תרחיש לחץ הוא בחירה של מי שמנתח. תמיד אפשר לבחור קשה יותר: למשל פריים גבוה בנקודה אחת, או מדד גבוה יותר. התשלום בו אינו תקרה.",
+    "",
+    "קרבה לתחזית לפי 451 לא הופכת אותו לתקרה. שני הדברים נבדלים בעצם: אחד שיטה, אחד בחירה.",
+    "לא: בתחזית לפי 451 התשלום הגבוה ביותר נמוך מזה שבלחץ בתמהיל הזה, אבל זה נובע מהנתונים ולא מכלל.",
+  ]}
+>
+  התשלום הגבוה ביותר בלחץ הוא {f.shekels("initial.stress.max")}, גבוה ב־<M>{n("initial.stress.max")} − {n("initial.forecast451.max")} = {n("initial.stress_gap")}</M> ₪ מזה שבתחזית לפי 451 ({f.shekels("initial.forecast451.max")}). אבל תרחיש שבו הפריים עולה יותר היה נותן תשלום גבוה יותר. תרחיש לחץ הוא תשובה ל״מה אם״ ספציפי.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## מה אומרים ללקוח
+
+</Section>
+
+נועם ושירה שואלים: ״כמה נשלם בחודש הכי גבוה?״. התשובה היא שלוש תשובות, כל אחת עם שמה.
+
+**צעד 1 — לפי הוראה 451.** התשלום הגבוה ביותר: {f.shekels("initial.forecast451.max")}, בחודש {f.plain("initial.forecast451.max_month")}. זה המספר להשוואה בין הצעות של בנקים שונים.
+
+**צעד 2 — בתרחיש לחץ.** {f.shekels("initial.stress.max")}. זה מראה כמה התשלום יכול לטפס אם הריבית הולכת רע, לא כמה יהיה.
+
+**צעד 3 — בתחזית מקרו להמחשה.** {f.shekels("initial.macro.max")}. זו תחזית אחת מבין כמה אפשריות.
+
+**מסקנה.** ההחזר הראשון הוא {f.shekels("initial.forecast451.first")} בכולן. אומרים ללקוח את הטווח, מסבירים מה כל אחד אומר, ולא בוחרים אחד שנשמע הכי נעים.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מי אמר מה?
+
+</Section>
+
+לכל משפט, בחרו אם הוא מתאים להוראה 451, לתרחיש לחץ או לתחזית מקרו. השורה הראשונה נתונה.
+
+<MatchTable
+  client:visible
+  id="8.10-match"
+  promptLabel="המשפט"
+  answerLabel="מתאים ל..."
+  options={["תחזית לפי הוראה 451", "תרחיש לחץ", "תחזית מקרו"]}
+  rows={[
+    { prompt: "חישוב קבוע מעקומי התשואה, כדי להשוות הצעות", answer: "תחזית לפי הוראה 451", given: true, why: "זו שיטה שההוראה קובעת." },
+    { prompt: "״מה אם הפריים יעלה ב־2 נקודות אחוז?״", answer: "תרחיש לחץ", why: "זו שאלה של ״מה אם״ שאדם בחר." },
+    { prompt: "הערכה של חוקרים לריבית ולאינפלציה בשנים הבאות", answer: "תחזית מקרו", why: "זו דעה של גוף מחקר על הכלכלה כולה." },
+    { prompt: "מוצגת בנפרד, ומסומנת, ולא מתחזית ההצעה", answer: "תרחיש לחץ", why: "לפי הכלל: מפרידים בין לחץ לתחזית של ההצעה." },
+    { prompt: "אסור להחליף בה את התחזית שבהצעה", answer: "תחזית מקרו", why: "לפי הדף בצוות: לא מחליפים את תחזית 451 בתחזית מקרו." },
+  ]}
+  success="נכון. שלוש הצהרות שונות: שיטה, בחירה ודעה."
+  hint="שאלו: מי קובע, ולשם מה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הנתונים הם הנחות של הקורס. התרגילים מסודרים מקל למאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.10-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "תחזית לפי הוראה 451", correct: true, feedback: "נכון. זו השיטה שמאפשרת להשוות הצעות על בסיס זהה." },
+    { text: "תרחיש לחץ", feedback: "תרחיש לחץ נבחר, ולכן אי אפשר להשוות בו הצעות כמו בהוראה." },
+    { text: "תחזית מקרו", feedback: "לפי הצוות, לא מחליפים בה את התחזית של ההוראה." },
+    { text: "כל מה שנראה מציאותי", feedback: "זה לא קריטריון שאפשר לשחזר." },
+  ]}
+>
+  באיזה תרחיש מחשבים את התשלום הגבוה ביותר החזוי שמופיע בהצעה לפי הוראה 451?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.10-2"
+  n={2}
+  level="קל"
+  unit="%"
+  tolerance={0.005}
+  near={0}
+  answer={f.raw("path.prime.macro")[4]}
+>
+  לפי טבלת תחזית המקרו שבשיעור, מה הפריים בשנה החמישית, באחוזים?
+</NumericExercise>
+
+<Solution for="8.10-2">
+{P("macro", 5)}. ריבית בנק ישראל בשנה החמישית בטבלה היא {f.raw("macro.policy_5")}%, והפריים נע איתה לעומת שנה ראשונה (שם הפריים הוא {f.raw("prime.today")}%).
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.10-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("initial.stress_gap")}
+  errors={[
+    { value: f.raw("initial.macro_gap"), message: "זה ההפרש בין ה־451 למקרו, לא ללחץ." },
+  ]}
+>
+  התשלום הגבוה ביותר של התמהיל הראשוני: בלחץ {f.shekels("initial.stress.max")}, לפי 451 {f.shekels("initial.forecast451.max")}. בכמה הוא גבוה בלחץ?
+</NumericExercise>
+
+<Solution for="8.10-3">
+<M>{n("initial.stress.max")} − {n("initial.forecast451.max")} = {n("initial.stress_gap")}</M> ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.10-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("initial.total_gap")}
+>
+  סך התשלומים של התמהיל הראשוני: בלחץ {f.shekels("initial.stress.total")}, לפי 451 {f.shekels("initial.forecast451.total")}. בכמה הסך בלחץ גבוה?
+</NumericExercise>
+
+<Solution for="8.10-4">
+<M>{n("initial.stress.total")} − {n("initial.forecast451.total")} = {n("initial.total_gap")}</M> ₪.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.10-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "להציג את שני המספרים, כל אחד עם שם התרחיש שלו, ולהסביר מה כל אחד אומר", correct: true, feedback: "נכון. מספר בלי שם התרחיש אינו מספר." },
+    { text: "להציג רק את המספר הנמוך כי הוא מרגיע", feedback: "זו בחירה של התוצאה ולא של השיטה." },
+    { text: "להציג רק את הלחץ כי הוא בטוח", feedback: "תרחיש לחץ אינו ערובה: אפשר לדמיין גרוע ממנו." },
+    { text: "להציג ממוצע שלהם", feedback: "ממוצע של שיטה ובחירה אינו מספר שמישהו הצהיר עליו." },
+  ]}
+>
+  יועץ מחשב את התשלום הגבוה ביותר לפי 451 ובתרחיש לחץ, ומקבל שני מספרים שונים. מה נכון להראות ללקוח?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.10-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "כבר החודש הראשון של מסלול צמוד כולל חודש של מדד, והמדד שונה בכל תרחיש", correct: true, feedback: "נכון. במסלול צמוד התשלום הראשון כבר מצביע על הצמדה." },
+    { text: "טעות בחישוב", feedback: "זה לא טעות: המדד חלק מהתרחיש." },
+    { text: "בלחץ הריבית גבוהה כבר בחודש 1", feedback: "הפריים זז רק מהשנה השנייה בתרחיש הזה." },
+    { text: "ההלוואה גדולה יותר בלחץ", feedback: "ההלוואה זהה בכל התרחישים." },
+  ]}
+>
+  ההחזר הראשון של תמהיל ״צמוד״ הוא {f.shekels("linked.forecast451.first")} לפי 451, {f.shekels("linked.stress.first")} בלחץ ו־{f.shekels("linked.macro.first")} במקרו. למה הוא לא זהה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.10-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לא נכון: מדובר בתחזית מקרו, לא במספר לפי הוראה 451. אם רוצים להציג אותה, מסמנים אותה כך", correct: true, feedback: "נכון. הכלל המוחלט: בלי להחליף תחזיות ובלי להציג מקרו כ־451." },
+    { text: "בסדר, כי מקרו מדויקת יותר", feedback: "לא ידוע שהיא מדויקת יותר. לפי הדף בצוות, לא מחליפים." },
+    { text: "בסדר אם התוצאה דומה", feedback: "דמיון בתוצאה לא משנה את מהות המספר." },
+    { text: "בסדר אם הלקוח מבקש", feedback: "הלקוח יכול לבקש לראות מקרו כתרחיש; לא להציג אותו כמספר של ההוראה." },
+  ]}
+>
+  יועץ מציג את התשלום הגבוה ביותר שחושב בתחזית מקרו כ״התשלום הגבוה ביותר החזוי לפי הוראה 451״. מה לא תקין?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על שלוש התחזיות">
+<p><strong>מה זה?</strong> שלוש דרכים להגדיר את העתיד שהמנוע מקבל כתרחיש: שיטה שנקבעה (451), מצב שנבחר (לחץ), ודעה של מומחים (מקרו).</p>
+<p><strong>למה זה קיים?</strong> כי שאלות שונות דורשות תשובות שונות: להשוות הצעות, לבדוק עמידות, או להבין את הכלכלה.</p>
+<p><strong>איך זה עובד?</strong> כל אחד נכתב כטבלה של שינויים בשנה, והמנוע מריץ את התמהיל עליה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> אותו תמהיל נראה אחרת בכל אחד. מי שמציג מספר בלי השם של התרחיש מטעה, גם אם המספר נכון.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים הצעות בתחזית של 451; בודקים עמידות בלחץ; ולא מציגים אף אחד מהם כהבטחה. מודל שפה יכול להסביר את ההבדל ללקוח, אבל לא מחשב אותו.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שלוש הצהרות:** שיטה (תחזית לפי הוראה 451), בחירה (תרחיש לחץ), דעה (תחזית מקרו). אי אפשר לדרג ביניהן כ״נכונה״.
+- **כולן נכנסות למנוע בצורה אחת,** טבלת שינויים לכל שנה, והמנוע דטרמיניסטי: אותו תרחיש, אותה תוצאה.
+- **לפי מה שהוחלט:** תחזית ההצעה היא של הוראה 451; לחץ מוצג בנפרד ומסומן; לא מחליפים אותה במקרו או בהנחה שטוחה.
+- **תרחיש לחץ אינו תקרה,** ותחזית שנגזרת מהשוק אינה התפלגות הסתברות.
+- **כל מספר בשיעור להמחשה:** העקומים, הטבלה של המקרו והלחץ אינם נתוני שוק ואינם החלטה של Mogi.
+
+**בשיעור הבא — 8.11, <Later lesson="8.11" quiet>סימולציית מונטה־קרלו מאפס</Later>:** מה עושים כשרוצים לא תרחיש אחד, אלא אלף עתידים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "חישוב ההחזר והתחזיות לפי 15 התשובות של אילון (2026-10-07; אדן קיבל ב־2026-10-08; המימוש לא הושלם): משתמשים בקלטי התחזית שבנק ישראל פרסם עבור הוראה 451, ולא מחליפים אותם בתחזית המקרו של מחלקת המחקר או בהנחת אינפלציה שטוחה; שומרים את התאריך והגרסה של המקור לכל חישוב. לפי הדף בצוות, כפי שנרשם; לא נקרא מחדש.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "הדף של הצוות על חיבורי נתוני בנק ישראל (אוקטובר 2026): ״נתיב שנגזר מהשוק אינו התפלגות הסתברות ואינו ערובה לתרחיש הגרוע ביותר״; לשמור תרחישי לחץ בנפרד מתחזית 451. המלצת מחקר, ממתינה לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "לא אומת", text: "שיטת התחזית של הוראה 451 (ריבית פורוורד מעקום האג״ח, אינפלציה צפויה כפער מצטבר) לפי תעתיק בצוות (גרסה 22 מ־19.07.2023), ממתין לבדיקה מול ההוראה.", date: "2026-08-03" },
+    { kind: "הנחת חישוב", text: "העקומים (src/data/curves.ts, גרסה א׳), טבלת תחזית המקרו (ריבית בנק ישראל מ־3.25% ויורדת, ואינפלציה מ־2.6%) ותרחיש הלחץ (המדד 4%, הפריים והעוגנים +2 נקודות) הם הנחות של הקורס להמחשה: לא נתוני בנק ישראל ולא תחזית. עוגן של מסלול משתנה במקרו נע לפי ממוצע הריבית ל־5 שנים: הנחה של הקורס. הפריים היום: ריבית בנק ישראל 3.25% (מ־2026-09-03, לא אומת) ועוד 1.5 נקודות אחוז, חישוב ולא נתון שפורסם." },
+    { kind: "ידע מתמטי כללי", text: "ריבית עתידית מרומזת (פורוורד) מעקום תשואות; ההבדל בין שיטה, בחירה ודעה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות; תחזית 451 נבדקה גם דרך חישוב נפרד של הפריים והעוגנים.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/scenarios.ts over engine.ts via scripts/lessons/lesson-8-10.ts (+ _stage8b-facts.ts) and data/lessons/8-10.json, rechecked by checks/kinds/scenarios.py (which also runs forecast.py's own route). Brain: 67436545 Q3; 67469313 (ZCM, 'stress separate'); 7733250. Illustration: src/components/ThreePrimePaths.vue (props only). Video: video/8-10.html. */}

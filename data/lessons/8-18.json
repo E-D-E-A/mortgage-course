@@ -1,0 +1,739 @@
+{
+  "lesson": "8.18",
+  "title": "אמידה מנתונים: רגרסיה, אי־ודאות של אומדן, ודאטה מועטה",
+  "note": "Synthetic. Sixty offers made by the course's seeded generator from a model with one step (financing over 60%: +0.40, base 0.80) plus noise of up to 8 basis points; we know the true step only because we made it. 95% two-sided t values (df 1-10, 15, 20, 30, 60, 120, infinity; between two rows the lower row is used: cautious). The prior (mean 0.25, sd 0.08) is an invented assumption standing for 'a published average'. The data enters the update as one observation whose spread is the estimate's standard error.",
+  "facts": [
+    {
+      "id": "t.limit",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.960"
+    },
+    {
+      "id": "truth.step",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.40"
+    },
+    {
+      "id": "truth.base",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.80"
+    },
+    {
+      "id": "thr",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "prior.mean",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "prior.sd",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.08"
+    },
+    {
+      "id": "gen.noise",
+      "kind": "given",
+      "inputs": {},
+      "value": "8"
+    },
+    {
+      "id": "gen.n",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "data.offers",
+      "kind": "pm_offers",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 60,
+        "noise_bp": 8
+      },
+      "value": [
+        {
+          "ltv": "34",
+          "pti": "22",
+          "margin": "0.82"
+        },
+        {
+          "ltv": "44",
+          "pti": "30",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "53",
+          "pti": "49",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "30",
+          "pti": "41",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "33",
+          "pti": "50",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "51",
+          "pti": "42",
+          "margin": "0.72"
+        },
+        {
+          "ltv": "50",
+          "pti": "40",
+          "margin": "0.88"
+        },
+        {
+          "ltv": "39",
+          "pti": "46",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "38",
+          "pti": "44",
+          "margin": "0.74"
+        },
+        {
+          "ltv": "62",
+          "pti": "31",
+          "margin": "1.20"
+        },
+        {
+          "ltv": "73",
+          "pti": "43",
+          "margin": "1.27"
+        },
+        {
+          "ltv": "71",
+          "pti": "40",
+          "margin": "1.25"
+        },
+        {
+          "ltv": "62",
+          "pti": "26",
+          "margin": "1.17"
+        },
+        {
+          "ltv": "53",
+          "pti": "47",
+          "margin": "0.88"
+        },
+        {
+          "ltv": "67",
+          "pti": "40",
+          "margin": "1.17"
+        },
+        {
+          "ltv": "71",
+          "pti": "26",
+          "margin": "1.18"
+        },
+        {
+          "ltv": "66",
+          "pti": "24",
+          "margin": "1.23"
+        },
+        {
+          "ltv": "71",
+          "pti": "44",
+          "margin": "1.12"
+        },
+        {
+          "ltv": "56",
+          "pti": "36",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "46",
+          "pti": "29",
+          "margin": "0.72"
+        },
+        {
+          "ltv": "30",
+          "pti": "26",
+          "margin": "0.83"
+        },
+        {
+          "ltv": "33",
+          "pti": "37",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "61",
+          "pti": "25",
+          "margin": "1.14"
+        },
+        {
+          "ltv": "63",
+          "pti": "37",
+          "margin": "1.17"
+        },
+        {
+          "ltv": "33",
+          "pti": "45",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "68",
+          "pti": "41",
+          "margin": "1.12"
+        },
+        {
+          "ltv": "37",
+          "pti": "40",
+          "margin": "0.82"
+        },
+        {
+          "ltv": "40",
+          "pti": "32",
+          "margin": "0.76"
+        },
+        {
+          "ltv": "40",
+          "pti": "37",
+          "margin": "0.88"
+        },
+        {
+          "ltv": "31",
+          "pti": "41",
+          "margin": "0.80"
+        },
+        {
+          "ltv": "35",
+          "pti": "49",
+          "margin": "0.81"
+        },
+        {
+          "ltv": "61",
+          "pti": "50",
+          "margin": "1.25"
+        },
+        {
+          "ltv": "68",
+          "pti": "25",
+          "margin": "1.13"
+        },
+        {
+          "ltv": "66",
+          "pti": "39",
+          "margin": "1.21"
+        },
+        {
+          "ltv": "62",
+          "pti": "41",
+          "margin": "1.22"
+        },
+        {
+          "ltv": "57",
+          "pti": "26",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "39",
+          "pti": "50",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "34",
+          "pti": "24",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "37",
+          "pti": "33",
+          "margin": "0.73"
+        },
+        {
+          "ltv": "42",
+          "pti": "20",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "55",
+          "pti": "27",
+          "margin": "0.81"
+        },
+        {
+          "ltv": "71",
+          "pti": "24",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "54",
+          "pti": "22",
+          "margin": "0.80"
+        },
+        {
+          "ltv": "52",
+          "pti": "38",
+          "margin": "0.79"
+        },
+        {
+          "ltv": "30",
+          "pti": "23",
+          "margin": "0.82"
+        },
+        {
+          "ltv": "48",
+          "pti": "35",
+          "margin": "0.80"
+        },
+        {
+          "ltv": "35",
+          "pti": "45",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "41",
+          "pti": "44",
+          "margin": "0.81"
+        },
+        {
+          "ltv": "46",
+          "pti": "27",
+          "margin": "0.79"
+        },
+        {
+          "ltv": "51",
+          "pti": "36",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "35",
+          "pti": "24",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "43",
+          "pti": "42",
+          "margin": "0.85"
+        },
+        {
+          "ltv": "65",
+          "pti": "23",
+          "margin": "1.22"
+        },
+        {
+          "ltv": "68",
+          "pti": "40",
+          "margin": "1.28"
+        },
+        {
+          "ltv": "35",
+          "pti": "42",
+          "margin": "0.74"
+        },
+        {
+          "ltv": "66",
+          "pti": "45",
+          "margin": "1.17"
+        },
+        {
+          "ltv": "54",
+          "pti": "39",
+          "margin": "0.83"
+        },
+        {
+          "ltv": "71",
+          "pti": "28",
+          "margin": "1.12"
+        },
+        {
+          "ltv": "34",
+          "pti": "46",
+          "margin": "0.83"
+        },
+        {
+          "ltv": "73",
+          "pti": "25",
+          "margin": "1.14"
+        }
+      ]
+    },
+    {
+      "id": "hand.mean",
+      "kind": "est_mean_interval",
+      "inputs": {
+        "values": "0.84,0.90,0.88,0.93,0.85"
+      },
+      "value": {
+        "n": 5,
+        "mean": "0.8800",
+        "sd": "0.0367",
+        "se": "0.0164",
+        "t": "2.776",
+        "low": "0.8344",
+        "high": "0.9256"
+      }
+    },
+    {
+      "id": "hand.step",
+      "kind": "est_step",
+      "inputs": {
+        "below": "0.80,0.82,0.78",
+        "above": "1.18,1.22,1.25"
+      },
+      "value": {
+        "nBelow": 3,
+        "nAbove": 3,
+        "meanBelow": "0.8000",
+        "meanAbove": "1.2167",
+        "step": "0.4167",
+        "se": "0.0233",
+        "df": 2,
+        "t": "4.303",
+        "low": "0.3163",
+        "high": "0.5171"
+      }
+    },
+    {
+      "id": "w.sd",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
+    },
+    {
+      "id": "w.5",
+      "kind": "est_width",
+      "inputs": {
+        "sd": "0.10",
+        "n": 5
+      },
+      "value": "0.2483"
+    },
+    {
+      "id": "w.20",
+      "kind": "est_width",
+      "inputs": {
+        "sd": "0.10",
+        "n": 20
+      },
+      "value": "0.0953"
+    },
+    {
+      "id": "w.100",
+      "kind": "est_width",
+      "inputs": {
+        "sd": "0.10",
+        "n": 100
+      },
+      "value": "0.0400"
+    },
+    {
+      "id": "w.400",
+      "kind": "est_width",
+      "inputs": {
+        "sd": "0.10",
+        "n": 400
+      },
+      "value": "0.0198"
+    },
+    {
+      "id": "slope",
+      "kind": "est_slope_data",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 60,
+        "noise_bp": 8
+      },
+      "value": {
+        "n": 60,
+        "slope": "0.0109",
+        "intercept": "0.3942",
+        "se": "0.0010",
+        "t": "2.042",
+        "low": "0.0088",
+        "high": "0.0129"
+      }
+    },
+    {
+      "id": "line_vs_step",
+      "kind": "est_line_vs_step",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 60,
+        "noise_bp": 8,
+        "thr": 60
+      },
+      "value": {
+        "lineMae": "0.0904",
+        "stepMae": "0.0416"
+      }
+    },
+    {
+      "id": "chain.8",
+      "kind": "est_posterior",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 8,
+        "noise_bp": 8,
+        "thr": 60,
+        "prior_mean": "0.25",
+        "prior_sd": "0.08"
+      },
+      "value": {
+        "nBelow": 8,
+        "nAbove": 0,
+        "estimate": null,
+        "posterior": {
+          "n": 0,
+          "priorWeight": "1.0000",
+          "mean": "0.2500",
+          "sd": "0.0800"
+        }
+      }
+    },
+    {
+      "id": "chain.12",
+      "kind": "est_posterior",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 12,
+        "noise_bp": 8,
+        "thr": 60,
+        "prior_mean": "0.25",
+        "prior_sd": "0.08"
+      },
+      "value": {
+        "nBelow": 9,
+        "nAbove": 3,
+        "estimate": {
+          "nBelow": 9,
+          "nAbove": 3,
+          "meanBelow": "0.7922",
+          "meanAbove": "1.2400",
+          "step": "0.4478",
+          "se": "0.0294",
+          "df": 2,
+          "t": "4.303",
+          "low": "0.3213",
+          "high": "0.5742"
+        },
+        "posterior": {
+          "n": 1,
+          "priorWeight": "0.1190",
+          "mean": "0.4243",
+          "sd": "0.0276"
+        }
+      }
+    },
+    {
+      "id": "chain.20",
+      "kind": "est_posterior",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 20,
+        "noise_bp": 8,
+        "thr": 60,
+        "prior_mean": "0.25",
+        "prior_sd": "0.08"
+      },
+      "value": {
+        "nBelow": 12,
+        "nAbove": 8,
+        "estimate": {
+          "nBelow": 12,
+          "nAbove": 8,
+          "meanBelow": "0.7975",
+          "meanAbove": "1.1988",
+          "step": "0.4013",
+          "se": "0.0255",
+          "df": 7,
+          "t": "2.365",
+          "low": "0.3410",
+          "high": "0.4615"
+        },
+        "posterior": {
+          "n": 1,
+          "priorWeight": "0.0922",
+          "mean": "0.3873",
+          "sd": "0.0243"
+        }
+      }
+    },
+    {
+      "id": "chain.30",
+      "kind": "est_posterior",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 30,
+        "noise_bp": 8,
+        "thr": 60,
+        "prior_mean": "0.25",
+        "prior_sd": "0.08"
+      },
+      "value": {
+        "nBelow": 19,
+        "nAbove": 11,
+        "estimate": {
+          "nBelow": 19,
+          "nAbove": 11,
+          "meanBelow": "0.8089",
+          "meanAbove": "1.1836",
+          "step": "0.3747",
+          "se": "0.0200",
+          "df": 10,
+          "t": "2.228",
+          "low": "0.3300",
+          "high": "0.4194"
+        },
+        "posterior": {
+          "n": 1,
+          "priorWeight": "0.0588",
+          "mean": "0.3674",
+          "sd": "0.0194"
+        }
+      }
+    },
+    {
+      "id": "chain.60",
+      "kind": "est_posterior",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "60:0.40",
+        "pti_steps": "",
+        "seed": 23,
+        "n": 60,
+        "noise_bp": 8,
+        "thr": 60,
+        "prior_mean": "0.25",
+        "prior_sd": "0.08"
+      },
+      "value": {
+        "nBelow": 39,
+        "nAbove": 21,
+        "estimate": {
+          "nBelow": 39,
+          "nAbove": 21,
+          "meanBelow": "0.8121",
+          "meanAbove": "1.1867",
+          "step": "0.3746",
+          "se": "0.0136",
+          "df": 20,
+          "t": "2.086",
+          "low": "0.3463",
+          "high": "0.4029"
+        },
+        "posterior": {
+          "n": 1,
+          "priorWeight": "0.0281",
+          "mean": "0.3711",
+          "sd": "0.0134"
+        }
+      }
+    },
+    {
+      "id": "upd.0",
+      "kind": "est_update",
+      "inputs": {
+        "prior_mean": "0.25",
+        "prior_sd": "0.08",
+        "n": 0,
+        "data_mean": "0.40",
+        "data_sd": "0.20"
+      },
+      "value": {
+        "n": 0,
+        "priorWeight": "1.0000",
+        "mean": "0.2500",
+        "sd": "0.0800"
+      }
+    },
+    {
+      "id": "upd.4",
+      "kind": "est_update",
+      "inputs": {
+        "prior_mean": "0.25",
+        "prior_sd": "0.08",
+        "n": 4,
+        "data_mean": "0.40",
+        "data_sd": "0.20"
+      },
+      "value": {
+        "n": 4,
+        "priorWeight": "0.6098",
+        "mean": "0.3085",
+        "sd": "0.0625"
+      }
+    },
+    {
+      "id": "upd.16",
+      "kind": "est_update",
+      "inputs": {
+        "prior_mean": "0.25",
+        "prior_sd": "0.08",
+        "n": 16,
+        "data_mean": "0.40",
+        "data_sd": "0.20"
+      },
+      "value": {
+        "n": 16,
+        "priorWeight": "0.2809",
+        "mean": "0.3579",
+        "sd": "0.0424"
+      }
+    },
+    {
+      "id": "upd.64",
+      "kind": "est_update",
+      "inputs": {
+        "prior_mean": "0.25",
+        "prior_sd": "0.08",
+        "n": 64,
+        "data_mean": "0.40",
+        "data_sd": "0.20"
+      },
+      "value": {
+        "n": 64,
+        "priorWeight": "0.0890",
+        "mean": "0.3867",
+        "sd": "0.0239"
+      }
+    },
+    {
+      "id": "upd.data_mean",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.40"
+    },
+    {
+      "id": "upd.data_sd",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.20"
+    }
+  ]
+}

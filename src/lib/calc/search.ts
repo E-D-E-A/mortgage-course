@@ -316,3 +316,25 @@ export function coarseToFine(spec: GridSpec, ctx: SearchContext, coarseStepPerce
   const pool = finish(merged, merged.length, coarse.engineCalls + engineCalls, ctx.weights);
   return { coarse, fine, engineCalls: coarse.engineCalls + engineCalls, pool };
 }
+
+/** Splits of 100/step pieces among the kinds, and how many keep the variable part within two thirds of the loan (the one-third-fixed rule). */
+export function countLegalSplits(kinds: TrackKind[], stepPercent: number): { legal: number; all: number } {
+  const units = 100 / stepPercent;
+  const all = splits(units, kinds.length);
+  const legal = all.filter((sp) => sp.reduce((v, u, k) => (isFixedForTerm(kinds[k]) ? v : v + u), 0) * 3 <= units * 2).length;
+  return { legal, all: all.length };
+}
+
+/** Years a count of candidates would take at `msEach` milliseconds a candidate, to one decimal (a labelled assumption, not a measurement). */
+export function yearsToCheck(count: bigint, msEach: number): Decimal {
+  return new Decimal(count.toString()).mul(msEach).div(1000).div(365 * 24 * 3600).toDecimalPlaces(1, Decimal.ROUND_HALF_UP);
+}
+
+/** A big count for people: "כ־152 מיליארד" (two or three significant digits, in Hebrew words). Display rounding only; the exact count stays a string/BigInt. */
+export function roughCount(count: string | bigint): string {
+  const s = String(count);
+  const L = s.length;
+  const [unit, size] = L >= 13 ? ["טריליון", 12] : L >= 10 ? ["מיליארד", 9] : L >= 7 ? ["מיליון", 6] : L >= 4 ? ["אלף", 3] : ["", 0];
+  const lead = Math.round(Number(s) / 10 ** size);
+  return unit ? `כ־${lead} ${unit}` : s;
+}

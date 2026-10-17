@@ -1,0 +1,345 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.5"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import LineFit from "../../components/LineFit.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { S8_LABEL } from "../../data/case-s8.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.5");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 3 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = `${S8_LABEL}`;
+export const predictionOptions = [
+  `בערך ${p("t.mae")} נקודות אחוז: הקו מתקרב מאוד לנקודות`,
+  "בערך 0.2 נקודות אחוז: הקו מפספס כל נקודה בגדול",
+  "בדיוק אפס: קו ישר עובר דרך כל הנקודות",
+  "אי אפשר לדעת: תלוי באיזה קו בוחרים",
+];
+export const resids = f.raw("h.resid").split(",");
+export const five = [["50", "1.12"], ["55", "1.14"], ["60", "1.22"], ["65", "1.25"], ["70", "1.30"]];
+export const handRows = five.map(([x, y], k) => ({ x, y, dx: f.raw(`h.dx${k}`), dy: f.raw(`h.dy${k}`), dxy: f.raw(`h.dxy${k}`), dxx: f.raw(`h.dxx${k}`) }));
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>מתמטיקה כללית</strong>, לא מערכת של Mogi. הנקודות סינתטיות: עשר הצעות בדויות של בנק בדוי. הקו מתאר את הנקודות האלה, <strong>לא את מה שבנקים עושים</strong>: איך בנקים מתמחרים בפועל לא ידוע לנו, ושאלה זו נשארת פתוחה (שאלה לאילון).</p>
+</Callout>
+
+יש לכם שני נתונים לכל מקרה, ורוצים לתאר את הקשר ביניהם בקו אחד: כשאחד גדל, מה קורה לשני? זה <Term t="קו מגמה" client:visible lesson="8.5">קו מגמה</Term>. ואחרי שמציירים קו, שואלים כמה הוא טועה: זו ה<Term t="שגיאה" client:visible lesson="8.5">שגיאה</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.5"
+  question={`עשר הצעות בדויות של בנק בדוי: כל אחת עם שיעור מימון (מ־40% עד 75%) ומרווח מעל העוגן (מ־1.00 עד 1.46 נקודות אחוז). הנקודות עולות בערך בקו, אבל לא בדיוק. מותחים את הקו הטוב ביותר דרכן. בכמה, בממוצע, הקו טועה בכל נקודה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## קו אחד, ושגיאה
+
+</Section>
+
+<LessonVideo lesson="8-5" />
+
+<Section kind="ההסבר">
+
+## קו דרך נקודות
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+כל הצעה היא נקודה: x הוא שיעור המימון, y הוא המרווח. קו ישר כותבים כך: <M>y = a × x + b</M>. **a** הוא השיפוע: כמה המרווח עולה על כל נקודת אחוז של מימון. **b** הוא המרווח כשהמימון 0, נקודת ההתחלה של הקו. (האותיות a, b, x ו־y הן של המתמטיקה הכללית, ולכן משמעות חדשה לאותיות שכבר השתמשנו בהן: b כאן אינו יתרה עתידית כמו בשיעור 0.3, a אינו עוגן כמו בשיעור 2.1, ו־y אינו תשואה של אג״ח כמו בשיעור 0.11.)
+
+איזה קו? אפשר להתחיל באומדן בעין: קו שעובר באמצע הנקודות. אבל אפשר גם לדרוש יותר: הקו שמקטין את **הטעות** הכוללת.
+
+### שגיאה
+
+לכל נקודה, הקו אומר ערך (a × x + b), והנקודה אומרת ערך אחר. ההפרש הוא ה**שגיאה** של הנקודה: הערך האמיתי פחות מה שהקו אמר. שגיאה חיובית: הנקודה מעל הקו. שלילית: מתחתיו.
+
+כדי לסכם עשר שגיאות במספר אחד, שתי דרכים:
+- **MAE**, הטעות הממוצעת בערך מוחלט: מוחקים את הסימנים ומחשבים ממוצע. קל להבין: ״בממוצע הקו טועה ב־X״.
+- **RMSE**: מעלים כל שגיאה בריבוע, ממוצע, ושורש. שגיאה גדולה נספרת הרבה יותר משגיאה קטנה, ולכן RMSE תמיד גדול מ־MAE או שווה לו, ומתרחק ממנו כשיש שגיאה אחת גדולה.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## התאימו קו לנקודות
+
+</Section>
+
+<LineFit client:visible note="הקו מתאר את עשר ההצעות הבדויות האלה בלבד." />
+
+נסו את אלה:
+1. הזיזו את השיפוע והנקודה עד שהקו נראה לכם טוב. כמה ה־MAE וה־RMSE שלכם?
+2. לחצו על ״הראו את הקו הטוב ביותר״. כמה הוא משפר?
+3. הגדילו את השיפוע בהרבה. מה קורה לשני מדדי השגיאה, ואיזה מהם עולה מהר יותר?
+4. הזיזו את הקו כך שיהיה מעל כל הנקודות. מה אפשר להגיד על השגיאות?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>קו בעין נותן שגיאה ממוצעת בסדר גודל של כמה אלפיות עד כמה מאיות נקודת אחוז. קו כמו {p("g.a")} ו־{p("g.b")} נותן MAE של {p("g.mae")} ו־RMSE של {p("g.rmse")}.</li>
+    <li>הקו הטוב ביותר: שיפוע {p("t.a")}, נקודת התחלה {p("t.b")}, MAE {p("t.mae")}, RMSE {p("t.rmse")}.</li>
+    <li>שני המדדים עולים, וה־RMSE מהר יותר כי הוא מעניש שגיאות גדולות בריבוע.</li>
+    <li>כל השגיאות חיוביות או כולן שליליות, והממוצע שלהן רחוק מאפס. בקו הטוב ביותר השגיאות מתקזזות: סכומן אפס.</li>
+  </ol>
+</details>
+
+<Section kind="ההסבר">
+
+## איך מוצאים את הקו הטוב ביותר
+
+</Section>
+
+השיטה של **הריבועים הפחותים** בוחרת את הקו שמקטין את סכום ריבועי השגיאות. יש לה נוסחה סגורה. נחשב אותה על חמש מהנקודות, ביד.
+
+**צעד 1 — הממוצעים.** שיעורי המימון: 50, 55, 60, 65, 70, ממוצע {p("h.xbar")}. המרווחים: 1.12, 1.14, 1.22, 1.25, 1.30, ממוצע {p("h.ybar")}.
+
+**צעד 2 — הסטיות.** לכל נקודה, כמה היא רחוקה מהממוצעים, בכל ציר.
+
+**צעד 3 — מכפילים.** סטיית x כפול סטיית y (ולצידה סטיית x בריבוע).
+
+<FillTable
+  client:visible
+  id="8.5-table"
+  rowKey="x"
+  periodLabel="מימון (%)"
+  columns={[
+    { key: "dx", label: "סטיית x", format: "number" },
+    { key: "dy", label: "סטיית y", format: "number" },
+    { key: "dxy", label: "x כפול y", format: "number" },
+    { key: "dxx", label: "x בריבוע", format: "number" },
+  ]}
+  rows={handRows}
+  blanks={["65.dx", "65.dxy", "70.dxx"]}
+  success={`הסכומים: ${f.raw("h.sxy")} ו־${f.raw("h.sxx")}.`}
+  hint="סטיית x היא x פחות 60. סטיית y היא y פחות 1.206. מכפילים או מעלים בריבוע."
+/>
+
+**צעד 4 — השיפוע.** סכום המכפלות {p("h.sxy")} חלקי סכום הריבועים {p("h.sxx")}: **{p("h.slope")}**.
+
+**צעד 5 — נקודת ההתחלה.** הקו חייב לעבור דרך נקודת הממוצעים: <M>b = {p("h.ybar")} − {p("h.slope")} × {p("h.xbar")} = {p("h.icpt")}</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <div class="ltr inline-grid justify-items-start gap-1 text-h3 text-navy" dir="ltr">
+    <span class="whitespace-nowrap">a = Σ (x<sub>k</sub> − x̄)(y<sub>k</sub> − ȳ) ÷ Σ (x<sub>k</sub> − x̄)²</span>
+    <span class="whitespace-nowrap">b = ȳ − a · x̄</span>
+  </div>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">x̄, ȳ</dt><dd>הממוצעים של x ושל y</dd>
+    <dt class="ltr font-semibold text-n900">a</dt><dd>השיפוע: כמה y משתנה כש־x גדל ב־1, ביחידות של y לכל יחידה של x</dd>
+    <dt class="ltr font-semibold text-n900">b</dt><dd>נקודת ההתחלה: y כש־x הוא 0 (יכול להיות מחוץ לטווח הנתונים)</dd>
+  </dl>
+</div>
+
+הקו של חמש הנקודות: <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. השגיאות בכל נקודה: {p("h.resid")} (הערך האמיתי פחות מה שהקו אומר). הטעות הממוצעת {p("h.mae")}, ה־RMSE {p("h.rmse")}. בעשר הנקודות כולן הקו הטוב ביותר הוא <M>y = {p("t.a")} × x + {p("t.b")}</M> עם MAE {p("t.mae")} ו־RMSE {p("t.rmse")}.
+
+**מתי הנוסחה נכונה?**
+1. יש לפחות שתי נקודות, ולא כל ערכי x זהים.
+2. הקשר בנתונים דומה לקו ישר. אם הוא מקבל צורה אחרת (למשל מדרגות), הקו הטוב ביותר עדיין קו, אבל הוא מתאר לא טוב.
+3. הקו מתאר את הנקודות שיש. ב־x שמחוץ לטווח, התחזית אינה ידועה (למטה).
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> השיפוע <span class="ltr">=SLOPE(Y, X)</span>, נקודת ההתחלה <span class="ltr">=INTERCEPT(Y, X)</span>, תחזית <span class="ltr">=FORECAST(x0, Y, X)</span>. שימו לב לסדר: קודם ה־y ואחר כך ה־x.</p>
+</Callout>
+
+<Callout title="שלושה דברים שהקו לא אומר" tone="warning">
+<p><strong>מחוץ לטווח.</strong> הנקודות כאן הן מ־{p("x.lo")}% עד {p("x.hi")}% מימון. הקו אומר שב־90% המרווח {p("x.pred90")}, אבל אין בנתונים אף נקודה שם, וזו לא ידיעה.</p>
+<p><strong>קיצוני.</strong> הצעה אחת חריגה (במימון 78% מרווח 2.5) מזיזה את השיפוע מ־{p("t.a")} ל־{p("o.a")} ומעלה את ה־RMSE מ־{p("t.rmse")} ל־{p("o.rmse")}.</p>
+<p><strong>סיבה ותוצאה.</strong> קו מגמה לא אומר שהמימון הוא שגורם למרווח. הוא מתאר שתי עמודות. ובמציאות לא ידוע לנו איך בנקים מתמחרים, ואם הקשר הוא קו: בשיעור <Later lesson="8.17" quiet>8.17</Later> נראה צורה שונה, מדרגות, גם היא על נתונים סינתטיים.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.5"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    `0.2 הוא סדר גודל של הצעה חריגה אחת, לא של קו על נתונים צפופים. בנקודות האלה MAE הוא ${p("t.mae")}.`,
+    "קו ישר אחד לא עובר דרך כל עשר נקודות שאינן על קו. תמיד יש שגיאה, והשאלה היא כמה.",
+    "אפשר: הקו הטוב ביותר מוגדר, והשגיאה שלו מחושבת.",
+  ]}
+>
+  הקו הטוב ביותר טועה בממוצע ב־{p("t.mae")} נקודות אחוז (MAE), וה־RMSE הוא {p("t.rmse")}. הנקודות כמעט על קו, ולכן השגיאה קטנה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## חיזוי בתוך הטווח
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+**צעד 1 — הקו.** מחמש הנקודות: <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>.
+
+**צעד 2 — חיזוי.** במימון 65%: <M>{p("h.slope")} × 65 + {p("h.icpt")} = {p("h.pred65")}</M>. הנקודה האמיתית בדוגמה היא 1.25, השגיאה {resids[3]}.
+
+**צעד 3 — מה אפשר להגיד.** בתוך הטווח (50 עד 70), הקו נותן אומדן סביר. מחוץ לו, אין לנו מידע.
+
+<Section kind="דוגמה חצי פתורה">
+
+## שגיאה של קו אחר
+
+</Section>
+
+קו אחר לחמש הנקודות: <M>y = 0.01 × x + 0.6</M>. הוא אומר 1.1, 1.15, 1.2, 1.25 ו־1.3. השלימו את הטעות הממוצעת.
+
+<FillTable
+  client:visible
+  id="8.5-half"
+  rowKey="x"
+  periodLabel="מימון (%)"
+  columns={[
+    { key: "y", label: "המרווח האמיתי", format: "number" },
+    { key: "pred", label: "הקו אומר", format: "number" },
+    { key: "e", label: "שגיאה", format: "number" },
+  ]}
+  rows={[
+    { x: "50", y: "1.12", pred: "1.1", e: "0.02" },
+    { x: "55", y: "1.14", pred: "1.15", e: "-0.01" },
+    { x: "60", y: "1.22", pred: "1.2", e: "0.02" },
+    { x: "65", y: "1.25", pred: "1.25", e: "0" },
+    { x: "70", y: "1.30", pred: "1.3", e: "0" },
+  ]}
+  blanks={["60.e", "65.e"]}
+  success={`הטעות הממוצעת בערך מוחלט: ${f.raw("ex.mae")}.`}
+  hint="שגיאה = הערך האמיתי פחות מה שהקו אומר."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים סינתטיים, וכדאי להשתמש בגיליון בתרגילים 3 עד 5.
+
+<ChoiceExercise
+  client:visible
+  id="8.5-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "שגיאה חיובית: הנקודה מעל הקו", correct: true, feedback: "נכון: שגיאה = ערך אמיתי פחות מה שהקו אומר." },
+    { text: "שגיאה שלילית: הנקודה מעל הקו", feedback: "ההפך: שלילית פירושה שהנקודה מתחת לקו." },
+    { text: "שגיאה אפס: הנקודה על הקו", feedback: "זו שגיאה אפס, אבל כאן הנקודה אינה על הקו." },
+    { text: "אי אפשר לדעת מהסימן", feedback: "אפשר: הסימן אומר באיזה צד של הקו הנקודה." },
+  ]}
+>
+  ערך אמיתי של 1.25, והקו אומר 1.2. מה השגיאה?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.5-2" n={2} level="קל" answer={f.raw("ex.pred")} errors={[]}>
+  הקו <M>y = {p("h.slope")} × x + {p("h.icpt")}</M>. מה הוא אומר במימון 55%? (לשלוש ספרות אחרי הנקודה)
+</NumericExercise>
+
+<Solution for="8.5-2">
+<M>{p("h.slope")} × 55 + {p("h.icpt")} = {p("ex.pred")}</M>.
+</Solution>
+
+<NumericExercise client:visible id="8.5-3" n={3} level="בינוני" answer={f.raw("ex.mae")} tolerance={0.0005} near={0.002} errors={[{ value: f.raw("ex.rmse"), message: "זה ה־RMSE: ריבועים, ממוצע ושורש. ב־MAE מוחקים סימנים ומחשבים ממוצע." }]}>
+  קו בדוי <M>y = 0.01 × x + 0.6</M> על חמש הנקודות של השיעור. מה הטעות הממוצעת בערך מוחלט (MAE), לשלוש ספרות?
+</NumericExercise>
+
+<Solution for="8.5-3">
+השגיאות: 0.02, −0.01, 0.02, 0, 0. בערך מוחלט: 0.02, 0.01, 0.02, 0, 0, סכום 0.05, חלקי 5: {p("ex.mae")}. (ה־RMSE הוא {p("ex.rmse")}.)
+</Solution>
+
+<NumericExercise client:visible id="8.5-4" n={4} level="בינוני" answer={f.raw("h.fit_mae")} tolerance={0.0005} near={0.002} errors={[{ value: f.raw("ex.mae"), message: "זה ה־MAE של הקו האחר. הקו הטוב ביותר טועה פחות." }]}>
+  הקו הטוב ביותר של חמש הנקודות (<M>y = {p("h.slope")} × x + {p("h.icpt")}</M>): מה ה־MAE שלו? (בארבע ספרות: השתמשו בגיליון.)
+</NumericExercise>
+
+<Solution for="8.5-4">
+השגיאות {p("h.resid")}: הסכום של הערכים המוחלטים חלקי 5 הוא {p("h.fit_mae")}, קטן מהקו האחר.
+</Solution>
+
+<NumericExercise client:visible id="8.5-5" n={5} level="בינוני" answer={f.raw("x.pred90")} tolerance={0.01} near={0.05} errors={[]}>
+  הקו של עשר הנקודות, <M>y = {p("t.a")} × x + {p("t.b")}</M>, אומר מה במימון 90%? (ובכל זאת: האם אפשר להסתמך על זה?)
+</NumericExercise>
+
+<Solution for="8.5-5">
+<M>{p("t.a")} × 90 + {p("t.b")} = {p("x.pred90")}</M> (בעיגול לשתי ספרות). אבל הנקודות מגיעות עד 75% בלבד, ולכן זו אקסטרפולציה: מחוץ לנתונים, ולא ידיעה.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.5-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "ה־RMSE מגיב חזק לשגיאה אחת גדולה, וה־MAE פחות: לכן ההבדל ביניהם מסמן קיצוני", correct: true, feedback: "נכון. כשהם רחוקים זה מזה, כדאי לחפש את הנקודה הגדולה." },
+    { text: "ה־MAE תמיד גדול מ־RMSE", feedback: "ההפך: ה־RMSE גדול מה־MAE או שווה לו." },
+    { text: "אין הבדל ביניהם", feedback: "יש: ריבוע נותן משקל גדול לשגיאה גדולה." },
+    { text: "ה־RMSE קטן כשיש קיצוני", feedback: "הוא גדל, ואפילו יותר מה־MAE." },
+  ]}
+>
+  מה אפשר ללמוד מכך שה־RMSE גדול בהרבה מה־MAE?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על קו מגמה ושגיאה">
+<p><strong>מה זה?</strong> קו מגמה הוא הקו שהכי קרוב לנקודות; שגיאה היא כמה הקו טועה בכל נקודה.</p>
+<p><strong>למה זה קיים?</strong> כדי לתאר קשר בין שני מספרים במשפט אחד, ולהעריך ערך בנקודה שאין בה נתון.</p>
+<p><strong>איך זה עובד?</strong> הריבועים הפחותים: שיפוע מסכום מכפלות סטיות, ונקודת התחלה מהממוצעים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ״ככל שהמימון גבוה יותר המרווח גבוה יותר״ הוא תיאור של נתונים ולא חוק, והוא נכון רק בטווח שנבדק.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משתמשים בקו לאומדן בתוך הטווח, מציינים תמיד את השגיאה, ולא נשענים עליו מחוץ לטווח. זה הבסיס לאמידה בשיעור 8.18.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **קו מגמה** y = ax + b: השיפוע a ונקודת ההתחלה b, מהריבועים הפחותים.
+- **שגיאה** = ערך אמיתי פחות מה שהקו אומר. MAE: ממוצע ערכים מוחלטים. RMSE: שורש ממוצע ריבועים.
+- הקו הטוב ביותר עובר דרך נקודת הממוצעים, והשגיאות שלו מתקזזות.
+- שגיאה קטנה על הנתונים מראה התאמה, לא ידיעה על נתונים חדשים; מחוץ לטווח אין ידיעה.
+- הנקודות סינתטיות: איך בנקים מתמחרים אינו ידוע, וזו שאלה לאילון.
+
+**בשיעור הבא — 8.6, <Later lesson="8.6" quiet>משתני ההחלטה</Later> בשתי רמות: מיצוב הבקשה ומבנה התמהיל:** סיום ההכנה במתמטיקה, והתחלת הניסוח של הבעיה של Mogi.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "קו מגמה בשיטת הריבועים הפחותים, שגיאה, MAE ו־RMSE, אקסטרפולציה: מתמטיקה כללית, בלי מקור מסוים." },
+    { kind: "הנחת חישוב", text: "עשר ההצעות (שיעור מימון ומרווח מעל העוגן) סינתטיות, מומצאות להמחשה. הן אינן הצעות של בנק, ואינן מראות איך בנק מתמחר. נתונים סינתטיים." },
+    { kind: "לא אומת", text: "איך בנקים מתמחרים בפועל, והאם המרווח עולה בקו או במדרגות: לא ידוע לנו; שאלה פתוחה לאילון (קובץ השאלות של שלב 8)." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/stats.ts via scripts/lessons/lesson-8-5.ts and _stats-facts.ts and data/lessons/8-5.json, rechecked by checks/kinds/stats.py. Data: src/data/s8-datasets.ts. Illustration: src/components/LineFit.vue. Video: video/8-5.html. Open: FK-H pricing questions (research/stage-8-raw/eylon-8-A.md). */}

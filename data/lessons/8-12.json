@@ -1,0 +1,436 @@
+{
+  "lesson": "8.12",
+  "title": "מתי מותר לייחס הסתברות",
+  "note": "Same prime track as lesson 8.11 (300,000, 15 years, price-list rate); four invented models of prime's yearly moves; synthetic approval counts (15 of 20, 150 of 200, 1,500 of 2,000) that illustrate sample size only. Teaching assumptions.",
+  "facts": [
+    {
+      "id": "t.amount",
+      "kind": "given",
+      "inputs": {},
+      "value": "300000.00"
+    },
+    {
+      "id": "t.rate",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.60"
+    },
+    {
+      "id": "t.years",
+      "kind": "given",
+      "inputs": {},
+      "value": 15
+    },
+    {
+      "id": "t.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "2400.00"
+    },
+    {
+      "id": "first",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 10,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "first"
+      },
+      "value": "2310.34"
+    },
+    {
+      "id": "m.calm.count_at_least",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 0.5,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "count_at_least",
+        "threshold": "2400"
+      },
+      "value": 45
+    },
+    {
+      "id": "m.calm.p_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 0.5,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "p_pct",
+        "threshold": "2400"
+      },
+      "value": "4.5"
+    },
+    {
+      "id": "m.calm.se_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 0.5,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "se_pct",
+        "threshold": "2400"
+      },
+      "value": "0.7"
+    },
+    {
+      "id": "m.calm.mean",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 0.5,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "mean_max"
+      },
+      "value": "2340.67"
+    },
+    {
+      "id": "m.normal.count_at_least",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "count_at_least",
+        "threshold": "2400"
+      },
+      "value": 287
+    },
+    {
+      "id": "m.normal.p_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "p_pct",
+        "threshold": "2400"
+      },
+      "value": "28.7"
+    },
+    {
+      "id": "m.normal.se_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "se_pct",
+        "threshold": "2400"
+      },
+      "value": "1.4"
+    },
+    {
+      "id": "m.normal.mean",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "mean_max"
+      },
+      "value": "2371.50"
+    },
+    {
+      "id": "m.wild.count_at_least",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 2,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "count_at_least",
+        "threshold": "2400"
+      },
+      "value": 505
+    },
+    {
+      "id": "m.wild.p_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 2,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "p_pct",
+        "threshold": "2400"
+      },
+      "value": "50.5"
+    },
+    {
+      "id": "m.wild.se_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 2,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "se_pct",
+        "threshold": "2400"
+      },
+      "value": "1.6"
+    },
+    {
+      "id": "m.wild.mean",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 2,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:10,-0.25:20,0:40,0.25:20,0.50:10",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "mean_max"
+      },
+      "value": "2434.64"
+    },
+    {
+      "id": "m.up.count_at_least",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:5,-0.25:10,0:35,0.25:30,0.50:20",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "count_at_least",
+        "threshold": "2400"
+      },
+      "value": 777
+    },
+    {
+      "id": "m.up.p_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:5,-0.25:10,0:35,0.25:30,0.50:20",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "p_pct",
+        "threshold": "2400"
+      },
+      "value": "77.7"
+    },
+    {
+      "id": "m.up.se_pct",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:5,-0.25:10,0:35,0.25:30,0.50:20",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "se_pct",
+        "threshold": "2400"
+      },
+      "value": "1.3"
+    },
+    {
+      "id": "m.up.mean",
+      "kind": "mc_run",
+      "inputs": {
+        "seed": 1,
+        "n": 1000,
+        "years": 15,
+        "scale": 1,
+        "min_shift": "-3",
+        "prime_steps": "-0.50:5,-0.25:10,0:35,0.25:30,0.50:20",
+        "inflation": "1:15,1.5:20,2:30,2.5:20,3:15",
+        "tracks": 1,
+        "t1_kind": "prime",
+        "t1_amount": "300000",
+        "t1_rate": "4.60",
+        "t1_months": 180,
+        "t1_method": "spitzer",
+        "measure": "mean_max"
+      },
+      "value": "2470.17"
+    },
+    {
+      "id": "apr.small",
+      "kind": "mc_share",
+      "inputs": {
+        "count": 15,
+        "total": 20
+      },
+      "value": {
+        "p_pct": "75.0",
+        "se_pct": "9.7"
+      }
+    },
+    {
+      "id": "apr.large",
+      "kind": "mc_share",
+      "inputs": {
+        "count": 150,
+        "total": 200
+      },
+      "value": {
+        "p_pct": "75.0",
+        "se_pct": "3.1"
+      }
+    },
+    {
+      "id": "apr.huge",
+      "kind": "mc_share",
+      "inputs": {
+        "count": 1500,
+        "total": 2000
+      },
+      "value": {
+        "p_pct": "75.0",
+        "se_pct": "1.0"
+      }
+    }
+  ]
+}

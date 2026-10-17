@@ -1,0 +1,170 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.13 - the space of mixes. Pure function of t; numbers from data/lessons/8-13.json.
+  Script: (1) title; (2) counting by hand (two kinds); (3) the Brain's space: 10,626 splits ... 150 billion ... 66 trillion; (4) time at an assumed 1 ms each;
+  (5) how many splits are legal; (6) takeaway. LABEL: counts computed by the course under a stated reading; time per candidate is an assumption.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      .tag { position: absolute; top: 36px; left: 40px; font-size: 16px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.13 · מרחב התמהילים</div>
+      <div class="tag">נתונים סינתטיים · להדגמה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/8-13.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // LTR isolate for a number (the number only; a sign stays outside).
+      const lr = (s) => `\u2066${s}\u2069`;
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const grow = (t, sc, s, d) => clamp((t - sc[0] - s) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", n400: "var(--mogi-n400)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+      const bar = (x, y, w, h, fill, o = 1) => el("rect", { x, y, width: Math.max(0, w), height: h, rx: 6, fill, opacity: o });
+
+      const big = (s) => new Intl.NumberFormat("he-IL").format(BigInt(s));
+      const rough = (v) => {
+        const s = String(v), L = s.length;
+        const [unit, size] = L >= 13 ? ["טריליון", 12] : L >= 10 ? ["מיליארד", 9] : L >= 7 ? ["מיליון", 6] : ["אלף", 3];
+        return `${Math.round(Number(s) / 10 ** size)} ${unit}`;
+      };
+      const S = { title: [0, 8], hand: [8, 46], brain: [46, 96], time: [96, 126], legal: [126, 146], end: [146, 160] };
+      window.duration = 160;
+      window.cues = [
+        [1, 5, "כמה תמהילים יש בכלל?"],
+        [5, 7.5, "חישוב של הקורס, לפי קריאה שמצוינת."],
+        [9, 17, "תמהיל: חלוקה של ההלוואה, ותקופה לכל מסלול."],
+        [17, 26, `שני סוגים, קפיצות של 50%: ${fact("hand.two")} חלוקות.`],
+        [26, 35, `ועם תקופה לכל מסלול שקיים: ${fact("hand.two_active")} תמהילים.`],
+        [35, 45, `אם סופרים גם מסלול בלי חלק: ${fact("hand.two_per")}.`],
+        [47, 56, "ועכשיו הרשת של הצוות: חמישה סוגי מסלול."],
+        [56, 65, `קפיצות של 5%: ${big(fact("brain.splits"))} חלוקות.`],
+        [65, 75, `תקופה אחת לכולם: ${rough(fact("brain.one"))}.`],
+        [75, 86, `תקופה לכל סוג: ${rough(fact("brain.per_track"))}.`],
+        [86, 95, `בקפיצות של 1%: ${rough(fact("brain.fine_per_track"))}.`],
+        [97, 106, "נניח אלפית שנייה לכל בדיקה. זו הנחה."],
+        [106, 116, `תקופה אחת: ${fact("time.one")} דקות.`],
+        [116, 125, `תקופה לכל סוג: ${fact("time.per_track")} שנים.`],
+        [127, 136, "לא כל חלוקה חוקית: כלל השליש הקבוע."],
+        [136, 145, `מתוך ${big(fact("brain.legal").all)}, ${big(fact("brain.legal").legal)} חוקיות.`],
+        [147, 153, "ולכן מחפשים בצורה חכמה."],
+        [153, 159, "רשת היא בחירה, לא כל האפשרויות."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מרחב התמהילים", 84, { w: 700, o });
+          txt(640, 360, "למה לא בודקים הכול", 52, { w: 700, o: after(t, S.title, 1, o) });
+          txt(640, 430, "הספירות חושבו בקוד לפי קריאה של הקורס, לא לפי Mogi", 24, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        if (inScene(t, S.hand)) {
+          const o = vis(t, S.hand);
+          txt(640, 124, "שני סוגי מסלול, קפיצות של 50%, שלוש תקופות", 34, { w: 700, o });
+          const rows = [["הכול לראשון", "hand.one_track", "מסלול אחד"], ["חצי־חצי", "hand.two_tracks", "שני מסלולים"], ["הכול לשני", "hand.one_track", "מסלול אחד"]];
+          rows.forEach(([a, id, b], k) => {
+            const y = 190 + k * 90;
+            const oc = after(t, S.hand, 2 + k * 6, o);
+            box(240, y, 800, 72, oc);
+            txt(1000, y + 46, a, 30, { anchor: "start", w: 700, o: oc });
+            txt(700, y + 46, b, 24, { anchor: "start", fill: C.n600, o: oc });
+            txt(300, y + 48, fact(id), 40, { anchor: "start", w: 700, fill: C.teal, o: oc, ltr: true });
+          });
+          const o2 = after(t, S.hand, 22, o);
+          txt(640, 510, `יחד ${lr(fact("hand.two_active"))}  ·  ואם סופרים גם בלי חלק: ${lr(fact("hand.two_per"))}`, 32, { w: 700, o: o2 });
+        }
+        if (inScene(t, S.brain)) {
+          const o = vis(t, S.brain);
+          txt(640, 124, `חמישה סוגים · קפיצות של ${lr("5%")} · ${lr("27")} תקופות`, 36, { w: 700, o });
+          const rows = [["חלוקות בלבד", "brain.splits", 9], ["תקופה אחת לכולם", "brain.one", 19], ["תקופה לכל סוג", "brain.per_track", 29], ["קפיצות של 1%, תקופה לכל סוג", "brain.fine_per_track", 40]];
+          rows.forEach(([a, id, from], k) => {
+            const y = 190 + k * 88;
+            const oc = after(t, S.brain, from - 4, o);
+            box(160, y, 960, 72, oc, k === 2 ? C.mint : C.n0);
+            txt(1090, y + 46, a, 28, { anchor: "start", w: 700, o: oc });
+            txt(300, y + 48, big(fact(id)), 34, { anchor: "start", w: 700, fill: C.navy, o: oc, ltr: true });
+          });
+        }
+        if (inScene(t, S.time)) {
+          const o = vis(t, S.time);
+          txt(640, 124, "אלפית שנייה לכל בדיקה (הנחה)", 40, { w: 700, o });
+          const rows = [["תקופה אחת לכולם", `${lr(fact("time.one"))} דקות`], ["תקופה לכל סוג", `${lr(fact("time.per_track"))} שנים`], [`קפיצות של ${lr("1%")}, תקופה לכל סוג`, `${lr(fact("time.fine"))} שנים`]];
+          rows.forEach(([a, b], k) => {
+            const y = 210 + k * 100;
+            const oc = after(t, S.time, 2 + k * 9, o);
+            txt(1060, y + 40, a, 30, { anchor: "start", w: 700, o: oc });
+            txt(600, y + 42, b, 40, { anchor: "start", w: 700, fill: C.teal, o: oc });
+          });
+        }
+        if (inScene(t, S.legal)) {
+          const o = vis(t, S.legal);
+          txt(640, 124, "וכמה מהחלוקות חוקיות?", 40, { w: 700, o });
+          const L = fact("brain.legal");
+          const w = 800;
+          const frac = Number(L.legal) / Number(L.all);
+          el("rect", { x: 240, y: 240, width: w, height: 70, rx: 12, fill: C.n100, opacity: o });
+          el("rect", { x: 240 + w - w * frac * grow(t, S.legal, 4, 3), y: 240, width: w * frac * grow(t, S.legal, 4, 3), height: 70, rx: 12, fill: C.teal, opacity: o });
+          txt(640, 360, `${lr(big(L.legal))} מתוך ${lr(big(L.all))}`, 44, { w: 700, o: after(t, S.legal, 8, o) });
+          txt(640, 420, "לפחות שליש מההלוואה במסלולים שאינם משתנים (לפי התעתיק, לא אומת)", 22, { fill: C.n600, o: after(t, S.legal, 10, o) });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 290, "אי אפשר לבדוק הכול", 56, { w: 700, o });
+          txt(640, 370, "רשת היא בחירה, לא כל האפשרויות", 34, { fill: C.teal, o: after(t, S.end, 2, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

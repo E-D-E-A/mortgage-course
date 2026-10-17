@@ -1,0 +1,422 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.8"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import WeightsPlayground from "../../components/WeightsPlayground.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatWholeShekels } from "../../lib/calc/money.ts";
+import { CANDIDATES } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right. */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.8");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const name = Object.fromEntries(CANDIDATES.map((c) => [c.id, c.name]));
+export const table = f.rows("cand.table");
+export const row = Object.fromEntries(table.map((r) => [r.id, r]));
+export const tbl = (id) => Object.fromEntries(f.rows(id).map((r) => [r.id, r]));
+export const bal = tbl("tbl.bal");
+export const free = tbl("tbl.bal_free");
+export const drop = tbl("tbl.bal_drop");
+export const three = tbl("tbl.three");
+export const winnerOf = (id) => f.rows(id).find((r) => r.rank === 1).id;
+export const pw = (w) => w;
+export const playRows = table.map((r) => ({ id: r.id, name: name[r.id], first: r.first, total: r.total, rise: r.rise, feasible: r.passes === "yes" }));
+export const nf = (v) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: 0, maximumFractionDigits: 6 }).format(Number(v)).replace("-", "−");
+export const sc = (id, k) => tbl(id)[k].score;
+export const THREE = ["half", "linked", "short"];
+export const predictionOptions = [
+  "כן: המנצח הכולל חייב להיות חזק בלפחות יעד אחד, כי הציון מחבר את היעדים",
+  "לא: ייתכן תמהיל שלא מנצח אף יעד לבדו ובכל זאת מנצח בציון המשוקלל",
+  "כן, אלא אם נותנים לאחד היעדים משקל אפס",
+  "לא, אבל רק אם כל התמהילים עוברים את הגבולות",
+];
+export const lat = f.raw("lat.10");
+
+<Callout title="איפה זה עומד: Mogi היום, הוחלט, עתיד">
+<p><strong>עתיד.</strong> בקוד של Mogi היום אין חישוב תמהיל, וקריאת המנוע מוקפאת. מה שהוחלט: שלושת היעדים (החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית) הם תכנון המוצר של Mogi, לפי הדף בצוות שעודכן ב־<span class="ltr">2026-10-08</span>. כל השאר בשיעור הוא <strong>המחשה של הקורס</strong>: הנרמול, הציון המשוקלל וכל משקולת. <strong>המשקולות להדגמה: הן אינן החלטה של Mogi ואינן מדיניות של בנק.</strong></p>
+<p>{MARK}</p>
+</Callout>
+
+בשיעור 8.7 הפרדתם בין מועמדים שעומדים באילוצים הקשיחים לבין מועמדים שלא. נשארה שאלה: מבין אלה שעומדים בהם, <Term t="פתרון מיטבי" client:visible lesson="8.8">מי הטוב ביותר</Term>? בשיעור 5.6 ראיתם שכל יעד מנצח תמהיל אחר. כאן נלמד איך מחברים שלושה יעדים למספר אחד, ומה אומר המשקל שנותנים לכל יעד.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.8"
+  question={`בשיעור 5.6 שלושה תמהילים ניצחו שלושה יעדים: ״${name.linked}״ בהחזר הראשון, ״${name.short}״ בסך התשלומים, ו״${name.fixed}״ ביציבות. נותנים לשלושת היעדים משקל כמעט שווה, ומחשבים לכל תמהיל ציון אחד. האם התמהיל עם הציון הטוב ביותר חייב להיות אחד משלושת המנצחים?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מבחר אחד, משקלים שונים, מנצחים שונים
+
+</Section>
+
+<LessonVideo lesson="8-8" />
+
+<Section kind="ההסבר">
+
+## מכמה יעדים לציון אחד
+
+</Section>
+
+### שלב 1: כל יעד הוא פונקציה
+
+<Term t="פונקציה" client:visible lesson="8.1">פונקציה</Term> היא כלל שמקבל קלט ונותן פלט. כאן הקלט הוא מועמד (תמהיל), והפלט הוא מספר אחד. כל כזו שמודדת כמה המועמד טוב ביעד אחד נקראת <Term t="פונקציית מטרה" client:visible lesson="8.8">פונקציית מטרה</Term>. בשיעור 5.6 הכרתם שלוש כאלה. הנה הן, כל אחת עם הקלט והפלט שלה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">היעד</th>
+        <th class="py-2 pe-3 text-start font-semibold">הפונקציה מחזירה</th>
+        <th class="py-2 pe-3 text-start font-semibold">יחידה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">החזר ראשון</td><td class="py-2 pe-3">התשלום בחודש 1, בתרחיש הבסיס</td><td class="py-2 pe-3">₪ בחודש</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">סך תשלומים</td><td class="py-2 pe-3">כל התשלומים, בתרחיש הבסיס</td><td class="py-2 pe-3">₪ לאורך ההלוואה</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">חשיפה</td><td class="py-2 pe-3">התשלום הגבוה ביותר בתרחיש המחמיר פחות ההחזר הראשון</td><td class="py-2 pe-3">₪ בחודש</td></tr>
+    </tbody>
+  </table>
+</div>
+
+בשלושתן **הקטן עדיף**. זו בחירה שמקלה על החישוב: יעד שבו הגדול עדיף (למשל ״כמה נשאר לחיות״) הופכים לקטן עדיף על ידי מדידה הפוכה.
+
+### שלב 2: אי אפשר לחבר שקלים לחודש עם שקלים לשלושים שנה
+
+ההחזר הראשון הוא כמה אלפי שקלים. סך התשלומים הוא כמה מיליונים. אם נחבר אותם כמו שהם, הסך יכריע הכול, רק כי המספר שלו גדול. לכן מביאים כל יעד לאותה סקאלה: **נרמול**. בכל יעד, לפי המועמדים שמשווים:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">n = (v − min) ÷ (max − min)</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">v</dt><dd>הערך של המועמד ביעד (שקלים)</dd>
+    <dt class="ltr font-semibold text-n900">min</dt><dd>הערך הקטן ביותר בקבוצה ביעד הזה: המועמד הטוב ביותר בו</dd>
+    <dt class="ltr font-semibold text-n900">max</dt><dd>הערך הגדול ביותר בקבוצה: הגרוע ביותר</dd>
+    <dt class="ltr font-semibold text-n900">n</dt><dd>הערך המנורמל, מספר בלי יחידה: 0 הוא הטוב בקבוצה, 1 הגרוע בה. מעגלים לארבע ספרות אחרי הנקודה, כדי שכל מי שמחשב ביד יגיע לאותו מספר</dd>
+  </dl>
+</div>
+
+(האות n כאן ערך מנורמל. בשיעורים הקודמים n היה מספר תקופות; בשיעור הזה היא שייכת רק למספר המנורמל, ואין בו תקופות.) אם כל המועמדים שווים ביעד, אין מה להבדיל, והערך המנורמל של כולם אפס.
+
+ננסה על שלושה תמהילים מהשיעור 5.6: ״{name.half}״, ״{name.linked}״ ו״{name.short}״. ההחזר הראשון שלהם: {nf(row.half.first)}, {nf(row.linked.first)} ו־{nf(row.short.first)} ₪. הקטן ביותר הוא ״{name.linked}״ והגדול ״{name.short}״. לכן ״{name.linked}״ מקבל 0, ״{name.short}״ מקבל 1, ו״{name.half}״ מקבל {f.raw("norm.first")[0]}: לפי הנוסחה, ממוקם בין השניים. כך מחשבים את שלושת היעדים.
+
+### שלב 3: משקולות
+
+<Term t="משקולת" client:visible lesson="8.8">משקולת</Term> היא מספר שאומר כמה יעד אחד חשוב. אותו רעיון מ<Term t="ממוצע משוקלל" client:visible lesson="8.2">הממוצע המשוקלל</Term> בשיעור 8.2: במקום שכל מספר יספור באותה מידה, לכל אחד משקל. הציון של מועמד:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">ציון = (w<sub>1</sub>·n<sub>1</sub> + w<sub>2</sub>·n<sub>2</sub> + w<sub>3</sub>·n<sub>3</sub>) ÷ (w<sub>1</sub> + w<sub>2</sub> + w<sub>3</sub>)</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">n<sub>1</sub>, n<sub>2</sub>, n<sub>3</sub></dt><dd>הערכים המנורמלים של המועמד: החזר ראשון, סך תשלומים, חשיפה</dd>
+    <dt class="ltr font-semibold text-n900">w<sub>1</sub>, w<sub>2</sub>, w<sub>3</sub></dt><dd>המשקולות: מספרים מאפס ומעלה. אפשר לכתוב אותם כאחוזים, אבל אין חובה שיסתכמו ב־100: מחלקים בסכומם</dd>
+  </dl>
+  <p class="mt-3 text-body-m text-n700">הציון הקטן ביותר מנצח. תיקו: מנצח זה שמופיע ראשון ברשימה.</p>
+</div>
+
+אם הכפלת כל המשקולות באותו מספר: אין שינוי, כי מחלקים בסכום. אילו המשקולות הן 2, 1, 1, זה בדיוק כמו 50%, 25%, 25%.
+
+### שלב 4: לחשב ביד, מועמד אחד
+
+משקולות להדגמה: 40, 30, 30 (החזר ראשון, סך תשלומים, חשיפה). בקבוצה של שלושת התמהילים, ל״{name.half}״ יש {three.half.n_first} בהחזר ראשון, {three.half.n_total} בסך התשלומים ו־{three.half.n_exposure} בחשיפה (הוא הטוב ביותר בה). הכפלה במשקולות:
+
+1. החזר ראשון: <M>{three.half.n_first} × 40 = {f.raw("hand.p1")}</M>
+2. סך תשלומים: <M>{three.half.n_total} × 30 = {f.raw("hand.p2")}</M>
+3. חשיפה: <M>{three.half.n_exposure} × 30 = {f.raw("hand.p3")}</M>
+4. סכום ההכפלות, מחולק ב־<M>40 + 30 + 30 = 100</M>: ציון <strong>{f.raw("hand.sum")}</strong>.
+
+אצל ״{name.linked}״ הציון הוא {three.linked.score}, ואצל ״{name.short}״ {three.short.score}. ״{name.half}״ מנצח את שלושתם, **בלי לנצח אף יעד אחד לבד** בשלושה: הוא בינוני בהחזר הראשון ובסך התשלומים, והטוב ביותר רק בחשיפה בתוך הקבוצה הקטנה. זה מה שהציון המשוקלל עושה: הוא מעדיף מועמד טוב בכל, על פני מועמד טוב מאוד באחד וגרוע באחר.
+
+<Callout title="מה זה לא אומר" tone="warning">
+<p>הציון הוא <strong>מספר שיצא מהחישוב שהגדרנו</strong>, לא מדד של ״כמה התמהיל טוב ללקוח״. הנרמול, בחירת ארבע הספרות והמשקולות הן שלנו, להדגמה. מי שמשנה אחד מהם משנה את הציון, ולפעמים את המנצח.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## משקולות היעדים
+
+</Section>
+
+הנה שבעה התמהילים של שיעור 5.6, עם שלושה סליידרים של משקולות. נקודת ההתחלה: 40, 30, 30.
+
+<WeightsPlayground client:visible rows={playRows} weights={[40, 30, 30]} />
+
+נסו, והסתכלו מי המנצח:
+1. הגדילו את המשקל של ״החזר ראשון״ עד שהוא הרבה יותר גדול משני האחרים. מי מנצח?
+2. הגדילו את ״סך תשלומים״ במקומו. ועכשיו?
+3. סמנו ״להתעלם מהגבולות״, בלי לשנות משקולות. מי מנצח עכשיו? הסתכלו על שורות שהיו אפורות.
+4. חזרו למשקולות ההתחלה. הכפילו כל אחת מהן. מה קורה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>בהחזר ראשון בלבד (למשל משקלים 70, 15, 15) מנצח ״{name[winnerOf("tbl.pay")]}״: החזר ראשון של {formatWholeShekels(row[winnerOf("tbl.pay")].first)}.</li>
+    <li>בסך תשלומים (15, 70, 15) מנצח ״{name[winnerOf("tbl.tot")]}״, ובחשיפה (15, 15, 70) מנצח ״{name[winnerOf("tbl.stab")]}״. כלומר שלושה מנצחים, אותם שלושה משיעור 5.6.</li>
+    <li>כשמתעלמים מהגבולות, במשקולות ההתחלה מנצח ״{name[winnerOf("tbl.bal_free")]}״ במקום ״{name[winnerOf("tbl.bal")]}״. שימו לב שגם הסולם משתנה, כי עכשיו שבעה תמהילים נכנסים לנרמול.</li>
+    <li>הכפלת כל המשקולות במספר אחד לא משנה כלום: אותו מנצח, אותו ציון ({sc("tbl.bal_x2", winnerOf("tbl.bal_x2"))}). הציון תלוי ביחס בין המשקולות.</li>
+  </ol>
+</details>
+
+על כל שילוב משקולות בקפיצות של 10% ({lat.count} שילובים) מנצחים **{lat.n_distinct}** תמהילים שונים. הבחירה תלויה במשקולות, ולכן המשקולות חייבות להגיע מהלקוח, לא מהמנוע.
+
+<Section kind="מהדוגמה לנוסחה">
+
+## פתרון אפשרי, פתרון מיטבי
+
+</Section>
+
+**צעד 1 — אילוצים.** <Term t="פתרון אפשרי" client:visible lesson="8.7">פתרון אפשרי</Term> הוא מועמד שעומד בכל <Term t="אילוץ" client:visible lesson="8.7">האילוצים</Term> הקשיחים (שיעור 8.7). לפי הטבלה בשיעור 5.6, חמישה מתוך שבעה תמהילים עוברים את הגבולות של הוראה 329 כפי שהצוות תעתק אותה (לא אומת). שניים, ״{name.linked_heavy}״ ו״{name.fixed_20}״, לא.
+
+**צעד 2 — מיטבי.** פתרון מיטבי הוא האפשרי עם הציון הטוב ביותר **בין המועמדים שנבדקו**. שלוש הערות על המילה ״מיטבי״:
+
+1. **היא תלויה במשקולות.** במשקלים 70, 15, 15 המיטבי הוא ״{name[winnerOf("tbl.pay")]}״, ובמשקלים 15, 70, 15 ״{name[winnerOf("tbl.tot")]}״.
+2. **היא תלויה בקבוצת המועמדים.** הנרמול משתמש בערך הקטן והגדול בקבוצה. כשמורידים את ״{name.linked}״, תמהיל שלא ניצח, הסולם משתנה, והמנצח במשקולות 40, 30, 30 עובר מ״{name[winnerOf("tbl.bal")]}״ ל״{name[winnerOf("tbl.bal_drop")]}״. זו תכונה של השיטה (נרמול לפי הקבוצה), לא טעות בחישוב, ויש שיטות אחרות לנרמל, כמו סולם קבוע שנבחר מראש. בכל שיטה צריך לכתוב איזו, כדי שאפשר יהיה לשחזר.
+3. **אילוץ הוא קיר, לא מחיר.** אי אפשר לשים ״יחס החזר עד 50%״ כמשקולת: משקולת גדולה רק מקטינה את הנטייה לעבור את הקו, אבל לא אוסרת. לכן הגבולות נבדקים לפני, והמשקולות רק מדרגות את מי שעבר.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy">מועמד ← <span class="ltr">עובר את כל האילוצים?</span> ← ציון משוקלל ← הקטן ביותר</p>
+  <p class="mt-2 text-body-m text-n700">אפשרי = עובר את האילוצים. מיטבי = אפשרי עם הציון הקטן ביותר, בין מי שנבדק.</p>
+</div>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה לכל יעד. לכל תא מנורמל: <span class="ltr">=ROUND((B2-MIN(B$2:B$6))/(MAX(B$2:B$6)-MIN(B$2:B$6)),4)</span>. ציון: <span class="ltr">=SUMPRODUCT(E2:G2,$J$2:$L$2)/SUM($J$2:$L$2)</span>, כשהמשקולות בשורה J2:L2. מנצח: <span class="ltr">=INDEX(A2:A6,MATCH(MIN(H2:H6),H2:H6,0))</span>. בטווח רק המועמדים שעוברים.</p>
+<p><strong>במחשבון:</strong> שלושה ציונים ביד אפשר, חמישה כבר מייגעים. זה בדיוק מה שמכונה עושה.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.8"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `הציון מחבר את היעדים, אבל החיבור מתגמל מי שטוב ״בכל מקום קצת״. במשקלים 40, 30, 30 המנצח הוא ״${name[winnerOf("tbl.bal")]}״, שלא ניצח אף יעד בשיעור 5.6.`,
+    "",
+    "גם משקל אפס אחד לא מבטיח שהמנצח הוא מנצח של יעד אחד. כשרק אחד משלושה היעדים נשאר, כן; אבל כל עוד שניים נשארים, הוא יכול להיות מתפשרים.",
+    "הגבולות פוסלים מועמדים לפני הציון, ולא משפיעים על השאלה אם המנצח הוא חזק ביעד אחד. כל שבעת התמהילים, בלי גבולות, מראים אותה תופעה.",
+  ]}
+>
+  במשקלים {"40, 30, 30"} המנצח הוא ״{name[winnerOf("tbl.bal")]}״ בציון {bal[winnerOf("tbl.bal")].score}. הוא לא ניצח אף יעד אחד בשיעור 5.6, אבל הוא בינוני בכולם. זה ההבדל בין ״הכי טוב ביעד״ ל״הכי טוב בסך הכול״: מי שנותן משקל לשלושה יעדים בוחר מי שמתפשר טוב, לא מי שמצטיין. זה תלוי במבחר ובמשקולות, ולא חוק.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: מי מנצח כשהמשפחה חוששת מסיכון?
+
+</Section>
+
+נועם ושירה אומרים: ״החזר חודשי נמוך חשוב לנו, אבל הכי חשוב לנו לא להיות חשופים לעליית ריבית״. נתרגם את זה למשקולות להדגמה: 15, 15, 70 (החזר ראשון, סך תשלומים, חשיפה).
+
+**צעד 1 — הגבולות קודם.** חמשת התמהילים שעוברים: ״{name.initial}״, ״{name.half}״, ״{name.fixed}״, ״{name.linked}״ ו״{name.short}״.
+
+**צעד 2 — נרמול.** בחשיפה, ״{name.fixed}״ הוא הטוב ביותר ({formatWholeShekels(row.fixed.rise)}) ו״{name.linked}״ הגרוע ({formatWholeShekels(row.linked.rise)}). לכן אצל הראשון הערך המנורמל הוא {tbl("tbl.stab").fixed.n_exposure}, ואצל השני {tbl("tbl.stab").linked.n_exposure}.
+
+**צעד 3 — ציונים.** ״{name.fixed}״: {sc("tbl.stab", "fixed")}. ״{name.short}״: {sc("tbl.stab", "short")}. ״{name.half}״: {sc("tbl.stab", "half")}. ״{name.linked}״: {sc("tbl.stab", "linked")}.
+
+**מסקנה.** המנצח הוא ״{name[winnerOf("tbl.stab")]}״. אבל שימו לב כמה הציונים קרובים: הפער בין הראשון לשני הוא קטן, והסדר הזה יכול להתהפך עם משקולת אחרת ב־5%. כשהפער קטן, אומרים ללקוח את זה, ולא מציגים אחד כ״התשובה״.
+
+<Section kind="דוגמה חצי פתורה">
+
+## ציון בקבוצה של שלושה
+
+</Section>
+
+משקולות 40, 30, 30, והקבוצה היא שלושת התמהילים של השיעור. השורה הראשונה מלאה. הערכים המנורמלים כבר נתונים; חשבו את הציון של שני האחרים (הכפילו כל ערך מנורמל במשקולת שלו, חברו, וחלקו ב־100; ארבע ספרות אחרי הנקודה מספיקות).
+
+<FillTable
+  client:visible
+  id="8.8-half"
+  rowKey="mix"
+  periodLabel="התמהיל"
+  columns={[
+    { key: "n_first", label: "החזר ראשון (מנורמל)", format: "number" },
+    { key: "n_total", label: "סך תשלומים (מנורמל)", format: "number" },
+    { key: "n_exposure", label: "חשיפה (מנורמל)", format: "number" },
+    { key: "score", label: "ציון", format: "number" },
+  ]}
+  rows={THREE.map((id) => ({ mix: name[id], n_first: three[id].n_first, n_total: three[id].n_total, n_exposure: three[id].n_exposure, score: three[id].score }))}
+  blanks={[`${name.linked}.score`, `${name.short}.score`]}
+  success={`״${name.half}״ מנצח, ו״${name.linked}״ אחרון, למרות שהוא הטוב ביותר בהחזר הראשון. אחד מושך את הציון למעלה בגלל שני האחרים.`}
+  hint="ציון = (הערך הראשון × 40 + השני × 30 + השלישי × 30) ÷ 100."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המשקולות והנרמול בתרגילים הם להדגמה, ולא החלטה של Mogi. בתרגילים 2, 3 ו־5 אפשר להסתכל בטבלאות בשיעור.
+
+<ChoiceExercise
+  client:visible
+  id="8.8-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אילוץ פוסל מועמד; משקולת רק מדרגת מי שעבר", correct: true, feedback: "נכון. אילוץ הוא קיר: מי שחצה אותו אינו מועמד. משקולת היא מחיר: היא קובעת איזה ויתור שווה מה." },
+    { text: "אין הבדל: משקולת גדולה מאוד היא אילוץ", feedback: "משקולת גדולה מקטינה את הסיכוי שמועמד שחצה גבול ינצח, אבל לא מונעת זאת. בנק ישראל לא מקבל ״כמעט״." },
+    { text: "אילוץ הוא יעד שהלקוח בחר, משקולת היא כלל של הבנק", feedback: "ההפך קרוב יותר: חלק מהאילוצים הם של הלקוח ושל הבנק, והמשקולות הן העדפות הלקוח. אבל ההבדל הוא לא ״של מי״, אלא פוסל מול מדרג." },
+    { text: "משקולת היא תמיד מספר שלם, אילוץ הוא אחוז", feedback: "שניהם יכולים להיות מספרים כלשהם. ההבדל הוא בתפקיד." },
+  ]}
+>
+  מה ההבדל בין אילוץ קשיח למשקולת?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.8-2"
+  n={2}
+  level="קל"
+  unit=""
+  tolerance={0.0001}
+  near={0}
+  answer={f.raw("norm.first")[0]}
+>
+  ההחזר הראשון של שלושה תמהילים: ״{name.half}״ {formatWholeShekels(row.half.first)}, ״{name.linked}״ {formatWholeShekels(row.linked.first)} ו־״{name.short}״ {formatWholeShekels(row.short.first)}. מה הערך המנורמל של ״{name.half}״ בהחזר הראשון? (ארבע ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="8.8-2">
+הקטן ביותר בקבוצה הוא {formatWholeShekels(row.linked.first)} והגדול {formatWholeShekels(row.short.first)}. הערך של ״{name.half}״, אחרי החישוב לפי הנוסחה, הוא {f.raw("norm.first")[0]}. הוא בערך שני שלישים מהדרך מהטוב אל הגרוע.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.8-3"
+  n={3}
+  level="בינוני"
+  unit=""
+  tolerance={0.0005}
+  near={0}
+  answer={three.short.score}
+>
+  בקבוצה של שלושת התמהילים, ל״{name.short}״ יש ערכים מנורמלים {three.short.n_first}, {three.short.n_total} ו־{three.short.n_exposure}. במשקולות 40, 30, 30, מה הציון שלו? (ארבע ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="8.8-3">
+הציון הוא הסכום של כל ערך מנורמל כפול המשקולת שלו, מחולק ב־100: {three.short.score}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.8-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "לא משתנה כלום: אותו מנצח ואותו ציון", correct: true, feedback: "נכון. מחלקים בסכום המשקולות, ולכן רק היחס ביניהן חשוב." },
+    { text: "הציונים כפולים, אבל המנצח אותו דבר", feedback: "לא: גם הציון נשאר. הכפלה בסכום מבטלת את עצמה בחילוק." },
+    { text: "המנצח יכול להשתנות", feedback: "לא: כל שלוש המשקולות גדלו באותו יחס." },
+    { text: "המשקולות כבר לא מסתכמות ב־100, ולכן החישוב לא תקף", feedback: "אין חובה שיסתכמו ב־100. הנוסחה מחלקת בסכומן." },
+  ]}
+>
+  מכפילים כל אחת משלוש המשקולות (40, 30, 30) ב־2. מה קורה לציונים ולמנצח?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.8-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: `הסולם של הנרמול השתנה: ״${name.fixed}״ מנצח במקום ״${name.half}״`, correct: true, feedback: "נכון. הערך הקטן והגדול בכל יעד נלקחים מהקבוצה, ו״צמוד״ היה הגדול בשניים מהם. בלעדיו כל היתר נראים אחרת." },
+    { text: "טעות בחישוב: מי שלא ניצח לא יכול להשפיע", feedback: "זו לא טעות. נרמול לפי הקבוצה הופך כל מועמד לחלק מהסולם של האחרים." },
+    { text: "המשקולות השתנו כשהסירו אותו", feedback: "המשקולות נשארו 40, 30, 30." },
+    { text: "״צמוד״ היה אחד המנצחים", feedback: `לא: בשיעור 5.6 הוא ניצח את ההחזר הראשון, אבל במשקולות האלה המנצח הוא ״${name.half}״.` },
+  ]}
+>
+  במשקולות 40, 30, 30 המנצח הוא ״{name.half}״. מסירים את ״{name.linked}״ מהקבוצה, שהוא אינו המנצח. המנצח משתנה. למה?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.8-6"
+  n={6}
+  level="בינוני"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={String(lat.n_distinct)}
+>
+  מנסים כל שילוב משקולות בקפיצות של 10% ({lat.count} שילובים בסך הכול). כמה תמהילים שונים מנצחים לפחות באחד מהם?
+</NumericExercise>
+
+<Solution for="8.8-6">
+{lat.n_distinct}: {lat.distinct.split("|").map((id) => name[id]).join(", ")}. לא כל תמהיל שעובר את הגבולות מנצח בשום משקולות: ״{name.initial}״ לא ניצח באף שילוב.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.8-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לשאול לפי אילו משקולות, מי נבדק, ואילו אילוצים", correct: true, feedback: "נכון. ״מיטבי״ בלי משקולות, קבוצה ואילוצים אינו טענה." },
+    { text: "להאמין: אלגוריתם לא טועה", feedback: "אלגוריתם מחשב נכון את מה שהגדירו לו. הבחירה במשקולות ובקבוצה היא של אדם, ולכן גם היא שאלה." },
+    { text: "לבקש את התמהיל עם המשקל הגדול ביותר בהחזר הראשון", feedback: "זה מנצח ביעד אחד בלבד, ואינו מיטבי בשום מובן כללי." },
+    { text: "לדרוש שכל התמהילים יהיו עם אותה ריבית", feedback: "זה פותר בעיה אחרת, ולא נוגע בשאלה של משקולות." },
+  ]}
+>
+  יועץ אומר ״האלגוריתם מצא את התמהיל המיטבי לכם״. מה כדאי לשאול?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על משקולות ופתרון מיטבי">
+<p><strong>מה זה?</strong> דרך להפוך כמה יעדים לציון אחד: מנרמלים כל יעד, מכפילים במשקולת, מחברים ומחלקים בסכום המשקולות. פתרון מיטבי הוא האפשרי עם הציון הקטן ביותר בין מי שנבדק.</p>
+<p><strong>למה זה קיים?</strong> כי אין תמהיל שמנצח בכל שלושת היעדים (שיעור 5.6), ומכונה צריכה כלל כדי לבחור. אבל הכלל הזה לא נוצר מעצמו: מישהו בוחר משקולות.</p>
+<p><strong>איך זה עובד?</strong> ראשית אילוצים (עובר או לא), אחר כך נרמול בתוך הקבוצה, אחר כך משקולות. כל שלב הוא פונקציה, ואפשר לבדוק אותו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מי שבחר את המשקולות בחר את התשובה. משפחה שחוששת מסיכון ומשפחה שרוצה תשלום נמוך מקבלות תמהילים אחרים מאותה חישוב, ושתיהן מקבלות תשובה נכונה לשאלה ששאלו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים את הלקוח מה חשוב לו, מתרגמים למשקולות, ומציגים את הדירוג לצד הסיכונים והפערים הקטנים. לפי תכנון המוצר של Mogi, שלושה תמהילים נבנים לשלושה יעדים; איך Mogi תתרגם העדפות למשקולות לא הוחלט, ויש על זה שאלה לאילון. מודל שפה יכול להסביר את התוצאה ללקוח, לעולם לא לחשב אותה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **פונקציית מטרה** מחזירה מספר אחד לכל מועמד, ביעד אחד. בקורס שלוש, והקטן עדיף בכולן.
+- **נרמול** מביא יעדים ביחידות שונות לסקאלה אחת, 0 עד 1, לפי הקבוצה שמשווים. הוא תלוי בקבוצה.
+- **משקולות** אומרות כמה כל יעד חשוב; הציון הוא ממוצע משוקלל של הערכים המנורמלים. רק היחס ביניהן קובע.
+- **אפשרי** = עומד בכל האילוצים. **מיטבי** = אפשרי עם הציון הטוב ביותר בין מי שנבדק, ביחס למשקולות ולנרמול. אילוץ הוא קיר, משקולת היא מחיר.
+- **הכול כאן להדגמה:** המשקולות, הנרמול והסקאלות אינם החלטה של Mogi ואינם מדיניות של בנק.
+
+**בשיעור הבא — 8.9, <Later lesson="8.9" quiet>תזרים לכל מסלול לפי תרחיש, ותזרים התמהיל</Later>:** איך המנוע מחשב את המספרים שהשיעור הזה לקח כנתונים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "בניית תמהיל מייצרת שלושה תמהילים לפי שלושה יעדים: החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית. תכנון המוצר של Mogi (עודכן ב־2026-10-08), כפי שנרשם בצוות; לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "הנרמול (מינימום־מקסימום, ארבע ספרות), הציון המשוקלל והמשקולות 40/30/30, 70/15/15, 15/70/15, 15/15/70 הם הדגמה של הקורס. אין בהם החלטה של Mogi ולא מדיניות של בנק. איך Mogi תתרגם העדפות של לקוח למשקולות לא ידוע (שאלה לאילון)." },
+    { kind: "הנחת חישוב", text: "שבעת התמהילים, רשימת המחירים והתרחישים (בסיס ומחמיר) הם של שיעור 5.6: הנחות של הקורס, לא הצעת בנק ולא תחזית. ״חשיפה״ כהפרש בין התשלום הגבוה ביותר במחמיר להחזר הראשון היא בחירה של הקורס." },
+    { kind: "לא אומת", text: "הגבולות של הוראה 329 (שיעור מימון, יחס החזר עד 50%, עד שני שלישים משתנה, עד 30 שנה) לפי תעתיק בצוות (עודכן ב־2026-10-08), ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "ידע מתמטי כללי", text: "פונקציה, נרמול מינימום־מקסימום, ממוצע משוקלל, בחירת המינימום מרשימה." },
+    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/objectives.ts over engine.ts via scripts/lessons/lesson-8-8.ts (+ _stage8b-facts.ts, _sensitivity-facts.ts) and data/lessons/8-8.json, rechecked by checks/kinds/objectives.py. Candidates: src/data/case-a-mix.ts (stage 5). Illustration: src/components/WeightsPlayground.vue (props only). Video: video/8-8.html. Brain: J-090 (page 7503881 / 7634954) for the three goals. */}

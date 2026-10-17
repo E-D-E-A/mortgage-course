@@ -17,14 +17,14 @@ def frac(s):
     return Fraction(str(s))
 
 
-def two(q):
-    """Two decimals, half away from zero, as a string."""
-    sign = -1 if q < 0 else 1
-    n = (abs(q) * 100 + Fraction(1, 2)).__floor__()
-    n *= sign
-    neg = n < 0
-    n = abs(n)
-    return f"{'-' if neg else ''}{n // 100}.{n % 100:02d}"
+def two(q, d=2):
+    """`d` decimals (default 2), half away from zero, as a string."""
+    scale = 10 ** d
+    n = (abs(q) * scale + Fraction(1, 2)).__floor__()
+    neg = q < 0 and n != 0
+    whole, frac_part = divmod(n, scale)
+    out = f"{whole}.{frac_part:0{d}d}" if d else str(whole)
+    return f"-{out}" if neg else out
 
 
 def parse(text):
@@ -41,6 +41,7 @@ AXES = [("x ≥ 0", Fraction(-1), Fraction(0), Fraction(0)), ("y ≥ 0", Fractio
 def _raw(i):
     cond = parse(i["conditions"]) + AXES
     c1, c2 = frac(i["c1"]), frac(i["c2"])
+    d = int(i.get("decimals", 2))
     out = []
     for p in range(len(cond)):
         for q in range(p + 1, len(cond)):
@@ -54,7 +55,7 @@ def _raw(i):
             broken = [k[0] for k in cond if k[1] * x + k[2] * y > k[3]]
             on = [k[0] for k in cond if k[1] * x + k[2] * y == k[3]]
             out.append({
-                "x": two(x), "y": two(y), "value": two(c1 * x + c2 * y), "active": on,
+                "x": two(x, d), "y": two(y, d), "value": two(c1 * x + c2 * y, d), "active": on,
                 "lines": [cond[p][0], cond[q][0]], "feasible": not broken, "breaks": broken,
                 "_exact": c1 * x + c2 * y,
             })
@@ -95,7 +96,7 @@ def lp_solve(i, _facts=None):
 
 
 def lp_value(i, _facts=None):
-    return two(frac(i["c1"]) * frac(i["x"]) + frac(i["c2"]) * frac(i["y"]))
+    return two(frac(i["c1"]) * frac(i["x"]) + frac(i["c2"]) * frac(i["y"]), int(i.get("decimals", 2)))
 
 
 def lp_valleys(i, _facts=None):
@@ -126,7 +127,12 @@ def lp_valleys(i, _facts=None):
     return {"localMinima": minima, "globalMin": g, "path": path}
 
 
+def lp_feasible_count(i, _facts=None):
+    return sum(1 for r in lp_crossings(i) if r["feasible"])
+
+
 KINDS = {
+    "lp_feasible_count": lp_feasible_count,
     "lp_valleys": lp_valleys,
     "lp_solve": lp_solve,
     "lp_crossings": lp_crossings,

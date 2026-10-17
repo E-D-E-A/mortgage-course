@@ -1,0 +1,188 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.11 - Monte Carlo from zero. Pure function of t; numbers from data/lessons/8-11.json.
+  Script: (1) title; (2) the assumed distribution of prime's yearly step; (3) the seeded generator and the steps it gives; (4) ten futures by hand;
+  (5) a thousand futures: the share that crosses the threshold; (6) the same question with other seeds: noise; (7) takeaway.
+  ILLUSTRATION: the distribution is an invented assumption.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      .tag { position: absolute; top: 36px; left: 40px; font-size: 16px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.11 · מונטה־קרלו</div>
+      <div class="tag">נתונים סינתטיים · להדגמה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/8-11.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // LTR isolate for a number (the number only; a sign stays outside).
+      const lr = (s) => `\u2066${s}\u2069`;
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const grow = (t, sc, s, d) => clamp((t - sc[0] - s) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", n400: "var(--mogi-n400)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+      const bar = (x, y, w, h, fill, o = 1) => el("rect", { x, y, width: Math.max(0, w), height: h, rx: 6, fill, opacity: o });
+
+      const STEPS = [["−0.5", 10], ["−0.25", 20], ["0", 40], ["+0.25", 20], ["+0.5", 10]];
+      const rng = fact("rng.seed1"), stp = fact("steps.seed1");
+      const ten = fact("ten.list").map(Number);
+      const th = Number(fact("t.threshold"));
+      const seeds = [1, 2, 3, 4, 5, 6, 7, 8].map((s) => Number(fact(`h.seed${s}.p_pct`)));
+      const S = { title: [0, 8], assume: [8, 36], gen: [36, 68], ten: [68, 100], k: [100, 128], noise: [128, 160], end: [160, 176] };
+      window.duration = 176;
+      window.cues = [
+        [1, 5, "מונטה־קרלו: להגריל עתידים ולספור."],
+        [5, 7.5, "ההנחות מומצאות, זו לא תחזית."],
+        [9, 17, `מסלול פריים של ${shek(fact("t.amount"))}. מה הסיכוי שיעבור ${shek(fact("t.threshold"))}?`],
+        [17, 25, "קודם הנחה: איך הפריים זז בכל שנה."],
+        [25, 35, "זו הנחה, לא עובדה: כמו קובייה לא הוגנת."],
+        [37, 45, "מחשב לא מטיל קובייה: יש לו מחולל מספרים."],
+        [45, 54, "מספר התחלה קבוע: אותה סדרה, בכל הרצה."],
+        [54, 67, "כל מספר הופך לצעד, לפי המשקלים."],
+        [69, 77, "עשרה עתידים, התשלום הגבוה ביותר בכל אחד."],
+        [77, 87, `אחד מתוך עשרה עבר את ${shek(fact("t.threshold"))}.`],
+        [87, 99, "עשרה זה מעט: זה יכול להיות מקרה."],
+        [101, 109, "עכשיו אלף עתידים."],
+        [109, 119, `${fact("k.count_at_least")} מתוך 1,000 עברו את הסף.`],
+        [119, 127, `ההסתברות המוערכת: ${fact("k.p_pct")}%.`],
+        [129, 137, "הרצה אחרת, אותה שאלה: מספר אחר."],
+        [137, 147, `מאה עתידים: בין ${Math.min(...seeds)}% ל־${Math.max(...seeds)}%.`],
+        [147, 159, "יותר עתידים, פחות רעש. הטעות קטנה בשורש."],
+        [161, 168, "הסימולציה לא הופכת הנחה לעובדה."],
+        [168, 175, "טובה כמו ההנחות שבה."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "אלף עתידים", 84, { w: 700, o });
+          txt(640, 360, "מונטה־קרלו מאפס", 52, { w: 700, o: after(t, S.title, 1, o) });
+          txt(640, 430, "ההנחות מומצאות להדגמה · נתונים סינתטיים", 26, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        if (inScene(t, S.assume)) {
+          const o = vis(t, S.assume);
+          txt(640, 124, "הנחה: צעד הפריים בשנה", 40, { w: 700, o });
+          txt(640, 166, "נקודות אחוז · משקל", 24, { fill: C.n600, o });
+          STEPS.forEach(([v, w], k) => {
+            const x = 1000 - k * 190;
+            const g = grow(t, S.assume, 6 + k * 2, 1.5);
+            const h = (w / 40) * 200 * g;
+            bar(x - 60, 450 - h, 120, h, k === 2 ? C.teal : C.tq2, o);
+            txt(x, 490, v, 28, { w: 700, o, ltr: true });
+            if (g > 0.9) txt(x, 440 - h, String(w), 26, { o, fill: C.n700, ltr: true });
+          });
+        }
+        if (inScene(t, S.gen)) {
+          const o = vis(t, S.gen);
+          txt(640, 124, "מחולל עם מספר התחלה", 40, { w: 700, o });
+          txt(640, 166, "אותו מספר התחלה, אותה סדרה", 24, { fill: C.n600, o });
+          rng.slice(0, 6).forEach((x, k) => {
+            const y = 210 + k * 56;
+            const oc = after(t, S.gen, 2 + k * 3.5, o);
+            txt(1000, y + 30, String(x), 28, { anchor: "end", w: 700, ltr: true, o: oc });
+            txt(520, y + 30, "←", 30, { fill: C.n600, o: oc });
+            txt(420, y + 30, `צעד ${stp[k]}`, 28, { anchor: "end", w: 700, fill: C.teal, ltr: true, o: oc });
+          });
+        }
+        if (inScene(t, S.ten)) {
+          const o = vis(t, S.ten);
+          txt(640, 124, "עשרה עתידים: התשלום הגבוה ביותר", 40, { w: 700, o });
+          const lo = 2280, hi = 2520;
+          const X = (v) => 1100 - ((v - lo) / (hi - lo)) * 900;
+          el("line", { x1: 200, x2: 1100, y1: 400, y2: 400, stroke: C.n300, opacity: o });
+          [2300, 2400, 2500].forEach((v) => txt(X(v), 440, num(v), 20, { fill: C.n600, o, ltr: true }));
+          const xt = X(th);
+          el("line", { x1: xt, x2: xt, y1: 200, y2: 400, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: after(t, S.ten, 10, o) });
+          txt(xt, 186, `סף ${lr(shek(th))}`, 22, { w: 700, o: after(t, S.ten, 10, o) });
+          ten.forEach((v, k) => {
+            const oc = after(t, S.ten, 2 + k * 0.7, o);
+            const stack = ten.slice(0, k).filter((u) => Math.abs(X(u) - X(v)) < 22).length;
+            el("circle", { cx: X(v), cy: 370 - stack * 26, r: 11, fill: v >= th ? C.navy : C.tq2, opacity: oc });
+          });
+          txt(640, 520, `אחד מתוך ${lr(ten.length)} עבר את הסף: ${lr(fact("ten.p_pct") + "%")}`, 28, { w: 700, o: after(t, S.ten, 20, o) });
+        }
+        if (inScene(t, S.k)) {
+          const o = vis(t, S.k);
+          txt(640, 124, "אלף עתידים", 40, { w: 700, o });
+          const g = grow(t, S.k, 6, 5);
+          el("rect", { x: 240, y: 230, width: 800, height: 60, rx: 10, fill: C.n100, opacity: o });
+          el("rect", { x: 1040 - 800 * (Number(fact("k.p_pct")) / 100) * g, y: 230, width: 800 * (Number(fact("k.p_pct")) / 100) * g, height: 60, rx: 10, fill: C.teal, opacity: o });
+          txt(1040, 330, `${lr(fact("k.count_at_least"))} מתוך ${lr("1,000")}`, 34, { anchor: "end", w: 700, o: after(t, S.k, 6, o) });
+          txt(640, 450, `${fact("k.p_pct")}% ± ${fact("k.se_pct")}`, 64, { w: 700, fill: C.teal, o: after(t, S.k, 14, o), ltr: true });
+          txt(640, 500, "ההסתברות המוערכת, והטעות של ההגרלה (נקודות אחוז)", 22, { fill: C.n600, o: after(t, S.k, 16, o) });
+        }
+        if (inScene(t, S.noise)) {
+          const o = vis(t, S.noise);
+          txt(640, 124, "אותה שאלה, הרצות אחרות", 40, { w: 700, o });
+          txt(640, 166, "מאה עתידים בכל הרצה, מספרי התחלה 1 עד 8", 22, { fill: C.n600, o });
+          seeds.forEach((v, k) => {
+            const x = 1060 - k * 120;
+            const g = grow(t, S.noise, 3 + k * 1.2, 1.2);
+            const h = (v / 35) * 240 * g;
+            bar(x - 38, 470 - h, 76, h, C.tq2, o);
+            txt(x, 500, `${v}%`, 22, { w: 700, o, ltr: true });
+          });
+          const o2 = after(t, S.noise, 20, o);
+          txt(640, 560, `אלף עתידים: ${lr(fact("k.p_pct") + "%")} ו־${lr(fact("k2.p_pct") + "%")} במספרי התחלה ${lr("1")} ו־${lr("2")}`, 24, { fill: C.n700, o: o2 });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 290, "הסימולציה לא הופכת הנחה לעובדה", 52, { w: 700, o });
+          txt(640, 370, "טובה כמו ההנחות שבה", 36, { fill: C.teal, o: after(t, S.end, 2, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

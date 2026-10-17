@@ -1,0 +1,114 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.24 (stage 8, author D). Rendered frame by frame by scripts/render-video.mjs:
+  window.render(t) depends only on t. Every number is read from /data/lessons/8-24.json (computed in code, rechecked in Python).
+  One idea: a model stays the same while the world moves; monitor the error, raise an alarm over a threshold, retrain, keep versions.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.24 · תחזוקה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/8-24.json")).json();
+      const V = (k) => String(data.facts.find((f) => f.id === k).value);
+      const lr = (x) => `⁦${x}⁩`;
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const vis = (t, sc) => Math.min(clamp((t - sc[0]) / 0.6), clamp((sc[1] - t) / 0.6));
+      const after = (t, sc, from, o, d = 0.6) => Math.min(o, clamp((t - sc[0] - from) / d));
+      const C = { navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)", n500: "var(--mogi-n500)", n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", warningBg: "var(--mogi-warning-bg)", successBg: "var(--mogi-success-bg)", infoBg: "var(--mogi-info-bg)", dangerBg: "var(--mogi-danger-bg)", danger: "var(--mogi-danger)" };
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      const txt = (x, y, s, size, o = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": o.w ?? 400, fill: o.fill ?? C.navy, "text-anchor": o.anchor ?? "middle", opacity: o.o ?? 1, direction: o.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const card = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 20, fill, stroke: C.n200, "stroke-width": 2, opacity: o });
+
+      const SCENES = [{"type":"title","at":[0,9],"title":"תחזוקה: מודל שהעולם עזב","sub":"זליגה, ניטור, אימון מחדש וגרסאות","foot":"בנק בדוי, נתונים סינתטיים. הכול עתיד: אין ל־Mogi מודל כזה."},{"type":"cards","at":[9,38],"title":"המודל פשוט: עוגן ועוד מרווח","cards":[{"h":"מה שהמודל למד","s":"מחודשים 1 עד 24","big":{"k":"m.spread1"}},{"h":"מה שהבנק עושה","s":"עד חודש 36","big":{"k":"spec.before"}},{"h":"מחודש 37","s":"הבנק משנה תמחור","big":{"k":"spec.after"}}],"foot":"המודל לא השתנה. העולם כן","footAt":14},{"type":"bars","at":[38,70],"title":"השגיאה של המודל הישן","bars":[{"label":"חודשי האימון","k":"m.baseline"},{"label":"חודשים תקינים","k":"m.healthy"},{"label":"אחרי ההתראה","k":"m.v1after","hl":true}],"foot":"קפיצה בשגיאה, לא עלייה איטית","footAt":14},{"type":"cards","at":[70,100],"title":"ניטור והתראה","cards":[{"h":"השגיאה הרגילה","big":{"k":"m.baseline"}},{"h":"הסף","s":"פי 3 מהרגילה","big":{"k":"m.threshold"}},{"h":"ההתראה","s":"אחרי השינוי","big":{"k":"m.delay"},"bigLabel":"חודשים אחרי השינוי"}],"foot":"התראה אומרת לבדוק, לא מה הסיבה","footAt":16},{"type":"bars","at":[100,130],"title":"אימון מחדש: על כמה חודשים?","bars":[{"label":"3 חודשים","k":"k3.after"},{"label":"6 חודשים","k":"k6.after"},{"label":"12 חודשים","k":"k12.after"},{"label":"24 חודשים","k":"k24.after"}],"foot":"מעט נותן רעש, הרבה כולל עבר","footAt":14},{"type":"cards","at":[130,150],"title":"ניהול גרסאות","cards":[{"h":"גרסה 1","s":"חודשים 1–24"},{"h":"גרסה 2","s":"אחרי ההתראה"}],"foot":"כל דעה נרשמת עם הגרסה שהפיקה אותה","footAt":5}];
+      window.duration = 150;
+      window.cues = [[1,5,"מודל שנבדק יפה יכול להתיישן."],[5,8.5,"בנק בדוי, נתונים סינתטיים."],[10,20,"המודל מאמין שהריבית היא עוגן ועוד מרווח."],[20,30,"את המרווח הוא למד מהחודשים הראשונים."],[30,37,"בחודש 37 הבנק משנה את התמחור שלו."],[39,50,"המודל לא השתנה, אבל העולם כן."],[50,62,"השגיאה קופצת, ונשארת גבוהה."],[62,69,"זו זליגה, או drift."],[71,81,"ניטור: עוקבים אחרי השגיאה."],[81,91,"הסף הוא פי שלושה מהשגיאה הרגילה."],[91,99,"ההתראה מגיעה חודשים אחרי השינוי."],[101,112,"אפשר לאמן מחדש על החודשים האחרונים."],[112,122,"כמה חודשים? מעט נותן רעש."],[122,129,"הרבה חודשים כולל את העבר."],[131,140,"שומרים כל גרסה עם הנתונים שלה."],[140,149,"וכל דעה נרשמת עם הגרסה שהפיקה אותה."]];
+      const bigOf = (b) => (b ? lr((b.pre ?? "") + V(b.k) + (b.suf ?? "")) : "");
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        for (const sc of SCENES) {
+          const range = sc.at;
+          if (!inScene(t, range)) continue;
+          const o = vis(t, range);
+          if (sc.type === "title") {
+            txt(640, 270, sc.title, 70, { w: 700, o });
+            txt(640, 350, sc.sub, 38, { fill: C.n600, o });
+            if (sc.foot) txt(640, 430, sc.foot, 24, { fill: C.n500, o: after(t, range, 3, o, 0.8) });
+          } else if (sc.type === "cards") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const n = sc.cards.length;
+            const w = n === 1 ? 700 : n === 2 ? 480 : n === 3 ? 340 : 270;
+            const gap = 30;
+            const total = n * w + (n - 1) * gap;
+            const x0 = 640 + total / 2;
+            sc.cards.forEach((c, i) => {
+              const oi = after(t, range, c.from ?? 1.5 + i * 3.5, o);
+              if (oi <= 0) return;
+              const right = x0 - i * (w + gap);
+              const left = right - w;
+              card(left, 170, w, 290, oi, c.fill ? C[c.fill] : C.n0);
+              el("rect", { x: right - 14, y: 170, width: 14, height: 290, rx: 7, fill: c.bar ? C[c.bar] : C.teal, opacity: oi });
+              txt((left + right) / 2 - 7, 235, c.h, n > 3 ? 30 : 34, { w: 700, o: oi });
+              if (c.s) txt((left + right) / 2 - 7, 285, c.s, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.s2) txt((left + right) / 2 - 7, 322, c.s2, n > 3 ? 22 : 26, { fill: C.n700, o: oi });
+              if (c.big) txt((left + right) / 2 - 7, 405, bigOf(c.big), 60, { w: 700, fill: C.teal, ltr: true, o: oi });
+              if (c.big && c.bigLabel) txt((left + right) / 2 - 7, 440, c.bigLabel, 22, { fill: C.n600, o: oi });
+            });
+            if (sc.foot) txt(640, 540, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 580, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          } else if (sc.type === "bars") {
+            txt(640, 110, sc.title, 46, { w: 700, o });
+            const vals = sc.bars.map((b) => Number(V(b.k)));
+            const max = Math.max(...vals) * 1.05;
+            sc.bars.forEach((b, i) => {
+              const oi = after(t, range, b.from ?? 1.5 + i * 3, o);
+              if (oi <= 0) return;
+              const y = 180 + i * 80;
+              const w = 560 * (vals[i] / max) * clamp((t - range[0] - (b.from ?? 1.5 + i * 3)) / 1.2);
+              txt(1140, y + 38, b.label, 28, { anchor: "start", fill: C.n700, o: oi });
+              el("rect", { x: 920 - w, y, width: Math.max(w, 2), height: 56, rx: 10, fill: b.hl ? C.teal : C.tq2, opacity: oi });
+              txt(920 - w - 14, y + 40, lr(V(b.k) + (sc.suf ?? "")), 30, { anchor: "end", w: 700, ltr: true, o: oi });
+            });
+            if (sc.foot) txt(640, 560, sc.foot, 30, { w: 600, fill: C.n700, o: after(t, range, sc.footAt ?? 8, o) });
+            if (sc.foot2) txt(640, 598, sc.foot2, 22, { fill: C.n500, o: after(t, range, (sc.footAt ?? 8) + 2, o) });
+          }
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

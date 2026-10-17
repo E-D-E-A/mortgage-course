@@ -1,0 +1,773 @@
+{
+  "lesson": "8.17",
+  "title": "מודל תמחור: עוגן ועוד מרווח, ומדרגות סביב ספים",
+  "note": "Synthetic. A teaching SHAPE, not a bank's pricing and not a Mogi model: margin = base 0.80 + a step for the financing ratio (over 40%: +0.10, over 60%: +0.35) + a step for the payment ratio (over 40%: +0.25), strictly above each threshold; the anchor is 4.20%. The example deal (1,800,000 ₪, 64% then 60% financing, payment ratio 36%, 25 years) is separate from case A. The sixty offers are made by the course's seeded generator (mulberry32) from the demo model plus noise of up to 6 basis points; the three models' errors are mean absolute differences.",
+  "facts": [
+    {
+      "id": "anchor",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.20"
+    },
+    {
+      "id": "base",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.80"
+    },
+    {
+      "id": "pti.threshold",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "th.40",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "th.60",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "step.40",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.10"
+    },
+    {
+      "id": "step.60",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.35"
+    },
+    {
+      "id": "step.pti",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.25"
+    },
+    {
+      "id": "d.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "1800000"
+    },
+    {
+      "id": "d.loan1",
+      "kind": "given",
+      "inputs": {},
+      "value": "1152000"
+    },
+    {
+      "id": "d.loan2",
+      "kind": "given",
+      "inputs": {},
+      "value": "1080000"
+    },
+    {
+      "id": "d.pti",
+      "kind": "given",
+      "inputs": {},
+      "value": "36"
+    },
+    {
+      "id": "d.years",
+      "kind": "given",
+      "inputs": {},
+      "value": "25"
+    },
+    {
+      "id": "d.ltv1",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1152000",
+        "value": "1800000"
+      },
+      "value": "64"
+    },
+    {
+      "id": "d.ltv2",
+      "kind": "ltv_percent",
+      "inputs": {
+        "loan": "1080000",
+        "value": "1800000"
+      },
+      "value": "60"
+    },
+    {
+      "id": "d.equity_added",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.loan1",
+        "subtrahend": "d.loan2"
+      },
+      "value": "72000.00"
+    },
+    {
+      "id": "d.margin1",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": "64",
+        "pti": "36"
+      },
+      "value": "1.15"
+    },
+    {
+      "id": "d.margin2",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": "60",
+        "pti": "36"
+      },
+      "value": "0.90"
+    },
+    {
+      "id": "d.rate1",
+      "kind": "pm_rate",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": "64",
+        "pti": "36"
+      },
+      "value": "5.35"
+    },
+    {
+      "id": "d.rate2",
+      "kind": "pm_rate",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": "60",
+        "pti": "36"
+      },
+      "value": "5.10"
+    },
+    {
+      "id": "d.whatif",
+      "kind": "pm_whatif",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": 64,
+        "pti": 36,
+        "new_ltv": 60
+      },
+      "value": {
+        "before": {
+          "margin": "1.15",
+          "rate": "5.35"
+        },
+        "after": {
+          "margin": "0.90",
+          "rate": "5.10"
+        },
+        "change": "-0.25"
+      }
+    },
+    {
+      "id": "d.stepsize",
+      "kind": "pm_stepsize",
+      "inputs": {
+        "steps": "40:0.10;60:0.35",
+        "frm": 64,
+        "to": 60
+      },
+      "value": "-0.25"
+    },
+    {
+      "id": "d.pay1",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|1152000|5.35|300|300|0|0|statement"
+      },
+      "value": "6971.47"
+    },
+    {
+      "id": "d.pay_loan_only",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|1080000|5.35|300|300|0|0|statement"
+      },
+      "value": "6535.75"
+    },
+    {
+      "id": "d.pay2",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|1080000|5.10|300|300|0|0|statement"
+      },
+      "value": "6376.66"
+    },
+    {
+      "id": "d.total1",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|1152000|5.35|300|300|0|0|statement"
+      },
+      "value": "2091438.33"
+    },
+    {
+      "id": "d.total2",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|1080000|5.10|300|300|0|0|statement"
+      },
+      "value": "1912995.44"
+    },
+    {
+      "id": "d.pay_drop",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.pay1",
+        "subtrahend": "d.pay2"
+      },
+      "value": "594.81"
+    },
+    {
+      "id": "d.pay_drop_loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.pay1",
+        "subtrahend": "d.pay_loan_only"
+      },
+      "value": "435.72"
+    },
+    {
+      "id": "d.pay_drop_rate",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.pay_loan_only",
+        "subtrahend": "d.pay2"
+      },
+      "value": "159.09"
+    },
+    {
+      "id": "d.total_drop",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.total1",
+        "subtrahend": "d.total2"
+      },
+      "value": "178442.89"
+    },
+    {
+      "id": "ex.m1",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": 45,
+        "pti": 42
+      },
+      "value": "1.15"
+    },
+    {
+      "id": "ex.m2",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": 61,
+        "pti": 38
+      },
+      "value": "1.15"
+    },
+    {
+      "id": "ex.m3",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": 60,
+        "pti": 40
+      },
+      "value": "0.90"
+    },
+    {
+      "id": "ex.r1",
+      "kind": "pm_rate",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": 61,
+        "pti": 38
+      },
+      "value": "5.35"
+    },
+    {
+      "id": "ex.w",
+      "kind": "pm_whatif",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": 70,
+        "pti": 45,
+        "new_ltv": 60
+      },
+      "value": {
+        "before": {
+          "margin": "1.40",
+          "rate": "5.60"
+        },
+        "after": {
+          "margin": "1.15",
+          "rate": "5.35"
+        },
+        "change": "-0.25"
+      }
+    },
+    {
+      "id": "ex.m4",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": 35,
+        "pti": 45
+      },
+      "value": "1.05"
+    },
+    {
+      "id": "ex.m5",
+      "kind": "pm_margin",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "ltv": 35,
+        "pti": 30
+      },
+      "value": "0.80"
+    },
+    {
+      "id": "ex.w_pti",
+      "kind": "pm_whatif",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "anchor": "4.20",
+        "ltv": 55,
+        "pti": 42,
+        "new_pti": 40
+      },
+      "value": {
+        "before": {
+          "margin": "1.15",
+          "rate": "5.35"
+        },
+        "after": {
+          "margin": "0.90",
+          "rate": "5.10"
+        },
+        "change": "-0.25"
+      }
+    },
+    {
+      "id": "data.offers",
+      "kind": "pm_offers",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "seed": 17,
+        "n": 60,
+        "noise_bp": 6
+      },
+      "value": [
+        {
+          "ltv": "61",
+          "pti": "25",
+          "margin": "1.15"
+        },
+        {
+          "ltv": "37",
+          "pti": "22",
+          "margin": "0.83"
+        },
+        {
+          "ltv": "42",
+          "pti": "36",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "61",
+          "pti": "44",
+          "margin": "1.37"
+        },
+        {
+          "ltv": "40",
+          "pti": "26",
+          "margin": "0.82"
+        },
+        {
+          "ltv": "63",
+          "pti": "29",
+          "margin": "1.15"
+        },
+        {
+          "ltv": "61",
+          "pti": "40",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "57",
+          "pti": "37",
+          "margin": "0.89"
+        },
+        {
+          "ltv": "32",
+          "pti": "21",
+          "margin": "0.85"
+        },
+        {
+          "ltv": "44",
+          "pti": "33",
+          "margin": "0.92"
+        },
+        {
+          "ltv": "57",
+          "pti": "21",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "66",
+          "pti": "23",
+          "margin": "1.21"
+        },
+        {
+          "ltv": "44",
+          "pti": "23",
+          "margin": "0.93"
+        },
+        {
+          "ltv": "39",
+          "pti": "32",
+          "margin": "0.83"
+        },
+        {
+          "ltv": "34",
+          "pti": "43",
+          "margin": "1.02"
+        },
+        {
+          "ltv": "67",
+          "pti": "48",
+          "margin": "1.38"
+        },
+        {
+          "ltv": "38",
+          "pti": "27",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "55",
+          "pti": "41",
+          "margin": "1.10"
+        },
+        {
+          "ltv": "51",
+          "pti": "48",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "68",
+          "pti": "22",
+          "margin": "1.19"
+        },
+        {
+          "ltv": "73",
+          "pti": "28",
+          "margin": "1.09"
+        },
+        {
+          "ltv": "61",
+          "pti": "24",
+          "margin": "1.13"
+        },
+        {
+          "ltv": "64",
+          "pti": "40",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "60",
+          "pti": "45",
+          "margin": "1.18"
+        },
+        {
+          "ltv": "50",
+          "pti": "21",
+          "margin": "0.92"
+        },
+        {
+          "ltv": "53",
+          "pti": "39",
+          "margin": "0.84"
+        },
+        {
+          "ltv": "73",
+          "pti": "21",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "35",
+          "pti": "29",
+          "margin": "0.80"
+        },
+        {
+          "ltv": "55",
+          "pti": "24",
+          "margin": "0.90"
+        },
+        {
+          "ltv": "66",
+          "pti": "20",
+          "margin": "1.18"
+        },
+        {
+          "ltv": "72",
+          "pti": "32",
+          "margin": "1.20"
+        },
+        {
+          "ltv": "44",
+          "pti": "28",
+          "margin": "0.91"
+        },
+        {
+          "ltv": "44",
+          "pti": "23",
+          "margin": "0.91"
+        },
+        {
+          "ltv": "66",
+          "pti": "31",
+          "margin": "1.15"
+        },
+        {
+          "ltv": "56",
+          "pti": "39",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "72",
+          "pti": "33",
+          "margin": "1.21"
+        },
+        {
+          "ltv": "56",
+          "pti": "37",
+          "margin": "0.92"
+        },
+        {
+          "ltv": "43",
+          "pti": "45",
+          "margin": "1.14"
+        },
+        {
+          "ltv": "48",
+          "pti": "32",
+          "margin": "0.85"
+        },
+        {
+          "ltv": "35",
+          "pti": "30",
+          "margin": "0.82"
+        },
+        {
+          "ltv": "32",
+          "pti": "38",
+          "margin": "0.74"
+        },
+        {
+          "ltv": "40",
+          "pti": "24",
+          "margin": "0.80"
+        },
+        {
+          "ltv": "56",
+          "pti": "40",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "30",
+          "pti": "40",
+          "margin": "0.86"
+        },
+        {
+          "ltv": "30",
+          "pti": "46",
+          "margin": "1.05"
+        },
+        {
+          "ltv": "59",
+          "pti": "21",
+          "margin": "0.95"
+        },
+        {
+          "ltv": "35",
+          "pti": "31",
+          "margin": "0.81"
+        },
+        {
+          "ltv": "48",
+          "pti": "36",
+          "margin": "0.85"
+        },
+        {
+          "ltv": "75",
+          "pti": "48",
+          "margin": "1.41"
+        },
+        {
+          "ltv": "46",
+          "pti": "28",
+          "margin": "0.89"
+        },
+        {
+          "ltv": "46",
+          "pti": "20",
+          "margin": "0.90"
+        },
+        {
+          "ltv": "31",
+          "pti": "25",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "55",
+          "pti": "29",
+          "margin": "0.90"
+        },
+        {
+          "ltv": "67",
+          "pti": "47",
+          "margin": "1.41"
+        },
+        {
+          "ltv": "69",
+          "pti": "22",
+          "margin": "1.16"
+        },
+        {
+          "ltv": "43",
+          "pti": "48",
+          "margin": "1.10"
+        },
+        {
+          "ltv": "60",
+          "pti": "35",
+          "margin": "0.87"
+        },
+        {
+          "ltv": "40",
+          "pti": "33",
+          "margin": "0.75"
+        },
+        {
+          "ltv": "32",
+          "pti": "26",
+          "margin": "0.77"
+        },
+        {
+          "ltv": "57",
+          "pti": "47",
+          "margin": "1.12"
+        }
+      ]
+    },
+    {
+      "id": "fit.truth",
+      "kind": "pm_fit",
+      "inputs": {
+        "base": "0.80",
+        "ltv_steps": "40:0.10;60:0.35",
+        "pti_steps": "40:0.25",
+        "truth_base": "0.80",
+        "truth_ltv_steps": "40:0.10;60:0.35",
+        "truth_pti_steps": "40:0.25",
+        "seed": 17,
+        "n": 60,
+        "noise_bp": 6
+      },
+      "value": "0.0267"
+    },
+    {
+      "id": "fit.start",
+      "kind": "pm_fit",
+      "inputs": {
+        "base": "0.90",
+        "ltv_steps": "40:0.05;60:0.15",
+        "pti_steps": "40:0.05",
+        "truth_base": "0.80",
+        "truth_ltv_steps": "40:0.10;60:0.35",
+        "truth_pti_steps": "40:0.25",
+        "seed": 17,
+        "n": 60,
+        "noise_bp": 6
+      },
+      "value": "0.1043"
+    },
+    {
+      "id": "fit.flat",
+      "kind": "pm_fit",
+      "inputs": {
+        "base": "1.10",
+        "ltv_steps": "40:0.00;60:0.00",
+        "pti_steps": "40:0.00",
+        "truth_base": "0.80",
+        "truth_ltv_steps": "40:0.10;60:0.35",
+        "truth_pti_steps": "40:0.25",
+        "seed": 17,
+        "n": 60,
+        "noise_bp": 6
+      },
+      "value": "0.1790"
+    },
+    {
+      "id": "flat.base",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.10"
+    },
+    {
+      "id": "gen.n",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "gen.noise",
+      "kind": "given",
+      "inputs": {},
+      "value": "6"
+    }
+  ]
+}

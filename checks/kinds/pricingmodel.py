@@ -71,6 +71,13 @@ def pm_whatif(i, _facts=None):
     }
 
 
+def truth_inputs(i):
+    """The model that MADE the offers: the `truth_*` inputs when given, else the model itself."""
+    if "truth_base" in i:
+        return {"base": i["truth_base"], "ltv_steps": i["truth_ltv_steps"], "pti_steps": i["truth_pti_steps"]}
+    return i
+
+
 def offers(i):
     from kinds import rng
 
@@ -83,7 +90,7 @@ def offers(i):
         ltv = lo_l + r.below(hi_l - lo_l + 1)
         pti = lo_p + r.below(hi_p - lo_p + 1)
         noise = r.below(2 * noise_bp + 1) - noise_bp
-        out.append({"ltv": str(ltv), "pti": str(pti), "margin": two(Decimal(two(margin(i, ltv, pti))) + Decimal(noise) / 100)})
+        out.append({"ltv": str(ltv), "pti": str(pti), "margin": two(Decimal(two(margin(truth_inputs(i), ltv, pti))) + Decimal(noise) / 100)})
     return out
 
 

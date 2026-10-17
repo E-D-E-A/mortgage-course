@@ -1,0 +1,465 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.20"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.20");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const mean8 = f.raw("pairs.mean");
+export const mean3 = f.raw("pairs3.mean");
+export const N = 8;
+export const idx = Array.from({ length: N }, (_, k) => k + 1);
+export const signed = (v) => `${Number(v) > 0 ? "+" : Number(v) < 0 ? "−" : ""}${Math.abs(Number(v))}`;
+export const money = (id) => formatShekels(f.raw(id));
+export const moneyAbs = (id) => formatShekels(String(Math.abs(Number(f.raw(id)))));
+export const predictionOptions = [
+  "של המודל: כך כל ההצעות נבדקות באותה שיטה",
+  "ממוצע של השניים, כי אי אפשר לדעת איזה נכון",
+  "של ההצעה: תנאי הצעה בפועל גוברים על ברירות המחדל של הסימולציה",
+  "הנמוך מבין השניים, כי הוא טוב יותר ללקוח",
+];
+
+בשיעורים 8.17–8.19 בניתם **אומדן**: ריבית משוערת, והסתברות משוערת. עכשיו מגיעה **הצעה של בנק**. הן לא אותו דבר, והבדל ביניהם הוא אחד הדברים שהכי קל לטשטש. השיעור הזה מלמד להבחין, ומה עושים כששתיהן קיימות.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>הוחלט, ועתיד.</strong> הכלל שהוחלט (אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם): הצעת בנק או הלוואה קיימת קובעות לפי **התנאים של ההצעה**, והסימולציה של Mogi משתמשת בברירות מחדל רק כשאין הצעה. כל השאר, ובמיוחד איך אומדן יתעדכן מהצעות ואיך נמדוד הטיה, הוא <strong>עתיד</strong>. אין היום ב־Mogi חישוב תמהילים, והבנקים בשיעור פיקטיביים. המספרים סינתטיים להדגמה.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.20"
+  question={`הסימולציה של Mogi מניחה, כברירת מחדל, שמסלול משתנה מתעדכן כל 5 שנים. בנק שולח הצעה למסלול כזה, ובה כתוב שהריבית מתעדכנת כל 7 שנים. איזה מהשניים משתמשים בו כדי לחשב את התשלומים של ההצעה?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מה בנק אמר, ומה אנחנו חשבנו
+
+</Section>
+
+<LessonVideo lesson="8-20" />
+
+<Section kind="ההסבר">
+
+## ארבעה מספרים שנראים אותו דבר
+
+</Section>
+
+### ממוצע, אומדן, הצעה, עסקה
+
+כשמישהו אומר ״הריבית הייתה 4.4%״, אפשר להתכוון לארבעה דברים שונים:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הדבר</th>
+        <th class="py-2 pe-3 text-start font-semibold">על מי הוא</th>
+        <th class="py-2 pe-3 text-start font-semibold">מי אומר</th>
+        <th class="py-2 pe-3 text-start font-semibold">מחייב?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold"><Term t="ריבית ממוצעת" client:visible lesson="5.5">ריבית ממוצעת</Term></td><td class="py-2 pe-3">הרבה לווים, בתקופה שעברה</td><td class="py-2 pe-3">פרסום ציבורי (בנק ישראל)</td><td class="py-2 pe-3">לא</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold"><Term t="אומדן" client:visible lesson="5.5">אומדן</Term></td><td class="py-2 pe-3">המקרה הזה, בניחוש</td><td class="py-2 pe-3">מודל (שיעורים 8.17–8.18)</td><td class="py-2 pe-3">לא</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold"><Term t="הצעה אישית" client:visible lesson="5.5">הצעה אישית</Term></td><td class="py-2 pe-3">המקרה הזה, בפועל</td><td class="py-2 pe-3">בנק, עם תאריך ותנאים</td><td class="py-2 pe-3">לפי התנאים, ובתוקף שכתוב בה</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold"><Term t="עסקה שבוצעה" client:visible lesson="5.5">עסקה שבוצעה</Term></td><td class="py-2 pe-3">מקרה אחד, בעבר</td><td class="py-2 pe-3">חוזה חתום</td><td class="py-2 pe-3">היה מחייב; היום רק מידע</td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">הממוצעים הציבוריים אינם מחיר שבנק יאשר (ידע מהשטח, אילון, 2026-10-08; ממתין לאישור אילון). לפי תיעוד הצוות של נתוני בנק ישראל (לא אומת): ריביות ב״קו המשווה״ הן אפקטיביות שנתיות, בלי בוליט, בלון ומט״ח, ואין להחליף בהן את הממוצעים של פירעון מוקדם.</p>
+</div>
+
+שלושה הבדלים חשובים:
+- **מי מחייב.** רק הצעה, ובתוך התוקף שלה.
+- **מה כלול.** הצעה מגיעה עם אחוז ריבית **חוזית** (<Term t="ריבית חוזית" client:visible lesson="5.5">שיעור 5.5</Term>) לכל מסלול, תקופה, שיטת החזר, תנאי עדכון ותנאים נוספים. אומדן לא יודע אותם, והוא חייב להניח.
+- **מה תלוי במה.** הממוצע לא תלוי בלקוח, האומדן תלוי במה שהמודל יודע על הלקוח, וההצעה תלויה בכל התיק, כולל מה שהבנק יודע ושאנחנו לא (ידע מהשטח).
+
+### אותו מקרה, אומדן והצעה
+
+נחזור לתיק של השיעורים הקודמים: נועם ושירה, תמהיל של חצי קבועה וחצי פריים ל־30 שנה, {f.shekels("est.amount_1")} בכל מסלול, בבנק ב׳ (בנק פיקטיבי). האומדן הוא רשימת המחירים של בנק ב׳. ההצעה (שהקורס המציא, כדי לבדוק את המנוע בסדנה 8.28) שונה ממנה בכמה מאיות נקודת אחוז:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הנתון</th>
+        <th class="py-2 pe-3 text-start font-semibold">אומדן</th>
+        <th class="py-2 pe-3 text-start font-semibold">הצעה</th>
+        <th class="py-2 pe-3 text-start font-semibold">ההפרש (הצעה פחות אומדן)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">קבועה, אחוז הריבית</td><td class="py-2 pe-3"><span class="ltr">{f.plain("est.rate_1")}%</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("off.rate_1")}%</span></td><td class="py-2 pe-3"><span class="ltr">{signed(f.raw("gap.rate_1"))}</span> נקודת אחוז</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">פריים, אחוז הריבית</td><td class="py-2 pe-3"><span class="ltr">{f.plain("est.rate_2")}%</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("off.rate_2")}%</span></td><td class="py-2 pe-3"><span class="ltr">{signed(f.raw("gap.rate_2"))}</span> נקודת אחוז</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">החזר ראשון</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("est.first")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("off.first")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{signed(f.raw("gap.first"))} ₪</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">סך תשלומים</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("est.total")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("off.total")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{signed(f.raw("gap.total"))} ₪</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">התשלום הגבוה ביותר בתרחיש הלחץ</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("est.max_stress")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("off.max_stress")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{signed(f.raw("gap.max_stress"))} ₪</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} תרחיש הבסיס והלחץ של תיק א׳ (שיעור 5.6).</p>
+</div>
+
+כאן האומדן קרוב מאוד: הריבית בקבועה עלתה ב־{f.plain("gap.rate_1")} נקודת אחוז והפריים ירדה ב־{f.plain("gap.rate_2").replace("-", "")}, והשניים כמעט ביטלו זה את זה. אבל **זה מקרה אחד**. שני הפערים האלה כאן מקריים; אין סיבה להניח שבמקרה הבא הם יבטלו זה את זה.
+
+### מה כתוב בהצעה, ואין באומדן
+
+הצעה כוללת תנאים שהאומדן חייב להניח. המשמעותי מביניהם הוא <Term t="נקודת עדכון ריבית" client:visible lesson="2.7">תדירות העדכון</Term> של מסלול משתנה. הסימולציה מניחה ברירת מחדל של 5 שנים, ומסמנת שזו הנחה. ההצעה אומרת מה בפועל. בדיוק על זה נקבע הכלל שהוחלט:
+
+**הכלל (הוחלט):** לאומדן ולסימולציה של פתיחה משתמשים בברירות המחדל, מסומנות כהנחה. **כשיש הצעת בנק או הלוואה קיימת, משתמשים בתנאים שכתובים בהן.** (אילון, 2026-10-07; קיבל עדן, 2026-10-08; המימוש לא הושלם.)
+
+הנה מה זה עושה. מסלול משתנה של 500,000 ₪ בריבית 4.10% ל־30 שנה, בתרחיש הלחץ של תיק א׳, אם הוא מתעדכן כל {f.plain("reset.default")} חודשים (ברירת המחדל) או כל {f.plain("reset.offer")} חודשים (כמו בהצעה):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הנתון בתרחיש הלחץ</th>
+        <th class="py-2 pe-3 text-start font-semibold">עדכון כל {f.plain("reset.default")} חודשים</th>
+        <th class="py-2 pe-3 text-start font-semibold">עדכון כל {f.plain("reset.offer")} חודשים</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">סך תשלומים</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("reset.sim.total")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("reset.off.total")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">התשלום הגבוה ביותר</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("reset.sim.max")}</span></td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{money("reset.off.max")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold">החודש שבו הוא מתחיל</td><td class="py-2 pe-3"><span class="ltr">{f.plain("reset.sim.max_month")}</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain("reset.off.max_month")}</span></td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} המסלול המשתנה לא צמוד, כשהריבית נקבעת מחדש בנקודות העדכון.</p>
+</div>
+
+ברירת המחדל הייתה מעריכה סך תשלומים גבוה ב־{f.shekels("reset.gap.total")} ותשלום גבוה ביותר גבוה ב־{f.shekels("reset.gap.max")}, **רק כי** היא מניחה עדכון מוקדם יותר. ההצעה היא עובדה על תנאי אחד; אין סיבה להשתמש בהנחה כשהעובדה בידנו.
+
+### ההצעה מלמדת את המודל
+
+כשמגיעה הצעה, היא מחליפה את האומדן לבנק הזה, ובנוסף נותנת למודל נקודת מידע: כמה האומדן היה רחוק. אחרי כמה הצעות אפשר לשאול: האם האומדן **מוטה** (טועה בכיוון אחד), או רק רועש? הנה שמונה זוגות סינתטיים (אומדן ואחוז ריבית בהצעה) למסלול קבוע בבנק ב׳:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">זוג</th>
+        <th class="py-2 pe-3 text-start font-semibold">אומדן, %</th>
+        <th class="py-2 pe-3 text-start font-semibold">הצעה, %</th>
+        <th class="py-2 pe-3 text-start font-semibold">הפרש, נקודות אחוז</th>
+      </tr>
+    </thead>
+    <tbody>
+      {idx.map((k) => (
+        <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{k}</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain(`pair.${k}.est`)}</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain(`pair.${k}.off`)}</span></td><td class="py-2 pe-3"><span class="ltr">{signed(f.raw(`pair.${k}.gap`))}</span></td></tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+כל ההפרשים חיוביים. ממוצע ההפרשים {mean8.mean}, וטווח 95% שלו (שיעור 8.18) מ־{mean8.low} עד {mean8.high}. **הטווח לא כולל אפס:** בשמונה זוגות, האומדן נראה מוטה כלפי מטה, בערך {mean8.mean} נקודת אחוז. אילו היו רק שלושה זוגות הראשונים, הממוצע {mean3.mean} אבל הטווח {mean3.low} עד {mean3.high}: **כן כולל אפס**, ואי אפשר לטעון הטיה.
+
+מה עושים עם הטיה? מתקנים את המודל: מזיזים את הבסיס שלו (שיעור 8.17) במה שנמדד, ומחזירים את התוצאה לבדיקה. ומה אם אין מספיק זוגות? ממשיכים עם האומדן, ושומרים את הזוגות.
+
+<Callout title="מה השיעור לא יודע" tone="warning">
+<p>הקורס לא יודע אם אומדן של Mogi יהיה מוטה, ובאיזה כיוון: זה תלוי בנתונים שעוד לא נאספו. הוא גם לא יודע אם הצעות שהתקבלו בעבר ״מייצגות״ את ההצעות הבאות (בנק עשוי לשנות מדיניות; שיעור 8.24). ולא ידוע אם בנק מציע ללקוח שמגיע דרך Mogi אותו מחיר שמציע לאחר (ידע מהשטח, ״הפקיד הוא איש מכירות״ ופותח במחיר גבוה מהיעד; ממתין לאישור אילון). שאלות לאילון נמצאות ברשימה.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## השוו אומדן להצעה
+
+</Section>
+
+הטבלאות שלמעלה הן ההמחשה. עברו עליהן וענו על שלוש שאלות:
+1. בטבלה של התמהיל: האם ההפרש בהחזר הראשון מראה את ההפרש ביניהם בפריים ובקבועה? מה זה אומר על ההשוואה בין אומדן להצעה רק לפי ההחזר הראשון?
+2. בטבלת הזוגות: מה היה קורה לממוצע אילו זוג 2 (הגבוה ביותר) לא היה בנתונים? האם הטווח היה כולל אפס?
+3. בטבלת העדכון: אם ההצעה אומרת 7 שנים, כמה שגתה ברירת המחדל בסך התשלומים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר הראשון זז רק ב־{moneyAbs("gap.first")}, אבל זה בגלל שני הפערים של הריבית שהלכו לכיוונים הפוכים (<span class="ltr">{signed(f.raw("gap.rate_1"))}</span> ו־<span class="ltr">{signed(f.raw("gap.rate_2"))}</span>). השוואה רק לפי המדד הכולל מסתירה פערים בכל מסלול.</li>
+    <li>הממוצע ירד אבל נשאר חיובי; כשיש מעט זוגות הטווח רחב, ולכן הכמות קובעת עד כמה אפשר לטעון הטיה (שיעור 8.18).</li>
+    <li>ברירת המחדל הגזימה ב־{f.shekels("reset.gap.total")}.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## מה מחליף מה
+
+</Section>
+
+**צעד 1 — לכל בנק, שני מצבים.** או שיש הצעה, או שאין.
+
+**צעד 2 — כלל ההחלפה.** כשיש הצעה, מחשבים לפי התנאים שבה: הריביות, התקופות, תדירות העדכון, ושאר התנאים. כשאין, מחשבים לפי האומדן, ומסמנים כל ברירת מחדל כהנחה.
+
+**צעד 3 — מה נשאר מהאומדן.** הוא עוזר לשאול ״מה אם״ (שיעור 8.17): ״מה בנק ב׳ היה מציע אילו הלקוח מכניס עוד הון עצמי״ היא שאלה על אומדן, גם כשיש הצעה לתנאים של עכשיו.
+
+**צעד 4 — מה ההצעה מוסיפה למודל.** זוג (אומדן, הצעה). כשמצטברים זוגות, בודקים הטיה לפי טווח של ההפרש הממוצע.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">הפרש = הצעה − אומדן</span></p>
+  <p class="text-h3 text-navy"><span class="ltr">הטיה אם הטווח של ההפרש הממוצע לא כולל אפס</span></p>
+</div>
+
+**מתי זה נכון?**
+1. ההצעה והאומדן מדברים על **אותו מקרה**: אותו סכום, אותו תמהיל, אותו חודש, ואותה תחזית (שיעור 5.3). אחרת ההפרש הוא מחיר של שינוי, לא טעות של אומדן.
+2. ההצעה **בתוקף**: אחרי שפג התוקף, היא כבר לא מחליפה כלום.
+3. ״הצעה״ מוגדרת אחת: אישור עקרוני, או הצעה מתומחרת, או הצעה בעל־פה? מי שמערבב מעוות את ההפרשים.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> עמודה של אומדן, עמודה של הצעה, ועמודה של ההפרש. הממוצע <span class="ltr">=AVERAGE(...)</span>, סטיית התקן <span class="ltr">=STDEV.S(...)</span>, וטווח כמו בשיעור 8.18.</p>
+<p><strong>במחשבון:</strong> אפשר ביד עד עשרה זוגות.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.20"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "עקביות חשובה, אבל כשיש עובדה, עובדה גוברת על הנחה. אחרת הצעה אמיתית הייתה מחושבת לפי משהו שהבנק לא אמר.",
+    "ממוצע של עובדה והנחה אינו שום דבר: הבנק אמר 7 שנים, ולא 6.",
+    "",
+    "הנמוך בשני אינו הכלל. התנאים של ההצעה הם מה שמחייב את הבנק, גם אם הנחה אחרת הייתה נותנת מספר יותר נוח.",
+  ]}
+>
+  ההצעה כתובה: 7 שנים. הסימולציה מניחה 5 רק כשאין הצעה. כך הוחלט, ובדוגמה למעלה הפער בסך התשלומים היה {f.shekels("reset.gap.total")}.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הצעה שהגיעה: מה מחליפים ומה לא
+
+</Section>
+
+בנק ב׳ שולח הצעה (הנתונים של הטבלה למעלה).
+
+**צעד 1 — מה השתנה.** אחוז הריבית בקבועה {f.plain("est.rate_1")}% ← {f.plain("off.rate_1")}%, בפריים {f.plain("est.rate_2")}% ← {f.plain("off.rate_2")}%.
+
+**צעד 2 — מה מחליפים.** מחשבים מחדש את ההחזר הראשון וסך התשלומים לפי הצעה: {money("off.first")} ו־{money("off.total")}, במקום {money("est.first")} ו־{money("est.total")}.
+
+**צעד 3 — ההפרש בסך התשלומים.** <M>{formatShekels(f.raw("off.total"))} − {formatShekels(f.raw("est.total"))} = {formatShekels(f.raw("gap.total"))}</M>: ההצעה זולה יותר ב־{moneyAbs("gap.total")} מהאומדן.
+
+**צעד 4 — מה נשאר.** את הפער, כל פער, שומרים כזוג (אומדן, הצעה). זוג אחד לא מראה הטיה. עוד זוגות כן.
+
+**צעד 5 — תוקף.** ההצעה תקפה עד תאריך שכתוב בה; אחרי זה היא כבר לא מחליפה את האומדן.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מה זה, לפי ההגדרות?
+
+</Section>
+
+לכל מספר בחרו מה הוא. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.20-match"
+  promptLabel="המספר"
+  answerLabel="מה זה"
+  options={["ריבית ממוצעת", "אומדן", "הצעה אישית", "עסקה שבוצעה"]}
+  rows={[
+    { prompt: "״4.4%״ שבנק ישראל פרסם כממוצע על כל ההלוואות שניתנו באוגוסט", answer: "ריבית ממוצעת", given: true, why: "ממוצע על הרבה לווים, בתקופה שעברה; לא מחיר שבנק יאשר." },
+    { prompt: "״4.3%״ שמודל התמחור של Mogi חישב לתיק של נועם ושירה בבנק ב׳", answer: "אומדן", why: "ניחוש לתיק הזה, בלי שבנק אמר דבר." },
+    { prompt: "״4.35%״ שבנק ב׳ כתב בהצעה לתיק של נועם ושירה, בתוקף לחודש", answer: "הצעה אישית", why: "תשובה של בנק לתיק, עם תאריך ותנאים." },
+    { prompt: "״4.2%״ שנכתב בחוזה שנחתם לפני שנתיים אצל לקוח אחר", answer: "עסקה שבוצעה", why: "עובדה על מקרה אחד בעבר; לא הצעה לנועם ושירה." },
+  ]}
+  success="נכון. אותו מספר, ארבעה סוגים, ארבעה מעמדות."
+  hint="שאלו: על מי הוא, מי אמר אותו, ומתי."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+הנתונים בתרגילים הם של השיעור: סינתטיים. התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.20-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אומדן הוא ניחוש של מודל; הצעה היא תשובה של בנק לתיק, עם תאריך ותנאים", correct: true, feedback: "נכון. רק הצעה מחייבת, בתוקף שלה." },
+    { text: "אין הבדל: שניהם ריבית שאפשר לקבל", feedback: "אומדן לא מחייב אף בנק. אפשר שלא יתקבל כלל." },
+    { text: "אומדן הוא ממוצע של בנק ישראל", feedback: "ממוצע בנק ישראל הוא מספר על הרבה לווים בעבר; אומדן הוא ניחוש לתיק מסוים." },
+    { text: "הצעה היא תמיד נמוכה מהאומדן", feedback: "ההפרש יכול להיות לכל כיוון; בשיעור ההפרשים בשמונה זוגות היו כולם חיוביים." },
+  ]}
+>
+  מה ההבדל בין אומדן להצעה אישית?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.20-2"
+  n={2}
+  level="קל"
+  answer={f.raw("gap.first")}
+  errors={[{ value: f.raw("gap.total"), message: "זה ההפרש בסך התשלומים. כאן שואלים על ההחזר הראשון." }]}
+>
+  ההחזר הראשון באומדן הוא {money("est.first")}, ובהצעה {money("off.first")}. מה ההפרש (הצעה פחות אומדן), בשקלים? (שלילי: ההצעה נמוכה.)
+</NumericExercise>
+
+<Solution for="8.20-2">
+<M>{formatShekels(f.raw("off.first"))} − {formatShekels(f.raw("est.first"))} = {formatShekels(f.raw("gap.first"))}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.20-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("gap.total")}
+  errors={[{ value: f.raw("gap.first"), message: "זה ההפרש בהחזר הראשון. כאן שואלים על סך כל התשלומים." }]}
+>
+  סך התשלומים באומדן {money("est.total")}, ובהצעה {money("off.total")}. מה ההפרש (הצעה פחות אומדן)?
+</NumericExercise>
+
+<Solution for="8.20-3">
+<M>{formatShekels(f.raw("off.total"))} − {formatShekels(f.raw("est.total"))} = {formatShekels(f.raw("gap.total"))}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.20-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("reset.gap.total")}
+  errors={[]}
+>
+  עם עדכון כל {f.plain("reset.default")} חודשים (ברירת המחדל) סך התשלומים בתרחיש הלחץ הוא {money("reset.sim.total")}, ועם עדכון כל {f.plain("reset.offer")} חודשים (כמו בהצעה) {money("reset.off.total")}. בכמה ברירת המחדל מגזימה?
+</NumericExercise>
+
+<Solution for="8.20-4">
+<M>{formatShekels(f.raw("reset.sim.total"))} − {formatShekels(f.raw("reset.off.total"))} = {formatShekels(f.raw("reset.gap.total"))}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.20-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "משתמשים בתנאי ההצעה (הכלל שהוחלט), ומסמנים שברירת המחדל לא נוצלה", correct: true, feedback: "נכון." },
+    { text: "משתמשים בברירת המחדל, כי היא עקבית בין תיקים", feedback: "עקביות לא מצדיקה להתעלם מעובדה." },
+    { text: "ממצעים את שניהם", feedback: "ממוצע של עובדה והנחה הוא לא מספר של אף אחד." },
+    { text: "משתמשים בזה שנותן הלוואה זולה יותר", feedback: "הכלל לא תלוי במה שנוח; הוא תלוי במה שנכתב בהצעה." },
+  ]}
+>
+  ההצעה אומרת שהמסלול המשתנה מתעדכן כל 7 שנים. הסימולציה מניחה 5. מה עושים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.20-6"
+  n={6}
+  level="בינוני"
+  answer={mean8.mean}
+  tolerance={0.0005}
+  near={0.005}
+  errors={[]}
+>
+  ממוצע ההפרשים (הצעה פחות אומדן) בשמונה הזוגות של השיעור, בנקודות אחוז? (ההפרשים בטבלה.)
+</NumericExercise>
+
+<Solution for="8.20-6">
+מסכמים את שמונת ההפרשים ומחלקים בשמונה: {mean8.mean}. סטיית התקן {mean8.sd}, שגיאת התקן {mean8.se}, ו־t לשבע דרגות חופש {mean8.t}: הטווח {mean8.low} עד {mean8.high}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.20-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "עם שמונה זוגות הטווח לא כולל אפס, ולכן יש סימן להטיה; עם שלושה הוא כולל אפס, ולכן אי אפשר לטעון", correct: true, feedback: "נכון. כמות הנתונים קובעת מה אפשר לטעון." },
+    { text: "עם שלושה זוגות ההפרש הממוצע גבוה יותר, ולכן ההטיה ברורה יותר", feedback: "ההפרש הממוצע דומה, אבל הטווח רחב מאוד ולכן אי אפשר לדעת." },
+    { text: "בשני המקרים יש הטיה, כי כל ההפרשים חיוביים", feedback: "כל ההפרשים חיוביים בשני המקרים, אבל עם שלושה זוגות זה יכול להיות מקרה." },
+    { text: "בשני המקרים אין הטיה, כי הפרשים קטנים", feedback: "הגודל לא קובע; הטווח קובע אם אפס אפשרי." },
+  ]}
+>
+  מה ההבדל בין בדיקת הטיה על שלושה זוגות לבין שמונה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.20-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: "אסור: הצעה היא מקרה אחד, ממוצע הוא על הרבה לווים, ושניהם לא אותו הדבר", correct: true, feedback: "נכון. השוואה כזו בודקת את הבחירה של הלווה והבנק, לא את הטעות של האומדן." },
+    { text: "מותר: אם ההצעה נמוכה מהממוצע, האומדן טוב", feedback: "ההצעה והממוצע אינם אותו הדבר; ממוצע גם לא מחיר שבנק יאשר." },
+    { text: "מותר: הממוצע הוא תמיד המחיר הנכון", feedback: "הממוצע הוא עבר ורבים, לא המחיר לתיק הזה." },
+    { text: "מותר, אבל רק לפריים", feedback: "הבעיה אינה סוג המסלול אלא סוג המספר." },
+  ]}
+>
+  יועץ אומר: ״ההצעה של בנק ב׳ נמוכה מהממוצע של בנק ישראל, ולכן המודל שלנו טעה״. האם מותר להסיק כך?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על אומדן מול הצעה">
+<p><strong>מה זה?</strong> אומדן הוא ניחוש של מודל לתיק מסוים. הצעת בנק היא תשובה של בנק לתיק, עם תנאים ותוקף. ממוצע הוא מספר ציבורי על רבים. אלה שלושה דברים שונים.</p>
+<p><strong>למה זה קיים?</strong> כי בלי הצעה אפשר רק לנחש, וכש־Mogi מתכננת דירוג בין בנקים (שיעור 8.21) היא צריכה לדעת מה בשל ממש ומה ניחוש.</p>
+<p><strong>איך זה עובד?</strong> כשיש הצעה, היא מחליפה את האומדן לאותו בנק, ומחשבים לפי התנאים שבה. הפער בין האומדן להצעה נשמר, ומראה אחרי כמה זוגות אם המודל מוטה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מספר שמוצג כ״ריבית״ הוא אחד מארבעה דברים. כדאי לשאול: ממוצע, אומדן, הצעה או עסקה, ובתוקף עד מתי.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> ממליצים רק על הצעות שיש להן תוקף, ומציגים אומדן כאומדן, עם הנחות מסומנות. החישוב נעשה בקוד שאפשר לבדוק: מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **ארבעה דברים אחרים:** ממוצע (רבים, עבר), אומדן (מודל, ניחוש), הצעה אישית (בנק, תיק, תוקף), עסקה שבוצעה (מקרה אחד, עבר).
+- **הצעה גוברת על אומדן** (הוחלט): התנאים שבהצעה, כמו תדירות העדכון, גוברים על ברירות המחדל של הסימולציה. בדוגמה, הפער היה {f.shekels("reset.gap.total")}.
+- **הצעה מחליפה, ומלמדת:** כל זוג (אומדן, הצעה) הוא מידע על ההטיה של המודל; מעט זוגות לא מראים הטיה, הרבה כן.
+- **אותו בסיס:** אומדן והצעה נקראים רק על אותו סכום, תמהיל וחודש.
+- **כל הבנקים והמספרים כאן פיקטיביים וסינתטיים.**
+
+**בשיעור הבא — 8.21, <Later lesson="8.21" quiet>הצנרת המלאה</Later>:** מחברים את כל מה שלמדתם: מיצוב, תמהיל, תמחור חזוי, הסתברות, דירוג והסבר. וכשמגיעה הצעה, היא מחליפה את האומדן.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "הצעת בנק או הלוואה קיימת נחשבות לפי התנאים של ההצעה; הסימולציה משתמשת בברירת מחדל (למשל עדכון כל 5 שנים) רק כשאין הצעה, ומסמנת אותה כהנחה. אילון אישר ב־2026-10-07, עדן קיבל ב־2026-10-08; המימוש לא הושלם . כפי שנרשם בצוות; לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "נתוני השוק הציבוריים לא נותנים מחיר שבנק באמת יאשר, ושינוי בתמהיל יכול לשנות את הריביות שהבנק יציע. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "״הפקיד הוא איש מכירות״: פותח במרווח של 0.7–0.8 כשמותר לו 0.5, ולוחץ עם ״תוקף 24 יום״ (טובי זמיר, 2026-08-05). מקור יחיד, לא נבדק. ממתין לאישור אילון.", date: "2026-08-05" },
+    { kind: "לא אומת", text: "מה שנאסף על מקורות הנתונים של בנק ישראל (ריביות ממוצעות, ״קו המשווה״ באפקטיבית שנתית בלי בוליט, בלון ומט״ח; הממוצעים של פירעון מוקדם נפרדים): לפי מסמך מחקר של הצוות (2026-10-08); לא נבדק מחדש מול האתר.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "הצעת בנק ב׳ (4.35% קבועה, 4.65% פריים) הומצאה לסדנה 8.28 ואינה הצעה של אף בנק. האומדן הוא רשימת המחירים של בנק ב׳ בתיק א׳ (4.30% ו־4.70%), תרחישי הבסיס והלחץ של תיק א׳. שמונת הזוגות מומצאים. עדכון כל 60 או 84 חודשים: תרגיל, לא תנאי של בנק." },
+    { kind: "ידע מתמטי כללי", text: "ממוצע, סטיית תקן, וטווח 95% מבוסס t לממוצע ההפרשים (שיעור 8.18)." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו בנפרד בפייתון.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/data/case-s8.ts (SAMPLE_OFFER), src/lib/calc/engine.ts and estimate.ts via scripts/lessons/lesson-8-20.ts and data/lessons/8-20.json; rechecked by checks/kinds/engine.py (through schedule.py) and estimate.py. No new illustration (the map's column says "—"): tables and a guided task. Brain: the 15 answers (Q4, Q5, rejected approaches) and the BoI data page. FK-H-057, FK-H-071 (awaiting Eylon). Video: video/8-20.html. */}

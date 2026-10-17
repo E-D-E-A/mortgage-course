@@ -1,0 +1,397 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.13"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { roughCount } from "../../lib/calc/search.ts";
+
+{/* Equations sit in <M> so they read left to right. */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.13");
+export const nf = (v) => new Intl.NumberFormat("he-IL").format(BigInt(v));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const rough = roughCount;
+export const predictionOptions = [
+  "בערך אלפים בודדים",
+  `${rough(f.raw("brain.one"))} (כשכל התמהיל באותה תקופה)`,
+  `${rough(f.raw("brain.per_track"))} (כשלכל מסלול תקופה משלו)`,
+  `${rough(f.raw("brain.fine_per_track"))}`,
+];
+
+<Callout title="איפה זה עומד: Mogi היום, הוחלט, עתיד">
+<p><strong>עתיד.</strong> בקוד של Mogi היום אין חיפוש בין תמהילים, וקריאת המנוע מוקפאת. מה שהוחלט: לכל מסלול יכולה להיות תקופה משלו (אילון, <span class="ltr">2026-08-03</span>). את המספרים שבשיעור, כולל ״150 מיליארד״ שהצוות רשם, הקורס <strong>חישב מחדש בקוד</strong> לפי קריאה שהוא מציין כאן ושאילון עוד לא אישר. זמני החישוב הם הנחה להדגמה, לא מדידה.</p>
+<p>{MARK}</p>
+</Callout>
+
+בשיעור 8.7 סיננתם מועמדים לפי אילוצים. אבל מאיפה בכלל באים המועמדים? כדי שאלגוריתם יבחר תמהיל טוב, צריך לשאול קודם: **כמה תמהילים יש?** התשובה מפתיעה, ומסבירה למה צריך שיטה ולא רק מחשב חזק.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.13"
+  question={`בונים תמהיל מחמישה סוגי מסלולים (קבועה, קבועה צמודה, פריים, משתנה ומשתנה צמודה). כל סוג מקבל חלק מההלוואה בקפיצות של 5%, ולכל מסלול שבתמהיל יכולה להיות תקופה משלו, כל אחת מ־${f.plain("brain.terms")} התקופות האפשריות. בערך כמה תמהילים שונים אפשר לבנות?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## למה אי אפשר לבדוק הכול
+
+</Section>
+
+<LessonVideo lesson="8-13" />
+
+<Section kind="ההסבר">
+
+## לספור תמהילים
+
+</Section>
+
+### תמהיל הוא רשימה של בחירות
+
+תמהיל הוא רשימת מסלולים. לכל מסלול: סוג, חלק מההלוואה, ותקופה. שלוש בחירות לכל מסלול, וכל בחירה היא עוד אפשרות. כשבוחרים כמה דברים אחד אחרי השני, מספר האפשרויות הכולל הוא **מכפלה**: אם יש כמה חולצות וכמה מכנסיים, מספר הלבושים האפשריים הוא מספר החולצות כפול מספר המכנסיים. את <Term t="תמהיל" client:visible lesson="1.4">התמהיל</Term> נספור באותה צורה.
+
+### שלב 1: איך מחלקים הלוואה
+
+נתחיל בהלוואה שמחלקים בין שני סוגי מסלול, בקפיצות של 50%. החלוקות האפשריות: הכול לראשון, חצי־חצי, הכול לשני. יש {f.plain("hand.two")}. אם יש שלושה סוגי מסלול, בקפיצות של 25% (ארבע חתיכות של 25%), יש {f.plain("hand.three_25")} חלוקות: למשל <span class="ltr">100-0-0</span>, <span class="ltr">75-25-0</span>, <span class="ltr">50-50-0</span>, ועוד.
+
+אפשר לחשב בלי לרשום: ״כמה דרכים יש לחלק k חתיכות שוות בין t מסלולים, כשמותר לתת לאחד אפס?״ התשובה היא:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">C(k + t − 1, t − 1)</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">k</dt><dd>מספר החתיכות: 100% חלקי גודל הקפיצה (אצלנו 4 בקפיצה של 25%). כאן k הוא מספר חתיכות, ולא ״התשלום ה־k״ משיעור 0.6</dd>
+    <dt class="ltr font-semibold text-n900">t</dt><dd>מספר סוגי המסלול</dd>
+    <dt class="ltr font-semibold text-n900">C(a, b)</dt><dd>״a על b״: כמה דרכים לבחור b מתוך a. אצלנו C(6, 2): התוצאה {f.plain("hand.three_25")}</dd>
+  </dl>
+</div>
+
+(זה הכלל המוכר של ״חתיכות וחלוקות״. גם הוא מתמטיקה כללית, ואין בו שום דבר של Mogi.)
+
+### שלב 2: תקופה לכל מסלול
+
+כל מסלול יכול לקבל תקופה משלו (אילון: <span class="ltr">2026-08-03</span>; ״30 שנה בקבועה ו־12 בפריים זה נפוץ ונורמלי״, ידע מהשטח, ממתין לאישור אילון). אז בכל חלוקה צריך לבחור תקופות. נחזור לשני סוגי מסלול, קפיצות של 50%, ו־3 תקופות אפשריות:
+
+- החלוקה ״הכול לראשון״: מסלול אחד, 3 תקופות: **{f.plain("hand.one_track")}** תמהילים.
+- החלוקה חצי־חצי: שני מסלולים, תקופה לכל אחד: <M>3 × 3 = {f.plain("hand.two_tracks")}</M> תמהילים.
+- החלוקה ״הכול לשני״: {f.plain("hand.one_track")} תמהילים.
+
+יחד: {f.plain("hand.two_active")}. ואם סופרים תקופה גם לסוג מסלול שאין לו חלק (כאילו כל סוג תמיד קיים, וכשחלקו אפס הוא בלי משמעות): {f.plain("hand.two_per")}. שתי השיטות מניחות הנחות שונות, וההבדל ביניהן יגדל. כדאי לשים לב אליו, כי הוא נוגע ל״150 מיליארד״ שהצוות רשם.
+
+### שלב 3: המרחב של הצוות
+
+ועכשיו המרחב האמיתי, כפי שהצוות תיאר אותו: {f.plain("brain.kinds")} סוגי מסלול, חלקים בקפיצות של {f.plain("brain.step")}% (כלומר עשרים חתיכות), ו־{f.plain("brain.terms")} תקופות אפשריות (הקורס קורא להן 4 עד 30 שנה, בקפיצה של שנה: זו הקריאה של הקורס, לא כתוב בדף).
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מה סופרים</th>
+        <th class="py-2 pe-3 text-start font-semibold">כמה תמהילים</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">רק חלוקות של ההלוואה, בלי תקופות</td><td class="py-2 pe-3"><span class="ltr">{nf(f.raw("brain.splits"))}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">חלוקה, ותקופה אחת לכל התמהיל</td><td class="py-2 pe-3"><span class="ltr">{nf(f.raw("brain.one"))}</span> ({rough(f.raw("brain.one"))})</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">חלוקה, ולכל סוג מסלול תקופה משלו</td><td class="py-2 pe-3 font-semibold text-n900"><span class="ltr">{nf(f.raw("brain.per_track"))}</span> ({rough(f.raw("brain.per_track"))})</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">כנ״ל, אבל רק מסלול שיש לו חלק מקבל תקופה</td><td class="py-2 pe-3"><span class="ltr">{nf(f.raw("brain.per_active"))}</span> ({rough(f.raw("brain.per_active"))})</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">קפיצות של 1% במקום 5%, תקופה אחת</td><td class="py-2 pe-3"><span class="ltr">{nf(f.raw("brain.fine_one"))}</span> ({rough(f.raw("brain.fine_one"))})</td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3">קפיצות של 1%, ולכל סוג תקופה משלו</td><td class="py-2 pe-3"><span class="ltr">{nf(f.raw("brain.fine_per_track"))}</span> ({rough(f.raw("brain.fine_per_track"))})</td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">נספר בקוד (מספרים שלמים גדולים), ונבדק בשפה אחרת. {MARK}</p>
+</div>
+
+המספר הראשון, {rough(f.raw("brain.one"))}, והשלישי, {rough(f.raw("brain.per_track"))}, הם בדיוק שני המספרים שהצוות רשם (״287 אלף״ ו״150 מיליארד״, וגם 124 מיליון ו־66 טריליון בקפיצות של 1%). הקורס הגיע אליהם רק בקריאה אחת: סוגי המסלול הם חמישה, ולכל אחד, גם אם החלק שלו אפס, נספרת תקופה. הקריאה המדויקת יותר, שבה רק מסלול שקיים מקבל תקופה, נותנת {rough(f.raw("brain.per_active"))}: עדיין עצום. אם הצוות סופר כך או אחרת, זו שאלה לאילון.
+
+### שלב 4: כמה זמן זה לוקח
+
+נניח (הנחה להדגמה, לא מדידה) שכל תמהיל נבדק באלפית שנייה אחת. זמן הבדיקה של כל המרחב:
+
+- תקופה אחת לכל התמהיל: {f.plain("time.one")} דקות.
+- תקופה לכל מסלול, כולל חלק אפס: {f.plain("time.per_track")} שנים.
+- כנ״ל, רק למסלול שקיים: {f.plain("time.per_active")} שנים.
+- קפיצות של 1%, תקופה לכל סוג: {f.plain("time.fine")} שנים.
+
+הצוות מדד בפייתון: ״סריקה של 3 מתוך 27 התקופות לקחה 15.3 שניות, וכ־137 שניות להערכה של כל המרחב של תקופה אחת״ (מדידה של הצוות, כפי שנרשמה; לא הורצה מחדש). כלומר תקופה אחת ניתנת לחישוב, ותקופה לכל מסלול לא. לכן מחפשים בצורה אחרת.
+
+### שלב 5: רגע, כמה מזה בכלל מותר?
+
+לא כל חלוקה חוקית. לפי כלל השליש הקבוע (בהוראה 329, כפי שהצוות תעתק אותה, לא אומת) לפחות שליש מההלוואה צריך להיות במסלולים שאינם משתנים לאורך כל התקופה. מתוך {nf(f.raw("brain.legal").all)} חלוקות בקפיצות של 5%, רק {nf(f.raw("brain.legal").legal)} עומדות בכלל הזה. לפי הצוות, מבין חמש המגבלות רק שתיים באמת מצמצמות את החלוקה (יחס ההחזר וחלק המשתנה); שיעור המימון והתקופה הן תכונות של ההלוואה כולה. סינון כזה חוסך חישוב: מי שאסור לא צריך להיבדק. את זה נראה בשיעור 8.14.
+
+### שלב 6: זה רק רשת
+
+המספרים האלה הם מספרים של **רשת**: חלקים בקפיצות קבועות. תמהיל אמיתי יכול להיות בכל סכום, באגורה. הרשת היא בחירה שלנו. כשמוצאים ״הטוב ביותר ברשת״, זה לא ״הטוב ביותר שיש״.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## ספירה עם טבלה קטנה
+
+</Section>
+
+בשיעור הזה אין רכיב אינטראקטיבי. במקומו, חישוב ביד שמראה את אותו דבר. השלימו את הטבלה של שני סוגי המסלול, קפיצות של 50% ושלוש תקופות, לפי הכלל ״תקופה לכל מסלול שקיים״.
+
+<FillTable
+  client:visible
+  id="8.13-hand"
+  rowKey="split"
+  periodLabel="החלוקה"
+  columns={[
+    { key: "tracks", label: "כמה מסלולים בה", format: "number" },
+    { key: "mixes", label: "כמה תמהילים", format: "number" },
+  ]}
+  rows={[
+    { split: "הכול לראשון", tracks: "1", mixes: f.raw("hand.one_track") },
+    { split: "חצי־חצי", tracks: "2", mixes: f.raw("hand.two_tracks") },
+    { split: "הכול לשני", tracks: "1", mixes: f.raw("hand.one_track") },
+  ]}
+  blanks={["חצי־חצי.mixes", "הכול לשני.mixes"]}
+  success={`נכון. ביחד ${f.plain("hand.two_active")}. ואם היו סופרים תקופה גם למסלול שאין לו חלק: ${f.plain("hand.two_per")}.`}
+  hint="מסלול אחד: שלוש תקופות. שני מסלולים: שלוש כפול שלוש."
+/>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## הנוסחה: חלוקות כפול תקופות
+
+</Section>
+
+**צעד 1 — חלוקות.** <span class="ltr">C(k + t − 1, t − 1)</span>. בשלושה סוגים ו־25%: {f.plain("hand.three_25")}. בחמישה סוגים ו־5%: {nf(f.raw("brain.splits"))}.
+
+**צעד 2 — תקופות.** כפול מספר התקופות, כמספר המסלולים שמקבלים תקופה.
+
+**צעד 3 — חיבור או כפל.** תקופה אחת: חלוקות כפול התקופות. תקופה לכל סוג: חלוקות כפול התקופות בחזקת מספר הסוגים. תקופה רק לסוג עם חלק: מחברים לפי כמה סוגים יש בחלוקה.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> <span class="ltr">=COMBIN(k+t-1,t-1)</span> נותן את מספר החלוקות. תקופה אחת: <span class="ltr">{"=COMBIN(24,4)*27"}</span> (בחמישה סוגים ו־5%). תקופה לכל סוג: <span class="ltr">{"=COMBIN(24,4)*27^5"}</span>.</p>
+<p><strong>שימו לב:</strong> גיליון אלקטרוני מחזיק רק 15 ספרות מדויקות, ולכן מספרים כמו אלה בקושי מדויקים בו. בקוד של הקורס הם שלמים גדולים.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.13"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    "זה קטן בהרבה: רק ספירת החלוקות לבדה, לפני שמוסיפים תקופות, כבר גדולה מזה.",
+    `זה המספר כשכל התמהיל חייב להיות באותה תקופה, ${rough(f.raw("brain.one"))}. בשאלה לכל מסלול יש תקופה משלו.`,
+    "",
+    "זה המספר כשהקפיצות הן 1%, לא 5%. בשאלה הקפיצה היא 5%.",
+  ]}
+>
+  בקפיצות של 5%, חמישה סוגי מסלול, {f.plain("brain.terms")} תקופות, ותקופה לכל מסלול: {nf(f.raw("brain.per_track"))}, {rough(f.raw("brain.per_track"))}. זה מספר אחד מכמה, כפי שראיתם בטבלה. הוא תלוי בקריאה, ובלי קשר לקריאה הוא גדול מדי לבדיקה אחת־אחת.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## כמה תמהילים בשלושה סוגי מסלול?
+
+</Section>
+
+הרשת של שיעור 8.14: שלושה סוגי מסלול (קבועה, פריים, משתנה), חלקים בקפיצות של 10%, ותקופה אחת לכל התמהיל מבין שלוש (20, 25, 30 שנה).
+
+**צעד 1 — חלוקות.** עשר חתיכות לשלושה סוגים: {f.plain("demo.splits")} חלוקות.
+
+**צעד 2 — תקופות.** שלוש אפשרויות לכל התמהיל.
+
+**צעד 3 — כפל.** {f.plain("demo.splits")} כפול 3: {f.plain("demo.grid")} תמהילים.
+
+**מסקנה.** רשת קטנה כזו קל לבדוק כולה: מאות תמהילים. ברשת של הצוות אי אפשר. ההבדל הוא לא ״המחשב״ אלא מספר הסוגים, הקפיצה והתקופות.
+
+<Section kind="דוגמה חצי פתורה">
+
+## רשת קטנה אחרת
+
+</Section>
+
+שלושה סוגי מסלול, קפיצות של 25% ותקופה אחת: מה מספר החלוקות? ואם יש 3 תקופות אפשריות לכל התמהיל? מלאו (השורה הראשונה נתונה).
+
+<FillTable
+  client:visible
+  id="8.13-half"
+  rowKey="case"
+  periodLabel="המקרה"
+  columns={[{ key: "n", label: "כמה תמהילים", format: "number" }]}
+  rows={[
+    { case: "חלוקות בלבד", n: f.raw("hand.three_25") },
+    { case: "חלוקות ושלוש תקופות לכל התמהיל", n: f.raw("hand.three_terms") },
+  ]}
+  blanks={["חלוקות ושלוש תקופות לכל התמהיל.n"]}
+  success="נכון: כפל. בכל חלוקה נבחרת תקופה אחת מבין שלוש."
+  hint="מספר החלוקות כפול מספר התקופות."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים הם חישוב של הקורס לפי קריאה שמצוינת בשיעור, ואינם נתוני שוק. התרגילים מסודרים מקל למאתגר.
+
+<NumericExercise
+  client:visible
+  id="8.13-1"
+  n={1}
+  level="קל"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={f.raw("hand.two_active")}
+  errors={[{ value: f.raw("hand.two_per"), message: "ספרתם תקופה גם לסוג שאין לו חלק. כאן רק מסלול שקיים מקבל תקופה: בחלוקה ״הכול לראשון״ יש רק שלוש אפשרויות, לא תשע." }]}
+>
+  שני סוגי מסלול, קפיצות של 50%, ושלוש תקופות אפשריות לכל מסלול שקיים. כמה תמהילים בסך הכול?
+</NumericExercise>
+
+<Solution for="8.13-1">
+הכול לראשון: 3. חצי־חצי: 9. הכול לשני: 3. יחד {f.plain("hand.two_active")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.13-2"
+  n={2}
+  level="קל"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={f.raw("hand.three_25")}
+>
+  שלושה סוגי מסלול, קפיצות של 25%. בכמה דרכים אפשר לחלק את ההלוואה?
+</NumericExercise>
+
+<NumericExercise
+  client:visible
+  id="8.13-3"
+  n={3}
+  level="בינוני"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={f.raw("brain.splits")}
+>
+  חמישה סוגי מסלול, קפיצות של 5%. בכמה דרכים אפשר לחלק את ההלוואה, בלי לבחור תקופות? (תוכלו להשתמש בגיליון: <span class="ltr">COMBIN</span>.)
+</NumericExercise>
+
+<NumericExercise
+  client:visible
+  id="8.13-4"
+  n={4}
+  level="בינוני"
+  unit=""
+  tolerance={0.05}
+  near={0}
+  answer={f.raw("time.per_track")}
+>
+  בהנחה שכל תמהיל נבדק באלפית שנייה, כמה שנים ייקח לבדוק את כל התמהילים בקריאה שבה לכל סוג מסלול יש תקופה? (בשנים, ספרה אחת אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="8.13-4">
+{nf(f.raw("brain.per_track"))} אלפיות שנייה הן {f.plain("time.per_track")} שנים. אם כל בדיקה לוקחת יותר מאלפית שנייה, זה יותר.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.13-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "כי בספירה השנייה רק מסלול שקיים מקבל תקופה, ובראשונה גם מסלול שחלקו אפס", correct: true, feedback: "נכון. בחלוקה שבה כמה סוגים נעדרים, הספירה הראשונה סופרת תקופות מיותרות." },
+    { text: "כי בשנייה הקפיצה גדולה יותר", feedback: "הקפיצה זהה בשתי הספירות." },
+    { text: "כי בשנייה יש פחות סוגי מסלול", feedback: "מספר הסוגים זהה." },
+    { text: "זו טעות חישוב", feedback: "שני המספרים נכונים לקריאה שלהם." },
+  ]}
+>
+  למה {rough(f.raw("brain.per_active"))} קטן מ־{rough(f.raw("brain.per_track"))}?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.13-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "הרבה יותר גדול: כמה מאות פעמים", correct: true, feedback: "נכון. קפיצה קטנה יותר מכפילה את מספר החלוקות הרבה." },
+    { text: "פי חמישה בדיוק", feedback: "הצעד קטן פי חמישה, אבל מספר החלוקות גדל הרבה יותר, כי מחלקים בין חמישה סוגים." },
+    { text: "בערך אותו דבר", feedback: "הטבלה מראה מספר שונה מאוד." },
+    { text: "קטן יותר", feedback: "יותר חתיכות פירושו יותר חלוקות." },
+  ]}
+>
+  עוברים מרשת של 5% לרשת של 1%. מה קורה למספר התמהילים בקריאה של תקופה לכל סוג?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.13-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לא: צריך לצמצם את המרחב ולחפש בו בצורה חכמה, ולא לבדוק הכול. זה נושא השיעור הבא", correct: true, feedback: "נכון. הבעיה היא לא כוח החישוב אלא הגודל, ולכן מצמצמים." },
+    { text: "כן: מי שמחפש בלי לבדוק הכול טועה", feedback: "מצמצמים באופן שהוא מבוקר: לדלג על מה שאסור, ולחפש גס ואז עדין. זה לא ניחוש." },
+    { text: "כן, אבל רק עם מחשב מהיר יותר", feedback: "גם מחשב פי אלף מהיר יותר לא מבטל את הצורך." },
+    { text: "אי אפשר לדעת", feedback: "אפשר לחשב ולהראות, כפי שנעשה בשיעור." },
+  ]}
+>
+  מישהו אומר: ״ברור שאי אפשר לעשות אופטימיזציה, יש 150 מיליארד תמהילים״. האם זה נכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על מרחב התמהילים">
+<p><strong>מה זה?</strong> כל התמהילים שאפשר לבנות: חלוקה של ההלוואה בין סוגי מסלול, ותקופה לכל מסלול.</p>
+<p><strong>למה זה קיים?</strong> כדי לדעת אם אפשר לבדוק הכול. התשובה: בקריאה של הצוות, לא.</p>
+<p><strong>איך זה עובד?</strong> חותכים את ההלוואה לחתיכות, ואז סופרים חלוקות ותקופות ומכפילים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> כל המלצה של אלגוריתם היא ״הטובה ביותר מבין מה שנבדק״, והשאלה היא מה נבדק.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים איך נבחר מה לבדוק, ומה הקפיצה של הרשת. לפי הצוות, מבין חמש המגבלות רק שתיים מצמצמות את החלוקה. מודל שפה לא מחשב ולא בוחר: הקוד סופר ובודק, והמודל לכל היותר מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **תמהיל** = חלוקה של ההלוואה בין סוגי מסלול + תקופה לכל מסלול. מספר האפשרויות הוא מכפלה.
+- **בקריאה של הצוות** (חמישה סוגים, קפיצות של 5%, 27 תקופות): {rough(f.raw("brain.one"))} עם תקופה אחת, {rough(f.raw("brain.per_track"))} עם תקופה לכל סוג. בקפיצות של 1%: {rough(f.raw("brain.fine_one"))} ו־{rough(f.raw("brain.fine_per_track"))}.
+- **הקריאה משנה:** אם רק מסלול שקיים מקבל תקופה, {rough(f.raw("brain.per_active"))}.
+- **בדיקה של הכול אינה ריאלית,** גם בהנחה נדיבה של אלפית שנייה לבדיקה.
+- **רשת היא בחירה:** ״הטוב ביותר ברשת״ אינו ״הטוב ביותר״.
+
+**בשיעור הבא — 8.14, <Later lesson="8.14" quiet>חיפוש על רשת וצמצום המרחב</Later>:** איך מחפשים בלי לבדוק הכול.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "עיקרון הכפל, ספירת חלוקות של k פריטים שווים בין t מקבלים (צירופים), ובחזקות. מקור: ״כללי״." },
+    { kind: "החלטה של Mogi", text: "לכל מסלול יכולה להיות תקופה משלו (אילון, 2026-08-03): ״אין קוד שמניח תקופה אחת״. לפי הדף בצוות, כפי שנרשם; לא נקרא מחדש.", date: "2026-08-03" },
+    { kind: "מחקר / הצעה", text: "הדף של הצוות על בחירות ועלויות בבניית תמהיל (עודכן ב־2026-10-08): חיפוש מוגבל שנכתב בצוות; כ־287 אלף צירופים עם תקופה אחת וכ־150 מיליארד עם תקופה לכל מסלול ברשת של 5 נקודות; כ־124 מיליון וכ־66 טריליון ברשת של נקודה; מבין חמש המגבלות רק שתיים מצמצמות את החלוקה; ״התקופות מתפרדות כשהחלוקה קבועה״. הקורס חישב את שני המספרים הראשונים בקוד לפי קריאה (חמישה סוגים, 27 תקופות שהוא קורא כ־4 עד 30 שנה, תקופה לכל סוג גם כשחלקו אפס). הצוות לא מפרט את הקריאה. כל זה המלצת מחקר שלא נבדקה." , date: "2026-10-08" },
+    { kind: "לא אומת", text: "המדידה של הצוות (סריקה של 3 מתוך 27 התקופות: 15.3 שניות בפייתון; כ־137 שניות להערכה לכל המרחב של תקופה אחת; 58.7% מהרשת שנמדדה היתה חוקית) לפי הדף של הצוות; לא הורצה מחדש." },
+    { kind: "לא אומת", text: "כלל השליש הקבוע (לפחות שליש מההלוואה במסלולים שאינם משתנים לאורך כל התקופה) לפי תעתיק בצוות של הוראה 329, ממתין לבדיקה מול ההוראה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "אלפית שנייה לבדיקת תמהיל היא הנחה להמחשה, לא מדידה." },
+    { kind: "בדיקת חישוב", text: "כל הספירות חושבו בקוד ונבדקו בשפה אחרת, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/search.ts (BigInt counting) via scripts/lessons/lesson-8-13.ts (+ _stage8b-facts.ts) and data/lessons/8-13.json, rechecked by checks/kinds/search.py. Brain: 7634954 (J-090 choices and costs: 287,000 -> ~150 billion; 124 million -> ~66 trillion; 58.7% legal; 15.3 s sweep), 7503881. Question for Eylon: how the 150 billion is counted. Video: video/8-13.html. */}

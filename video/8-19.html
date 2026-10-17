@@ -1,0 +1,169 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.19 — "האם 90% הוא באמת 9 מתוך 10". Every number comes from data/lessons/8-19.json; render(t)
+  depends only on t. Synthetic applicants, made by a seeded generator; Mogi has no approvals data (the stamp and the last
+  scene say so).
+
+  Script (one idea: a probability is calibrated when "70%" really happens 7 times in 10; you can only tell by grouping many
+  predictions and comparing with what happened; thin groups are noise; a correction can be learned and must be tested on
+  new cases; Mogi has no approvals data yet):
+  1. Title.
+  2. A model says how likely approval is; the true chance of the same applicant is lower.
+  3. The reliability diagram: bins of predictions against what happened.
+  4. Few applicants: a noisy table.
+  5. A correction learned on the first half, tested on the second.
+  6. Takeaway: no approvals data yet.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.19 · הסתברות וכיול</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      import { boot } from "/video/_s8c.js";
+      const v = await boot("8-19");
+      const { fact, num, whole, shek, pl, lr, clamp, inScene, vis, after, grow, C, el, txt, box, line, dot, stamp, title } = v;
+      const T10 = fact("table10").filter((r) => r.n >= 10);
+      const thin = fact("thin5").filter((r) => r.n > 0);
+      const recal = fact("recal");
+      const t5 = fact("table5");
+      const top = t5[4];
+      const pc = (s) => `${Math.round(Number(s) * 100)}%`;
+      const V = { n: pl(fact("n")), truth: pc(fact("ex.truth")), pred: pc(fact("ex.pred")), k: pl(fact("k")), ltv: pl(fact("ex.ltv")), pti: pl(fact("ex.pti")), gap5: fact("gap5"), brier: fact("brier") };
+      const S = { title: [0, 7], model: [7, 34], diagram: [34, 78], thin: [78, 104], recal: [104, 132], end: [132, 146] };
+      window.duration = 146;
+      window.cues = [
+        [1, 5.5, "האם 90% הוא באמת 9 מתוך 10?"],
+        [8, 15, `מבקש: מימון ${V.ltv}%, יחס החזר ${V.pti}%.`],
+        [15, 23, `הסיכוי האמיתי, בנתונים שיצרנו: ${V.truth}.`],
+        [23, 33.5, `המודל מגזים בביטחון: הוא אומר ${V.pred}.`],
+        [35, 42, `${V.n} מבקשים, ולכל אחד תחזית של המודל.`],
+        [42, 50, "מחלקים לפסים לפי מה שהמודל אמר."],
+        [50, 59, "בכל פס: מה אמר המודל, ומה קרה באמת."],
+        [59, 68, "על הקו המקווקו: 70% הם 7 מתוך 10."],
+        [68, 77.5, `בפס העליון אמר ${pc(top.predicted)}, ואושרו ${pc(top.observed)}.`],
+        [79, 86, "ועם מאה מבקשים בלבד?"],
+        [86, 95, "פסים קטנים: כל מקרה זז אותם הרבה."],
+        [95, 103.5, "טבלת כיול מעטה מגזימה ברעש."],
+        [105, 112, "אפשר ללמוד תיקון מכל פס."],
+        [112, 120, "ולבדוק אותו על מי שלא ראה."],
+        [120, 131.5, `הפער ירד מ־${recal.before.gap} ל־${recal.after.gap}.`],
+        [133, 139, "אבל בלי נתונים אי אפשר לכייל."],
+        [139, 145, "ל־Mogi אין עדיין נתוני אישורים."],
+      ];
+
+      const G = { l: 470, r: 900, top: 150, bot: 470 };
+      const X = (p) => G.l + Number(p) * (G.r - G.l);
+      const Y = (p) => G.bot - Number(p) * (G.bot - G.top);
+      const frame = (o) => {
+        line(X(0), Y(0), X(1), Y(0), o);
+        line(X(0), Y(0), X(0), Y(1), o);
+        line(X(0), Y(0), X(1), Y(1), o, C.navy, 2, "8 6");
+        [0, 0.5, 1].forEach((v) => { txt(X(v), G.bot + 30, pc(v), 18, { fill: C.n600, o, ltr: true }); txt(G.l - 14, Y(v) + 6, pc(v), 18, { fill: C.n600, o, anchor: "end", ltr: true }); });
+        txt(X(0.5), G.bot + 62, "מה שהמודל אמר", 18, { fill: C.n600, o });
+        txt(G.l + 8, G.top - 14, "מה שקרה ↑", 18, { fill: C.n600, o, anchor: "start" });
+      };
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) title(t, S.title, "האם 90% הוא באמת 9 מתוך 10?", "הסתברות לאישור, וכיול", "נתונים סינתטיים · אין עדיין נתוני אישורים");
+        if (inScene(t, S.model)) {
+          const o = vis(t, S.model);
+          txt(640, 120, "מבקש אחד", 40, { w: 700, o });
+          box(200, 180, 880, 90, after(t, S.model, 1, o));
+          txt(1050, 236, `מימון ${V.ltv}% · יחס החזר ${V.pti}%`, 30, { anchor: "start", w: 700, o: after(t, S.model, 1, o) });
+          const bars = [["הסיכוי האמיתי", V.truth, fact("ex.truth"), C.tq2, 8], ["המודל אומר", V.pred, fact("ex.pred"), C.teal, 16]];
+          bars.forEach(([label, text, val, color, from], k) => {
+            const y = 330 + k * 100;
+            const g = grow(t, S.model, from, 3);
+            txt(1000, y - 10, label, 26, { anchor: "start", w: 700, o: after(t, S.model, from - 1, o) });
+            el("rect", { x: 1000 - 600 * Number(val) * g, y, width: 600 * Number(val) * g, height: 52, rx: 8, fill: color, opacity: o });
+            if (g > 0.95) txt(1000 - 600 * Number(val) - 14, y + 38, text, 30, { anchor: "end", w: 700, ltr: true, o });
+          });
+          txt(640, 530, `המודל מכפיל את הציון ב־${V.k}`, 24, { fill: C.n700, o: after(t, S.model, 22, o) });
+          stamp(o);
+        }
+        if (inScene(t, S.diagram)) {
+          const o = vis(t, S.diagram);
+          txt(640, 110, "עקומת כיול", 38, { w: 700, o });
+          frame(o);
+          T10.forEach((r, k) => {
+            const oa = after(t, S.diagram, 7 + k * 1.2, o);
+            const rad = Math.max(6, Math.min(24, 2.4 * Math.sqrt(r.n)));
+            dot(X(r.predicted), Y(r.observed), rad, C.teal, oa * 0.85);
+          });
+          const o2 = after(t, S.diagram, 36, o);
+          if (o2 > 0) {
+            const r = T10[T10.length - 1];
+            txt(X(r.predicted) - 40, Y(r.observed) + 46, `${pc(r.predicted)} ← ${pc(r.observed)}`, 22, { anchor: "start", w: 700, ltr: true, o: o2 });
+          }
+          txt(240, 300, "מתחת לקו: המודל הבטיח", 22, { anchor: "start", fill: C.n700, o: after(t, S.diagram, 26, o) });
+          txt(240, 330, "יותר ממה שקרה", 22, { anchor: "start", fill: C.n700, o: after(t, S.diagram, 26, o) });
+          stamp(o);
+        }
+        if (inScene(t, S.thin)) {
+          const o = vis(t, S.thin);
+          txt(640, 110, "מאה מבקשים בלבד", 38, { w: 700, o });
+          frame(o);
+          thin.forEach((r, k) => {
+            const oa = after(t, S.thin, 2 + k * 1.5, o);
+            const rad = Math.max(6, Math.min(24, 2.4 * Math.sqrt(r.n)));
+            dot(X(r.predicted), Y(r.observed), rad, C.tq2, oa * 0.9);
+            txt(X(r.predicted) + 6, Y(r.observed) - rad - 10, `${r.n} מבקשים`, 18, { fill: C.n700, o: oa });
+          });
+          stamp(o);
+        }
+        if (inScene(t, S.recal)) {
+          const o = vis(t, S.recal);
+          txt(640, 110, "תיקון שנלמד ונבדק", 38, { w: 700, o });
+          const cards = [
+            { x: 960, label: "למדו על", val: `${recal.trained}`, from: 1 },
+            { x: 640, label: "בדקו על", val: `${recal.tested}`, from: 4 },
+            { x: 320, label: "פער", val: `${recal.before.gap} ← ${recal.after.gap}`, from: 14 },
+          ];
+          cards.forEach((c) => {
+            const oa = after(t, S.recal, c.from, o);
+            box(c.x - 150, 200, 300, 150, oa);
+            txt(c.x, 252, c.label, 26, { fill: C.n600, o: oa });
+            txt(c.x, 318, c.val, c.val.length > 8 ? 34 : 54, { w: 700, o: oa, ltr: true });
+          });
+          txt(640, 440, `בריאר ${recal.before.brier} ← ${recal.after.brier}: כמעט לא זז`, 26, { fill: C.n700, o: after(t, S.recal, 20, o) });
+          stamp(o);
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          const rows = [["כיול", "בודקים בפסים, עם הרבה מקרים"], ["תיקון", "נלמד ונבדק על מקרים חדשים"], ["Mogi היום", "אין נתוני אישורים"]];
+          rows.forEach(([a, b], i) => {
+            const oa = after(t, S.end, 0.3 + i * 2.5, o);
+            txt(1060, 240 + i * 80, a, 34, { anchor: "start", w: 700, o: oa });
+            txt(760, 240 + i * 80, b, 30, { anchor: "start", fill: i === 2 ? C.navy : C.teal, o: oa });
+          });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

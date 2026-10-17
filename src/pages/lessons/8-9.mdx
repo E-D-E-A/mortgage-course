@@ -1,0 +1,405 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.9"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import MixBuilder from "../../components/MixBuilder.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { INITIAL_MIX, KIND_NAME_HE, SCENARIOS, builderTracks } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right. */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.9");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const MONTHS = [1, 61, 121, 360];
+export const KINDS = ["prime", "variable_unlinked", "fixed_unlinked"];
+export const builderStart = builderTracks(INITIAL_MIX);
+export const sc = SCENARIOS.base;
+export const predictionOptions = [
+  "כן: מכונה מעגלת קצת אחרת בכל פעם, ולכן יש הבדלים של אגורות",
+  "לא: אותו קלט נותן בדיוק אותה תוצאה, עד האגורה, כל פעם",
+  "כן, אם מחשבים בשעה אחרת ביום, כי הריבית משתנה",
+  "לא, אבל רק כשאין מסלול צמוד בתמהיל",
+];
+export const rate = (i) => `${f.plain(`init.rate_${i}`)}%`;
+
+<Callout title="איפה זה עומד: Mogi היום, הוחלט, עתיד">
+<p><strong>Mogi היום:</strong> אין חישוב תמהיל בקוד, וקריאת המנוע מוקפאת. <strong>הוחלט:</strong> 15 כללי החישוב שאילון אישר ב־<span class="ltr">2026-10-07</span> ואדן קיבל ב־<span class="ltr">2026-10-08</span> (המימוש לא הושלם). הקורס ראה מהם רק מה שתועד בצוות, ומציין אותו במקומו. <strong>עתיד:</strong> כל השאר. המנוע שבשיעור הוא <strong>המחשה של הקורס</strong>, שבנויה מכללי הלוחות של שלב 3, ולא קוד של Mogi.</p>
+<p>{MARK}</p>
+</Callout>
+
+בשיעור 8.8 לקחתם את שלושת המספרים של כל תמהיל (ההחזר הראשון, סך התשלומים והחשיפה) כנתונים. עכשיו תראו מאיפה הם מגיעים: <strong>המנוע</strong>. הוא עושה בדיוק מה שעשיתם בשלב 3, הלוח של מסלול, ואז חיבור של כמה מסלולים, רק בלי יד אנושית ובלי טעויות עיגול. בשיעור הזה שני רעיונות חדשים: <Term t="תרחיש" client:visible lesson="8.9">תרחיש</Term> הוא קלט, והמנוע <Term t="דטרמיניסטי" client:visible lesson="8.9">דטרמיניסטי</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.9"
+  question={`מריצים את אותו חישוב פעמיים: אותו תמהיל של נועם ושירה (${f.whole("init.amount_1")}, ${f.whole("init.amount_2")} ו־${f.whole("init.amount_3")}), באותן ריביות, באותו תרחיש. האם התוצאות חייבות להיות זהות?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## קלט אחד, תוצאה אחת
+
+</Section>
+
+<LessonVideo lesson="8-9" />
+
+<Section kind="ההסבר">
+
+## מה עושה מנוע
+
+</Section>
+
+### מנוע הוא פונקציה
+
+<Term t="פונקציה" client:visible lesson="8.1">פונקציה</Term> מקבלת קלט ומחזירה פלט (שיעור 8.1). המנוע הוא פונקציה אחת גדולה:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy">מועמד (תמהיל) + תרחיש ← כללי הלוח ← תזרים ומדדים</p>
+  <p class="mt-2 text-body-m text-n700">מסלול אחד: סכום, אחוז ריבית, תקופה, שיטת החזר. תרחיש: איך זזים המדד, הפריים והעוגנים. תוצאה: התשלום בכל חודש, והמדדים שלמדתם בשלב 3.</p>
+</div>
+
+### מסלול אחד, ביד
+
+מסלול קטן שאפשר לעשות ביד: {f.shekels("hand.amount")} ב־{f.plain("hand.rate")}% לשנה, ל־{f.plain("hand.months")} חודשים, בשיטת קרן שווה (כל חודש חוזר אותו חלק מהקרן). אחוז הריבית החודשי הוא אחוז הריבית לשנה חלקי 12, שיעור 0.4: 1% בחודש.
+
+1. **חודש 1.** הריבית על כל הסכום: {f.shekels("hand.int_1")}. החלק של הקרן: {f.shekels("hand.prin_1")} (הסכום חלקי מספר החודשים). התשלום: <M>{n("hand.int_1")} + {n("hand.prin_1")} = {n("hand.pay_1")}</M>. אחרי התשלום נשארו {f.shekels("hand.close_1")}.
+2. **חודש 2.** הריבית על מה שנשאר: {f.shekels("hand.int_2")}. אותו חלק של קרן, {f.shekels("hand.prin_2")}. התשלום: <M>{n("hand.int_2")} + {n("hand.prin_2")} = {n("hand.pay_2")}</M>, ונשארו {f.shekels("hand.close_2")}.
+3. **חודש 12.** נשארו רק {f.shekels("hand.prin_12")}, ולכן הריבית קטנה ל־{f.shekels("hand.int_12")}, והתשלום האחרון {f.shekels("hand.pay_12")}. אחריו היתרה {f.shekels("hand.close_12")}.
+
+כל התשלומים יחד: {f.shekels("hand.total")}, מהם {f.shekels("hand.interest")} ריבית. המנוע עושה את זה לכל חודש של כל מסלול: פותח ביתרה, מחשב ריבית, קובע תשלום, מוריד קרן, ועובר לחודש הבא.
+
+### תרחיש הוא קלט
+
+מסלול פריים משלם ריבית שתלויה בפריים, ומסלול צמוד משלם לפי המדד. כדי לחשב את התשלום בעוד עשר שנים צריך להניח מה קרה לפריים ולמדד: ההנחה הזו היא <strong>תרחיש</strong>. המנוע לא מנחש אותו: הוא מקבל אותו. אותו תמהיל בשני תרחישים נותן שני תזרימים, כל אחד נכון לתרחיש שלו.
+
+בשיעורים 5.6–5.8 הכרתם שני תרחישים: תרחיש בסיס (המדד עולה {sc.inflation}% בשנה, הפריים והעוגנים לא זזים) ותרחיש מחמיר (המדד עולה {SCENARIOS.stress.inflation}% בשנה, והפריים והעוגנים עולים ב־{SCENARIOS.stress.primeShift} נקודות אחוז). שניהם הנחות של הקורס, לא תחזיות. בשיעור 8.10 נראה שלוש דרכים שונות לקבוע תרחיש.
+
+### התמהיל הוא סכום המסלולים
+
+התמהיל של נועם ושירה: שלושה מסלולים ל־{f.plain("init.years")} שנה: פריים {f.shekels("init.amount_1")} ב־{rate(1)}, משתנה לא צמודה {f.shekels("init.amount_2")} ב־{rate(2)}, וקבועה לא צמודה {f.shekels("init.amount_3")} ב־{rate(3)}. המנוע מחשב כל מסלול לבד, ואחר כך מחבר חודש אחרי חודש. בכל חודש, התשלום של התמהיל הוא סכום התשלומים של המסלולים באותו חודש.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">התרחיש והחודש</th>
+        <th class="py-2 pe-2 text-start font-semibold">פריים</th>
+        <th class="py-2 pe-2 text-start font-semibold">משתנה</th>
+        <th class="py-2 pe-2 text-start font-semibold">קבועה</th>
+        <th class="py-2 pe-2 text-start font-semibold">הסכום</th>
+        <th class="py-2 pe-2 text-start font-semibold">התמהיל</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["base", "stress"].flatMap((sid) => MONTHS.map((m) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-2 font-semibold text-n900">{sid === "base" ? "בסיס" : "מחמיר"}, חודש <span class="ltr">{m}</span></td>
+          {[1, 2, 3].map((k) => (<td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.shekelsExact(`pay.${sid}.t${k}.${m}`)}</span></td>))}
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.shekelsExact(`pay.${sid}.sum.${m}`)}</span></td>
+          <td class="py-2 pe-2 font-semibold"><span class="ltr whitespace-nowrap">{f.shekelsExact(`pay.${sid}.mix.${m}`)}</span></td>
+        </tr>
+      )))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} העמודה ״הסכום״ היא חיבור של שלוש העמודות שלפניה; ״התמהיל״ היא מה שהמנוע מחשב לתמהיל כולו. הן זהות.</p>
+</div>
+
+שני דברים לשים לב אליהם. בתרחיש הבסיס שתי השורות של חודש 1 זהות לתרחיש המחמיר ({f.shekels("pay.base.mix.1")}), כי עוד לא קרה כלום. ובחודש {MONTHS[3]} במחמיר התשלום של התמהיל הוא {f.shekels("pay.stress.mix.360")}: הריביות הגבוהות עשו את שלהן. מסלול שנגמר לא מוסיף כלום; סדר המסלולים לא משנה.
+
+### שלושת המדדים, ומה שלא נעלם
+
+מהתזרים של התמהיל המנוע מוציא את מה שלמדתם בשלב 3: ההחזר הראשון ({f.shekels("init.base.first")}), ההחזר הגבוה ביותר ({f.shekels("init.base.max")}, בחודש {f.plain("init.base.max_month")}), וסך התשלומים ({f.shekels("init.base.total")}) בתרחיש הבסיס. ובמחמיר: הגבוה ביותר {f.shekels("init.stress.max")} בחודש {f.plain("init.stress.max_month")}, וסך התשלומים {f.shekels("init.stress.total")}.
+
+המנוע גם בודק את עצמו. סך התשלומים הוא ההלוואה ({f.shekels("init.base.loan")}) ועוד הריבית ({f.shekels("init.base.interest")}) ועוד הפרשי ההצמדה: <M>{n("init.base.loan")} + {n("init.base.interest")} = {n("init.base.total")}</M>. כאן אין הצמדה. בתמהיל ״צמוד״ מ־5.6 יש: הלוואה {f.shekels("linked.loan")}, ריבית {f.shekels("linked.interest")}, הפרשי הצמדה {f.shekels("linked.indexation")}, ובסך הכול {f.shekels("linked.total")}. הפער בין הסכום הזה לסך התשלומים הוא {f.shekels("linked.residual")}. שום אגורה לא נעלמת.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## אותו תמהיל בשני תרחישים
+
+</Section>
+
+זה התמהיל הראשוני של נועם ושירה בבונה שהכרתם בשיעור 3.7. הוא מריץ את אותו מנוע בדפדפן.
+
+<MixBuilder
+  client:visible
+  loan={1640000}
+  tracks={builderStart}
+  scenario={{ inflation: Number(sc.inflation), primeShift: Number(sc.primeShift), primeFromYear: 2, anchorShift: Number(sc.anchorShift) }}
+  amountStep={1000}
+  labels={{ first: "החזר ראשון", max: "התשלום הגבוה ביותר בתרחיש", total: "סך תשלומים" }}
+/>
+
+1. הגדירו תרחיש מחמיר: המדד {SCENARIOS.stress.inflation}% בשנה, הפריים {SCENARIOS.stress.primeShift}+ נקודות אחוז, העוגן {SCENARIOS.stress.anchorShift}+ נקודות אחוז. מה השתנה בשלושת המספרים, ומה נשאר?
+2. החזירו לבסיס. הזיזו סכום של מסלול והחזירו לאותו ערך. האם המספרים חוזרים בדיוק למה שהיו?
+3. שנו מסלול אחד ל״קבועה צמודה״ והחזירו. מה אתם מסיקים על הקשר בין הקלט לתוצאה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>ההחזר הראשון נשאר {f.shekels("init.stress.first")}; התשלום הגבוה ביותר עולה ל־{f.shekels("init.stress.max")} וסך התשלומים ל־{f.shekels("init.stress.total")} (מ־{f.shekels("init.base.total")}).</li>
+    <li>כן: אותו קלט, אותה תוצאה. אין ״זיכרון״ של ההזזה.</li>
+    <li>כשהקלט חוזר, התוצאה חוזרת. זה מה שמאפשר לבדוק, לשחזר ולהסביר.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## אותו קלט, אותה תוצאה
+
+</Section>
+
+**צעד 1 — מה זה דטרמיניסטי.** חישוב דטרמיניסטי הוא כזה שהתוצאה שלו תלויה אך ורק בקלט. אין בו שעון, מזל, סדר הרצה או משהו שנשאר בזיכרון מהריצה הקודמת. בלשון של פונקציה (שיעור 8.1): אותו x תמיד נותן אותו f(x).
+
+**צעד 2 — איך בודקים.** לוקחים את התוצאות (ההחזר הראשון, הגבוה ביותר, החודש שלו, הסך, מספר החודשים) וכותבים אותן כטקסט אחד, אחר כך נותנים לו ״טביעת אצבע״: קוד קצר של שמונה תווים שמשתנה אם אחד המספרים משתנה באגורה. הרצה ראשונה: <span class="ltr">{f.plain("fp.run1")}</span>. הרצה שנייה: <span class="ltr">{f.plain("fp.run2")}</span>. אותה טביעה, כי אותה תוצאה. בתרחיש מחמיר: <span class="ltr">{f.plain("fp.stress")}</span>. בסדר מסלולים הפוך: <span class="ltr">{f.plain("fp.reversed")}</span>, שוב אותו קוד כמו ההרצה הראשונה, כי סדר המסלולים לא משנה. ואם מעלים שקל אחד בסכום של מסלול אחד ומורידים שקל בסכום של אחר: <span class="ltr">{f.plain("fp.nudged")}</span>. הקוד השתנה, אף על פי שהסך הכל של ההלוואה לא.
+
+**צעד 3 — למה זה חשוב.** המנוע של שיעור 8.14 יחפש מבין אלפי תמהילים. אם אותו תמהיל יכול לתת תוצאות שונות בשתי בדיקות, החיפוש יכריע בין מועמדים לפי רעש. ואם אי אפשר לשחזר תוצאה, אי אפשר להסביר אותה ללקוח או לבודק. לפי הדף בצוות, המדיניות המוסכמת היא ״לשמור את הקלטים שמאחורי כל תוצאה״.
+
+<Callout title="מה ממנוע דטרמיניסטי לא נובע" tone="warning">
+<p>דטרמיניסטי אומר ״חוזר על עצמו״, לא ״נכון״ ולא ״חוזה את העתיד״. המנוע יכול לתת תמיד את אותה תשובה לא נכונה, אם הקלט (התרחיש) לא נכון. אי־ודאות לא נעלמת: היא עוברת לתרחיש. בשיעורים 8.10–8.12 נלמד איך מתמודדים עם זה.</p>
+</Callout>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> שורה לכל חודש. עמודות לכל מסלול: יתרה, ריבית (<span class="ltr">=B2*C$1/12/100</span>), תשלום, קרן. עמודת התמהיל: <span class="ltr">=SUM(E2,K2,Q2)</span>. מדדים: <span class="ltr">=INDEX(...,1)</span>, <span class="ltr">=MAX(...)</span> ו־<span class="ltr">=SUM(...)</span>.</p>
+<p><strong>עיגול:</strong> בלוחות של הקורס כל חודש מעוגלת הריבית לאגורה והתשלום האחרון סוגר את היתרה, ולכן הסך מתיישב עם ההלוואה, הריבית וההצמדה עד האגורה. כל מקור לא יעגל כך בהכרח; מה שבנק מדפיס עשוי להיות שונה באגורות.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.9"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "חישוב על מספרים עשרוניים בכלל עיגול קבוע (הריבית של כל חודש לאגורה, בכיוון קבוע) נותן בדיוק אותו מספר בכל הרצה. הבדלים של אגורות הם סימן לכך שכלל העיגול לא קבוע, או שהקלט שונה.",
+    "",
+    "הריבית היא חלק מהקלט: אם היא זהה, גם התוצאה. שעת הריצה לא נכנסת לחישוב. ריבית שמשתנה ביום אחר היא קלט אחר.",
+    "מסלול צמוד לא מכניס אקראיות: המדד הוא חלק מהתרחיש, שנקבע מראש.",
+  ]}
+>
+  כך זה בלוח של הקורס: הטביעה של שתי ההרצות היא <span class="ltr">{f.plain("fp.run1")}</span> בשתיהן. אילו המנוע לא היה דטרמיניסטי, אי אפשר היה לדעת אם תמהיל אחד באמת טוב מאחר, או שהמזל נתן לו תוצאה טובה בהרצה הזו. (המחקר של הצוות מציע לחשב כסף במספרים עשרוניים ולא בשברים מצוף: בשני אופנים התוצאות קרובות מאוד, אבל רק עשרוניים נותנים שוויון מדויק וכלל עיגול שאפשר לבדוק. זו הצעת מחקר, לא החלטה.)
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## מה המנוע עושה לתמהיל ״צמוד״
+
+</Section>
+
+התמהיל ״צמוד״ מ־5.6: משתנה צמודה וקבועה צמודה. נעקוב אחרי הסך שלו בתרחיש הבסיס.
+
+**צעד 1 — הלוואה.** {f.shekels("linked.loan")}.
+
+**צעד 2 — ריבית.** אחוז הריבית כפול היתרה בכל חודש, מצטבר: {f.shekels("linked.interest")}.
+
+**צעד 3 — הפרשי הצמדה.** המדד מעלה את היתרה לפני כל תשלום. מצטבר: {f.shekels("linked.indexation")}.
+
+**צעד 4 — סך התשלומים.** {f.shekels("linked.total")}. בדיקת המנוע: הלוואה, ריבית והצמדה, יחד, פחות סך התשלומים, נותנים {f.shekels("linked.residual")}. 
+
+**מסקנה.** בתמהיל עם מסלולים צמודים סך התשלומים כולל שלושה רכיבים: הקרן, הריבית וההצמדה. ההצמדה היא כאן {f.shekels("linked.indexation")}, ואין להשוות את הסך של תמהיל צמוד לסך של תמהיל לא צמוד בלי לומר באיזה תרחיש של מדד חושבו.
+
+<Section kind="דוגמה חצי פתורה">
+
+## התשלום של התמהיל בחודש 61
+
+</Section>
+
+התשלום של התמהיל בחודש 61 הוא סכום התשלומים של שלושת המסלולים. השורה הראשונה (תרחיש הבסיס) מלאה; השלימו את השנייה (תרחיש מחמיר): חברו את שלוש העמודות הראשונות.
+
+<FillTable
+  client:visible
+  id="8.9-half"
+  rowKey="scenario"
+  periodLabel="התרחיש"
+  columns={[
+    { key: "prime", label: "פריים" },
+    { key: "variable", label: "משתנה" },
+    { key: "fixed", label: "קבועה" },
+    { key: "mix", label: "התמהיל" },
+  ]}
+  rows={[
+    { scenario: "בסיס", prime: f.raw("pay.base.t1.61"), variable: f.raw("pay.base.t2.61"), fixed: f.raw("pay.base.t3.61"), mix: f.raw("pay.base.mix.61") },
+    { scenario: "מחמיר", prime: f.raw("pay.stress.t1.61"), variable: f.raw("pay.stress.t2.61"), fixed: f.raw("pay.stress.t3.61"), mix: f.raw("pay.stress.mix.61") },
+  ]}
+  blanks={["מחמיר.mix"]}
+  success="נכון. התמהיל הוא סכום המסלולים. בחודש 61 הפריים עלה, והמשתנה עלה בנקודת העדכון הראשונה, והקבועה לא זזה."
+  hint="חברו את שלושת התשלומים של אותה שורה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים הם הנחות של הקורס, לא הצעת בנק. התרגילים מסודרים מקל למאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.9-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אותו קלט נותן בדיוק אותה תוצאה בכל הרצה", correct: true, feedback: "נכון. התוצאה תלויה בקלט בלבד." },
+    { text: "התוצאה תמיד נכונה", feedback: "דטרמיניסטי אומר שחוזר על עצמו, לא שנכון. עם תרחיש לא נכון יוצאת תוצאה לא נכונה, שוב ושוב." },
+    { text: "אין בו אי־ודאות בכלל", feedback: "האי־ודאות עוברת לקלט (התרחיש). המנוע עצמו לא מגריל." },
+    { text: "הוא מחשב מהר", feedback: "מהירות היא תכונה אחרת." },
+  ]}
+>
+  מה פירוש ״מנוע דטרמיניסטי״?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.9-2"
+  n={2}
+  level="קל"
+  answer={f.raw("hand.int_2")}
+  errors={[
+    { value: f.raw("hand.int_1"), message: "זו הריבית של חודש 1, על כל הסכום. בחודש 2 הריבית על מה שנשאר אחרי החזר הקרן הראשון." },
+  ]}
+>
+  במסלול הקטן ({f.shekels("hand.amount")} ב־{f.plain("hand.rate")}% לשנה, {f.plain("hand.months")} חודשים, קרן שווה), נשארו אחרי חודש 1 {f.shekels("hand.close_1")}. מה הריבית בחודש 2?
+</NumericExercise>
+
+<Solution for="8.9-2">
+אחוז הריבית החודשי הוא 12 חלקי 12, 1%. על {n("hand.close_1")} ₪ הריבית היא {n("hand.int_2")} ₪.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.9-3"
+  n={3}
+  level="קל"
+  answer={f.raw("pay.base.sum.61")}
+  errors={[
+    { value: f.raw("pay.base.t1.61"), message: "זה התשלום של מסלול הפריים בלבד. התמהיל הוא סכום שלושת המסלולים." },
+  ]}
+>
+  בתרחיש הבסיס, בחודש 61, מסלול הפריים משלם {f.shekels("pay.base.t1.61")}, המשתנה {f.shekels("pay.base.t2.61")} והקבועה {f.shekels("pay.base.t3.61")}. מה התשלום של התמהיל בחודש 61?
+</NumericExercise>
+
+<Solution for="8.9-3">
+<M>{n("pay.base.t1.61")} + {n("pay.base.t2.61")} + {n("pay.base.t3.61")} = {n("pay.base.sum.61")}</M> ₪, והמנוע מחשב לתמהיל כולו {f.shekels("pay.base.mix.61")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.9-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("init.base.interest_gap")}
+>
+  בתרחיש הבסיס סך התשלומים של התמהיל הראשוני הוא {f.shekels("init.base.total")}, וההלוואה {f.shekels("init.base.loan")}. אין בו מסלול צמוד. כמה ריבית שילמו בסך הכול?
+</NumericExercise>
+
+<Solution for="8.9-4">
+בלי הצמדה, סך התשלומים הוא ההלוואה ועוד הריבית: <M>{n("init.base.total")} − {n("init.base.loan")} = {n("init.base.interest_gap")}</M> ₪, והמנוע מדווח אותו מספר כריבית.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.9-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "יש בו משהו שאינו הקלט: שעון, הגרלה, סדר ביצוע או זיכרון של ריצה קודמת", correct: true, feedback: "נכון. בחישוב דטרמיניסטי הקלט בלבד קובע." },
+    { text: "הלקוח שינה את דעתו", feedback: "אם הלקוח שינה את הקלט, הקלט שונה. אותו קלט, אותה תוצאה." },
+    { text: "זה תקין: מספרים עשרוניים לא מדויקים", feedback: "עשרוניים עם כלל עיגול קבוע חוזרים על עצמם בדיוק." },
+    { text: "הבנק שינה את הריבית", feedback: "אם הריבית שונה, הקלט שונה." },
+  ]}
+>
+  מריצים את אותו תמהיל פעמיים באותו תרחיש, ומקבלים הבדל של 3 אגורות בסך. מה זה מעיד?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.9-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "תרחיש הוא הנחה שמזינים למנוע; תחזית היא טענה על מה שיקרה", correct: true, feedback: "נכון. המנוע לא יודע מה יקרה: הוא מחשב מה קורה אם התרחיש הזה יתקיים." },
+    { text: "תרחיש הוא תוצאה של המנוע", feedback: "התרחיש נכנס למנוע, לא יוצא ממנו." },
+    { text: "אין הבדל", feedback: "יש: תרחיש הוא ״מה אם״, תחזית היא ״מה יהיה״. שיעור 8.10 יפרט כמה סוגי תרחישים." },
+    { text: "תרחיש הוא תמיד המחמיר מבין האפשרויות", feedback: "תרחיש בסיס הוא גם תרחיש." },
+  ]}
+>
+  מה ההבדל בין תרחיש לתחזית?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.9-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "להשוות אותם קלט מול קלט: אותו סכום, תאריך חישוב, תרחיש ושיטת עיגול, ולבדוק את ההבדלים לפי סיבה", correct: true, feedback: "נכון. לפי הדף בצוות, מתאימים את הקלטים לפני ההשוואה, ובודקים הבדלים לפי סיבה: עיגול, תאריכי תשלום, הצמדה, גרסת התחזית ומנגנון הריבית של הבנק. סף הסבירות של ההבדל עוד לא נקבע." },
+    { text: "לקבוע שהמנוע שגוי: הבנק לא טועה", feedback: "אי אפשר לדעת. ייתכן שההבדל בעיגול או בתאריכים. הצוות מתעד שהשוואה כוללת בדיקה לפי סיבות." },
+    { text: "לקבוע שהבנק שגוי: המנוע לא טועה", feedback: "אותה בעיה: אי אפשר לדעת לפני בדיקת הקלטים." },
+    { text: "להתעלם מההבדל כי הוא קטן", feedback: "לפי הצוות עוד לא הוסכם סף לסבילות, ולכן ״קטן״ הוא לא קריטריון." },
+  ]}
+>
+  הצוות משווה את המנוע ללוח של בנק על אותה הלוואה, ויש הבדל קטן. מה עושים קודם?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על מנוע החישוב">
+<p><strong>מה זה?</strong> פונקציה שמקבלת תמהיל ותרחיש ומחזירה את התשלום בכל חודש ואת המדדים של שלב 3.</p>
+<p><strong>למה זה קיים?</strong> כדי שכל מי שרוצה לדעת כמה עולה תמהיל, באיזה תרחיש, יקבל אותה תשובה, וכדי שחיפוש בין אלפי תמהילים יהיה מבוסס על מספרים שאפשר לסמוך עליהם.</p>
+<p><strong>איך זה עובד?</strong> חודש אחר חודש לכל מסלול: ריבית, תשלום, קרן, יתרה; ואז חיבור של המסלולים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> כל המלצה מתחילה ממספרים שהמנוע מחשב. אם אין לכם דרך לשחזר אותם, אין דרך לבדוק אותם.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שומרים את הקלטים עם התוצאה, ומציגים את התרחיש לצד המספר. לפי הדף בצוות, מספר שמוצג ללקוח הוא ״תשלום חודשי בתנאים הנוכחיים״, לצדו ההחזר הראשון והתשלום הגבוה ביותר החזוי, שהוא תחזית ולא תקרה. כדאי לסמן אותו אם הוא גבוה ב־10% לפחות (סף שהוחלט). מודל שפה יכול להסביר את התוצאה, ולעולם לא לחשב אותה.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **מנוע** = פונקציה: תמהיל ותרחיש נכנסים, תזרים ומדדים יוצאים.
+- **תזרים של מסלול:** חודש אחר חודש, ריבית על היתרה, קרן, יתרה חדשה. **תזרים של תמהיל:** סכום התזרימים של המסלולים, חודש אחר חודש.
+- **תרחיש** הוא קלט (הנחה על המדד, הפריים והעוגנים), לא תחזית. המנוע **דטרמיניסטי**: אותו קלט, אותה תוצאה, עד האגורה.
+- **סך התשלומים = הלוואה + ריבית + הפרשי הצמדה.** המנוע בודק את זה על עצמו.
+- **מה שהוחלט** (אילון, <span class="ltr">2026-10-07</span>): 15 כללי חישוב, ובהם ההחזר הראשון והחזוי נשמרים בנפרד ו״הקלטים נשמרים עם התוצאה״. המימוש לא הושלם, והקורס ראה רק את מה שתועד.
+
+**בשיעור הבא — 8.10, <Later lesson="8.10" quiet>שלוש תחזיות שונות</Later>:** הוראה 451, <Later lesson="8.10" quiet>תרחיש לחץ</Later> ו<Later lesson="8.10" quiet>תחזית מקרו</Later>, ומה ההבדל בין שלושתן.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "החלטה של Mogi", text: "חישוב ההחזר, תחזיות ופרטים אחרים לפי 15 התשובות של אילון (אושרו ב־2026-10-07, אדן קיבל ב־2026-10-08; ״המימוש לא הושלם״). ממנו הקורס הביא: ההחזר החודשי בתנאים הנוכחיים מוצג, ההחזר הראשון והתשלום הגבוה ביותר החזוי נשמרים בנפרד (הדגשה כשהגבוה גבוה ב־10% לפחות), ״תחזית אינה תקרה מובטחת״, והקלטים שמאחורי כל תוצאה נשמרים. לפי הדף בצוות, כפי שנרשם; הקורס לא ראה את כל הרשימה וממתין לה (שאלה לאילון).", date: "2026-10-08" },
+    { kind: "מחקר / הצעה", text: "ההצעה לחשב כסף במספרים עשרוניים ולא בשברים מצוף נובעת ממדידה של הצוות (אגורות לעומת כמה ננו־שקלים). זו המלצת מחקר, לא החלטה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "התמהיל הראשוני של תיק A, רשימת המחירים ושני התרחישים (בסיס ומחמיר) הם הנחות של הקורס מ־5.6: לא הצעת בנק ולא תחזית. אחוז הריבית החודשי הוא אחוז הריבית השנתי חלקי 12. כלל העיגול: הריבית של כל חודש לאגורה, התשלום האחרון סוגר את היתרה." },
+    { kind: "ידע מתמטי כללי", text: "פונקציה, חישוב דטרמיניסטי, קוד גיבוב קצר (FNV) כדוגמה לטביעת אצבע של תוצאה." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים, בשתי שיטות נפרדות.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/engine.ts (on schedule.ts, metrics via scheduleTotals) via scripts/lessons/lesson-8-9.ts (+ _stage8b-facts.ts) and data/lessons/8-9.json, rechecked by checks/kinds/engine.py (with schedule.py). Brain: 67436545 (15 rules; Q1, Q2, Q3, Q4), 7733250. Illustration: src/components/MixBuilder.vue (props only). Video: video/8-9.html. */}

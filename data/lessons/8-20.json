@@ -1,0 +1,600 @@
+{
+  "lesson": "8.20",
+  "title": "אומדן מול הצעת בנק",
+  "note": "Synthetic. The workshop's made-up offer of fictional bank ב׳ (candidate c05's shape: 50% fixed, 50% prime, 30 years; rates 4.35% and 4.65%) against the estimate at bank ב׳'s list (4.30% and 4.70%), flat scenarios of case A. The reset example: a variable track of 500,000 ₪ at 4.10% over 30 years, stress scenario of case A, reset every 60 months (the simulation's assumption) against 84 months (an offer's terms). The eight pairs (estimate, offer) are invented teaching numbers.",
+  "facts": [
+    {
+      "id": "est.rate_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "off.rate_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.35"
+    },
+    {
+      "id": "est.amount_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "820000.00"
+    },
+    {
+      "id": "est.rate_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.70"
+    },
+    {
+      "id": "off.rate_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.65"
+    },
+    {
+      "id": "est.amount_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "820000.00"
+    },
+    {
+      "id": "est.first",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.70",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8310.78"
+    },
+    {
+      "id": "est.total",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.70",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2991877.66"
+    },
+    {
+      "id": "est.max_stress",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.30",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.70",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max"
+      },
+      "value": "9323.51"
+    },
+    {
+      "id": "off.first",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.65",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "first"
+      },
+      "value": "8310.28"
+    },
+    {
+      "id": "off.total",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.65",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "2",
+        "prime_shift_1": "0",
+        "prime_shift_2": "0",
+        "anchor_shift_1": "0",
+        "measure": "total"
+      },
+      "value": "2991699.94"
+    },
+    {
+      "id": "off.max_stress",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 2,
+        "block_months": 12,
+        "t1_kind": "fixed_unlinked",
+        "t1_amount": "820000.00",
+        "t1_rate": "4.35",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t2_kind": "prime",
+        "t2_amount": "820000.00",
+        "t2_rate": "4.65",
+        "t2_months": 360,
+        "t2_method": "spitzer",
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max"
+      },
+      "value": "9323.10"
+    },
+    {
+      "id": "gap.first",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "off.first",
+        "subtrahend": "est.first"
+      },
+      "value": "-0.50"
+    },
+    {
+      "id": "gap.total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "off.total",
+        "subtrahend": "est.total"
+      },
+      "value": "-177.72"
+    },
+    {
+      "id": "gap.max_stress",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "off.max_stress",
+        "subtrahend": "est.max_stress"
+      },
+      "value": "-0.41"
+    },
+    {
+      "id": "gap.rate_1",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "off.rate_1",
+        "subtrahend": "est.rate_1"
+      },
+      "value": "0.05"
+    },
+    {
+      "id": "gap.rate_2",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "off.rate_2",
+        "subtrahend": "est.rate_2"
+      },
+      "value": "-0.05"
+    },
+    {
+      "id": "reset.default",
+      "kind": "given",
+      "inputs": {},
+      "value": "60"
+    },
+    {
+      "id": "reset.offer",
+      "kind": "given",
+      "inputs": {},
+      "value": "84"
+    },
+    {
+      "id": "reset.sim.total",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "total"
+      },
+      "value": "1028818.99"
+    },
+    {
+      "id": "reset.off.total",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 84,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "total"
+      },
+      "value": "1006232.18"
+    },
+    {
+      "id": "reset.sim.max",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max"
+      },
+      "value": "2946.21"
+    },
+    {
+      "id": "reset.off.max",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 84,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max"
+      },
+      "value": "2910.47"
+    },
+    {
+      "id": "reset.sim.max_month",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 60,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max_month"
+      },
+      "value": 61
+    },
+    {
+      "id": "reset.off.max_month",
+      "kind": "eng_eval",
+      "inputs": {
+        "tracks": 1,
+        "block_months": 12,
+        "t1_kind": "variable_unlinked",
+        "t1_amount": "500000",
+        "t1_rate": "4.10",
+        "t1_months": 360,
+        "t1_method": "spitzer",
+        "t1_reset": 84,
+        "rounding": "statement",
+        "inflation_1": "4",
+        "prime_shift_1": "0",
+        "prime_shift_2": "2",
+        "anchor_shift_1": "2",
+        "measure": "max_month"
+      },
+      "value": 85
+    },
+    {
+      "id": "reset.gap.total",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "reset.sim.total",
+        "subtrahend": "reset.off.total"
+      },
+      "value": "22586.81"
+    },
+    {
+      "id": "reset.gap.max",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "reset.sim.max",
+        "subtrahend": "reset.off.max"
+      },
+      "value": "35.74"
+    },
+    {
+      "id": "pair.1.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "pair.1.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.35"
+    },
+    {
+      "id": "pair.2.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "pair.2.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.40"
+    },
+    {
+      "id": "pair.3.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.35"
+    },
+    {
+      "id": "pair.3.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.38"
+    },
+    {
+      "id": "pair.4.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.28"
+    },
+    {
+      "id": "pair.4.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "pair.5.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.32"
+    },
+    {
+      "id": "pair.5.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.41"
+    },
+    {
+      "id": "pair.6.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.30"
+    },
+    {
+      "id": "pair.6.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.36"
+    },
+    {
+      "id": "pair.7.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.33"
+    },
+    {
+      "id": "pair.7.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.38"
+    },
+    {
+      "id": "pair.8.est",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.31"
+    },
+    {
+      "id": "pair.8.off",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.37"
+    },
+    {
+      "id": "pair.1.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.1.off",
+        "subtrahend": "pair.1.est"
+      },
+      "value": "0.05"
+    },
+    {
+      "id": "pair.2.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.2.off",
+        "subtrahend": "pair.2.est"
+      },
+      "value": "0.10"
+    },
+    {
+      "id": "pair.3.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.3.off",
+        "subtrahend": "pair.3.est"
+      },
+      "value": "0.03"
+    },
+    {
+      "id": "pair.4.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.4.off",
+        "subtrahend": "pair.4.est"
+      },
+      "value": "0.02"
+    },
+    {
+      "id": "pair.5.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.5.off",
+        "subtrahend": "pair.5.est"
+      },
+      "value": "0.09"
+    },
+    {
+      "id": "pair.6.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.6.off",
+        "subtrahend": "pair.6.est"
+      },
+      "value": "0.06"
+    },
+    {
+      "id": "pair.7.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.7.off",
+        "subtrahend": "pair.7.est"
+      },
+      "value": "0.05"
+    },
+    {
+      "id": "pair.8.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "pair.8.off",
+        "subtrahend": "pair.8.est"
+      },
+      "value": "0.06"
+    },
+    {
+      "id": "pairs.mean",
+      "kind": "est_mean_interval",
+      "inputs": {
+        "values": "0.05,0.10,0.03,0.02,0.09,0.06,0.05,0.06"
+      },
+      "value": {
+        "n": 8,
+        "mean": "0.0575",
+        "sd": "0.0271",
+        "se": "0.0096",
+        "t": "2.365",
+        "low": "0.0348",
+        "high": "0.0802"
+      }
+    },
+    {
+      "id": "pairs3.mean",
+      "kind": "est_mean_interval",
+      "inputs": {
+        "values": "0.05,0.10,0.03"
+      },
+      "value": {
+        "n": 3,
+        "mean": "0.0600",
+        "sd": "0.0361",
+        "se": "0.0208",
+        "t": "4.303",
+        "low": "-0.0296",
+        "high": "0.1496"
+      }
+    },
+    {
+      "id": "pairs.count",
+      "kind": "given",
+      "inputs": {},
+      "value": "8"
+    }
+  ]
+}

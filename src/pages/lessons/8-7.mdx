@@ -1,0 +1,386 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.7"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import CandidateFilter from "../../components/CandidateFilter.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { S8_LABEL, CANDIDATE_NAMES } from "../../data/case-s8.ts";
+import { CONSTRAINTS, FAMILY_HE } from "../../lib/calc/constraints.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.7");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = `${S8_LABEL}`;
+export const label = (id) => CONSTRAINTS.find((k) => k.id === id).labelHe;
+export const reasonsOf = (id) => String(f.raw(`r.${id}`)).split(",").filter(Boolean);
+export const predictionOptions = [
+  `כולם, ${p("k.n")}: כל אחד מהם נראה סביר`,
+  `${p("f.law")}: אלה שעומדים בחוק`,
+  `${p("f.all")}: אלה שעומדים בכל האילוצים`,
+  "אף אחד: תמיד יש אילוץ שנשבר",
+];
+export const ids = ["c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12"];
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>עתיד.</strong> השיעור מציג מודל לימודי של מסנן שמפריד מועמד אפשרי מאחד שאינו אפשרי. אין מסנן כזה בקוד של Mogi היום. <strong>הוחלט:</strong> חלק מכללי החישוב של אילון (איך מחשבים את ההחזר ואת יחס ההחזר). הקווים של הוראה 329 הם תעתיק של הצוות, לא נבדקו מול ההוראה; הקווים של הבנקים והמגבלות של הלקוח בדויים, <strong>להדגמה</strong>, והנתונים סינתטיים.</p>
+</Callout>
+
+בשיעור הקודם הגדרתם מה מותר לשנות: שתי רמות של משתני החלטה. מספר המועמדים עצום, ורובם לא יכולים להתקיים: הם שוברים כלל. עכשיו מגדירים את הכללים האלה, <Term t="אילוץ" client:visible lesson="8.7">אילוצים</Term>, ומה נשאר אחריהם: <Term t="פתרון אפשרי" client:visible lesson="8.7">פתרון אפשרי</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.7"
+  question={`נועם ושירה (תיק א׳, בדויים) שוקלים ${p("k.n")} מועמדים: בקשות ותמהילים שונים. כל מועמד נבדק מול הכללים: הוראה 329 (לפי התעתיק של הצוות), הקווים של הבנק (הבדוי), ומה שהלקוח קבע (החזר חודשי עד ${f.shekels("k.max_pay")}, ויחס החזר עד ${p("k.target")}%). כמה מועמדים עומדים בכל הכללים?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## מי נשאר אחרי הכללים
+
+</Section>
+
+<LessonVideo lesson="8-7" />
+
+<Section kind="ההסבר">
+
+## הנתונים שהאלגוריתם קורא
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+לפני שמסננים, צריך לדעת על מה מסננים. הנתונים שהאלגוריתם (בתכנון) קורא:
+- **פרטי הלקוח:** מחיר הנכס ({f.shekels("k.price")} בתיק א׳), ההון, ההכנסות, ההתחייבויות והחיסכון. מאומתים ממסמכים (שלב 4).
+- **המחירון והקווים של כל בנק:** באיזו ריבית כל מסלול, ומעל איזה יחס החזר או שיעור מימון הבנק מסרב. בקורס הבנקים בדויים, והקווים שלהם מומצאים (שיעורים 6.9 עד 6.11). איך בנקים אמיתיים מחליטים לא ידוע לנו.
+- **נתוני שוק:** תחזיות מדד ופריים (שיעור 5.4), שיעורי 8.9 ואילך.
+- **מה שהלקוח קבע:** ההחזר החודשי המרבי ויעד יחס ההחזר, בדוגמה בדויים.
+
+חלק מהחישוב מוגדר כבר: איך מחשבים את ההחזר שנכנס ליחס ההחזר (ההחזר הראשון על הסכום המלא), איך מחשבים הכנסה פנויה (ההכנסה המוכרת פחות התחייבויות של יותר מ־18 חודשים), ומה יחס ההחזר (ההחזר הרלוונטי חלקי ההכנסה הפנויה). אלה הכללים המוסכמים (הוחלט) ששיעור 8.6 הזכיר, ואין כאן מקום לחשב אותם בדרך אחרת.
+
+<Section kind="ההסבר">
+
+## אילוץ: ״חייב״, לא ״עדיף״
+
+</Section>
+
+**אילוץ** הוא תנאי שמועמד חייב לקיים. מי שמפר אותו נפסל, ולא מקבל ציון נמוך. ההבדל מ״יעד״: יעד הוא מה שרוצים שיהיה טוב (בשיעור הבא), ואילוץ הוא מה שחייב להתקיים. בקורס יש ארבע משפחות:
+
+| משפחה | מה בודקת | מקור |
+|---|---|---|
+| **עקביות** | המסלולים מצטברים להלוואה; כל מסלול חיובי | חשבון |
+| **רגולציה** | שיעור מימון, יחס החזר עד 50%, לפחות שליש קבוע, עד 30 שנה | הוראה 329, תעתיק של הצוות, לא אומת |
+| **מדיניות הבנק** | נקודות הסירוב של בנק מסוים, בדויות | הנחה: שיעורים 6.9 עד 6.11 |
+| **הלקוח** | ההון קיים; החזר מרבי; יעד יחס החזר | מה שהלקוח אמר |
+
+ויש גם קו שהוא לא אילוץ: יחס החזר מעל 40% מותר, והבנק מחזיק יותר הון (שיעור 4.5). המודל רושם אותו כהערה. אם הלקוח אומר שהוא רוצה להישאר מתחת ל־40%, זו כבר מגבלה שלו, ואז היא אילוץ.
+
+<div class="my-6 hidden overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:block">
+  <table class="w-full min-w-[34rem] border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">האילוץ</th>
+        <th class="py-2 pe-3 text-start font-semibold">משפחה</th>
+        <th class="py-2 pe-3 text-start font-semibold">הכלל</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CONSTRAINTS.map((k) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold text-n900">{k.labelHe}</td>
+          <td class="py-2 pe-3 text-n700">{FAMILY_HE[k.family]}</td>
+          <td class="py-2 pe-3 text-n700">{k.ruleHe}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<ul class="list-reset my-6 space-y-3 sm:hidden">
+  {CONSTRAINTS.map((k) => (
+    <li class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+      <p class="font-semibold text-n900">{k.labelHe}</p>
+      <p class="text-caption text-n600">{FAMILY_HE[k.family]}</p>
+      <p class="mt-1 text-body-m text-n700">{k.ruleHe}</p>
+    </li>
+  ))}
+</ul>
+
+הצוות רשם בעבודת מחקר שמבין חמשת הקווים של הוראה 329 (שיעור 4.4), רק שניים מגבילים את **חלוקת** ההלוואה בין מסלולים: יחס ההחזר והחלק בריבית משתנה; שיעור המימון והתקופה הם תכונות של ההלוואה (ושל התקופה הארוכה ביותר). זו הערה של מחקר, לא החלטה. בקורס בודקים את כולם, כי בדרך ממיצוב לתמהיל כולם נכנסים.
+
+<Section kind="ההסבר">
+
+## כל הסיבות, לא רק הראשונה
+
+</Section>
+
+מסנן פשוט עוצר בכלל הראשון שנשבר. מסנן שמסביר שומר **כל** סיבה. הסיבה: יועץ שרואה שבקשה נפסלה בגלל יחס החזר, ואחר כך מגלה שהיא נפסלה גם בגלל שליש קבוע, היה צריך לתקן פעמיים. הפסאודו־קוד:
+
+<pre class="my-4 overflow-x-auto rounded-md border border-n200 bg-n50 p-4 text-body-m text-n800" dir="ltr">{`for candidate in candidates:
+    reasons = []
+    for rule in hard_constraints:      # every rule, no early exit
+        if not rule.holds(candidate):
+            reasons.append(rule.name)
+    if reasons == []:
+        feasible.append(candidate)
+    else:
+        rejected[candidate] = reasons  # all of them`}</pre>
+
+מועמד שנפסל על כמה סיבות הוא מועמד רחוק מהמצב הרצוי. מועמד שנפסל על סיבה אחת קרוב: לעתים שינוי קטן ברמה 1 מציל אותו.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## סינון מועמדים
+
+</Section>
+
+<CandidateFilter client:visible note="הבנק והמועמדים בדויים. הרכב המועמדים נבנה כך שלכל משפחה יש מה לפסול." />
+
+נסו את אלה:
+1. הפעילו רק את ״עקביות״. כמה עוברים?
+2. הוסיפו ״רגולציה״, אחר כך ״מדיניות הבנק״ ואחר כך ״הלקוח״. איך המספר משתנה?
+3. כבו ״הלקוח״ והשאירו את השאר. איזה מועמד נפסל על הרבה סיבות?
+4. מצאו מועמד שנפסל על סיבה אחת בלבד. איזו סיבה, ומה אפשר לשנות כדי להצילו?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>{p("f.identity")} מתוך {p("k.n")}: כולם עקביים, כי נבנו כך.</li>
+    <li>אחרי רגולציה {p("f.law")}, אחרי הבנק {p("f.bank")}, ואחרי הלקוח {p("f.all")}. כל משפחה מוסיפה פסילות.</li>
+    <li>בלי הלקוח, מועמד ״{CANDIDATE_NAMES.c03}״ נופל בחוק (יחס החזר) ובבנק, ולכן יש לו כמה סיבות.</li>
+    <li>למשל ״{CANDIDATE_NAMES.c09}״: רק שליש קבוע נשבר (הוא {p("m.c09_var")}% משתנה), ואפשר להציל אותו בתמהיל עם פחות משתנה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## איך נראה מועמד שנפסל
+
+</Section>
+
+מועמד **{CANDIDATE_NAMES.c03}**: כל ההלוואה, {f.shekels("m.c03_loan")}, בקבועה לא צמודה ל־20 שנה בבנק א׳.
+
+**צעד 1 — עקביות.** המסלול הוא כל ההלוואה, ולכן עובר.
+
+**צעד 2 — רגולציה.** שיעור המימון {p("m.c03_ltv")}%: עובר. אין משתנה: עובר. 240 חודשים: עובר. אבל יחס ההחזר {p("m.c03_ratio")}%, מעל 50%: נשבר.
+
+**צעד 3 — הבנק.** גם מעל נקודת הסירוב של הבנק (45%): נשבר.
+
+**צעד 4 — הלקוח.** ההחזר {f.shekels("m.c03_pay")} מעל {f.shekels("k.max_pay")}, ויחס ההחזר מעל {p("k.target")}%: שני כללים נשברים.
+
+**הסיבות שנרשמות:** {reasonsOf("c03").map(label).join("; ")}. ארבע סיבות.
+
+המנוע לא ״מעניש״ אותו. הוא מוציא אותו מהרשימה, ומסביר למה.
+
+<Callout title="מתי הבדיקה עוברת" tone="info">
+<p>״מעל״ הוא ממש מעל. מועמד שיחס ההחזר שלו בדיוק 50.00% עובר את הקו של 50%, כמו בשיעור 4.4. כך גם בכל האילוצים האחרים: שוויון עובר. חישוב על המספרים המדויקים, לא על אלה שמוצגים בעיגול.</p>
+</Callout>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> לכל אילוץ עמודה עם <span class="ltr">=IF(תנאי, "עובר", "נפסל")</span>. עמודה אחרונה סופרת את הנפסלים: <span class="ltr">=COUNTIF(B2:L2, "נפסל")</span>. המועמד אפשרי כשהיא אפס. בדיוק כך בנוי המנוע של הסדנה בשיעור 8.28.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.7"
+  options={predictionOptions}
+  correct={2}
+  notes={[
+    `רוב המועמדים נשברים בכלל אחד לפחות. ${p("f.rejected")} מתוך ${p("k.n")} נפסלים.`,
+    `${p("f.law")} עומדים בחוק, אבל הבנק והלקוח פוסלים עוד.`,
+    "",
+    "יש מועמדים אפשריים. אם אין, צריך לשנות את המיצוב ולחפש שוב; אבל כאן יש.",
+  ]}
+>
+  {p("f.all")} מתוך {p("k.n")}: ״{CANDIDATE_NAMES.c07}״ ו־״{CANDIDATE_NAMES.c11}״. {p("f.law")} עומדים בחוק, {p("f.bank")} אחרי הבנק, ושניים אחרי הלקוח. מי שעומד בכל הכללים הוא פתרון אפשרי; מי מהשניים טוב יותר, זו שאלה של יעדים.
+</PredictionReveal>
+
+<Section kind="ההסבר">
+
+## אפשרי הוא לא טוב
+
+</Section>
+
+שני המועמדים האפשריים: ״{CANDIDATE_NAMES.c07}״, עם יחס החזר {p("m.c07_ratio")}% והחזר של {f.shekels("m.c07_pay")}, ו־״{CANDIDATE_NAMES.c11}״, עם יחס {p("m.c11_ratio")}% והחזר {f.shekels("m.c11_pay")}. שניהם אפשריים. האם אחד טוב מהשני? אי אפשר לדעת בלי יעד: אפשר להעדיף החזר נמוך, סך תשלומים נמוך או חשיפה נמוכה (שיעור 5.6). זה הנושא של 8.8.
+
+שלושה דברים שכדאי לזכור:
+1. **ייתכן שאין אף פתרון אפשרי.** אז לא מחפשים טוב יותר: משנים את המיצוב (הון נוסף, סגירת הלוואה, לווה נוסף) ובודקים שוב.
+2. **פתרון אפשרי הוא אפשרי לפי הכללים שהוגדרו.** אם הקו של הבנק אינו מה שהבנק עושה, האפשרי כאן עלול להידחות שם. הקווים הבדויים כאן אינם מדיניות של בנק.
+3. **הצעת הבנק יכולה להשתנות עם התמהיל.** לפי השערה מהשטח (ממתין לאישור אילון), נתוני השוק לא נותנים מחיר שבנק יאשר, ושינוי בתמהיל יכול לשנות את הריביות שהבנק מציע. המודל כאן מתמחר כל מועמד לפי המחירון של הבנק, כהנחה מפשטת.
+
+<Section kind="דוגמה פתורה">
+
+## נועם ושירה: מי מהם אפשרי
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+**צעד 1 — הבקשה כמו שהיא.** ״{CANDIDATE_NAMES.c01}״: יחס החזר {p("m.c01_ratio")}%, מעל יעד הלקוח, {p("k.target")}%. כל השאר עובר: שיעור מימון {p("m.c01_ltv")}%, החלק המשתנה {p("m.c01_var")}%. הסיבה היחידה: {reasonsOf("c01").map(label).join("")}.
+
+**צעד 2 — מה אפשר לשנות.** ב־8.6 ראינו שהון נוסף, סגירת הלוואה או לווה נוסף מורידים את היחס. ״{CANDIDATE_NAMES.c07}״ מוסיף הון נוסף ועובר: יחס {p("m.c07_ratio")}%.
+
+**צעד 3 — שימו לב ל״בקושי״.** {p("m.c07_ratio")}% קרוב מאוד ל־{p("k.target")}%. הבדיקה נעשית על המספר המדויק, ולא על זה שמוצג בעיגול לשתי ספרות. שינוי קטן, למשל בריבית, והמועמד נפסל. זה אות לא להסתמך על מועמד כזה בלי לבדוק את הרגישות (שיעור 5.7).
+
+<Section kind="דוגמה חצי פתורה">
+
+## הסיבות של כל מועמד
+
+</Section>
+
+שלושה מועמדים. השלימו את מספר הסיבות של מועמד ״{CANDIDATE_NAMES.c06}״ (שתיים מהן יחס החזר, ואחת החזר חודשי מרבי).
+
+<FillTable
+  client:visible
+  id="8.7-half"
+  rowKey="who"
+  periodLabel="מועמד"
+  columns={[{ key: "n", label: "כמה סיבות", format: "number" }]}
+  rows={[
+    { who: CANDIDATE_NAMES.c01, n: String(reasonsOf("c01").length) },
+    { who: CANDIDATE_NAMES.c06, n: String(reasonsOf("c06").length) },
+    { who: CANDIDATE_NAMES.c03, n: String(reasonsOf("c03").length) },
+  ]}
+  blanks={[`${CANDIDATE_NAMES.c06}.n`]}
+  success={`${CANDIDATE_NAMES.c06}: ${reasonsOf("c06").map(label).join("; ")}.`}
+  hint="ספרו כל אילוץ שנשבר: הבנק, ההחזר המרבי של הלקוח והיעד שלו."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים להמחשה בלבד.
+
+<ChoiceExercise
+  client:visible
+  id="8.7-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אילוץ חייב להתקיים והמפר נפסל; יעד הוא מה שרוצים שיהיה טוב", correct: true, feedback: "נכון." },
+    { text: "אילוץ הוא יעד חשוב במיוחד", feedback: "אילוץ הוא תנאי: מי שמפר נפסל, ולא מקבל ציון." },
+    { text: "יעד חייב להתקיים ואילוץ לא", feedback: "ההפך." },
+    { text: "אין הבדל", feedback: "יש: האחד מסנן והשני מדרג." },
+  ]}
+>
+  מה ההבדל בין אילוץ ליעד?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.7-2" n={2} level="קל" answer={f.raw("ex.max_loan")} errors={[]}>
+  דירה יחידה של {f.shekels("ex.price")}. מהי ההלוואה הגדולה ביותר שתקרת שיעור המימון (75%, לפי התעתיק של הצוות) מאפשרת?
+</NumericExercise>
+
+<Solution for="8.7-2">
+<M>{n("ex.price")} × 75% = {n("ex.max_loan")}</M>.
+</Solution>
+
+<NumericExercise client:visible id="8.7-3" n={3} level="בינוני" answer={f.raw("ex.max_var")} errors={[]}>
+  הלוואה של {f.shekels("ex.loan")}. מהו הסכום הגדול ביותר שמותר להיות בו בריבית שיכולה להשתנות (שני שלישים)?
+</NumericExercise>
+
+<Solution for="8.7-3">
+<M>{n("ex.loan")} × 2 ÷ 3 = {n("ex.max_var")}</M>.
+</Solution>
+
+<NumericExercise client:visible id="8.7-4" n={4} level="בינוני" answer={f.raw("f.law")} tolerance={0} near={0} errors={[{ value: f.raw("f.all"), message: "זה מספר המועמדים שעומדים בכל ארבע המשפחות. כאן רק עקביות ורגולציה." }]}>
+  כמה מתוך {p("k.n")} המועמדים עומדים בעקביות וברגולציה בלבד (בלי הבנק והלקוח)? השתמשו בסינון של השיעור.
+</NumericExercise>
+
+<Solution for="8.7-4">
+המועמדים ש״{CANDIDATE_NAMES.c02}״, ״{CANDIDATE_NAMES.c03}״ ו־״{CANDIDATE_NAMES.c09}״ נופלים בחוק (יחס החזר או שליש קבוע). שאר התשעה עוברים: {p("f.law")}.
+</Solution>
+
+<NumericExercise client:visible id="8.7-5" n={5} level="בינוני" answer={f.raw("lim.max_pay40")} errors={[{ value: f.raw("lim.max_pay50"), message: "זה ההחזר המרבי ב־50%. השאלה על 40%." }]}>
+  הכנסה פנויה של {f.shekels("m.c01_disp")}. מהו ההחזר החודשי הגדול ביותר שיחס של 40% מאפשר?
+</NumericExercise>
+
+<Solution for="8.7-5">
+<M>{n("m.c01_disp")} × 40% = {n("lim.max_pay40")}</M>. ל״{CANDIDATE_NAMES.c01}״ יש החזר של {f.shekels("m.c01_pay")}, מעל הסכום הזה, ולכן הוא נפסל על יעד הלקוח.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.7-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "לא לחפש תמהיל טוב יותר, אלא לשנות את המיצוב (רמה 1) ולבדוק שוב", correct: true, feedback: "נכון: הבעיה לא ברמה 2." },
+    { text: "להסיר את אילוצי הלקוח כדי שיהיה מועמד", feedback: "אילוצי הלקוח הם מה שהלקוח רוצה. מסירים אותם רק בהסכמה." },
+    { text: "לבחור את המועמד שנפסל על הכי פחות סיבות", feedback: "מועמד שנפסל נשאר פסול. אפשר רק ללמוד ממנו מה לתקן." },
+    { text: "להוריד את הריבית של הבנק", feedback: "הריבית היא נתון של הבנק, לא משתנה החלטה של הלקוח." },
+  ]}
+>
+  אם אף מועמד אינו אפשרי, מה עושים?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על אילוצים ופתרון אפשרי">
+<p><strong>מה זה?</strong> אילוץ הוא תנאי שחייב להתקיים; פתרון אפשרי הוא מועמד שעומד בכולם.</p>
+<p><strong>למה זה קיים?</strong> כדי לא לדרג מועמדים שלא יכולים להתקיים, ולהסביר לכל מועמד פסול מה שבר אותו.</p>
+<p><strong>איך זה עובד?</strong> בודקים כל מועמד מול כל אילוץ, רושמים כל סיבה, וממשיכים רק עם מי שאין לו סיבות.</p>
+<p><strong>איך זה משפיע עליכם?</strong> הבקשה שלכם יכולה להיפסל בגלל אילוץ שאינו שלכם: קו של בנק, שלא תמיד ידוע.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> לפני שמשווים הצעות, בודקים שהן אפשריות; ואם אין אפשרית, משנים מיצוב.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **נתונים** מגיעים מהלקוח, מהבנק ומהשוק; **אילוץ** הוא תנאי קשיח; **פתרון אפשרי** הוא מועמד שעומד בכולם.
+- ארבע משפחות: עקביות, רגולציה, מדיניות הבנק והלקוח.
+- המסנן שומר **כל** סיבה לפסילה, ולא רק את הראשונה.
+- אפשרי אינו טוב: הבחירה בין אפשריים היא עניין של יעדים.
+- ייתכן שאין פתרון אפשרי: אז משנים את המיצוב.
+- הכול כאן מודל לימודי (עתיד): הקווים של הבנקים בדויים והקווים של הוראה 329 הם תעתיק של הצוות.
+
+**בשיעור הבא — 8.8, העדפות ו<Later lesson="8.8" quiet>משקולות</Later>. <Later lesson="8.7" quiet>פתרון אפשרי</Later> מול <Later lesson="8.8" quiet>פתרון מיטבי</Later>:** מתוך האפשריים, איך בוחרים את הטוב ביותר.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "לא אומת", text: "הוראה 329: תקרות שיעור המימון (75%, 70%, 50%), יחס החזר עד 50% (בדיוק 50.00% מותר), לפחות שליש קבוע, עד 30 שנה: לפי תעתיק של הצוות ב־Brain (דף 7503881, עודכן 2026-10-08), ממתין לבדיקה מול המקור.", date: "2026-10-08" },
+    { kind: "החלטה של Mogi", text: "כללי החישוב של ההחזר, ההכנסה הפנויה (התחייבויות של יותר מ־18 חודשים) ויחס ההחזר: חמישה עשר הכללים של אילון, 2026-10-07 (עדן אישר ב־2026-10-08), לפי הרישום של הצוות; ההטמעה לא הושלמה.", date: "2026-10-08" },
+    { kind: "מחקר / הצעה", text: "מבין חמשת הקווים של הוראה 329 רק יחס ההחזר והחלק בריבית משתנה מגבילים את חלוקת ההלוואה; שיעור המימון והתקופה הן תכונות של ההלוואה: עבודת מחקר של הצוות (Brain, דף 7634954, אוגוסט 2026, עודכן 2026-10-08), המלצות פתיחה ולא החלטה.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "נתוני שוק ציבוריים אינם מחיר שבנק יאשר, ושינוי בתמהיל יכול לשנות את הריביות שהבנק מציע: אילון (דף מחקר), 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "הבנקים (בנק א׳ עד ד׳), הקווים שלהם (נקודות סירוב של יחס החזר ושיעור מימון), ההחזר המרבי ויעד יחס ההחזר של הלקוח הם הנחות לימוד בדויות, להדגמה. המועמדים בנויים כך שלכל משפחה יש מה לפסול. תיק א׳ בדוי. נתונים סינתטיים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור, כולל רשימות הסיבות, חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד (ללא ייבוא מהקוד של הקורס).", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/constraints.ts (on regulation.ts, affordability.ts, mixcheck.ts, bankpolicy.ts) and src/data/case-s8.ts via scripts/lessons/lesson-8-7.ts and _constraints-facts.ts and data/lessons/8-7.json, rechecked by checks/kinds/constraints.py and regulation.py. Illustration: src/components/CandidateFilter.vue. Video: video/8-7.html. FK-H-057 (pricing depends on the mix; awaiting Eylon). The 15 rules: Brain 67436545 via research/notes/brain-calculation.md. */}

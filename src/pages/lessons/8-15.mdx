@@ -1,0 +1,475 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.15"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import EfficientFrontier from "../../components/EfficientFrontier.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatWholeShekels } from "../../lib/calc/money.ts";
+import { NAMES, ENTRIES } from "../../data/frontier-candidates.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.15");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const table = f.rows("cand.table");
+export const T = Object.fromEntries(table.map((r) => [r.id, r]));
+export const frontLaw = Object.fromEntries(f.rows("law.front").map((r) => [r.id, r]));
+export const frontFT = Object.fromEntries(f.rows("law.ft.front").map((r) => [r.id, r]));
+export const frontClient = Object.fromEntries(f.rows("client.front").map((r) => [r.id, r]));
+export const okClient = (id) => f.raw(`client.${id}`) === "";
+export const nm = (id) => NAMES[id];
+export const cands = table.map((r) => ({ id: r.id, name: NAMES[r.id], first: r.first, total: r.total, rise: r.rise, clientOk: okClient(r.id) }));
+export const reach = f.raw("law.reach");
+export const pickName = (key) => nm(f.raw(`pick.${key}`).id);
+export const pickClientName = (key) => nm(f.raw(`pick.client.${key}`).id);
+export const predictionOptions = [
+  "אחד: התמהיל הטוב ביותר, ושאר המועמדים פחות טובים",
+  `${f.plain("law.count_efficient")} מתוך ${f.plain("law.count_feasible")}: אלה שאי אפשר לשפר בהם יעד בלי לפגוע באחר`,
+  `כולם, ${f.plain("law.count_feasible")} מתוך ${f.plain("law.count_feasible")}: כל תמהיל מנצח במשהו`,
+  "שלושה: אחד לכל יעד, והם המנצחים של שלושת היעדים",
+];
+export const w = (k) => WEIGHTS[k];
+export const WEIGHTS = { pay: "60, 20, 20", total: "20, 60, 20", exp: "20, 20, 60", even: "1, 1, 1" };
+export const limitIds = ENTRIES.map((e) => e.id).filter((id) => okClient(id));
+
+בשיעור 8.8 למדתם ש<Term t="משקולת" client:visible lesson="8.8">משקולות</Term> הופכות העדפות של לקוח למספר אחד לכל מועמד, ושהמועמד עם המספר הנמוך ביותר מנצח. בשיעורים 8.13–8.14 ראיתם איך <Term t="חיפוש על רשת" client:visible lesson="8.14">חיפוש על רשת</Term> אוסף מועמדים. בשיעור הזה מוסיפים צעד שקודם למשקולות: לזרוק את מי שאפשר לזרוק בלי לשאול איש, ולראות מה נשאר.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>עתיד.</strong> אין היום בקוד של Mogi חישוב תמהילים (קריאת המנוע מוקפאת), והשיעור מציג שיטה לימודית, לא מערכת קיימת. החלק המתמטי (שליטה וחזית) נכון בכל מקום. שלושת היעדים הם תכנון המוצר של Mogi (שיעור 5.6); הניסוח של כל יעד כמספר, והמשקולות, הם של הקורס <strong>להדגמה</strong>, ואינם החלטה של Mogi או מדיניות של בנק. כל המחירים כאן הם רשימת המחירים של הקורס לבנק א׳, אותה רשימה לכל המועמדים; בשוק בנק מתמחר את התיק כולו (ידע מהשטח, אילון, 2026-10-08; ממתין לאישור אילון).</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.15"
+  question={`בשיעור יש ${f.plain("law.count_feasible")} תמהילים אפשריים של נועם ושירה, ולכל אחד שלושה מספרים: החזר ראשון, סך תשלומים וחשיפה (כולם: קטן יותר טוב יותר). כמה מהתמהילים האלה אי אפשר להחליף באחר שטוב ממנו בכל שלושת המספרים?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## אין טוב בלי ויתור
+
+</Section>
+
+<LessonVideo lesson="8-15" />
+
+<Section kind="ההסבר">
+
+## מי שולט במי
+
+</Section>
+
+### שני תמהילים, שלושה מספרים
+
+נועם ושירה, עם הורה שמצטרף כלווה נוסף, לוקחים הלוואה של {f.shekels("loan")}, אותה הלוואה בכל מועמד. הנה שני תמהילים מהשיעור, בתרחיש הבסיס (שיעור 5.6):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+      </tr>
+    </thead>
+    <tbody>
+      {["m06", "m08"].map((id) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold text-n900">{nm(id)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(T[id].first)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(T[id].total)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+התמהיל הראשון נמוך יותר בהחזר הראשון, בהפרש של {f.shekels("d.m06_m08.first")}, ונמוך יותר גם בסך התשלומים, בהפרש של {f.shekels("d.m08_m06.total")}. אם שני המספרים האלה הם כל מה שחשוב, אין מי שיבחר בשני: הראשון טוב ממנו בכל. אומרים שהראשון <strong>שולט</strong> בשני.
+
+### שליטה: הכלל
+
+מועמד א׳ **שולט** במועמד ב׳ כש:
+1. א׳ **לא גרוע** מב׳ באף יעד, **ו**
+2. א׳ **טוב יותר** מב׳ ביעד אחד לפחות.
+
+(כל היעדים כאן הם "קטן יותר טוב יותר", כמו בשיעור 8.8.) שני תנאים, ולא אחד: אם שני מועמדים שווים בכל יעד, אף אחד לא שולט באחר.
+
+### החזית
+
+<Term t="חזית יעילה" client:visible lesson="8.15">החזית היעילה</Term> היא כל המועמדים **האפשריים** שאף מועמד אפשרי לא שולט בהם. המילה "אפשריים" חשובה: מועמד שהוא <Term t="פתרון אפשרי" client:visible lesson="8.7">לא אפשרי</Term> (שיעור 8.7) לא נמצא על החזית וגם לא שולט באיש, כי הוא כבר נפסל. החזית נבנית מהאפשריים בלבד.
+
+על החזית, כדי לשפר יעד אחד צריך לוותר על יעד אחר. מחוץ לה, יש מי ששיפר הכול. זה כל הרעיון, ולכן אין טוב בלי ויתור: מי שעל החזית כבר "טוב", ומה שנשאר לבחור הוא איזה ויתור מתאים ללקוח.
+
+### החזית של {f.plain("law.count_feasible")} המועמדים
+
+הנה כל המועמדים, מי מהם על החזית (בשלושת היעדים), ומי שולט במי שלא:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        <th class="py-2 pe-3 text-start font-semibold">החזר ראשון, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">חשיפה, ₪</th>
+        <th class="py-2 pe-3 text-start font-semibold">מצב</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ENTRIES.map((e) => (
+        <tr class={`border-b border-n100 ${frontLaw[e.id].efficient ? "" : "text-n600"}`}>
+          <td class="py-2 pe-3 font-semibold">{nm(e.id)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(T[e.id].first)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatWholeShekels(T[e.id].total)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{formatShekels(T[e.id].rise)}</span></td>
+          <td class="py-2 pe-3">{frontLaw[e.id].efficient ? <strong class="text-teal-deep">על החזית</strong> : `נשלט על ידי ${frontLaw[e.id].dominatedBy.map(nm).join("; ")}`}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} חשיפה: כמה התשלום הגבוה ביותר ב<Term t="תרחיש לחץ" client:visible lesson="8.10">תרחיש הלחץ</Term> גבוה מההחזר הראשון (שיעור 5.6). כל המועמדים עוברים את החוק ואת הקווים של בנק א׳; גבולות הלקוח עוד לא הוכנסו.</p>
+</div>
+
+{f.plain("law.count_efficient")} מתוך {f.plain("law.count_feasible")} על החזית, ו־{f.plain("law.count_dominated")} נשלטים. את החמישה אפשר לזרוק בלי לשאול את נועם ושירה דבר: לכל אחד מהם יש תמהיל אחר שטוב ממנו בשלושת המספרים. את העשרה שנשארו אי אפשר לדרג בלי להכיר העדפה.
+
+### תמונה בשני יעדים עלולה להטעות
+
+שימו לב ל״{nm("m08")}״. אם מסתכלים רק על <strong>החזר ראשון וסך תשלומים</strong>, ״{nm("m06")}״ שולט בו, כמו בטבלה הקטנה למעלה. אבל החשיפה שלו, {formatShekels(T.m08.rise)}, נמוכה מזו של ״{nm("m06")}״, {formatShekels(T.m06.rise)}: ביעד השלישי הוא טוב יותר. לכן, בשלושת היעדים, הוא עדיין על החזית. בשני היעדים הראשונים יש רק {f.plain("law.ft.count_efficient")} מועמדים על החזית; בשלושה, {f.plain("law.count_efficient")}.
+
+**כלל:** החזית שייכת לקבוצת יעדים. מוסיפים יעד, ומועמדים שנשלטו חוזרים לחזית. לכן אומרים תמיד "החזית של אילו יעדים".
+
+### הגבול של הלקוח מקצץ את החזית
+
+עד כאן בדקנו רק מה החוק והבנק מרשים. אבל נועם ושירה אמרו שההחזר הראשון לא יעלה על {f.shekels("limit.first")} (גבול של הלקוח, <Term t="אילוץ" client:visible lesson="8.7">אילוץ</Term> קשיח משיעור 8.7). עם הגבול הזה נשארים רק {f.plain("client.count_feasible")} מועמדים אפשריים, ו־{f.plain("client.count_efficient")} מהם על החזית: {limitIds.filter((id) => frontClient[id].efficient).map(nm).join("; ")}.
+
+החזית השתנתה כי היא תמיד **החזית של הקבוצה האפשרית**. גבול חדש הוא קבוצה אחרת, ולפעמים חזית אחרת. בפרט, התמהילים עם התקופות הקצרות, שהם הזולים ביותר בסך התשלומים, פשוט נפלו.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## חזית, גבול ומשקולות
+
+</Section>
+
+כל נקודה היא תמהיל. תוכלו לבחור שני יעדים לתמונה, להוסיף את הגבול של הלקוח, ולהזיז משקולות. הנקודה המסומנת בטבעת כהה היא מה שהמשקולות בוחרות מבין האפשריים.
+
+<EfficientFrontier client:visible candidates={cands} limitLabel={`ההחזר הראשון עד ${formatShekels(f.raw("limit.first"))}`} />
+
+נסו את אלה:
+1. השאירו את ברירת המחדל (החזר ראשון מול סך תשלומים, בלי הגבול). כמה מועמדים על החזית בשני היעדים, וכמה בשלושה?
+2. שנו את הציר האנכי ל״חשיפה״. איזו נקודה, שהייתה נשלטת, חזרה לחזית?
+3. הוסיפו את הגבול של הלקוח. מה קרה לחזית, ומי נבחר עכשיו עם משקולות שוות?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>על החזית בשני היעדים: {f.plain("law.ft.count_efficient")}. בשלושה: {f.plain("law.count_efficient")}.</li>
+    <li>בחשיפה מול החזר ראשון על החזית {f.plain("law.fe.count_efficient")} מועמדים בלבד. ״{nm("m08")}״ נשלט שם או לא, ובשלושה יעדים הוא על החזית. מה שמכריע הוא היעד השלישי.</li>
+    <li>נשארים {f.plain("client.count_feasible")} מועמדים אפשריים; החזית שלהם {f.plain("client.count_efficient")}. עם משקולות שוות הנבחר הוא ״{pickClientName("even")}״.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## בחירה על החזית
+
+</Section>
+
+**צעד 1 — שליטה.** לכל מועמד יש רשימה של מספרי יעד. נכתוב את המספר של מועמד ביעד מספר j כ־u<sub>j</sub>. מועמד א׳ שולט בב׳ כש:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">u<sub>j</sub>(א׳) ≤ u<sub>j</sub>(ב׳)</span> לכל יעד j, ו־<span class="ltr">u<sub>j</sub>(א׳) &lt; u<sub>j</sub>(ב׳)</span> לפחות באחד</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">u<sub>j</sub></dt><dd>המספר של מועמד ביעד j: החזר ראשון, סך תשלומים או חשיפה. ככל שקטן, טוב יותר. האות u חדשה בקורס, ו־j רק מונה את היעדים</dd>
+  </dl>
+</div>
+
+**צעד 2 — החזית.** מוחקים כל מועמד שיש מי ששולט בו. מה שנשאר הוא החזית.
+
+**צעד 3 — בחירה לפי משקולות.** אותו ציון משוקלל משיעור 8.8: מנרמלים כל יעד על פני המועמדים האפשריים, מכפילים במשקולת, ובוחרים את הציון הנמוך ביותר. כשכל המשקולות גדולות מאפס, המנצח **תמיד על החזית**: אם מישהו שולט בו, הוא היה מקבל ציון נמוך או שווה, ולא היה מנצח. (כשמשקולת היא אפס, המנצח עלול להיות מועמד שנשלט ביעד ההוא בלבד: זו הסיבה לכך שהכלי לא נותן לכם לבחור אפס בכל המשקולות.)
+
+**מתי זה נכון?**
+1. כל היעדים הם "קטן יותר טוב יותר". יעד שבו גדול טוב יותר הופכים בסימן.
+2. כל המועמדים נבדקו באותו תרחיש ועל אותה הלוואה (שיעור 5.3).
+3. החזית היא של **המועמדים שנבדקו**, לא של כל התמהילים האפשריים בעולם. חיפוש אחר, או רשת עדינה יותר (שיעור 8.14), עשויים להוסיף מועמד ששולט באחד מאלה.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> שורה לכל מועמד ושלוש עמודות יעד. מועמד נשלט אם קיימת שורה אחרת שבה <span class="ltr">=AND(B2&lt;=B$2:B$16, C2&lt;=…)</span> ופחות מזה באחד לפחות. בפועל קל יותר: ממיינים לפי יעד אחד, ובדיקה אחת-אחת של השורות שמעליו.</p>
+<p><strong>בקוד:</strong> שתי לולאות מקוננות, מועמד מול כל מועמד אחר. עם 15 מועמדים זה 210 השוואות; עם מיליון מועמדים כבר צריך דרך חכמה יותר (נושא לשיעורים הבאים, לא לשיעור הזה).</p>
+</Callout>
+
+### בחירה לפי משקולות: גם כאן יש גבול
+
+ארבע קבוצות משקולות (החזר ראשון, סך תשלומים, חשיפה), על {f.plain("law.count_feasible")} המועמדים, בלי הגבול של הלקוח, ועם הגבול:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">המשקולות</th>
+        <th class="py-2 pe-3 text-start font-semibold">בלי גבול הלקוח</th>
+        <th class="py-2 pe-3 text-start font-semibold">עם גבול הלקוח</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[["pay", "החזר ראשון חשוב יותר"], ["total", "סך תשלומים חשוב יותר"], ["exp", "חשיפה חשובה יותר"], ["even", "הכול שווה"]].map(([k, label]) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{label} <span class="ltr text-caption font-normal text-n600">({WEIGHTS[k]})</span></td>
+          <td class="py-2 pe-3">{pickName(k)}</td>
+          <td class="py-2 pe-3">{pickClientName(k)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} משקולות להדגמה. כל הנבחרים על החזית.</p>
+</div>
+
+מה שחשוב כאן: הלקוח לא נשאל "איזה תמהיל", אלא "מה יותר חשוב". והתשובה גם לא תמיד אפשרית לשימוש: ברשת של 5% בין משקולות (כל השלשות של משקולות במרווחים של 5 נקודות אחוז) יש {f.plain("law.never_count")} מועמדים על החזית **שאף קבוצת משקולות לא בוחרת**: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ועדיין תמיד יש שכן שמנצח אותם בציון המשוקלל. זה קורה כשהחזית "שקועה" בין שכניה. מי שרוצה גם אותם צריך דרך בחירה אחרת, למשל לקבוע גבול על יעד אחד (חשיפה עד סכום מסוים) ולמזער את האחר. מה Mogi תבחר: **שאלה פתוחה** (הקורס לא יודע; ראו המקורות).
+
+<PredictionReveal
+  client:visible
+  id="8.15"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "בטבלה אין מועמד אחד שטוב מכל השאר בשלושת המספרים. מי שמציג ״התמהיל הטוב ביותר״ בלי לומר לפי איזה יעד, חושב על יעד אחד בלבד.",
+    "",
+    "חמישה מתוך החמישה־עשר נשלטים: לכל אחד מהם יש תמהיל שטוב ממנו בכל שלושת המספרים. לכן לא כולם על החזית.",
+    "המנצחים של כל יעד הם על החזית, אבל היא כוללת עוד מועמדים: כל מי שמציע איזון בין היעדים שאי אפשר לשפר בלי ויתור.",
+  ]}
+>
+  על החזית {f.plain("law.count_efficient")} מתוך {f.plain("law.count_feasible")}. אין "הטוב ביותר", יש קבוצה של מועמדים שכולם "בלי ויתור זול": כל מעבר ביניהם קונה יעד אחד במחיר יעד אחר. ו{f.plain("law.count_dominated")} האחרים אפשר לזרוק מיד.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## ויתור במספרים: מ־30 שנה ל־20
+
+</Section>
+
+נועם ושירה שואלים: "מה כל כך נורא בתקופה קצרה יותר?" ״{nm("m03")}״ ו״{nm("m01")}״ הם שניהם על החזית, אז אף אחד מהם לא שולט בשני.
+
+**צעד 1 — החזר ראשון.** <M>{formatShekels(f.raw("v.m01.first"))} − {formatShekels(f.raw("v.m03.first"))} = {formatShekels(f.raw("d.m01_m03.first"))}</M>: ב־20 שנה משלמים {f.shekels("d.m01_m03.first")} יותר בחודש.
+
+**צעד 2 — סך תשלומים.** <M>{formatShekels(f.raw("v.m03.total"))} − {formatShekels(f.raw("v.m01.total"))} = {formatShekels(f.raw("d.m03_m01.total"))}</M>: ב־20 שנה משלמים {f.shekels("d.m03_m01.total")} פחות בסך הכול.
+
+**צעד 3 — מה זה אומר.** אין תשובה "נכונה". זה מחיר: {f.shekels("d.m01_m03.first")} בחודש מול {f.shekels("d.m03_m01.total")} בסך הכול. אצל נועם ושירה, ההחזר של ״{nm("m01")}״ גם עובר את הגבול של {f.shekels("limit.first")}, ולכן הוא נופל כשמכניסים את הגבול. בלי הגבול, הוא אחד המועמדים שהמשקולות יכולות לבחור.
+
+<Section kind="דוגמה חצי פתורה">
+
+## מי נשלט?
+
+</Section>
+
+לכל תמהיל בחרו: על החזית (בשלושת היעדים), או נשלט. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.15-match"
+  promptLabel="התמהיל"
+  answerLabel="המצב"
+  options={["על החזית", "נשלט"]}
+  rows={["m04", "m02", "m10", "m05", "m08"].map((id, k) => ({
+    prompt: nm(id),
+    answer: frontLaw[id].efficient ? "על החזית" : "נשלט",
+    given: k === 0,
+    why: frontLaw[id].efficient ? `אף מועמד אפשרי לא טוב ממנו בשלושת המספרים.` : `${frontLaw[id].dominatedBy.map(nm).join("; ")} ${frontLaw[id].dominatedBy.length > 1 ? "טובים" : "טוב"} ממנו בכל שלושת המספרים.`,
+  }))}
+  success="נכון. נשלט פירושו שיש תמהיל אחר שטוב ממנו בשלושת המספרים, לא רק באחד."
+  hint="בטבלה של השיעור, העמודה האחרונה אומרת מי שולט במי."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+הנתונים בתרגילים הם הנתונים של השיעור: סינתטיים, להמחשה. התרגילים מסודרים מהקל אל המאתגר, ובכולם אפשר להסתכל בטבלאות ובכלי של השיעור.
+
+<ChoiceExercise
+  client:visible
+  id="8.15-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "אין לו מתחרה שטוב ממנו בכל היעדים בבת אחת", correct: true, feedback: "נכון. על החזית נמצא מי שאף אחד לא שולט בו." },
+    { text: "הוא טוב ביותר ביעד אחד לפחות", feedback: "זה תנאי מספיק, לא הכרחי: מועמד שמאזן בין היעדים יכול להיות על החזית בלי להיות הטוב ביותר באף יעד." },
+    { text: "יש לו את הציון המשוקלל הנמוך ביותר", feedback: "זה הנבחר לפי משקולות מסוימות. החזית כוללת גם את מי שניצח במשקולות אחרות." },
+    { text: "הוא זול ביותר בסך התשלומים", feedback: "זה יעד אחד. החזית מתייחסת לכל היעדים." },
+  ]}
+>
+  מה פירוש "מועמד על החזית היעילה"?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.15-2"
+  n={2}
+  level="קל"
+  tolerance={0}
+  near={0}
+  answer={f.raw("law.count_dominated")}
+  errors={[{ value: f.raw("law.count_efficient"), message: "ספרתם את מי שעל החזית. השאלה היא כמה נשלטים." }]}
+>
+  כמה מתוך {f.plain("law.count_feasible")} המועמדים בטבלה של השיעור נשלטים (יש מועמד שטוב מהם בכל שלושת המספרים)?
+</NumericExercise>
+
+<Solution for="8.15-2">
+עוברים על עמודת "מצב": {f.plain("law.count_dominated")} שורות כתוב בהן "נשלט". אלה: {ENTRIES.filter((e) => !frontLaw[e.id].efficient).map((e) => nm(e.id)).join("; ")}. השאר, {f.plain("law.count_efficient")}, על החזית.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.15-3"
+  n={3}
+  level="בינוני"
+  options={[
+    { text: `לא: ״${nm("m08")}״ נשלט בהחזר ראשון ובסך התשלומים, אבל החשיפה שלו נמוכה, ולכן בשלושת היעדים הוא על החזית`, correct: true, feedback: "נכון. מוסיפים יעד ומועמד חוזר לחזית." },
+    { text: `כן: ״${nm("m06")}״ טוב ממנו בשני מספרים, וזה מספיק`, feedback: "בשלושה יעדים צריך שליטה בשלושתם (או שוויון, ושיפור באחד). כאן ביעד השלישי ״" + nm("m08") + "״ טוב יותר." },
+    { text: "אי אפשר לדעת בלי המשקולות", feedback: "שליטה לא תלויה במשקולות. היא מוגדרת רק על המספרים עצמם." },
+    { text: "לא: מי שעל החזית בשני יעדים תמיד על החזית בשלושה, ולכן הוא נשלט", feedback: "הפוך: על החזית בשלושה יעדים יכול להיות מי שנשלט בשניים. כמו כאן." },
+  ]}
+>
+  ״{nm("m06")}״ טוב מ״{nm("m08")}״ בהחזר הראשון ובסך התשלומים. האם ״{nm("m08")}״ נשלט, לפי שלושת היעדים?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.15-4"
+  n={4}
+  level="בינוני"
+  answer={f.raw("d.m01_m03.first")}
+  errors={[{ value: f.raw("d.m03_m01.total"), message: "זה ההפרש בסך התשלומים. השאלה על ההחזר הראשון, בחודש אחד." }]}
+>
+  ההחזר הראשון של ״{nm("m01")}״ הוא {f.shekels("v.m01.first")}, וזה של ״{nm("m03")}״ הוא {f.shekels("v.m03.first")}. בכמה שקלים בחודש הראשון הראשון גבוה מהשני?
+</NumericExercise>
+
+<Solution for="8.15-4">
+<M>{formatShekels(f.raw("v.m01.first"))} − {formatShekels(f.raw("v.m03.first"))} = {formatShekels(f.raw("d.m01_m03.first"))}</M>. זה מה ש״קונים״ בו את החיסכון בסך התשלומים.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.15-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("d.m03_m01.total")}
+  errors={[{ value: f.raw("d.m01_m03.first"), message: "זה ההפרש בהחזר הראשון, בחודש אחד. כאן שואלים על כל התקופה." }]}
+>
+  סך התשלומים של ״{nm("m03")}״ הוא {f.shekels("v.m03.total")}, ושל ״{nm("m01")}״ {f.shekels("v.m01.total")}. כמה פחות משלמים בסך הכול ב־20 שנה?
+</NumericExercise>
+
+<Solution for="8.15-5">
+<M>{formatShekels(f.raw("v.m03.total"))} − {formatShekels(f.raw("v.m01.total"))} = {formatShekels(f.raw("d.m03_m01.total"))}</M>. זה היתרון של התקופה הקצרה; החיסרון הוא ההחזר החודשי הגבוה מתרגיל 4.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.15-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "החזית משתנה: היא של הקבוצה האפשרית, וקבוצה חדשה היא לפעמים חזית אחרת", correct: true, feedback: "נכון. עם הגבול נשארו פחות מועמדים, והחזית שלהם קטנה יותר." },
+    { text: "החזית נשארת אותה חזית, ורק נבחר ממנה אחרת", feedback: "לא: מועמדים שהיו על החזית נפלו בגלל הגבול, וגם אחרים עשויים להיכנס אליה." },
+    { text: "הגבול של הלקוח לא משפיע על החזית אלא על המשקולות", feedback: "הגבול הוא אילוץ קשיח: הוא קובע מי אפשרי, לא כמה חשוב כל יעד." },
+    { text: "החזית מתרחבת, כי הגבול מוסיף מידע", feedback: "גבול מפחית את מספר המועמדים האפשריים, ולכן בדרך כלל מקצץ את החזית." },
+  ]}
+>
+  מה קורה לחזית כשמוסיפים אילוץ קשיח חדש של הלקוח (ההחזר הראשון עד {f.shekels("limit.first")})?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.15-7"
+  n={7}
+  level="מאתגר"
+  tolerance={0}
+  near={0}
+  answer={f.raw("law.never_count")}
+  errors={[{ value: f.raw("law.count_efficient"), message: "זה מספר המועמדים על החזית כולה. השאלה על אלה מהם שאף קבוצת משקולות ברשת לא בוחרת." }]}
+>
+  ברשת של משקולות בקפיצות של 5 נקודות אחוז, כמה מועמדים על החזית (בלי גבול הלקוח) לא נבחרים באף קבוצת משקולות? (הרשימה כתובה בשיעור.)
+</NumericExercise>
+
+<Solution for="8.15-7">
+{f.plain("law.never_count")} מועמדים: ״{reach.never.map(nm).join("״, ״")}״. הם יעילים, ובכל זאת בציון משוקלל תמיד מנצח מישהו אחר. הרשת היא בדיקה סופית של קבוצות משקולות, לא הוכחה; עם רשת עדינה יותר אולי אחד מהם היה זוכה בקבוצה צרה מאוד.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.15-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: "לשאול על איזו קבוצת מועמדים הוא בדק, לפי איזה משקולות, ובאילו גבולות", correct: true, feedback: "נכון. ״אופטימלי״ הוא תמיד ביחס לקבוצה שנבדקה, למשקולות ולגבולות." },
+    { text: "להאמין לו: אם הוא על החזית, הוא הטוב ביותר", feedback: "על החזית יש הרבה מועמדים, וכל אחד טוב לפי העדפה אחרת." },
+    { text: "לבחור את המועמד עם סך התשלומים הנמוך ביותר, כי זה תמיד חשוב ביותר", feedback: "מה שחשוב ביותר תלוי במשפחה. ״תמיד״ הוא לא תשובה." },
+    { text: "לדרוש שהמועמד ינצח בכל שלושת היעדים", feedback: "בקבוצה של השיעור אין מועמד כזה; ואם יש הבטחה כזו, בודקים אם נבדק מרחב מצומצם." },
+  ]}
+>
+  יועץ אומר: ״זה התמהיל האופטימלי בשבילכם, והוא על החזית היעילה״. מה כדאי לעשות?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על חזית יעילה">
+<p><strong>מה זה?</strong> קבוצת המועמדים האפשריים שאף מועמד אפשרי אחר לא טוב מהם בכל היעדים. כל מי שלא עליה אפשר לזרוק.</p>
+<p><strong>למה זה קיים?</strong> כי כשיש כמה יעדים אין "הטוב ביותר", אבל יש "בוודאי לא": מי ששולט בו מישהו אחר. הצעד הזה מצמצם את הבחירה לפני ששואלים את הלקוח.</p>
+<p><strong>איך זה עובד?</strong> משווים כל מועמד לכל אחר: אם אחר לא גרוע ממנו באף יעד וטוב ממנו באחד לפחות, הוא נשלט. מי שנשאר הוא החזית. מועמד שלא אפשרי (שיעור 8.7) לא נכנס.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההצעה שתקבלו אמורה להיות על החזית של מה שנבדק. אם היא נשלטת, יש הצעה שטובה ממנה בכל מה שחשוב לכם. ואם החזית נבדקה בקבוצה צרה, או עם גבולות של מישהו אחר, ייתכן שחסרה בה אפשרות.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> קודם זורקים את הנשלטים, אחר כך שואלים מה חשוב (משקולות, או גבול על יעד אחד), ובוחרים. את ההסבר כותבים בלשון הוויתור: "קיבלתם החזר נמוך בעשר מאות שקלים, ובתמורה סך התשלומים גבוה יותר". הבחירה והחישוב נעשים בקוד שאפשר לבדוק: מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **שליטה:** מועמד א׳ שולט בב׳ כשהוא לא גרוע ממנו באף יעד וטוב ממנו באחד לפחות. מי שנשלט אפשר לזרוק בלי לשאול.
+- **חזית יעילה:** המועמדים האפשריים שאף אחד לא שולט בהם. בהם, כל שיפור ביעד אחד עולה ביעד אחר.
+- **החזית שייכת לקבוצת יעדים ולקבוצת מועמדים אפשריים:** יעד נוסף מחזיר אליה מועמדים; גבול חדש של הלקוח מקצץ אותה.
+- **משקולות בוחרות נקודה על החזית** (כשכולן גדולות מאפס), אבל לא את כל הנקודות: בקבוצה של השיעור {f.plain("law.never_count")} יעילים אף פעם לא נבחרים.
+- **״אופטימלי״** פירושו הטוב ביותר לפי הנתונים, האילוצים, המטרות והמרחב שנבדק. לא יותר.
+- **המספרים והמשקולות כאן להדגמה:** סינתטיים, לא החלטה של Mogi ולא מדיניות של בנק.
+
+**בשיעור הבא — 8.16, <Later lesson="8.16" quiet>היכרות עם תכנון לינארי, ומתי כל שיטה מתאימה</Later>:** שיטה אחרת למצוא פתרון, ומה פירוש ״אופטימלי״ ביחס למה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "שליטה (דומיננטיות) והחזית היעילה של פארטו; הציון המשוקלל כהסכם של משקולות על ערכים מנורמלים; העובדה שבחירה במשקולות חיוביות נופלת על החזית, ושנקודה ״שקועה״ בחזית יכולה שלא להיבחר באף משקולת (חזית לא קמורה). ידע כללי, לא מקור שצוטט." },
+    { kind: "החלטה של Mogi", text: "שלושת היעדים של בניית תמהיל (החזר חודשי נמוך, חיסכון כולל מרבי, חשיפה מינימלית לריבית) הם תכנון המוצר של Mogi, כפי שנרשם ב־Brain (עודכן ב־2026-10-08). ההפיכה של כל יעד למספר, והמשקולות, הן של הקורס, להדגמה.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "שינוי בתמהיל יכול לשנות את הריביות שהבנק מציע. אילון, 2026-10-08. ממתין לאישור אילון. לכן המחירים כאן, רשימה אחת לכל התמהילים, הם כלי הוראה.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "הלקוחות: תיק א׳ (נועם ושירה) עם הורה שמצטרף כלווה, מחיר 2,200,000 ₪, הלוואה לפי שיעור 8.7; הגבולות של הלקוח (החזר ראשון עד 8,300 ₪ ויחס החזר עד 40%) הם הנחות הוראה של הקורס. רשימת מחירים אחת לבנק א׳, בנק פיקטיבי. תרחיש הבסיס ותרחיש הלחץ הם של תיק א׳ (שיעור 5.4)." },
+    { kind: "לא אומת", text: "איך Mogi תבחר נקודה על החזית (משקולות, גבול על יעד אחד, או שיטה אחרת) לא הוחלט, ולא ידוע לקורס. שאלה פתוחה לאילון ולצוות." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו בנפרד בפייתון.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/frontier.ts (on objectives.ts, constraints.ts, sensitivity.ts) and src/data/frontier-candidates.ts (on case-s8.ts) via scripts/lessons/lesson-8-15.ts and data/lessons/8-15.json; rechecked by checks/kinds/frontier.py (with constraints.py, sensitivity.py). Illustration: src/components/EfficientFrontier.vue. FK-H-057 (awaiting Eylon). Video: video/8-15.html. */}

@@ -1,0 +1,323 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.4"
+minutes: 45
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import DiceToPayments from "../../components/DiceToPayments.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { S8_LABEL } from "../../data/case-s8.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.4");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = `${S8_LABEL}`;
+export const predictionOptions = [
+  `כמו ההחזר היום (${f.shekels("t.pay3")}): מה שעולה מתקזז במה שיורד`,
+  `גבוה מההחזר היום, ואינו אחד מששת ההחזרים האפשריים`,
+  "נמוך מההחזר היום, כי ריבית יכולה לרדת באותה מידה שהיא עולה",
+  `אחד מששת ההחזרים האפשריים: זה שבאמצע, ${f.shekels("t.pay3")} או ${f.shekels("t.pay4")}`,
+];
+export const faceRows = [1, 2, 3, 4, 5, 6].map((k) => ({ face: String(k), change: f.raw(`t.change${k}`), rate: f.raw(`t.rate${k}`), pay: f.raw(`t.pay${k}`) }));
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>מתמטיקה כללית</strong>, לא מערכת של Mogi. הקובייה והמסלול בדויים: הקובייה היא <strong>משל</strong>, לא תחזית לריבית. בשוק אין קובייה, ובשיעור 8.12 נראה מתי מותר לדבר על הסתברות לריבית ומתי לא.</p>
+</Callout>
+
+בשיעור הקודם חישבתם פיזור ואחוזון של נתונים שכבר קרו. עכשיו עוסקים בנתונים שעוד לא קרו, אבל מבנה המקרה ידוע. הכלים: <Term t="הסתברות" client:visible lesson="8.4">הסתברות</Term> ו<Term t="תוחלת" client:visible lesson="8.4">תוחלת</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.4"
+  question={`חוב של ${f.shekels("t.balance")} שנשארו בו ${p("t.months")} חודשים, בריבית ${p("t.rate")}% לשנה: ההחזר היום ${f.shekels("t.pay3")}. בנקודת העדכון מטילים קובייה הוגנת, ולכל פאה שינוי בריבית: ${p("t.change1")}, ${p("t.change2")}, ${p("t.change3")}, ${p("t.change4")}, ${p("t.change5")} ו־${p("t.change6")} נקודות אחוז. אחרי העדכון ההחזר הוא אחד משישה סכומים. מהו ההחזר שמצפים לו בממוצע, על פני הרבה הטלות?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## הסתברות ותוחלת
+
+</Section>
+
+<LessonVideo lesson="8-4" />
+
+<Section kind="ההסבר">
+
+## הסתברות: כמה מקרים רצויים מכלל המקרים
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+קובייה הוגנת יש לה שש פאות, וכל אחת סבירה באותה מידה. **הסתברות** של מקרה היא מספר המקרים הרצויים חלקי מספר כל המקרים: להטיל 6 היא 1 חלקי 6, כלומר {p("one.p")}%. להטיל 5 או 6: שני מקרים מתוך שישה, {p("one.p_ge5")}%.
+
+חוקים קטנים:
+- הסתברות היא בין 0% ל־100%.
+- סכום ההסתברויות של כל התוצאות האפשריות הוא 100%.
+- כשמטילים שתי קוביות, יש {p("two.cases")} צירופים סבירים באותה מידה (שש כפול שש). צירוף מסוים, למשל 3 ואז 5, הוא {p("two.pair")}%.
+- הסכום 7 יוצא מכמה צירופים (1 ו־6, 2 ו־5, ועוד): ההסתברות {p("two.p7")}%. הסכום 2 רק מצירוף אחד: {p("two.p2")}%. הסכום 10 או יותר: {p("two.p_ge10")}%.
+
+**תוחלת.** כשמטילים קובייה הרבה פעמים, מה הממוצע? מכפילים כל תוצאה בהסתברות שלה ומחברים: <M>E = 1 × 1/6 + 2 × 1/6 + … + 6 × 1/6 = {p("one.exp")}</M>. תוחלת של קובייה היא {p("one.exp")}: אין פאה כזו. התוחלת אינה תוצאה שיכולה לקרות, אלא ממוצע לטווח ארוך. לשתי קוביות, התוחלת של הסכום היא {p("two.exp")}.
+
+בשיעור 8.2 היה ממוצע משוקלל; התוחלת היא ממוצע משוקלל שבו המשקל הוא ההסתברות.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">E = Σ (v<sub>k</sub> · prob<sub>k</sub>)</p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">v<sub>k</sub></dt><dd>התוצאה האפשרית ה־k: למשל החזר בשקלים</dd>
+    <dt class="ltr font-semibold text-n900">prob<sub>k</sub></dt><dd>ההסתברות שלה, כמספר עשרוני בין 0 ל־1. הסכום של כל ה־prob הוא 1</dd>
+    <dt class="ltr font-semibold text-n900">E</dt><dd>התוחלת, באותן יחידות כמו v</dd>
+  </dl>
+</div>
+
+האות E (גדולה) היא תוחלת, ואינה ה־e הקטן של הריבית האפקטיבית משיעור 0.4. prob היא הסתברות. ב־8.2 ה־μ<sub>w</sub> היה ממוצע משוקלל, וכאן E הוא אותו רעיון עם משקלים שסכומם 1.
+
+<Section kind="ההסבר">
+
+## קובייה שקובעת החזר (משל)
+
+</Section>
+
+נחזור לשאלת החיזוי. כל פאה היא שינוי בריבית, וכל שינוי הוא החזר: מחשבים אותו בשפיצר על החוב שנשאר ועל החודשים שנשארו.
+
+<FillTable
+  client:visible
+  id="8.4-table"
+  rowKey="face"
+  periodLabel="פאה"
+  columns={[
+    { key: "change", label: "שינוי בריבית (נקודות אחוז)", format: "number" },
+    { key: "rate", label: "ריבית חדשה (%)", format: "number" },
+    { key: "pay", label: "ההחזר החדש" },
+  ]}
+  rows={faceRows}
+  blanks={["5.pay", "6.pay"]}
+  success="ההחזר עולה עם הריבית, וכל נקודת אחוז נוספת מעלה אותו יותר (כמו בשיעור 8.1)."
+  hint="בגיליון: =PMT(ריבית חדשה/12, 240, -500000)."
+/>
+
+ההחזרים נעים בין {f.shekels("t.pay1")} ל־{f.shekels("t.pay6")}: טווח של {f.shekels("t.range")}. עם קובייה הוגנת כל החזר סביר באותה מידה, והתוחלת היא הממוצע שלהם: **{f.shekels("t.exp_fair")}**. היא גבוהה מההחזר היום ({f.shekels("t.pay3")}) ב־{f.shekels("t.exp_minus_now")}, והיא לא אחד מהחזרים האפשריים. שתי סיבות: הפאות לא סימטריות (הן מזיזות את הריבית ב־{p("t.rate_exp")} נקודות אחוז בממוצע, כלפי מעלה), וההחזר עולה בקצב שגדל עם הריבית.
+
+הסיכוי להחזר גבוה מההחזר היום, בקובייה הוגנת, הוא {p("t.p_above_fair")}%.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## קוביות ← החזרים
+
+</Section>
+
+<DiceToPayments client:visible note="הקובייה היא משל ולא תחזית. נתונים סינתטיים." />
+
+נסו את אלה:
+1. עם קובייה הוגנת, מה התוחלת ומה הסיכוי להחזר גבוה מההחזר היום (הקו)?
+2. עברו לקובייה המוטה לריביות נמוכות. מה קורה לתוחלת ולסיכוי?
+3. עברו לקובייה המוטה לריביות גבוהות. כמה השתנתה התוחלת בהשוואה להוגנת?
+4. בקובייה הוגנת, הזיזו את הקו עד שהסיכוי להחזר גבוה ממנו הוא שליש. איפה הוא נמצא?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>התוחלת {f.shekels("t.exp_fair")} והסיכוי {p("t.p_above_fair")}%.</li>
+    <li>התוחלת יורדת ל־{f.shekels("t.exp_low")} והסיכוי ל־{p("t.p_above_low")}%: הקובייה נותנת יותר משקל לריביות נמוכות.</li>
+    <li>התוחלת עולה ל־{f.shekels("t.exp_high")} והסיכוי ל־{p("t.p_above_high")}%.</li>
+    <li>בין ההחזר הרביעי ({f.shekels("t.pay4")}) לחמישי ({f.shekels("t.pay5")}): רק שתי פאות מעליו, 2 מתוך 6.</li>
+  </ol>
+</details>
+
+התוחלת שונה בכל קובייה, כי שינינו את ההסתברויות, לא את ההחזרים. זו הנקודה החשובה של השיעור: **התוחלת היא פונקציה של ההסתברויות שמניחים.** מי שמניח הסתברויות אחרות מקבל תוחלת אחרת.
+
+<Callout title="קובייה היא לא שוק" tone="warning">
+<p>בקובייה יודעים את ההסתברויות מהמבנה שלה. בשוק, ״מה הסיכוי שהריבית תעלה נקודת אחוז?״ אין לה מבנה כזה. כל הסתברות שמציבים לריבית היא <strong>הנחה</strong>, לא עובדה. מתי יש לה בסיס ומתי אין, זה הנושא של שיעורים <Later lesson="8.11" quiet>8.11</Later> ו־<Later lesson="8.12" quiet>8.12</Later>.</p>
+</Callout>
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> אם ההחזרים בעמודה A והסתברויות בעמודה B (כמספרים עשרוניים שסכומם 1): <span class="ltr">=SUMPRODUCT(A1:A6, B1:B6)</span>. עם משקלים במקום הסתברויות: <span class="ltr">=SUMPRODUCT(A1:A6, B1:B6)/SUM(B1:B6)</span>.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.4"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "הפאות לא סימטריות: יש שלוש שמעלות את הריבית (ושתיים שמורידות, אחת שלא משנה), וההחזר גם עולה בקצב שגדל. לכן הממוצע לא שווה להחזר היום.",
+    "",
+    `רק שתיים מהפאות מורידות את הריבית (${p("t.change1")} ו־${p("t.change2")}), ושלוש מעלות אותה (${p("t.change4")}, ${p("t.change5")} ו־${p("t.change6")}); העליות מעלות את ההחזר יותר ממה שהירידות מורידות.`,
+    `התוחלת ${f.shekels("t.exp_fair")} אינה אחד מששת ההחזרים: ${f.shekels("t.pay3")} ו־${f.shekels("t.pay4")} הם השכנים שלה.`,
+  ]}
+>
+  התוחלת היא {f.shekels("t.exp_fair")}, גבוהה מההחזר היום ב־{f.shekels("t.exp_minus_now")}, ואינה אחד מששת ההחזרים. היא ממוצע לטווח ארוך, ולא החזר שמישהו ישלם.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## התוחלת של שתי קוביות
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+**צעד 1 — כל התוצאות.** שתי קוביות נותנות {p("two.cases")} צירופים סבירים באותה מידה, וסכום מ־2 עד 12.
+
+**צעד 2 — ההסתברויות.** הסכום 7 יוצא מ־6 צירופים: {p("two.p7")}%. הסכום 2 מצירוף אחד: {p("two.p2")}%. הסכום 10: מ־3 צירופים, {p("two.p10")}%.
+
+**צעד 3 — התוחלת.** כל סכום כפול ההסתברות שלו, ומחברים: {p("two.exp")}. הסכום האמצעי, כי ההתפלגות סימטרית.
+
+**צעד 4 — מה למדנו.** אפשר לחשב תוחלת בלי להטיל אף קובייה. כשלא מכירים את ההסתברויות, כמו בשוק, אי אפשר.
+
+<Section kind="דוגמה חצי פתורה">
+
+## ההחזר המצופה בקובייה מוטה
+
+</Section>
+
+בקובייה המוטה לריביות נמוכות הפאות הראשונות יוצאות בתדירות גבוהה יותר: פאה 1 שלוש פעמים, פאה 2 פעמיים, והשאר פעם אחת, בסך הכול תשעה מקרים. השלימו את שורת התוצאה.
+
+<FillTable
+  client:visible
+  id="8.4-half"
+  rowKey="what"
+  periodLabel="הקובייה"
+  columns={[{ key: "v", label: "ההחזר המצופה" }]}
+  rows={[
+    { what: "הוגנת", v: f.raw("t.exp_fair") },
+    { what: "מוטה לריביות נמוכות", v: f.raw("t.exp_low") },
+    { what: "מוטה לריביות גבוהות", v: f.raw("t.exp_high") },
+  ]}
+  blanks={["מוטה לריביות גבוהות.v"]}
+  success="ככל שהקובייה נותנת יותר משקל לפאות הגבוהות, התוחלת גבוהה יותר."
+  hint="המשקלים בקובייה המוטה לריביות גבוהות: 1, 1, 1, 1, 2, 3 (סכום 9). כופלים כל החזר במשקל שלו, מחברים, ומחלקים ב־9."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים להמחשה בלבד. בתרגילים 4 ו־5 כדאי להשתמש בטבלה של השיעור.
+
+<ChoiceExercise
+  client:visible
+  id="8.4-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "ממוצע לטווח ארוך, שלא חייב להיות תוצאה אפשרית", correct: true, feedback: "נכון. 3.5 בקובייה." },
+    { text: "התוצאה שהכי סביר שתקרה", feedback: "זו השכיחה. התוחלת יכולה להיות מספר שלא יוצא אף פעם." },
+    { text: "תוצאה שמובטחת", feedback: "אין שום הבטחה: זו ממוצע של הרבה הטלות." },
+    { text: "התוצאה הגרועה ביותר", feedback: "התוחלת היא ממוצע, לא קצה." },
+  ]}
+>
+  מהי תוחלת?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.4-2" n={2} level="קל" answer={f.raw("ex.sum_exp")} errors={[]}>
+  קובייה בדויה בעלת ארבע פאות, 1, 2, 3 ו־4, כולן סבירות באותה מידה. מהי התוחלת?
+</NumericExercise>
+
+<Solution for="8.4-2">
+<M>(1 + 2 + 3 + 4) ÷ 4 = {p("ex.sum_exp")}</M>.
+</Solution>
+
+<NumericExercise client:visible id="8.4-3" n={3} level="בינוני" unit="%" answer={f.raw("ex.ge8")} errors={[{ value: f.raw("two.p_ge10"), message: "זה הסיכוי לסכום 10 ומעלה. כאן שואלים על 8 ומעלה." }]}>
+  שתי קוביות הוגנות. מה הסיכוי שהסכום יהיה 8 או יותר, באחוזים (לספרה אחת)? (לשם כך ספרו את הצירופים: 8 יוצא מ־5, 9 מ־4, 10 מ־3, 11 מ־2, 12 מ־1 מתוך 36.)
+</NumericExercise>
+
+<Solution for="8.4-3">
+<M>5 + 4 + 3 + 2 + 1 = 15</M> צירופים מתוך 36: {p("ex.ge8")}%.
+</Solution>
+
+<NumericExercise client:visible id="8.4-4" n={4} level="בינוני" answer={f.raw("t.exp_low")} errors={[{ value: f.raw("t.exp_fair"), message: "זו התוחלת בקובייה ההוגנת. כאן לפאות משקלים שונים." }]}>
+  בקובייה המוטה לריביות נמוכות, המשקלים של ששת ההחזרים (מ־{f.shekels("t.pay1")} עד {f.shekels("t.pay6")}) הם 3, 2, 1, 1, 1, 1. מהי התוחלת של ההחזר?
+</NumericExercise>
+
+<Solution for="8.4-4">
+<M>(3 × {n("t.pay1")} + 2 × {n("t.pay2")} + {n("t.pay3")} + {n("t.pay4")} + {n("t.pay5")} + {n("t.pay6")}) ÷ 9</M> = {f.shekels("t.exp_low")}.
+</Solution>
+
+<NumericExercise client:visible id="8.4-5" n={5} level="בינוני" unit="%" answer={f.raw("t.p_above_high")} errors={[{ value: f.raw("t.p_above_fair"), message: "זה בקובייה ההוגנת. בקובייה המוטה לריביות גבוהות הפאות הגבוהות יוצאות יותר." }]}>
+  בקובייה המוטה לריביות גבוהות המשקלים הם 1, 1, 1, 1, 2, 3 (סכום 9). מה הסיכוי להחזר גבוה מההחזר היום, באחוזים (לספרה אחת)?
+</NumericExercise>
+
+<Solution for="8.4-5">
+הפאות 4, 5 ו־6 מעלות את ההחזר: משקלים 1 ו־2 ו־3, בסך 6 מתוך 9: {p("t.p_above_high")}%.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.4-6"
+  n={6}
+  level="מאתגר"
+  options={[
+    { text: "לא: בקובייה ההסתברויות ידועות מהמבנה, ובשוק כל הסתברות היא הנחה שצריך להצדיק", correct: true, feedback: "נכון." },
+    { text: "כן, כי הקובייה מייצגת את השוק", feedback: "היא משל. אין שום דבר בשוק שמבטיח ששש תוצאות סבירות באותה מידה." },
+    { text: "כן, כי תוחלת היא עובדה", feedback: "תוחלת היא חישוב על הסתברויות. אם ההסתברויות הנחה, גם התוחלת." },
+    { text: "לא, כי אי אפשר לחשב תוחלת לריבית", feedback: "אפשר לחשב. השאלה היא אם יש בסיס להסתברויות." },
+  ]}
+>
+  האם אפשר להסיק מהתוחלת בקובייה על ההחזר שישלמו בפועל בעדכון ריבית אמיתי?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על הסתברות ותוחלת">
+<p><strong>מה זה?</strong> הסתברות היא כמה מקרים רצויים מכלל המקרים הסבירים באותה מידה; תוחלת היא ממוצע של תוצאות לפי ההסתברויות שלהן.</p>
+<p><strong>למה זה קיים?</strong> כדי לדבר על דברים שעוד לא קרו, בלי להעמיד פנים שמדויק מה יקרה.</p>
+<p><strong>איך זה עובד?</strong> ספירה של מקרים; תוחלת היא סכום של תוצאה כפול הסתברות.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ״ההחזר הצפוי״ הוא ממוצע, וההחזר הגבוה ביותר שייתכן נמצא מעליו. הוא אינו מה שתשלמו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים מאיפה באות ההסתברויות; ומסתכלים לא רק על התוחלת אלא גם על התוצאה הגרועה (שיעורים 8.10 עד 8.12).</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **הסתברות** = מקרים רצויים ÷ כל המקרים (כשהם סבירים באותה מידה); הסכום הוא 100%.
+- **תוחלת** = סכום של (תוצאה × הסתברות): ממוצע משוקלל לטווח ארוך.
+- התוחלת לא חייבת להיות תוצאה אפשרית, ולא מובטחת.
+- הקובייה היא משל: ההסתברויות שלה ידועות מהמבנה. בשוק כל הסתברות היא הנחה.
+- תוחלת משתנה כשמשנים את ההסתברויות, גם כשהתוצאות אותן תוצאות.
+
+**בשיעור הבא — 8.5, <Later lesson="8.5" quiet>קו מגמה</Later> ו<Later lesson="8.5" quiet>שגיאה</Later>:** איך מתארים קשר בין שני נתונים בקו אחד, ואיך מודדים כמה הקו טועה.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "הסתברות של מקרים סבירים באותה מידה, תוחלת, שתי קוביות: מתמטיקה כללית, בלי מקור מסוים." },
+    { kind: "הנחת חישוב", text: "הקובייה, שש הפאות והשינויים בריבית שהן מייצגות הם משל לימודי: אינם תחזית, אינם מדיניות של בנק ואינם החלטה של Mogi. החוב (500,000 ₪), 240 החודשים והריבית 4.10% בדויים; ההחזרים בשפיצר. נתונים סינתטיים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/stats.ts via scripts/lessons/lesson-8-4.ts and _stats-facts.ts and data/lessons/8-4.json, rechecked by checks/kinds/stats.py. Data: src/data/s8-datasets.ts. Illustration: src/components/DiceToPayments.vue (schedule.ts payment rule). Video: video/8-4.html. No field knowledge. */}

@@ -1,0 +1,468 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.18"
+minutes: 55
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import EstimateInterval from "../../components/EstimateInterval.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { PRIOR } from "../../data/pricing-demo.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.18");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const offers = f.raw("data.offers");
+export const hand = f.raw("hand.mean");
+export const hstep = f.raw("hand.step");
+export const slope = f.raw("slope");
+export const lvs = f.raw("line_vs_step");
+export const NS = [8, 12, 20, 30, 60];
+export const chain = Object.fromEntries(NS.map((n) => [n, f.raw(`chain.${n}`)]));
+export const upd = Object.fromEntries([0, 4, 16, 64].map((n) => [n, f.raw(`upd.${n}`)]));
+export const pct = (s) => `${Math.round(Number(s) * 100)}%`;
+export const predictionOptions = [
+  `בערך חצי: מ־${f.plain("w.100")} ל־${f.plain("w.400")}`,
+  "בערך רבע: מחלקים ב־4, כי יש פי 4 יותר נתונים",
+  "לא משתנה: הטווח תלוי רק בפיזור של הנתונים",
+  "קטן רק במעט, כי אחרי מאה הצעות כמעט שום דבר לא משתנה",
+];
+
+בשיעור 8.17 בניתם מודל תמחור קטן, והמספרים שלו (הבסיס, גודל המדרגות) הוצגו כאילו ידועים. אבל מאיפה הם באים? בשיעור הזה: איך <strong>לומדים אותם מנתונים</strong>, איך אומרים כמה לא בטוחים באומדן, ומה עושים כשיש רק קצת נתונים.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>עתיד, וידע כללי.</strong> אין היום ב־Mogi שום אמידה של מרווחים. מה שמתוכנן, לפי חלק 4 של תכנון האלגוריתם: קודם ממוצעים שבנק ישראל מפרסם, ואחר כך הצעות אמיתיות מתיקי Mogi. הממוצעים הציבוריים אינם מחיר שבנק יאשר (ידע מהשטח, אילון, 2026-10-08; ממתין לאישור אילון), ולכן הם יכולים לשמש רק נקודת פתיחה. הרגרסיה והטווחים בשיעור הם <strong>ידע כללי של סטטיסטיקה</strong>. הנתונים כאן ״סינתטיים״: הקורס יצר אותם בגנרטור ידוע, ולכן אפשר לראות מה האומדן מפספס. בדאטה אמיתי לא יודעים מה האמת.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.18"
+  question={`אומדים ממוצע של מרווח מ־100 הצעות סינתטיות עם פיזור של ${f.plain("w.sd")} נקודות אחוז. רוחב טווח 95% של האומדן הוא ${f.plain("w.100")} נקודות אחוז. מה יקרה לרוחב הטווח אילו היו 400 הצעות, פי 4 יותר, עם אותו פיזור?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## כמה אנחנו לא בטוחים
+
+</Section>
+
+<LessonVideo lesson="8-18" />
+
+<Section kind="ההסבר">
+
+## מנתונים למספר, ועם טווח
+
+</Section>
+
+### אומדן הוא מספר שמחשבים מדגימה
+
+<Term t="אומדן" client:visible lesson="5.5">אומדן</Term> (שיעור 5.5) הוא מספר שמחשבים מנתונים, כשהאמת לא ידועה. הנה הדוגמה הקטנה ביותר: חמש הצעות סינתטיות שונות לאותו סוג עסקה, עם המרווחים האלה: <span class="ltr">0.84, 0.90, 0.88, 0.93, 0.85</span>. הממוצע שלהם הוא {hand.mean}.
+
+אבל אילו היו חמש הצעות **אחרות**, הממוצע היה אחר. כמה אחר? זה מה שאומד **סטיית התקן** (שיעור 8.3): של חמש ההצעות {hand.sd} נקודות אחוז. ומזה, הטעות הטיפוסית של הממוצע, שנקראת **שגיאת תקן**: סטיית התקן חלקי שורש מספר ההצעות, כלומר <M>{hand.sd} ÷ √{hand.n} = {hand.se}</M>.
+
+### רווח סמך
+
+<Term t="רווח סמך" client:visible lesson="8.18">רווח סמך</Term> של 95% הוא האומדן, פלוס ומינוס שגיאת התקן כפול מספר שנקרא t. בחמש הצעות t הוא {hand.t}: <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{hand.low} עד {hand.high}.
+
+למה t ולא 2? כי עם מעט נתונים גם סטיית התקן עצמה מעורערת, והטווח צריך להיות רחב יותר: עם שלוש הצעות בכל צד t הוא {hstep.t}, עם 21 הצעות {chain[60].estimate.t}, ובגבול של הרבה נתונים {f.plain("t.limit")}. את הערכים לוקחים מטבלה (ראו המקורות).
+
+**מה ״95%״ אומר, ומה לא.** אם חוזרים על כל התהליך (לוקחים חמש הצעות, מחשבים טווח) הרבה פעמים, בערך 95 מכל 100 טווחים יכללו את הממוצע האמיתי, **בתנאי** שההצעות הן מדגם הוגן מאותו עולם ושהרעש סביר. זה **לא** אומר ״יש 95% סיכוי שהמספר האמיתי בתוך הטווח הזה״ במקרה אחד. והטווח מדבר על רעש בלבד: אם הנתונים מוטים, הוא יפספס.
+
+### כמה הטווח מתכווץ
+
+הרוחב של הטווח יורד כמו אחד חלקי שורש מספר הנתונים. כשהפיזור {f.plain("w.sd")}:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מספר ההצעות</th>
+        <th class="py-2 pe-3 text-start font-semibold">רוחב טווח 95%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[5, 20, 100, 400].map((n) => (
+        <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{n}</span></td><td class="py-2 pe-3"><span class="ltr">{f.plain(`w.${n}`)}</span></td></tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} רוחב: מהקצה התחתון לעליון, בנקודות אחוז.</p>
+</div>
+
+פי 4 יותר נתונים נותנים טווח צר בערך פי 2 (מ־{f.plain("w.100")} ל־{f.plain("w.400")}), לא פי 4. כדי לחצות את הטווח צריך פי ארבעה יותר נתונים: מי שרוצה אומדן הרבה יותר מדויק יצטרך הרבה יותר הצעות.
+
+### רגרסיה: קו לנתונים
+
+<Term t="רגרסיה" client:visible lesson="8.18">רגרסיה</Term> היא הדרך למצוא קשר בין מספרים. בשיעור 8.5 התאמתם קו ישר לנקודות בשיטת הריבועים הפחותים. נעשה זאת על ההצעות הסינתטיות: שיעור המימון (אופקי) מול המרווח (אנכי), {f.plain("gen.n")} הצעות. הקו שיוצא: המרווח גדל בערך ב־{slope.slope} נקודות אחוז לכל נקודת אחוז של מימון, עם טווח 95% של {slope.low} עד {slope.high}.
+
+זה נראה מדויק ומועיל. **אבל נתנו לקורס לבנות את הנתונים בעצמו**: יש בהם מדרגה אחת, בסף {f.plain("thr")}%, בגודל {f.plain("truth.step")}, ובכל מקום אחר המרווח שטוח. הקו אומר שהמרווח עולה בהדרגה, מנקודת אחוז לנקודה, וזה לא נכון. הטעות הממוצעת של הקו היא {lvs.lineMae}, והטעות של מודל שמכיר את המדרגה, ממוצע משני צידי הסף, היא {lvs.stepMae}: פחות ממחצית. **מי שמתאים צורה שגויה מקבל טווח צר סביב מספר שאינו קיים.**
+
+### לאמוד מדרגה
+
+כדי לאמוד את המדרגה: ממוצע המרווחים מעל הסף, פחות הממוצע עד הסף. לכל ממוצע יש שגיאה, ולהפרש יש שגיאת תקן משלו: <M>√(שונות<sub>1</sub> ÷ כמות<sub>1</sub> + שונות<sub>2</sub> ÷ כמות<sub>2</sub>)</M>.
+
+דוגמה של שלוש הצעות מכל צד (מספרים להמחשה): עד הסף {hstep.meanBelow}, מעל {hstep.meanAbove}, ההפרש {hstep.step}, שגיאת תקן {hstep.se}. עם 2 דרגות חופש (קטן מבין שתי הכמויות פחות אחד) t הוא {hstep.t}, והטווח {hstep.low} עד {hstep.high}: מרחב גדול, כי יש רק שלוש הצעות בכל צד.
+
+### מעט נתונים: הנחת פתיחה
+
+אצל Mogi, בהתחלה, כמעט אין הצעות. מה עושים? מתחילים מ<Term t="הנחת פתיחה" client:visible lesson="8.18">הנחת פתיחה</Term> (prior באנגלית): מה שחושבים על המדרגה לפני הנתונים, כטווח. למשל, ״בערך {PRIOR.mean}, עם פיזור {PRIOR.sd}״ (הנחה שהמציאה הקורס, שמייצגת ״ממוצע מפורסם״). כשמגיעים נתונים, מחברים: **ממוצע משוקלל** של ההנחה והאומדן (שיעור 8.2), כשהמשקל הוא הדיוק של כל אחד: אחד חלקי הפיזור בריבוע.
+
+הנה השרשרת על ההצעות הסינתטיות, כשמשתמשים בהצעות הראשונות בלבד (המדרגה האמיתית שיצרנו {f.plain("truth.step")}):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">הצעות</th>
+        <th class="py-2 pe-2 text-start font-semibold">עד / מעל הסף</th>
+        <th class="py-2 pe-2 text-start font-semibold">אומדן (טווח 95%)</th>
+        <th class="py-2 pe-2 text-start font-semibold">אחרי החיבור</th>
+        <th class="py-2 pe-2 text-start font-semibold">משקל ההנחה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {NS.map((n) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-2 font-semibold"><span class="ltr">{n}</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{chain[n].nBelow} / {chain[n].nAbove}</span></td>
+          <td class="py-2 pe-2">{chain[n].estimate ? <span class="ltr whitespace-nowrap">{chain[n].estimate.step} ({chain[n].estimate.low}–{chain[n].estimate.high})</span> : "אין נתונים"}</td>
+          <td class="py-2 pe-2"><span class="ltr">{chain[n].posterior.mean}</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{pct(chain[n].posterior.priorWeight)}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} הנחת הפתיחה: {PRIOR.mean} עם פיזור {PRIOR.sd}.</p>
+</div>
+
+מה רואים:
+1. **ב־{NS[0]} הצעות אין שום הצעה מעל הסף:** אין נתונים על המדרגה, ולכן נשארים עם ההנחה, {chain[8].posterior.mean}. זה מה שהנחת פתיחה נותנת: תשובה, אפילו בלי נתונים, והיא ״אומרת״ במפורש שהיא רק הנחה.
+2. **עם {chain[12].nAbove} הצעות מעל הסף** ({NS[1]} הצעות) האומדן קופץ ל־{chain[12].estimate.step}, עם טווח רחב ({chain[12].estimate.low}–{chain[12].estimate.high}); ההנחה עדיין שוקלת {pct(chain[12].posterior.priorWeight)} ומושכת את התוצאה ל־{chain[12].posterior.mean}.
+3. **ככל שיש יותר נתונים משקל ההנחה יורד:** {pct(chain[12].posterior.priorWeight)}, {pct(chain[20].posterior.priorWeight)}, {pct(chain[30].posterior.priorWeight)}, {pct(chain[60].posterior.priorWeight)}. עם 60 הצעות האומדן ({chain[60].estimate.step}) והתוצאה ({chain[60].posterior.mean}) כמעט זהים.
+4. **הטווח מתכווץ:** מ־{chain[12].estimate.low}–{chain[12].estimate.high} לטווח של {chain[60].estimate.low}–{chain[60].estimate.high}. והמדרגה האמיתית שיצרנו, {f.plain("truth.step")}, בתוך טווח 60 ההצעות, אבל קרוב לקצה: אומדן יכול להיות רחוק קצת מהאמת גם כשהטווח לא מפספס אותה.
+
+<Callout title="מה יכול להשתבש" tone="warning">
+<p><strong>הנחה לא טובה, מעט נתונים.</strong> אילו הנחת הפתיחה הייתה רחוקה מאוד מהאמת ובטוחה בעצמה (פיזור קטן), היא הייתה מושכת את התוצאה רחוק. לכן בודקים מה קורה אם ההנחה שגויה (הכלי שבהמשך נותן לנסות), ומחליפים אותה בנתונים כשיש.</p>
+<p><strong>נתונים לא מייצגים.</strong> הטווח מדבר רק על רעש. הצעות שמגיעות רק מתיקי Mogi, שאולי שונים מהשוק, הן מדגם מוטה, והטווח לא יתפוס את זה. (שיעורים 8.23–8.25 על תיוג, בדיקה ופיצול לפי זמן; ושיעור 8.26 על ההסכמה לשימוש בהצעות.)</p>
+<p><strong>דאטה מועט, הרבה מדרגות.</strong> אם רוצים לאמוד שלוש מדרגות ועוד, עם 30 הצעות, כל אחת תקבל רק חלק קטן מהנתונים. הכי כדאי להתחיל במדרגה אחת, ולהוסיף כשיש נתונים.</p>
+</Callout>
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## אומדן, טווח והנחה
+
+</Section>
+
+הכלי משתמש באותן {f.plain("gen.n")} הצעות סינתטיות. בחרו כמה הצעות מותר להשתמש בהן, וכמה בטוחים בהנחת הפתיחה.
+
+<EstimateInterval client:visible offers={offers} thr={60} prior={PRIOR} truth={f.raw("truth.step")} />
+
+נסו:
+1. הגדילו את מספר ההצעות מ־8 עד 60. מה קורה לטווח, ומה למשקל ההנחה?
+2. עם 12 הצעות, שנו את הנחת הפתיחה ל־0.00 עם פיזור 0.05. מה קורה לתוצאה?
+3. עם 60 הצעות, עשו אותו דבר. מה שונה?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>הטווח מתכווץ (מ־{chain[12].estimate.low}–{chain[12].estimate.high} ב־12 הצעות ל־{chain[60].estimate.low}–{chain[60].estimate.high} ב־60), ומשקל ההנחה יורד.</li>
+    <li>עם 12 הצעות ו־3 מעל הסף, הנחה חזקה ושגויה מושכת את התוצאה מטה, רחוק מהנתונים; ההנחה מנצחת כי הנתונים מעטים וחסרי דיוק.</li>
+    <li>עם 60 הצעות כמעט שום דבר לא משתנה: הנתונים מכריעים. הנחה שגויה פוגעת בעיקר כשיש מעט נתונים.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## שלוש נוסחאות
+
+</Section>
+
+**צעד 1 — טווח לממוצע.** מתוך N תצפיות עם ממוצע וסטיית תקן d:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">ממוצע ± t × d ÷ √N</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">N</dt><dd>מספר התצפיות (האות N, באות גדולה, אינה n מהטבלה של הקורס: שם n היא מספר התקופות)</dd>
+    <dt class="ltr font-semibold text-n900">d</dt><dd>סטיית התקן של המדגם (שיעור 8.3, חלוקה ב־N פחות אחד). האות d חדשה</dd>
+    <dt class="ltr font-semibold text-n900">t</dt><dd>מספר מטבלה, תלוי ב־N פחות אחד: {hand.t} ל־5 תצפיות, {chain[60].estimate.t} ל־21 תצפיות בקבוצה הקטנה, ו־{f.plain("t.limit")} בגבול (ל־95%)</dd>
+  </dl>
+</div>
+
+**צעד 2 — מדרגה.** הפרש הממוצעים ± t כפול שורש סכום השונויות חלקי הכמויות (הנוסחה שלמעלה), כש־t נבחר לפי הקטנה מבין שתי הכמויות פחות אחד.
+
+**צעד 3 — חיבור הנחה ונתונים.** לכל אחד דיוק: אחד חלקי הפיזור בריבוע. המשקל של ההנחה הוא <M>דיוק<sub>ההנחה</sub> ÷ (דיוק<sub>ההנחה</sub> + דיוק<sub>הנתונים</sub>)</M>, והתוצאה:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">תוצאה = משקל × הנחה + (1 − משקל) × אומדן</span></p>
+</div>
+
+**מתי זה נכון?**
+1. התצפיות **בלתי תלויות**: הצעה אחת לא משפיעה על אחרת. (שני אחים, אותו בנק, אותו יום: כבר פחות.)
+2. הרעש סביר, בצורת פעמון בקירוב. עם מעט נתונים זה חשוב יותר.
+3. **המדגם הוגן:** הוא מייצג את העולם שרוצים לדעת עליו. זה התנאי שהכי קל להפר.
+4. ההנחה והנתונים נמדדים באותן יחידות, והפיזור של ההנחה הוא באמת ״כמה לא בטוחים״.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> ממוצע <span class="ltr">=AVERAGE(...)</span>, סטיית תקן של מדגם <span class="ltr">=STDEV.S(...)</span>, שגיאת תקן <span class="ltr">=STDEV.S(...)/SQRT(COUNT(...))</span>, ו־t <span class="ltr">=T.INV.2T(0.05;N-1)</span>. הטווח הוא הממוצע פלוס או מינוס t כפול שגיאת התקן. הערכים שהקורס מציג לקוחים מטבלה של שורות מעטות, ובין שורות בוחרים את השורה הנמוכה, שהיא זהירה יותר.</p>
+<p><strong>במחשבון:</strong> אפשר לחשב ביד לכמה תצפיות, עם הטבלה של t.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.18"
+  options={predictionOptions}
+  correct={0}
+  notes={[
+    "",
+    "פי 4 יותר נתונים לא מחלקים את הטווח ב־4: הוא קטן כמו שורש של 4, כלומר פי 2. כדי לקצץ פי 4 את הטווח צריך פי 16 יותר נתונים.",
+    "הפיזור קובע את הגודל, אבל גם מספר הנתונים: אותו פיזור, יותר הצעות, טווח צר יותר.",
+    "עוד נתונים תמיד עוזרים, אבל באיטיות: גם אחרי מאה הצעות הטווח עדיין נחצה כשמוסיפים פי ארבעה.",
+  ]}
+>
+  הטווח קטן כמו אחד חלקי שורש מספר ההצעות: מ־{f.plain("w.100")} ל־{f.plain("w.400")}. לכן ״עוד קצת נתונים״ לא מספיק, וכשיש מעט נתונים מסתמכים על הנחת פתיחה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## טווח לחמש הצעות, ביד
+
+</Section>
+
+חמש הצעות: <span class="ltr">0.84, 0.90, 0.88, 0.93, 0.85</span> (מספרים להמחשה).
+
+**צעד 1 — הממוצע.** סכום החמישה, מחולק בחמש: {hand.mean}.
+
+**צעד 2 — סטיית התקן.** מסכמים את ריבועי ההפרשים מהממוצע, מחלקים בארבע (5 פחות 1), ומוציאים שורש: {hand.sd}.
+
+**צעד 3 — שגיאת התקן.** <M>{hand.sd} ÷ √{hand.n} = {hand.se}</M>.
+
+**צעד 4 — t.** 4 דרגות חופש: {hand.t}.
+
+**צעד 5 — הטווח.** <M>{hand.mean} ± {hand.t} × {hand.se}</M>, כלומר מ־{hand.low} עד {hand.high}.
+
+**מסקנה.** הממוצע של חמש הצעות הוא {hand.mean}, אבל הערך האמיתי יכול, בטווח של 95%, להיות בין {hand.low} ל־{hand.high}. אילו רוצים לדעת עד חצי מזה, צריך כמעט פי ארבעה יותר הצעות.
+
+<Section kind="דוגמה חצי פתורה">
+
+## איזו שיטה מתאימה?
+
+</Section>
+
+לכל מצב בחרו את הצעד הנכון. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.18-match"
+  promptLabel="המצב"
+  answerLabel="מה עושים"
+  options={["להשוות ממוצעים משני צידי הסף", "להוסיף נתונים ולהצר את הטווח", "להישען על הנחת הפתיחה בזהירות", "לשאול אם המדגם מייצג"]}
+  rows={[
+    { prompt: "המרווח קופץ בסף ושטוח בין ספים", answer: "להשוות ממוצעים משני צידי הסף", given: true, why: "קו ישר לא מתאים למדרגה; ממוצע לכל צד כן." },
+    { prompt: "הטווח רחב מדי, ויש עוד הצעות זמינות", answer: "להוסיף נתונים ולהצר את הטווח", why: "הטווח קטן כמו אחד חלקי שורש מספר ההצעות." },
+    { prompt: "אין עדיין אף הצעה מעל הסף", answer: "להישען על הנחת הפתיחה בזהירות", why: "אין נתונים על המדרגה: מה שיש הוא ההנחה, ומסמנים שהיא רק הנחה." },
+    { prompt: "כל ההצעות הגיעו מתיקים של Mogi, שאולי שונים מהשוק", answer: "לשאול אם המדגם מייצג", why: "הטווח מדבר על רעש; הטיה במדגם הוא עניין אחר, והטווח לא יתפוס אותה." },
+  ]}
+  success="נכון. כל מצב שואל שאלה אחרת: צורה, כמות, חוסר נתונים או ייצוגיות."
+  hint="חשבו מה כל מצב אומר על הנתונים: צורה, כמות, ריק או הטיה."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+הנתונים הם סינתטיים, והמספרים להדגמה. התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.18-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "טווח סביב אומדן שאומר כמה אנחנו לא בטוחים בו", correct: true, feedback: "נכון. הוא מתכווץ כשיש יותר נתונים." },
+    { text: "הערך האמיתי, בדיוק", feedback: "הטווח לא נותן ערך אמיתי: הוא מראה את אי־הוודאות סביב אומדן." },
+    { text: "הממוצע של כל ההצעות בשוק", feedback: "הוא מבוסס רק על המדגם שיש, לא על כל השוק." },
+    { text: "הסיכוי שהאומדן נכון", feedback: "״95%״ מתאר את השיטה לאורך הרבה חזרות, לא את הסיכוי במקרה אחד." },
+  ]}
+>
+  מהו רווח סמך?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.18-2"
+  n={2}
+  level="קל"
+  answer={hand.mean}
+  tolerance={0.001}
+  near={0.01}
+  errors={[]}
+>
+  חמש הצעות עם מרווחים 0.84, 0.90, 0.88, 0.93, 0.85. מה הממוצע?
+</NumericExercise>
+
+<Solution for="8.18-2">
+<M>(0.84 + 0.90 + 0.88 + 0.93 + 0.85) ÷ 5 = {hand.mean}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.18-3"
+  n={3}
+  level="בינוני"
+  answer={hand.se}
+  tolerance={0.001}
+  near={0.005}
+  errors={[{ value: hand.sd, tolerance: 0.001, message: "זו סטיית התקן של ההצעות. שגיאת התקן של הממוצע היא סטיית התקן חלקי שורש מספר ההצעות." }]}
+>
+  סטיית התקן של חמש ההצעות היא {hand.sd}. מה שגיאת התקן של הממוצע?
+</NumericExercise>
+
+<Solution for="8.18-3">
+<M>{hand.sd} ÷ √{hand.n} = {hand.se}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.18-4"
+  n={4}
+  level="בינוני"
+  answer={hand.high}
+  tolerance={0.001}
+  near={0.01}
+  errors={[{ value: hand.low, tolerance: 0.001, message: "זה הקצה התחתון. השאלה על הקצה העליון." }]}
+>
+  הממוצע {hand.mean}, שגיאת התקן {hand.se}, ו־t הוא {hand.t}. מהו הקצה העליון של טווח 95%?
+</NumericExercise>
+
+<Solution for="8.18-4">
+<M>{hand.mean} + {hand.t} × {hand.se} = {hand.high}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.18-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "לא: הנתונים מכילים מדרגה, והקו מציג עלייה הדרגתית שאינה קיימת, עם טווח צר שמטעה", correct: true, feedback: "נכון. הקו טועה יותר ממודל שמכיר את המדרגה, וטווח צר סביב קו שגוי לא עוזר." },
+    { text: "כן: הטווח של השיפוע צר, ולכן הקו נכון", feedback: "הטווח אומר כמה בטוח השיפוע לקו הזה, לא אם הקו הוא הצורה הנכונה." },
+    { text: "כן: קו תמיד עדיף על ממוצעים", feedback: "הצורה צריכה להתאים לנתונים. כשיש מדרגה, ממוצעים משני צידי הסף מתאימים יותר." },
+    { text: "לא: בגלל שהשיפוע שלילי", feedback: "השיפוע חיובי. הבעיה היא הצורה, לא הסימן." },
+  ]}
+>
+  הרגרסיה על ההצעות הסינתטיות נותנת שיפוע {slope.slope} עם טווח {slope.low} עד {slope.high}. האם מותר לומר ״כל נקודת אחוז של מימון מוסיפה {slope.slope} למרווח״?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.18-6"
+  n={6}
+  level="בינוני"
+  answer={chain[60].estimate.step}
+  tolerance={0.001}
+  near={0.01}
+  errors={[{ value: f.raw("truth.step"), tolerance: 0.001, message: "זו המדרגה שהקורס יצר, וכך אנחנו יודעים אותה רק כי הנתונים סינתטיים. השאלה על האומדן מ־60 ההצעות." }]}
+>
+  ממוצע המרווח מעל הסף ב־60 ההצעות הוא {chain[60].estimate.meanAbove}, ועד הסף {chain[60].estimate.meanBelow}. מה אומדן המדרגה?
+</NumericExercise>
+
+<Solution for="8.18-6">
+<M>{chain[60].estimate.meanAbove} − {chain[60].estimate.meanBelow} = {chain[60].estimate.step}</M>. הטווח {chain[60].estimate.low} עד {chain[60].estimate.high}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.18-7"
+  n={7}
+  level="מאתגר"
+  answer={upd[16].mean}
+  tolerance={0.001}
+  near={0.01}
+  errors={[{ value: upd[4].mean, tolerance: 0.001, message: "זה התוצאה עם 4 תצפיות. כאן 16 תצפיות, ולכן הנתונים שוקלים יותר." }]}
+>
+  הנחת הפתיחה {f.plain("prior.mean")} עם פיזור {f.plain("prior.sd")}, ו־16 תצפיות עם ממוצע {f.plain("upd.data_mean")} ופיזור {f.plain("upd.data_sd")} לכל תצפית. התוצאה אחרי החיבור? (הכלל: דיוק הנתונים הוא N חלקי הפיזור בריבוע; השתמשו בגיליון.)
+</NumericExercise>
+
+<Solution for="8.18-7">
+דיוק ההנחה הוא אחד חלקי הפיזור שלה בריבוע, ודיוק הנתונים הוא 16 חלקי הפיזור של תצפית בריבוע. משקל ההנחה הוא דיוקה חלקי סכום שני הדיוקים: {pct(upd[16].priorWeight)}, ולכן התוצאה {upd[16].mean}: קרובה לנתונים ({f.plain("upd.data_mean")}) יותר מאשר להנחה ({f.plain("prior.mean")}). עם 4 תצפיות משקל ההנחה {pct(upd[4].priorWeight)} והתוצאה {upd[4].mean}; עם 64 תצפיות {pct(upd[64].priorWeight)} ו־{upd[64].mean}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.18-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: "בעיקר כשיש מעט נתונים וההנחה שגויה ובטוחה בעצמה: אז היא מושכת את התוצאה רחוק מהנתונים", correct: true, feedback: "נכון. ולכן בודקים מה קורה לתוצאה אם ההנחה שגויה, ומחליפים אותה בנתונים כשיש." },
+    { text: "תמיד, כי הנחה אף פעם לא נכונה", feedback: "הנחה יכולה להיות סבירה. הבעיה היא ביטחון יתר ומעט נתונים, לא עצם ההנחה." },
+    { text: "אף פעם: אחרי חיבור עם נתונים ההנחה נעלמת", feedback: "היא לא נעלמת: משקלה יורד רק כשיש הרבה נתונים." },
+    { text: "רק כשיש הרבה נתונים", feedback: "ההפך: ככל שיש יותר נתונים, ההנחה פחות חשובה." },
+  ]}
+>
+  מתי הנחת פתיחה מסוכנת?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על אמידה מנתונים">
+<p><strong>מה זה?</strong> חישוב מספר (ממוצע, מדרגה, שיפוע) מתוך נתונים, ביחד עם טווח שאומר כמה אנחנו לא בטוחים בו. כשיש מעט נתונים, גם הנחת פתיחה שמתעדכנת.</p>
+<p><strong>למה זה קיים?</strong> כי אף אחד לא יודע את הנוסחה של הבנק, ובלי נתונים אי אפשר לנחש. אמידה היא הדרך להפוך הצעות שנאספו להערכה, ולהגיד בכנות כמה היא רחוקה.</p>
+<p><strong>איך זה עובד?</strong> ממוצעים, הפרשים וקווים מנתונים; שגיאת תקן שקטנה כשיש יותר נתונים; ומשקל לכל מקור מידע לפי הדיוק שלו.</p>
+<p><strong>איך זה משפיע עליכם?</strong> כל ״אומדן״ שתראו צריך שיגידו לכם עם כמה נתונים, באיזה טווח, ובאיזו הנחה. מספר בלי טווח הוא מספר שלא יודעים כמה לסמוך עליו.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> מתחילים מהנחה (למשל ממוצעים ציבוריים), מעדכנים בהצעות אמיתיות כשהן מגיעות, ומציגים את האומדן עם טווח. כשמגיעה הצעה אמיתית של בנק היא מחליפה את האומדן. החישוב נעשה בקוד שאפשר לבדוק: מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **אומדן הוא מספר מדגימה:** דגימה אחרת, מספר אחר. שגיאת התקן מודדת כמה.
+- **רווח סמך:** האומדן ± t × שגיאת תקן. הוא מתכווץ כמו אחד חלקי שורש מספר הנתונים: פי 4 יותר נתונים, טווח צר פי 2.
+- **רגרסיה:** קו לנתונים. אבל קו על נתונים שיש בהם מדרגה נותן טווח צר סביב מספר שאינו קיים. מתאימים צורה, לא רק קו.
+- **לאמוד מדרגה:** ממוצע מעל הסף פחות ממוצע עד הסף, עם שגיאת תקן משלו.
+- **הנחת פתיחה שמתעדכנת:** ממוצע משוקלל של ההנחה והנתונים. עם מעט נתונים ההנחה גוברת, ועם הרבה היא נעלמת, בתנאי שהנתונים מייצגים.
+- **הכול כאן סינתטי, להדגמה.** בדאטה אמיתי אין ״מדרגה אמיתית״ שאפשר להשוות אליה.
+
+**בשיעור הבא — 8.19, <Later lesson="8.19" quiet>הסתברות לאישור, וכיול</Later>:** איך מודל נותן סיכוי לאישור, ואיך בודקים אם ״70%״ באמת קורה 7 פעמים מתוך 10.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "ממוצע, סטיית תקן של מדגם (חלוקה ב־N פחות אחד), שגיאת תקן, טווח סמך מבוסס t, רגרסיה בשיטת הריבועים הפחותים, הפרש ממוצעים עם שגיאת תקן לא מאוחדת, ועדכון נורמלי של הנחת פתיחה (משקל לפי דיוק). ידע כללי, לא מקור שצוטט. הערכים של t (95%, שני צדדים: דרגות חופש 1 עד 10, 15, 20, 30, 60, 120 וגבול 1.960) הם ערכי טבלה מוכרים; בין שורות נבחרת השורה הנמוכה, שהיא זהירה יותר." },
+    { kind: "מחקר / הצעה", text: "תכנון האלגוריתם של Mogi (חלק 4 של תוכנית הקורס): אמידת המרווח מנתונים, קודם ממוצעי בנק ישראל, אחר כך הצעות אמיתיות מתיקי Mogi; רגרסיה, אי־ודאות ושיטות לדאטה מועט, הנחת פתיחה סבירה שמתעדכנת עם כל תיק. תכנון, לא קוד שקיים." },
+    { kind: "ידע מהשטח", text: "נתוני השוק הציבוריים לא נותנים מחיר שבנק באמת יאשר, ושינוי בתמהיל יכול לשנות את הריביות שהבנק יציע. אילון, 2026-10-08. ממתין לאישור אילון.", date: "2026-10-08" },
+    { kind: "ידע מהשטח", text: "הריבית הממוצעת בשוק מתפרסמת, והבנקים חייבים לפרסם נתונים אחרי סוף חודש או רבעון. אילון, 2026-08-26. פרסום הממוצעים תואם (לפי תיעוד הצוות); ״אקטוארי״ לא נבדק. ממתין לאישור אילון.", date: "2026-08-26" },
+    { kind: "הנחת חישוב", text: "הנתונים: 60 הצעות סינתטיות שנוצרו בגנרטור מספרים אקראיים עם גרעין קבוע, ממודל עם מדרגה אחת (מימון מעל 60%: 0.40 מעל בסיס 0.80) ורעש של עד 8 מאיות נקודת אחוז. הנחת הפתיחה (0.25 עם פיזור 0.08) מומצאת. הנתונים נכנסים לעדכון כתצפית אחת שפיזורה הוא שגיאת התקן של האומדן." },
+    { kind: "לא אומת", text: "אילו נתונים של Mogi יהיו זמינים לאמידה, ובאיזו הסכמה מותר ללמוד מהם, לא הוחלט (שיעור 8.26). שאלה פתוחה לאילון ולעורך הדין." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו בנפרד בפייתון, כולל הנתונים הסינתטיים (אותו גנרטור כתוב פעמיים).", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/estimate.ts (on stats.ts) and pricingmodel.ts (seeded data through montecarlo.ts's mulberry32) via scripts/lessons/lesson-8-18.ts and data/lessons/8-18.json; rechecked by checks/kinds/estimate.py, pricingmodel.py, rng.py. Illustration: src/components/EstimateInterval.vue. FK-H-057, FK-H-056 (awaiting Eylon). Video: video/8-18.html. */}

@@ -1,0 +1,251 @@
+{
+  "lesson": "8.13",
+  "title": "מרחב התמהילים",
+  "note": "Counts by combinatorics (BigInt in src/lib/calc/search.ts; Python integers in the check). Five kinds of track, 5-point split grid, 27 terms read as 4-30 years: the course's reconstruction of the Brain's figures. 1 ms per candidate is an assumption for illustration, not a measurement.",
+  "facts": [
+    {
+      "id": "hand.two",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 2,
+        "step": 50,
+        "terms": 1,
+        "mode": "one"
+      },
+      "value": "3"
+    },
+    {
+      "id": "hand.two_terms",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 2,
+        "step": 50,
+        "terms": 3,
+        "mode": "one"
+      },
+      "value": "9"
+    },
+    {
+      "id": "hand.two_per",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 2,
+        "step": 50,
+        "terms": 3,
+        "mode": "per_track"
+      },
+      "value": "27"
+    },
+    {
+      "id": "hand.two_active",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 2,
+        "step": 50,
+        "terms": 3,
+        "mode": "per_active_track"
+      },
+      "value": "15"
+    },
+    {
+      "id": "hand.three_25",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 3,
+        "step": 25,
+        "terms": 1,
+        "mode": "one"
+      },
+      "value": "15"
+    },
+    {
+      "id": "hand.three_terms",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 3,
+        "step": 25,
+        "terms": 3,
+        "mode": "one"
+      },
+      "value": "45"
+    },
+    {
+      "id": "hand.one_track",
+      "kind": "srch_pow",
+      "inputs": {
+        "base": 3,
+        "exp": 1
+      },
+      "value": "3"
+    },
+    {
+      "id": "hand.two_tracks",
+      "kind": "srch_pow",
+      "inputs": {
+        "base": 3,
+        "exp": 2
+      },
+      "value": "9"
+    },
+    {
+      "id": "demo.grid",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 3,
+        "step": 10,
+        "terms": 3,
+        "mode": "one"
+      },
+      "value": "198"
+    },
+    {
+      "id": "demo.splits",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 3,
+        "step": 10,
+        "terms": 1,
+        "mode": "one"
+      },
+      "value": "66"
+    },
+    {
+      "id": "brain.kinds",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "brain.step",
+      "kind": "given",
+      "inputs": {},
+      "value": 5
+    },
+    {
+      "id": "brain.terms",
+      "kind": "given",
+      "inputs": {},
+      "value": 27
+    },
+    {
+      "id": "brain.splits",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 5,
+        "terms": 1,
+        "mode": "one"
+      },
+      "value": "10626"
+    },
+    {
+      "id": "brain.one",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 5,
+        "terms": 27,
+        "mode": "one"
+      },
+      "value": "286902"
+    },
+    {
+      "id": "brain.per_track",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 5,
+        "terms": 27,
+        "mode": "per_track"
+      },
+      "value": "152471485782"
+    },
+    {
+      "id": "brain.per_active",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 5,
+        "terms": 27,
+        "mode": "per_active_track"
+      },
+      "value": "58224991752"
+    },
+    {
+      "id": "brain.fine_one",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 1,
+        "terms": 27,
+        "mode": "one"
+      },
+      "value": "124149402"
+    },
+    {
+      "id": "brain.fine_per_track",
+      "kind": "srch_count",
+      "inputs": {
+        "kinds": 5,
+        "step": 1,
+        "terms": 27,
+        "mode": "per_track"
+      },
+      "value": "65978082348282"
+    },
+    {
+      "id": "brain.legal",
+      "kind": "srch_legal",
+      "inputs": {
+        "kinds": "fixed_unlinked|fixed_linked|prime|variable_unlinked|variable_linked",
+        "step": 5
+      },
+      "value": {
+        "legal": 6300,
+        "all": 10626
+      }
+    },
+    {
+      "id": "time.ms",
+      "kind": "given",
+      "inputs": {},
+      "value": 1
+    },
+    {
+      "id": "time.one",
+      "kind": "srch_minutes",
+      "inputs": {
+        "count": "brain.one",
+        "ms": 1
+      },
+      "value": "4.8"
+    },
+    {
+      "id": "time.per_track",
+      "kind": "srch_years",
+      "inputs": {
+        "count": "brain.per_track",
+        "ms": 1
+      },
+      "value": "4.8"
+    },
+    {
+      "id": "time.per_active",
+      "kind": "srch_years",
+      "inputs": {
+        "count": "brain.per_active",
+        "ms": 1
+      },
+      "value": "1.8"
+    },
+    {
+      "id": "time.fine",
+      "kind": "srch_years",
+      "inputs": {
+        "count": "brain.fine_per_track",
+        "ms": 1
+      },
+      "value": "2092.2"
+    }
+  ]
+}

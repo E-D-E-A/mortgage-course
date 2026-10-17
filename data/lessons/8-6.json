@@ -1,0 +1,346 @@
+{
+  "lesson": "8.6",
+  "title": "משתני ההחלטה בשתי רמות",
+  "note": "A design lesson (future): the formulation of the problem, on the synthetic case.",
+  "facts": [
+    {
+      "id": "d.price",
+      "kind": "given",
+      "inputs": {},
+      "value": "2200000"
+    },
+    {
+      "id": "d.equity",
+      "kind": "given",
+      "inputs": {},
+      "value": "560000"
+    },
+    {
+      "id": "d.income1",
+      "kind": "given",
+      "inputs": {},
+      "value": "12400"
+    },
+    {
+      "id": "d.income2",
+      "kind": "given",
+      "inputs": {},
+      "value": "9300"
+    },
+    {
+      "id": "d.car",
+      "kind": "given",
+      "inputs": {},
+      "value": "1450"
+    },
+    {
+      "id": "d.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000"
+    },
+    {
+      "id": "d.extra",
+      "kind": "given",
+      "inputs": {},
+      "value": "20000"
+    },
+    {
+      "id": "d.loan_after",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.loan",
+        "subtrahend": "d.extra"
+      },
+      "value": "1620000.00"
+    },
+    {
+      "id": "s.level1",
+      "kind": "stats_count_product",
+      "inputs": {
+        "factors": "5,2,2,4"
+      },
+      "value": 80
+    },
+    {
+      "id": "s.l1_0",
+      "kind": "given",
+      "inputs": {},
+      "value": "5"
+    },
+    {
+      "id": "s.l1_1",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "s.l1_2",
+      "kind": "given",
+      "inputs": {},
+      "value": "2"
+    },
+    {
+      "id": "s.l1_3",
+      "kind": "given",
+      "inputs": {},
+      "value": "4"
+    },
+    {
+      "id": "s.level2",
+      "kind": "stats_shapes",
+      "inputs": {
+        "kinds": 3,
+        "step": 10,
+        "terms": 3
+      },
+      "value": 1224
+    },
+    {
+      "id": "s.total",
+      "kind": "stats_count_product",
+      "inputs": {
+        "factors": "80,1224"
+      },
+      "value": 97920
+    },
+    {
+      "id": "s.kinds",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "s.step",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "s.terms",
+      "kind": "given",
+      "inputs": {},
+      "value": "3"
+    },
+    {
+      "id": "c.none_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "c.none_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "payment",
+        "decimals": 2
+      },
+      "value": "8309.92"
+    },
+    {
+      "id": "c.none_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "41.04"
+    },
+    {
+      "id": "c.none_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "20250"
+    },
+    {
+      "id": "c.eq_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:800000:4.6:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1600000"
+    },
+    {
+      "id": "c.eq_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:800000:4.6:360",
+        "part": "payment",
+        "decimals": 2
+      },
+      "value": "8107.24"
+    },
+    {
+      "id": "c.eq_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:800000:4.6:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "40.04"
+    },
+    {
+      "id": "c.eq_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=600000;avail=600000;incomes=12400,9300;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:800000:4.4:360,prime:800000:4.6:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "20250"
+    },
+    {
+      "id": "c.car_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "c.car_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "payment",
+        "decimals": 2
+      },
+      "value": "8309.92"
+    },
+    {
+      "id": "c.car_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "38.29"
+    },
+    {
+      "id": "c.car_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=564000;incomes=12400,9300;obl=;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "21700"
+    },
+    {
+      "id": "c.parent_loan",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "loan",
+        "decimals": 0
+      },
+      "value": "1640000"
+    },
+    {
+      "id": "c.parent_pay",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "payment",
+        "decimals": 2
+      },
+      "value": "8309.92"
+    },
+    {
+      "id": "c.parent_ratio",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "ratio",
+        "decimals": 2
+      },
+      "value": "34.27"
+    },
+    {
+      "id": "c.parent_disp",
+      "kind": "cons_measure",
+      "inputs": {
+        "candidate": "price=2200000;equity=560000;avail=600000;incomes=12400,9300,4000;obl=1450:26;max=8300;target=40;bank=45:75:prime=4.60,variable_unlinked=4.10,fixed_unlinked=4.40,fixed_linked=2.90,variable_linked=2.50;tracks=fixed_unlinked:820000:4.4:360,prime:820000:4.6:360",
+        "part": "disposable",
+        "decimals": 0
+      },
+      "value": "24250"
+    },
+    {
+      "id": "c.eq_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.none_ratio",
+        "subtrahend": "c.eq_ratio"
+      },
+      "value": "1.00"
+    },
+    {
+      "id": "c.car_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.none_ratio",
+        "subtrahend": "c.car_ratio"
+      },
+      "value": "2.75"
+    },
+    {
+      "id": "c.parent_gain",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c.none_ratio",
+        "subtrahend": "c.parent_ratio"
+      },
+      "value": "6.77"
+    },
+    {
+      "id": "ex.l1",
+      "kind": "stats_count_product",
+      "inputs": {
+        "factors": "2,2,2,3"
+      },
+      "value": 24
+    },
+    {
+      "id": "ex.l2",
+      "kind": "stats_shapes",
+      "inputs": {
+        "kinds": 2,
+        "step": 10,
+        "terms": 1
+      },
+      "value": 11
+    },
+    {
+      "id": "ex.extra",
+      "kind": "given",
+      "inputs": {},
+      "value": "30000"
+    },
+    {
+      "id": "ex.loan",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "d.loan",
+        "subtrahend": "ex.extra"
+      },
+      "value": "1610000.00"
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.2"
+minutes: 35
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { S8_LABEL } from "../../data/case-s8.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.2");
+export const p = (id) => f.plain(id);
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const MARK = `${S8_LABEL}`;
+export const predictionOptions = [
+  `${p("m.simple")}%: הממוצע של שלוש הריביות`,
+  `${p("m.weighted")}%: הממוצע שבו המסלול הגדול משפיע יותר`,
+  "4.60%: הגבוהה מבין השלוש, כי כך הבנק מרוויח",
+  "אי אפשר לדעת בלי לחשב את סך הריבית לכל התקופה",
+];
+export const tableRows = [
+  { track: "קבועה לא צמודה", amount: f.raw("m.a0"), rate: f.raw("m.r0"), prod: f.raw("m.prod0") },
+  { track: "פריים", amount: f.raw("m.a1"), rate: f.raw("m.r1"), prod: f.raw("m.prod1") },
+  { track: "משתנה לא צמודה", amount: f.raw("m.a2"), rate: f.raw("m.r2"), prod: f.raw("m.prod2") },
+];
+
+<Callout title="איזה סוג שיעור זה" tone="info">
+<p><strong>מתמטיקה כללית</strong>, לא מערכת של Mogi. הסכומים והריביות כאן להדגמה, והנתונים סינתטיים.</p>
+</Callout>
+
+בשיעור הקודם ראיתם שהחזר הוא פלט של כלל. עכשיו שאלה פשוטה יותר: יש הרבה מספרים, ורוצים מספר אחד שמייצג אותם. בשביל זה משתמשים בסכום ובממוצע, ובתמהיל יש להם גרסה חשובה במיוחד: <Term t="ממוצע משוקלל" client:visible lesson="8.2">ממוצע משוקלל</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.2"
+  question={`נועם ושירה (תיק א׳, בדויים) לוקחים הלוואה של ${f.shekels("m.loan")} בשלושה מסלולים: ${f.shekels("m.a0")} בריבית ${p("m.r0")}% (קבועה), ${f.shekels("m.a1")} בריבית ${p("m.r1")}% (פריים) ו־${f.shekels("m.a2")} בריבית ${p("m.r2")}% (משתנה). מהי הריבית הממוצעת שהם משלמים בתחילת ההלוואה, על כל הכסף?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## ממוצע שמתחשב בגודל
+
+</Section>
+
+<LessonVideo lesson="8-2" />
+
+<Section kind="ההסבר">
+
+## סכום: סימון אחד לחיבור ארוך
+
+</Section>
+
+<Callout title="דוגמה לימודית" tone="info">
+<p>{MARK}</p>
+</Callout>
+
+שלושת המסלולים של תיק א׳ בדוגמה: קבועה לא צמודה ({f.shekels("m.a0")}), פריים ({f.shekels("m.a1")}) ומשתנה לא צמודה ({f.shekels("m.a2")}). כמה כסף נלקח? מחברים: <M>{n("m.a0")} + {n("m.a1")} + {n("m.a2")} = {n("m.loan")}</M>. זה בדיוק מחיר הנכס פחות ההון העצמי של תיק א׳.
+
+כשיש הרבה מחוברים כותבים בקיצור. האות היוונית Σ (סיגמא) פירושה ״חברו את כל אלה״: <M>Σ x<sub>k</sub> = x<sub>1</sub> + x<sub>2</sub> + … + x<sub>n</sub></M>. האות k סופרת את המחוברים (כמו בשיעור 0.6) ו־n הוא כמה יש. כל הנוסחאות בהמשך השלב משתמשות בסימון הזה, והוא רק קיצור.
+
+סכום הוא מה שהופך מסלולים להלוואה אחת: ההחזר של התמהיל הוא סכום ההחזרים של המסלולים. שלושת ההחזרים (360 חודשים, שפיצר) הם {f.shekels("pay0")}, {f.shekels("pay1")} ו־{f.shekels("pay2")}, וביחד {f.shekels("pay.sum")}.
+
+<Section kind="ההסבר">
+
+## ממוצע: הנקודה שמאזנת
+
+</Section>
+
+**ממוצע** של כמה מספרים הוא הסכום שלהם חלקי מספרם: <M>μ = Σ x<sub>k</sub> ÷ n</M>. בשלוש הריביות שלנו: <M>({p("m.r0")} + {p("m.r1")} + {p("m.r2")}) ÷ 3 = {p("m.simple4")}</M>, ובעיגול לשתי ספרות {p("m.simple")}%.
+
+אבל זה לא מה ששילמו. המסלול הקבוע הוא חצי מההלוואה, והמשתנה חמישית ממנה. הממוצע הפשוט נותן לכל מסלול אותו משקל, והוא מתעלם מהגודל.
+
+### ממוצע משוקלל
+
+הרעיון: במקום להתייחס לכל מספר כאילו הופיע פעם אחת, מתייחסים אליו כאילו הופיע כמה שהוא גדול. הצעדים:
+
+**צעד 1 — מכפילים כל ריבית בסכום שלה.** כמה ״שקל־אחוז״ יש בכל מסלול.
+
+<FillTable
+  client:visible
+  id="8.2-table"
+  rowKey="track"
+  periodLabel="מסלול"
+  columns={[
+    { key: "amount", label: "הסכום" },
+    { key: "rate", label: "ריבית בשנה (%)", format: "number" },
+    { key: "prod", label: "הסכום כפול הריבית", format: "number" },
+  ]}
+  rows={tableRows}
+  blanks={["פריים.prod", "משתנה לא צמודה.prod"]}
+  success={`מחברים: ${f.raw("m.prod0")} + ${f.raw("m.prod1")} + ${f.raw("m.prod2")} = ${f.raw("m.prod_sum")}.`}
+  hint="הסכום כפול הריבית באחוזים: למשל 820,000 כפול 4.40 הוא 3,608,000."
+/>
+
+**צעד 2 — מחברים את המכפלות.** {n("m.prod_sum")}.
+
+**צעד 3 — מחלקים בסכום המשקלים.** המשקלים כאן הם הסכומים, וביחד {n("m.loan")}: <M>{n("m.prod_sum")} ÷ {n("m.loan")} = {p("m.weighted3")}</M>. הריבית ההתחלתית הממוצעת על כל ההלוואה היא **{p("m.weighted")}%**, ולא {p("m.simple")}%.
+
+אפשר גם להחליף את הסכומים בחלקים: {p("m.share0")}%, {p("m.share1")}% ו־{p("m.share2")}% מההלוואה. התוצאה זהה, {p("m.weighted_shares")}%, כי מה שחשוב הוא היחס בין המשקלים ולא גודלם.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="ltr text-h3 text-navy">μ<sub>w</sub> = Σ (x<sub>k</sub> · w<sub>k</sub>) ÷ Σ w<sub>k</sub></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">x<sub>k</sub></dt><dd>המספר ה־k שמחשבים עליו ממוצע. כאן: אחוז הריבית של מסלול</dd>
+    <dt class="ltr font-semibold text-n900">w<sub>k</sub></dt><dd>המשקל של המספר ה־k: ככל שהוא גדול, המספר משפיע יותר. כאן: הסכום של המסלול, בשקלים. לא שלילי, ולא הכול אפס</dd>
+    <dt class="ltr font-semibold text-n900">μ<sub>w</sub></dt><dd>הממוצע המשוקלל (האות היוונית מו; w הוא ״משקל״). באותן יחידות כמו x: כאן אחוזים</dd>
+  </dl>
+</div>
+
+האותיות x ו־w הן אותיות כלליות של מתמטיקה. n כאן הוא כמה מספרים יש, ובשיעור 0.2 n היה מספר התקופות: משמעות חדשה לאות ישנה. האות M נשארת של מדד (שיעור 0.7), ולכן הממוצע המשוקלל נכתב μ.
+
+**מתי הנוסחה נכונה?**
+1. כל המשקלים אינם שליליים ויש לפחות אחד שאינו אפס.
+2. המשקל הוא באמת מה שמבדיל בין המספרים: כאן, כמה כסף יושב בכל ריבית.
+3. כשכל המשקלים שווים, מתקבל הממוצע הפשוט.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני.</strong> אם הריביות בעמודה A והסכומים בעמודה B: <span class="ltr">=SUMPRODUCT(A1:A3, B1:B3) / SUM(B1:B3)</span>. הממוצע הפשוט: <span class="ltr">=AVERAGE(A1:A3)</span>.</p>
+</Callout>
+
+<Callout title="מה הממוצע המשוקלל הזה לא אומר" tone="warning">
+<p>{p("m.weighted")}% הוא הריבית ההתחלתית הממוצעת על כל הכסף. הוא <strong>לא</strong> המחיר של ההלוואה: לא רואים בו את התקופה של כל מסלול, את העדכון של ריבית המסלול המשתנה, או את ההצמדה (שיעורים 3.8 ו־5.3). שני תמהילים עם אותו ממוצע משוקלל יכולים לעלות סכומים שונים לגמרי בסוף.</p>
+</Callout>
+
+### מלכודת: ממוצע של יחסים
+
+יחס הוא מנה, ולכן ממוצע פשוט של יחסים מטעה. שני בתים בדויים:
+- בית א: הכנסה {f.shekels("h.inc1")}, החזר {f.shekels("h.pay1")}. היחס: {p("h.r1")}%.
+- בית ב: הכנסה {f.shekels("h.inc2")}, החזר {f.shekels("h.pay2")}. היחס: {p("h.r2")}%.
+
+הממוצע של שני היחסים: {p("h.avg")}%. אבל כשמחשבים על שני הבתים יחד, החזרים של {f.shekels("h.pay_sum")} על הכנסות של {f.shekels("h.inc_sum")}, היחס הוא {p("h.overall")}%. ההבדל נובע מכך שהבית הגדול משפיע יותר. הממוצע המשוקלל של שני היחסים, כשהמשקל הוא ההכנסה, נותן בדיוק את התוצאה הנכונה. הכלל: **ממוצע של יחסים צריך משקלים; או שמחברים קודם את המונים ואת המכנים.**
+
+<PredictionReveal
+  client:visible
+  id="8.2"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `זה הממוצע הפשוט. הוא נותן למסלול של ${f.shekels("m.a2")} אותו משקל כמו למסלול של ${f.shekels("m.a0")}.`,
+    "",
+    "4.60% היא הריבית של המסלול הפריים בלבד, שהוא פחות ממחצית ההלוואה. הממוצע על כל הכסף נמוך ממנה.",
+    "אפשר לדעת את הריבית ההתחלתית הממוצעת בלי זה. מה שאי אפשר לדעת ממנה הוא סך הריבית לכל התקופה.",
+  ]}
+>
+  הריבית ההתחלתית הממוצעת על כל הכסף היא {p("m.weighted")}%: המסלול הקבוע, החצי מההלוואה, מושך אותה אליו. הממוצע הפשוט ({p("m.simple")}%) היה נמוך מדי.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הריבית הממוצעת של שני מסלולים
+
+</Section>
+
+<Callout title="דוגמה לימודית">
+<p>{MARK}</p>
+</Callout>
+
+הלוואה בדויה של 1,000,000 ₪ בשני מסלולים: 900,000 ₪ ב־4.0% ו־100,000 ₪ ב־6.0%.
+
+**צעד 1 — הממוצע הפשוט.** <M>(4.0 + 6.0) ÷ 2 = {p("ex.nine_simple")}</M>%. הוא נראה סביר, אבל המסלול השני הוא עשירית ההלוואה.
+
+**צעד 2 — הממוצע המשוקלל.** המשקלים הם הסכומים: 900,000 ו־100,000. התוצאה: **{p("ex.nine")}%**.
+
+**צעד 3 — מה למדנו.** הפער בין {p("ex.nine_simple")}% ל־{p("ex.nine")}% הוא כל מה שהמשקל עושה. כשמסלול קטן באמת, הוא כמעט לא משפיע.
+
+<Section kind="דוגמה חצי פתורה">
+
+## שני בתים
+
+</Section>
+
+שני בתים בדויים, שההכנסות שלהם ביחד {f.shekels("ex.inc")}. בית ג: הכנסה 8,000 ₪ והחזר 2,400 ₪ (יחס {p("ex.ra")}%); בית ד: הכנסה 32,000 ₪ והחזר 16,000 ₪ (יחס {p("ex.rb")}%). השלימו את שלוש התוצאות.
+
+<FillTable
+  client:visible
+  id="8.2-half"
+  rowKey="what"
+  periodLabel="מה מחשבים"
+  columns={[{ key: "v", label: "התוצאה (אחוזים)", format: "number" }]}
+  rows={[
+    { what: "ממוצע פשוט של שני היחסים", v: f.raw("ex.avg") },
+    { what: "סך ההחזרים חלקי סך ההכנסות", v: f.raw("ex.overall") },
+  ]}
+  blanks={["סך ההחזרים חלקי סך ההכנסות.v"]}
+  success="הממוצע הפשוט נמוך, כי הוא לא רואה שבית ד גדול פי ארבעה."
+  hint="חברו את ההחזרים (2,400 ועוד 16,000) וחלקו בסכום ההכנסות (8,000 ועוד 32,000), וכפלו ב־100."
+/>
+
+<Section kind="תרגול">
+
+## שישה תרגילים
+
+</Section>
+
+המספרים להמחשה בלבד, וכדאי להשתמש במחשבון או בגיליון בתרגילים 3 עד 6.
+
+<ChoiceExercise
+  client:visible
+  id="8.2-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "כשהמספרים לא באותו גודל או משקל, כמו מסלולים בסכומים שונים", correct: true, feedback: "נכון. המשקל הוא מה שמבדיל." },
+    { text: "תמיד, כי הוא מדויק יותר", feedback: "כשכל המשקלים שווים הוא זהה לממוצע הפשוט." },
+    { text: "כשיש מספר שלילי", feedback: "זה לא קשור למשקלים." },
+    { text: "אף פעם, כי הממוצע הפשוט מספיק", feedback: "ראיתם שהוא נותן תשובה שונה מזו ששילמו." },
+  ]}
+>
+  מתי ממוצע משוקלל שונה מהפשוט, ולכן נחוץ?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.2-2" n={2} level="קל" unit="%" answer={f.raw("ex.mean")} errors={[]}>
+  ארבעה בנקים בדויים הציעו לאותו מסלול ריביות של 4.40%, 4.30%, 4.35% ו־4.55%. מהו הממוצע הפשוט שלהן, באחוזים?
+</NumericExercise>
+
+<Solution for="8.2-2">
+<M>(4.40 + 4.30 + 4.35 + 4.55) ÷ 4 = {p("ex.mean")}</M>. {p("ex.mean")}%.
+</Solution>
+
+<NumericExercise client:visible id="8.2-3" n={3} level="בינוני" unit="%" answer={f.raw("ex.w")} errors={[{ value: "4.5", message: "זה הממוצע הפשוט של 4.2 ו־4.8. המסלול של 600,000 ₪ גדול יותר, ולכן הוא מושך את הממוצע אליו." }]}>
+  הלוואה בדויה: 600,000 ₪ בריבית 4.2% ו־400,000 ₪ בריבית 4.8%. מהי הריבית ההתחלתית הממוצעת על כל הכסף, באחוזים?
+</NumericExercise>
+
+<Solution for="8.2-3">
+<M>(600,000 × 4.2 + 400,000 × 4.8) ÷ 1,000,000 = {p("ex.w")}</M>. {p("ex.w")}%.
+</Solution>
+
+<NumericExercise client:visible id="8.2-4" n={4} level="בינוני" unit="%" answer={f.raw("ex.overall")} errors={[{ value: f.raw("ex.avg"), message: "זה הממוצע הפשוט של שני היחסים. הבית הגדול משפיע יותר, ולכן חשבו את הסכום חלקי הסכום." }]}>
+  בית ג: הכנסה 8,000 ₪ והחזר 2,400 ₪. בית ד: הכנסה 32,000 ₪ והחזר 16,000 ₪. מהו יחס ההחזר של שני הבתים יחד, באחוזים (לספרה אחת)?
+</NumericExercise>
+
+<Solution for="8.2-4">
+<M>({n("ex.pay")}) ÷ ({n("ex.inc")}) × 100 = {p("ex.overall")}</M>%. הממוצע הפשוט של היחסים, {p("ex.avg")}%, נמוך מדי.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.2-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "לא: זה הריבית ההתחלתית הממוצעת; המחיר תלוי גם בתקופות, בעדכוני הריבית ובהצמדה", correct: true, feedback: "נכון." },
+    { text: "כן, כי הוא כולל את כל הכסף", feedback: "הוא כולל את כל הכסף, אבל לא את הזמן." },
+    { text: "כן, כי כך מחשבים את העלות הממשית של האשראי", feedback: "העלות הממשית (שיעור 3.10) היא שיעור תשואה פנימי על כל התשלומים, שיטה אחרת." },
+    { text: "לא, כי ממוצע משוקלל הוא מושג שלא קשור לריבית", feedback: "הוא קשור: הוא פשוט לא מספיק." },
+  ]}
+>
+  האם הממוצע המשוקלל של הריביות בתמהיל הוא המחיר של ההלוואה?
+</ChoiceExercise>
+
+<NumericExercise client:visible id="8.2-6" n={6} level="מאתגר" unit="%" answer={f.raw("ex.c05")} errors={[{ value: f.raw("m.weighted"), message: "זה הממוצע של תמהיל אחר, בשלושה מסלולים." }]}>
+  תמהיל בדוי: חצי מההלוואה בקבועה לא צמודה ב־4.40% וחצי בפריים ב־4.60% (כל חצי ב־50% מההלוואה). מהי הריבית ההתחלתית הממוצעת המשוקללת?
+</NumericExercise>
+
+<Solution for="8.2-6">
+המשקלים שווים, ולכן זה הממוצע הפשוט: <M>(4.40 + 4.60) ÷ 2 = {p("ex.c05")}</M>. {p("ex.c05")}%.
+</Solution>
+
+<Callout title="חמש שאלות על סכום וממוצע">
+<p><strong>מה זה?</strong> סכום הוא חיבור של הרבה מספרים; ממוצע הוא הסכום חלקי מספרם; ממוצע משוקלל נותן לכל מספר משקל לפי הגודל שלו.</p>
+<p><strong>למה זה קיים?</strong> כדי להחליף רשימה ארוכה במספר אחד שאפשר להשוות.</p>
+<p><strong>איך זה עובד?</strong> מכפילים במשקלים, מחברים, ומחלקים בסכום המשקלים.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ריבית ״ממוצעת״ שמוצגת לכם עשויה להיות פשוטה או משוקללת, והיא משפיעה על ההשוואה בין הצעות. שאלו איזה.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> משווים תמהילים לפי ממוצע משוקלל רק כמדד התחלתי, ובודקים תמיד גם את ההחזר ואת סך התשלומים.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **Σ** הוא קיצור לחיבור ארוך; ההחזר של תמהיל הוא סכום ההחזרים של המסלולים.
+- **ממוצע** = סכום ÷ מספר. הוא נקודת איזון, ולא בהכרח מספר שמופיע ברשימה.
+- **ממוצע משוקלל** = סכום של (מספר × משקל) ÷ סכום המשקלים. בתמהיל, המשקל הוא הסכום של המסלול.
+- הריבית ההתחלתית הממוצעת של התמהיל בדוגמה היא {p("m.weighted")}%, לא {p("m.simple")}%, ובכל זאת היא לא מחיר ההלוואה.
+- ממוצע של יחסים צריך משקלים: או שמחברים קודם מונים ומכנים.
+
+**בשיעור הבא — 8.3, <Later lesson="8.3" quiet>התפלגות</Later>, <Later lesson="8.3" quiet>פיזור</Later> ו<Later lesson="8.3" quiet>אחוזון</Later>:** ממוצע אחד לא מספר כמה הנתונים מתפזרים. נבנה <Later lesson="8.3" quiet>היסטוגרמה</Later> ונחשב ערך שמתחתיו יושבים רוב הנתונים.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "סכום, ממוצע וממוצע משוקלל, וההבדל בין ממוצע של יחסים ליחס של סכומים: מתמטיקה כללית, בלי מקור מסוים." },
+    { kind: "הנחת חישוב", text: "התמהיל (820,000 ₪ קבועה ב־4.40%, 492,000 ₪ פריים ב־4.60%, 328,000 ₪ משתנה ב־4.10%) הוא תמהיל בדוי על הלוואה של תיק א׳, מהמחירון הבדוי של שיעור 5.6. הבתים והסכומים בתרגילים בדויים. נתונים סינתטיים. ההחזרים בשפיצר, 360 חודשים." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו ונבדקו פעמיים: ב־TypeScript וב־Python, בנפרד.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/stats.ts via scripts/lessons/lesson-8-2.ts and _stats-facts.ts and data/lessons/8-2.json, rechecked by checks/kinds/stats.py. Case numbers: src/data/case-s8.ts. Video: video/8-2.html. */}

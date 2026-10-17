@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCalibrator, binCalibrator, brierScore, calibrationGap, equalEdges, logistic, reliabilityTable, type Scored } from "./calibration.ts";
+import { recalibrate, applyCalibrator, binCalibrator, brierScore, calibrationGap, equalEdges, logistic, reliabilityTable, type Scored } from "./calibration.ts";
 
 // By hand: five predictions of 0.8 of which 4 happened, and four of 0.2 of which 1 happened.
 const DATA: Scored[] = [
@@ -55,5 +55,38 @@ describe("logistic", () => {
     expect(logistic("2.197224577336219")).toBe("0.900000"); // ln 9
     expect(logistic(-2)).toBe("0.119203");
     expect(logistic(2)).toBe("0.880797");
+  });
+});
+
+import { DEMO_APPROVAL, syntheticApplicants, toScored } from "./calibration.ts";
+describe("syntheticApplicants", () => {
+  it("is reproducible and over-confident", () => {
+    const a = syntheticApplicants(11, 2000);
+    expect(syntheticApplicants(11, 2000)).toEqual(a);
+    const rows = reliabilityTable(toScored(a), equalEdges(5));
+    // The model says 0.9+ in the top bin; fewer than that happens.
+    const top = rows[4];
+    expect(top.n).toBeGreaterThan(50);
+    expect(Number(top.gap)).toBeLessThan(-0.02);
+    expect(DEMO_APPROVAL.k).toBe("1.6");
+  });
+});
+
+describe("recalibrate", () => {
+  it("a model that always says 0.9 but is right 6 in 10: after learning the map, the held-out gap is small", () => {
+    const outcomes = [1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]; // 12 of 20 happen
+    const data = outcomes.map((o) => ({ p: "0.9", outcome: o as 0 | 1 }));
+    const r = recalibrate(data, 10, equalEdges(5), 5);
+    expect(r.trained).toBe(10);
+    expect(r.tested).toBe(10);
+    // Held-out: 6 of 10 happen, the model said 0.9 (gap 0.3). The map learned 6 of 10 from the training half: the new prediction is 0.6.
+    expect(r.before.gap).toBe("0.3000");
+    expect(r.after.gap).toBe("0.0000");
+    expect(Number(r.after.brier)).toBeLessThan(Number(r.before.brier));
+  });
+  it("a bin with too few training cases is left alone", () => {
+    const data = [{ p: "0.9", outcome: 1 }, { p: "0.9", outcome: 0 }, { p: "0.9", outcome: 1 }, { p: "0.9", outcome: 1 }] as { p: string; outcome: 0 | 1 }[];
+    const r = recalibrate(data, 2, equalEdges(5), 5);
+    expect(r.after.gap).toBe(r.before.gap);
   });
 });

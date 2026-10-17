@@ -1,0 +1,558 @@
+{
+  "lesson": "8.19",
+  "title": "הסתברות לאישור, וכיול",
+  "note": "Synthetic. 2,000 applicants made by the course's seeded generator (mulberry32): financing 30-75%, payment ratio 20-50%; the TRUE chance of approval is logistic(0.4 + 0.5·(40 − payment ratio)/10 + 0.3·(60 − financing)/10); the MODEL's chance is logistic of 1.6 times the same score (over-confident). Mogi has no approvals data; a calibrated probability needs data Mogi does not have yet. Bins are [lo, hi) except the last; rates at four decimals.",
+  "facts": [
+    {
+      "id": "k",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.6"
+    },
+    {
+      "id": "n",
+      "kind": "given",
+      "inputs": {},
+      "value": "2000"
+    },
+    {
+      "id": "seed",
+      "kind": "given",
+      "inputs": {},
+      "value": "31"
+    },
+    {
+      "id": "ex.ltv",
+      "kind": "given",
+      "inputs": {},
+      "value": "55"
+    },
+    {
+      "id": "ex.pti",
+      "kind": "given",
+      "inputs": {},
+      "value": "35"
+    },
+    {
+      "id": "ex.z",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.80"
+    },
+    {
+      "id": "ex.zm",
+      "kind": "given",
+      "inputs": {},
+      "value": "1.28"
+    },
+    {
+      "id": "ex.truth",
+      "kind": "cal_logistic",
+      "inputs": {
+        "z": "0.80"
+      },
+      "value": "0.689974"
+    },
+    {
+      "id": "ex.pred",
+      "kind": "cal_logistic",
+      "inputs": {
+        "z": "1.28"
+      },
+      "value": "0.782450"
+    },
+    {
+      "id": "log.0",
+      "kind": "cal_logistic",
+      "inputs": {
+        "z": "0"
+      },
+      "value": "0.500000"
+    },
+    {
+      "id": "log.2",
+      "kind": "cal_logistic",
+      "inputs": {
+        "z": "2"
+      },
+      "value": "0.880797"
+    },
+    {
+      "id": "log.m2",
+      "kind": "cal_logistic",
+      "inputs": {
+        "z": "-2"
+      },
+      "value": "0.119203"
+    },
+    {
+      "id": "people",
+      "kind": "cal_applicants",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "show": 6
+      },
+      "value": [
+        {
+          "ltv": 60,
+          "pti": 45,
+          "truth": "0.537430",
+          "p": "0.559714",
+          "outcome": 0
+        },
+        {
+          "ltv": 32,
+          "pti": 32,
+          "truth": "0.837535",
+          "p": "0.932390",
+          "outcome": 1
+        },
+        {
+          "ltv": 33,
+          "pti": 48,
+          "truth": "0.692110",
+          "p": "0.785161",
+          "outcome": 0
+        },
+        {
+          "ltv": 60,
+          "pti": 29,
+          "truth": "0.721115",
+          "p": "0.820538",
+          "outcome": 0
+        },
+        {
+          "ltv": 56,
+          "pti": 33,
+          "truth": "0.704746",
+          "p": "0.800911",
+          "outcome": 0
+        },
+        {
+          "ltv": 32,
+          "pti": 42,
+          "truth": "0.757680",
+          "p": "0.861045",
+          "outcome": 0
+        }
+      ]
+    },
+    {
+      "id": "table10",
+      "kind": "cal_table",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 10
+      },
+      "value": [
+        {
+          "lo": "0",
+          "hi": "0.1",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.1",
+          "hi": "0.2",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.2",
+          "hi": "0.3",
+          "n": 2,
+          "happened": 2,
+          "predicted": "0.2932",
+          "observed": "1.0000",
+          "gap": "0.7068"
+        },
+        {
+          "lo": "0.3",
+          "hi": "0.4",
+          "n": 44,
+          "happened": 18,
+          "predicted": "0.3543",
+          "observed": "0.4091",
+          "gap": "0.0548"
+        },
+        {
+          "lo": "0.4",
+          "hi": "0.5",
+          "n": 106,
+          "happened": 51,
+          "predicted": "0.4540",
+          "observed": "0.4811",
+          "gap": "0.0271"
+        },
+        {
+          "lo": "0.5",
+          "hi": "0.6",
+          "n": 155,
+          "happened": 84,
+          "predicted": "0.5529",
+          "observed": "0.5419",
+          "gap": "-0.0109"
+        },
+        {
+          "lo": "0.6",
+          "hi": "0.7",
+          "n": 233,
+          "happened": 147,
+          "predicted": "0.6567",
+          "observed": "0.6309",
+          "gap": "-0.0258"
+        },
+        {
+          "lo": "0.7",
+          "hi": "0.8",
+          "n": 434,
+          "happened": 282,
+          "predicted": "0.7551",
+          "observed": "0.6498",
+          "gap": "-0.1054"
+        },
+        {
+          "lo": "0.8",
+          "hi": "0.9",
+          "n": 595,
+          "happened": 460,
+          "predicted": "0.8518",
+          "observed": "0.7731",
+          "gap": "-0.0787"
+        },
+        {
+          "lo": "0.9",
+          "hi": "1",
+          "n": 431,
+          "happened": 353,
+          "predicted": "0.9343",
+          "observed": "0.8190",
+          "gap": "-0.1153"
+        }
+      ]
+    },
+    {
+      "id": "brier",
+      "kind": "cal_brier",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6"
+      },
+      "value": "0.2052"
+    },
+    {
+      "id": "gap10",
+      "kind": "cal_gap",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 10
+      },
+      "value": "0.0783"
+    },
+    {
+      "id": "table5",
+      "kind": "cal_table",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 5
+      },
+      "value": [
+        {
+          "lo": "0",
+          "hi": "0.2",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.2",
+          "hi": "0.4",
+          "n": 46,
+          "happened": 20,
+          "predicted": "0.3517",
+          "observed": "0.4348",
+          "gap": "0.0831"
+        },
+        {
+          "lo": "0.4",
+          "hi": "0.6",
+          "n": 261,
+          "happened": 135,
+          "predicted": "0.5127",
+          "observed": "0.5172",
+          "gap": "0.0045"
+        },
+        {
+          "lo": "0.6",
+          "hi": "0.8",
+          "n": 667,
+          "happened": 429,
+          "predicted": "0.7208",
+          "observed": "0.6432",
+          "gap": "-0.0776"
+        },
+        {
+          "lo": "0.8",
+          "hi": "1",
+          "n": 1026,
+          "happened": 813,
+          "predicted": "0.8865",
+          "observed": "0.7924",
+          "gap": "-0.0941"
+        }
+      ]
+    },
+    {
+      "id": "gap5",
+      "kind": "cal_gap",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 5
+      },
+      "value": "0.0766"
+    },
+    {
+      "id": "thin5",
+      "kind": "cal_table",
+      "inputs": {
+        "seed": 31,
+        "n": 100,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 5
+      },
+      "value": [
+        {
+          "lo": "0",
+          "hi": "0.2",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.2",
+          "hi": "0.4",
+          "n": 2,
+          "happened": 1,
+          "predicted": "0.3694",
+          "observed": "0.5000",
+          "gap": "0.1306"
+        },
+        {
+          "lo": "0.4",
+          "hi": "0.6",
+          "n": 11,
+          "happened": 2,
+          "predicted": "0.5227",
+          "observed": "0.1818",
+          "gap": "-0.3409"
+        },
+        {
+          "lo": "0.6",
+          "hi": "0.8",
+          "n": 35,
+          "happened": 23,
+          "predicted": "0.7213",
+          "observed": "0.6571",
+          "gap": "-0.0642"
+        },
+        {
+          "lo": "0.8",
+          "hi": "1",
+          "n": 52,
+          "happened": 43,
+          "predicted": "0.8904",
+          "observed": "0.8269",
+          "gap": "-0.0635"
+        }
+      ]
+    },
+    {
+      "id": "thin_gap5",
+      "kind": "cal_gap",
+      "inputs": {
+        "seed": 31,
+        "n": 100,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 5
+      },
+      "value": "0.0956"
+    },
+    {
+      "id": "recal",
+      "kind": "cal_recal",
+      "inputs": {
+        "seed": 31,
+        "n": 2000,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 10,
+        "train": 1000,
+        "min_per_bin": 30
+      },
+      "value": {
+        "trained": 1000,
+        "tested": 1000,
+        "before": {
+          "gap": "0.0676",
+          "brier": "0.1966"
+        },
+        "after": {
+          "gap": "0.0488",
+          "brier": "0.1959"
+        }
+      }
+    },
+    {
+      "id": "recal_small",
+      "kind": "cal_recal",
+      "inputs": {
+        "seed": 31,
+        "n": 300,
+        "a": "0.4",
+        "b": "0.5",
+        "c": "0.3",
+        "k": "1.6",
+        "bins": 10,
+        "train": 100,
+        "min_per_bin": 30
+      },
+      "value": {
+        "trained": 100,
+        "tested": 200,
+        "before": {
+          "gap": "0.1257",
+          "brier": "0.2298"
+        },
+        "after": {
+          "gap": "0.1257",
+          "brier": "0.2298"
+        }
+      }
+    },
+    {
+      "id": "recal.min",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "hand.table",
+      "kind": "cal_table",
+      "inputs": {
+        "data": "0.8:1,0.8:1,0.8:1,0.8:0,0.8:0,0.4:1,0.4:0,0.4:0,0.4:1,0.4:0",
+        "bins": 5
+      },
+      "value": [
+        {
+          "lo": "0",
+          "hi": "0.2",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.2",
+          "hi": "0.4",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.4",
+          "hi": "0.6",
+          "n": 5,
+          "happened": 2,
+          "predicted": "0.4000",
+          "observed": "0.4000",
+          "gap": "0.0000"
+        },
+        {
+          "lo": "0.6",
+          "hi": "0.8",
+          "n": 0,
+          "happened": 0,
+          "predicted": null,
+          "observed": null,
+          "gap": null
+        },
+        {
+          "lo": "0.8",
+          "hi": "1",
+          "n": 5,
+          "happened": 3,
+          "predicted": "0.8000",
+          "observed": "0.6000",
+          "gap": "-0.2000"
+        }
+      ]
+    },
+    {
+      "id": "hand.brier",
+      "kind": "cal_brier",
+      "inputs": {
+        "data": "0.8:1,0.8:1,0.8:1,0.8:0,0.8:0,0.4:1,0.4:0,0.4:0,0.4:1,0.4:0"
+      },
+      "value": "0.2600"
+    },
+    {
+      "id": "hand.gap",
+      "kind": "cal_gap",
+      "inputs": {
+        "data": "0.8:1,0.8:1,0.8:1,0.8:0,0.8:0,0.4:1,0.4:0,0.4:0,0.4:1,0.4:0",
+        "bins": 5
+      },
+      "value": "0.1000"
+    }
+  ]
+}

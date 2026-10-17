@@ -1,0 +1,1114 @@
+{
+  "lesson": "8.28",
+  "title": "סדנה: מנוע קטן בגיליון (וגם ב־Python)",
+  "note": "Synthetic: the stage's case (case A's numbers, fictional banks), a 66-candidate grid, hard constraints, front, a choice by illustrative weights, the explanation numbers and a made-up bank offer. Mogi today has no mix calculation in code; everything is future and for illustration.",
+  "facts": [
+    {
+      "id": "ws.case",
+      "kind": "given",
+      "inputs": {},
+      "value": {
+        "price": "2200000",
+        "base_equity": "560000",
+        "savings": "40000",
+        "car_payoff": "36000",
+        "incomes": [
+          "12400",
+          "9300"
+        ],
+        "parent_income": "4000",
+        "car_monthly": "1450",
+        "rules": {
+          "ltv_ceiling": "75",
+          "pti_limit": "50",
+          "variable_numerator": 2,
+          "variable_denominator": 3,
+          "max_term_months": 360,
+          "years": 30,
+          "step": 10,
+          "reset_months": 60
+        },
+        "car_months_left": 26,
+        "max_payment": "8300",
+        "target_ratio": "40",
+        "banks": {
+          "a": {
+            "name": "בנק א׳",
+            "prices": {
+              "fixed_unlinked": "4.40",
+              "prime": "4.60",
+              "variable_unlinked": "4.10"
+            },
+            "ratio_max": "45",
+            "ltv_max": "75"
+          },
+          "b": {
+            "name": "בנק ב׳",
+            "prices": {
+              "fixed_unlinked": "4.30",
+              "prime": "4.70",
+              "variable_unlinked": "4.00"
+            },
+            "ratio_max": "50",
+            "ltv_max": "75"
+          },
+          "c": {
+            "name": "בנק ג׳",
+            "prices": {
+              "fixed_unlinked": "4.35",
+              "prime": "4.55",
+              "variable_unlinked": "4.20"
+            },
+            "ratio_max": "50",
+            "ltv_max": "75"
+          },
+          "d": {
+            "name": "בנק ד׳",
+            "prices": {
+              "fixed_unlinked": "4.45",
+              "prime": "4.65",
+              "variable_unlinked": "4.15"
+            },
+            "ratio_max": "50",
+            "ltv_max": "70"
+          }
+        },
+        "scenarios": {
+          "base": {
+            "prime_shift": "0",
+            "anchor_shift": "0"
+          },
+          "stress": {
+            "prime_shift": "2",
+            "anchor_shift": "2"
+          }
+        },
+        "offer": {
+          "bank": "b",
+          "shares": [
+            50,
+            50,
+            0
+          ],
+          "rates": {
+            "fixed_unlinked": "4.35",
+            "prime": "4.65"
+          }
+        }
+      }
+    },
+    {
+      "id": "w.0",
+      "kind": "given",
+      "inputs": {},
+      "value": "40"
+    },
+    {
+      "id": "w.1",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "w.2",
+      "kind": "given",
+      "inputs": {},
+      "value": "30"
+    },
+    {
+      "id": "p.loan",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "loan"
+      },
+      "value": "1620000.00"
+    },
+    {
+      "id": "p.ltv",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "ltv"
+      },
+      "value": "73.64"
+    },
+    {
+      "id": "p.disposable",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "disposable"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "p.space",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "space"
+      },
+      "value": 66
+    },
+    {
+      "id": "p.feasible",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "feasible"
+      },
+      "value": 14
+    },
+    {
+      "id": "p.efficient",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "efficient"
+      },
+      "value": 6
+    },
+    {
+      "id": "p.front_ids",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "front_ids"
+      },
+      "value": "g40-0-60|g50-0-50|g60-0-40|g70-0-30|g80-0-20|g90-0-10"
+    },
+    {
+      "id": "p.winner_id",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner_id"
+      },
+      "value": "g40-0-60"
+    },
+    {
+      "id": "p.runner_id",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "runner_id"
+      },
+      "value": "g50-0-50"
+    },
+    {
+      "id": "p.winner:first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner:first"
+      },
+      "value": "7941.62"
+    },
+    {
+      "id": "p.winner:total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner:total"
+      },
+      "value": "2858982.61"
+    },
+    {
+      "id": "p.winner:exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner:exposure"
+      },
+      "value": "1031.61"
+    },
+    {
+      "id": "p.gap:first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "gap:first"
+      },
+      "value": "28.45"
+    },
+    {
+      "id": "p.gap:total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "gap:total"
+      },
+      "value": "10242.87"
+    },
+    {
+      "id": "p.gap:exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "gap:exposure"
+      },
+      "value": "-170.60"
+    },
+    {
+      "id": "p.reject:sum_equals_loan",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:sum_equals_loan"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:equity_available",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:equity_available"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:ltv",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:ltv"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:pti",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:pti"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:variable_share",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:variable_share"
+      },
+      "value": 38
+    },
+    {
+      "id": "p.reject:term",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:term"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:bank_ratio",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:bank_ratio"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:bank_ltv",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:bank_ltv"
+      },
+      "value": 0
+    },
+    {
+      "id": "p.reject:client_max_payment",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:client_max_payment"
+      },
+      "value": 1
+    },
+    {
+      "id": "p.reject:client_target_ratio",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "reject:client_target_ratio"
+      },
+      "value": 31
+    },
+    {
+      "id": "p.offer:estimate_first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:estimate_first"
+      },
+      "value": "8310.78"
+    },
+    {
+      "id": "p.offer:offer_first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:offer_first"
+      },
+      "value": "8310.28"
+    },
+    {
+      "id": "p.offer:first_gap",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:first_gap"
+      },
+      "value": "-0.50"
+    },
+    {
+      "id": "p.offer:estimate_total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:estimate_total"
+      },
+      "value": "2991877.66"
+    },
+    {
+      "id": "p.offer:offer_total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:offer_total"
+      },
+      "value": "2991699.94"
+    },
+    {
+      "id": "p.offer:total_gap",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "offer:total_gap"
+      },
+      "value": "-177.72"
+    },
+    {
+      "id": "b.loan",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "loan"
+      },
+      "value": "1640000.00"
+    },
+    {
+      "id": "b.ltv",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "ltv"
+      },
+      "value": "74.55"
+    },
+    {
+      "id": "b.disposable",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "disposable"
+      },
+      "value": "20250.00"
+    },
+    {
+      "id": "b.feasible",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "feasible"
+      },
+      "value": 4
+    },
+    {
+      "id": "b.efficient",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "efficient"
+      },
+      "value": 3
+    },
+    {
+      "id": "b.winner_id",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner_id"
+      },
+      "value": "g40-0-60"
+    },
+    {
+      "id": "b.winner:first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "0",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "winner:first"
+      },
+      "value": "8039.66"
+    },
+    {
+      "id": "o.feasible",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 1,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "feasible"
+      },
+      "value": 0
+    },
+    {
+      "id": "x.winner_id",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "10|20|70",
+        "what": "winner_id"
+      },
+      "value": "g90-0-10"
+    },
+    {
+      "id": "x.winner:first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "10|20|70",
+        "what": "winner:first"
+      },
+      "value": "8083.87"
+    },
+    {
+      "id": "x.winner:exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "10|20|70",
+        "what": "winner:exposure"
+      },
+      "value": "175.49"
+    },
+    {
+      "id": "p.row.g40-0-60.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g40-0-60:first"
+      },
+      "value": "7941.62"
+    },
+    {
+      "id": "p.row.g40-0-60.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g40-0-60:total"
+      },
+      "value": "2858982.61"
+    },
+    {
+      "id": "p.row.g40-0-60.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g40-0-60:exposure"
+      },
+      "value": "1031.61"
+    },
+    {
+      "id": "p.row.g40-0-60.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g40-0-60:score"
+      },
+      "value": "0.272940"
+    },
+    {
+      "id": "p.row.g40-0-60.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g40-0-60:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "p.row.g50-0-50.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g50-0-50:first"
+      },
+      "value": "7970.07"
+    },
+    {
+      "id": "p.row.g50-0-50.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g50-0-50:total"
+      },
+      "value": "2869225.48"
+    },
+    {
+      "id": "p.row.g50-0-50.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g50-0-50:exposure"
+      },
+      "value": "861.01"
+    },
+    {
+      "id": "p.row.g50-0-50.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g50-0-50:score"
+      },
+      "value": "0.349310"
+    },
+    {
+      "id": "p.row.g50-0-50.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g50-0-50:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "p.row.g60-0-40.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g60-0-40:first"
+      },
+      "value": "7998.53"
+    },
+    {
+      "id": "p.row.g60-0-40.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g60-0-40:total"
+      },
+      "value": "2879464.48"
+    },
+    {
+      "id": "p.row.g60-0-40.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g60-0-40:exposure"
+      },
+      "value": "687.15"
+    },
+    {
+      "id": "p.row.g60-0-40.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g60-0-40:score"
+      },
+      "value": "0.424660"
+    },
+    {
+      "id": "p.row.g60-0-40.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g60-0-40:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "p.row.g70-0-30.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g70-0-30:first"
+      },
+      "value": "8026.97"
+    },
+    {
+      "id": "p.row.g70-0-30.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g70-0-30:total"
+      },
+      "value": "2889710.93"
+    },
+    {
+      "id": "p.row.g70-0-30.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g70-0-30:exposure"
+      },
+      "value": "516.01"
+    },
+    {
+      "id": "p.row.g70-0-30.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g70-0-30:score"
+      },
+      "value": "0.500850"
+    },
+    {
+      "id": "p.row.g70-0-30.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g70-0-30:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "p.row.g80-0-20.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g80-0-20:first"
+      },
+      "value": "8055.42"
+    },
+    {
+      "id": "p.row.g80-0-20.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g80-0-20:total"
+      },
+      "value": "2899953.87"
+    },
+    {
+      "id": "p.row.g80-0-20.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g80-0-20:exposure"
+      },
+      "value": "345.53"
+    },
+    {
+      "id": "p.row.g80-0-20.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g80-0-20:score"
+      },
+      "value": "0.577280"
+    },
+    {
+      "id": "p.row.g80-0-20.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g80-0-20:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "p.row.g90-0-10.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g90-0-10:first"
+      },
+      "value": "8083.87"
+    },
+    {
+      "id": "p.row.g90-0-10.total",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g90-0-10:total"
+      },
+      "value": "2910197.40"
+    },
+    {
+      "id": "p.row.g90-0-10.exposure",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g90-0-10:exposure"
+      },
+      "value": "175.49"
+    },
+    {
+      "id": "p.row.g90-0-10.score",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g90-0-10:score"
+      },
+      "value": "0.653830"
+    },
+    {
+      "id": "p.row.g90-0-10.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g90-0-10:reasons"
+      },
+      "value": ""
+    },
+    {
+      "id": "s.variable",
+      "kind": "dr_percent",
+      "inputs": {
+        "part": 38,
+        "whole": 66
+      },
+      "value": "57.58"
+    },
+    {
+      "id": "s.max",
+      "kind": "dr_percent",
+      "inputs": {
+        "part": 1,
+        "whole": 66
+      },
+      "value": "1.52"
+    },
+    {
+      "id": "s.target",
+      "kind": "dr_percent",
+      "inputs": {
+        "part": 31,
+        "whole": 66
+      },
+      "value": "46.97"
+    },
+    {
+      "id": "p.rej.first",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g0-60-40:first"
+      },
+      "value": "8114.03"
+    },
+    {
+      "id": "p.rej.reasons",
+      "kind": "ws8_value",
+      "inputs": {
+        "extra_equity": "20000",
+        "close_car": 0,
+        "parent": 0,
+        "bank": "a",
+        "weights": "40|30|30",
+        "what": "row:g0-60-40:reasons"
+      },
+      "value": "variable_share|client_target_ratio"
+    },
+    {
+      "id": "p.rej.id",
+      "kind": "given",
+      "inputs": {},
+      "value": "g0-60-40"
+    }
+  ]
+}

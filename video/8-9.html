@@ -1,0 +1,182 @@
+<!doctype html>
+<!--
+  Video scene for lesson 8.9 - the calculation engine. window.render(t) is a pure function of t; every number comes from data/lessons/8-9.json.
+  Script: (1) title; (2) a hand-sized track month by month; (3) the mix is the sum of tracks; (4) one mix, two scenarios; (5) deterministic: fingerprints; (6) takeaway.
+  LABEL: the engine is the course's illustration; Mogi today has none in code.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 400; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-600-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 600; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+FB1D-FB4F; }
+      @font-face { font-family: "Heebo"; font-weight: 700; src: url("/node_modules/@fontsource/heebo/files/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-22FF; }
+      /* The bottom 150px stay clear for the subtitles. */
+      html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--mogi-n50); font-family: "Heebo", sans-serif; color: var(--mogi-n900); }
+      #stage { position: relative; width: 1280px; height: 720px; }
+      .logo { position: absolute; top: 28px; right: 40px; height: 44px; }
+      .kicker { position: absolute; top: 36px; right: 100px; font-size: 18px; font-weight: 600; color: var(--mogi-n600); }
+      .tag { position: absolute; top: 36px; left: 40px; font-size: 16px; font-weight: 600; color: var(--mogi-n600); }
+      svg text { font-family: "Heebo", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img class="logo" src="/public/brand/mogi-logo.png" alt="" />
+      <div class="kicker">שיעור 8.9 · מנוע החישוב</div>
+      <div class="tag">נתונים סינתטיים · להדגמה</div>
+      <svg id="svg" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+    </div>
+    <script type="module">
+      const data = await (await fetch("/data/lessons/8-9.json")).json();
+      const fact = (id) => data.facts.find((f) => f.id === id).value;
+      const nf2 = new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const num = (v) => nf2.format(Number(v)).replace(/\.00$/, "");
+      const shek = (v) => `${num(v)} ₪`;
+      const pl = (v) => String(v).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+      // LTR isolate for a number (the number only; a sign stays outside).
+      const lr = (s) => `\u2066${s}\u2069`;
+
+      const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+      const inScene = (t, [a, b]) => t >= a && t < b;
+      const fadeIn = (t, [a], d = 0.6) => clamp((t - a) / d);
+      const fadeOut = (t, [, b], d = 0.6) => clamp((b - t) / d);
+      const vis = (t, sc) => Math.min(fadeIn(t, sc), fadeOut(t, sc));
+      const after = (t, sc, s, o) => Math.min(o, clamp((t - sc[0] - s) / 0.6));
+      const grow = (t, sc, s, d) => clamp((t - sc[0] - s) / d);
+
+      const C = {
+        navy: "var(--mogi-navy)", n0: "var(--mogi-n0)", n100: "var(--mogi-n100)", n200: "var(--mogi-n200)", n300: "var(--mogi-n300)",
+        n600: "var(--mogi-n600)", n700: "var(--mogi-n700)", n400: "var(--mogi-n400)",
+        teal: "var(--mogi-teal-deep)", tq2: "var(--mogi-turquoise-2)", mint: "var(--mogi-mint)",
+      };
+
+      const svg = document.getElementById("svg");
+      const el = (tag, attrs, text) => {
+        const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text !== undefined) e.textContent = text;
+        svg.appendChild(e);
+        return e;
+      };
+      // RTL text: anchor "start" puts its right edge at x. LTR runs (numbers) take ltr: true.
+      const txt = (x, y, s, size, opts = {}) =>
+        el("text", { x, y, "font-size": size, "font-weight": opts.w ?? 400, fill: opts.fill ?? C.navy, "text-anchor": opts.anchor ?? "middle", opacity: opts.o ?? 1, direction: opts.ltr ? "ltr" : "rtl", "unicode-bidi": "isolate" }, s);
+      const box = (x, y, w, h, o, fill = C.n0) => el("rect", { x, y, width: w, height: h, rx: 14, fill, stroke: fill === C.n0 ? C.n200 : "none", opacity: o });
+      const bar = (x, y, w, h, fill, o = 1) => el("rect", { x, y, width: Math.max(0, w), height: h, rx: 6, fill, opacity: o });
+
+      const MONTHS = [1, 61, 121, 360];
+      const KN = ["פריים", "משתנה", "קבועה"];
+      const S = { title: [0, 8], hand: [8, 46], mix: [46, 84], scen: [84, 120], det: [120, 156], end: [156, 170] };
+      window.duration = 170;
+      window.cues = [
+        [1, 5, "מנוע החישוב: תמהיל ותרחיש נכנסים, תזרים יוצא."],
+        [5, 7.5, "המנוע הוא המחשה של הקורס."],
+        [9, 16, `מסלול קטן: ${shek(fact("hand.amount"))}, ${fact("hand.rate")}% לשנה.`],
+        [16, 24, "קרן שווה: כל חודש אותו חלק מהקרן."],
+        [24, 32, `חודש 1: ריבית ${shek(fact("hand.int_1"))}, תשלום ${shek(fact("hand.pay_1"))}.`],
+        [32, 39, `חודש 2: הריבית יורדת ל־${shek(fact("hand.int_2"))}.`],
+        [39, 45, `חודש 12: נשאר ${shek(fact("hand.prin_12"))}, והיתרה אפס.`],
+        [47, 55, "שלושה מסלולים, כל אחד מחושב לבד."],
+        [55, 66, "בכל חודש, התמהיל הוא סכום המסלולים."],
+        [66, 76, `בחודש 61: ${shek(fact("pay.base.mix.61"))} בתרחיש הבסיס.`],
+        [76, 83, "מסלול שנגמר לא מוסיף כלום."],
+        [85, 93, "תרחיש הוא הנחה על העתיד: קלט, לא תוצאה."],
+        [93, 104, `חודש 1: אותו תשלום בשני התרחישים, ${shek(fact("pay.base.mix.1"))}.`],
+        [104, 112, `חודש 360 במחמיר: ${shek(fact("pay.stress.mix.360"))}.`],
+        [112, 119, "אותו תמהיל, שני תרחישים, שני תזרימים."],
+        [121, 129, "דטרמיניסטי: אותו קלט, אותה תוצאה."],
+        [129, 139, "טביעת אצבע של התוצאה: שמונה תווים."],
+        [139, 148, "סדר המסלולים לא משנה. שקל אחד שונה, כן."],
+        [148, 155, "בלי זה אי אפשר לבדוק, לשחזר או להסביר."],
+        [157, 163, "הסך = הלוואה + ריבית + הצמדה, עד האגורה."],
+        [163, 169, "אי־ודאות עוברת לקלט, לתרחיש."],
+      ];
+
+      window.render = (t) => {
+        svg.replaceChildren();
+        if (inScene(t, S.title)) {
+          const o = vis(t, S.title);
+          txt(640, 280, "מנוע החישוב", 80, { w: 700, o });
+          txt(640, 360, "אותו קלט, אותה תוצאה", 52, { w: 700, o: after(t, S.title, 1, o) });
+          txt(640, 430, "המנוע הוא המחשה של הקורס, לא קוד של Mogi", 26, { fill: C.n600, o: after(t, S.title, 4, o) });
+        }
+        if (inScene(t, S.hand)) {
+          const o = vis(t, S.hand);
+          txt(640, 124, `${lr(shek(fact("hand.amount")))} · ${lr(fact("hand.rate") + "%")} · ${lr(fact("hand.months"))} חודשים · קרן שווה`, 34, { w: 700, o });
+          const cols = ["חודש", "ריבית", "קרן", "תשלום", "יתרה"];
+          const xs = [1100, 880, 660, 440, 220];
+          cols.forEach((c, k) => txt(xs[k], 190, c, 24, { fill: C.n600, w: 700, o, anchor: "end" }));
+          el("line", { x1: 120, x2: 1160, y1: 205, y2: 205, stroke: C.n300, opacity: o });
+          [1, 2, 12].forEach((m, r) => {
+            const y = 260 + r * 78;
+            const or = after(t, S.hand, 6 + r * 7, o);
+            const vals = [String(m), shek(fact(`hand.int_${m}`)), shek(fact(`hand.prin_${m}`)), shek(fact(`hand.pay_${m}`)), shek(fact(`hand.close_${m}`))];
+            vals.forEach((v, k) => txt(xs[k], y, v, 30, { anchor: "end", ltr: true, w: k === 3 ? 700 : 400, fill: k === 3 ? C.teal : C.navy, o: or }));
+          });
+          txt(640, 520, `סך הכול ${lr(shek(fact("hand.total")))}, מהם ${lr(shek(fact("hand.interest")))} ריבית`, 26, { fill: C.n700, o: after(t, S.hand, 28, o) });
+        }
+        if (inScene(t, S.mix)) {
+          const o = vis(t, S.mix);
+          txt(640, 124, "התמהיל = סכום המסלולים", 40, { w: 700, o });
+          txt(640, 166, "חודש 61, תרחיש בסיס", 24, { fill: C.n600, o });
+          const vals = [1, 2, 3].map((k) => Number(fact(`pay.base.t${k}.61`)));
+          const total = Number(fact("pay.base.mix.61"));
+          const scale = 900 / total;
+          let x = 1140;
+          const fills = [C.teal, C.tq2, C.n300];
+          vals.forEach((v, k) => {
+            const w = v * scale * grow(t, S.mix, 3 + k * 4, 2);
+            bar(x - w, 230, w, 90, fills[k], o);
+            if (grow(t, S.mix, 3 + k * 4, 2) > 0.95) {
+              txt(x - w / 2, 280, shek(fact(`pay.base.t${k + 1}.61`)), 24, { w: 700, o, ltr: true, fill: k === 2 ? C.navy : C.n0 });
+              txt(x - w / 2, 350, KN[k], 22, { o, fill: C.n600 });
+            }
+            x -= w;
+          });
+          const o2 = after(t, S.mix, 18, o);
+          box(240, 420, 800, 90, o2 * 0.95, C.mint);
+          txt(640, 478, `התמהיל: ${lr(shek(fact("pay.base.mix.61")))}`, 44, { w: 700, o: o2 });
+        }
+        if (inScene(t, S.scen)) {
+          const o = vis(t, S.scen);
+          txt(640, 124, "אותו תמהיל, שני תרחישים", 40, { w: 700, o });
+          const hx = [1100, 780, 460, 140];
+          MONTHS.forEach((m, k) => txt(hx[k] + 80, 190, `חודש ${m}`, 24, { fill: C.n600, w: 700, o, anchor: "end" }));
+          [["בסיס", "base", C.teal], ["מחמיר", "stress", C.navy]].forEach(([label, sid, color], r) => {
+            const y = 260 + r * 110;
+            const or = after(t, S.scen, 3 + r * 6, o);
+            txt(1235, y, label, 28, { anchor: "start", w: 700, o: or });
+            MONTHS.forEach((m, k) => txt(hx[k] + 80, y, shek(fact(`pay.${sid}.mix.${m}`)), 28, { anchor: "end", ltr: true, w: 700, fill: color, o: or }));
+          });
+          txt(640, 520, "בסיס: המדד 2% בשנה · מחמיר: המדד 4%, הפריים והעוגנים +2 נקודות", 22, { fill: C.n600, o: after(t, S.scen, 18, o) });
+        }
+        if (inScene(t, S.det)) {
+          const o = vis(t, S.det);
+          txt(640, 124, "דטרמיניסטי = טביעת אצבע זהה", 40, { w: 700, o });
+          const rows = [["הרצה ראשונה", "fp.run1", true], ["הרצה שנייה", "fp.run2", true], ["סדר מסלולים הפוך", "fp.reversed", true], ["שקל אחד בין מסלולים", "fp.nudged", false]];
+          rows.forEach(([label, id, same], k) => {
+            const y = 190 + k * 80;
+            const or = after(t, S.det, 2 + k * 6, o);
+            box(240, y, 800, 62, or * 0.95, same ? C.n0 : C.mint);
+            txt(1010, y + 42, label, 26, { anchor: "start", w: 700, o: or });
+            txt(300, y + 44, fact(id), 32, { anchor: "start", ltr: true, w: 700, fill: same ? C.teal : C.navy, o: or });
+          });
+        }
+        if (inScene(t, S.end)) {
+          const o = vis(t, S.end);
+          txt(640, 290, "הלוואה + ריבית + הצמדה = סך התשלומים", 40, { w: 700, o });
+          txt(640, 360, "אי־ודאות לא נעלמת: היא עוברת לקלט", 32, { fill: C.teal, o: after(t, S.end, 2, o) });
+        }
+      };
+
+      await document.fonts.ready;
+      window.ready = true;
+      window.render(0);
+    </script>
+  </body>
+</html>

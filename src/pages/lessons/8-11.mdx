@@ -1,0 +1,428 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.11"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import ScenarioSimulator from "../../components/ScenarioSimulator.vue";
+import FillTable from "../../components/FillTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { DEFAULT_MODEL } from "../../lib/calc/montecarlo.ts";
+import { INITIAL_MIX, PRICE_LIST } from "../../data/case-a-mix.ts";
+
+{/* Equations sit in <M> so they read left to right. */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.11");
+export const nv = (v) => { const x = Number(v); return new Intl.NumberFormat("he-IL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 6 }).format(x); };
+export const n = (id) => nv(f.raw(id));
+export const pc = (id) => `${f.raw(id)}%`;
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const steps = DEFAULT_MODEL.primeSteps;
+export const weightTotal = steps.reduce((s, o) => s + o.weight, 0);
+export const track = { kind: "prime", amount: "300000", rate: PRICE_LIST.prime, months: 180 };
+export const mixes = [
+  { id: "prime", name: "מסלול פריים: 300,000 ₪ ל־15 שנה", tracks: [track], years: 15, range: { min: 2300, max: 2700, step: 25, start: 2400 } },
+  { id: "initial", name: "התמהיל הראשוני של נועם ושירה (30 שנה)", tracks: INITIAL_MIX, years: 30, range: { min: 8100, max: 9800, step: 50, start: 8700 } },
+];
+export const predictionOptions = [
+  "אותה הסתברות בדיוק, כי ההנחות והמסלול זהים",
+  "קרובה אבל לא זהה, וההבדל קטן ככל שמגרילים יותר עתידים",
+  "שונה לגמרי, כי כל הגרלה היא מקרה",
+  "קרובה, אבל רק אם משתמשים באותו מספר התחלה",
+];
+export const seeds = [1, 2, 3, 4, 5, 6, 7, 8];
+
+<Callout title="איפה זה עומד: Mogi היום, הוחלט, עתיד">
+<p><strong>עתיד, ושיטה כללית.</strong> בקוד של Mogi היום אין סימולציה, וקריאת המנוע מוקפאת; לא הוחלט שתהיה. מונטה־קרלו היא שיטה מתמטית כללית (מקור: ״כללי״). ההנחות על תנועת הפריים בשיעור <strong>מומצאות להדגמה</strong>: לא החלטה של Mogi, לא נתוני שוק ולא מדיניות של בנק.</p>
+<p>{MARK}</p>
+</Callout>
+
+בשיעור 8.4 קיבלתם <Term t="הסתברות" client:visible lesson="8.4">הסתברות</Term> ו<Term t="תוחלת" client:visible lesson="8.4">תוחלת</Term> מקוביות: כל תוצאה אפשרית, והמשקל שלה. בשיעור 8.10 ראיתם שלעתיד יש הרבה פנים. מה עושים כשרוצים לשאול לא ״מה יהיה התשלום בתרחיש הזה״ אלא ״מה הסיכוי שהתשלום יעבור סכום מסוים״? יש שיטה: <Term t="מונטה־קרלו" client:visible lesson="8.11">מונטה־קרלו</Term>.
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.11"
+  question={`מריצים סימולציה של 1,000 עתידים לפריים, ומקבלים שב־${pc("k.p_pct")} מהם התשלום עבר ${f.whole("t.threshold")}. מריצים שוב עם 1,000 עתידים אחרים (מספר התחלה אחר), על אותו מסלול ועל אותן הנחות. מה צפוי לצאת?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## אלף עתידים
+
+</Section>
+
+<LessonVideo lesson="8-11" />
+
+<Section kind="ההסבר">
+
+## להגריל עתידים ולספור
+
+</Section>
+
+### הבעיה
+
+מסלול פריים של {f.shekels("t.amount")} ל־{f.plain("t.years")} שנה, באחוז ריבית {f.plain("t.rate")}% (רשימת המחירים של הקורס). ההחזר הראשון הוא {f.shekels("k.first")}. אם הפריים יעלה, התשלום יעלה. השאלה: **מה הסיכוי שהתשלום יעבור {f.whole("t.threshold")}?**
+
+אי אפשר לענות על זה בתרחיש אחד. הפריים יכול לזוז בכל אחת מ־{f.plain("t.years")} השנים בכמה צעדים, ומספר המסלולים האפשריים גדול מדי לספירה. אז עושים משהו אחר: מגרילים עתידים, מחשבים לכל אחד את התוצאה, וסופרים.
+
+### שלב 1: הנחה (וזה השלב החשוב)
+
+מחליטים איך הפריים זז. **זו הנחה, לא עובדה.** נניח שכל שנה, מהשנה השנייה, הפריים זז בצעד אחד מחמישה, בהסתברויות האלה:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הצעד של הפריים (נקודות אחוז)</th>
+        <th class="py-2 pe-3 text-start font-semibold">משקל (מתוך <span class="ltr">{weightTotal}</span>)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {steps.map((o) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3"><span class="ltr">{Number(o.value) > 0 ? "+" : Number(o.value) < 0 ? "−" : ""}{Math.abs(Number(o.value))}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{o.weight}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">הנחה מומצאת להדגמה. זה כמו קובייה עם חמש פאות שאינן שוות: מחצית מהמקרים (40) הפריים לא זז. {MARK}</p>
+</div>
+
+(יש גם הגרלה של אינפלציה בכל שנה. היא חשובה רק למסלול צמוד, ולמסלול הפריים היא לא משפיעה.)
+
+### שלב 2: מחולל מספרים
+
+מחשב לא ״מטיל קובייה״. יש לו נוסחה קטנה שמקבלת מספר התחלה, ויוצרת סדרה של מספרים שלמים שנראים אקראיים. הסדרה נקבעת כולה לפי מספר ההתחלה: **אותו מספר התחלה, אותה סדרה.** זה חשוב בקורס, כי כל מספר כאן חייב להיות אפשר לשחזר ולבדוק. עם מספר התחלה 1, ששת המספרים הראשונים הם:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="ltr text-body-m text-n800">{f.raw("rng.seed1").join(" · ")}</p>
+</div>
+
+כל מספר נע בין 0 ל־4,294,967,295. מחלקים אותו בגודל הטווח (4,294,967,296) ומקבלים שבר בין 0 ל־1. ההגרלה: אם השבר קטן מ־10% מהטווח, הצעד הוא ״מינוס 0.5״; בין 10% ל־30%, ״מינוס 0.25״; בין 30% ל־70%, אפס; בין 70% ל־90%, ״פלוס 0.25״; ומ־90% ומעלה, ״פלוס 0.5״. כלומר המחלקים של הטווח הם בדיוק המשקלים של הטבלה. ששת המספרים האלה (כאילו כל אחד היה הגרלה של צעד אחד) נותנים:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="ltr text-body-m text-n800">{f.raw("steps.seed1").join("  ·  ")}</p>
+</div>
+
+(בסימולציה עצמה כל שנה משתמשת בשתי הגרלות: צעד הפריים ואינפלציה. הדוגמה כאן רק מראה את המיפוי.) **המחולל של הקורס אינו `Math.random`**, והוא כתוב בשתי שפות שונות שנותנות בדיוק אותם מספרים (בדיקה של הצוות).
+
+### שלב 3: עתיד אחד
+
+כל עתיד הוא סדרה של {f.plain("t.years")} שנים. השנה הראשונה: הפריים כמו היום. בכל שנה אחריה מגרילים צעד ומוסיפים אותו למה שהצטבר (והפריים אינו יורד יותר משלוש נקודות אחוז מהיום). זה מסלול פריים אחד, ובו כל שנה מעדכנת את התשלום. את המסלול הזה מכניסים למנוע של שיעור 8.9 ומקבלים את התשלום בכל חודש, ואת **התשלום הגבוה ביותר** שלו.
+
+### שלב 4: עשרה עתידים, ביד
+
+בעשרה עתידים הראשונים שהמחולל נותן, התשלום הגבוה ביותר של המסלול הוא:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="ltr text-body-m text-n800">{f.raw("ten.list").map((v) => nv(v)).join(" · ")}</p>
+</div>
+
+ההחזר הראשון הוא {f.shekels("ten.first")}, ובעתידים שבהם הפריים כמעט לא עלה התשלום הגבוה ביותר נשאר שם. כמה מהעשרה עברו את {f.whole("t.threshold")}? {f.plain("ten.count")}. כלומר 1 מתוך 10, שהם 10%. הממוצע של העשרה הוא {f.shekels("ten.mean")}. עשרה עתידים זה מעט מדי: נראה למה מיד.
+
+### שלב 5: אלף עתידים
+
+ועכשיו אלף. אותו תהליך, רק שהמחשב עושה אותו: {f.plain("k.count_at_least")} מתוך 1,000 עתידים עברו את {f.whole("t.threshold")}. זה <strong>{pc("k.p_pct")}</strong>. וההתפלגות של התשלום הגבוה ביותר, בכל 1,000 העתידים: הקטן {f.shekels("k.min_max")} (בדיוק ההחזר הראשון), הממוצע {f.shekels("k.mean_max")}, החציון {f.shekels("k.p50_max")}, אחוזון 5 {f.shekels("k.p5_max")}, אחוזון 95 {f.shekels("k.p95_max")}, והגדול {f.shekels("k.max_max")}. (אחוזונים בשיטת הקורס, שיעור 8.3.)
+
+### שלב 6: הטעות של ההגרלה
+
+הרצה שנייה, אלף עתידים אחרים (מספר התחלה 2): {pc("k2.p_pct")}. הרצה ראשונה: {pc("k.p_pct")}. אותה שאלה ואותן הנחות, ושני מספרים שונים. הסיבה: כל הרצה היא **מדגם** של עתידים, וההבדלים בין מדגמים הם רעש. ואם מריצים רק מאה עתידים, בשמונה מספרי התחלה:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <p class="ltr text-body-m text-n800">{seeds.map((s) => pc(`h.seed${s}.p_pct`)).join(" · ")}</p>
+  <p class="mt-2 text-caption text-n600">מאה עתידים בכל הרצה, מספרי התחלה 1 עד 8. אותה שאלה, אותן הנחות.</p>
+</div>
+
+הם נעים בין {pc("h.seed1.p_pct")} ל־{pc("h.seed8.p_pct")}. מאה עתידים לא מספיקים כדי לדעת אם זה בערך 17% או בערך 30%. עם אלף ההבדלים קטנים יותר. כמה קטנים? יש נוסחה.
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## הריצו עתידים
+
+</Section>
+
+<ScenarioSimulator client:visible mixes={mixes} seed={1} n={100} />
+
+נסו:
+1. הריצו מאה עתידים עם מספר התחלה 1, אחר כך עם 2, 3, 4. מה קורה לאחוז שעבר את הסף?
+2. הגדילו ל־1,000 עתידים והריצו עם שלושה מספרי התחלה. האם האחוזים קרובים יותר זה לזה?
+3. החזירו את מספר ההתחלה ל־1, והחליפו את ״כמה סוערת תנועת הפריים״ ל״סוער״. מה קורה לאחוז, ולהתפלגות?
+4. הריצו את אותה הרצה פעמיים (אותם מספר התחלה, מספר עתידים וסערה). מה אתם מסיקים?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>האחוז נע מהרצה להרצה, למשל בין {pc("h.seed1.p_pct")} ל־{pc("h.seed8.p_pct")} במאה עתידים.</li>
+    <li>עם 1,000 עתידים האחוזים קרובים זה לזה יותר, אבל לא זהים ({pc("k.p_pct")} ו־{pc("k2.p_pct")} במספרי התחלה 1 ו־2).</li>
+    <li>כשהסערה גדלה, אחוז העתידים שעוברים את הסף גדל הרבה: ההנחה קובעת את התשובה.</li>
+    <li>אותה הרצה נותנת בדיוק אותה תוצאה: ההגרלה נקבעת לפי מספר ההתחלה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## ההסתברות שמעריכים, והטעות שלה
+
+</Section>
+
+**צעד 1 — ההערכה.** אם מגרילים n עתידים, ו־c מהם עברו את הסף, ההסתברות המוערכת היא:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">p = c ÷ n</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">n</dt><dd>כמה עתידים הוגרלו (כאן n היא לא מספר תקופות)</dd>
+    <dt class="ltr font-semibold text-n900">c</dt><dd>כמה מהם הגיעו לסף</dd>
+    <dt class="ltr font-semibold text-n900">p</dt><dd>ההסתברות המוערכת, כשבר: 0.25 הוא 25%. (p קטנה: ההסתברות. P גדולה היא עדיין הסכום של היום, מ־0.2.)</dd>
+  </dl>
+</div>
+
+בהרצה של שלב 5: <M>{n("k.count_at_least")} ÷ 1,000 = {n("k.p_at_least")}</M>.
+
+**צעד 2 — הטעות של ההגרלה.** כמה ההערכה הזו יכולה להיות רחוקה ממה שהייתה יוצאת עם אינסוף עתידים? בקירוב, הטעות הטיפוסית היא:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">טעות ≈ √( p × (1 − p) ÷ n )</span></p>
+</div>
+
+בהרצה שלנו: <M>√( {n("k.p_at_least")} × (1 − {n("k.p_at_least")}) ÷ 1,000 ) = {n("k.se")}</M>, כלומר בערך {f.raw("k.se_pct")} נקודות אחוז. התוצאה בין {pc("k2.p_pct")} ל־{pc("k.p_pct")} בשתי ההרצות מתיישבת עם זה בקירוב. שימו לב שהטעות קטנה **בשורש** של n: כדי לחתוך אותה לשליש, צריך פי תשעה יותר עתידים.
+
+**מתי זה נכון?**
+1. העתידים הוגרלו בנפרד זה מזה.
+2. n גדול מספיק, ו־p לא קרוב לאפס או ל־1 (אחרת הנוסחה גסה).
+3. זו הטעות של **ההגרלה בלבד**. היא לא אומרת כלום על כך שההנחות נכונות.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> אין מחולל מספרים עם מספר התחלה בפונקציה <span class="ltr">RAND</span>, ולכן ההגרלה לא תחזור על עצמה. לשחזור, מדביקים את המספרים של הסדרה כעמודה. ספירה: <span class="ltr">=COUNTIF(B2:B1001,"&gt;="&amp;D1)</span>. הערכה: <span class="ltr">=COUNTIF(...)/COUNT(B2:B1001)</span>. טעות: <span class="ltr">=SQRT(p*(1-p)/n)</span>.</p>
+<p><strong>במחשבון:</strong> סימולציה לא נעשית במחשבון. זה בדיוק מה שמחשב טוב בו.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.11"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "אילו ההנחות זהות היה אפשר לחשוב כך, אבל כל הרצה היא מדגם: מקבלים מספר קרוב, לא זהה.",
+    "",
+    "לא שונה לגמרי: ההבדל בין הרצות קטן ככל שיש יותר עתידים, כי הטעות קטנה בשורש של מספר העתידים.",
+    "אותו מספר התחלה נותן אותה הרצה בדיוק, ולא אחרת. אבל השאלה היא על מספר התחלה אחר.",
+  ]}
+>
+  עם מספר התחלה 1: {pc("k.p_pct")}. עם מספר התחלה 2: {pc("k2.p_pct")}. קרוב, לא זהה. טעות ההגרלה בערך {f.raw("k.se_pct")} נקודות אחוז. ואם רוצים אחוז יציב אפשר להגדיל את מספר העתידים.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## הסיכוי שהתשלום יעבור 2,400
+
+</Section>
+
+**צעד 1 — השאלה.** מסלול הפריים של {f.shekels("t.amount")} ל־{f.plain("t.years")} שנה. הסף: {f.whole("t.threshold")}.
+
+**צעד 2 — ההנחות.** חמישה צעדים של הפריים בכל שנה, במשקלים 10, 20, 40, 20, 10. זו הנחה.
+
+**צעד 3 — ההגרלה.** 1,000 עתידים, מספר התחלה 1.
+
+**צעד 4 — הספירה.** {f.plain("k.count_at_least")} מתוך 1,000: {pc("k.p_pct")}.
+
+**צעד 5 — הטעות.** בערך {f.raw("k.se_pct")} נקודות אחוז.
+
+**מסקנה.** ״לפי ההנחות של הקורס, כ־{pc("k.p_pct")} מהעתידים שהגרלנו מביאים את התשלום ל־{f.whole("t.threshold")} לפחות״. לא ״יש סיכוי של {pc("k.p_pct")} שזה יקרה״: הצורה הראשונה אומרת מה נעשה. השנייה מצהירה על העולם, וזה מה ששיעור 8.12 יבחן.
+
+<Section kind="דוגמה חצי פתורה">
+
+## עשרה עתידים
+
+</Section>
+
+מבין עשרת העתידים של שלב 4, חשבו את מספר העתידים שהתשלום הגבוה ביותר שלהם עבר את {f.whole("t.threshold")}, ואת ההסתברות המוערכת. השורה הראשונה נתונה.
+
+<FillTable
+  client:visible
+  id="8.11-half"
+  rowKey="what"
+  periodLabel="מה"
+  columns={[
+    { key: "value", label: "ערך", format: "number" },
+  ]}
+  rows={[
+    { what: "מספר העתידים", value: "10" },
+    { what: "כמה עברו את הסף", value: f.raw("ten.count") },
+    { what: "ההסתברות המוערכת (כשבר)", value: f.raw("ten.p") },
+  ]}
+  blanks={["כמה עברו את הסף.value", "ההסתברות המוערכת (כשבר).value"]}
+  success="עשרה עתידים נתנו 0.1, ואלף נתנו הרבה יותר. מדגם קטן הוא רעש."
+  hint="ספרו כמה מהערכים ברשימה גדולים או שווים לסף; ההסתברות היא הספירה חלקי 10."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+המספרים הם הנחות של הקורס. התרגילים מסודרים מקל למאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.11-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "מגרילים הרבה עתידים לפי הנחה, מחשבים תוצאה לכל אחד, וסופרים", correct: true, feedback: "נכון. זו כל השיטה." },
+    { text: "מנבאים מה יקרה בעתיד", feedback: "לא: היא מראה מה היה קורה אם ההנחה נכונה." },
+    { text: "בוחרים את התרחיש הגרוע ביותר", feedback: "זה תרחיש לחץ, לא מונטה־קרלו." },
+    { text: "מחשבים נוסחה סגורה", feedback: "מונטה־קרלו משמשת בדיוק כשאין נוסחה כזו." },
+  ]}
+>
+  מה עושה סימולציית מונטה־קרלו?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.11-2"
+  n={2}
+  level="קל"
+  unit=""
+  tolerance={0}
+  near={0}
+  answer={f.raw("ten.count")}
+>
+  עשרת התשלומים הגבוהים ביותר בעשרה עתידים: {f.raw("ten.list").map((v) => nv(v)).join(", ")}. כמה מהם עברו את {f.whole("t.threshold")}?
+</NumericExercise>
+
+<NumericExercise
+  client:visible
+  id="8.11-3"
+  n={3}
+  level="בינוני"
+  tolerance={0.005}
+  answer={f.raw("ten.mean")}
+>
+  מה הממוצע של עשרת הערכים בתרגיל הקודם?
+</NumericExercise>
+
+<Solution for="8.11-3">
+חיבור עשרת הערכים וחלוקה ב־10: {f.shekels("ten.mean")}.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.11-4"
+  n={4}
+  level="בינוני"
+  unit=""
+  tolerance={0.0005}
+  near={0}
+  answer={f.raw("k.p_at_least")}
+>
+  מתוך 1,000 עתידים, {f.plain("k.count_at_least")} עברו את הסף. מה ההסתברות המוערכת, כשבר? (שלוש ספרות אחרי הנקודה.)
+</NumericExercise>
+
+<Solution for="8.11-4">
+<M>{n("k.count_at_least")} ÷ 1,000 = {n("k.p_at_least")}</M>, כלומר {pc("k.p_pct")}.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.11-5"
+  n={5}
+  level="בינוני"
+  options={[
+    { text: "בערך פי שלושה קטנה יותר (השורש של 10 הוא קרוב ל־3)", correct: true, feedback: "נכון. הטעות קטנה בשורש של מספר העתידים." },
+    { text: "פי עשרה קטנה יותר", feedback: "הקטנה ביחס לשורש, לא ביחס ישר. כדי להקטין פי עשרה צריך פי מאה עתידים." },
+    { text: "אותה טעות: מספר העתידים לא משנה", feedback: "משנה: ככל שיש יותר, ההערכה יציבה יותר." },
+    { text: "נעלמת לגמרי", feedback: "לא. היא קטנה, ולא נעלמת." },
+  ]}
+>
+  מגדילים את מספר העתידים פי 10. מה קורה לטעות של ההגרלה?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.11-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "אותה הרצה בדיוק, כל פעם. כדי להגריל מדגם אחר, משנים את המספר", correct: true, feedback: "נכון. זה מאפשר לשחזר ולבדוק: כל מספר חייב להיות אפשר לשחזר." },
+    { text: "הרצה אחרת בכל פעם, כמו קובייה", feedback: "בקורס אין הגרלה ״אמיתית״: המחולל נקבע לפי מספר ההתחלה." },
+    { text: "הרצה שתלויה בשעה", feedback: "אין שעון בחישוב." },
+    { text: "ההתחלה משפיעה רק על ההחזר הראשון", feedback: "היא משפיעה על כל ההגרלות." },
+  ]}
+>
+  מה עושה ״מספר ההתחלה״ של המחולל?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.11-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "ההנחה על תנועת הפריים: הסימולציה נכונה רק אם היא נכונה, והיא בחירה שלנו", correct: true, feedback: "נכון. היועץ הציג ״סיכוי״ בלי לומר שהוא תוצאה של הנחה." },
+    { text: "אין חסר: אלף עתידים זה מספיק", feedback: "מספיק להקטנת הטעות של ההגרלה, לא להצדקת ההנחה." },
+    { text: "צריך להגריל יותר", feedback: "גם עשרה מיליון הגרלות לא יהפכו את ההנחה לעובדה." },
+    { text: "צריך להשתמש בממוצע במקום בהסתברות", feedback: "ממוצע לא פותר את הבעיה של ההנחה." },
+  ]}
+>
+  יועץ אומר ללקוח: ״לפי סימולציה של אלף עתידים, יש {pc("k.p_pct")} סיכוי שההחזר יעבור {f.whole("t.threshold")}״. מה חסר בהצהרה הזו?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על מונטה־קרלו">
+<p><strong>מה זה?</strong> דרך לענות על ״מה הסיכוי ש...״ בעזרת הרבה עתידים מוגרלים, כשאין נוסחה.</p>
+<p><strong>למה זה קיים?</strong> כי הנוסחאות הסגורות מסתדרות רק עם בעיות פשוטות, ובעיות של תשלום לאורך שנים עם ריבית משתנה אינן כאלה.</p>
+<p><strong>איך זה עובד?</strong> הנחה על ההתפלגות, מחולל עם מספר התחלה, מנוע שמחשב כל עתיד, וספירה.</p>
+<p><strong>איך זה משפיע עליכם?</strong> מספר שנראה מדויק (״28.7%״) יכול להיות תוצאה של הנחה מומצאת. לפני שמאמינים לו שואלים: איזו הנחה, ומה היה קורה אם היא אחרת.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> כטווח, בלי להציג הסתברות כעובדה. מה Mogi תעשה בפועל לא הוחלט. מודל שפה לא מריץ את הסימולציה ולא כותב את תוצאתה: הקוד מחשב, והמודל לכל היותר מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **מונטה־קרלו:** מניחים התפלגות, מגרילים הרבה עתידים, מריצים את המנוע על כל אחד, וסופרים.
+- **ההגרלה קבועה לפי מספר התחלה,** ולכן אפשר לשחזר אותה ולבדוק.
+- **ההערכה:** p = c ÷ n. **הטעות של ההגרלה:** בערך √(p(1 − p) ÷ n), קטנה בשורש של מספר העתידים.
+- **הסימולציה לא הופכת הנחה לעובדה.** המספר טוב כמו ההנחה שבו.
+- **כל מספר כאן להדגמה:** ההנחות על הפריים מומצאות.
+
+**בשיעור הבא — 8.12, <Later lesson="8.12" quiet>מתי מותר לייחס הסתברות</Later>, ומתי אין לה בסיס:** מתי ״28.7%״ הוא טענה על העולם, ומתי רק על ההנחות.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "שיטת מונטה־קרלו; מחולל מספרים פסאודו־אקראי עם מספר התחלה; הערכת הסתברות כשבר של מקרים; הטעות הטיפוסית של הערכה כזו, כשורש של p(1−p) חלקי n (קירוב נורמלי). מקור: ״כללי״." },
+    { kind: "הנחת חישוב", text: "תנועת הפריים בשנה (חמישה צעדים במשקלים 10, 20, 40, 20, 10), הגבלה של שלוש נקודות אחוז מטה, והאינפלציה המוגרלת הן הנחה מומצאת להמחשה. המסלול (300,000 ₪ ל־15 שנה בפריים 4.60%) הוא של הקורס, לא הצעת בנק. התוצאות הן ״מה קורה לפי ההנחה״, לא תחזית." },
+    { kind: "בדיקת חישוב", text: "המחולל (mulberry32) נכתב בנפרד בשתי שפות, ונותן בדיוק אותם מספרים; כל מספר בשיעור חושב ונבדק פעמיים.", date: "2026-10-17" },
+    { kind: "החלטה של Mogi", text: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו: הוא מסביר, מסווג ומנסח. הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/montecarlo.ts (seeded mulberry32) over engine.ts via scripts/lessons/lesson-8-11.ts (+ _stage8b-facts.ts) and data/lessons/8-11.json, rechecked by checks/kinds/montecarlo.py (with schedule.py). Illustration: src/components/ScenarioSimulator.vue (props only; no Math.random). Video: video/8-11.html. */}

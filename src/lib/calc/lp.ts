@@ -70,6 +70,8 @@ export interface LpProblem {
   c: [Numeric, Numeric];
   goal: "min" | "max";
   conditions: Condition[];
+  /** Decimals shown for x, y and the objective (default 2). The comparison of corners always uses the exact values. */
+  decimals?: number;
 }
 
 const AXIS_X: Condition = { label: "x ≥ 0", a: [-1, 0], b: 0 };
@@ -78,9 +80,9 @@ const AXIS_Y: Condition = { label: "y ≥ 0", a: [0, -1], b: 0 };
 const withAxes = (conditions: Condition[]): Condition[] => [...conditions, AXIS_X, AXIS_Y];
 
 const dot = (a: [Numeric, Numeric], x: Decimal, y: Decimal) => new D(a[0]).mul(x).plus(new D(a[1]).mul(y));
-const fmt = (v: Decimal) => {
-  const r = v.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
-  return r.isZero() ? "0.00" : r.toFixed(2);
+const fmt = (v: Decimal, d = 2) => {
+  const r = v.toDecimalPlaces(d, Decimal.ROUND_HALF_UP);
+  return r.isZero() ? (0).toFixed(d) : r.toFixed(d);
 };
 
 /** Where two lines cross, or null when they are parallel. */
@@ -106,10 +108,11 @@ function rawCrossings(problem: LpProblem): Raw[] {
       if (!at) continue;
       const [x, y] = at;
       const broken = breaks(all, x, y);
+      const d = problem.decimals ?? 2;
       out.push({
-        x: fmt(x),
-        y: fmt(y),
-        value: fmt(dot(problem.c, x, y)),
+        x: fmt(x, d),
+        y: fmt(y, d),
+        value: fmt(dot(problem.c, x, y), d),
         exact: dot(problem.c, x, y),
         active: onLine(all, x, y),
         lines: [all[i].label, all[j].label],
@@ -164,8 +167,8 @@ export function solveLp(problem: LpProblem): LpResult {
 }
 
 /** The objective at a point, two decimals: what the lesson's guided tasks read off at a chosen split. */
-export function objectiveAt(c: [Numeric, Numeric], x: Numeric, y: Numeric): string {
-  return fmt(dot(c, new D(x), new D(y)));
+export function objectiveAt(c: [Numeric, Numeric], x: Numeric, y: Numeric, decimals = 2): string {
+  return fmt(dot(c, new D(x), new D(y)), decimals);
 }
 
 /** Whether a point obeys every condition, and the labels of those it breaks. */

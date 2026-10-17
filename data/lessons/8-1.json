@@ -1,0 +1,314 @@
+{
+  "lesson": "8.1",
+  "title": "משתנה ופונקציה",
+  "note": "General maths on mortgage examples; the numbers are the synthetic case's.",
+  "facts": [
+    {
+      "id": "rate.year",
+      "kind": "given",
+      "inputs": {},
+      "value": "4.8"
+    },
+    {
+      "id": "rate.month_pct",
+      "kind": "stats_quot",
+      "inputs": {
+        "num": "4.8",
+        "den": "12",
+        "decimals": 1
+      },
+      "value": "0.4"
+    },
+    {
+      "id": "rate.month",
+      "kind": "given",
+      "inputs": {},
+      "value": "0.004"
+    },
+    {
+      "id": "f.in_a",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000"
+    },
+    {
+      "id": "f.out_a",
+      "kind": "stats_prod",
+      "inputs": {
+        "a": "100000",
+        "b": "0.004",
+        "decimals": 0
+      },
+      "value": "400"
+    },
+    {
+      "id": "f.in_b",
+      "kind": "given",
+      "inputs": {},
+      "value": "200000"
+    },
+    {
+      "id": "f.out_b",
+      "kind": "stats_prod",
+      "inputs": {
+        "a": "200000",
+        "b": "0.004",
+        "decimals": 0
+      },
+      "value": "800"
+    },
+    {
+      "id": "f.in_c",
+      "kind": "given",
+      "inputs": {},
+      "value": "750000"
+    },
+    {
+      "id": "f.out_c",
+      "kind": "stats_prod",
+      "inputs": {
+        "a": "750000",
+        "b": "0.004",
+        "decimals": 0
+      },
+      "value": "3000"
+    },
+    {
+      "id": "f.in_d",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000"
+    },
+    {
+      "id": "f.out_d",
+      "kind": "stats_prod",
+      "inputs": {
+        "a": "1640000",
+        "b": "0.004",
+        "decimals": 0
+      },
+      "value": "6560"
+    },
+    {
+      "id": "loan.p1",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "4",
+        "months": 300
+      },
+      "value": "5278.37"
+    },
+    {
+      "id": "loan.p2",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "2000000",
+        "rate": "4",
+        "months": 300
+      },
+      "value": "10556.74"
+    },
+    {
+      "id": "loan.ratio",
+      "kind": "stats_quot",
+      "inputs": {
+        "num": "10556.74",
+        "den": "5278.37",
+        "decimals": 3
+      },
+      "value": "2"
+    },
+    {
+      "id": "rate.p3",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "3",
+        "months": 300
+      },
+      "value": "4742.11"
+    },
+    {
+      "id": "rate.p4",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "4",
+        "months": 300
+      },
+      "value": "5278.37"
+    },
+    {
+      "id": "rate.p5",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "5",
+        "months": 300
+      },
+      "value": "5845.90"
+    },
+    {
+      "id": "rate.p6",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "6",
+        "months": 300
+      },
+      "value": "6443.01"
+    },
+    {
+      "id": "rate.d34",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rate.p4",
+        "subtrahend": "rate.p3"
+      },
+      "value": "536.26"
+    },
+    {
+      "id": "rate.d45",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rate.p5",
+        "subtrahend": "rate.p4"
+      },
+      "value": "567.53"
+    },
+    {
+      "id": "rate.d56",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "rate.p6",
+        "subtrahend": "rate.p5"
+      },
+      "value": "597.11"
+    },
+    {
+      "id": "term.p240",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "4",
+        "months": 240
+      },
+      "value": "6059.80"
+    },
+    {
+      "id": "term.p300",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "4",
+        "months": 300
+      },
+      "value": "5278.37"
+    },
+    {
+      "id": "term.p360",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1000000",
+        "rate": "4",
+        "months": 360
+      },
+      "value": "4774.15"
+    },
+    {
+      "id": "chain.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1640000"
+    },
+    {
+      "id": "chain.income",
+      "kind": "given",
+      "inputs": {},
+      "value": "20250"
+    },
+    {
+      "id": "chain.pay",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1640000",
+        "rate": "4.40",
+        "months": 360
+      },
+      "value": "8212.48"
+    },
+    {
+      "id": "chain.ratio",
+      "kind": "stats_percent",
+      "inputs": {
+        "part": "8212.48",
+        "whole": "20250",
+        "decimals": 1
+      },
+      "value": "40.6"
+    },
+    {
+      "id": "chain.pay_300",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1640000",
+        "rate": "4.40",
+        "months": 300
+      },
+      "value": "9022.82"
+    },
+    {
+      "id": "chain.ratio_300",
+      "kind": "stats_percent",
+      "inputs": {
+        "part": "9022.82",
+        "whole": "20250",
+        "decimals": 1
+      },
+      "value": "44.6"
+    },
+    {
+      "id": "ex.loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1200000"
+    },
+    {
+      "id": "ex.pay",
+      "kind": "stats_payment",
+      "inputs": {
+        "amount": "1200000",
+        "rate": "4",
+        "months": 300
+      },
+      "value": "6334.04"
+    },
+    {
+      "id": "ex.ratio",
+      "kind": "stats_percent",
+      "inputs": {
+        "part": "6334.04",
+        "whole": "20250",
+        "decimals": 1
+      },
+      "value": "31.3"
+    },
+    {
+      "id": "ex.loan_f",
+      "kind": "given",
+      "inputs": {},
+      "value": "900000"
+    },
+    {
+      "id": "ex.f_out",
+      "kind": "stats_prod",
+      "inputs": {
+        "a": "900000",
+        "b": "0.004",
+        "decimals": 0
+      },
+      "value": "3600"
+    }
+  ]
+}

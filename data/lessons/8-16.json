@@ -1,0 +1,694 @@
+{
+  "lesson": "8.16",
+  "title": "היכרות עם תכנון לינארי, ומתי כל שיטה מתאימה",
+  "note": "Synthetic. Two fixed tracks of the course's price list (4.40%), 30 and 15 years; the cost per unit of 100,000 ₪ is the total paid and the payment per unit the first payment (stage-3 module, statement rounding). The conditions (cover the loan; at least 40% in the long track, a wish of the client; the largest monthly payment 6,000 ₪, then 6,600 ₪) are teaching inputs. The corners are found by crossing the boundary lines (lp.ts) and checked with exact fractions. The eleven-value cost curve with two valleys is invented.",
+  "facts": [
+    {
+      "id": "unit",
+      "kind": "given",
+      "inputs": {},
+      "value": "100000"
+    },
+    {
+      "id": "need",
+      "kind": "given",
+      "inputs": {},
+      "value": "10"
+    },
+    {
+      "id": "cap",
+      "kind": "given",
+      "inputs": {},
+      "value": "6000"
+    },
+    {
+      "id": "cap2",
+      "kind": "given",
+      "inputs": {},
+      "value": "6600"
+    },
+    {
+      "id": "loan",
+      "kind": "given",
+      "inputs": {},
+      "value": "1000000"
+    },
+    {
+      "id": "lg.pay",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|100000|4.40|360|360|0|0|statement"
+      },
+      "value": "500.76"
+    },
+    {
+      "id": "lg.cost",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|100000|4.40|360|360|0|0|statement"
+      },
+      "value": "180274.17"
+    },
+    {
+      "id": "sh.pay",
+      "kind": "met_first_payment",
+      "inputs": {
+        "tracks": "spitzer|100000|4.40|180|180|0|0|statement"
+      },
+      "value": "759.89"
+    },
+    {
+      "id": "sh.cost",
+      "kind": "met_total_paid",
+      "inputs": {
+        "tracks": "spitzer|100000|4.40|180|180|0|0|statement"
+      },
+      "value": "136780.80"
+    },
+    {
+      "id": "a",
+      "kind": "lp_solve",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "goal": "min",
+        "conditions": "כיסוי ההלוואה:-1:-1:-10;לפחות 40% בארוכה:-3:2:0;ההחזר החודשי:500.76:759.89:6000",
+        "decimals": 10
+      },
+      "value": {
+        "status": "optimal",
+        "corners": [
+          {
+            "x": "6.1702620306",
+            "y": "3.8297379694",
+            "value": "1636173.4894956200",
+            "active": [
+              "כיסוי ההלוואה",
+              "ההחזר החודשי"
+            ]
+          },
+          {
+            "x": "10.0000000000",
+            "y": "0.0000000000",
+            "value": "1802741.7000000000",
+            "active": [
+              "כיסוי ההלוואה",
+              "y ≥ 0"
+            ]
+          },
+          {
+            "x": "11.9817876827",
+            "y": "0.0000000000",
+            "value": "2160006.8296189792",
+            "active": [
+              "ההחזר החודשי",
+              "y ≥ 0"
+            ]
+          }
+        ],
+        "best": [
+          {
+            "x": "6.1702620306",
+            "y": "3.8297379694",
+            "value": "1636173.4894956200",
+            "active": [
+              "כיסוי ההלוואה",
+              "ההחזר החודשי"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "kind": "lp_solve",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "goal": "min",
+        "conditions": "כיסוי ההלוואה:-1:-1:-10;לפחות 40% בארוכה:-3:2:0;ההחזר החודשי:500.76:759.89:6600",
+        "decimals": 10
+      },
+      "value": {
+        "status": "optimal",
+        "corners": [
+          {
+            "x": "4.0000000000",
+            "y": "6.0000000000",
+            "value": "1541781.4800000000",
+            "active": [
+              "כיסוי ההלוואה",
+              "לפחות 40% בארוכה"
+            ]
+          },
+          {
+            "x": "10.0000000000",
+            "y": "0.0000000000",
+            "value": "1802741.7000000000",
+            "active": [
+              "כיסוי ההלוואה",
+              "y ≥ 0"
+            ]
+          },
+          {
+            "x": "4.0229307050",
+            "y": "6.0343960575",
+            "value": "1550620.0140802575",
+            "active": [
+              "לפחות 40% בארוכה",
+              "ההחזר החודשי"
+            ]
+          },
+          {
+            "x": "13.1799664510",
+            "y": "0.0000000000",
+            "value": "2376007.5125808771",
+            "active": [
+              "ההחזר החודשי",
+              "y ≥ 0"
+            ]
+          }
+        ],
+        "best": [
+          {
+            "x": "4.0000000000",
+            "y": "6.0000000000",
+            "value": "1541781.4800000000",
+            "active": [
+              "כיסוי ההלוואה",
+              "לפחות 40% בארוכה"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cross",
+      "kind": "lp_crossings",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "goal": "min",
+        "conditions": "כיסוי ההלוואה:-1:-1:-10;לפחות 40% בארוכה:-3:2:0;ההחזר החודשי:500.76:759.89:6000",
+        "decimals": 10
+      },
+      "value": [
+        {
+          "x": "4.0000000000",
+          "y": "6.0000000000",
+          "value": "1541781.4800000000",
+          "active": [
+            "כיסוי ההלוואה",
+            "לפחות 40% בארוכה"
+          ],
+          "lines": [
+            "כיסוי ההלוואה",
+            "לפחות 40% בארוכה"
+          ],
+          "feasible": false,
+          "breaks": [
+            "ההחזר החודשי"
+          ]
+        },
+        {
+          "x": "6.1702620306",
+          "y": "3.8297379694",
+          "value": "1636173.4894956200",
+          "active": [
+            "כיסוי ההלוואה",
+            "ההחזר החודשי"
+          ],
+          "lines": [
+            "כיסוי ההלוואה",
+            "ההחזר החודשי"
+          ],
+          "feasible": true,
+          "breaks": []
+        },
+        {
+          "x": "0.0000000000",
+          "y": "10.0000000000",
+          "value": "1367808.0000000000",
+          "active": [
+            "כיסוי ההלוואה",
+            "x ≥ 0"
+          ],
+          "lines": [
+            "כיסוי ההלוואה",
+            "x ≥ 0"
+          ],
+          "feasible": false,
+          "breaks": [
+            "לפחות 40% בארוכה",
+            "ההחזר החודשי"
+          ]
+        },
+        {
+          "x": "10.0000000000",
+          "y": "0.0000000000",
+          "value": "1802741.7000000000",
+          "active": [
+            "כיסוי ההלוואה",
+            "y ≥ 0"
+          ],
+          "lines": [
+            "כיסוי ההלוואה",
+            "y ≥ 0"
+          ],
+          "feasible": true,
+          "breaks": []
+        },
+        {
+          "x": "3.6572097318",
+          "y": "5.4858145978",
+          "value": "1409654.5582547795",
+          "active": [
+            "לפחות 40% בארוכה",
+            "ההחזר החודשי"
+          ],
+          "lines": [
+            "לפחות 40% בארוכה",
+            "ההחזר החודשי"
+          ],
+          "feasible": false,
+          "breaks": [
+            "כיסוי ההלוואה"
+          ]
+        },
+        {
+          "x": "0.0000000000",
+          "y": "0.0000000000",
+          "value": "0.0000000000",
+          "active": [
+            "לפחות 40% בארוכה",
+            "x ≥ 0",
+            "y ≥ 0"
+          ],
+          "lines": [
+            "לפחות 40% בארוכה",
+            "x ≥ 0"
+          ],
+          "feasible": false,
+          "breaks": [
+            "כיסוי ההלוואה"
+          ]
+        },
+        {
+          "x": "0.0000000000",
+          "y": "0.0000000000",
+          "value": "0.0000000000",
+          "active": [
+            "לפחות 40% בארוכה",
+            "x ≥ 0",
+            "y ≥ 0"
+          ],
+          "lines": [
+            "לפחות 40% בארוכה",
+            "y ≥ 0"
+          ],
+          "feasible": false,
+          "breaks": [
+            "כיסוי ההלוואה"
+          ]
+        },
+        {
+          "x": "0.0000000000",
+          "y": "7.8958796668",
+          "value": "1080004.7375278001",
+          "active": [
+            "ההחזר החודשי",
+            "x ≥ 0"
+          ],
+          "lines": [
+            "ההחזר החודשי",
+            "x ≥ 0"
+          ],
+          "feasible": false,
+          "breaks": [
+            "כיסוי ההלוואה",
+            "לפחות 40% בארוכה"
+          ]
+        },
+        {
+          "x": "11.9817876827",
+          "y": "0.0000000000",
+          "value": "2160006.8296189792",
+          "active": [
+            "ההחזר החודשי",
+            "y ≥ 0"
+          ],
+          "lines": [
+            "ההחזר החודשי",
+            "y ≥ 0"
+          ],
+          "feasible": true,
+          "breaks": []
+        },
+        {
+          "x": "0.0000000000",
+          "y": "0.0000000000",
+          "value": "0.0000000000",
+          "active": [
+            "לפחות 40% בארוכה",
+            "x ≥ 0",
+            "y ≥ 0"
+          ],
+          "lines": [
+            "x ≥ 0",
+            "y ≥ 0"
+          ],
+          "feasible": false,
+          "breaks": [
+            "כיסוי ההלוואה"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cross.feasible",
+      "kind": "lp_feasible_count",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "goal": "min",
+        "conditions": "כיסוי ההלוואה:-1:-1:-10;לפחות 40% בארוכה:-3:2:0;ההחזר החודשי:500.76:759.89:6000",
+        "decimals": 10
+      },
+      "value": 3
+    },
+    {
+      "id": "a.long_shek",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "100000",
+        "c2": "0",
+        "x": "6.1702620306",
+        "y": "3.8297379694",
+        "decimals": 0
+      },
+      "value": "617026"
+    },
+    {
+      "id": "a.short_shek",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "0",
+        "c2": "100000",
+        "x": "6.1702620306",
+        "y": "3.8297379694",
+        "decimals": 0
+      },
+      "value": "382974"
+    },
+    {
+      "id": "a.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "6.1702620306",
+        "y": "3.8297379694"
+      },
+      "value": "6000.00"
+    },
+    {
+      "id": "a.cost",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "x": "6.1702620306",
+        "y": "3.8297379694"
+      },
+      "value": "1636173.49"
+    },
+    {
+      "id": "b.long_shek",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "100000",
+        "c2": "0",
+        "x": "4.0000000000",
+        "y": "6.0000000000",
+        "decimals": 0
+      },
+      "value": "400000"
+    },
+    {
+      "id": "b.short_shek",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "0",
+        "c2": "100000",
+        "x": "4.0000000000",
+        "y": "6.0000000000",
+        "decimals": 0
+      },
+      "value": "600000"
+    },
+    {
+      "id": "b.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "4.0000000000",
+        "y": "6.0000000000"
+      },
+      "value": "6562.38"
+    },
+    {
+      "id": "b.cost",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "x": "4.0000000000",
+        "y": "6.0000000000"
+      },
+      "value": "1541781.48"
+    },
+    {
+      "id": "alllong.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "10",
+        "y": "0"
+      },
+      "value": "5007.60"
+    },
+    {
+      "id": "alllong.cost",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "x": "10",
+        "y": "0"
+      },
+      "value": "1802741.70"
+    },
+    {
+      "id": "allshort.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "0",
+        "y": "10"
+      },
+      "value": "7598.90"
+    },
+    {
+      "id": "allshort.cost",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "x": "0",
+        "y": "10"
+      },
+      "value": "1367808.00"
+    },
+    {
+      "id": "mid.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "8",
+        "y": "2"
+      },
+      "value": "5525.86"
+    },
+    {
+      "id": "mid.cost",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "180274.17",
+        "c2": "136780.80",
+        "x": "8",
+        "y": "2"
+      },
+      "value": "1715754.96"
+    },
+    {
+      "id": "c40.pay",
+      "kind": "lp_value",
+      "inputs": {
+        "c1": "500.76",
+        "c2": "759.89",
+        "x": "4",
+        "y": "6"
+      },
+      "value": "6562.38"
+    },
+    {
+      "id": "a.saving_vs_long",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "alllong.cost",
+        "subtrahend": "a.cost"
+      },
+      "value": "166568.21"
+    },
+    {
+      "id": "b.saving_vs_a",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "a.cost",
+        "subtrahend": "b.cost"
+      },
+      "value": "94392.01"
+    },
+    {
+      "id": "b.more_pay",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "b.pay",
+        "subtrahend": "a.pay"
+      },
+      "value": "562.38"
+    },
+    {
+      "id": "alllong.room",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "cap",
+        "subtrahend": "alllong.pay"
+      },
+      "value": "992.40"
+    },
+    {
+      "id": "c40.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "c40.pay",
+        "subtrahend": "cap"
+      },
+      "value": "562.38"
+    },
+    {
+      "id": "allshort.over",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "allshort.pay",
+        "subtrahend": "cap"
+      },
+      "value": "1598.90"
+    },
+    {
+      "id": "pay.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "sh.pay",
+        "subtrahend": "lg.pay"
+      },
+      "value": "259.13"
+    },
+    {
+      "id": "curve.local",
+      "kind": "given",
+      "inputs": {},
+      "value": "83"
+    },
+    {
+      "id": "curve.global",
+      "kind": "given",
+      "inputs": {},
+      "value": "79"
+    },
+    {
+      "id": "curve.gap",
+      "kind": "difference",
+      "inputs": {
+        "minuend": "curve.local",
+        "subtrahend": "curve.global"
+      },
+      "value": "4.00"
+    },
+    {
+      "id": "valley.0",
+      "kind": "lp_valleys",
+      "inputs": {
+        "values": "100,92,85,83,88,94,90,84,79,82,91",
+        "start": 0
+      },
+      "value": {
+        "localMinima": [
+          3,
+          8
+        ],
+        "globalMin": 8,
+        "path": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "valley.6",
+      "kind": "lp_valleys",
+      "inputs": {
+        "values": "100,92,85,83,88,94,90,84,79,82,91",
+        "start": 6
+      },
+      "value": {
+        "localMinima": [
+          3,
+          8
+        ],
+        "globalMin": 8,
+        "path": [
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "id": "valley.10",
+      "kind": "lp_valleys",
+      "inputs": {
+        "values": "100,92,85,83,88,94,90,84,79,82,91",
+        "start": 10
+      },
+      "value": {
+        "localMinima": [
+          3,
+          8
+        ],
+        "globalMin": 8,
+        "path": [
+          10,
+          9,
+          8
+        ]
+      }
+    }
+  ]
+}

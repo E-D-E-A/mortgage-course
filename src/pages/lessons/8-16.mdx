@@ -1,0 +1,487 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.16"
+minutes: 50
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import CornerSolver from "../../components/CornerSolver.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels, formatWholeShekels } from "../../lib/calc/money.ts";
+import { CURVE } from "../../data/lp-demo.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.16");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים.";
+export const u2 = (v) => new Intl.NumberFormat("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v));
+export const A = f.raw("a");
+export const B = f.raw("b");
+export const cross = f.raw("cross");
+export const bestA = A.best[0];
+export const bestB = B.best[0];
+// One row per place (a point where three lines meet appears once, with all its lines).
+export const places = (() => {
+  const m = new Map();
+  for (const c of cross) {
+    const key = `${c.x}|${c.y}`;
+    if (!m.has(key)) m.set(key, { ...c, lines: new Set(c.lines), breaks: new Set(c.breaks) });
+    else c.lines.forEach((l) => m.get(key).lines.add(l));
+  }
+  return [...m.values()].map((c) => ({ ...c, lines: [...c.lines], breaks: [...c.breaks] }));
+})();
+export const predictionOptions = [
+  "באמצע האזור המותר: שם הכול מאוזן",
+  "באחת הפינות של האזור המותר",
+  "בכל נקודה באזור המותר: העלות זהה",
+  "תמיד בכל הכסף במסלול הקצר, כי הוא הזול ביותר בסך הכול",
+];
+export const lessonCost = (v) => formatWholeShekels(v);
+
+בשיעור 8.15 ראיתם איך זורקים את מי שאחר שולט בו, ובוחרים על החזית לפי העדפות. עכשיו שאלה אחרת: איך מוצאים את הטוב ביותר **בלי לבדוק כל מועמד**, כשהכול נמדד בקווים ישרים? זו שיטה שנקראת <Term t="תכנון לינארי" client:visible lesson="8.16">תכנון לינארי</Term>. נכיר אותה על דוגמה של שני מסלולים בלבד, ונשאל מתי היא מתאימה ומתי לא.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>עתיד.</strong> אין היום בקוד של Mogi חישוב תמהילים (קריאת המנוע מוקפאת). הכלי בשיעור הוא תכנון לינארי לשני משתנים בלבד, ונועד להראות מה השיטה, לא לפתור בעיה של Mogi. החלק המתמטי נכון בכל מקום. מה Mogi תבחר לבנות הוא <strong>הצעה של מחקר</strong>, לא החלטה (ראו המקורות). המחירים הם רשימת המחירים של הקורס; ההחזר המרבי והאחוז הארוך הם תנאים להדגמה.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.16"
+  question={`נועם ושירה צריכים הלוואה של ${f.shekels("loan")} משני מסלולים קבועים: ארוך (30 שנה) וקצר (15 שנה). יש כמה תנאים (כל אחד קו ישר), והעלות היא סכום של שני הסכומים כפול מחיר לשקל. כשמחפשים את הפתרון הזול ביותר שעומד בכל התנאים, איפה הוא נמצא?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## הפתרון יושב בפינה
+
+</Section>
+
+<LessonVideo lesson="8-16" />
+
+<Section kind="ההסבר">
+
+## שני מסלולים, שלושה תנאים
+
+</Section>
+
+### הבעיה הקטנה
+
+נועם ושירה צריכים {f.shekels("loan")}. הם מתלבטים בין שני מסלולים קבועים לא צמודים באותו אחוז ריבית מרשימת המחירים של הקורס, 4.40%: **ארוך** (30 שנה) ו**קצר** (15 שנה). מחלקים את ההלוואה לשני סכומים, ונמדוד אותם ביחידות של {f.shekels("unit")}: **x** הוא הסכום בארוך, ו־**y** הסכום בקצר. ההלוואה היא {f.plain("need")} יחידות.
+
+כדי להשוות, לכל מסלול יש **עלות ליחידה**: סך התשלומים על {f.shekels("unit")}. בארוך {f.shekels("lg.cost")}, ובקצר {f.shekels("sh.cost")}. וההחזר החודשי ליחידה: {f.shekels("lg.pay")} בארוך ו־{f.shekels("sh.pay")} בקצר. הקצר זול בסך הכול וגבוה בחודש: אותו ויתור מ־8.15.
+
+שלושה תנאים:
+1. **לכסות את ההלוואה:** <M>x + y ≥ {f.plain("need")}</M>.
+2. **לפחות 40% מההלוואה בארוך** (רצון של הלקוח, כדי להשאיר כרית): <M>x ≥ 0.4·(x + y)</M>, כלומר <M>3x ≥ 2y</M>.
+3. **ההחזר החודשי לא יעלה על {f.shekels("cap")}** (תנאי של הלקוח): <M>{f.plain("lg.pay")}·x + {f.plain("sh.pay")}·y ≤ {f.plain("cap")}</M>.
+
+והמטרה: לשלם כמה שפחות בסך הכול, כלומר <M>{f.plain("lg.cost")}·x + {f.plain("sh.cost")}·y</M> הקטן ביותר.
+
+כל תנאי הוא **קו ישר**: משתנים כפול מספרים, מחוברים, ומשווים למספר. וגם המטרה. זה מה שהופך את הבעיה ל**לינארית**.
+
+### האזור המותר
+
+כל תנאי חותך חצי מהמישור. מה שעובר את שלושתם (ועוד: x ו־y לא שליליים) הוא צורה עם צלעות ישרות: **האזור המותר**. אצל נועם ושירה הוא משולש. בכל הנקודות שבתוכו התנאים מתקיימים, ולכן כל אחת מהן היא <Term t="פתרון אפשרי" client:visible lesson="8.7">פתרון אפשרי</Term> (שיעור 8.7); השאלה היא איזו הזולה ביותר.
+
+### הפינות
+
+הטענה המתמטית המרכזית: כשהמטרה היא קו ישר, **הפתרון הטוב ביותר, אם יש, נמצא בפינה של האזור**. הנה למה, בלי הוכחה פורמלית: דמיינו קו של עלות קבועה, למשל כל הנקודות שעלותן מיליון וחצי. אם מזיזים אותו לכיוון עלות נמוכה יותר, הוא חותך את האזור עד שהוא נוגע בו לבסוף. נקודת המגע האחרונה היא פינה (או צלע שלמה, ואז גם הפינות שלה טובות באותה מידה).
+
+לכן אפשר לא לבדוק את כל הנקודות, שהן אינסוף, אלא רק את **הפינות**. פינה היא נקודה שבה נחתכים שני קווי גבול. הנה כל החיתוכים של הקווים (כולל הצירים x = 0 ו־y = 0), ומי מהם עומד בכל התנאים:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הנקודה (x, y)</th>
+        <th class="py-2 pe-3 text-start font-semibold">הקווים שנחתכים</th>
+        <th class="py-2 pe-3 text-start font-semibold">אפשרית?</th>
+        <th class="py-2 pe-3 text-start font-semibold">העלות, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {places.map((c) => (
+        <tr class={`border-b border-n100 align-top ${c.feasible ? "" : "text-n600"}`}>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">({u2(c.x)}, {u2(c.y)})</span></td>
+          <td class="py-2 pe-3">{c.lines.join(" · ")}</td>
+          <td class="py-2 pe-3">{c.feasible ? <strong class="text-teal-deep">כן</strong> : `לא: שובר ${c.breaks.join(", ")}`}</td>
+          <td class="py-2 pe-3">{Number(c.value) === 0 ? "—" : <span class="ltr whitespace-nowrap">{lessonCost(c.value)}</span>}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} x ו־y ביחידות של {formatWholeShekels(f.raw("unit"))}. העלות: סך התשלומים.</p>
+</div>
+
+מתוך החיתוכים רק {f.plain("cross.feasible")} עומדים בכל התנאים. הזול מביניהם: **x = {u2(bestA.x)}, y = {u2(bestA.y)}**, כלומר {f.shekels("a.long_shek")} בארוך ו־{f.shekels("a.short_shek")} בקצר, בעלות של {lessonCost(bestA.value)}. זו בדיוק הפינה שבה נפגשים כיסוי ההלוואה ותקרת ההחזר: ההחזר החודשי שלה {f.shekels("a.pay")}, בדיוק על התקרה. הפינה השלישית, בקצה הימני של האזור, דורשת לקחת יותר מהדרוש, ויקרה בהרבה.
+
+שימו לב לשלוש נקודות שלא אפשריות. כל הכסף בקצר (0, 10) הוא הזול ביותר בסך הכול, {lessonCost(f.raw("allshort.cost"))}, אבל ההחזר החודשי שלו {f.shekels("allshort.pay")} עובר את התקרה ב־{f.shekels("allshort.over")}, והוא גם שובר את הרצון לארוך. ובפינה (4, 6), שבה נפגשים כיסוי ו־40% בארוך, ההחזר {f.shekels("c40.pay")}: מעל התקרה ב־{f.shekels("c40.over")}. כל הכסף בארוך (10, 0) אפשרי, אבל עולה {lessonCost(f.raw("alllong.cost"))}: {f.shekels("a.saving_vs_long")} יותר מהפינה הטובה.
+
+### אותם תנאים, תקרה אחרת, פינה אחרת
+
+נניח שנועם ושירה מוכנים להחזר חודשי של {f.shekels("cap2")} במקום {f.shekels("cap")}. התנאים האחרים זהים, והמטרה זהה. הפינה הטובה עוברת לנקודה שבה נפגשים כיסוי ו־40% בארוך: x = {u2(bestB.x)}, y = {u2(bestB.y)}, כלומר {f.shekels("b.long_shek")} בארוך ו־{f.shekels("b.short_shek")} בקצר. ההחזר החודשי {f.shekels("b.pay")}, יותר ב־{f.shekels("b.more_pay")} מקודם, וסך התשלומים נמוך ב־{f.shekels("b.saving_vs_a")}.
+
+מה שלמדנו: ״הפתרון האופטימלי״ הוא פונקציה של **הנתונים והתנאים**. תקרה אחרת, מחיר אחר או תחזית אחרת נותנים פינה אחרת. כשהנתונים הם הנחות על העתיד, האופטימום תלוי בהן (שיעורים 8.10–8.12).
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## האזור, הפינות, והפינה הטובה ביותר
+
+</Section>
+
+הצורה התכולה היא האזור המותר. הנקודות הכהות הן פינות שעומדות בתנאים; האפורות הן חיתוכים שלא. הטבעת מסמנת את הטובה ביותר.
+
+<CornerSolver
+  client:visible
+  pay={[f.raw("lg.pay"), f.raw("sh.pay")]}
+  cost={[f.raw("lg.cost"), f.raw("sh.cost")]}
+  cap={Number(f.raw("cap"))}
+  need={Number(f.raw("need"))}
+/>
+
+נסו:
+1. השאירו את הערכים. איפה הפינה הטובה ביותר, ואיזה שני תנאים נפגשים בה?
+2. העלו את ההחזר המרבי ל־{f.shekels("cap2")}. מה קרה לפינה הטובה, ומה למחיר ולהחזר?
+3. הורידו את ההחזר המרבי עד שקורה משהו לאזור. מה קרה, ומה זה אומר לגבי הבקשה של הלקוח?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>x = {u2(bestA.x)}, y = {u2(bestA.y)}: נפגשים תנאי הכיסוי ותקרת ההחזר.</li>
+    <li>הפינה הטובה עוברת לנקודה שבה נפגשים הכיסוי ו־40% בארוך: x = {u2(bestB.x)}, y = {u2(bestB.y)}. ההחזר גבוה ב־{f.shekels("b.more_pay")}, וסך התשלומים נמוך ב־{f.shekels("b.saving_vs_a")}. אין צורך לשנות את האלגוריתם: התנאי השתנה, והפינה איתו.</li>
+    <li>מתחת ל־{f.shekels("alllong.pay")} האזור נעלם: גם כל ההלוואה בארוך, שהוא הנמוך ביותר בחודש, עובר את התקרה. אין שום חלוקה של שני המסלולים שעומדת בכל התנאים. האלגוריתם אומר זאת במקום להחזיר תשובה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## בעיה לינארית, ואיך מוצאים פינה
+
+</Section>
+
+**צעד 1 — כותבים את הבעיה.** משתנים x ו־y (האותיות האלה הן לשיעור הזה בלבד). כל תנאי הוא <M>a<sub>1</sub>·x + a<sub>2</sub>·y ≤ b</M>, והמטרה <M>c<sub>1</sub>·x + c<sub>2</sub>·y</M>. תנאי "לפחות" כותבים עם מינוסים: <M>x + y ≥ 10</M> הוא <M>−x − y ≤ −10</M>.
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">min c<sub>1</sub>·x + c<sub>2</sub>·y</span> כש־<span class="ltr">a<sub>1</sub>·x + a<sub>2</sub>·y ≤ b</span> לכל תנאי, ו־<span class="ltr">x, y ≥ 0</span></p>
+  <dl class="mx-auto mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-start text-body-m text-n700">
+    <dt class="ltr font-semibold text-n900">c<sub>1</sub>, c<sub>2</sub></dt><dd>העלות של יחידה במסלול הראשון ובשני (כאן: סך התשלומים על {formatWholeShekels(f.raw("unit"))})</dd>
+    <dt class="ltr font-semibold text-n900">a<sub>1</sub>, a<sub>2</sub>, b</dt><dd>המספרים של תנאי: כמה כל יחידה משפיעה, והגבול. בעיה יכולה לכלול כמה תנאים</dd>
+    <dt class="ltr font-semibold text-n900">min</dt><dd>״הקטן ביותר״. ל״הגדול ביותר״ כותבים max</dd>
+  </dl>
+</div>
+
+**צעד 2 — כל פינה היא חיתוך של שני קווי גבול.** לכל זוג קווים פותרים שתי משוואות עם שני נעלמים. עם <M>a<sub>1</sub>x + a<sub>2</sub>y = b</M> ו־<M>d<sub>1</sub>x + d<sub>2</sub>y = e</M>:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 text-center shadow-sm">
+  <p class="text-h3 text-navy"><span class="ltr">x = (b·d<sub>2</sub> − a<sub>2</sub>·e) ÷ (a<sub>1</sub>·d<sub>2</sub> − a<sub>2</sub>·d<sub>1</sub>)</span></p>
+  <p class="text-h3 text-navy"><span class="ltr">y = (a<sub>1</sub>·e − b·d<sub>1</sub>) ÷ (a<sub>1</sub>·d<sub>2</sub> − a<sub>2</sub>·d<sub>1</sub>)</span></p>
+  <p class="mt-2 text-body-m text-n700">כשהמכנה אפס, הקווים מקבילים ואין חיתוך.</p>
+</div>
+
+**צעד 3 — בודקים כל חיתוך מול כל התנאים.** מי ששובר תנאי נפסל. **צעד 4 — קוראים את המטרה בכל פינה אפשרית**, ובוחרים את הקטנה ביותר.
+
+**מתי זה נכון?**
+1. המטרה וכל התנאים הם **קווים ישרים** במשתנים. עלות שיש בה קפיצות, מדרגות, או כפל בין משתנים, היא כבר לא לינארית (ראו להלן).
+2. המשתנים יכולים לקבל כל ערך רציף, לא רק "פרוסות" של 10%.
+3. לפחות פתרון אפשרי אחד קיים, והאזור סגור בכיוון שבו המטרה משתפרת. אחרת השיטה מדווחת: אין פתרון, או שאפשר להשתפר בלי סוף.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> יש תוסף שנקרא פותר (Solver), שעושה בדיוק את זה לכמה משתנים. לשני משתנים אפשר גם ביד: פותרים את המשוואות בצעד 2 לכל זוג קווים, ובודקים בעמודה אחת.</p>
+<p><strong>במחשבון:</strong> מחשבון רגיל מספיק לחיתוך אחד; לכמה חיתוכים כדאי טבלה. בקוד: שלוש שורות לכל חיתוך, בלי חומרה מיוחדת. בבעיות עם עשרות משתנים משתמשים בספריות שנבנו לכך.</p>
+</Callout>
+
+<Callout title="מה אי אפשר לעשות בתכנון לינארי, ובעיה אמיתית של משכנתא" tone="warning">
+<p>בבעיה האמיתית של Mogi המטרה והתנאים אינם בהכרח ישרים. כך כתב מחקר הצוות (עדיין לא הוחלט): עלות הפירעון המוקדם כוללת ״הקטן משני ערכים״, ״הגדול מאפס״ וחיפוש בטבלה שקופצת בין מדרגות, וכל אלה אינם קווים ישרים.</p>
+<p>ובשיעור הבא תראו עוד סיבה: אם הריבית שהבנק נותן קופצת במדרגות לפי שיעור המימון או יחס ההחזר, העלות ליחידה כבר לא מספר קבוע, אלא תלויה במה שמחליטים. בשיעור הזה העלות ליחידה זהה בכל כמות; בשוק זו הנחה.</p>
+</Callout>
+
+### פתרון ״מקומי״ ופתרון ״גלובלי״
+
+בבעיה לינארית יש משהו נוח: אם מצאתם פינה שאין שכנה טובה ממנה, זה כבר הפתרון הטוב ביותר בכל האזור. בבעיה שאינה ישרה זה לא נכון. הנה עלות (באלפי ₪, **מספרים שהקורס המציא להמחשה**) לפי החלק הקבוע של ההלוואה, ב־0%, 10% ועד 100%:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">החלק הקבוע</th>
+        {CURVE.map((_, k) => (<th class="py-2 pe-2 text-start font-semibold"><span class="ltr">{k * 10}%</span></th>))}
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100">
+        <td class="py-2 pe-2 font-semibold">העלות</td>
+        {CURVE.map((c) => (<td class="py-2 pe-2"><span class="ltr">{c}</span></td>))}
+      </tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">דוגמה סכמתית, לא נתוני שוק: עקומה עם שני עמקים.</p>
+</div>
+
+שני עמקים: ב־30% (עלות {f.plain("curve.local")}) וב־80% (עלות {f.plain("curve.global")}). מי שמתחיל ב־0% והולך תמיד לשכן הזול יותר עובר דרך {f.rows("valley.0").path.map((k) => `${k * 10}%`).join(", ")} ונעצר ב־30%: <Term t="אופטימום מקומי וגלובלי" client:visible lesson="8.16">אופטימום מקומי</Term>, כי אין שכן טוב ממנו. הטוב ביותר מכולם, האופטימום הגלובלי, ב־80%. מי שמתחיל ב־60% או ב־100% מגיע לשם. ההפרש {f.plain("curve.gap")} אלף ₪.
+
+**כלל:** לפי אותו הכלל, בעיה לינארית אין לה עמקים כאלה. בעיות אחרות כן, ושום הליכה מטה לא מבטיחה שהגעתם לטוב ביותר. כדי להיות בטוחים צריך לבדוק יותר מנקודת התחלה אחת, או לבדוק את כל הרשת (שיעור 8.14), או להוכיח שהבעיה לינארית.
+
+### ״אופטימלי״ ביחס למה?
+
+מילה אחת, ארבעה תנאים. כל ״אופטימום״ הוא טוב ביותר:
+1. **ביחס לנתונים:** ריבית של בנק, תחזית, ההחזר של הלקוח. נתונים אחרים, פינה אחרת (ראו למעלה).
+2. **ביחס לאילוצים:** מה נחשב אפשרי.
+3. **ביחס למטרה:** מה נמדד, ובאילו משקולות (שיעורים 8.8, 8.15).
+4. **ביחס למרחב שנבדק:** כל החלוקות הרציפות? רשת של 10%? רק 15 מועמדים?
+
+אין להבטיח ״האופטימום הגלובלי״ בלי להצדיק אותו: כאן ההצדקה היא שהבעיה לינארית. בבעיה שאינה לינארית, ״הטוב ביותר שמצאנו״ הוא ביחס למה שחיפשנו.
+
+### שיטות, וכל אחת למה היא מתאימה
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">השיטה</th>
+        <th class="py-2 pe-3 text-start font-semibold">מתאימה כש…</th>
+        <th class="py-2 pe-3 text-start font-semibold">מה היא לא מבטיחה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold">תכנון לינארי</td><td class="py-2 pe-3">המטרה והתנאים ישרים, והמשתנים רציפים</td><td class="py-2 pe-3">כלום, אם משהו בבעיה לא ישר: אז היא לא מתאימה</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold">חיפוש על רשת (8.14)</td><td class="py-2 pe-3">הבעיה קופצת או מדורגת, והמרחב קטן מספיק לספור</td><td class="py-2 pe-3">את מה שבין נקודות הרשת; רשת עדינה יותר עלולה להוסיף מועמד טוב יותר</td></tr>
+      <tr class="border-b border-n100 align-top"><td class="py-2 pe-3 font-semibold">הליכה מטה מנקודה</td><td class="py-2 pe-3">הבעיה חלקה ויש לה עמק אחד</td><td class="py-2 pe-3">שהעמק שנמצא הוא הטוב ביותר</td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">אין שיטה אחת שעדיפה תמיד: ההתאמה תלויה בצורה של הבעיה.</p>
+</div>
+
+### מה Mogi מתכננת
+
+במסמך מחקר של הצוות (עדן, אוגוסט 2026, עודכן ב־2026-10-08) נבדקו אפשרויות לבנייה של מנוע התמהילים. ההמלצה של המחקר, כ״נקודת פתיחה ולא החלטה סופית״: חיפוש מוגבל שנכתב בבית. הנימוקים: מבין חמשת הקווים של הוראה 329 רק שניים קובעים את החלוקה (יחס ההחזר והחלק המשתנה); מטרה שכוללת את עלות הפירעון המוקדם אינה חלקה; ופותר מוכן לא מחזיר את ההסבר, למשל ״התמהיל שלכם נפסל כי הוראה 329 דורשת שליש קבוע לפחות״. פותרים מוכנים (HiGHS, OR-Tools, SciPy) נשללו במחקר כרכיב. זו המלצה של מחקר, **עתיד** ולא קוד שקיים.
+
+<PredictionReveal
+  client:visible
+  id="8.16"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    "באמצע לא מאוזן שום דבר. קו מטרה ישר משתפר כל הזמן לכיוון אחד, ולכן הוא לא נעצר באמצע האזור: הוא נעצר בקצה.",
+    "",
+    "העלות משתנה מנקודה לנקודה: כל חלוקה אחרת נותנת סכום אחר. רק לכל החלוקות על אותו קו מטרה העלות זהה.",
+    `הקצר זול יותר בסך הכול, אבל תקרת ההחזר מונעת לשים בו הכול: ההחזר החודשי שלו ${f.shekels("allshort.pay")}, מעל התקרה. הפינה הטובה כוללת ${f.shekels("a.short_shek")} בקצר בלבד.`,
+  ]}
+>
+  הפתרון נמצא בפינה: {f.shekels("a.long_shek")} בארוך ו־{f.shekels("a.short_shek")} בקצר. לא כל הכסף במסלול הזול, כי יש תנאים: תקרת ההחזר עוצרת אותו. ואם התנאים או הנתונים משתנים, הפינה משתנה.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## חיתוך ביד: כיסוי ההלוואה וקו שני השלישים
+
+</Section>
+
+מוצאים את הפינה הטובה בטבלה, ביד. שני הקווים: <M>x + y = {f.plain("need")}</M> (כיסוי) ו־<M>{f.plain("lg.pay")}·x + {f.plain("sh.pay")}·y = {f.plain("cap")}</M> (תקרת ההחזר).
+
+**צעד 1 — מציבים.** מהראשון: x = {f.plain("need")} − y. מציבים בשני: <M>{f.plain("lg.pay")}·({f.plain("need")} − y) + {f.plain("sh.pay")}·y = {f.plain("cap")}</M>.
+
+**צעד 2 — מפשטים.** הסכום <M>{f.plain("lg.pay")}·{f.plain("need")}</M> הוא {f.shekels("alllong.pay")}: ההחזר של כל ההלוואה בארוך. כל שקל שעובר לקצר מוסיף את ההפרש, {f.shekels("pay.gap")} ליחידה. לכן <M>{f.plain("alllong.pay")} + {f.plain("pay.gap")}·y = {f.plain("cap")}</M>.
+
+**צעד 3 — פותרים.** התקרה מרשה עוד {f.shekels("alllong.room")} מעל הארוך בלבד, ולכן y = {f.plain("alllong.room")} ÷ {f.plain("pay.gap")} = {u2(bestA.y)}, ו־x = {u2(bestA.x)}.
+
+**צעד 4 — בשקלים.** {f.shekels("a.long_shek")} בארוך ו־{f.shekels("a.short_shek")} בקצר, ביחד {f.shekels("loan")}.
+
+**צעד 5 — בודקים את שאר התנאים.** ארוך הוא {u2(bestA.x)} מתוך {f.plain("need")}: יותר מ־40%. הפינה אפשרית. העלות {lessonCost(bestA.value)}, נמוכה מכל פינה אפשרית אחרת בטבלה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## איזו פינה אפשרית?
+
+</Section>
+
+לכל נקודה בחרו: אפשרית או לא. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.16-match"
+  promptLabel="הנקודה"
+  answerLabel="המצב"
+  options={["אפשרית", "לא אפשרית"]}
+  rows={[
+    { prompt: `${u2(bestA.x)} בארוך, ${u2(bestA.y)} בקצר`, answer: "אפשרית", given: true, why: "עומדת בכיסוי, ב־40% בארוך ובתקרת ההחזר (בדיוק עליה)." },
+    { prompt: "0 בארוך, 10 בקצר", answer: "לא אפשרית", why: `ההחזר החודשי שלה ${formatShekels(f.raw("allshort.pay"))}, גבוה מהתקרה ב־${formatShekels(f.raw("allshort.over"))}, וגם אין בה ארוך.` },
+    { prompt: "4 בארוך, 6 בקצר", answer: "לא אפשרית", why: `ההחזר החודשי שלה ${formatShekels(f.raw("c40.pay"))}, גבוה מהתקרה ב־${formatShekels(f.raw("c40.over"))}.` },
+    { prompt: "8 בארוך, 2 בקצר", answer: "אפשרית", why: `ההחזר החודשי ${formatShekels(f.raw("mid.pay"))} מתחת לתקרה, ולפחות 40% בארוך. העלות ${formatWholeShekels(f.raw("mid.cost"))}, יותר מהפינה הטובה.` },
+  ]}
+  success="נכון. נקודה פנימית היא אפשרית אבל לא הזולה: הזולה בפינה."
+  hint="בכל נקודה: x ועוד y לפחות 10, שלוש פעמים x לפחות פעמיים y, והתשלום ליחידה כפול הסכומים לא עולה על התקרה."
+/>
+
+<Section kind="תרגול">
+
+## שבעה תרגילים
+
+</Section>
+
+הנתונים בתרגילים הם של השיעור: סינתטיים, להמחשה. התרגילים מסודרים מהקל אל המאתגר.
+
+<ChoiceExercise
+  client:visible
+  id="8.16-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "באחת מפינות האזור המותר", correct: true, feedback: "נכון. קו ישר שמזיזים נוגע באזור לבסוף בפינה." },
+    { text: "בנקודה הפנימית של האזור", feedback: "פנימית היא אפשרית, אבל קו מטרה ישר תמיד משתפר לכיוון אחד, ולכן מי שבפנים לא הטוב ביותר." },
+    { text: "בנקודה שבה שני התנאים שווים", feedback: "זה תנאי לפינה בלבד כשמדובר בשני תנאים שנחתכים. השאלה היא איזו פינה הכי טובה." },
+    { text: "בכל נקודה בקו המטרה הראשון", feedback: "הקו הראשון הוא הנקודה ההתחלתית של ההזזה, לא הסוף שלה." },
+  ]}
+>
+  בבעיה לינארית עם פתרון טוב ביותר, איפה הוא נמצא?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.16-2"
+  n={2}
+  level="קל"
+  tolerance={0}
+  near={0}
+  answer={f.raw("cross.feasible")}
+  errors={[{ value: String(places.length), message: "ספרתם את כל החיתוכים. רק אלה שעוברים את כל התנאים הם פינות אפשריות." }]}
+>
+  כמה פינות אפשריות יש לאזור של נועם ושירה (לפי הטבלה בשיעור)?
+</NumericExercise>
+
+<Solution for="8.16-2">
+בטבלה, בעמודה ״אפשרית?״ כתוב ״כן״ ב־{f.plain("cross.feasible")} שורות: שלושת קודקודי המשולש. השאר חיתוכים של קווים שאינם גבול של האזור.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.16-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("c40.over")}
+  errors={[{ value: f.raw("c40.pay"), message: "זה ההחזר החודשי עצמו. השאלה בכמה הוא עובר את התקרה." }]}
+>
+  בנקודה (4, 6) ההחזר החודשי הוא {f.shekels("c40.pay")}, והתקרה {f.shekels("cap")}. בכמה שקלים ההחזר עובר את התקרה?
+</NumericExercise>
+
+<Solution for="8.16-3">
+<M>{formatShekels(f.raw("c40.pay"))} − {formatShekels(f.raw("cap"))} = {formatShekels(f.raw("c40.over"))}</M>. זו הסיבה שהנקודה נפסלת כשהתקרה {f.shekels("cap")}; כשהתקרה {f.shekels("cap2")} היא כבר הפינה הטובה.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.16-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: "התנאי השתנה: התקרה עלתה. האזור גדל, והפינה הטובה אחרת", correct: true, feedback: "נכון. עם תקרה גבוהה יותר אפשר לשים יותר בקצר, עד הגבול של 40% בארוך." },
+    { text: "השיטה טעתה בפעם הראשונה", feedback: "היא לא טעתה: היא פתרה את הבעיה שהוצגה לה, עם התקרה הנמוכה." },
+    { text: "בבעיה לינארית הפינה הטובה אף פעם לא משתנה", feedback: "היא משתנה כשתנאי או מטרה משתנים, גם בבעיה לינארית." },
+    { text: "המטרה השתנתה, כי הקצר נעשה זול יותר", feedback: "העלות ליחידה לא השתנתה: אותם מסלולים ואותם מחירים." },
+  ]}
+>
+  למה הפינה הטובה ביותר עברה לנקודה אחרת כשהתקרה עלתה מ־{f.shekels("cap")} ל־{f.shekels("cap2")}?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.16-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("b.saving_vs_a")}
+  errors={[{ value: f.raw("b.more_pay"), message: "זה ההפרש בהחזר החודשי. השאלה על ההפרש בסך התשלומים." }]}
+>
+  הפינה הטובה כשהתקרה {f.shekels("cap")} עולה {f.shekels("a.cost")} בסך הכול, וכשהתקרה {f.shekels("cap2")} היא עולה {f.shekels("b.cost")}. כמה פחות משלמים בסך הכול כשהתקרה גבוהה יותר?
+</NumericExercise>
+
+<Solution for="8.16-5">
+<M>{formatShekels(f.raw("a.cost"))} − {formatShekels(f.raw("b.cost"))} = {formatShekels(f.raw("b.saving_vs_a"))}</M>, במחיר של {f.shekels("b.more_pay")} בחודש. זה אותו ויתור משיעור 8.15, כאן בתוך בעיה לינארית.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.16-6"
+  n={6}
+  level="מאתגר"
+  answer={f.raw("curve.gap")}
+  errors={[{ value: "79", message: "זה העלות באופטימום הגלובלי. השאלה על ההפרש בינו ובין העמק שבו נעצרת ההליכה מ־0%." }]}
+>
+  מי שמתחיל ב־0% בעקומה של השיעור ויורד לשכן הזול יותר נעצר בעלות {f.plain("curve.local")} (באלפי ₪). העלות הנמוכה ביותר בעקומה היא {f.plain("curve.global")}. מה ההפרש, באלפי ₪?
+</NumericExercise>
+
+<Solution for="8.16-6">
+<M>{f.plain("curve.local")} − {f.plain("curve.global")} = {f.plain("curve.gap")}</M> אלף ₪. ההליכה נעצרה באופטימום מקומי.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.16-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "היא מתאימה רק אם העלות והתנאים באמת ישרים; אם יש מדרגות או קפיצות, צריך שיטה אחרת, ולכל שיטה יש מה שהיא לא מבטיחה", correct: true, feedback: "נכון. זה מה שמחקר הצוות נימק, ושיעור 8.17 מראה למה מדרגות שוברות את ההנחה." },
+    { text: "היא תמיד עדיפה, כי היא מבטיחה אופטימום גלובלי", feedback: "היא מבטיחה אופטימום גלובלי רק בבעיה לינארית. מי שמשתמש בה על בעיה שאינה כזו מקבל תשובה שאינה מובטחת." },
+    { text: "היא אף פעם לא מתאימה, כי כל בעיה במשכנתא לא לינארית", feedback: "חלק מהחלקים של הבעיה הם לינאריים (למשל סכום המסלולים שווה להלוואה). השאלה היא על הבעיה כולה." },
+    { text: "היא מתאימה כשיש יותר משני משתנים", feedback: "מספר המשתנים לא קובע. הצורה של המטרה והתנאים קובעת." },
+  ]}
+>
+  יועץ טוען ש״תכנון לינארי הוא השיטה הנכונה למצוא את התמהיל האופטימלי״. מה נכון?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על תכנון לינארי">
+<p><strong>מה זה?</strong> שיטה למצוא את הערכים הטובים ביותר של כמה משתנים כשהמטרה וכל התנאים הם קווים ישרים. הפתרון, אם יש, בפינה של האזור המותר.</p>
+<p><strong>למה זה קיים?</strong> כי כשהעולם ישר אפשר לדלג על אינסוף נקודות ולבדוק רק פינות, ולקבל תשובה מדויקת, מהר, ועם הבטחה שאין טוב ממנה.</p>
+<p><strong>איך זה עובד?</strong> חותכים כל שני קווי גבול, פוסלים חיתוכים ששוברים תנאי, וקוראים את המטרה בשאר הפינות. הקטנה ביותר מנצחת.</p>
+<p><strong>איך זה משפיע עליכם?</strong> כשמישהו אומר ״זה האופטימום״, כדאי לדעת לפי אילו נתונים, אילו תנאים, איזו מטרה, ובאיזה מרחב. נתונים שהם הנחות על העתיד נותנים אופטימום שתלוי בהנחות.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> שואלים אם הבעיה ישרה. אם כן, תכנון לינארי נותן תשובה מובטחת. אם לא, בודקים רשת או מועמדים, ומציינים בכנות שה״אופטימום״ הוא ביחס למה שנבדק. החישוב נעשה בקוד שאפשר לבדוק: מודל שפה לא מחשב אף מספר, אלא רק מסביר.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **תכנון לינארי:** מטרה ותנאים שהם קווים ישרים. האזור המותר הוא צורה עם פינות, והפתרון הטוב ביותר בפינה.
+- **למצוא פינה:** חותכים שני קווי גבול, בודקים מול כל התנאים, וקוראים את המטרה.
+- **תנאים זהים, נתונים אחרים, פינה אחרת:** האופטימום תלוי בנתונים.
+- **אופטימום מקומי וגלובלי:** בבעיה לא לינארית ייתכנו כמה עמקים, וההליכה מטה נתקעת באחד. בבעיה לינארית אין כזה.
+- **״אופטימלי״ הוא ביחס** לנתונים, לאילוצים, למטרה ולמרחב שנבדק.
+- **אין שיטה שעדיפה תמיד.** Mogi לא בנתה אף אחת מאלה; המחקר של הצוות ממליץ על חיפוש מוגבל (עתיד, לא החלטה).
+
+**בשיעור הבא — 8.17, <Later lesson="8.17" quiet>מודל תמחור: עוגן ועוד מרווח, ומדרגות סביב ספים</Later>:** איך הבנק נכנס למשוואה, ולמה המדרגות שוברות את ההנחה הלינארית.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "ידע מתמטי כללי", text: "תכנון לינארי בשני משתנים: האזור המותר כצורה עם צלעות ישרות, והעובדה שמטרה ישרה מגיעה לערך הטוב ביותר בפינה; חיתוך של שני קווים בכלל קרמר; אופטימום מקומי וגלובלי; בעיה לינארית שבה כל אופטימום מקומי הוא גלובלי. ידע כללי, לא מקור שצוטט." },
+    { kind: "מחקר / הצעה", text: "מסמך מחקר של הצוות על הבחירות והעלויות של בניית מנוע התמהילים (עדן, אוגוסט 2026, עודכן ב־2026-10-08): ההמלצה כנקודת פתיחה היא חיפוש מוגבל שנכתב בבית; הנימוקים (שניים מחמשת הקווים של הוראה 329 קובעים את החלוקה; מטרה שכוללת פירעון מוקדם אינה חלקה; פותר מוכן לא מחזיר הסבר); פותרים מוכנים נשללו כרכיב. המסמך עצמו אומר שאלה נקודות פתיחה ולא החלטות סופיות. לפי הרשומה בצוות; לא נקרא מחדש בכתיבת השיעור.", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "שני מסלולים קבועים לא צמודים ב־4.40% מרשימת המחירים של הקורס לתיק א׳, ל־30 ול־15 שנה; עלות ליחידה היא סך התשלומים על 100,000 ₪ לפי כלל העיגול של הקורס. ההחזר המרבי (6,000 ₪ ואז 6,600 ₪) ורצון הלקוח ל־40% בארוך הם תנאים להדגמה. העקומה בעלת שני העמקים נוצרה להדגמה." },
+    { kind: "בדיקת חישוב", text: "הפינות נמצאו בקוד ונבדקו בנפרד בפייתון בשברים מדויקים.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/lp.ts and metrics.ts (via scripts/lessons/lesson-3-8.ts helpers) through scripts/lessons/lesson-8-16.ts and data/lessons/8-16.json; rechecked by checks/kinds/lp.py (exact fractions) and metrics.py. Illustration: src/components/CornerSolver.vue. Brain research page J-090 for the "what Mogi plans" paragraph (HiGHS/OR-Tools ruled out as a component; starting positions, not decisions). Video: video/8-16.html. */}

@@ -15,7 +15,7 @@
  *   - `requestOf`, `mixOf`, `candidateOf`: build a constraints.ts Candidate from the choices, with the tracks priced at the
  *     asked bank's list prices (BANK_PRICES) — a TEACHING SIMPLIFICATION (in the market a bank prices the whole case, so a
  *     change in the mix can change the rates: FK-H-057, awaiting Eylon; lesson 8.17 teaches that shape);
- *   - `CANDIDATES`: a curated list of candidates (lesson 8.7), each failing a different set of reasons, and `FEASIBLE_ID`;
+ *   - `CANDIDATES`: a curated list of candidates (lesson 8.7), each failing a different set of reasons;
  *   - `SAMPLE_OFFER`: a made-up bank offer for the workshop's check (lesson 8.28): the tracks and rates one fictional bank
  *     "gave" for one candidate. Its payments are NOT typed here: the engine (B) or schedule.ts computes them.
  *
@@ -40,9 +40,9 @@
  *   loanOfChoice(choice)                         the loan the choice leaves: price − equity
  *   mixOf(choice, shape)                         TrackSpec[] priced at the asked bank's list
  *   candidateOf(id, choice, shape)               constraints.ts Candidate
- *   CANDIDATES, candidateById(id)                the curated list (12 candidates)
+ *   CANDIDATES, CANDIDATE_NAMES, candidateById(id), entryOf(id)   the curated list (12 candidates; c07 and c11 are feasible), their Hebrew names
  *   BASE_CHOICE                                  the family's own request: no extra equity, car loan kept, no parent, bank א׳
- *   SAMPLE_OFFER                                 {bank, shape, choice, tracks}: the made-up offer of the workshop
+ *   SAMPLE_OFFER, sampleOfferTracks()            the made-up offer of the workshop (candidate c05 shape at bank ב׳, own rates)
  *
  * Money is a string of shekels, a share is a whole percent, a rate is a percent string.
  */
@@ -203,7 +203,7 @@ const VAR = "variable_unlinked" as const;
 
 /**
  * Twelve candidates for the filter of lesson 8.7. They are chosen so that every family of constraints rejects at least one,
- * some candidates fail several reasons at once, and exactly one is feasible at the asked bank — see candidates.test (case-s8.test.ts).
+ * some candidates fail several reasons at once, and exactly two are feasible (c07, c11) — see candidates.test (case-s8.test.ts).
  * Which fails what is NOT typed anywhere: constraints.ts computes it.
  */
 const ENTRIES: Entry[] = [
@@ -213,12 +213,12 @@ const ENTRIES: Entry[] = [
   { id: "c04", name: "קבועה בלבד ל־25 שנה", choice: BASE_CHOICE, shape: [part(FIXED, 100, 25)] },
   { id: "c05", name: "חצי קבועה, חצי פריים", choice: BASE_CHOICE, shape: [part(FIXED, 50), part(PRIME, 50)] },
   { id: "c06", name: "קבועה ופריים, ופריים קצר", choice: BASE_CHOICE, shape: [part(FIXED, 60), part(PRIME, 40, 20)] },
-  { id: "c07", name: "שני שלישים קבועה, עוד הון עצמי", choice: { ...BASE_CHOICE, extraEquity: "20000" }, shape: [part(FIXED, 60), part(PRIME, 20), part(VAR, 20)] },
+  { id: "c07", name: "60% קבועה, עם הון עצמי נוסף", choice: { ...BASE_CHOICE, extraEquity: "20000" }, shape: [part(FIXED, 60), part(PRIME, 20), part(VAR, 20)] },
   { id: "c08", name: "אחרי סגירת הרכב, מנוצל כל החיסכון", choice: { ...BASE_CHOICE, closeCar: true, extraEquity: "40000" }, shape: [part(FIXED, 50), part(PRIME, 30), part(VAR, 20)] },
   { id: "c09", name: "הורה כלווה נוסף", choice: { ...BASE_CHOICE, parent: true }, shape: [part(FIXED, 30), part(PRIME, 40), part(VAR, 30)] },
   { id: "c10", name: "בבנק ד׳", choice: { ...BASE_CHOICE, bank: "d" }, shape: [part(FIXED, 40), part(PRIME, 30), part(VAR, 30)] },
-  { id: "c11", name: "הרבה הון עצמי, מעט בנק", choice: { ...BASE_CHOICE, extraEquity: "40000" }, shape: [part(FIXED, 40), part(PRIME, 30), part(VAR, 30)] },
-  { id: "c12", name: "מיקס עם 40% קבועה בלבד", choice: BASE_CHOICE, shape: [part(FIXED, 40), part(PRIME, 40), part(VAR, 20)] },
+  { id: "c11", name: "40,000 ₪ הון עצמי נוסף", choice: { ...BASE_CHOICE, extraEquity: "40000" }, shape: [part(FIXED, 40), part(PRIME, 30), part(VAR, 30)] },
+  { id: "c12", name: "40% קבועה, 40% פריים", choice: BASE_CHOICE, shape: [part(FIXED, 40), part(PRIME, 40), part(VAR, 20)] },
 ];
 
 export const CANDIDATE_NAMES: Record<string, string> = Object.fromEntries(ENTRIES.map((e) => [e.id, e.name]));
@@ -258,4 +258,30 @@ export function sampleOfferTracks(): TrackSpec[] {
   const { choice, shape } = entryOf(SAMPLE_OFFER.base);
   const at = { ...choice, bank: SAMPLE_OFFER.bank };
   return mixOf(at, shape).map((t) => ({ ...t, rate: SAMPLE_OFFER.rates[t.kind] ?? t.rate }));
+}
+
+// ── Counting the small space (lesson 8.6) ──────────────────────────────────
+
+/** n choose k, exact (small n). */
+function choose(n: number, k: number): number {
+  let r = 1;
+  for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i;
+  return Math.round(r);
+}
+
+/**
+ * How many mixes level 2 allows: tracks of `kinds.length` kinds, shares in steps of `step` percent that add to 100 (a kind
+ * may be left out), and each track used has one of `terms` terms. For each number k of kinds used: pick which kinds
+ * (n choose k), split 100/step units among them each at least one (C(units − 1, k − 1)), choose a term for each (terms^k).
+ */
+export function countShapes(kinds: number, step: number, terms: number): number {
+  const units = 100 / step;
+  let total = 0;
+  for (let k = 1; k <= Math.min(kinds, units); k++) total += choose(kinds, k) * choose(units - 1, k - 1) * terms ** k;
+  return total;
+}
+
+/** The size of level 1: the product of the options of its variables. */
+export function countChoices(): number {
+  return LEVEL1.extraEquity.length * LEVEL1.closeCar.length * LEVEL1.parent.length * LEVEL1.bank.length;
 }

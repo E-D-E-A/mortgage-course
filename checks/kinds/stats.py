@@ -260,3 +260,40 @@ KINDS = {
     "stats_fact_expect": fact_expect,
     "stats_fact_prob_above": fact_prob_share,
 }
+
+
+def _choose(n, k):
+    from math import comb
+    return comb(n, k)
+
+
+def shapes(i, _f=None):
+    """How many mixes: shares in steps of `step` percent adding to 100, a kind may be left out, a term per used track."""
+    kinds, step, terms = int(i["kinds"]), int(i["step"]), int(i["terms"])
+    units = 100 // step
+    return sum(_choose(kinds, k) * _choose(units - 1, k - 1) * terms ** k for k in range(1, min(kinds, units) + 1))
+
+
+def product_of(i, _f=None):
+    out = 1
+    for x in str(i["factors"]).split(","):
+        out *= int(x)
+    return out
+
+
+KINDS["stats_shapes"] = shapes
+KINDS["stats_count_product"] = product_of
+
+
+def percent_of_whole(i, _f=None):
+    """part ÷ whole × 100, in percent."""
+    return _plain(Decimal(i["part"]) * HUNDRED / Decimal(i["whole"]), i["decimals"])
+
+
+def fact_percent(i, facts):
+    """Like percent_of_whole, but part and whole are other facts' values."""
+    return _plain(Decimal(facts[i["part"]]["value"]) * HUNDRED / Decimal(facts[i["whole"]]["value"]), i["decimals"])
+
+
+KINDS["stats_percent"] = percent_of_whole
+KINDS["stats_fact_percent"] = fact_percent

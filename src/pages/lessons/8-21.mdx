@@ -1,0 +1,569 @@
+---
+layout: ../../layouts/LessonLayout.astro
+lesson: "8.21"
+minutes: 60
+---
+import Term from "../../components/Term.vue";
+import Later from "../../components/Later.astro";
+import Callout from "../../components/Callout.astro";
+import Section from "../../components/Section.astro";
+import LessonVideo from "../../components/LessonVideo.astro";
+import Prediction from "../../components/Prediction.vue";
+import PredictionReveal from "../../components/PredictionReveal.vue";
+import PipelineFlow from "../../components/PipelineFlow.vue";
+import MatchTable from "../../components/MatchTable.vue";
+import NumericExercise from "../../components/NumericExercise.vue";
+import ChoiceExercise from "../../components/ChoiceExercise.vue";
+import Sources from "../../components/Sources.astro";
+import M from "../../components/M.astro";
+import Solution from "../../components/Solution.astro";
+import { facts } from "../../lib/facts.ts";
+import { formatShekels } from "../../lib/calc/money.ts";
+import { s8Bank } from "../../data/case-s8.ts";
+import { BANK_HE, POSITIONING_HE, mixName } from "../../data/pipeline-demo.ts";
+
+{/* Equations sit in <M> so they read left to right; strings use the same isolation via eq(). */}
+export const eq = (x) => `⁦${x}⁩`;
+export const f = facts("8.21");
+export const MARK = "דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. נתונים סינתטיים; הבנקים פיקטיביים.";
+export const BANKS = ["a", "b", "c", "d"];
+export const POS = ["asked", "parent"];
+export const pc = (s) => `${Math.round(Number(s) * 100)}%`;
+export const money = (id) => formatShekels(f.raw(id));
+export const ranked = (id) => f.raw(id);
+export const rankOf = (id, bank) => ranked(id).find((r) => r.id === bank).rank;
+export const groupOf = (id, bank) => ranked(id).find((r) => r.id === bank).group;
+export const byRank = (id) => ranked(id).filter((r) => r.rank !== null).sort((a, b) => a.rank - b.rank).map((r) => r.id);
+export const est = byRank("rank.estimate");
+export const off = byRank("rank.offer");
+export const pickOf = (bank) => ranked(`${bank}.pick`).find((r) => r.rank === 1)?.id.split(".")[1] ?? "asked";
+export const grid = (bank, pos) => f.raw(`${bank}.${pos}.grid`);
+export const hasV = (bank, pos) => grid(bank, pos).best !== "";
+export const runOf = (bank, pos) => {
+  const g = grid(bank, pos);
+  const key = `${bank}.${pos}`;
+  if (g.best === "") return { bank, positioning: pos, bestId: "", feasible: g.feasible, size: g.size, decision: "none", relief: "0", ratio: "0", ltv: "0", rates: [], first: "0", total: "0", p: "0.000000", ltvMax: s8Bank(bank).ltvMax };
+  const rates = [1, 2, 3].map((k) => { try { return f.raw(`${key}.v.rate_${k}`); } catch { return null; } }).filter((x) => x !== null);
+  return { bank, positioning: pos, bestId: g.best, feasible: g.feasible, size: g.size, decision: f.raw(`${key}.v.decision`), relief: f.raw(`${key}.v.relief`), ratio: f.raw(`${key}.v.ratio`), ltv: f.raw(`${key}.v.ltv`), rates, first: f.raw(`${key}.v.first`), total: f.raw(`${key}.v.total`), p: f.raw(`${key}.p`), ltvMax: s8Bank(bank).ltvMax };
+};
+export const runs = BANKS.flatMap((b) => POS.map((p) => runOf(b, p)));
+export const offer = { bank: "c", rate: f.raw("offer.rate"), first: f.raw("offer.first"), total: f.raw("offer.total") };
+export const first = est[0];
+export const second = est[1];
+export const third = est[2];
+export const keptKey = (bank) => `${bank}.${pickOf(bank)}`;
+export const reliefOf = (bank) => f.raw(`${keptKey(bank)}.v.relief`);
+export const predictionOptions = [
+  `${BANK_HE.c} הופך לראשון: ההצעה זולה מהאומדן`,
+  `${BANK_HE.c} עולה למקום ${rankOf("rank.offer", "c")}, ו${BANK_HE[off[0]]} נשאר ראשון`,
+  "לא משתנה: ההצעה לא משפיעה על הדירוג",
+  `${BANK_HE.c} יורד, כי הצעה אמיתית תמיד גרועה מאומדן`,
+];
+
+בשיעורים 8.6–8.20 בניתם חלק אחרי חלק: המשתנים, האילוצים, המשקולות, המנוע, חיפוש, חזית, תמחור, הסתברות והצעה אמיתית. עכשיו מחברים. בשיעור הזה תראו את **כל האלגוריתם**, מקצה לקצה, פעם אחת לכל בנק.
+
+<Callout title="מה השיעור הזה לא אומר">
+<p><strong>{MARK}</strong></p>
+<p><strong>עתיד.</strong> אין היום ב־Mogi חישוב תמהילים (קריאת המנוע מוקפאת). מה שהוחלט: <strong>מודל שפה מסביר ומסווג, לעולם לא מחשב ולעולם לא כותב מצב</strong> (אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29), והכלל מ־8.20 על הצעות (אילון, 2026-10-07). כל השאר כאן הוא <strong>תכנון להדגמה</strong>: ארבעת הבנקים פיקטיביים, הקווים והמחירים שלהם הומצאו בשלב 6, ההסתברות היא המודל הסינתטי של 8.19 כאילו כויל (אין עדיין נתוני אישורים), והדירוג, הסף והמשקולות הם של הקורס, להדגמה.</p>
+</Callout>
+
+<Section kind="לפני שמתחילים: נחשו">
+
+## שאלת חיזוי
+
+</Section>
+
+<Prediction
+  client:visible
+  id="8.21"
+  question={`הצנרת דירגה ארבעה בנקים פיקטיביים לתיק של נועם ושירה. ${BANK_HE.c} במקום השלישי, לפי אומדן. עכשיו מגיעה ממנו הצעה אמיתית, בריבית של ${f.plain("offer.rate")}% בקבועה: נמוכה מהאומדן. מה קורה לדירוג?`}
+  options={predictionOptions}
+/>
+
+<Section kind="סרטון">
+
+## המנוע מקצה לקצה
+
+</Section>
+
+<LessonVideo lesson="8-21" />
+
+<Section kind="ההסבר">
+
+## שבעה שלבים, לכל בנק
+
+</Section>
+
+### התמונה כולה
+
+לכל בנק עוברים ארבעה שלבים של חישוב, ואחריהם דירוג והסבר. כשמגיעה הצעה אמיתית, היא נכנסת במקום האומדן:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm">
+  <ol class="list-reset space-y-2 text-body-m text-n800">
+    <li><strong>1. מיצוב</strong> — איך הבקשה מוגשת (<Term t="משתנה החלטה" client:visible lesson="8.6">משתני ההחלטה</Term> של הרמה הראשונה): למשל, האם הורה מצטרף ללווים.</li>
+    <li><strong>2. תמהיל</strong> — <Term t="חיפוש על רשת" client:visible lesson="8.14">חיפוש על רשת</Term> של תמהילים שעומדים ב<Term t="אילוץ" client:visible lesson="8.7">אילוצים</Term> של החוק, של הבנק ושל הלקוח, והטוב מביניהם לפי המשקולות.</li>
+    <li><strong>3. מחיר חזוי</strong> — מה הבנק היה גובה על התמהיל הזה: <Term t="מודל תמחור" client:visible lesson="8.17">מודל התמחור</Term>, או פסילה.</li>
+    <li><strong>4. הסתברות</strong> — סיכוי האישור, ממודל <Term t="כיול" client:visible lesson="8.19">מכויל</Term> (בהנחה שכויל).</li>
+    <li><strong>5. <Term t="דירוג" client:visible lesson="8.21">דירוג</Term></strong> — סידור הבנקים לפי כלל שנקבע מראש.</li>
+    <li><strong>6. הסבר</strong> — למה כל בנק נמצא איפה שהוא. נכתב ממספרים שהקוד כבר חישב.</li>
+    <li><strong>7. הצעה אמיתית</strong> — מחליפה את האומדן לאותו בנק (שיעור 8.20).</li>
+  </ol>
+</div>
+
+המנוע כולו הוא קוד שאפשר לבדוק. **מודל שפה נכנס רק בשלב 6, ורק כדי לנסח** מה שכבר חושב: הוא לא בוחר תמהיל, לא מחשב מחיר, לא מדרג ולא כותב שום דבר לתיק (כלל של Mogi שהוחלט).
+
+### המקרה
+
+הילדים של הסדנה הם התיק של נועם ושירה (שיעורים 5–6), מול ארבעת הבנקים הפיקטיביים של שלב 6, עם רשימות המחירים שלהם, וקווים שהקורס המציא: בכל בנק קו מימון ויחס החזר שמעליהם הוא פוסל, וקווים שמתחתיהם הוא מוריד מהריבית (**הקלה**). אלה חוקים של התרגיל, לא של בנק אמיתי.
+
+### שלב 1: מיצוב
+
+שני מיצובים (מתוך אפשרויות גדולות יותר, כמו בשיעור 8.6): **כפי שביקשו**, ו**הורה מצטרף ללווים** (ההכנסה שלו נכנסת; זו החלטה של המשפחה, לא של האלגוריתם). לכל בנק מריצים את שני השלבים הבאים על כל מיצוב, ושומרים את הטוב יותר לפי כלל הדירוג.
+
+### שלב 2: תמהיל
+
+לכל בנק ולכל מיצוב, חיפוש על רשת: קבועה, פריים ומשתנה בחלקים של 10%, ל־25 או ל־30 שנה, עם האילוצים: החוק (שיעור 4.4), הקווים של הבנק, והגבולות של הלקוח (שיעור 8.15). הטוב ביותר, לפי משקולות שוות (להדגמה):
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">המיצוב</th>
+        <th class="py-2 pe-3 text-start font-semibold">אפשריים מתוך {f.plain("a.asked.grid").size}</th>
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל הטוב ביותר</th>
+      </tr>
+    </thead>
+    <tbody>
+      {BANKS.flatMap((b) => POS.map((p) => { const g = grid(b, p); return (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold">{BANK_HE[b]}</td>
+          <td class="py-2 pe-3">{POSITIONING_HE[p]}</td>
+          <td class="py-2 pe-3"><span class="ltr">{g.feasible}</span></td>
+          <td class="py-2 pe-3">{g.best ? mixName(g.best) : "אין: כל המועמדים נפסלו"}</td>
+        </tr>
+      ); }))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+**בנק ד׳ פוסל את כל המועמדים**, בשני המיצובים: קו המימון שלו, {s8Bank("d").ltvMax}%, נמוך משיעור המימון של המשפחה, שבדוגמה אינו משתנה. לא נשאר שום מועמד אפשרי, ולכן אין מה לתמחר שם. בנקים א׳, ב׳ ו־ג׳ מוצאים מועמדים; כשהורה מצטרף יש הרבה יותר אפשריים, כי יחס ההחזר יורד.
+
+### שלב 3: מחיר חזוי
+
+התמהיל הטוב ביותר נקרא על ידי הכללים של הבנק: מה יחס ההחזר ושיעור המימון שלו, האם הוא פוסל, ואם לא, כמה נקודות אחוז הוא מוריד מהריבית (הקלה). הריביות החזויות והתשלומים:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-2 text-start font-semibold">בנק, מיצוב</th>
+        <th class="py-2 pe-2 text-start font-semibold">יחס החזר</th>
+        <th class="py-2 pe-2 text-start font-semibold">הקלה</th>
+        <th class="py-2 pe-2 text-start font-semibold">החזר ראשון, ₪</th>
+        <th class="py-2 pe-2 text-start font-semibold">סך תשלומים, ₪</th>
+      </tr>
+    </thead>
+    <tbody>
+      {BANKS.filter((b) => b !== "d").flatMap((b) => POS.map((p) => { const k = `${b}.${p}`; return (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-2 font-semibold">{BANK_HE[b]}, {POSITIONING_HE[p]}</td>
+          <td class="py-2 pe-2"><span class="ltr">{f.plain(`${k}.v.ratio`)}%</span></td>
+          <td class="py-2 pe-2"><span class="ltr">{f.plain(`${k}.v.relief`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.raw(`${k}.v.first`)}</span></td>
+          <td class="py-2 pe-2"><span class="ltr whitespace-nowrap">{f.raw(`${k}.v.total`)}</span></td>
+        </tr>
+      ); }))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ההקלה מורידה את הריבית של כל המסלולים, בנקודות אחוז. סך התשלומים בתרחיש הבסיס של תיק א׳.</p>
+</div>
+
+שימו לב שבנק ב׳ נותן הקלה של {f.plain("b.parent.v.relief")} רק כשהורה מצטרף: יחס ההחזר יורד אז מתחת לקו שלו, והמחיר יורד איתו. זה בדיוק ה״מדרגה״ משיעור 8.17, וכאן היא עובדת בשלב 3: **מיצוב אחר משנה את המחיר**.
+
+### שלב 4: הסתברות
+
+לכל בנק ולכל מיצוב, הסתברות לאישור מהמודל של שיעור 8.19, שהוא יחס ההחזר ושיעור המימון של הקובץ. כאן מניחים **שהוא כויל** (בלי נתונים אי אפשר, שיעור 8.19) ומשתמשים בהסתברות האמיתית של הנתונים הסינתטיים. בנק שפוסל מקבל 0.
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">{POSITIONING_HE.asked}</th>
+        <th class="py-2 pe-3 text-start font-semibold">{POSITIONING_HE.parent}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {BANKS.map((b) => (
+        <tr class="border-b border-n100">
+          <td class="py-2 pe-3 font-semibold">{BANK_HE[b]}</td>
+          {POS.map((p) => (<td class="py-2 pe-3"><span class="ltr">{pc(f.raw(`${b}.${p}.p`))}</span></td>))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK} ״כפי שביקשו״: מתחת לסף של {pc(f.raw("threshold"))} בכל הבנקים; עם הורה: מעליו.</p>
+</div>
+
+### שלב 5: דירוג
+
+הכלל (של הקורס, להדגמה): **קודם** בנקים שמאשרים בסיכוי של {pc(f.raw("threshold"))} לפחות, לפי סך התשלומים מהזול ליקר; **אחר כך** בנקים שמאשרים בסיכוי נמוך מהסף; ובסוף בנקים שפוסלים (בלי מקום). הכלל נבחר כך שהמחיר לא יקדים בנק שלא סביר שיאשר.
+
+לכל בנק נשאר המיצוב הטוב ביותר שלו: {BANKS.map((b) => `${BANK_HE[b]}: ${b === "d" ? "פוסל בשניהם" : POSITIONING_HE[pickOf(b)]}`).join("; ")}. הדירוג:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מקום</th>
+        <th class="py-2 pe-3 text-start font-semibold">הבנק</th>
+        <th class="py-2 pe-3 text-start font-semibold">התמהיל</th>
+        <th class="py-2 pe-3 text-start font-semibold">סך תשלומים</th>
+        <th class="py-2 pe-3 text-start font-semibold">סיכוי אישור</th>
+      </tr>
+    </thead>
+    <tbody>
+      {est.map((b, k) => (
+        <tr class="border-b border-n100 align-top">
+          <td class="py-2 pe-3 font-semibold"><span class="ltr">{k + 1}</span></td>
+          <td class="py-2 pe-3 font-semibold">{BANK_HE[b]}</td>
+          <td class="py-2 pe-3">{mixName(grid(b, pickOf(b)).best)}</td>
+          <td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.raw(`${keptKey(b)}.v.total`)}</span></td>
+          <td class="py-2 pe-3"><span class="ltr">{pc(f.raw(`${keptKey(b)}.p`))}</span></td>
+        </tr>
+      ))}
+      <tr class="border-b border-n100 text-n600"><td class="py-2 pe-3">—</td><td class="py-2 pe-3 font-semibold">{BANK_HE.d}</td><td class="py-2 pe-3" colspan="3">פוסל: אין מועמד שעומד בקו המימון שלו</td></tr>
+    </tbody>
+  </table>
+  <p class="mt-2 text-caption text-n600">{MARK}</p>
+</div>
+
+אילו נועם ושירה הגישו כפי שביקשו, אף בנק לא היה מעל הסף של {pc(f.raw("threshold"))}, ושלושת הבנקים היו בקבוצה השנייה: הסדר ביניהם היה לפי המחיר בלבד, וראשון היה {BANK_HE[byRank("rank.asked")[0]]}. עם סף גבוה יותר, {pc(f.raw("threshold.strict"))}, שלושת הבנקים נשארים מתחת לסף, ולכן הסדר ביניהם נקבע שוב לפי המחיר.
+
+### שלב 6: הסבר
+
+הדירוג בא עם הסבר, לכל בנק. הסברים אלה נכתבים ממספרים שהקוד כבר חישב, וכל אחד מהם אפשר להפוך למשפט:
+
+- **{BANK_HE[first]}, מקום ראשון.** הזול ביותר מבין מי שסיכוי האישור שלהם לפחות {pc(f.raw("threshold"))}: {f.shekels(`${keptKey(first)}.v.total`)} בסך הכול, כי הקלה של {reliefOf(first)} נקודות אחוז (יחס ההחזר, {f.plain(`${keptKey(first)}.v.ratio`)}%, מתחת לקו שלו).
+- **{BANK_HE[second]}, מקום שני.** יקר ב־{f.shekels("gap.rank_1")} מהראשון, עם הקלה של {reliefOf(second)}.
+- **{BANK_HE[third]}, מקום שלישי.** יקר ב־{f.shekels("gap.rank_2")} משני, עם הקלה של {reliefOf(third)}.
+- **{BANK_HE.d}, נפסל.** אין מועמד אפשרי: הקו על המימון שלו נמוך משיעור המימון של המשפחה.
+
+**מודל שפה לא חישב כאן שום מספר.** אם מנסחים את ההסבר בעזרת מודל שפה, הוא מקבל את המספרים האלה כקלט ומנסח משפט; הוא לא יודע לחשב אותם, והמשפט נבדק מול המספרים.
+
+### שלב 7: הצעה אמיתית
+
+{BANK_HE.c} שולח הצעה (מומצאת): {f.plain("offer.rate")}% בקבועה, במקום מה שחזינו. ההחזר הראשון שלה {money("offer.first")} וסך התשלומים {money("offer.total")}, פחות ב־{f.shekels("offer.gap_total").replace("-", "")} מהאומדן. הצעה היא אישור: ההסתברות הופכת ל־100%, והמחיר הוא מה שהבנק כתב. הדירוג נקרא שוב:
+
+<div class="my-6 overflow-x-auto rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
+  <table class="w-full border-collapse text-body-m">
+    <thead>
+      <tr class="border-b border-n200 text-caption text-n600">
+        <th class="py-2 pe-3 text-start font-semibold">מקום</th>
+        <th class="py-2 pe-3 text-start font-semibold">לפי אומדן</th>
+        <th class="py-2 pe-3 text-start font-semibold">אחרי ההצעה</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[0, 1, 2].map((k) => (
+        <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold"><span class="ltr">{k + 1}</span></td><td class="py-2 pe-3">{BANK_HE[est[k]]}</td><td class="py-2 pe-3">{BANK_HE[off[k]]}{off[k] === "c" ? " (הצעה אמיתית)" : ""}</td></tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+{BANK_HE.c} עולה למקום {rankOf("rank.offer", "c")}, לפני {BANK_HE.a}, אבל {BANK_HE[off[0]]} נשאר ראשון: ההצעה זולה מהאומדן, ובכל זאת לא מספיק. וגם הדבר ההפוך אפשרי: הצעה גבוהה מהאומדן הייתה מורידה בנק. **הצעה אמיתית מחליפה את האומדן, בכל כיוון, ומלמדת את המודל** (שיעור 8.20).
+
+<Section kind="המחשה: הזיזו בעצמכם">
+
+## תרשים זרימה חי
+
+</Section>
+
+הכלי מחשב מחדש את הדירוג כשמזיזים את המיצוב, הסף וההצעה. לחצו על בנק כדי לראות את כל שבעת השלבים שלו.
+
+<PipelineFlow client:visible runs={runs} offer={offer} threshold={f.raw("threshold")} />
+
+נסו:
+1. השאירו את ההגדרות, ופתחו כל בנק. מה כל שלב מוסיף?
+2. בחרו ״כפי שביקשו״. מה קורה לדירוג, ולמה?
+3. החזירו, והדליקו את ההצעה מבנק ג׳. מה השתנה בדירוג, ומה בהסבר?
+4. הגדילו את הסף עד 0.65. מה קורה, ומה זה אומר על כלל הדירוג?
+
+<details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
+  <summary class="cursor-pointer font-semibold text-n900">מה הייתם אמורים לראות</summary>
+  <ol class="mt-2 list-decimal space-y-1 ps-6">
+    <li>כל שלב מוסיף מספר אחד לבנק: המיצוב, התמהיל, המחיר, ההסתברות והדירוג. ההסבר מצטט אותם.</li>
+    <li>בלי הורה, כל הבנקים מתחת לסף ונופלים לקבוצה השנייה. הדירוג ביניהם נקבע לפי המחיר בלבד, וראשון הוא {BANK_HE[byRank("rank.asked")[0]]}.</li>
+    <li>{BANK_HE.c} עולה למקום {rankOf("rank.offer", "c")}, והסיכוי שלו 100%. ההסבר שלו משתנה: הוא כבר לא ״אומדן״.</li>
+    <li>מעל הסף שבו שלושת הבנקים מאשרים בסיכוי של בערך חמישים ושבעה אחוזים, כולם נופלים לקבוצה השנייה. הסדר ביניהם לפי המחיר לא משתנה, אבל ההסבר כן: ״אחרי מי שמעל הסף״. הסף הוא בחירה, לא עובדה.</li>
+  </ol>
+</details>
+
+<Section kind="מהדוגמה לנוסחה">
+
+## פסאודו־קוד של המנוע
+
+</Section>
+
+זה האלגוריתם, בשורות. כל שורה היא שיעור שכבר עברתם:
+
+<div class="my-6 rounded-lg border border-n200 bg-n0 p-5 shadow-sm" dir="ltr">
+<pre class="ltr overflow-x-auto text-body-m text-n900">{`for each bank b:
+    for each positioning p in {as asked, parent joins}:        # 8.6
+        candidates = grid(b)                                    # 8.13-8.14
+        feasible   = [c for c in candidates
+                      if no hard constraint rejects c]          # 8.7: law, bank, client
+        best       = argmin weighted_score(feasible)            # 8.8, 8.9 (engine)
+        verdict    = bank_rules(b, best)                        # refuse | relief   (8.17)
+        price      = engine(best at predicted rates)            # 8.9
+        prob       = P(approve | ratio, financing)              # 8.19 (calibrated)
+    keep the better positioning                                 # rank rule
+if an offer arrived from b: price, prob = offer, 1              # 8.20
+rank banks: prob >= t first, then by total paid; refusals last  # this lesson
+explain(rank)                                                   # text from numbers; the model only phrases`}</pre>
+</div>
+
+**מתי זה נכון?**
+1. **הכללים של הבנק ידועים.** כאן הם מומצאים. בשוק הם לא ידועים (שיעור 8.17), ולכן המחיר החזוי הוא אומדן.
+2. **ההסתברות מכוילת.** כאן היא מוצהרת כמכוילת, כי אין נתונים. בלי כיול הסף של {pc(f.raw("threshold"))} אינו אומר שום דבר.
+3. **משקולות, סף ומיצובים הם החלטות של בני אדם**: האלגוריתם מחשב, ובני אדם בוחרים.
+
+<Callout title="איך מחשבים">
+<p><strong>בגיליון אלקטרוני:</strong> גיליון לכל בנק עם התמהיל, הריביות והחזר; עמודה של הסתברות; ו־<span class="ltr">=SORT(...)</span> או מיון ידני לפי קבוצה ואז מחיר. בסדנה 8.28 תבנו גרסה קטנה כזו.</p>
+<p><strong>במחשבון:</strong> אפשר לדרג שלושה בנקים ביד: כתבו את סך התשלומים והסיכוי של כל אחד, וסדרו.</p>
+</Callout>
+
+<PredictionReveal
+  client:visible
+  id="8.21"
+  options={predictionOptions}
+  correct={1}
+  notes={[
+    `${BANK_HE.c} נעשה זול יותר, אבל הוא עדיין יקר מ${BANK_HE[off[0]]}, והפער ביניהם גדול מהחיסכון שההצעה נתנה.`,
+    "",
+    "הצעה משנה: היא מחליפה את האומדן ואת ההסתברות של אותו בנק, והדירוג נקרא שוב.",
+    "אין כלל כזה. הצעה יכולה להיות גבוהה או נמוכה מהאומדן; כאן היא נמוכה.",
+  ]}
+>
+  {BANK_HE.c} עלה ממקום {rankOf("rank.estimate", "c")} למקום {rankOf("rank.offer", "c")}, וההסבר שלו השתנה. {BANK_HE[off[0]]} נשאר ראשון: ההצעה חסכה {f.shekels("offer.gap_total").replace("-", "")} מול האומדן, ופער המחיר מהראשון היה גדול יותר.
+</PredictionReveal>
+
+<Section kind="דוגמה פתורה">
+
+## בנק אחד, מקצה לקצה
+
+</Section>
+
+נעקוב אחרי {BANK_HE.b}.
+
+**צעד 1 — מיצוב.** שני מיצובים: כפי שביקשו, ועם הורה. לשניהם מריצים את הצעדים הבאים.
+
+**צעד 2 — תמהיל.** בשני המיצובים הטוב ביותר הוא {mixName(grid("b", "asked").best)}: {grid("b", "asked").feasible} אפשריים בלי הורה, ו־{grid("b", "parent").feasible} עם הורה.
+
+**צעד 3 — מחיר.** בלי הורה, יחס ההחזר {f.plain("b.asked.v.ratio")}%, והקלה {f.plain("b.asked.v.relief")}: סך {f.shekels("b.asked.v.total")}. עם הורה, יחס ההחזר {f.plain("b.parent.v.ratio")}%, והקלה {f.plain("b.parent.v.relief")}: סך {f.shekels("b.parent.v.total")}.
+
+**צעד 4 — הסתברות.** בלי הורה {pc(f.raw("b.asked.p"))}, עם הורה {pc(f.raw("b.parent.p"))}. הסף {pc(f.raw("threshold"))}.
+
+**צעד 5 — הכלל.** עם הורה, {BANK_HE.b} מעל הסף וגם הזול יותר. בלי הורה הוא מתחת לסף. נשמר: עם הורה.
+
+**צעד 6 — דירוג.** מקום {rankOf("rank.estimate", "b")}.
+
+**מסקנה.** המיצוב לא רק משנה את הסיכוי: אצל {BANK_HE.b} הוא משנה גם את המחיר, בגלל ההקלה.
+
+<Section kind="דוגמה חצי פתורה">
+
+## איזה שלב קורא את זה?
+
+</Section>
+
+לכל פריט בחרו את השלב שבו הוא נכנס. השורה הראשונה כבר מלאה.
+
+<MatchTable
+  client:visible
+  id="8.21-match"
+  promptLabel="הפריט"
+  answerLabel="השלב"
+  options={["תמהיל", "מחיר חזוי", "הסתברות", "דירוג", "הצעה אמיתית"]}
+  rows={[
+    { prompt: "קו המימון של הבנק (מעליו הוא פוסל)", answer: "תמהיל", given: true, why: "זה אילוץ קשיח: הוא קובע אילו מועמדים אפשריים." },
+    { prompt: "הקלה של נקודות אחוז כשיחס ההחזר מתחת לקו", answer: "מחיר חזוי", why: "הקלה מורידה את הריבית החזויה של כל המסלולים." },
+    { prompt: "ההסתברות של בנק לאשר, מיחס ההחזר ושיעור המימון", answer: "הסתברות", why: "זה המודל של שיעור 8.19." },
+    { prompt: "קבוצה ראשונה: מי שמעל הסף, לפי סך התשלומים", answer: "דירוג", why: "כלל הדירוג של השיעור." },
+    { prompt: "ריבית שבנק כתב בהצעה, שמחליפה את החזויה", answer: "הצעה אמיתית", why: "הצעה מחליפה אומדן, ומעלה את ההסתברות ל־100%." },
+  ]}
+  success="נכון. כל שלב קורא דבר אחר, ומעביר מספר לשלב הבא."
+  hint="שאלו: האם זה מה שקובע מי אפשרי, מה המחיר, מה הסיכוי, איך מסדרים, או מה הבנק באמת אמר."
+/>
+
+<Section kind="תרגול">
+
+## שמונה תרגילים
+
+</Section>
+
+הנתונים הם סינתטיים והבנקים פיקטיביים. התרגילים מסודרים מהקל אל המאתגר, ובכולם אפשר להסתכל בטבלאות ובכלי של השיעור.
+
+<ChoiceExercise
+  client:visible
+  id="8.21-1"
+  n={1}
+  level="קל"
+  options={[
+    { text: "מיצוב, תמהיל, מחיר חזוי, הסתברות, דירוג, הסבר", correct: true, feedback: "נכון. וכשמגיעה הצעה אמיתית היא מחליפה את האומדן." },
+    { text: "דירוג, תמהיל, מיצוב, מחיר, הסתברות, הסבר", feedback: "אי אפשר לדרג לפני שיש מחיר והסתברות לכל בנק." },
+    { text: "הסבר, מחיר, תמהיל, הסתברות, דירוג, מיצוב", feedback: "ההסבר בא אחרון: הוא מנסח את מה שכבר חושב." },
+    { text: "הסתברות, מחיר, מיצוב, תמהיל, דירוג, הסבר", feedback: "קודם צריך לדעת מה הבקשה (מיצוב) ומה התמהיל, ורק אז מחיר והסתברות." },
+  ]}
+>
+  מה סדר שלבי הצנרת לכל בנק?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.21-2"
+  n={2}
+  level="קל"
+  answer={f.raw("gap.rank_1")}
+  errors={[{ value: f.raw("gap.rank_2"), message: "זה ההפרש בין המקום השלישי לשני. כאן שואלים על ההפרש בין השני לראשון." }]}
+>
+  סך התשלומים של {BANK_HE[first]} (ראשון) הוא {money(`${keptKey(first)}.v.total`)}, ושל {BANK_HE[second]} (שני) {money(`${keptKey(second)}.v.total`)}. בכמה השני יקר מהראשון?
+</NumericExercise>
+
+<Solution for="8.21-2">
+<M>{formatShekels(f.raw(`${keptKey(second)}.v.total`))} − {formatShekels(f.raw(`${keptKey(first)}.v.total`))} = {formatShekels(f.raw("gap.rank_1"))}</M>.
+</Solution>
+
+<NumericExercise
+  client:visible
+  id="8.21-3"
+  n={3}
+  level="בינוני"
+  answer={f.raw("gap.rank_2")}
+  errors={[{ value: f.raw("gap.rank_1"), message: "זה ההפרש בין השני לראשון. כאן שואלים על ההפרש בין השלישי לשני." }]}
+>
+  סך התשלומים של {BANK_HE[third]} (שלישי) הוא {money(`${keptKey(third)}.v.total`)}. בכמה הוא יקר מ{BANK_HE[second]} (שני, {money(`${keptKey(second)}.v.total`)})?
+</NumericExercise>
+
+<Solution for="8.21-3">
+<M>{formatShekels(f.raw(`${keptKey(third)}.v.total`))} − {formatShekels(f.raw(`${keptKey(second)}.v.total`))} = {formatShekels(f.raw("gap.rank_2"))}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.21-4"
+  n={4}
+  level="בינוני"
+  options={[
+    { text: `${BANK_HE.d} פוסל כל מועמד, כי קו המימון שלו נמוך משיעור המימון של המשפחה; ${BANK_HE.c}, למשל, אינו פוסל, אלא עשוי להיות בקבוצה השנייה אם סיכוי האישור שלו נמוך מהסף`, correct: true, feedback: "נכון. פסילה היא אילוץ קשיח; סף הוא חלק מכלל הדירוג." },
+    { text: "אין הבדל: בשני המקרים הבנק נפסל", feedback: "בנק מתחת לסף עדיין מאשר, ומדורג אחרי מי שמעל הסף. בנק שפוסל אינו מדורג." },
+    { text: "בנק ד׳ נפסל כי הוא יקר", feedback: "הוא נפסל לפני שיש מחיר: אין מועמד אפשרי." },
+    { text: "בנק מתחת לסף נפסל כמו בנק שפוסל", feedback: "הסף משנה את הסדר, לא את הקבלה." },
+  ]}
+>
+  מה ההבדל בין בנק שפוסל לבין בנק שמאשר בסיכוי מתחת לסף?
+</ChoiceExercise>
+
+<NumericExercise
+  client:visible
+  id="8.21-5"
+  n={5}
+  level="בינוני"
+  answer={f.raw("offer.gap_total")}
+  errors={[{ value: f.raw("offer.gap_first"), message: "זה ההפרש בהחזר הראשון. כאן שואלים על סך כל התשלומים." }]}
+>
+  סך התשלומים של {BANK_HE.c} באומדן הוא {money(`${keptKey("c")}.v.total`)}, ובהצעה {money("offer.total")}. מה ההפרש (הצעה פחות אומדן)? (שלילי: ההצעה זולה.)
+</NumericExercise>
+
+<Solution for="8.21-5">
+<M>{formatShekels(f.raw("offer.total"))} − {formatShekels(f.raw(`${keptKey("c")}.v.total`))} = {formatShekels(f.raw("offer.gap_total"))}</M>.
+</Solution>
+
+<ChoiceExercise
+  client:visible
+  id="8.21-6"
+  n={6}
+  level="בינוני"
+  options={[
+    { text: "ההצעה חסכה פחות מהפער לראשון: הראשון עדיין זול ממנה", correct: true, feedback: "נכון. ההפרש בין השני לראשון, וההצעה כמעט לא קירבה אליו." },
+    { text: "ההצעה עדיין לא תקפה", feedback: "בצנרת הצעה תקפה מחליפה את האומדן; כאן היא נכנסה." },
+    { text: "הדירוג מתעלם מהצעות", feedback: "הוא לא מתעלם: ב־ג׳ הדירוג השתנה." },
+    { text: "הסתברות 100% שומרת את ג׳ מאחור", feedback: "הסתברות גבוהה רק מכניסה לקבוצה הראשונה." },
+  ]}
+>
+  למה {BANK_HE.c} לא הפך לראשון, אחרי הצעה זולה מהאומדן?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.21-7"
+  n={7}
+  level="מאתגר"
+  options={[
+    { text: "לנסח את ההסבר ממספרים שכבר חושבו; הוא לא מחשב, לא בוחר ולא כותב מצב", correct: true, feedback: "נכון. זה כלל של Mogi שהוחלט." },
+    { text: "לבחור את התמהיל, כי הוא מבין את הלקוח", feedback: "הבחירה היא של הקוד והמשפחה, לא של מודל שפה." },
+    { text: "לחשב את ההחזר החודשי, כדי לחסוך זמן", feedback: "מודל שפה לא מחשב אף מספר שלקוח או בנק נשענים עליו." },
+    { text: "לעדכן את התיק עם הדירוג", feedback: "מודל שפה לא כותב מצב: הכתיבה עוברת דרך נתיב הכתיבה, ורק אחרי אישור אדם." },
+  ]}
+>
+  מה תפקיד מודל שפה בצנרת?
+</ChoiceExercise>
+
+<ChoiceExercise
+  client:visible
+  id="8.21-8"
+  n={8}
+  level="מאתגר"
+  options={[
+    { text: `סף מ־${pc(f.raw("threshold.strict"))} משאיר את שלושת הבנקים מתחת לסף: הם נשארים מאושרים, בקבוצה השנייה, והסדר ביניהם לפי המחיר. הסף הוא בחירה של הקורס`, correct: true, feedback: "נכון." },
+    { text: "בנק אחד נפסל, כי הסיכוי שלו מתחת לסף", feedback: "הסף לא פוסל: הוא רק מסדר." },
+    { text: "הדירוג מתהפך: היקר הופך לראשון", feedback: "בקבוצה אחת הסדר הוא עדיין לפי מחיר." },
+    { text: "הסף לא משפיע, כי כל הבנקים מאשרים", feedback: "הוא כן משפיע: הוא קובע מי בקבוצה הראשונה." },
+  ]}
+>
+  מה קורה לדירוג כשהסף עולה מ־{pc(f.raw("threshold"))} ל־{pc(f.raw("threshold.strict"))}?
+</ChoiceExercise>
+
+<Callout title="חמש שאלות על הצנרת">
+<p><strong>מה זה?</strong> התהליך כולו, לכל בנק: מיצוב, תמהיל, מחיר חזוי, הסתברות, דירוג והסבר. הצעה אמיתית מחליפה את האומדן.</p>
+<p><strong>למה זה קיים?</strong> כל חלק לבדו עונה על שאלה אחת. רק ביחד אפשר להגיד לאיזה בנק לפנות, באיזה תמהיל, ולמה.</p>
+<p><strong>איך זה עובד?</strong> חיפוש בתוך האילוצים, מחיר מכללי הבנק, הסתברות ממודל מכויל, דירוג לפי כלל, והסבר ממספרים. כל שלב מעביר מספר לשלב הבא.</p>
+<p><strong>איך זה משפיע עליכם?</strong> ההמלצה שתקבלו אמורה לבוא עם ההסבר: מה נבדק, מה נפסל, מה המחיר, ומה הסיכוי. ואם אחד השלבים הוא הנחה (למשל הסתברות שלא כויל), זה צריך להיות כתוב.</p>
+<p><strong>איך משתמשים בזה בהחלטה?</strong> הדירוג הוא הצעה לדיון. מחליטים לפי מה שחשוב למשפחה, מול הצעות אמיתיות, ובזהירות מהנחות. החישוב נעשה בקוד שאפשר לבדוק: מודל שפה מסביר ומסווג, ולעולם לא מחשב ולא כותב מצב.</p>
+</Callout>
+
+<Section kind="סיכום">
+
+## מה לקחת מהשיעור
+
+</Section>
+
+- **צנרת:** מיצוב ← תמהיל ← מחיר חזוי ← הסתברות ← דירוג ← הסבר, לכל בנק. כל שלב קורא את הקודם.
+- **מיצוב משנה גם מחיר:** אצל בנק שנותן הקלה מתחת לקו, מיצוב שמוריד את יחס ההחזר מוריד את הריבית.
+- **פסילה היא אילוץ, סף הוא כלל דירוג.** בנק שפוסל אינו מדורג; בנק שמאשר בסיכוי נמוך מדורג אחרי.
+- **הצעה אמיתית מחליפה אומדן** בכל כיוון, וקוראת את הדירוג מחדש.
+- **מודל שפה מנסח, לא מחשב ולא כותב.**
+- **הכול כאן להדגמה:** בנקים פיקטיביים, קווים ומחירים מומצאים, הסתברות מוצהרת כמכוילת בלי נתונים. Mogi היום: אין חישוב תמהילים.
+
+**בשיעור הבא — 8.22, <Later lesson="8.22" quiet>מאיפה הדאטה מגיעה</Later>:** יומן האירועים, ושני המצבים שבהם התוכנה לומדת בלי להחליט: מצב צל ומצב מסייע.
+
+<Section kind="מקורות">
+
+## מקורות
+
+</Section>
+
+<Sources
+  items={[
+    { kind: "מחקר / הצעה", text: "תכנון האלגוריתם של Mogi (חלק 4 של תוכנית הקורס): לכל בנק, המיצוב המיטבי, התמהיל המיטבי שעומד באילוצים של הבנק ושל הלקוח, תמחור חזוי, הסתברות אישור, דירוג בין הבנקים והסבר; כשמגיעה הצעה אמיתית היא מחליפה את האומדן ומלמדת את המודל. תכנון, לא קוד שקיים; קריאת המנוע מוקפאת." },
+    { kind: "החלטה של Mogi", text: "מודל שפה מסביר, מסווג, מסכם ומנסח, אבל לעולם לא מחשב מספר שלקוח או בנק נשענים עליו, ולא כותב מצב. אילון הציע ב־2026-07-27; הוחלט בפגישת הצוות ב־2026-07-29.", date: "2026-07-29" },
+    { kind: "החלטה של Mogi", text: "הצעת בנק או הלוואה קיימת קובעות לפי התנאים שלהן, והסימולציה משתמשת בברירת מחדל רק כשאין הצעה (אילון, 2026-10-07; קיבל עדן, 2026-10-08; המימוש לא הושלם).", date: "2026-10-08" },
+    { kind: "הנחת חישוב", text: "ארבעת הבנקים פיקטיביים; רשימות המחירים והקווים (קו מימון, קו יחס החזר, הקלות) הומצאו בשלב 6. הגבולות של הלקוח (החזר ראשון עד 8,300 ₪ ויחס עד 40%) הם הנחות של תיק א׳. ההסתברות היא המודל הסינתטי של שיעור 8.19, בלי הגזמת הביטחון (מוצהר כמכוייל, אין נתוני אישורים). המשקולות 1, 1, 1, הסף 0.55 וכלל הדירוג הם של הקורס, להדגמה. ההצעה של בנק ג׳ (4.05%) מומצאת." },
+    { kind: "לא אומת", text: "מה Mogi תבחר לבנות בפועל: אופן הדירוג, והאם לכלול הסתברות בדירוג, לא הוחלט. שאלה פתוחה לאילון ולצוות." },
+    { kind: "בדיקת חישוב", text: "כל המספרים בשיעור חושבו בקוד ונבדקו בנפרד בפייתון: החיפוש (בכתיבה נפרדת בפייתון), הכללים של הבנק, המנוע, ההסתברות והדירוג.", date: "2026-10-17" },
+  ]}
+/>
+
+{/* Internal note: numbers come from src/lib/calc/pipeline.ts and ranking.ts (on search.ts, constraints.ts, bankpolicy.ts, engine.ts, calibration.ts) via scripts/lessons/lesson-8-21.ts and data/lessons/8-21.json; rechecked by checks/kinds/pipeline.py (pipe_prob, pipe_rank, pipe_grid = srch_grid with a clean memo), bankpolicy.py, sensitivity.py, ltv.py, engine.py. Illustration: src/components/PipelineFlow.vue. Video: video/8-21.html. */}
