@@ -151,16 +151,23 @@ function onScore(s: { id: string; points: number; max: number; revealed: boolean
   openScores[s.id] = { points: s.points, max: s.max, revealed: s.revealed };
 }
 
-// The options in a fixed, scrambled order per question (the same on the server and in the browser): the right answer is written first.
+// The options in a fixed order per question (the same on the server and in the browser). The wrong options are scrambled by a generator
+// seeded with the question's id, and the right one is put at a place that walks through the positions question after question
+// (second, first, fourth, third, ...), so it is neither always first nor always in the same place.
 function shuffled(q: Item): [NonNullable<Item["options"]>[number], number][] {
   const opts = (q.options ?? []).map((o, j) => [o, j] as [NonNullable<Item["options"]>[number], number]);
+  const right = opts.filter(([o]) => o.correct);
+  const wrong = opts.filter(([o]) => !o.correct);
   let seed = [...q.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
   const next = () => (seed = (seed * 1103515245 + 12345) >>> 0) / 2 ** 32;
-  for (let i = opts.length - 1; i > 0; i--) {
+  for (let i = wrong.length - 1; i > 0; i--) {
     const k = Math.floor(next() * (i + 1));
-    [opts[i], opts[k]] = [opts[k], opts[i]];
+    [wrong[i], wrong[k]] = [wrong[k], wrong[i]];
   }
-  return opts;
+  const choices = props.items.filter((x) => x.type === "choice");
+  const at = (choices.findIndex((x) => x.id === q.id) * 3 + 1) % Math.max(opts.length, 1);
+  wrong.splice(at, 0, ...right);
+  return wrong;
 }
 const exact = (q: Item) => new Intl.NumberFormat("he-IL", { maximumFractionDigits: 3 }).format(Number(q.answer));
 const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
@@ -293,7 +300,7 @@ const resultId = computed(() => `exam-${props.examId.replace(/\./g, "-")}-result
           מודל שפה לא בודק שום חלק במבחן: את הסגורות בודק קוד, ואת הפתוחות בודקים אתם מול המחוון.
         </p>
 
-        <div class="mt-4 overflow-x-auto">
+        <div v-if="submitted" class="mt-4 overflow-x-auto">
           <table class="w-full border-collapse text-body-m">
             <caption class="pb-2 text-start text-caption font-semibold text-n700">הנקודות לפי חלק</caption>
             <thead>
