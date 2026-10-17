@@ -61,7 +61,7 @@ onBeforeUnmount(() => {
       <span class="block font-semibold text-navy">{{ t }}</span>
       <span class="mt-1 block">{{ entry?.definition ?? "הגדרה בכתיבה" }}</span>
       <span v-if="entry && entry.lesson !== lesson" class="mt-2 block text-caption text-n500">הוסבר בשיעור {{ entry.lesson }}</span>
-      <a href="/glossary/" class="mt-2 block text-caption text-navy underline">למילון המלא</a>
+      <a :href="`/glossary/#${encodeURIComponent(t)}`" class="mt-1 inline-flex min-h-11 items-center text-caption font-semibold text-navy underline decoration-n300 underline-offset-4 hover:decoration-turquoise">למילון המלא</a>
     </span>
   </span>
 </template>

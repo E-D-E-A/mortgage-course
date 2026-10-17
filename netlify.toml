@@ -17,3 +17,10 @@
     X-Robots-Tag = "noindex, nofollow"
     Referrer-Policy = "same-origin"
     X-Content-Type-Options = "nosniff"
+
+# Built files under /_astro/ have the content hash in their name: a changed file gets a new name, so the
+# browser may keep them for good and never ask again (the sign-in gate still runs in front of each request).
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

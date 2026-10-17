@@ -1,11 +1,9 @@
 @import "tailwindcss";
 @import "./tokens.css";
-/* Heebo, self-hosted from @fontsource/heebo 5.3.0 (OFL-1.1), as the advisor app does.
-   No request to Google Fonts. */
-@import "@fontsource/heebo/400.css";
-@import "@fontsource/heebo/500.css";
-@import "@fontsource/heebo/600.css";
-@import "@fontsource/heebo/700.css";
+/* Heebo's @font-face rules are not here: BaseLayout and PublicLayout print them as one identical <style> on
+   every page (src/lib/fonts.ts). When a page replaces another, the browser keeps a <style> that has not
+   changed, so Heebo stays loaded and the text never blanks or reflows; fonts declared in the per-page
+   stylesheet would be created again with every page and flash. */
 
 /*
  * Mogi's tokens as Tailwind utilities — the same names the advisor app uses
@@ -241,6 +239,90 @@ astro-island[data-wide-table]::before {
   color: var(--mogi-n600);
 }
 
+
+/* Moving between pages is client-side (ClientRouter in BaseLayout). The new page replaces the old one in a
+   single step, with no cross-fade: nothing blanks, flashes or shifts while it happens. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* The course map's stages open and close smoothly. Which one is open on first paint is decided in
+   index.astro (html[data-cur]) before anything is drawn; afterwards data-open on the stage is the state. */
+@layer components {
+  .stage-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+  }
+  [data-course-map][data-anim] .stage-body {
+    transition:
+      grid-template-rows var(--mogi-duration-base) var(--mogi-ease-out),
+      visibility 0s linear var(--mogi-duration-base);
+  }
+  .stage-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .stage[data-open="true"] > .stage-body {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition-delay: 0s !important;
+  }
+  .stage[data-open="false"] > .stage-body {
+    grid-template-rows: 0fr;
+    visibility: hidden;
+  }
+  [data-course-map][data-anim] .stage-chevron {
+    transition: transform var(--mogi-duration-base) var(--mogi-ease-out);
+  }
+  .stage[data-open="true"] .stage-chevron {
+    transform: rotate(180deg);
+  }
+  /* The progress lines are drawn by script from this browser's saved progress. Their space is reserved, and
+     they appear (no layout change) once the script has filled them. */
+  .map-fill {
+    visibility: hidden;
+  }
+  [data-course-map][data-ready] .map-fill,
+  .map-fill[data-ready] {
+    visibility: visible;
+  }
+  .lesson-tick {
+    opacity: 0;
+  }
+  .lesson-row[data-opened] .lesson-tick {
+    opacity: 1;
+  }
+}
+/* Without script nothing is collapsed and nothing is filled in. */
+@media (scripting: none) {
+  .map-fill {
+    visibility: visible;
+  }
+  .stage-body {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-body,
+  .stage-chevron,
+  .lesson-row {
+    transition: none !important;
+  }
+}
+
 /* Printing: the sticky site header would sit over the middle of a long table, and the
    on-screen scroll hints mean nothing on paper. */
 @media print {
@@ -250,5 +332,9 @@ astro-island[data-wide-table]::before {
   .scroll-hint,
   astro-island[data-wide-table]::before {
     display: none;
+  }
+  .stage-body {
+    grid-template-rows: 1fr !important;
+    visibility: visible !important;
   }
 }

@@ -4,7 +4,11 @@
 //     saves the last score and attempt, shows no pass mark, and every stage page is reachable
 //     with no saved progress at all (nothing is locked);
 //  3. at phone width, every fill-in table fits, every wider table shows the scroll hint,
-//     and no interactive component reports a hydration mismatch.
+//     and no interactive component reports a hydration mismatch;
+//  4. the site chrome at phone width: a sign-out link in the header, a back link on lesson and check pages,
+//     every lesson row on the course map a link at least 44px tall, no sideways scroll, and client-side
+//     navigation that keeps the page (no full load), starts progress sync once, and still sends a signed-out
+//     visitor to the sign-in page (a stand-in for the Netlify gate); signing out removes the saved answers.
 // Run: pnpm qa:browser
 import { createServer } from "node:http";
 import { readdir, readFile } from "node:fs/promises";
@@ -32,6 +36,13 @@ const lessonFiles = (await readdir(join(src, "lessons"))).filter((f) => f.endsWi
 const withFill = [];
 for (const f of lessonFiles) if ((await readFile(join(src, "lessons", f), "utf8")).includes("<FillTable")) withFill.push(f.replace(".mdx", ""));
 const stages = (await readdir(join(src, "checks")).catch(() => [])).filter((f) => /^\d+\.mdx$/.test(f)).map((f) => Number(f.replace(".mdx", "")));
+
+// The public sign-in pages may load nothing from the gated /_astro/ folder except fonts.
+const gatedRefs = [];
+for (const f of ["login/index.html", "auth/callback/index.html"]) {
+  const html = await readFile(join(root, f), "utf8");
+  for (const m of html.matchAll(/\/_astro\/[\w.\-]+/g)) if (!/\.woff2?$/.test(m[0])) gatedRefs.push(`${f}: ${m[0]}`);
+}
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
 const problems = [];
@@ -163,8 +174,134 @@ for (const stage of stages) {
   await page.close();
 }
 
+// 4. The site chrome, with a stand-in for the Netlify gate: every path but the public ones needs the cookie mc_at.
+{
+  let sessionCalls = 0;
+  const gate = createServer(async (req, res) => {
+    const url = req.url.split("?")[0];
+    const cookie = req.headers.cookie ?? "";
+    const publicPath = url === "/login/" || url.startsWith("/auth/") || url === "/brand/mogi-logo.png" || (url.startsWith("/_astro/") && /\.woff2?$/.test(url));
+    if (url === "/auth/session" && req.method === "GET") {
+      sessionCalls++;
+      const b = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+      const ok = cookie.includes("mc_at=ok");
+      res.writeHead(ok ? 200 : 401, { "content-type": "application/json", "cache-control": "no-store" });
+      return res.end(JSON.stringify(ok ? { email: "dvir@first-edea.com", access_token: `${b({ alg: "none" })}.${b({ sub: "u1", email: "dvir@first-edea.com" })}.s` } : { error: "signed-out" }));
+    }
+    if (url === "/auth/logout") {
+      res.writeHead(302, { location: "/login/?signed_out=1", "set-cookie": "mc_at=; Max-Age=0; Path=/" });
+      return res.end();
+    }
+    if (!publicPath && !cookie.includes("mc_at=ok")) {
+      res.writeHead(302, { location: `/login/?next=${encodeURIComponent(url)}` });
+      return res.end();
+    }
+    let path = decodeURIComponent(url);
+    if (path.endsWith("/")) path += "index.html";
+    try {
+      const body = await readFile(join(root, path));
+      res.writeHead(200, { "content-type": types[extname(path)] ?? "application/octet-stream" });
+      res.end(body);
+    } catch {
+      res.writeHead(404).end();
+    }
+  });
+  await new Promise((ok) => gate.listen(0, "127.0.0.1", ok));
+  const gbase = `http://127.0.0.1:${gate.address().port}`;
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: "he-IL" });
+  await ctx.addCookies([{ name: "mc_at", value: "ok", url: gbase }]);
+  const page = await ctx.newPage();
+  await page.route(/supabase\.co/, (r) => r.abort());
+  page.on("pageerror", (e) => problems.push(`chrome: page error: ${e.message}`));
+  page.on("console", (m) => /hydration/i.test(m.text()) && problems.push(`chrome: ${m.text().slice(0, 120)}`));
+  const noSideScroll = async (label) => {
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (over > 0) problems.push(`chrome ${label}: horizontal scroll of ${over}px`);
+  };
+
+  await page.goto(`${gbase}/`, { waitUntil: "networkidle" });
+  await page.evaluate(() => (window.__keptAlive = 1));
+  await noSideScroll("map");
+  const logout = page.locator("header a[data-logout]");
+  const lb = await logout.boundingBox();
+  if (!(await logout.isVisible()) || (await logout.getAttribute("aria-label")) !== "יציאה" || (await logout.getAttribute("href")) !== "/auth/logout") problems.push("chrome: no visible sign-out link in the header");
+  if (lb && (lb.height < 44 || lb.width < 44)) problems.push(`chrome: sign-out target is ${lb.width}x${lb.height}`);
+  await page.waitForFunction(() => document.querySelector("[data-who]")?.textContent, null, { timeout: 5000 }).catch(() => problems.push("chrome: the signed-in email is not shown"));
+  // Every lesson row of every stage is a link of at least 44px (open every stage first).
+  for (const t of await page.locator(".stage-toggle").all()) if ((await t.getAttribute("aria-expanded")) !== "true") await t.click();
+  await page.waitForTimeout(400);
+  const rows = await page.locator("a[data-lesson]").evaluateAll((as) => as.map((a) => ({ href: a.getAttribute("href"), h: a.getBoundingClientRect().height, tag: a.tagName })));
+  const short = rows.filter((r) => r.h < 43.5);
+  if (rows.length < 100) problems.push(`chrome: only ${rows.length} lesson rows are links on the map`);
+  if (short.length) problems.push(`chrome: ${short.length} lesson row(s) under 44px, e.g. ${short[0].href} (${short[0].h}px)`);
+  console.log(`chrome: ${rows.length} lesson rows are links, shortest ${Math.min(...rows.map((r) => r.h))}px`);
+  await noSideScroll("map, all stages open");
+
+  // Client-side navigation: map -> lesson (no full load), back link -> stage, glossary and its back link.
+  await page.goto(`${gbase}/`, { waitUntil: "networkidle" });
+  await page.evaluate(() => (window.__keptAlive = 1));
+  await page.locator('a[href="/lessons/0-2/"]').first().click();
+  await page.waitForSelector(".prose-lesson");
+  if (!(await page.evaluate(() => window.__keptAlive === 1))) problems.push("chrome: the click on a lesson row reloaded the whole page");
+  const back = page.locator("a.back-link").first();
+  if (!(await back.isVisible()) || (await back.getAttribute("href")) !== "/#stage-0") problems.push(`chrome: lesson page back link is ${await back.getAttribute("href")}`);
+  await noSideScroll("lesson");
+  const lessonLinks = await page.locator('nav[aria-label="שיעור קודם והבא"] a').count();
+  if (lessonLinks < 3) problems.push(`chrome: previous/next/back links at the end of a lesson: ${lessonLinks}`);
+  await page.locator('a[href="/glossary/"]').first().click();
+  await page.waitForSelector("dl");
+  await noSideScroll("glossary");
+  await page.locator('a[data-back="history"]').click();
+  await page.waitForSelector(".prose-lesson");
+  if (!page.url().endsWith("/lessons/0-2/")) problems.push(`chrome: the glossary back link went to ${page.url()}`);
+  await back.click();
+  await page.waitForSelector("[data-course-map]");
+  const stageOpen = await page.evaluate(() => {
+    const el = document.getElementById("stage-0");
+    const r = el.getBoundingClientRect();
+    return { open: el.dataset.open, inView: r.top < innerHeight && r.bottom > 0, lessons: el.querySelector("a[data-lesson]").getBoundingClientRect().height > 0 };
+  });
+  if (!page.url().endsWith("/#stage-0") || stageOpen.open !== "true" || !stageOpen.inView || !stageOpen.lessons) problems.push(`chrome: the back link did not land on an open stage 0 (${page.url()} ${JSON.stringify(stageOpen)})`);
+  await page.goto(`${gbase}/checks/0/`, { waitUntil: "networkidle" });
+  if ((await page.locator("a.back-link").first().getAttribute("href")) !== "/#stage-0") problems.push("chrome: the check page has no back link to its stage");
+  // One sync start for the whole visit, however many pages were shown.
+  await page.goto(`${gbase}/`, { waitUntil: "networkidle" });
+  await page.locator('a[href="/lessons/0-1/"]').first().click();
+  await page.waitForSelector(".prose-lesson");
+  await page.locator('nav[aria-label="שיעור קודם והבא"] a[href^="/lessons/"]').last().click();
+  await page.waitForFunction(() => location.pathname === "/lessons/0-2/");
+  await page.waitForTimeout(800);
+  // No session was stored at the start, so sync fetched it from the server once; every later page reused it.
+  if (sessionCalls !== 1) problems.push(`chrome: ${sessionCalls} GET /auth/session calls over a whole visit (expected 1)`);
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("mogi-course:sb-session") || "null"));
+  if (!stored?.access_token || "refresh_token" in stored) problems.push(`chrome: the stored session is ${JSON.stringify(stored)}`);
+  console.log(`chrome: ${sessionCalls} /auth/session call for a visit of many pages`);
+
+  // Signed out in the middle of a visit: a client-side click still ends at the sign-in page.
+  await ctx.clearCookies();
+  await page.locator('a[href="/lessons/0-3/"]').first().click().catch(() => {});
+  await page.goto(`${gbase}/`).catch(() => {});
+  await page.waitForURL(/\/login\//, { timeout: 5000 }).catch(() => problems.push(`chrome: a signed-out visitor did not reach the sign-in page (${page.url()})`));
+  if (!(await page.locator("#google").isVisible().catch(() => false))) problems.push("chrome: the sign-in page does not show its button");
+
+  // Signing out removes the session and this person's saved answers from the browser.
+  await ctx.addCookies([{ name: "mc_at", value: "ok", url: gbase }]);
+  await page.goto(`${gbase}/`, { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    localStorage.setItem("mogi-course:exercise:x", "1");
+    localStorage.setItem("mogi-course:sb-session", "{}");
+  });
+  await page.locator("header a[data-logout]").click();
+  await page.waitForURL(/signed_out=1/);
+  const left = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("mogi-course:")));
+  if (left.length) problems.push(`chrome: sign-out left ${left.join(", ")} in the browser`);
+  await ctx.close();
+  gate.close();
+}
+
 await browser.close();
 server.close();
+for (const g of gatedRefs) problems.push(`public page loads a gated file: ${g}`);
 if (problems.length) {
   console.error(problems.map((p) => `✗ ${p}`).join("\n"));
   process.exit(1);

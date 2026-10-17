@@ -83,20 +83,48 @@ describe("push", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("refreshes the token on 401, stores the new session and retries once", async () => {
+  it("on 401 asks the server (not Supabase) for a fresh token, stores it and retries once", async () => {
     setSession();
-    const fresh = jwt("user-1");
+    const fresh = jwt("user-1") + "x";
     fetchMock
       .mockResolvedValueOnce(json(401))
-      .mockResolvedValueOnce(json(200, { access_token: fresh + "x", refresh_token: "r2" }))
+      .mockResolvedValueOnce(json(200, { email: "a@first-edea.com", access_token: fresh }))
       .mockResolvedValueOnce(json(201));
     const { progress } = await mods();
     progress.save("exercise:a", 1);
     await vi.advanceTimersByTimeAsync(2000);
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock.mock.calls[1][0]).toBe("https://x.supabase.co/auth/v1/token?grant_type=refresh_token");
-    expect(fetchMock.mock.calls[2][1].headers.Authorization).toBe(`Bearer ${fresh}x`);
-    expect(JSON.parse(ls.getItem(P + "sb-session")!)).toEqual({ access_token: fresh + "x", refresh_token: "r2" });
+    const [url, init] = fetchMock.mock.calls[1];
+    expect(url).toBe("/auth/session");
+    expect(init.method).toBe("GET");
+    expect(init.cache).toBe("no-store");
+    expect(init.headers["x-mogi-session"]).toBe("1");
+    expect(fetchMock.mock.calls.some((c) => String(c[0]).includes("/auth/v1/token"))).toBe(false);
+    expect(fetchMock.mock.calls[2][1].headers.Authorization).toBe(`Bearer ${fresh}`);
+    expect(JSON.parse(ls.getItem(P + "sb-session")!)).toEqual({ access_token: fresh });
+  });
+
+  it("replaces a token that is about to expire before using it", async () => {
+    const soon = (sub: string, inSeconds: number) => {
+      const b = (o: object) => btoa(JSON.stringify(o)).replace(/=/g, "");
+      return `${b({ alg: "none" })}.${b({ sub, exp: Math.floor(Date.now() / 1000) + inSeconds })}.sig`;
+    };
+    ls.setItem(P + "sb-session", JSON.stringify({ access_token: soon("user-1", 5) }));
+    const fresh = soon("user-1", 3600);
+    fetchMock.mockImplementation(async (url: string) => (url === "/auth/session" ? json(200, { access_token: fresh }) : json(201)));
+    const { progress } = await mods();
+    progress.save("exercise:a", 1);
+    await vi.advanceTimersByTimeAsync(2000);
+    const post = fetchMock.mock.calls.find((c) => c[1]?.method === "POST")!;
+    expect(post[1].headers.Authorization).toBe(`Bearer ${fresh}`);
+  });
+
+  it("never keeps a refresh token in the page: a session saved by the earlier version is stripped", async () => {
+    setSession();
+    expect(JSON.parse(ls.getItem(P + "sb-session")!).refresh_token).toBe("r1");
+    const { progress } = await mods();
+    progress.save("exercise:a", 1);
+    expect(JSON.parse(ls.getItem(P + "sb-session")!)).toEqual({ access_token: jwt("user-1") });
   });
 
   it("survives network failure and unavailable storage", async () => {
@@ -139,7 +167,7 @@ describe("pull", () => {
     expect(progress.load("exercise:old")).toBe("server-new");
     expect(progress.load("exercise:new")).toBe("local-new");
     expect(progress.load("prediction:remote")).toBe(4);
-    expect(JSON.parse(ls.getItem(P + "sb-session")!).refresh_token).toBe("r1");
+    expect(JSON.parse(ls.getItem(P + "sb-session")!).access_token).toBe(jwt("user-1"));
     await vi.advanceTimersByTimeAsync(2000);
     const post = fetchMock.mock.calls.find((c) => c[1].method === "POST")!;
     const keys = JSON.parse(post[1].body).map((r: any) => r.key).sort();
@@ -155,5 +183,159 @@ describe("pull", () => {
     await vi.advanceTimersByTimeAsync(4001);
     expect(await p).toBe(false);
     expect(ls.getItem(P + "exercise:a")).toBe("1");
+  });
+});
+
+describe("startSync without a stored session", () => {
+  const serverSession = (sub = "user-1", extra: object = {}) => json(200, { email: "a@first-edea.com", access_token: jwt(sub), expires_at: 9999999999, ...extra });
+
+  it("fetches the session from the server, stores it, pulls, then pushes what the server lacks", async () => {
+    ls.setItem(P + "exercise:mine", JSON.stringify("local"));
+    fetchMock.mockImplementation(async (url: string, init: any) => {
+      if (url === "/auth/session") return serverSession();
+      return init.method === "GET" ? json(200, [{ user_id: "user-1", key: "prediction:remote", value: 4, updated_at: "2026-01-01T00:00:00Z" }]) : json(201);
+    });
+    const { sync, progress } = await mods();
+    expect(await sync.startSync()).toBe(true);
+    const order = fetchMock.mock.calls.map((c) => `${c[1]?.method ?? "GET"} ${c[0]}`);
+    expect(order[0]).toBe("GET /auth/session");
+    expect(order[1]).toBe("GET https://x.supabase.co/rest/v1/progress?select=key,value,updated_at");
+    expect(JSON.parse(ls.getItem(P + "sb-session")!)).toEqual({ access_token: jwt("user-1") });
+    expect(progress.load("prediction:remote")).toBe(4);
+    await vi.advanceTimersByTimeAsync(2000);
+    const post = fetchMock.mock.calls.find((c) => c[1]?.method === "POST")!;
+    expect(JSON.parse(post[1].body).map((r: any) => r.key)).toEqual(["exercise:mine"]);
+  });
+
+  it("sends the same-origin GET and never puts the session in a pushed row", async () => {
+    fetchMock.mockImplementation(async (url: string, init: any) => (url === "/auth/session" ? serverSession() : init.method === "GET" ? json(200, []) : json(201)));
+    const { sync } = await mods();
+    await sync.startSync();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "GET", credentials: "same-origin", cache: "no-store" });
+    for (const c of fetchMock.mock.calls.filter((c) => c[1]?.method === "POST")) {
+      expect(JSON.parse(c[1].body).some((r: any) => r.key === "sb-session" || r.key === "owner")).toBe(false);
+    }
+  });
+
+  it("stays local when the server says signed out, and does not retry on every call", async () => {
+    fetchMock.mockImplementation(async () => json(401, { error: "signed-out" }));
+    const { sync, progress } = await mods();
+    expect(await sync.startSync()).toBe(false);
+    expect(await sync.startSync()).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    progress.save("exercise:a", 1);
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(progress.load("exercise:a")).toBe(1);
+    expect(ls.getItem(P + "sb-session")).toBeNull();
+  });
+
+  it("does not hit the network at all without the Supabase settings", async () => {
+    vi.stubEnv("PUBLIC_SUPABASE_URL", "");
+    const { sync } = await mods();
+    expect(await sync.startSync()).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("uses the stored session when there is one (no server call)", async () => {
+    setSession();
+    fetchMock.mockImplementation(async (_u: string, init: any) => (init.method === "GET" ? json(200, []) : json(201)));
+    const { sync } = await mods();
+    expect(await sync.startSync()).toBe(true);
+    expect(fetchMock.mock.calls.some((c) => c[0] === "/auth/session")).toBe(false);
+  });
+
+  it("shares one server request between concurrent callers", async () => {
+    fetchMock.mockImplementation(async (url: string) => (url === "/auth/session" ? serverSession() : json(200, [])));
+    const { sync } = await mods();
+    await Promise.all([sync.fetchServerSession(), sync.fetchServerSession(), sync.startSync()]);
+    expect(fetchMock.mock.calls.filter((c) => c[0] === "/auth/session")).toHaveLength(1);
+  });
+
+  it("ignores a malformed answer", async () => {
+    fetchMock.mockImplementation(async () => json(200, { access_token: 5 }));
+    const { sync } = await mods();
+    expect(await sync.fetchServerSession()).toBeNull();
+    expect(ls.getItem(P + "sb-session")).toBeNull();
+  });
+});
+
+describe("two people on one browser", () => {
+  const rowsFor = (sub: string) => (_u: string, init: any) =>
+    Promise.resolve(init.method === "GET" ? json(200, [{ user_id: sub, key: `exercise:of-${sub}`, value: sub, updated_at: "2026-01-01T00:00:00Z" }]) : json(201));
+
+  it("removes the previous person's answers when another person signs in, and pushes none of them", async () => {
+    setSession(jwt("user-1"));
+    ls.setItem(P + "owner", "user-1");
+    ls.setItem(P + "exercise:of-user-1", JSON.stringify("user-1"));
+    ls.setItem(P + "sync-times", JSON.stringify({ "exercise:of-user-1": 5 }));
+    // a new sign-in as user-2 leaves a stale session of user-1 nowhere: the callback clears it, so the server is asked
+    ls.removeItem(P + "sb-session");
+    fetchMock.mockImplementation(async (url: string, init: any) => (url === "/auth/session" ? json(200, { access_token: jwt("user-2") }) : rowsFor("user-2")(url, init)));
+    const { sync, progress } = await mods();
+    await sync.startSync();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(progress.load("exercise:of-user-1")).toBeNull();
+    expect(progress.load("exercise:of-user-2")).toBe("user-2");
+    expect(ls.getItem(P + "owner")).toBe("user-2");
+    for (const c of fetchMock.mock.calls.filter((c) => c[1]?.method === "POST")) {
+      expect(c[1].body).not.toContain("of-user-1");
+    }
+  });
+
+  it("keeps the same person's answers across sign-ins", async () => {
+    ls.setItem(P + "owner", "user-1");
+    ls.setItem(P + "exercise:local-only", JSON.stringify("kept"));
+    fetchMock.mockImplementation(async (url: string, init: any) => (url === "/auth/session" ? json(200, { access_token: jwt("user-1") }) : rowsFor("user-1")(url, init)));
+    const { sync, progress } = await mods();
+    await sync.startSync();
+    expect(progress.load("exercise:local-only")).toBe("kept");
+  });
+
+  it("claims an untagged mirror for the first person who signs in", async () => {
+    ls.setItem(P + "exercise:old", JSON.stringify("old"));
+    fetchMock.mockImplementation(async (url: string, init: any) => (url === "/auth/session" ? json(200, { access_token: jwt("user-1") }) : rowsFor("user-1")(url, init)));
+    const { sync, progress } = await mods();
+    await sync.startSync();
+    expect(ls.getItem(P + "owner")).toBe("user-1");
+    expect(progress.load("exercise:old")).toBe("old");
+  });
+
+  it("endSession sends what is queued, then removes the session, the mirror and the owner tag", async () => {
+    setSession();
+    ls.setItem(P + "owner", "user-1");
+    fetchMock.mockImplementation(async (_u: string, init: any) => (init.method === "GET" ? json(200, []) : json(201)));
+    const { sync, progress } = await mods();
+    progress.save("exercise:last", { n: 1 });
+    ls.setItem("unrelated", "stays");
+    await sync.endSession();
+    const post = fetchMock.mock.calls.find((c) => c[1]?.method === "POST");
+    expect(post && JSON.parse(post[1].body)[0].key).toBe("exercise:last");
+    expect([...ls.m.keys()].filter((k) => k.startsWith(P))).toEqual([]);
+    expect(ls.getItem("unrelated")).toBe("stays");
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(fetchMock.mock.calls.filter((c) => c[1]?.method === "POST")).toHaveLength(1);
+  });
+
+  it("endSession does not wait for a hung request longer than its limit", async () => {
+    setSession();
+    fetchMock.mockImplementation(() => new Promise(() => {}));
+    const { sync, progress } = await mods();
+    progress.save("exercise:last", 1);
+    const done = sync.endSession(2500);
+    await vi.advanceTimersByTimeAsync(2600);
+    await done;
+    expect(ls.getItem(P + "sb-session")).toBeNull();
+    expect(ls.getItem(P + "exercise:last")).toBeNull();
+  });
+
+  it("currentUser reads the email from the cached session, for display", async () => {
+    const b = (o: object) => btoa(JSON.stringify(o)).replace(/=/g, "");
+    ls.setItem(P + "sb-session", JSON.stringify({ access_token: `${b({})}.${b({ sub: "u9", email: "dvir@first-edea.com" })}.s` }));
+    const { sync } = await mods();
+    expect(sync.currentUser()).toEqual({ id: "u9", email: "dvir@first-edea.com" });
+    ls.clear?.();
+    ls.m.clear();
+    expect(sync.currentUser()).toBeNull();
   });
 });

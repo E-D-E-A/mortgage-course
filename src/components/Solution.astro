@@ -14,15 +14,20 @@ const { for: exerciseId } = Astro.props;
 </details>
 
 <script>
-  // A solution already unlocked in an earlier visit opens straight away.
-  document.querySelectorAll<HTMLDetailsElement>("details[data-solution-for]").forEach((d) => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(`mogi-course:exercise:${d.dataset.solutionFor}`) ?? "null");
-      if (saved?.correct) d.hidden = false;
-    } catch {
-      /* storage unavailable: the exercise unlocks it again */
-    }
+  import { onPage } from "../lib/page.ts";
+  // A solution already unlocked in an earlier visit opens straight away (on every page shown, also after a
+  // client-side navigation).
+  onPage(() => {
+    document.querySelectorAll<HTMLDetailsElement>("details[data-solution-for]").forEach((d) => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(`mogi-course:exercise:${d.dataset.solutionFor}`) ?? "null");
+        if (saved?.correct) d.hidden = false;
+      } catch {
+        /* storage unavailable: the exercise unlocks it again */
+      }
+    });
   });
+  // One listener for the whole visit: this script runs once, however many pages are shown.
   document.addEventListener("mogi:solution", (e) => {
     const id = (e as CustomEvent<string>).detail;
     document.querySelectorAll<HTMLDetailsElement>(`details[data-solution-for="${CSS.escape(id)}"]`).forEach((d) => {

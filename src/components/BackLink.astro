@@ -1,0 +1,23 @@
+---
+// A visible "back" control. `href` is the page it leads to when nothing better is known. With `history`,
+// a learner who came from another page of the course goes back there (the browser's own back, which keeps
+// the scroll position); someone who opened the page directly goes to `href`.
+import Icon from "./Icon.astro";
+
+interface Props {
+  href: string;
+  label: string;
+  history?: boolean;
+}
+const { href, label, history = false } = Astro.props;
+---
+
+<a
+  href={href}
+  data-back={history ? "history" : undefined}
+  data-astro-prefetch="hover"
+  class="back-link -ms-3 inline-flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-n100 hover:underline hover:decoration-turquoise hover:decoration-2 hover:underline-offset-4 active:bg-n200"
+>
+  <Icon name="back" class="size-5 shrink-0" />
+  <span>{label}</span>
+</a>

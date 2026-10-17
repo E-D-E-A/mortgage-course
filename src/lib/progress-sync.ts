@@ -1,5 +1,10 @@
 /**
  * Per-learner progress sync with the course's Supabase project.
+ * The page never holds a refresh token. Its Supabase access token comes from the server (GET /auth/session,
+ * which checks the HttpOnly cookies and the company domain, and refreshes them when needed), is cached in
+ * localStorage, and is fetched again when it is missing, nearly expired or refused. That also covers learners
+ * who signed in before sync existed, and a browser whose storage was cleared.
+ *
  * localStorage stays the source the components read (synchronously); this module mirrors it to
  * public.progress (row-level security keeps each learner to their own rows) and merges it back on sign-in.
  * Every function here is best-effort: no session, no storage, no network or a refused request is silent,
@@ -8,9 +13,13 @@
 const PREFIX = "mogi-course:";
 const SESSION_KEY = "sb-session";
 const TIMES_KEY = "sync-times";
+/** Whose progress this browser's mirror holds (the token's `sub`). Never pushed. */
+const OWNER_KEY = "owner";
 const DEBOUNCE_MS = 1500;
+/** A token with less than this left is replaced before it is used. */
+const EXPIRY_MARGIN_S = 30;
 
-type Session = { access_token: string; refresh_token: string };
+type Session = { access_token: string };
 type Row = { user_id: string; key: string; value: unknown; updated_at: string };
 
 function env(name: "PUBLIC_SUPABASE_URL" | "PUBLIC_SUPABASE_ANON_KEY"): string {
@@ -19,7 +28,7 @@ function env(name: "PUBLIC_SUPABASE_URL" | "PUBLIC_SUPABASE_ANON_KEY"): string {
 
 /** Keys that are not learner progress: the login session and this module's own bookkeeping. */
 export function isProgressKey(key: string): boolean {
-  return key.length > 0 && key.length <= 200 && key !== SESSION_KEY && key !== TIMES_KEY;
+  return key.length > 0 && key.length <= 200 && key !== SESSION_KEY && key !== TIMES_KEY && key !== OWNER_KEY;
 }
 
 function store(): Storage | null {
@@ -34,7 +43,12 @@ function readSession(): Session | null {
   try {
     const raw = store()?.getItem(PREFIX + SESSION_KEY);
     const s = raw ? JSON.parse(raw) : null;
-    return s?.access_token && s?.refresh_token ? s : null;
+    if (!s?.access_token || typeof s.access_token !== "string") return null;
+    // A session saved by an earlier version also holds a refresh token. It must not stay in the page: Supabase
+    // rotates refresh tokens, so a copy here goes stale when the server refreshes the cookie's, and using a stale
+    // one makes Supabase revoke the whole session. Drop it.
+    if ("refresh_token" in s) writeSession({ access_token: s.access_token });
+    return { access_token: s.access_token };
   } catch {
     return null;
   }
@@ -42,22 +56,40 @@ function readSession(): Session | null {
 
 function writeSession(s: Session): void {
   try {
-    store()?.setItem(PREFIX + SESSION_KEY, JSON.stringify({ access_token: s.access_token, refresh_token: s.refresh_token }));
+    store()?.setItem(PREFIX + SESSION_KEY, JSON.stringify({ access_token: s.access_token }));
   } catch {
     /* ignore */
   }
 }
 
-/** The user id is the access token's `sub` claim. Not verified here: the server checks the token on every request. */
-function userIdOf(token: string): string | null {
+function claimsOf(token: string): { sub?: string; email?: string; exp?: number } | null {
   try {
     const part = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
     const json = new TextDecoder().decode(Uint8Array.from(atob(part), (c) => c.charCodeAt(0)));
-    const sub = JSON.parse(json).sub;
-    return typeof sub === "string" && sub ? sub : null;
+    const c = JSON.parse(json);
+    return c && typeof c === "object" ? c : null;
   } catch {
     return null;
   }
+}
+
+/** The user id is the access token's `sub` claim. Not verified here: the server checks the token on every request. */
+function userIdOf(token: string): string | null {
+  const sub = claimsOf(token)?.sub;
+  return typeof sub === "string" && sub ? sub : null;
+}
+
+function expiresSoon(token: string): boolean {
+  const exp = claimsOf(token)?.exp;
+  return typeof exp === "number" && exp - EXPIRY_MARGIN_S <= Date.now() / 1000;
+}
+
+/** Who is signed in, as far as this browser's cached session says. For display only; never an access decision. */
+export function currentUser(): { id: string | null; email: string | null } | null {
+  const s = readSession();
+  if (!s) return null;
+  const c = claimsOf(s.access_token);
+  return { id: userIdOf(s.access_token), email: typeof c?.email === "string" ? c.email : null };
 }
 
 function readTimes(): Record<string, number> {
@@ -78,28 +110,42 @@ function writeTimes(t: Record<string, number>): void {
   }
 }
 
-async function refresh(s: Session): Promise<Session | null> {
-  try {
-    const res = await fetch(`${env("PUBLIC_SUPABASE_URL")}/auth/v1/token?grant_type=refresh_token`, {
-      method: "POST",
-      headers: { apikey: env("PUBLIC_SUPABASE_ANON_KEY"), "content-type": "application/json" },
-      body: JSON.stringify({ refresh_token: s.refresh_token }),
-    });
-    if (!res.ok) return null;
-    const b = await res.json();
-    if (!b?.access_token || !b?.refresh_token) return null;
-    const next = { access_token: b.access_token as string, refresh_token: b.refresh_token as string };
-    writeSession(next);
-    return next;
-  } catch {
-    return null;
-  }
+let sessionRequest: Promise<Session | null> | null = null;
+
+/**
+ * Asks the server for this learner's access token. Same origin, GET only, never cached. The server answers
+ * only for a valid session from the company domain (it refreshes an expired one itself), so a 401/403 means
+ * signed out. Concurrent callers share one request. Returns null on any failure.
+ */
+export function fetchServerSession(): Promise<Session | null> {
+  sessionRequest ??= (async () => {
+    try {
+      const res = await fetch("/auth/session", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "x-mogi-session": "1", accept: "application/json" },
+      });
+      if (!res.ok) return null;
+      const b = await res.json();
+      if (typeof b?.access_token !== "string" || !b.access_token) return null;
+      const next = { access_token: b.access_token as string };
+      writeSession(next);
+      return next;
+    } catch {
+      return null;
+    }
+  })().finally(() => {
+    sessionRequest = null;
+  });
+  return sessionRequest;
 }
 
-/** One authenticated REST call; on 401 refreshes the token once and retries. Returns null on any failure. */
+/** One authenticated REST call; on 401 (or an expired token) asks the server for a fresh token once and retries. Returns null on any failure. */
 async function rest(path: string, init: { method: string; body?: string; prefer?: string }): Promise<Response | null> {
   let session = readSession();
   if (!session || !env("PUBLIC_SUPABASE_URL") || !env("PUBLIC_SUPABASE_ANON_KEY")) return null;
+  if (expiresSoon(session.access_token)) session = (await fetchServerSession()) ?? session;
   const go = (s: Session) =>
     fetch(`${env("PUBLIC_SUPABASE_URL")}/rest/v1/${path}`, {
       method: init.method,
@@ -114,7 +160,7 @@ async function rest(path: string, init: { method: string; body?: string; prefer?
   try {
     let res = await go(session);
     if (res.status === 401) {
-      session = await refresh(session);
+      session = await fetchServerSession();
       if (!session) return null;
       res = await go(session);
     }
@@ -139,12 +185,14 @@ async function upsert(rows: { key: string; value: unknown; at: number }[]): Prom
   await rest("progress?on_conflict=user_id,key", { method: "POST", body, prefer: "resolution=merge-duplicates" });
 }
 
-function flush(): void {
+/** Sends everything queued now. Never throws; resolves when the request has finished. */
+function flush(): Promise<void> {
+  if (timer !== null) clearTimeout(timer);
   timer = null;
   const batch = [...pending];
   pending.clear();
   const times = readTimes();
-  void upsert(batch.map(([key, value]) => ({ key, value, at: times[key] ?? Date.now() }))).catch(() => {});
+  return upsert(batch.map(([key, value]) => ({ key, value, at: times[key] ?? Date.now() }))).catch(() => {});
 }
 
 /** Called by save(): stamps the key's local time and queues one debounced, batched upsert. Never throws. */
@@ -156,7 +204,7 @@ export function recordSave(key: string, value: unknown): void {
     writeTimes(times);
     if (!readSession()) return;
     pending.set(key, value);
-    if (timer === null) timer = setTimeout(flush, DEBOUNCE_MS);
+    if (timer === null) timer = setTimeout(() => void flush(), DEBOUNCE_MS);
   } catch {
     /* never block a save */
   }
@@ -204,11 +252,99 @@ export async function pullProgress(): Promise<boolean> {
       pending.set(key, JSON.parse(raw));
     }
     writeTimes(times);
-    if (pending.size && timer === null) timer = setTimeout(flush, DEBOUNCE_MS);
+    if (pending.size && timer === null) timer = setTimeout(() => void flush(), DEBOUNCE_MS);
     return true;
   } catch {
     return false;
   }
+}
+
+// ---- lifecycle --------------------------------------------------------------------------------
+
+function clearKeys(keep: (key: string) => boolean): void {
+  const ls = store();
+  if (!ls) return;
+  try {
+    const doomed: string[] = [];
+    for (let i = 0; i < ls.length; i++) {
+      const full = ls.key(i);
+      if (full?.startsWith(PREFIX) && !keep(full.slice(PREFIX.length))) doomed.push(full);
+    }
+    for (const full of doomed) ls.removeItem(full);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Two people can sign in on one browser, one after the other. This mirror holds one person's answers: it is
+ * tagged with the owner's id, and when a different person signs in, the previous owner's answers (which are on
+ * the server under their own id) are removed before anything is pulled or pushed. A mirror with no tag yet
+ * (made before this existed) is claimed by the first person who signs in; it cannot be attributed any better.
+ */
+function claimMirror(uid: string): void {
+  const ls = store();
+  if (!ls) return;
+  try {
+    const owner = ls.getItem(PREFIX + OWNER_KEY);
+    if (owner && owner !== uid) {
+      clearKeys((k) => k === SESSION_KEY);
+      pending.clear();
+      if (timer !== null) clearTimeout(timer);
+      timer = null;
+    }
+    if (owner !== uid) ls.setItem(PREFIX + OWNER_KEY, uid);
+  } catch {
+    /* ignore */
+  }
+}
+
+let started: Promise<boolean> | null = null;
+let hiddenListener = false;
+
+/**
+ * Starts progress sync for this page (and, in a client-side navigated site, for the whole visit): gets the
+ * session (cached, else from the server), makes sure the mirror belongs to this person, pulls, and pushes
+ * what the server lacks. Safe to call on every page; it runs once. Resolves to true when the server answered.
+ */
+export function startSync(): Promise<boolean> {
+  started ??= (async () => {
+    if (!env("PUBLIC_SUPABASE_URL") || !env("PUBLIC_SUPABASE_ANON_KEY") || !store()) return false;
+    if (!hiddenListener && typeof document !== "undefined") {
+      hiddenListener = true;
+      // Saves are debounced; a tab that is being left must not lose the last ones.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden" && pending.size) void flush();
+      });
+    }
+    let session = readSession();
+    if (!session || expiresSoon(session.access_token)) session = (await fetchServerSession()) ?? session;
+    const uid = session && userIdOf(session.access_token);
+    if (!session || !uid) return false;
+    claimMirror(uid);
+    const ok = await pullProgress();
+    if (ok && typeof document !== "undefined") document.dispatchEvent(new Event("mogi:progress-pulled"));
+    return ok;
+  })().catch(() => false);
+  return started;
+}
+
+/**
+ * Signing out: sends what is still queued while the token is valid (never waiting longer than `ms`), then
+ * removes everything this course keeps in the browser: the session, the mirror of the answers and its owner tag.
+ * The next person to sign in starts from their own rows on the server. The caller then goes to /auth/logout.
+ */
+export async function endSession(ms = 2500): Promise<void> {
+  try {
+    if (pending.size && readSession()) await Promise.race([flush(), new Promise<void>((r) => setTimeout(r, ms))]);
+  } catch {
+    /* sign out anyway */
+  }
+  pending.clear();
+  if (timer !== null) clearTimeout(timer);
+  timer = null;
+  started = null;
+  clearKeys(() => false);
 }
 
 /** For the sign-in page: pull, but never wait longer than `ms` so login cannot hang. */
@@ -221,4 +357,7 @@ export function _resetSync(): void {
   pending.clear();
   if (timer !== null) clearTimeout(timer);
   timer = null;
+  started = null;
+  sessionRequest = null;
+  hiddenListener = false;
 }

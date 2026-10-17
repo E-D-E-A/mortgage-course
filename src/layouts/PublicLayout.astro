@@ -2,6 +2,7 @@
 // The layout of the only two public pages (sign-in and its callback): no
 // navigation into the course, and no script or style from the gated /_astro/ folder.
 import "../styles/main.css";
+import FontPreload from "../components/FontPreload.astro";
 interface Props {
   title: string;
 }
@@ -16,6 +17,7 @@ const { title } = Astro.props;
     <meta name="robots" content="noindex, nofollow" />
     <title>{title} · קורס המשכנתאות של Mogi</title>
     <link rel="icon" type="image/png" href="/brand/mogi-logo.png" />
+    <FontPreload />
   </head>
   <body class="grid min-h-dvh place-items-center bg-n50 px-4">
     <main class="w-full max-w-md rounded-lg border border-n200 bg-n0 p-8 text-center shadow-md">

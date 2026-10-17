@@ -26,7 +26,13 @@ const domain = import.meta.env.PUBLIC_ALLOWED_DOMAIN ?? "first-edea.com";
       error.textContent = "הכניסה לא הצליחה. נסו שוב.";
       error.classList.remove("hidden");
     }
-    if (params.get("signed_out")) document.getElementById("signed-out").classList.remove("hidden");
+    if (params.get("signed_out")) {
+      document.getElementById("signed-out").classList.remove("hidden");
+      // Whoever signs in next on this browser must not inherit this person's saved answers or session.
+      try {
+        for (const k of Object.keys(localStorage)) if (k.startsWith("mogi-course:")) localStorage.removeItem(k);
+      } catch {}
+    }
     const next = params.get("next") || "/";
     try { sessionStorage.setItem("mogi-course:next", next.startsWith("/") ? next : "/"); } catch {}
     const redirectTo = `${location.origin}/auth/callback/`;

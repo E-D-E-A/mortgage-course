@@ -10,6 +10,8 @@ const root = new URL("../dist/", import.meta.url).pathname;
 const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".png": "image/png", ".woff2": "font/woff2", ".woff": "font/woff", ".mp4": "video/mp4", ".vtt": "text/vtt", ".svg": "image/svg+xml" };
 const server = createServer(async (req, res) => {
   let path = decodeURIComponent(req.url.split("?")[0]);
+  // A stand-in for the Netlify edge function (a 200 with no token, so the browser logs no error); the page's sync start asks for it on every visit.
+  if (path === "/auth/session") return res.writeHead(200, { "content-type": "application/json" }).end("{}");
   if (path.endsWith("/")) path += "index.html";
   try {
     const body = await readFile(join(root, path));

@@ -2,8 +2,17 @@
 // checking the token and the company domain on the server.
 import type { Config } from "@netlify/edge-functions";
 import { clearedCookies, sessionCookies, verifyAccess } from "./lib/auth.ts";
+import { pageSession } from "./lib/page-session.ts";
 
 export default async (request: Request) => {
+  // GET: a signed-in page asks for its own access token (same origin only; see lib/page-session.ts).
+  if (request.method === "GET") {
+    return pageSession(request, {
+      supabaseUrl: Netlify.env.get("SUPABASE_URL") ?? "",
+      anonKey: Netlify.env.get("SUPABASE_ANON_KEY") ?? "",
+      allowedDomain: Netlify.env.get("ALLOWED_DOMAIN") ?? "first-edea.com",
+    });
+  }
   if (request.method !== "POST") return new Response(null, { status: 405 });
   const { access_token, refresh_token } = (await request.json().catch(() => ({}))) as { access_token?: string; refresh_token?: string };
   const verdict = await verifyAccess(access_token, {

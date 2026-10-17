@@ -1,123 +1,81 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import LinkRow from "../components/LinkRow.astro";
 import { checkHref, isBuilt, isCheckBuilt, lessonHref, stages } from "../lib/course.ts";
+import { pickStage } from "../lib/current-stage.ts";
+
+// Printed into the page (and re-run after every client-side swap to this page, data-astro-rerun) so the stage
+// the learner is in is open on the very first paint. pickStage is self-contained on purpose.
+const pickScript = `(function(){var s="0";try{s=String((${pickStage.toString()})(localStorage,location.hash))}catch(e){}document.documentElement.setAttribute("data-cur",s)})()`;
+// html[data-cur=N] opens stage N until the learner (or enhanceMap) sets data-open on it.
+const openRules = stages
+  .map((s) => `html[data-cur="${s.id}"] #stage-${s.id}:not([data-open]) > .stage-body{grid-template-rows:1fr;visibility:visible;transition-delay:0s}html[data-cur="${s.id}"] #stage-${s.id}:not([data-open]) .stage-chevron{transform:rotate(180deg)}`)
+  .join("");
 ---
 
 <BaseLayout title="מפת הקורס">
+  <style is:global set:html={openRules} slot="head"></style>
+  <script is:inline data-astro-rerun set:html={pickScript} slot="head"></script>
   <div class="mx-auto max-w-6xl px-4 py-10">
     <h1 class="text-h1 text-navy">קורס המשכנתאות של Mogi</h1>
     <p class="mt-3 max-w-2xl text-body-l text-n700">
       מאפס מוחלט — מה זה אחוז, מה זו ריבית — ועד האלגוריתם שבונה תמהיל. עשרה שלבים, ומומלץ ללכת לפי הסדר, כי כל שיעור נשען על מה שכבר נלמד. הכול פתוח: אפשר להיכנס לכל שלב, שיעור וסעיף בכל רגע, והדף הזה מראה לכם איפה אתם.
     </p>
-    <p id="overall-progress" class="mt-3 hidden max-w-2xl rounded-md bg-n50 p-3 text-body-m text-n800" aria-live="polite"></p>
-    <ol class="mt-10 grid gap-6">
+    <p id="overall-progress" class="map-fill mt-3 flex min-h-[4.25rem] max-w-2xl items-center rounded-md bg-n50 p-3 text-body-m text-n800 sm:min-h-[3rem]" aria-live="polite">
+      עוד לא פתחתם שיעור. כל שיעור שתפתחו יסומן כאן.
+    </p>
+    <ol class="mt-6 grid gap-4" data-course-map>
       {
         stages.map((s) => (
-          <li class="rounded-lg border border-n200 bg-n0 p-6 shadow-sm">
-            <div class="flex flex-wrap items-baseline gap-3">
-              <span class="rounded-pill bg-navy px-3 py-0.5 text-caption font-semibold text-turquoise">שלב {s.id}</span>
-              <h2 class="text-h2 text-navy">{s.title}</h2>
-              <span class="stage-done hidden rounded-pill bg-success-bg px-3 py-0.5 text-caption font-semibold text-n900" data-done={s.id}>הושלם</span>
-            </div>
-            <p class="mt-2 text-body-m text-n600">{s.goal}</p>
-            <p
-              class="stage-progress mt-2 hidden text-caption text-n700"
-              data-stage={s.id}
-              data-lessons={s.lessons.filter((l) => isBuilt(l.id)).map((l) => l.id).join(",")}
-            >
-            </p>
-            <ol class="mt-4 grid gap-1 sm:grid-cols-2">
-              {s.lessons.map((l) => (
-                <li class="text-body-m">
-                  {isBuilt(l.id) ? (
-                    <a href={lessonHref(l.id)} class="flex gap-2 rounded-sm px-2 py-1 font-semibold text-navy hover:bg-mint/40">
-                      <span class="w-10 shrink-0 text-n600">{l.id}</span>
-                      <span>{l.title}</span>
-                    </a>
-                  ) : (
-                    <span class="flex gap-2 px-2 py-1 text-n500">
-                      <span class="w-10 shrink-0">{l.id}</span>
-                      <span>{l.title}</span>
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ol>
-            <p class="mt-3 text-body-m">
-              {isCheckBuilt(s.id) ? (
-                <a href={checkHref(s.id)} class="inline-flex gap-2 rounded-sm px-2 py-1 font-semibold text-navy hover:bg-mint/40">
-                  <span aria-hidden="true">✔</span>
-                  <span>בדיקת סיום שלב {s.id}</span>
-                  <span class="check-score hidden font-normal text-n600" data-check={s.id}></span>
-                </a>
-              ) : (
-                <span class="inline-flex gap-2 px-2 py-1 text-n500">
-                  <span aria-hidden="true">✔</span>
-                  <span>בדיקת סיום שלב {s.id}</span>
+          <li id={`stage-${s.id}`} data-stage={s.id} class="stage scroll-mt-20 rounded-lg border border-n200 bg-n0 shadow-sm">
+            <h2>
+              <button
+                type="button"
+                class="stage-toggle flex min-h-16 w-full items-center gap-3 rounded-lg px-4 py-3 text-start transition-colors duration-fast ease-out hover:bg-n50 active:bg-n100"
+                aria-expanded="false"
+                aria-controls={`stage-body-${s.id}`}
+              >
+                <span class="shrink-0 rounded-pill bg-navy px-3 py-0.5 text-caption font-semibold text-turquoise">שלב {s.id}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="block text-h3 text-navy">{s.title}</span>
+                  <span
+                    class="stage-progress map-fill mt-0.5 flex min-h-5 flex-wrap items-center gap-x-2 text-caption text-n600"
+                    data-lessons={s.lessons.filter((l) => isBuilt(l.id)).map((l) => l.id).join(",")}
+                  >
+                    <span class="stage-progress-text">{s.lessons.filter((l) => isBuilt(l.id)).length} שיעורים</span>
+                    <span class="stage-done hidden rounded-pill bg-success-bg px-2 py-0.5 text-caption font-semibold text-n900" data-done={s.id}>הושלם</span>
+                  </span>
                 </span>
-              )}
-            </p>
+                <Icon name="down" class="stage-chevron size-6 shrink-0 text-n600" />
+              </button>
+            </h2>
+            <div id={`stage-body-${s.id}`} class="stage-body">
+              <div class="stage-inner">
+                <div class="px-4 pb-4">
+                  <p class="text-body-m text-n600">{s.goal}</p>
+                  <ol class="mt-3 grid gap-2 p-1 sm:grid-cols-2">
+                    {s.lessons.map((l) => (
+                      <li>
+                        <LinkRow href={isBuilt(l.id) ? lessonHref(l.id) : undefined} num={l.id} title={l.title} lesson={l.id} />
+                      </li>
+                    ))}
+                  </ol>
+                  <p class="stage-exercises map-fill mt-2 min-h-5 px-1 text-caption text-n600" />
+                  <div class="mt-2 p-1 sm:max-w-md">
+                    <LinkRow
+                      href={isCheckBuilt(s.id) ? checkHref(s.id) : undefined}
+                      title={`בדיקת סיום שלב ${s.id}`}
+                      check={isCheckBuilt(s.id) ? s.id : undefined}
+                      note="בכתיבה"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
         ))
       }
     </ol>
   </div>
 </BaseLayout>
-
-<script>
-  // Shows this browser's progress per stage. Nothing here opens or closes anything: every link is always open.
-  // A stage is "done" (הושלם) once its completion check has been answered at least once, with any score.
-  import { load } from "../lib/progress.ts";
-
-  type Check = { score?: number; total?: number; attempts?: number };
-  const prefix = "mogi-course:";
-  const savedKeys = (): string[] => {
-    const keys: string[] = [];
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k?.startsWith(prefix)) keys.push(k.slice(prefix.length));
-      }
-    } catch {
-      /* storage unavailable: show no progress */
-    }
-    return keys;
-  };
-  const keys = savedKeys();
-  const visited = new Set(keys.filter((k) => k.startsWith("lesson:")).map((k) => k.slice("lesson:".length)));
-  const exerciseIds = keys.filter((k) => k.startsWith("exercise:") && !k.endsWith(":first")).map((k) => k.slice("exercise:".length));
-  // An exercise id is its lesson id, or the lesson id followed by "-…" ("4.2-3").
-  const inLesson = (id: string, lessons: Set<string>) => lessons.has(id) || lessons.has(id.split("-")[0]);
-
-  let visitedTotal = 0;
-  let lessonsTotal = 0;
-  let checksDone = 0;
-  const stageEls = document.querySelectorAll<HTMLElement>(".stage-progress");
-  for (const el of stageEls) {
-    const lessons = new Set((el.dataset.lessons ?? "").split(",").filter(Boolean));
-    const seen = [...lessons].filter((l) => visited.has(l)).length;
-    const exercises = exerciseIds.filter((id) => inLesson(id, lessons)).length;
-    const check = load<Check>(`check:${el.dataset.stage}`);
-    const answered = typeof check?.score === "number" && typeof check?.total === "number";
-    const parts = [`שיעורים שנפתחו: ${seen} מתוך ${lessons.size}`, `תרגילים שנעשו: ${exercises}`];
-    parts.push(answered ? `בדיקת הסיום: ${check!.score} מתוך ${check!.total}` : "בדיקת הסיום: עוד לא נעשתה");
-    el.textContent = parts.join(" · ");
-    el.classList.remove("hidden");
-    visitedTotal += seen;
-    lessonsTotal += lessons.size;
-    if (answered) {
-      checksDone++;
-      document.querySelector<HTMLElement>(`[data-done="${el.dataset.stage}"]`)?.classList.remove("hidden");
-      const mark = document.querySelector<HTMLElement>(`[data-check="${el.dataset.stage}"]`);
-      if (mark) {
-        mark.textContent = `· הציון האחרון: ${check!.score} מתוך ${check!.total}`;
-        mark.classList.remove("hidden");
-      }
-    }
-  }
-  const overall = document.getElementById("overall-progress");
-  if (overall && (visitedTotal > 0 || checksDone > 0 || exerciseIds.length > 0)) {
-    overall.textContent = `ההתקדמות שלכם: ${visitedTotal} מתוך ${lessonsTotal} שיעורים נפתחו, ${checksDone} מתוך ${stageEls.length} בדיקות סיום נענו.`;
-    overall.classList.remove("hidden");
-  }
-</script>

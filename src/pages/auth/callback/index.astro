@@ -4,8 +4,9 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
 
 <PublicLayout title="נכנסים…">
   <p id="status" class="mt-6 text-body-l text-n700" role="status">נכנסים לקורס…</p>
-  <script>
-    import { pullProgressWithTimeout } from "../../../lib/progress-sync.ts";
+  <!-- is:inline on purpose: this page is public, so it may load nothing from the gated /_astro/ folder, and a
+       bundled script with imports would live there. The first course page starts progress sync itself. -->
+  <script is:inline>
     // Supabase returns the session in the URL fragment, which never reaches a server.
     // The server checks it (token and company domain) and sets the course's cookies.
     (async () => {
@@ -24,10 +25,9 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
         return location.replace(body.error === "wrong-domain" ? "/login/?error=domain" : "/login/?error=1");
       }
       if (!res.ok) return location.replace("/login/?error=1");
-      // The progress store talks to Supabase from the browser under row-level security.
-      try { localStorage.setItem("mogi-course:sb-session", JSON.stringify({ access_token, refresh_token })); } catch {}
-      // Bring this learner's saved answers from other devices before the first lesson loads (never longer than 4 s).
-      await pullProgressWithTimeout(4000);
+      // A session cached here belongs to whoever signed in before. Drop it: the first course page asks the
+      // server for this person's token, and the progress mirror is checked against their id (progress-sync.ts).
+      try { localStorage.removeItem("mogi-course:sb-session"); } catch {}
       let next = "/";
       try { next = sessionStorage.getItem("mogi-course:next") || "/"; } catch {}
       location.replace(next.startsWith("/") && !next.startsWith("//") ? next : "/");

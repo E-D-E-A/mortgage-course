@@ -1,0 +1,55 @@
+---
+// One row of a list of links, built to look and feel like something you can press: a bordered row at least
+// 44px tall, a chevron on the end side (pointing left on this right-to-left page), a hover / focus / pressed
+// state, and a "done" tick whose space is always reserved so progress appearing later moves nothing.
+// A row with no `href` (a lesson still being written) is the same shape, muted, with no chevron.
+import Icon from "./Icon.astro";
+
+interface Props {
+  href?: string;
+  num?: string;
+  title: string;
+  lesson?: string;
+  check?: number;
+  note?: string;
+}
+const { href, num, title, lesson, check, note } = Astro.props;
+const base = "lesson-row group flex min-h-11 items-center gap-3 rounded-md border px-3 py-2 text-body-m";
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      data-lesson={lesson}
+      data-check-row={check}
+      data-astro-prefetch="hover"
+      class:list={[
+        base,
+        "border-n200 bg-n50 text-navy transition-[background-color,border-color,transform] duration-fast ease-out hover:border-turquoise hover:bg-mint/40 active:scale-[0.99] active:bg-mint/70 data-[opened]:text-n700",
+      ]}
+    >
+      {num && (
+        <span class="w-9 shrink-0 text-caption font-semibold text-n600">
+          <bdi>{num}</bdi>
+        </span>
+      )}
+      <span class="min-w-0 flex-1 font-semibold underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-fast ease-out group-hover:decoration-turquoise group-focus-visible:decoration-turquoise">
+        {title}
+      </span>
+      {check !== undefined && <span class="check-score map-fill min-w-14 text-end text-caption text-n600" data-check={check} />}
+      <Icon name="check" class="lesson-tick size-5 shrink-0 text-success transition-opacity duration-fast" />
+      <Icon name="forward" class="size-5 shrink-0 text-n500 transition-[transform,color] duration-fast ease-out group-hover:-translate-x-0.5 group-hover:text-navy" />
+    </a>
+  ) : (
+    <div class:list={[base, "border-n200 bg-n0 text-n500"]} aria-disabled="true">
+      {num && (
+        <span class="w-9 shrink-0 text-caption font-semibold">
+          <bdi>{num}</bdi>
+        </span>
+      )}
+      <span class="min-w-0 flex-1">{title}</span>
+      <span class="text-caption">{note ?? "בכתיבה"}</span>
+    </div>
+  )
+}

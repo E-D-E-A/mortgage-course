@@ -1,5 +1,8 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import "../styles/main.css";
+import FontPreload from "../components/FontPreload.astro";
+import Icon from "../components/Icon.astro";
 
 interface Props {
   title: string;
@@ -8,8 +11,8 @@ interface Props {
 const { title, description = "קורס המשכנתאות של Mogi — לצוות בלבד" } = Astro.props;
 const path = Astro.url.pathname;
 const nav = [
-  { href: "/", label: "מפת הקורס" },
-  { href: "/glossary/", label: "מילון מונחים" },
+  { href: "/", label: "מפת הקורס", short: "מפת הקורס" },
+  { href: "/glossary/", label: "מילון מונחים", short: "מילון" },
 ];
 ---
 
@@ -22,14 +25,17 @@ const nav = [
     <meta name="description" content={description} />
     <title>{title} · קורס המשכנתאות של Mogi</title>
     <link rel="icon" type="image/png" href="/brand/mogi-logo.png" />
+    <FontPreload />
+    <ClientRouter />
+    <slot name="head" />
   </head>
   <body class="min-h-dvh">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-tooltip focus:bg-n0 focus:p-3"
       >דלג לתוכן</a
     >
-    <header class="sticky top-0 z-sticky border-b border-n200 bg-n0">
-      <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <a href="/" class="flex items-center gap-3" aria-label="דף הבית של הקורס">
+    <header transition:persist="site-header" class="sticky top-0 z-sticky border-b border-n200 bg-n0">
+      <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-4">
+        <a href="/" class="flex min-h-11 items-center gap-3" aria-label="דף הבית של הקורס">
           <img src="/brand/mogi-logo.png" alt="Mogi" class="h-9 w-auto" width="198" height="197" />
           <span class="hidden text-h3 text-navy sm:inline">קורס המשכנתאות</span>
         </a>
@@ -38,16 +44,29 @@ const nav = [
             nav.map((item) => (
               <a
                 href={item.href}
-                class:list={[
-                  "rounded-md px-3 py-2 text-body-m transition-colors duration-fast ease-out",
-                  path === item.href ? "font-semibold text-navy" : "text-n600 hover:bg-n50 hover:text-navy",
-                ]}
+                data-nav
+                data-astro-prefetch="hover"
                 aria-current={path === item.href ? "page" : undefined}
+                class="inline-flex min-h-11 items-center rounded-md px-2 text-body-m text-n600 transition-colors duration-fast ease-out hover:bg-n50 hover:text-navy active:bg-n100 aria-[current=page]:font-semibold aria-[current=page]:text-navy sm:px-3"
               >
-                {item.label}
+                <span class="sm:hidden">{item.short}</span>
+                <span class="hidden sm:inline">{item.label}</span>
               </a>
             ))
           }
+          <span class="mx-1 hidden h-6 w-px bg-n200 lg:block" aria-hidden="true"></span>
+          <span data-who class="hidden max-w-52 truncate text-caption text-n600 lg:block lg:w-52" dir="ltr"></span>
+          <a
+            href="/auth/logout"
+            data-logout
+            data-astro-reload
+            data-astro-prefetch="false"
+            aria-label="יציאה"
+            class="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md px-2 text-body-m text-n600 transition-colors duration-fast ease-out hover:bg-n50 hover:text-navy active:bg-n100 aria-busy:opacity-60 sm:px-3"
+          >
+            <Icon name="logout" class="size-5 shrink-0" />
+            <span class="hidden sm:inline">יציאה</span>
+          </a>
         </nav>
       </div>
     </header>
@@ -55,40 +74,17 @@ const nav = [
       <slot />
     </main>
     <footer class="mt-16 border-t border-n200 bg-n0">
-      <div class="mx-auto max-w-6xl px-4 py-6 text-caption text-n500">
-        קורס פנימי של Mogi, לצוות בלבד. הקורס אינו רישיון ואינו הסמכה. כל התיקים בקורס סינתטיים.
+      <div class="mx-auto max-w-6xl space-y-2 px-4 py-6 text-caption text-n500">
+        <p>קורס פנימי של Mogi, לצוות בלבד. הקורס אינו רישיון ואינו הסמכה. כל התיקים בקורס סינתטיים.</p>
+        <p data-who-row class="invisible flex min-h-6 flex-wrap items-center gap-x-2 text-n600">
+          <span>מחוברים כ־<bdi data-who dir="ltr"></bdi></span>
+          <span aria-hidden="true">·</span>
+          <a href="/auth/logout" data-logout data-astro-reload data-astro-prefetch="false" class="inline-flex min-h-11 items-center font-semibold text-navy underline decoration-n300 underline-offset-4 hover:decoration-turquoise">יציאה</a>
+        </p>
       </div>
     </footer>
     <script>
-      // A table wider than the screen scrolls sideways inside its box. On a phone
-      // nothing shows that, so the learner misses the columns past the edge: say it.
-      function markWideTables() {
-        const islands = new Map();
-        for (const box of document.querySelectorAll<HTMLElement>("main .overflow-x-auto, main .overflow-auto")) {
-          const wide = box.scrollWidth > box.clientWidth + 1;
-          // Inside an interactive component the DOM belongs to Vue: inserting an element
-          // there breaks hydration. Mark the component's wrapper instead; CSS draws the hint.
-          const island = box.closest("astro-island");
-          if (island) {
-            islands.set(island, (islands.get(island) ?? false) || wide);
-            continue;
-          }
-          let hint = box.previousElementSibling;
-          if (!hint?.classList.contains("scroll-hint")) {
-            if (!wide) continue;
-            hint = document.createElement("p");
-            hint.className = "scroll-hint";
-            hint.textContent = "הטבלה רחבה מהמסך: יש עוד עמודות משמאל. גללו אותה הצידה כדי לראות אותן.";
-            box.before(hint);
-          }
-          hint.toggleAttribute("hidden", !wide);
-        }
-        for (const [island, wide] of islands) island.toggleAttribute("data-wide-table", wide);
-      }
-      markWideTables();
-      addEventListener("resize", markWideTables);
-      // Interactive pieces render after load and can change width.
-      new ResizeObserver(markWideTables).observe(document.body);
+      import "../lib/site-client.ts";
     </script>
   </body>
 </html>

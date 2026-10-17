@@ -11,6 +11,10 @@ export default defineConfig({
   integrations: [vue(), mdx()],
   vite: { plugins: [tailwindcss()] },
   devToolbar: { enabled: false },
+  // No `prefetch` setting on purpose: it would add a script to every page, the public sign-in pages included,
+  // and those may load nothing from the gated /_astro/ folder. <ClientRouter /> starts prefetching by itself
+  // (links on hover or focus; the ones marked data-astro-prefetch="viewport" when they scroll into view).
+  // The sign-out links opt out with data-astro-prefetch="false": a GET to /auth/logout ends the session.
   // Styles go inline so the public sign-in page needs nothing from the gated /_astro/ folder.
   build: { inlineStylesheets: "always" },
 });

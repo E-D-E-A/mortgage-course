@@ -1,0 +1,10 @@
+---
+// The Heebo font rules (one <style>, identical on every page, so a client-side page swap keeps it as it is)
+// and a preload for the Hebrew and Latin files, so the first paint already has the brand font and the text
+// does not reflow when it arrives. Fonts are the one thing under /_astro/ the sign-in gate lets through, so
+// this works on the public sign-in page too.
+import { fontFaceCss, preloadFonts } from "../lib/fonts.ts";
+---
+
+{preloadFonts.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin="anonymous" />)}
+<style is:inline set:html={fontFaceCss}></style>
