@@ -225,6 +225,7 @@ export default function lesson95(): LessonData {
   add(given("s3a.months", "180"));
   add(M.total("s3a.total", [loan3]));
   add(M.first("s3a.first", [loan3]));
+  add({ id: "s3a.times", kind: "met_times", inputs: { of: "s3a.first", count: 180 }, value: moneyString(num("s3a.first").mul(180)) });
   add(M.difference("s3a.answer", get("s3a.total"), get("s3a.principal")));
 
   // Stage 4 (4.2): the 18-month rule: only obligations with more than 18 payments left come off the income

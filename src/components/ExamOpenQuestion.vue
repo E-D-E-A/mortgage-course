@@ -44,7 +44,8 @@ const asTable = ref(false);
 
 const points = computed(() => (revealed.value ? props.rubric.filter((r) => ticks[r.id]).length : 0));
 const words = computed(() => (text.value.trim() ? text.value.trim().split(/\s+/).length : 0));
-const canReveal = computed(() => words.value >= 1);
+const MIN_WORDS = 8;
+const canReveal = computed(() => words.value >= MIN_WORDS);
 
 function report() {
   emit("score", { id: props.id, points: points.value, max: props.rubric.length, revealed: revealed.value });
@@ -119,6 +120,7 @@ const fieldId = computed(() => `exam-${props.examId}-${props.id}`.replace(/\./g,
       >
         סיימתי לכתוב: להציג את תשובת הדוגמה ואת המחוון
       </button>
+      <p v-if="!canReveal" class="mt-1 text-caption text-n600">הלחצן נפתח אחרי שכתבתם לפחות {{ MIN_WORDS }} מילים ({{ words }} עד עכשיו).</p>
       <p class="mt-1 text-caption text-n600">אחרי הלחיצה אי אפשר לערוך את התשובה. כך הציון נשאר שלכם ולא של תשובת הדוגמה.</p>
     </div>
 

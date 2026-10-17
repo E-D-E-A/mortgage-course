@@ -58,6 +58,18 @@
       "value": "50"
     },
     {
+      "id": "in.years",
+      "kind": "given",
+      "inputs": {},
+      "value": 30
+    },
+    {
+      "id": "in.car_left",
+      "kind": "given",
+      "inputs": {},
+      "value": 26
+    },
+    {
       "id": "g.payment.a.loan",
       "kind": "sens_mix",
       "inputs": {
@@ -2861,15 +2873,6 @@
       "value": "20250.00"
     },
     {
-      "id": "q2.line40",
-      "kind": "reg_max_payment",
-      "inputs": {
-        "income": "20250.00",
-        "percent": "40"
-      },
-      "value": "8100.00"
-    },
-    {
       "id": "q2.err_nocar",
       "kind": "reg_left",
       "inputs": {
@@ -2877,84 +2880,6 @@
         "out_1": "11500"
       },
       "value": "10200.00"
-    },
-    {
-      "id": "q3.gross",
-      "kind": "given",
-      "inputs": {},
-      "value": "16500.00"
-    },
-    {
-      "id": "q3.net",
-      "kind": "aff_payslip_net",
-      "inputs": {
-        "gross": "16500",
-        "mandatory": "1950|610|480|1060"
-      },
-      "value": "12400.00"
-    },
-    {
-      "id": "q3.answer",
-      "kind": "aff_net_to_pay",
-      "inputs": {
-        "net": "12400.00",
-        "other": "60"
-      },
-      "value": "12340.00"
-    },
-    {
-      "id": "q3.deposit",
-      "kind": "given",
-      "inputs": {},
-      "value": "12100.00"
-    },
-    {
-      "id": "q3.union",
-      "kind": "given",
-      "inputs": {},
-      "value": "60.00"
-    },
-    {
-      "id": "q7.appraisal",
-      "kind": "given",
-      "inputs": {},
-      "value": "2100000.00"
-    },
-    {
-      "id": "q7.max_loan",
-      "kind": "reg_max_loan",
-      "inputs": {
-        "value": "2100000.00",
-        "deal": "only_home"
-      },
-      "value": "1575000.00"
-    },
-    {
-      "id": "q7.extra",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "in.loan",
-        "subtrahend": "q7.max_loan"
-      },
-      "value": "44000.00"
-    },
-    {
-      "id": "q7.short",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "q7.extra",
-        "subtrahend": "in.reserve_after"
-      },
-      "value": "25000.00"
-    },
-    {
-      "id": "q7.ltv",
-      "kind": "ltv_percent",
-      "inputs": {
-        "loan": "1619000.00",
-        "value": "2100000.00"
-      },
-      "value": "77.1"
     },
     {
       "id": "q9.points",
@@ -3011,76 +2936,6 @@
       "kind": "given",
       "inputs": {},
       "value": "10000.00"
-    },
-    {
-      "id": "q11.total.stress_total",
-      "kind": "scn_eval",
-      "inputs": {
-        "scenario": "stress",
-        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
-        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
-        "reset_years": 5,
-        "stress_inflation": "4",
-        "stress_prime_shift": "2",
-        "stress_anchor_shift": "2",
-        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
-        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
-        "tracks": 2,
-        "t1_kind": "variable_unlinked",
-        "t1_amount": "1079000.00",
-        "t1_rate": "4.00",
-        "t1_months": 300,
-        "t1_method": "spitzer",
-        "t1_reset": 60,
-        "t2_kind": "fixed_unlinked",
-        "t2_amount": "540000.00",
-        "t2_rate": "4.30",
-        "t2_months": 300,
-        "t2_method": "spitzer",
-        "measure": "total"
-      },
-      "value": "2839905.74"
-    },
-    {
-      "id": "q11.exposure.stress_total",
-      "kind": "scn_eval",
-      "inputs": {
-        "scenario": "stress",
-        "nominal": "3.2000,3.3427,3.4719,3.5888,3.6945,3.7902,3.8768,3.9551,4.0260,4.0901,4.1482,4.2007,4.2482,4.2912,4.3301,4.3653,4.3972,4.4260,4.4521,4.4756,4.4970,4.5163,4.5338,4.5496,4.5639,4.5769,4.5886,4.5992,4.6088,4.6175",
-        "real": "1.3000,1.3999,1.4903,1.5721,1.6462,1.7131,1.7737,1.8286,1.8782,1.9231,1.9637,2.0005,2.0337,2.0638,2.0911,2.1157,2.1380,2.1582,2.1764,2.1930,2.2079,2.2214,2.2337,2.2447,2.2547,2.2638,2.2720,2.2794,2.2861,2.2922",
-        "reset_years": 5,
-        "stress_inflation": "4",
-        "stress_prime_shift": "2",
-        "stress_anchor_shift": "2",
-        "macro_policy": "3.25,3.00,2.75,2.75,3.00,3.25,3.25,3.50,3.50,3.50",
-        "macro_inflation": "2.60,2.30,2.10,2.00,2.00,2.00,2.00,2.00,2.00,2.00",
-        "tracks": 1,
-        "t1_kind": "fixed_unlinked",
-        "t1_amount": "1619000.00",
-        "t1_rate": "4.30",
-        "t1_months": 360,
-        "t1_method": "spitzer",
-        "measure": "total"
-      },
-      "value": "2884308.34"
-    },
-    {
-      "id": "q11.answer",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "q11.exposure.stress_total",
-        "subtrahend": "q11.total.stress_total"
-      },
-      "value": "44402.60"
-    },
-    {
-      "id": "q11.base",
-      "kind": "difference",
-      "inputs": {
-        "minuend": "g.exposure.b.total",
-        "subtrahend": "g.total.b.total"
-      },
-      "value": "169652.31"
     },
     {
       "id": "q13.0.pts",

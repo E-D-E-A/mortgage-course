@@ -116,6 +116,7 @@ const rows = computed(() =>
       short: s.short,
       closedRight: submitted.value ? cs.filter((q) => results.value[q.id]?.correct).length : null,
       closedMax: cs.length,
+      openShown: os.some((q) => openScores[q.id]?.revealed),
       openPoints: os.reduce((n, q) => n + (openScores[q.id]?.revealed ? openScores[q.id].points : 0), 0),
       openMax: os.reduce((n, q) => n + (q.rubric?.length ?? 0), 0),
     };
@@ -318,7 +319,7 @@ const resultId = computed(() => `exam-${props.examId.replace(/\./g, "-")}-result
                   <span v-else>–</span>
                 </td>
                 <td class="py-2 text-n800">
-                  <span v-if="r.openMax"><span class="ltr">{{ r.openPoints }} / {{ r.openMax }}</span></span>
+                  <span v-if="r.openMax"><span class="ltr">{{ r.openShown ? r.openPoints : "–" }} / {{ r.openMax }}</span></span>
                   <span v-else>–</span>
                 </td>
               </tr>
