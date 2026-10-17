@@ -7,7 +7,7 @@ import Decimal from "decimal.js";
 import { DICE, DIE_RATE_CHANGES } from "../../src/data/s8-datasets.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { difference, given } from "./lesson-3-8.ts";
-import { countProduct, expect, factExpect, factProbAbove, percentOf, prob, spitzer } from "./_stats-facts.ts";
+import { countProduct, lin, expect, factExpect, factProbAbove, percentOf, prob, spitzer } from "./_stats-facts.ts";
 
 export default function lesson84(): LessonData {
   const facts: Fact[] = [];
@@ -31,6 +31,8 @@ export default function lesson84(): LessonData {
   push(factExpect("t.exp_fair", pays, [...DICE.fair]), factExpect("t.exp_low", pays, [...DICE.loadedLow]), factExpect("t.exp_high", pays, [...DICE.loadedHigh]));
   push(difference("t.exp_minus_now", facts.find((f) => f.id === "t.exp_fair") as Fact, now), difference("t.range", pays[5], pays[0]), difference("t.worst_minus_now", pays[5], now));
   push(factProbAbove("t.p_above_fair", pays, [...DICE.fair], now), factProbAbove("t.p_above_low", pays, [...DICE.loadedLow], now), factProbAbove("t.p_above_high", pays, [...DICE.loadedHigh], now));
+  push(lin("t.rate_avg", 1, "4.10", "0.25", 2), spitzer("t.pay_avg", "500000", "4.35", 240));
+  push(difference("t.shift_part", facts.find((f) => f.id === "t.pay_avg") as Fact, now), difference("t.convex", facts.find((f) => f.id === "t.exp_fair") as Fact, facts.find((f) => f.id === "t.pay_avg") as Fact));
   push(expect("t.rate_exp", DIE_RATE_CHANGES.map((v) => ({ value: v, count: 1 })), 2));
 
   // ── Exercises. ──

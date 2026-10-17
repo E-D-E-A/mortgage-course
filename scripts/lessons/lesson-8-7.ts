@@ -12,13 +12,14 @@ import { maxLoanAt, maxPaymentAt, maxVariable } from "../../src/lib/calc/regulat
 import type { Fact, LessonData } from "../build-data.ts";
 import { feasibleCountFact, measureFact, reasonsFact } from "./_constraints-facts.ts";
 import { given } from "./lesson-3-8.ts";
+import { countProduct, intDiff } from "./_stats-facts.ts";
 
 export default function lesson87(): LessonData {
   const facts: Fact[] = [];
   const push = (...f: Fact[]) => facts.push(...f);
 
   push(given("k.price", S8_CASE.price), given("k.max_pay", S8_CASE.maxPayment), given("k.target", S8_CASE.targetRatio));
-  push(given("k.n", String(CANDIDATES.length)));
+  push(countProduct("k.n", [CANDIDATES.length]));
 
   // ── Every candidate: its reasons, and (for four of them) the numbers the checks read. ──
   for (const c of CANDIDATES) push(reasonsFact(`r.${c.id}`, c));
@@ -29,7 +30,7 @@ export default function lesson87(): LessonData {
   push(measureFact("m.c09_disp", candidateById("c09"), "disposable", 0), measureFact("m.c01_disp", candidateById("c01"), "disposable", 0));
   push(measureFact("m.c05_ratio", candidateById("c05"), "ratio", 2), measureFact("m.c05_pay", candidateById("c05"), "payment", 0));
   push(measureFact("m.c10_ltv", candidateById("c10"), "ltv", 2));
-  push(measureFact("m.c06_ratio", candidateById("c06"), "ratio", 2));
+  push(measureFact("m.c06_ratio", candidateById("c06"), "ratio", 2), measureFact("m.c06_pay", candidateById("c06"), "payment", 0));
 
   // ── How many pass, as families of constraints are switched on. ──
   push(
@@ -38,8 +39,8 @@ export default function lesson87(): LessonData {
     feasibleCountFact("f.bank", CANDIDATES, ["identity", "law", "bank"]),
     feasibleCountFact("f.all", CANDIDATES),
   );
-  const rejected = CANDIDATES.filter((c) => !evaluate(c).feasible);
-  push(given("f.rejected", String(rejected.length)));
+  const feasibleN = CANDIDATES.filter((c) => evaluate(c).feasible).length;
+  push(intDiff("f.rejected", CANDIDATES.length, feasibleN));
 
   // ── The limits as numbers (regulation.ts, recomputed by regulation.py). ──
   const maxLoan = { id: "lim.max_loan", kind: "reg_max_loan", inputs: { value: S8_CASE.price, deal: "only_home" }, value: moneyString(maxLoanAt(S8_CASE.price, "only_home")) } as Fact;

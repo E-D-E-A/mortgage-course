@@ -63,3 +63,4 @@ export const countProduct = (id: string, factors: number[]) => f(id, "stats_coun
 export const percentOf = (id: string, part: N, whole: N, d = 1) => f(id, "stats_percent", { part, whole, decimals: d }, S.formatPlain(new Decimal(part).mul(100).div(whole), d));
 export const factPercent = (id: string, part: Fact, whole: Fact, d = 1) =>
   f(id, "stats_fact_percent", { part: part.id, whole: whole.id, decimals: d }, S.formatPlain(new Decimal(part.value as string).mul(100).div(whole.value as string), d));
+export const intDiff = (id: string, a: number, b: number) => f(id, "stats_int_diff", { a, b }, a - b);

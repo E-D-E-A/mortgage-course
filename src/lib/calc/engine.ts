@@ -21,7 +21,16 @@
  *                                     month, and each track's own flow.
  *   evaluate(tracks, scenario)        the measures of lesson 3.8-3.9 for one scenario:
  *                                       first    the payment in month 1
- *                                       max      the highest payment, maxMonth the first month it is paid
+ *                                       max      the highest PROJECTED payment, maxMonth the first month it is paid.
+ *                                                "Projected" leaves out the clearing payment: in the last month of a
+ *                                                level-payment (Spitzer) track the statement convention pays whatever is
+ *                                                left, which carries the rounding of all the months before it (a few
+ *                                                shekels). That is a rounding effect, not a rate or index effect, so for
+ *                                                the highest payment the last month of such a track is replaced by the
+ *                                                payment that was due: the previous month's payment moved by the index's
+ *                                                move that month (projectedLast). `first`, `total` and every other figure
+ *                                                still use the payments actually made. (Assumes the rate does not change
+ *                                                in the very last month of the track; the course's resets never do.)
  *                                       total    every payment added up
  *                                       interest, indexation   where the total went besides the principal
  *                                       loan, months
@@ -172,15 +181,35 @@ export function mixFlow(tracks: TrackSpec[], scenario: Scenario = {}): MixFlow {
 
 const cents = (d: Decimal): Decimal => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
+/**
+ * The payment that was due in a track's last month, without the clearing of rounding: the previous month's payment moved by the
+ * index's move between the two months, to the agora. Only for a Spitzer track of at least two months; any other track pays what it pays.
+ */
+export function projectedLast(t: TrackFlow): Decimal {
+  const n = t.rows.length;
+  const last = t.rows[n - 1];
+  if ((t.track.method ?? "spitzer") !== "spitzer" || n < 2) return last.payment;
+  const prev = t.rows[n - 2];
+  return prev.payment.mul(last.indexRatio).div(prev.indexRatio).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+}
+
+/** The mix's payments with each track's clearing payment replaced by the one that was due (see `evaluate`: what `max` reads). */
+export function projectedPayments(flow: MixFlow): Decimal[] {
+  return Array.from({ length: flow.months }, (_, t) =>
+    flow.tracks.reduce((s, f) => (t >= f.rows.length ? s : t === f.rows.length - 1 ? s.plus(projectedLast(f)) : s.plus(f.rows[t].payment)), ZERO),
+  );
+}
+
 export function evaluate(tracks: TrackSpec[], scenario: Scenario = {}): Evaluation {
   const flow = mixFlow(tracks, scenario);
+  const projected = projectedPayments(flow);
   let best = 0;
-  for (let t = 1; t < flow.months; t++) if (cents(flow.payments[t]).gt(cents(flow.payments[best]))) best = t;
+  for (let t = 1; t < flow.months; t++) if (cents(projected[t]).gt(cents(projected[best]))) best = t;
   const sum = (pick: (f: TrackFlow) => Decimal) => flow.tracks.reduce((s, f) => s.plus(pick(f)), ZERO);
   return {
     loan: tracks.reduce((s, t) => s.plus(t.amount), ZERO),
     first: flow.payments[0],
-    max: flow.payments[best],
+    max: projected[best],
     maxMonth: best + 1,
     total: flow.payments.reduce((s, p) => s.plus(p), ZERO),
     interest: sum((f) => f.interest),

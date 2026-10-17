@@ -41,6 +41,10 @@ export default function lesson81(): LessonData {
   const pay2 = spitzer("chain.pay_300", loanOfChoice(BASE_CHOICE).toString(), "4.40", 300);
   push(pay2, percentOf("chain.ratio_300", pay2.value as string, income, 1));
 
+  // Task 3 of the illustration: a point of rate against 60 months less, from the case's own starting point (4.40%, 360 months).
+  const payR = spitzer("chain.pay_r", loanOfChoice(BASE_CHOICE).toString(), "5.40", 360);
+  push(payR, difference("chain.d_rate", payR, pay), difference("chain.d_term", pay2, pay));
+
   // ── Exercises. ──
   const ex4 = spitzer("ex.pay", "1200000", "4", 300);
   push(given("ex.loan", "1200000"), ex4, percentOf("ex.ratio", ex4.value as string, income, 1));

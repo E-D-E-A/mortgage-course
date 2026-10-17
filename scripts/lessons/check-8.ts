@@ -58,6 +58,7 @@ export default function check8(): LessonData {
   const loan1: Track = { principal: "520000", rates: ["4.1"], months: 240 };
   add(M.given("r1.principal", "520000.00"));
   given("r1.rate", "4.1");
+  given("r1.years", "20");
   add(M.total("r1.total", [loan1]));
   add(M.difference("r1.answer", get("r1.total"), get("r1.principal")));
   add(M.first("r1.first", [loan1]));
@@ -136,6 +137,7 @@ export default function check8(): LessonData {
   const qCounts = [1, 3, 3, 1];
   given("q3.balance", "600000");
   given("q3.months", "240");
+  given("q3.rate_now", "4.0");
   const qPays = qRates.map((r, k) => {
     given(`q3.rate${k + 1}`, r);
     return add(S.spitzer(`q3.pay${k + 1}`, "600000", r, 240));
@@ -171,6 +173,10 @@ export default function check8(): LessonData {
   const kept = candidateOf("q6y", BASE_CHOICE, [P("fixed_unlinked", 40, 30), P("variable_unlinked", 60, 30)]);
   const flatBase = scenarioFrom(SCENARIOS.base);
   given("q6.max_payment", "8300");
+  given("q6.fixed_share", "40");
+  given("q6.var_share", "60");
+  given("q6.years_cheap", "25");
+  given("q6.years_kept", "30");
   given("q6.target", "40");
   given("q6.law_ratio", "50");
   given("q6.law_ltv", "75");
@@ -214,6 +220,7 @@ export default function check8(): LessonData {
   given("q8.amount_short", "300000");
   given("q8.rate_short", "4.60");
   given("q8.years_short", "15");
+  given("q8.short_months", "180");
   given("q8.month", "200");
   add(engFact("q8.long.1", [longTrack], flat, "payment", 1));
   add(engFact("q8.short.1", [shortTrack], flat, "payment", 1));
@@ -229,6 +236,7 @@ export default function check8(): LessonData {
   const varTrack: TrackSpec[] = [{ kind: "variable_unlinked", amount: "600000", rate: "4.00", months: 300 }];
   given("q9.amount", "600000");
   given("q9.years", "25");
+  given("q9.rate", "4.00");
   for (const sid of ["forecast451", "stress", "macro"] as const) {
     add(scnEvalFact(`q9.${sid}.max`, sid, varTrack, "max"));
     add(scnEvalFact(`q9.${sid}.first`, sid, varTrack, "first"));
@@ -244,6 +252,7 @@ export default function check8(): LessonData {
   const calm: FutureModel = { ...mcModel, scale: 0.5 };
   given("q10.amount", "250000");
   given("q10.years", "10");
+  given("q10.rate", "4.60");
   add(M.given("q10.threshold", `${TH}.00`));
   add(mcFact("q10.first", [mcTrack], 5, 1000, mcModel, "first"));
   for (const [tag, model] of [["normal", mcModel], ["wild", wild], ["calm", calm]] as const) {
@@ -298,6 +307,10 @@ export default function check8(): LessonData {
   const SHORT: Track = { principal: UNIT, rates: ["4.00"], months: 180 };
   given("q13.unit", UNIT);
   given("q13.need", "10");
+  given("q13.rate", "4.00");
+  given("q13.long_years", "30");
+  given("q13.short_years", "15");
+  given("q13.min_long", "40");
   given("q13.cap1", "6200");
   given("q13.cap2", "6800");
   add(M.first("q13.lg.pay", [LONG]));

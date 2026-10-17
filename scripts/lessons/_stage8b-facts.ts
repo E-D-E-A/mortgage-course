@@ -286,3 +286,33 @@ export const minutesFact = (id: string, countId: string, ms: number, count: bigi
 });
 
 export const powFact = (id: string, base: number, exp: number): Fact => ({ id, kind: "srch_pow", inputs: { base, exp }, value: (BigInt(base) ** BigInt(exp)).toString() });
+
+// ── engine table (kind eng_table): the same inputs as sens_table, the engine's measures ──
+import { CASE_A, caseAPasses, type CaseACandidate } from "../../src/data/case-a-mix.ts";
+import { scenarioFrom, type ScenarioSpec } from "../../src/lib/calc/sensitivity.ts";
+
+const encodeTracks = (tracks: TrackSpec[]) => tracks.map((t) => [t.kind, t.amount, t.rate, t.months].join("|")).join(";");
+
+export function engTableFact(id: string, cands: CaseACandidate[], base: ScenarioSpec, stress: ScenarioSpec): Fact {
+  const inputs: Record<string, string | number> = {
+    candidates: cands.length,
+    base_inflation: String(base.inflation), base_prime_shift: String(base.primeShift), base_anchor_shift: String(base.anchorShift),
+    stress_inflation: String(stress.inflation), stress_prime_shift: String(stress.primeShift), stress_anchor_shift: String(stress.anchorShift),
+    price: CASE_A.price,
+    income: CASE_A.recognisedIncome, obligation_monthly: CASE_A.car.monthly, obligation_months: CASE_A.car.monthsLeft as number,
+  };
+  cands.forEach((c, k) => {
+    inputs[`c${k + 1}_id`] = c.id;
+    inputs[`c${k + 1}_tracks`] = encodeTracks(c.tracks);
+  });
+  const ctx = { base: scenarioFrom(base), stress: scenarioFrom(stress) };
+  return {
+    id,
+    kind: "eng_table",
+    inputs,
+    value: cands.map((c) => {
+      const a = assess(c.tracks, ctx);
+      return { id: c.id, first: moneyString(a.base.first), max: moneyString(a.base.max), max_month: a.base.maxMonth, total: moneyString(a.base.total), stress_max: moneyString(a.stress.max), rise: moneyString(a.rise), passes: caseAPasses(c.tracks) ? "yes" : "no" };
+    }),
+  };
+}

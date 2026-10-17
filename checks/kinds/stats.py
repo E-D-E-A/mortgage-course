@@ -297,3 +297,10 @@ def fact_percent(i, facts):
 
 KINDS["stats_percent"] = percent_of_whole
 KINDS["stats_fact_percent"] = fact_percent
+
+
+def int_diff(i, _f=None):
+    return int(i["a"]) - int(i["b"])
+
+
+KINDS["stats_int_diff"] = int_diff

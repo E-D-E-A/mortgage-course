@@ -11,8 +11,8 @@ import { CANDIDATES, CASE_A, SCENARIOS } from "../../src/data/case-a-mix.ts";
 import { ltvPercent } from "../../src/lib/calc/ltv.ts";
 import { percentString } from "../../src/lib/calc/percent.ts";
 import type { Fact, LessonData } from "../build-data.ts";
-import { difference, givenMoney, tableFact } from "./_sensitivity-facts.ts";
-import { mulFact, normRows, objLatticeFact, objNormFact, objTableFact, sumFact, type TableRow } from "./_stage8b-facts.ts";
+import { difference, givenMoney } from "./_sensitivity-facts.ts";
+import { engTableFact, mulFact, normRows, objLatticeFact, objNormFact, objTableFact, sumFact, type TableRow } from "./_stage8b-facts.ts";
 
 export const WEIGHT_SETS = { bal: [40, 30, 30], pay: [70, 15, 15], tot: [15, 70, 15], stab: [15, 15, 70] } as const;
 export const THREE = ["half", "linked", "short"] as const;
@@ -26,7 +26,7 @@ export default function lesson88(): LessonData {
   add(difference("a.loan", price, equity));
   add({ id: "a.ltv", kind: "ltv_percent", inputs: { loan: CASE_A.loan, value: CASE_A.price }, value: percentString(ltvPercent(CASE_A.loan, CASE_A.price)) });
 
-  const table = add(tableFact("cand.table", CANDIDATES, SCENARIOS.base, SCENARIOS.stress));
+  const table = add(engTableFact("cand.table", CANDIDATES, SCENARIOS.base, SCENARIOS.stress));
   const rows = table.value as (TableRow & { passes: string })[];
   const allowed = rows.filter((r) => r.passes === "yes").map((r) => r.id);
   const everyone = rows.map((r) => r.id);

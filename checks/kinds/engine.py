@@ -4,8 +4,9 @@ Plain Python Decimal; nothing imported from src/. The cash flow of a mix comes f
 written without the TypeScript); what is written here is the engine's own layer: the measures of one mix under one
 scenario, from the flat inputs of schedule.mixInputs plus `measure`:
 
-  first / max / max_month / total / months   the payment in month 1, the highest payment, the first month it is paid
-                                             (compared to the agora), every payment added up, the longest term
+  first / max / max_month / total / months   the payment in month 1, the highest PROJECTED payment (see `projected`: the clearing
+                                             payment of a Spitzer track's last month is replaced by the one that was due), the first
+                                             month it is paid (compared to the agora), every payment added up, the longest term
   loan                                       the tracks' amounts added
   interest / indexation                      the sums of the rows' interest and of the balance's indexation
   residual                                   total - loan - interest - indexation (to the agora: should be 0.00)
@@ -35,9 +36,26 @@ def evaluate_flat(i):
     return schedule.flow(j)
 
 
+def projected(i, tracks, months):
+    """The mix's payments for the highest-payment measure: in the last month of a Spitzer track the clearing payment (it carries the
+    rounding of all earlier months) is replaced by the payment that was due: the previous month's payment times the index's move
+    that month (index_ratio now over index_ratio before), to the agora. Other tracks pay what they pay."""
+    out = [Decimal(0)] * months
+    for k, t in enumerate(tracks, start=1):
+        rows = t["rows"]
+        n = len(rows)
+        for m in range(n):
+            pay = rows[m]["payment"]
+            if m == n - 1 and n >= 2 and i[f"t{k}_method"] == "spitzer":
+                pay = agorot(rows[m - 1]["payment"] * rows[m]["index_ratio"] / rows[m - 1]["index_ratio"])
+            out[m] += pay
+    return out
+
+
 def measure(i, measure_name, month=None):
     payments, tracks = evaluate_flat(i)
-    cents = [agorot(p) for p in payments]
+    proj = projected(i, tracks, len(payments))
+    cents = [agorot(p) for p in proj]
     first = str(agorot(payments[0]))
     top = str(max(cents))
     top_month = cents.index(max(cents)) + 1
@@ -84,4 +102,25 @@ def eng_sum(i, facts):
     return str(agorot(sum((Decimal(facts[x]["value"]) for x in str(i["ids"]).split("|")), Decimal(0))))
 
 
-KINDS = {"eng_eval": eng_eval, "eng_sum": eng_sum}
+def eng_table(i, _facts=None):
+    """One row per candidate, like sens_table's inputs (same field names), with the engine's measures: first, max (the projected highest
+    payment), max_month and total under the base scenario, stress_max under the stress scenario, rise = stress_max - first, and passes
+    (the limits of Directive 329 as sensitivity.py's _passes writes them). Written from kinds/sensitivity.py's input helpers and this
+    file's `measure`."""
+    from kinds import sensitivity as sens
+
+    rows = []
+    for cid, n in sens._candidates(i):
+        base = sens._candidate_inputs(i, n, "base")
+        stress = sens._candidate_inputs(i, n, "stress")
+        first = Decimal(measure(base, "first"))
+        smax = Decimal(measure(stress, "max"))
+        rows.append({
+            "id": cid, "first": measure(base, "first"), "max": measure(base, "max"), "max_month": measure(base, "max_month"),
+            "total": measure(base, "total"), "stress_max": measure(stress, "max"), "rise": str(agorot(smax - first)),
+            "passes": "yes" if sens._passes(base, i) else "no",
+        })
+    return rows
+
+
+KINDS = {"eng_eval": eng_eval, "eng_sum": eng_sum, "eng_table": eng_table}

@@ -212,7 +212,7 @@ const ENTRIES: Entry[] = [
   { id: "c03", name: "קבועה בלבד ל־20 שנה", choice: BASE_CHOICE, shape: [part(FIXED, 100, 20)] },
   { id: "c04", name: "קבועה בלבד ל־25 שנה", choice: BASE_CHOICE, shape: [part(FIXED, 100, 25)] },
   { id: "c05", name: "חצי קבועה, חצי פריים", choice: BASE_CHOICE, shape: [part(FIXED, 50), part(PRIME, 50)] },
-  { id: "c06", name: "קבועה ופריים, ופריים קצר", choice: BASE_CHOICE, shape: [part(FIXED, 60), part(PRIME, 40, 20)] },
+  { id: "c06", name: "קבועה ופריים, ופריים קצר", choice: BASE_CHOICE, shape: [part(FIXED, 60), part(PRIME, 40, 18)] },
   { id: "c07", name: "60% קבועה, עם הון עצמי נוסף", choice: { ...BASE_CHOICE, extraEquity: "20000" }, shape: [part(FIXED, 60), part(PRIME, 20), part(VAR, 20)] },
   { id: "c08", name: "אחרי סגירת הרכב, מנוצל כל החיסכון", choice: { ...BASE_CHOICE, closeCar: true, extraEquity: "40000" }, shape: [part(FIXED, 50), part(PRIME, 30), part(VAR, 20)] },
   { id: "c09", name: "הורה כלווה נוסף", choice: { ...BASE_CHOICE, parent: true }, shape: [part(FIXED, 30), part(PRIME, 40), part(VAR, 30)] },

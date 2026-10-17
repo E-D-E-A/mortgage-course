@@ -73,8 +73,12 @@ describe("same input, same output", () => {
 });
 
 describe("assess", () => {
-  it("rise is sensitivity.ts's stressRise, for every case-A candidate", () => {
-    for (const c of CANDIDATES) expect(assess(c.tracks, GOAL_CONTEXT).rise.toString(), c.id).toBe(stressRise(c.tracks, GOAL_CONTEXT).toString());
+  it("rise is sensitivity.ts's stressRise apart from the clearing payment's rounding: within a few shekels", () => {
+    for (const c of CANDIDATES) {
+      const mine = assess(c.tracks, GOAL_CONTEXT).rise;
+      const theirs = stressRise(c.tracks, GOAL_CONTEXT);
+      expect(theirs.minus(mine).abs().lt(30), c.id).toBe(true);
+    }
   });
 });
 
@@ -83,5 +87,35 @@ describe("fnv1a", () => {
     expect(fnv1a("")).toBe("811c9dc5");
     expect(fnv1a("a")).toBe("e40c292c");
     expect(fnv1a("foobar")).toBe("bf9cf968");
+  });
+});
+
+import { projectedLast, projectedPayments } from "./engine.ts";
+
+describe("the highest payment leaves out the clearing payment", () => {
+  it("a fixed 20-year loan has the same highest payment under any scenario: the last month's rounding is not a rise", () => {
+    const t: TrackSpec = { kind: "fixed_unlinked", amount: "1640000", rate: "4.4", months: 240 };
+    const a = assess([t], GOAL_CONTEXT);
+    expect(a.rise.toString()).toBe("0");
+    expect(a.base.max.toString()).toBe(a.base.first.toString());
+    // the payment actually made in the last month does differ by a few agorot or shekels: it is rounding
+    expect(mixFlow([t], GOAL_CONTEXT.base).payments[239].toString()).not.toBe(a.base.first.toString());
+  });
+  it("the stress peak of case A's initial mix is month 61's, not month 360's", () => {
+    const e = evaluate(INITIAL_MIX, GOAL_CONTEXT.stress);
+    expect(e.maxMonth).toBe(61);
+    expect(e.max.toString()).toBe(mixFlow(INITIAL_MIX, GOAL_CONTEXT.stress).payments[60].toString());
+  });
+  it("by hand: a one-month change leaves a track of two months as is; an equal-principal track pays what it pays", () => {
+    const ep = trackFlow({ kind: "fixed_unlinked", amount: "120000", rate: "12", months: 12, method: "equal_principal" }, FLAT);
+    expect(projectedLast(ep).toString()).toBe("10100");
+    expect(projectedPayments(mixFlow([{ kind: "fixed_unlinked", amount: "120000", rate: "12", months: 12, method: "equal_principal" }], FLAT))[11].toString()).toBe("10100");
+  });
+  it("a linked track's due last payment keeps the index's rise (it is a real rise)", () => {
+    const t: TrackSpec = { kind: "fixed_linked", amount: "500000", rate: "2.9", months: 240 };
+    const f = trackFlow(t, GOAL_CONTEXT.base);
+    const due = projectedLast(f);
+    expect(due.gt(f.payments[238])).toBe(true);
+    expect(due.minus(f.payments[239]).abs().lt(20)).toBe(true);
   });
 });
