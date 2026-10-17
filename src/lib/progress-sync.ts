@@ -14,7 +14,7 @@ type Session = { access_token: string; refresh_token: string };
 type Row = { user_id: string; key: string; value: unknown; updated_at: string };
 
 function env(name: "PUBLIC_SUPABASE_URL" | "PUBLIC_SUPABASE_ANON_KEY"): string {
-  return String((import.meta as any).env?.[name] ?? "");
+  return String((import.meta.env as Record<string, string | undefined>)[name] ?? "");
 }
 
 /** Keys that are not learner progress: the login session and this module's own bookkeeping. */
