@@ -6,7 +6,7 @@
   Every number comes from data/lessons/4-12.json. The sizes of the six layers are
   the course's teaching numbers: nobody gave it the size of any layer, and the
   scene says so on screen. The only figures a source gave are a banker's 0.5 and
-  0.8 (Tobi Zamir, 2026-08-05; field knowledge, a single source, units not
+  0.8 (a field banker, 2026-08-05; field knowledge, a single source, units not
   stated, read here as percentage points: an assumption the scene states). The
   cue lines (window.cues) are the narration script, one line each.
 -->
@@ -52,12 +52,12 @@
         monthDiff: shekels("pred.month_diff"), totalDiff: whole("pred.total_diff"), months: fact("pred.months"), loan: whole("pred.loan"),
       };
       const LAYERS = [
-        { id: "cost", name: "עלות המימון", q: "כמה עולה הכסף מעל העוגן?", who: "טובי זמיר", c: "teal" },
+        { id: "cost", name: "עלות המימון", q: "כמה עולה הכסף מעל העוגן?", who: "בנקאי בשטח", c: "teal" },
         { id: "risk", name: "סיכון", q: "ישלמו, או לא?", who: "", c: "tq2" },
-        { id: "capital", name: "דרישות הון", q: "כמה הון להחזיק?", who: "טובי זמיר; לא אומת", c: "tq2" },
-        { id: "competition", name: "תחרות", q: "ואם ילכו לבנק אחר?", who: "טובי זמיר", c: "tq2" },
-        { id: "value", name: "ערך הלקוח", q: "כמה הוא שווה לי?", who: "טובי זמיר", c: "tq2" },
-        { id: "appetite", name: "תיאבון", q: "כמה אני רוצה את זה עכשיו?", who: "טובי זמיר", c: "tq2" },
+        { id: "capital", name: "דרישות הון", q: "כמה הון להחזיק?", who: "בנקאי בשטח; לא אומת", c: "tq2" },
+        { id: "competition", name: "תחרות", q: "ואם ילכו לבנק אחר?", who: "בנקאי בשטח", c: "tq2" },
+        { id: "value", name: "ערך הלקוח", q: "כמה הוא שווה לי?", who: "בנקאי בשטח", c: "tq2" },
+        { id: "appetite", name: "תיאבון", q: "כמה אני רוצה את זה עכשיו?", who: "בנקאי בשטח", c: "tq2" },
       ].map((l) => ({ ...l, v: Number(fact(`tower.${l.id}`)), s: fact(`tower.${l.id}`) }));
 
       const S = { title: [0, 10], formula: [10, 38], tower: [38, 98], known: [98, 138], gap: [138, 172], end: [172, 184] };
@@ -213,7 +213,7 @@
           const o4 = after(t, S.gap, 26, o);
           txt(290, 345, `בכל ${V.months} החודשים`, 24, { o: o4, fill: C.n700 });
           txt(290, 393, V.totalDiff, 40, { w: 700, o: o4, ltr: true });
-          txt(640, 548, `${V.loan} ל־25 שנה. היחידה של טובי לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
+          txt(640, 548, `${V.loan} ל־25 שנה. היחידה של הבנקאי בשטח לא נאמרה: הנחה שלנו.`, 22, { fill: C.n600, o: after(t, S.gap, 14, o) });
         }
         // 6 — closing
         if (inScene(t, S.end)) {

@@ -2,7 +2,7 @@
 <!--
   Video scene for unit 9.5, the final exam (stage 9, author C). Rendered frame by frame by scripts/render-video.mjs:
   window.render(t) depends only on t. Every number is read from /data/lessons/9-5.json (computed in code, rechecked in Python).
-  One idea: how the exam works: two parts, points for closed questions (graded by code) and for rubric lines (ticked by the learner), a proposed pass mark. The exam has no calculation of its own (case A, synthetic, fictional banks).
+  One idea: how the exam works: two parts, points for closed questions (graded by code) and for rubric lines (ticked by the learner), a score shown as points only, with no pass mark. The exam has no calculation of its own (case A, synthetic, fictional banks).
 -->
 <html lang="he" dir="rtl">
   <head>
@@ -67,14 +67,14 @@
           { h: "שאלה סגורה", s: "בודק קוד", s2: "מספר או בחירה", from: 1.5 },
           { h: "שאלה פתוחה", s: "בודקים אתם", s2: "מול המחוון", from: 11 },
         ], foot: "מודל שפה לא בודק ולא מחשב", footAt: 21 },
-        { type: "cards", at: [102, 130], title: "הסף המוצע", cards: [
-          { h: "אחוזים", s: "מכל הנקודות", big: { k: "exam.pass_percent", suf: "%" }, from: 1.5 },
-          { h: "נקודות", s: "מעוגל כלפי מעלה", big: { k: "exam.pass" }, from: 9 },
-        ], foot: "הצעה, ממתינה לאישור של דביר", footAt: 17 },
+        { type: "cards", at: [102, 130], title: "הציון", cards: [
+          { h: "נקודות מתוך", s: "כל הנקודות במבחן", big: { k: "exam.total" }, from: 1.5 },
+          { h: "בלי סף", s: "אין ציון עובר", s2: "אפשר לנסות שוב", from: 9 },
+        ], foot: "מוצג רק הציון", footAt: 17 },
         { type: "cards", at: [130, 152], title: "אחרי המבחן", cards: [{ h: "הציון הוא מפה", s: "חוזרים לשיעור שליד השאלה", s2: "ולא מסיקים מסקנה על יכולת" }], foot: "לא נעול ולא נפתח לפי הציון", footAt: 7 },
       ];
       window.duration = 152;
-      window.cues = [[1,5,"המבחן המסכם של הקורס."],[5,9,"התיק בדוי, והבנקים בדויים."],[11,22,"חלק א׳: התיק של נועם ושירה."],[22,36,"חלק ב׳: שאלות קצרות מכל שלב."],[39,50,"שאלה סגורה שווה נקודה אחת."],[50,60,"שאלה פתוחה: נקודה לכל שורה במחוון."],[60,69,"הציון נספר מכל הנקודות יחד."],[71,84,"את השאלות הסגורות בודק קוד."],[84,96,"את הפתוחות בודקים אתם, מול מחוון."],[96,101,"מודל שפה לא בודק, ולא מחשב."],[103,115,"הסף המוצע הוא שמונים אחוז מכל הנקודות."],[115,128,"זו הצעה, וממתינה לאישור של דביר."],[131,141,"הציון הוא מפה של מה לחזור אליו."],[141,151,"הוא לא נועל ולא פותח שום דבר."]];
+      window.cues = [[1,5,"המבחן המסכם של הקורס."],[5,9,"התיק בדוי, והבנקים בדויים."],[11,22,"חלק א׳: התיק של נועם ושירה."],[22,36,"חלק ב׳: שאלות קצרות מכל שלב."],[39,50,"שאלה סגורה שווה נקודה אחת."],[50,60,"שאלה פתוחה: נקודה לכל שורה במחוון."],[60,69,"הציון נספר מכל הנקודות יחד."],[71,84,"את השאלות הסגורות בודק קוד."],[84,96,"את הפתוחות בודקים אתם, מול מחוון."],[96,101,"מודל שפה לא בודק, ולא מחשב."],[103,115,"הציון מוצג כמספר נקודות מתוך כל הנקודות."],[115,128,"אין ציון עובר, ואפשר לנסות שוב."],[131,141,"הציון הוא מפה של מה לחזור אליו."],[141,151,"הוא לא נועל ולא פותח שום דבר."]];
       const ils = (x) => Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₪";
       const bigOf = (b) => (b ? lr(b.fmt === "ils" ? ils(V(b.k)) : (b.pre ?? "") + V(b.k) + (b.suf ?? "")) : "");
 

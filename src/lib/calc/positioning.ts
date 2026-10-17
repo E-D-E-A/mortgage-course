@@ -149,8 +149,8 @@ export const EXAMPLE_THRESHOLDS: Threshold[] = [
   { id: "pti.35", metric: "pti", kind: "course_example", percent: "35", label: "35% יחס החזר", source: "הנחת חישוב: דוגמה של הקורס (30%–35%), והמספרים לבדיקה" },
   { id: "pti.40", metric: "pti", kind: "capital_threshold", percent: PTI_CAPITAL_THRESHOLD, label: "סף ההון: 40% יחס החזר", source: "תיעוד הצוות; לא אומת" },
   { id: "pti.50", metric: "pti", kind: "regulatory_limit", percent: PTI_LIMIT, label: "המגבלה: 50% יחס החזר", source: "תעתיק הצוות להוראה 329; לא אומת" },
-  { id: "ltv.40", metric: "ltv", kind: "field_hypothesis", percent: "40", label: "40% מימון", source: "טובי זמיר, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
-  { id: "ltv.60", metric: "ltv", kind: "field_hypothesis", percent: "60", label: "60% מימון", source: "טובי זמיר, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
+  { id: "ltv.40", metric: "ltv", kind: "field_hypothesis", percent: "40", label: "40% מימון", source: "בנקאי בשטח, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
+  { id: "ltv.60", metric: "ltv", kind: "field_hypothesis", percent: "60", label: "60% מימון", source: "בנקאי בשטח, 2026-08-05 (FK-H-004); מקור יחיד, לא נבדק" },
   { id: "ltv.75", metric: "ltv", kind: "regulatory_limit", percent: LTV_CEILINGS.only_home, label: "התקרה: 75% מימון (דירה יחידה)", source: "תעתיק הצוות להוראה 329; לא אומת" },
 ];
 

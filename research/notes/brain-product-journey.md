@@ -18,7 +18,7 @@ Tool: Atlassian Rovo MCP (getConfluencePage / getConfluencePageDescendants / sea
 
 **Loaded OK (all requested pages):** 5373953 Journey · descendants list (51 pages) · 5570561 J-010 · 5439547 J-020 · 5636146 J-030 · 5832771 J-040 · 5898285 J-050 · 5931054 J-060 · 5931117 J-070 · 6455359 J-080 · 7503881 J-090 (markdown + ADF) · 6848521 J-100 · 8126465 J-110 · 8454147 J-120 · 8716289 J-130 · 8716324 J-140 · 9863169 J-150 · 9863207 J-160 · 9895937 J-170 · 20480025 Product and scope · 2949123 Eylon intro 2026-07-27 · 60981249 Five values · 16809986 Mogi go-to-market · 3670017 Decisions index (+ group rules pages 28901456 The domain rules, 28934145 Automation and the advisor app, 41254969 Open decisions, 43253761 Documents and reading).
 
-**Loaded OK (found by CQL, domain-relevant):** 67436545 Eylon's 15 calculation answers · 3112963 Question Files – Tobi · 4489217 meeting 2026-07-29 · 60588034 meeting 2026-10-01 · 3670057 meeting 2026-07-31 · 26836993 meeting 2026-08-16 · 25395201 meeting 2026-08-19 · 26935299 Hebrew advisor walkthrough (Eylon-approved) · 7733250 How the regulator says to compare offers · 7798786 קנס היוון · 8290315 What banks need before they lend · 9797633 What banks make you insure · 9568265 Licensing bill · 6455298 Credit report · 16777218 V1 pre-approval track · 67469313 BoI data connections (Eylon) · 16646263 Term per track · 8650753 Banking calendar · 6029348 Advisor channels · 9830401 Signing electronically · 7634954 J-090 choices & costs · 30375937 Discount pre-approval questionnaire · 43384833 What each document gives us.
+**Loaded OK (found by CQL, domain-relevant):** 67436545 Eylon's 15 calculation answers · 3112963 Question Files – field banker · 4489217 meeting 2026-07-29 · 60588034 meeting 2026-10-01 · 3670057 meeting 2026-07-31 · 26836993 meeting 2026-08-16 · 25395201 meeting 2026-08-19 · 26935299 Hebrew advisor walkthrough (Eylon-approved) · 7733250 How the regulator says to compare offers · 7798786 קנס היוון · 8290315 What banks need before they lend · 9797633 What banks make you insure · 9568265 Licensing bill · 6455298 Credit report · 16777218 V1 pre-approval track · 67469313 BoI data connections (Eylon) · 16646263 Term per track · 8650753 Banking calendar · 6029348 Advisor channels · 9830401 Signing electronically · 7634954 J-090 choices & costs · 30375937 Discount pre-approval questionnaire · 43384833 What each document gives us.
 
 **Failed:** none.
 
@@ -407,10 +407,10 @@ Tool: Atlassian Rovo MCP (getConfluencePage / getConfluencePageDescendants / sea
 
 ### Summary
 - **שמאי** = licensed property appraiser; bank won't lend until property valued (property = security).
-- Steps: (1) each bank hands a **הפניה לביצוע שמאות** + list of its appraisers; list arrives with the pre-approval; Directive 451 requires it filtered to the property's area [FACT-SRC]; (2) customer or advisor phones an appraiser — no marketplace/booking system; "all three banks that publish instructions say to telephone"; **Tobi confirmed (call, August 2026) this is how it goes in the field, and the advisor makes the call as often as the customer** [FIELD — Tobi, Aug 2026]; (3) physical visit — Directive 451 §10(א): *"עריכת השומה מחייבת ביקור פיזי בנכס"* [FACT-SRC]; (4) customer pays the appraiser ~**₪500–850** for a property under ₪4M (Discount's published range), ₪600–2,000 more widely depending on size [FACT-SRC (Discount) + RES]; (5) **appraiser sends report straight to the bank**, customer may ask the bank for a copy and is entitled to one — **Tobi confirmed (call, Aug 2026)** [FIELD + FACT].
+- Steps: (1) each bank hands a **הפניה לביצוע שמאות** + list of its appraisers; list arrives with the pre-approval; Directive 451 requires it filtered to the property's area [FACT-SRC]; (2) customer or advisor phones an appraiser — no marketplace/booking system; "all three banks that publish instructions say to telephone"; **field banker confirmed (call, August 2026) this is how it goes in the field, and the advisor makes the call as often as the customer** [FIELD — field banker, Aug 2026]; (3) physical visit — Directive 451 §10(א): *"עריכת השומה מחייבת ביקור פיזי בנכס"* [FACT-SRC]; (4) customer pays the appraiser ~**₪500–850** for a property under ₪4M (Discount's published range), ₪600–2,000 more widely depending on size [FACT-SRC (Discount) + RES]; (5) **appraiser sends report straight to the bank**, customer may ask the bank for a copy and is entitled to one — **field banker confirmed (call, Aug 2026)** [FIELD + FACT].
 - "We are not in the commercial loop."
 - **One valuation, not four:** Directive 451 §9(ה): bank **shall not unreasonably refuse** a valuation the borrower holds, if produced at another bank's request, appraiser is on this bank's list, and **≤90 days** since valuation date. Hapoalim collateral page: *"אם כבר ערכתם שמאות עבור בנק אחר ב-3 החודשים שקדמו לביצוע ההלוואה תוכלו להעביר לנו עותק ממנה"*. [FACT-SRC]
-- **Tobi (call, Aug 2026): "if you have a valuation from one bank, the other banks are obliged to accept it."** Written rule narrower; off-list appraiser case not asked. [FIELD — Tobi] ⚠️ CONTRADICTION/tension with written rule (§9(ה) conditions + "not unreasonably refuse" + bank may demand adjustments).
+- **field banker (call, Aug 2026): "if you have a valuation from one bank, the other banks are obliged to accept it."** Written rule narrower; off-list appraiser case not asked. [FIELD — field banker] ⚠️ CONTRADICTION/tension with written rule (§9(ה) conditions + "not unreasonably refuse" + bank may demand adjustments).
 - Order forced: all four approvals → compare lists → pick appraiser on all → book once. "A system that orders the valuation early to save time will order the wrong one." No bank publishes its list. [RES]
 - Liability: if we pick the appraiser, the risk of non-portable valuation becomes ours; three rules if brokering: never recommend before all four approvals; say plainly when overlap empty/thin; record every recommendation and whether portable. [RES/proposal]
 - Cautions: "shall not unreasonably refuse" ≠ must accept; bank may require report sent directly and demand adjustments. **No "at least three appraisers" rule** in Directive 451; three is bank practice, not uniform — Mizrahi's page says three, Leumi's form has six numbered slots. [FACT-SRC]
@@ -418,8 +418,8 @@ Tool: Atlassian Rovo MCP (getConfluencePage / getConfluencePageDescendants / sea
 - **Directive self-contradiction:** list requirement at §4ג(ג)(2) in current version; §9(ה) refers to §4ג(ב8) (old location) — cite §4ג(ג)(2). [FACT-SRC, flagged]
 - **Internal refinance needs no valuation at all**; moving to a different bank does. [claim, unsourced on page — verify]
 - Physical visit = "the first genuinely irreducible human step this journey has met".
-- Open: off-list appraiser acceptance (follow-up to Tobi); should Mogi pick the appraiser; meaning of "unreasonably refuse"; other banks' fees (Discount fee PDF digits reversed); duration call→report; appraiser directory (chamber ~1,900 members with phones; government register ~3,100 licensed appraisers, no contacts). [OPEN]
-- Source of Tobi answers: "Question Files - Tobi" (page 3112963).
+- Open: off-list appraiser acceptance (follow-up to field banker); should Mogi pick the appraiser; meaning of "unreasonably refuse"; other banks' fees (Discount fee PDF digits reversed); duration call→report; appraiser directory (chamber ~1,900 members with phones; government register ~3,100 licensed appraisers, no contacts). [OPEN]
+- Source of field banker answers: "Question Files - field banker" (page 3112963).
 
 ### Useful for course
 - שמאות end to end: referral, appraiser lists, physical visit, fees, report to bank, 90-day portability (§9(ה)), myths (three appraisers), internal refinance exemption.
@@ -718,14 +718,14 @@ From **Product and scope**: see §20 (banks: volume earns official access; separ
 
 ---
 
-## 25. Question Files - Tobi — page 3112963  ★ FIELD KNOWLEDGE (Tobi, Aug 2026)
+## 25. Question Files - field banker — page 3112963  ★ FIELD KNOWLEDGE (field banker, Aug 2026)
 
-- URL: https://first-edea-team.atlassian.net/wiki/spaces/MTG/pages/3112963/Question+Files+-+Tobi · Last modified Aug 21, 2026 · Author: amit · Type: raw source (Q&A, by phone, August 2026). Tobi = "a mortgage professional outside the team"; answers "exactly as they were typed".
+- URL: https://first-edea-team.atlassian.net/wiki/spaces/MTG/pages/3112963/Question+Files+-+field banker · Last modified Aug 21, 2026 · Author: amit · Type: raw source (Q&A, by phone, August 2026). field banker = "a mortgage professional outside the team"; answers "exactly as they were typed".
 
 ### Content
 - Q1 (Eden): "איך עובד תהליך הקבלה של ייפוי כח באופן דיגיטלי מיועצים?" — **no answer recorded; still open.** [OPEN]
-- Q2 (Eden): who actually orders the appraiser? Answer verbatim: **"שמאי שולח ישירות לבנק את השמאות - היועת או הלקוח מזמינים את השמאי"** [FIELD — Tobi, Aug 2026]. Filed into J-140 on 2026-08-06.
-- Q3 (Eden): do the four banks' appraiser lists overlap? Answer verbatim: **"אם יש שמאות מבנק אחד - הבנקים האחרים מחוייבים לקבל אותה"** [FIELD — Tobi]. Page notes: "This answer is stronger than the written rule" (Directive 451 §9(ה): shall not unreasonably refuse, only if appraiser on receiving bank's list); off-list case not asked. ⚠️ Tension between field claim and written rule.
+- Q2 (Eden): who actually orders the appraiser? Answer verbatim: **"שמאי שולח ישירות לבנק את השמאות - היועת או הלקוח מזמינים את השמאי"** [FIELD — field banker, Aug 2026]. Filed into J-140 on 2026-08-06.
+- Q3 (Eden): do the four banks' appraiser lists overlap? Answer verbatim: **"אם יש שמאות מבנק אחד - הבנקים האחרים מחוייבים לקבל אותה"** [FIELD — field banker]. Page notes: "This answer is stronger than the written rule" (Directive 451 §9(ה): shall not unreasonably refuse, only if appraiser on receiving bank's list); off-list case not asked. ⚠️ Tension between field claim and written rule.
 
 ### Useful for course
 - Appraisal practice (who books, where the report goes, cross-bank acceptance) — with the written-rule caveat.
@@ -1050,7 +1050,7 @@ From **Product and scope**: see §20 (banks: volume earns official access; separ
 ### 2026-07-31 — פגישת ביניים (3670057), last modified Jul 31, 2026, Meeting notes (participants: אילון (organiser), עדן, עמית, דביר; speaker attribution scrambled → body unattributed)
 - Pre-approval = customer's go/no-go; "מי שעשה אותו פעם, לכל היותר יעשה עוד אחד" [FIELD-ish, unattributed]; free pre-approval at all banks proposed; risk "בא להתגלח".
 - "כל משכנתא בישראל מחייבת ביטוח חיים ← גם לקוח שלא סגר משכנתא הוא ליד שאפשר למכור לחברת ביטוח" [FIELD-ish claim]; insurance companies not bound by bank directives (claim).
-- **טובי זמיר (טוביה)** — "כ-4–5 שנים במערכת הבנקאית"; to validate that team members' field experience isn't exaggerated, talk about professionals and non-professionals, and past attempts to regulate advisors (exam like for real-estate brokers). [context for Tobi's field authority]
+- **בנקאי בשטח (טוביה)** — "כ-4–5 שנים במערכת הבנקאית"; to validate that team members' field experience isn't exaggerated, talk about professionals and non-professionals, and past attempts to regulate advisors (exam like for real-estate brokers). [context for the field banker's field authority]
 - Personas: young couple first mortgage; older person (reverse mortgage, low app usage); those who choose an advisor for hand-holding.
 - Open: who issues advisor codes at Hapoalim and Discount; Eylon task: **"להוציא קודי יועץ בלאומי ובמזרחי"**.
 
@@ -1090,7 +1090,7 @@ From **Product and scope**: see §20 (banks: volume earns official access; separ
 
 # Part C — Consolidated "Field-knowledge claims"
 
-Every claim attributable to Eylon (אילון אשכנזי — the team's mortgage expert; role per 2026-07-29: "התחום העסקי, הפיננסי, האסטרטגי והידע המקצועי במשכנתאות") or to experienced advisors / Tobi (טובי/טוביה זמיר — "a mortgage professional outside the team", ~4–5 years in the banking system). All = **field knowledge, to verify before teaching**. Exact wording kept; Hebrew where the source is Hebrew.
+Every claim attributable to Eylon (אילון אשכנזי — the team's mortgage expert; role per 2026-07-29: "התחום העסקי, הפיננסי, האסטרטגי והידע המקצועי במשכנתאות") or to experienced advisors / field banker (בנקאי בשטח — "a mortgage professional outside the team", ~4–5 years in the banking system). All = **field knowledge, to verify before teaching**. Exact wording kept; Hebrew where the source is Hebrew.
 
 ### A. Eylon — 2026-07-27 intro call (page 2949123; summary written by Dvir; Eylon = knowledge giver/organiser)
 | # | Exact wording (as on page) | Verdict vs Brain research |
@@ -1152,7 +1152,7 @@ Every claim attributable to Eylon (אילון אשכנזי — the team's mortga
 | E51 | same | Prime: BoI GetInterest returns the **policy rate**; keep policy rate, prime and customer spread distinct; keep manual prime-update process. |
 | E52 | 2026-10-07/08, Research 67469313 (author Eylon) | Policy rate observed 3.25% (next decision 2026-10-21); קו המשווה rates are annual effective, exclude bullet/balloon/FX; "Public market data do not supply a bank's executable price ... Changing a mix may change the rates a bank will offer." |
 
-### C. Tobi (טובי / טוביה זמיר) — August 2026 phone answers (page 3112963; used in J-140)
+### C. field banker (בנקאי בשטח) — August 2026 phone answers (page 3112963; used in J-140)
 | # | Exact wording | Note |
 |---|---|---|
 | T1 | "**שמאי שולח ישירות לבנק את השמאות - היועת או הלקוח מזמינים את השמאי**" | Consistent with banks' published instructions; advisor may book |
@@ -1183,7 +1183,7 @@ Every claim attributable to Eylon (אילון אשכנזי — the team's mortga
 1. **Uniform basket composition** — Eylon 2026-07-27 "(פריים, קבועה צמודה, קבועה לא צמודה)" vs Directive 451 App. 5 transcription (pages 6455359, 7733250): 1 = 100% קל"צ; 2 = ⅓ קל"צ + ⅓ פריים + ⅓ משתנה צמודה 5 שנים; 3 = ½ קל"צ + ½ פריים; קבועה צמודה in none. → Teach the directive version.
 2. **Pre-approval validity** — Eylon "28–30 יום" and rates "3 חודשים" vs Directive 451 §4ג(א)(4) "not less than 24 days", 12 days if no new lien (§4ג(ז)); J-060 calls 3 months "folklore". Banks may give longer in practice.
 3. **Bank response time** — Eylon "חוק מ־2021 ... 5–7 ימי עסקים ... חשוף לתביעות" vs Directive 451 §4ג(א)(5): 5 business days; 7 only for categories pre-defined in credit policy, customer entitled to reason. Source is a BoI directive, not a law; "lawsuits" unverified.
-4. **Appraisal validity/portability** — Eylon "שמאות מ־12–14 החודשים האחרונים תקפה" vs §9(ה) 90 days for cross-bank reuse (Hapoalim "3 החודשים"). Tobi: other banks "obliged" to accept — stronger than §9(ה)'s "not unreasonably refuse" + on-list + adjustable.
+4. **Appraisal validity/portability** — Eylon "שמאות מ־12–14 החודשים האחרונים תקפה" vs §9(ה) 90 days for cross-bank reuse (Hapoalim "3 החודשים"). field banker: other banks "obliged" to accept — stronger than §9(ה)'s "not unreasonably refuse" + on-list + adjustable.
 5. **PTI 40%** — Eylon "banks tighten in practice to 40%" vs J-090/Directive 329 §6: 40% is a capital/price boundary; 42% borrower "not rejected ... priced worse". Possibly both true (bank appetite vs regulation) — present carefully.
 6. **קנס היוון** — Eylon's delta-of-rates description vs the 2002 Order (two formulas, BoI average rates, take lower, time-served reductions, prime exempt). Also J-090 "the fixed part is exactly the part that carries an early-repayment penalty" vs research: variable tracks resetting less often than yearly can carry a (small) fee.
 7. **Life insurance "mandatory"** — Eylon/2026-07-31 "חובת ביטוח חיים לכל משכנתא" vs Directive 451 §11(א): the bank **may** require; not required ≤ ₪30,000; customer may buy externally. Reverse mortgage: Eylon says no life insurance duty.
@@ -1214,7 +1214,7 @@ Every claim attributable to Eylon (אילון אשכנזי — the team's mortga
 | Pre-approval: what it is, free, no documents, 5/7 business days, 24/12-day validity, credit check | 5570561, 5898285, 5931054, 8290315, 6455298 | Regulation |
 | Documents (what, why, payslip anatomy, bank-specific file-opening lists) | 5636146, 8716289, 43384833, 8290315 | Mixed (draft list flagged "Eylon/Amit should correct") |
 | Underwriting (חיתום) & credit data | 9863169, 6455298 | Regulation/research |
-| Appraisal (שמאות) | 8716324, 3112963 (Tobi) | Regulation + field |
+| Appraisal (שמאות) | 8716324, 3112963 (field banker) | Regulation + field |
 | Insurance (life & structure) | 9797633, 8290315, 9863207 | Regulation |
 | Signing, POAs, notary, e-signature | 9863207, 9830401, 6029348 | Law/regulation |
 | Funding: interim period, schedule anchoring, letter of intent, registration | 9895937 | Regulation |

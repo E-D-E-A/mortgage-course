@@ -6,7 +6,7 @@
  * J-050, J-130, J-140, J-160 and J-170, its research pages on the banks'
  * advisor channels (6029348), on signing and the two powers of attorney
  * (9830401), on insurance (9797633) and on the advisor-licensing bill
- * (9568265); field knowledge from Tobi Zamir (FK-H-040). The lawyer's card is a
+ * (9568265); field knowledge from a field banker (FK-H-040). The lawyer's card is a
  * general description, marked as not checked. No card states a number.
  */
 import type { MapLink, MapNode } from "./types.ts";

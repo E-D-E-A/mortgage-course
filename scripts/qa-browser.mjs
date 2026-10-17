@@ -1,7 +1,8 @@
 // Browser checks the screenshots can't make, over the built site (run `pnpm build` first):
 //  1. every half-worked table (FillTable) accepts its own right answers;
-//  2. every stage check scores 0 when all answers are wrong and all when all are right,
-//     records the pass, and opens the next stage's mark on the home page;
+//  2. every stage check shows the score only (0 when all answers are wrong, all when all are right),
+//     saves the last score and attempt, shows no pass mark, and every stage page is reachable
+//     with no saved progress at all (nothing is locked);
 //  3. at phone width, every fill-in table fits, every wider table shows the scroll hint,
 //     and no interactive component reports a hydration mismatch.
 // Run: pnpm qa:browser
@@ -34,15 +35,10 @@ const stages = (await readdir(join(src, "checks")).catch(() => [])).filter((f) =
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
 const problems = [];
-const openAll = (page) =>
-  page.addInitScript(() => {
-    for (let s = 0; s < 10; s++) localStorage.setItem(`mogi-course:check:${s}`, JSON.stringify({ passed: true }));
-  });
 
 // 1. Half-worked tables.
 {
   const page = await browser.newPage();
-  await openAll(page);
   page.on("pageerror", (e) => problems.push(`fill: page error: ${e.message}`));
   for (const lesson of withFill) {
     await page.goto(`${base}/lessons/${lesson}/`);
@@ -67,13 +63,13 @@ const openAll = (page) =>
 // 2. Stage checks.
 for (const stage of stages) {
   const page = await browser.newPage();
-  await page.addInitScript((n) => {
-    for (let s = 0; s < n; s++) localStorage.setItem(`mogi-course:check:${s}`, JSON.stringify({ passed: true }));
-  }, stage);
+  // No saved progress at all: the page must still be open and complete.
   page.on("pageerror", (e) => problems.push(`check ${stage}: page error: ${e.message}`));
-  await page.goto(`${base}/`);
-  const closedBefore = await page.locator(`[data-after-check="${stage}"]`).isVisible();
   await page.goto(`${base}/checks/${stage}/`);
+  const lockText = await page.locator("main").innerText();
+  for (const word of ["עדיין סגור", "ייפתח אחרי", "עברתם", "נכשלתם", "80%", "כדי לעבור"]) {
+    if (lockText.includes(word)) problems.push(`check ${stage}: the page says "${word}"`);
+  }
   const props = JSON.parse(await page.locator("astro-island[component-url*=StageCheck]").getAttribute("props"));
   const decode = (v) =>
     Array.isArray(v) ? (v[0] === 1 ? v[1].map(decode) : v[0] === 0 && typeof v[1] === "object" ? Object.fromEntries(Object.entries(v[1]).map(([k, x]) => [k, decode(x)])) : v[1]) : v;
@@ -95,21 +91,48 @@ for (const stage of stages) {
   const wrong = await answer(false);
   await page.getByRole("button", { name: "לנסות שוב מההתחלה" }).click();
   const right = await answer(true);
+  const resultText = await page.locator(`[id^=check-${stage}-result]`).innerText();
+  for (const word of ["עברתם", "נכשלתם", "הסף", "80%", "כדי לעבור"]) {
+    if (resultText.includes(word)) problems.push(`check ${stage}: the result says "${word}"`);
+  }
   const saved = await page.evaluate((n) => JSON.parse(localStorage.getItem(`mogi-course:check:${n}`) || "null"), stage);
   await page.goto(`${base}/`);
-  const closedAfter = await page.locator(`[data-after-check="${stage}"]`).isVisible();
-  console.log(`check ${stage}: all wrong → ${wrong} · all right → ${right} · pass saved ${saved?.passed === true} · next stage closed ${closedBefore} → ${closedAfter}`);
+  const mark = (await page.locator(`[data-check="${stage}"]`).textContent())?.trim();
+  const doneVisible = await page.locator(`[data-done="${stage}"]`).isVisible();
+  console.log(`check ${stage}: all wrong → ${wrong} · all right → ${right} · saved ${JSON.stringify(saved)} · map says "${mark}"`);
   if (!wrong.startsWith("0 ")) problems.push(`check ${stage}: all-wrong scored ${wrong}`);
   if (!right.startsWith(`${questions.length} `)) problems.push(`check ${stage}: all-right scored ${right}`);
-  if (saved?.passed !== true) problems.push(`check ${stage}: pass not saved`);
-  if (closedAfter) problems.push(`check ${stage}: next stage still marked closed after the pass`);
+  if (saved?.score !== questions.length || saved?.total !== questions.length || saved?.attempts !== 2) problems.push(`check ${stage}: last score/attempt not saved (${JSON.stringify(saved)})`);
+  if (!doneVisible || !mark?.includes(`${questions.length} מתוך ${questions.length}`)) problems.push(`check ${stage}: the course map does not show the score (${mark})`);
+  await page.close();
+}
+
+// 2b. Nothing is locked: with no saved progress, every stage's first lesson and check opens and shows its content.
+{
+  const page = await browser.newPage();
+  page.on("pageerror", (e) => problems.push(`open: page error: ${e.message}`));
+  await page.goto(`${base}/`);
+  const hrefs = await page.locator("main ol a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  const checkLinks = [...new Set(hrefs.filter((h) => h.startsWith("/checks/")))];
+  const lessons = hrefs.filter((h) => h.startsWith("/lessons/"));
+  const stageFirst = new Set();
+  for (const h of lessons) stageFirst.add(h.split("/")[2].split("-")[0]);
+  const targets = [...checkLinks];
+  for (const st of stageFirst) targets.push(lessons.find((h) => h.split("/")[2].startsWith(`${st}-`)));
+  for (const h of targets) {
+    await page.goto(`${base}${h}`);
+    const visible = await page.locator("main .prose-lesson").first().isVisible();
+    const text = await page.locator("main").innerText();
+    if (!visible || text.includes("עדיין סגור")) problems.push(`open: ${h} is not reachable without progress`);
+  }
+  if (stageFirst.size !== stages.length) problems.push(`open: found lessons for ${stageFirst.size} stages, checks for ${stages.length}`);
+  console.log(`open: ${targets.length} stage pages reachable with no saved progress`);
   await page.close();
 }
 
 // 3. Tables at phone width.
 {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await openAll(page);
   let current = "";
   page.on("console", (m) => {
     if (/hydration/i.test(m.text())) problems.push(`phone ${current}: ${m.text().slice(0, 120)}`);

@@ -164,7 +164,7 @@ export default function lesson110(): LessonData {
     given("rule.payday_3", "15"),
     // The file-opening charge, from a secondary source (Brain 8290315, לא אומת).
     given("fee.file_opening_max", "360"),
-    // Field: registration at the Israel Land Authority (Tobi, 2026-08-05, FK-H-046).
+    // Field: registration at the Israel Land Authority (field banker, 2026-08-05, FK-H-046).
     given("field.rmi_months_low", "3"),
     given("field.rmi_months_high", "4"),
     // Field: "rates valid 3 months" (Eylon, 2026-07-27, FK-H-027), contradicted by the directive's floor.

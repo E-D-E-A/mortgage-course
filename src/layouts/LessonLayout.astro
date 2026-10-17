@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import StageLock from "../components/StageLock.astro";
 import { checkHref, isBuilt, isCheckBuilt, lessonById, lessonHref, neighbours, stageOf } from "../lib/course.ts";
 
 const { frontmatter, headings = [] } = Astro.props;
@@ -59,8 +58,8 @@ const sections = headings.filter((h: { depth: number }) => h.depth === 2);
         }
       </div>
 
-      <StageLock stage={stage.id} />
-      <div class="prose-lesson stage-lockable mt-8">
+      <div id="lesson-visit" data-lesson={lesson} hidden></div>
+      <div class="prose-lesson mt-8">
         <slot />
       </div>
 
@@ -98,3 +97,11 @@ const sections = headings.filter((h: { depth: number }) => h.depth === 2);
     </article>
   </div>
 </BaseLayout>
+
+<script>
+  // Opening a lesson is saved as progress (once), so the course map can show which lessons were opened.
+  // It opens and closes nothing: every lesson is open to everyone.
+  import { load, save } from "../lib/progress.ts";
+  const id = document.getElementById("lesson-visit")?.dataset.lesson;
+  if (id && !load(`lesson:${id}`)) save(`lesson:${id}`, { at: new Date().toISOString() });
+</script>

@@ -6,8 +6,8 @@
  * every one of them with no new Python except the points (checks/kinds/exam.py, kind exam_points).
  *
  * Nothing here is advice and nothing says what a bank would do: case A, the four banks, their lines and prices, the scenarios and the
- * family's living budget are the course's own invented or illustrative assumptions (same labels as 9.1–9.4). The pass mark (80%) is a
- * PROPOSAL, pending Dvir. The exam is graded by code (closed) and by the learner against a rubric (open); a language model grades
+ * family's living budget are the course's own invented or illustrative assumptions (same labels as 9.1–9.4). The exam has no pass mark
+ * (Dvir, 2026-10-17): it shows points only. The exam is graded by code (closed) and by the learner against a rubric (open); a language model grades
  * nothing and computes nothing.
  *
  * Teaching numbers of part B and what they test (all invented; none is a market figure):
@@ -28,7 +28,7 @@ import { SCENARIOS } from "../../src/data/case-a-mix.ts";
 import { bank } from "../../src/data/case-a-positioning.ts";
 import { PTI_CAPITAL_THRESHOLD, PTI_LIMIT } from "../../src/lib/calc/regulation.ts";
 import { CHOICE, THRESHOLD_PTI } from "../../src/data/case-a-recommendation.ts";
-import { CLOSED, OPEN, PASS_PERCENT } from "../../src/data/exam-9-5.ts";
+import { CLOSED, OPEN } from "../../src/data/exam-9-5.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { disposable as disposableFact, net as netFact, netToPay as netToPayFact } from "./affordability-facts.ts";
 import { claimStateFact, countStatesFact, equityFact, incomeFact } from "./_casefile-facts.ts";
@@ -57,14 +57,13 @@ export default function lesson95(): LessonData {
 
   // ═══ The exam's points (kind exam_points) ═══
   const rubric = OPEN.map((o) => o.lines).join("|");
-  for (const measure of ["closed", "open_questions", "open_lines", "total", "pass"] as const) {
+  for (const measure of ["closed", "open_questions", "open_lines", "total"] as const) {
     const closed = CLOSED.length;
     const lines = OPEN.map((o) => o.lines);
     const total = closed + lines.reduce((a, b) => a + b, 0);
-    const value = measure === "closed" ? closed : measure === "open_questions" ? lines.length : measure === "open_lines" ? lines.reduce((a, b) => a + b, 0) : measure === "total" ? total : Math.ceil((total * PASS_PERCENT) / 100);
-    add({ id: `exam.${measure}`, kind: "exam_points", inputs: { closed, rubric, pass_percent: PASS_PERCENT, measure }, value });
+    const value = measure === "closed" ? closed : measure === "open_questions" ? lines.length : measure === "open_lines" ? lines.reduce((a, b) => a + b, 0) : total;
+    add({ id: `exam.${measure}`, kind: "exam_points", inputs: { closed, rubric, measure }, value });
   }
-  add(given("exam.pass_percent", PASS_PERCENT));
 
   // ═══ Part A: case A ═══
   const plan = planOf();
@@ -281,7 +280,7 @@ export default function lesson95(): LessonData {
   return {
     lesson: "9.5",
     title: "המבחן המסכם",
-    note: "The final exam: case A (the whole file of 9.1-9.4; every number from src/lib/calc/casefile.ts and the earlier stages' modules) and two short closed questions from each of the stages 0-8 on new teaching numbers (all invented, none a market figure). Closed questions are graded by code, open questions by the learner against a rubric after reading a model answer; a language model grades nothing. The pass mark of 80% is a proposal pending Dvir. Case A, its banks, the lines and prices of the banks, the scenarios and the family's living budget are the course's own invented or illustrative assumptions.",
+    note: "The final exam: case A (the whole file of 9.1-9.4; every number from src/lib/calc/casefile.ts and the earlier stages' modules) and two short closed questions from each of the stages 0-8 on new teaching numbers (all invented, none a market figure). Closed questions are graded by code, open questions by the learner against a rubric after reading a model answer; a language model grades nothing. The exam has no pass mark: it shows points only. Case A, its banks, the lines and prices of the banks, the scenarios and the family's living budget are the course's own invented or illustrative assumptions.",
     facts,
   };
 }

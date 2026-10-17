@@ -1,15 +1,11 @@
 /**
- * The shape of the final exam (unit 9.5, stage-9 author C): which questions it has, how many points each is worth and the proposed
- * pass mark. The TEXT of the questions lives in src/pages/lessons/9-5.mdx (their numbers are facts of scripts/lessons/lesson-9-5.ts);
+ * The shape of the final exam (unit 9.5, stage-9 author C): which questions it has and how many points each is worth. The exam has no pass mark. The TEXT of the questions lives in src/pages/lessons/9-5.mdx (their numbers are facts of scripts/lessons/lesson-9-5.ts);
  * the page checks at build time that its questions are exactly these ids. The points are computed from here by lesson-9-5.ts
  * (fact kind exam_points, rechecked in checks/kinds/exam.py), so a question added here is counted everywhere or the build stops.
  *
  * Points: one for every closed question (graded by code) and one for every rubric line of an open question (ticked by the learner after
  * reading the model answer: the learner grades, never a language model).
- *
- * The pass mark is a PROPOSAL of the course, pending Dvir: nothing locks or opens on it.
  */
-export const PASS_PERCENT = 80;
 
 /** The sections of the exam, in the order of the page. "A" is case A; "0"…"8" are the short questions of each stage. */
 export const SECTION_IDS = ["A", "0", "1", "2", "3", "4", "5", "6", "7", "8"] as const;

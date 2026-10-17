@@ -2,8 +2,8 @@
 // The final exam of the course (unit 9.5): one page of closed and open questions, scored once.
 // Closed questions (a number or one of several options) are graded by code when the learner presses "סיימתי"; each then shows the right
 // answer, the reason and the lesson to go back to. Open questions are ExamOpenQuestion: the learner writes, reads the model answer and
-// ticks the rubric lines the text meets. The score adds both. A language model grades nothing. The pass mark is a PROPOSAL of the course
-// (a percentage passed in with its points, computed in code): nothing is locked or opened by it. Progress (the answers, the submitted
+// ticks the rubric lines the text meets. The score adds both. A language model grades nothing. The exam shows the score only (no pass mark,
+// no threshold); the learner can start it again. Progress (the answers, the submitted
 // state) is kept in this browser through progress.ts, like the stage checks; each open question keeps its own text and ticks.
 import { computed, onMounted, reactive, ref } from "vue";
 import { load, parseAnswer, save } from "../lib/progress.ts";
@@ -52,10 +52,8 @@ const props = defineProps<{
   examId: string;
   sections: Section[];
   items: Item[];
-  /** All the points of the exam, and the points the proposed pass mark asks for (both computed in code). */
+  /** All the points of the exam (computed in code). */
   totalPoints: number;
-  passPoints: number;
-  passPercent: number;
 }>();
 
 const key = computed(() => `exam:${props.examId}`);
@@ -101,8 +99,6 @@ const results = computed(() => (submitted.value ? Object.fromEntries(closed.valu
 const closedScore = computed(() => Object.values(results.value).filter((r) => r.correct).length);
 const openScore = computed(() => opens.value.reduce((s, q) => s + (openScores[q.id]?.revealed ? openScores[q.id].points : 0), 0));
 const total = computed(() => closedScore.value + openScore.value);
-const percent = computed(() => Math.round((100 * total.value) / props.totalPoints));
-const passed = computed(() => total.value >= props.passPoints);
 const opensRevealed = computed(() => opens.value.filter((q) => openScores[q.id]?.revealed).length);
 const complete = computed(() => submitted.value && opensRevealed.value === opens.value.length);
 
@@ -277,12 +273,12 @@ const resultId = computed(() => `exam-${props.examId.replace(/\./g, "-")}-result
     </div>
 
     <div :id="resultId" class="mt-8 scroll-mt-24" aria-live="polite">
-      <div class="rounded-lg p-4 sm:p-5" :class="!submitted ? 'bg-n50' : complete ? (passed ? 'bg-success-bg' : 'bg-warning-bg') : 'bg-info-bg'">
+      <div class="rounded-lg p-4 sm:p-5" :class="!submitted ? 'bg-n50' : complete ? 'bg-success-bg' : 'bg-info-bg'">
         <h3 class="!mt-0 text-h3 text-n900">סיכום הציון</h3>
         <p v-if="!submitted" class="mt-2 text-body-m text-n800">הציון מופיע אחרי שתלחצו על ״סיימתי את השאלות הסגורות״ ותציגו את הפתרון של השאלות הפתוחות.</p>
         <template v-else>
           <p class="mt-2 text-h2 text-n900">
-            <span class="ltr">{{ total }}</span> מתוך <span class="ltr">{{ totalPoints }}</span> נקודות (<span class="ltr">{{ percent }}%</span>)
+            <span class="ltr">{{ total }}</span> מתוך <span class="ltr">{{ totalPoints }}</span> נקודות
           </p>
           <p class="mt-1 text-body-m text-n800">
             סגורות, לפי הקוד: {{ closedScore }} מתוך {{ closed.length }}. פתוחות, לפי הסימונים שלכם במחוון: {{ openScore }} מתוך
@@ -291,14 +287,12 @@ const resultId = computed(() => `exam-${props.examId.replace(/\./g, "-")}-result
           <p v-if="!complete" class="mt-2 text-body-m text-n800">
             עוד לא הצגתם את הפתרון של {{ opens.length - opensRevealed }} שאלות פתוחות, ולכן הציון חלקי. כתבו תשובה, הציגו את הפתרון וסמנו את המחוון.
           </p>
-          <p v-else-if="passed" class="mt-2 text-body-l text-n800">הגעתם לסף המוצע ({{ passPoints }} נקודות).</p>
           <p v-else class="mt-2 text-body-l text-n800">
-            לא הגעתם לסף המוצע ({{ passPoints }} נקודות). ליד כל שאלה מופיעים ההסבר והשיעור שכדאי לחזור אליו, ובטבלה למטה רואים באיזה חלק חסרו נקודות.
+            ליד כל שאלה מופיעים ההסבר והשיעור שכדאי לחזור אליו, ובטבלה למטה רואים באיזה חלק חסרו נקודות. אפשר להתחיל את המבחן מחדש בכל רגע.
           </p>
         </template>
         <p class="mt-3 text-body-m text-n800">
-          הסף המוצע הוא {{ passPercent }}% מהנקודות, כלומר {{ passPoints }} מתוך {{ totalPoints }}. זו הצעה של הקורס, ממתינה לאישור של דביר, ושום דבר לא ננעל ולא נפתח לפיה.
-          מודל שפה לא בודק שום חלק במבחן: את הסגורות בודק קוד, ואת הפתוחות בודקים אתם מול המחוון.
+          הציון הוא מספר נקודות בלבד: אין ציון עובר, ושום דבר לא תלוי בו. מודל שפה לא בודק שום חלק במבחן: את הסגורות בודק קוד, ואת הפתוחות בודקים אתם מול המחוון.
         </p>
 
         <div v-if="submitted" class="mt-4 overflow-x-auto">

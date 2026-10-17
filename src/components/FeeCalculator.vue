@@ -128,11 +128,11 @@ const steps = computed<Step[]>(() => {
       n: 3,
       title: "שלוש ריביות חודשיות: לא מערבבים",
       lines: [
-        { label: `הריבית בחוזה (נומינלית ${rate.value.toFixed(2)}%, שווה ל־${contractEff.value}% אפקטיבית): חלקי 12`, value: monthlyContract.value },
+        { label: `הריבית בחוזה (חוזית ${rate.value.toFixed(2)}%, שווה ל־${contractEff.value}% אפקטיבית): חלקי 12`, value: monthlyContract.value },
         { label: `הממוצע ביום הפירעון (אפקטיבי ${avgToday.value}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyToday.value },
         { label: `הממוצע בהעמדה (אפקטיבי ${hasGrant.value ? avgGrant.value : "—"}%): ${mistake.value ? "חלקי 12 (הטעות)" : "שורש 12"}`, value: monthlyGrant.value },
       ],
-      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית בחוזה נומינלית: משווים רק ריביות חודשיות. הטווח בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה טווח הוא שייך)" : ""}.`,
+      note: `הממוצעים שבנק ישראל מפרסם הם אפקטיביים לשנה, והריבית בחוזה חוזית: משווים רק ריביות חודשיות. הטווח בקובץ הממוצעים, לפי הזמן שנשאר: ${x.bucket.label} שנים${x.bucket.onEdge ? " (בדיוק על גבול: לא ידוע לאיזה טווח הוא שייך)" : ""}.`,
     },
   ];
   if (d) {
@@ -211,7 +211,7 @@ const steps = computed<Step[]>(() => {
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ formatShekels(principal) }}</span></span>
       </label>
       <label class="flex flex-col">
-        <span class="text-caption font-semibold text-n600">הריבית בחוזה (נומינלית, לשנה)</span>
+        <span class="text-caption font-semibold text-n600">הריבית בחוזה (חוזית, לשנה)</span>
         <input v-model.number="rate" type="range" min="3" max="8" step="0.01" aria-label="הריבית בחוזה" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ rate.toFixed(2) }}%</span></span>
       </label>

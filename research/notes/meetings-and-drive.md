@@ -48,7 +48,7 @@ Large transcripts exceeded the tool's token limit and were saved by the harness 
 | Date | Title / recording | Transcript id | Mortgage content? | Coverage | Notes |
 |---|---|---|---|---|---|
 | 2026-07-27 | "Jul 27, 07:35 PM" (Eylon and Dvir: market intro) | 01KYJ6WG4SQ4X2SG99ZWJCY38G | **Yes, major source** | Read in full | Speaker 1/3 is Eylon, Speaker 2 is Dvir. Confluence page 2949123 summarises it. |
-| 2026-08-05 | "פגישה 05-08-2026 - אורי טובי זמיר.m4a" | 01M0HP1D33EVANJMPRV379SFJ3 | **Yes, major source** | Lines 1–2075 and 2380–3451 read in full; 2075–2380 keyword-scanned | Tovi Zamir, a banker (about 4–5 years, including a digital external-refinancing desk), present until about 48:50; then team discussion. Speaker labels are mixed. Banker claims are third-party field knowledge. |
+| 2026-08-05 | "פגישה 05-08-2026 - אורי בנקאי בשטח.m4a" | 01M0HP1D33EVANJMPRV379SFJ3 | **Yes, major source** | Lines 1–2075 and 2380–3451 read in full; 2075–2380 keyword-scanned | field banker, a banker (about 4–5 years, including a digital external-refinancing desk), present until about 48:50; then team discussion. Speaker labels are mixed. Banker claims are third-party field knowledge. |
 | 2026-08-16 20:30 | "פ.ע אילון + עדן" | 01M05T8GFYMH5J5S5Y1VRS1001 | Marginal | Keyword-scanned | Claude/tool setup. |
 | 2026-08-21 10:23 | event model | 01M0HK7J5W6ZEW57YKH1HYHF83 | Yes (minor) | Keyword-scanned | Happy path and self-employed documents (FK-62). |
 | 2026-08-21 14:30 | "מערכת יועץ" | 01M0J1GZ6XW955NV3D44A91PN3 | Yes (minor) | Read in full | What comes with a pre-approval (FK-20). |
@@ -66,7 +66,7 @@ Meeting short names used below:
 
 - **INTRO** = 2026-07-27, Eylon and Dvir market intro, id 01KYJ6WG4SQ4X2SG99ZWJCY38G
 - **TASKS** = 2026-07-31, פגישת ביניים - משימות, id 01KYSNNTMESHHXEHRX5X7ERZAP
-- **BANKER** = 2026-08-05, Tovi Zamir meeting, id 01M0HP1D33EVANJMPRV379SFJ3
+- **BANKER** = 2026-08-05, field banker meeting, id 01M0HP1D33EVANJMPRV379SFJ3
 - **TEAM26** = 2026-08-26 team session, id 01M0ZGRDTRPAQ0YXY0K6XTPYRE
 - **PILOT** = 2026-09-16 18:38 client pilot, id 01M2NDWXJSA2SFWS26K3XRFPRF
 - **S0916B** = 2026-09-16 19:50, id 01M2NJ1DCQJNB7M44GSVT8HQS8
@@ -88,13 +88,13 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Gloss: Replacement-home buyers are capped at 70% LTV; self-builders get 50% of the land value, then 70% of the projected finished value.
 
 **FK-03. LTV tiers (40 / 60 / 75%) are about the bank's capital allocation and are published by the Bank of Israel.**
-- Source: BANKER, 2026-08-05, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=400, Tovi Zamir (banker)
+- Source: BANKER, 2026-08-05, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=400, field banker (banker)
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: The price tiers by LTV reflect how much capital the bank must hold, and the tier boundaries are Bank of Israel published.
 - Status: field knowledge from a third-party banker — needs Eylon's confirmation.
 
 **FK-04. Finance is up to the appraised value; contractor flats use a "zero report" (דוח אפס); the appraiser costs 800–1,000 NIS.**
-- Source: BANKER (team part, after Tovi left), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=10570, Eylon (label mixed)
+- Source: BANKER (team part, after field banker left), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=10570, Eylon (label mixed)
 - Hebrew: "דוח אפס" (term); rest paraphrase (verbatim not captured)
 - Gloss: The loan is measured against the appraisal, new-build projects use a project zero report, and an appraisal costs about 800–1,000 NIS.
 
@@ -123,7 +123,7 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - **Flag: he contradicts himself within the same sentence** (first "40% free income", then "50%"). A further unclear remark at BANKER 2:18:04 (https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=8284) mentions 40% "עם הכנסת מע"מ", which is probably a transcription error. Must be checked against the Bank of Israel directive before teaching.
 
 **FK-09. Self-employed income comes from the latest tax assessment, then a monthly figure after tax, checked against cash flow; years in business are asked.**
-- Source: PILOT, 2026-09-16, https://app.fireflies.ai/view/01M2NDWXJSA2SFWS26K3XRFPRF?t=320 (05:20–05:37), Eylon; also BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2253 (37:33–37:56, Tovi: tax assessment plus a calculator "לפי נקודות זיכוי")
+- Source: PILOT, 2026-09-16, https://app.fireflies.ai/view/01M2NDWXJSA2SFWS26K3XRFPRF?t=320 (05:20–05:37), Eylon; also BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2253 (37:33–37:56, field banker: tax assessment plus a calculator "לפי נקודות זיכוי")
 - Hebrew: "לפי נקודות זיכוי" (BANKER); PILOT computation paraphrased (verbatim not captured, and the figures are the client's, so they are not copied)
 - Gloss: Self-employed income = annual assessed income minus tax, divided by 12, sanity-checked against the account's cash flow.
 
@@ -139,7 +139,7 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Status: open question, not settled (the Drive summary of this meeting says the same).
 
 **FK-12. People fabricate income figures.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2216 (36:56–37:01), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2216 (36:56–37:01), field banker
 - Hebrew: "סטטוס לא 7,000, משכורת נכנסה 6,500. אנשים מפברקים"
 - Gloss: The declared salary says 7,000 but 6,500 actually came in; people fabricate.
 
@@ -180,7 +180,7 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Gloss: Each bank runs its own online pre-approval; the dates are his recollection.
 
 **FK-19. What the computer submits is a request for pre-approval, not a pre-approval; in refinancing there is no instant approval.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1670 (27:50–28:03), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1670 (27:50–28:03), field banker
 - Hebrew: "זה לא אישור עקרוני מה שאתה מגיש במחשב... בקשה לאישור עקרוני"
 - Gloss: Submitting online starts a pre-approval request; refinancing requests always go to a person.
 
@@ -190,7 +190,7 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Gloss: There is a regulated answer deadline, and the approval names appraisers and the documents to bring.
 
 **FK-21. The 5–7 day rule covers the pre-approval only, not a priced final offer; the bank calls to say it was approved ("it's the law"), and a rep calls back with an offer in 3–5 business days.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1713 (28:33–29:08) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2008 (33:28–34:09), Tovi Zamir and Eylon (disputed between them)
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1713 (28:33–29:08) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2008 (33:28–34:09), field banker and Eylon (disputed between them)
 - Hebrew: "זה חוק" (on the approval call); rest paraphrase (verbatim not captured)
 - Gloss: The legal clock applies to the in-principle answer; pricing comes later and is not on the same clock.
 - Flag: disputed in the meeting.
@@ -201,7 +201,7 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Gloss: Through the advisor channel at Discount, documents come first.
 
 **FK-23. Pre-approval validity: Eylon says 28–30 days and offer rates 3 months (he was unsure); the banker and the Drive summary say 24 days.**
-- Source: INTRO, https://app.fireflies.ai/view/01KYJ6WG4SQ4X2SG99ZWJCY38G?t=1373 (22:53–23:17), Eylon; BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=527 ("תוקף 24 יום", Tovi) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=10364 (2:52:44, "24 days on rates")
+- Source: INTRO, https://app.fireflies.ai/view/01KYJ6WG4SQ4X2SG99ZWJCY38G?t=1373 (22:53–23:17), Eylon; BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=527 ("תוקף 24 יום", field banker) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=10364 (2:52:44, "24 days on rates")
 - Hebrew: "תוקף 24 יום" (banker)
 - Gloss: How long a pre-approval and its rates hold.
 - **Flag: contradiction.** The Drive summary of 2026-08-05 cites the Bank of Israel for 24 days. Treat 24 days as the candidate answer and confirm.
@@ -237,23 +237,23 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Note: the Drive summary of 2026-08-05 cites Directive 451 section 9(e): 90 days, with conditions. Consistent.
 
 **FK-29. A smart advisor orders the appraiser immediately; the client pays; the bank gives a list; advisors keep a regular appraiser.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2077 (34:37–35:27), Tovi Zamir and Eylon
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2077 (34:37–35:27), field banker and Eylon
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: Ordering the appraisal early removes a bottleneck.
 
 **FK-30. Appraiser lists: generic at pre-approval, concrete after documents; random by area; Leumi's is the biggest (20–30 per area against 4–5 at others); appraisers earn 600–800 NIS from bank work.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2313 (38:33–39:37) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2395 (39:55), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2313 (38:33–39:37) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2395 (39:55), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: How appraiser referral works and roughly what it pays.
 - Note: FK-04 says 800–1,000 NIS for the client's fee; the two figures may be what the appraiser earns versus what the client pays.
 
 **FK-31. Underwriting timing differs: some banks send documents to underwriting early; Leumi does it at the end.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2154 (35:54–36:34), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2154 (35:54–36:34), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: Where the risk of a late rejection sits depends on the bank.
 
 **FK-32. Files fail on securities: a caveat (הערת אזהרה) in the land registry, or a property registered with the Israel Land Authority (3–4 months).**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=879 (14:39–14:55), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=879 (14:39–14:55), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: Title and registration problems, not income, are a common late failure.
 
@@ -265,37 +265,37 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 ### E. Rates, spreads and how banks price
 
 **FK-34. Banks work to a target spread (for example 0.5%), today the same for every file; formerly it varied by client and LTV. There is a minimum profitability, and going below it needs the manager.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=360 (06:00–06:13) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=227 (03:47–04:09), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=360 (06:00–06:13) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=227 (03:47–04:09), field banker
 - Hebrew: "אם אני צריך את התיק שלך בשביל לסגור את החודש..." (03:47)
 - Gloss: The rep has a floor; a file the rep needs to close the month can get better terms.
 
 **FK-35. The rep is a salesperson: he opens at 0.7–0.8 against an allowed 0.5 and pressures with the 24-day validity; above a rate band the request escalates to the manager and the manager's manager.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=527 (08:47–09:11) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2813 (46:53–47:16), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=527 (08:47–09:11) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2813 (46:53–47:16), field banker
 - Hebrew: "תוקף 24 יום" (the pressure lever)
 - Gloss: The first offer leaves room; negotiation moves it within a band.
 
 **FK-36. The bank cares about volume and monthly market share: "I'd rather work five 2-million files than ten 200,000 files".**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=436 (07:16–08:40), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=436 (07:16–08:40), field banker
 - Hebrew: "אני אעדיף לעבוד על 5 תיקים של 2 מיליון ולא על 10 תיקים של 200,000"
 - Gloss: Big loans get attention.
 
 **FK-37. The spread is managed as a monthly aggregate: if it is already low, a counter-offer won't help; beginning versus end of month matters but "is not an exact science"; targets run from the 1st to the 30th.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=633 (10:33–10:41) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=645 (10:45–12:52), Tovi Zamir; echoed in S0910, https://app.fireflies.ai/view/01M265CRJSXB8WNMVG8YMJG8W9?t=2512 (41:52, no point in a counter-offer if the spread is already the tightest)
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=633 (10:33–10:41) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=645 (10:45–12:52), field banker; echoed in S0910, https://app.fireflies.ai/view/01M265CRJSXB8WNMVG8YMJG8W9?t=2512 (41:52, no point in a counter-offer if the spread is already the tightest)
 - Hebrew: "זה לא מדע מדויק"
 - Gloss: Timing within the bank's month can matter, but unreliably.
 
 **FK-38. Purchases are always a little more expensive than refinancing; branches push balloon loans.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=579 (09:39) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=589 (09:49), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=579 (09:39) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=589 (09:49), field banker
 - Hebrew: "רכישות זה תמיד טיפה יותר יקר ממחזור"
 - Gloss: Refinance pricing is sharper than purchase pricing.
 
 **FK-39. The cheapest bank changes by quarter; the rate depends on each bank's cost of funds; advisors' software shows a spread that isn't exact.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1251 (20:51–20:57) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1285 (21:25–21:49), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1251 (20:51–20:57) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1285 (21:25–21:49), field banker
 - Hebrew: "זה לפי ריבעון... ריבעון אחד שבנק דיסקונט הכי זול..."
 - Gloss: No bank is always cheapest.
 
 **FK-40. "From the first to the third month Poalim is the best in the market"; advisors learn who is cheapest from conferences and WhatsApp/Facebook groups; focus negotiation on 2–3 banks, because each takes a different time.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1940 (32:20–32:55) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1985 (33:05–33:24), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1940 (32:20–32:55) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1985 (33:05–33:24), field banker
 - Hebrew: "מחודש ראשון עד חודש שלישי פועלים הכי טובים בשוק"
 - Gloss: A snapshot of relative pricing, and the informal channels where it spreads.
 - Flag: time-bound; do not teach as a standing fact.
@@ -306,13 +306,13 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Gloss: Public benchmarks exist for checking an offer.
 
 **FK-42. The advisor pads the rate: if the market gives 4.5, he quotes 4.7.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=264 (04:24–04:40), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=264 (04:24–04:40), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: Some advisors keep a margin between the bank's rate and what they show the client.
 - Flag: an allegation about competitors, not a verified practice.
 
 **FK-43. A private client who studied YouTube for 2–3 hours got rates far below the market and below any advisor's.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2631 (43:51–44:42), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2631 (43:51–44:42), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: An anecdote; self-directed clients can negotiate well.
 
@@ -384,18 +384,18 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 ### G. Refinancing
 
 **FK-56. Internal refinancing is re-opening at the same bank; external refinancing is regulatorily a new credit at the receiving bank, so it is harder; refinancing is most of an advisor's work today. Internal refinancing is "retention only".**
-- Source: INTRO, https://app.fireflies.ai/view/01KYJ6WG4SQ4X2SG99ZWJCY38G?t=280 (04:40–06:35), Eylon; BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2132 (35:32–35:43), Tovi Zamir
-- Hebrew: "רוב עיסוקו היום של יועץ משכנתאות" (Eylon); "רק שימור", "שומר לך על קהל עד 2.5 אחוז" (Tovi)
+- Source: INTRO, https://app.fireflies.ai/view/01KYJ6WG4SQ4X2SG99ZWJCY38G?t=280 (04:40–06:35), Eylon; BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=2132 (35:32–35:43), field banker
+- Hebrew: "רוב עיסוקו היום של יועץ משכנתאות" (Eylon); "רק שימור", "שומר לך על קהל עד 2.5 אחוז" (field banker)
 - Gloss: Refinancing dominates advisory work; the internal desk exists to keep the customer.
 - Flag: "עד 2.5 אחוז" is unclear in context.
 
 **FK-57. The external-refinance desk: cases arrive after the call centre approves them; it asks for the balance statement (דוח יתרות); it gives an offer without documents (unlike the branch and new-money desk, where documents come first); the process runs over email.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1432 (23:52–24:07), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=904 (15:04–15:28), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=933 (15:33), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1432 (23:52–24:07), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=904 (15:04–15:28), https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=933 (15:33), field banker
 - Hebrew: "אהלן, בוא תשלח לי את הדוח יתרות... אני לא אביא לך ישר את האחוזון" (29:46, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1786)
 - Gloss: The refinance flow: balance statement, offer, negotiation by email, then documents and appraiser (30:41–30:54, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1841).
 
 **FK-58. The call-centre system shows only the total amount; a 3-minute verification call follows, unless there is a self-employed borrower.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1538 (25:38–26:17), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1538 (25:38–26:17), field banker
 - Hebrew: "אלא אם כן יש לך עצמאי"
 - Gloss: Salaried files get a short call; self-employed files get more scrutiny.
 
@@ -406,24 +406,24 @@ Status for every item is **field knowledge — needs Eylon's confirmation** unle
 - Hebrew: "שלוש ספרות סלאש שתי ספרות"; "אין צורך... להיות שום אדם... מיוחד, בשביל להיות יועץ משכנתאות"
 - Gloss: The profession is unregulated; banks issue advisor codes on request. Eylon wishes regulation were stricter.
 
-**FK-60. All four banks have advisor portals (Tovi: nobody uses them); Discount and Poalim consent forms allow advisors their own apps, while Leumi puts it in robots.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=950 (15:50–16:04), Tovi Zamir; https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1033 (17:13–17:33), Eylon
+**FK-60. All four banks have advisor portals (field banker: nobody uses them); Discount and Poalim consent forms allow advisors their own apps, while Leumi puts it in robots.**
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=950 (15:50–16:04), field banker; https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1033 (17:13–17:33), Eylon
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: Bank channels for advisors exist but are underused.
 - Flag: "Leumi puts it in robots" is unclear as transcribed.
 
 **FK-61. The authorisation letter (כתב הרשאה) is a signed file in each bank's own wording; one bank requires a scanned ID.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1191 (19:51–20:17), Tovi Zamir and Eylon
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1191 (19:51–20:17), field banker and Eylon
 - Hebrew: "כתב הרשאה" (term); rest paraphrase (verbatim not captured)
 - Gloss: Each bank has its own form; the four forms are in Drive (see Drive inventory).
 
 **FK-62. The area manager will not engage until you bring volume; submission goes through a call centre (מוקד) or CRM.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1133 (18:53–19:14) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=324 (05:24), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=1133 (18:53–19:14) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=324 (05:24), field banker
 - Hebrew: "מוקד" (term); rest paraphrase (verbatim not captured)
 - Gloss: Relationships with the bank follow volume.
 
 **FK-63. At big advisory firms the file is handled by an operations person with a fixed script; the "advisor" is the salesperson; the bigger the firm, the lower the rep's quality.**
-- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=92 (01:32–02:29) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=170 (02:50), Tovi Zamir
+- Source: BANKER, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=92 (01:32–02:29) and https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=170 (02:50), field banker
 - Hebrew: paraphrase (verbatim not captured)
 - Gloss: An insider's view of advisory firms.
 
@@ -509,7 +509,7 @@ Product and business points that are not market facts. Each is a team direction 
 - **Loan purposes and property types.** 2026-09-06 (Eden): purposes are purchase, self-build, renovation, extension; מחיר למשתכן means the seller is a contractor; single / replacement / additional apartment. Eden advised having Eylon fill forms manually and compare with OCR.
 - **Pricing ideas.** BANKER team part, https://app.fireflies.ai/view/01M0HP1D33EVANJMPRV379SFJ3?t=9841 (2:44:01–2:44:16): a paid stage at 300 NIS after the free pre-approval. The Drive summary of 2026-08-05 repeats it (charge 300 NIS before showing the tailored offer). S0910, https://app.fireflies.ai/view/01M265CRJSXB8WNMVG8YMJG8W9?t=2721 (45:21): free refinancing for the first two months (idea). Founders' summary of 2026-08-19 (Drive): pilot of 3 files at 5,900–6,000 NIS incl. VAT, first-time salaried buyers, the MOGI brand — **decision** as recorded there.
 - **Task.** TASKS, https://app.fireflies.ai/view/01KYSNNTMESHHXEHRX5X7ERZAP?t=3442 (57:22): get advisor codes at Leumi and Mizrahi; call Poalim and Discount.
-- **Banker's background.** TASKS, https://app.fireflies.ai/view/01KYSNNTMESHHXEHRX5X7ERZAP?t=4166 (1:09:26): Tovi has 4–5 years in banking.
+- **Banker's background.** TASKS, https://app.fireflies.ai/view/01KYSNNTMESHHXEHRX5X7ERZAP?t=4166 (1:09:26): field banker has 4–5 years in banking.
 
 ### Worked example from Drive (Dvir's dictation test)
 

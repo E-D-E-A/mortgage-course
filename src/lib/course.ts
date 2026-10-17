@@ -25,8 +25,8 @@ export function neighbours(id: string) {
   return { prev: allLessons[i - 1], next: allLessons[i + 1] };
 }
 
-// Each stage ends with a completion check, src/pages/checks/<stage>.mdx. A
-// stage opens only after the previous stage's check is passed (StageLock).
+// Each stage ends with a completion check, src/pages/checks/<stage>.mdx. Nothing is locked:
+// every stage, lesson and check is open to everyone, whatever progress is saved.
 const checksBuilt = new Set(
   Object.keys(import.meta.glob("../pages/checks/*.mdx")).map((p) => Number(p.match(/(\d+)\.mdx$/)![1])),
 );

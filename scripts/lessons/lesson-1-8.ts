@@ -55,8 +55,8 @@ export default function lesson18(): LessonData {
     given("claim.eylon_low", 28),
     given("claim.eylon_high", 30),
     given("claim.eylon_rates_months", 3),
-    // Tobi Zamir, 2026-08-05 (FK-H-027): "תוקף 24 יום" — his figure, shown as his claim.
-    given("claim.tobi_days", 24),
+    // a field banker, 2026-08-05 (FK-H-027): "תוקף 24 יום" — his figure, shown as his claim.
+    given("claim.field_banker_days", 24),
 
     // Worked example: נועם ושירה, בנק א׳ (the same dates as lesson 1.7).
     given("worked.approved", approved),

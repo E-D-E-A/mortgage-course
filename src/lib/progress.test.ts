@@ -30,3 +30,18 @@ describe("parseAnswer", () => {
     }
   });
 });
+
+describe("save and load", () => {
+  it("keeps the last score and the attempt count of a stage check, with no pass flag", async () => {
+    const store = new Map<string, string>();
+    (globalThis as { localStorage?: unknown }).localStorage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+    };
+    const { load, save } = await import("./progress.ts");
+    save("check:3", { score: 11, total: 14, attempts: 2, at: "2026-10-17T00:00:00.000Z" });
+    expect(load("check:3")).toEqual({ score: 11, total: 14, attempts: 2, at: "2026-10-17T00:00:00.000Z" });
+    expect(store.get("mogi-course:check:3")).not.toContain("passed");
+    delete (globalThis as { localStorage?: unknown }).localStorage;
+  });
+});

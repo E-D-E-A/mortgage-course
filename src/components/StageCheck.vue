@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // A stage's completion check. Unlike the practice inside a lesson, the
-// learner answers every question first and is scored once: a pass opens the
-// next stage (see StageLock). After scoring, every question shows the right
-// answer, why, and the lesson to go back to — a failed check still teaches.
-// A pass is kept: a later retake never locks the stage again.
+// learner answers every question first and is scored once. The page shows the
+// score only ("N מתוך M"): there is no pass mark and nothing is locked or opened by it.
+// After scoring, every question shows the right answer, why, and the lesson to go
+// back to. The learner can retry as often as they like. The last score and the number
+// of attempts are kept as progress ("done" = answered at least once).
 import { computed, onMounted, reactive, ref } from "vue";
 import { load, parseAnswer, save } from "../lib/progress.ts";
 
@@ -28,17 +29,21 @@ interface Question {
   explanation: string;
 }
 const props = withDefaults(
-  defineProps<{ stage: number; questions: Question[]; passPercent?: number; nextHref?: string; nextLabel?: string; passText?: string }>(),
-  { passPercent: 80, nextHref: undefined, nextLabel: undefined, passText: "עברתם את הבדיקה. השלב הבא פתוח." },
+  defineProps<{ stage: number; questions: Question[]; nextHref?: string; nextLabel?: string }>(),
+  { nextHref: undefined, nextLabel: undefined },
 );
 
 const key = `check:${props.stage}`;
 const answers = reactive<Record<string, string | number | null>>(Object.fromEntries(props.questions.map((q) => [q.id, null])));
 const submitted = ref(false);
-const passedBefore = ref(false);
+/** The last saved attempt from this browser (or from the learner's synced progress), if any. */
+const before = ref<{ score: number; total: number; attempts: number } | null>(null);
 
 onMounted(() => {
-  passedBefore.value = load<{ passed: boolean }>(key)?.passed === true;
+  const saved = load<{ score?: number; total?: number; attempts?: number }>(key);
+  if (saved && typeof saved.score === "number" && typeof saved.total === "number") {
+    before.value = { score: saved.score, total: saved.total, attempts: saved.attempts ?? 1 };
+  }
 });
 
 const answered = computed(() => props.questions.filter((q) => answers[q.id] !== null && answers[q.id] !== "").length);
@@ -63,14 +68,13 @@ function grade(q: Question): { correct: boolean; note: string } {
 
 const results = computed(() => (submitted.value ? Object.fromEntries(props.questions.map((q) => [q.id, grade(q)])) : {}));
 const score = computed(() => Object.values(results.value).filter((r) => r.correct).length);
-const needed = computed(() => Math.ceil((props.questions.length * props.passPercent) / 100));
-const passed = computed(() => score.value >= needed.value);
 
 function submit() {
   submitted.value = true;
   const at = new Date().toISOString();
-  save(key, { passed: passed.value || passedBefore.value, score: score.value, total: props.questions.length, at });
-  if (passed.value) passedBefore.value = true;
+  const attempts = (before.value?.attempts ?? 0) + 1;
+  save(key, { score: score.value, total: props.questions.length, attempts, at });
+  before.value = { score: score.value, total: props.questions.length, attempts };
   document.getElementById(`check-${props.stage}-result`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -100,15 +104,14 @@ const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
 <template>
   <div class="my-6">
     <div :id="`check-${stage}-result`" aria-live="polite" class="scroll-mt-24">
-      <div v-if="submitted" class="mb-6 rounded-lg p-5" :class="passed ? 'bg-success-bg' : 'bg-warning-bg'">
+      <div v-if="submitted" class="mb-6 rounded-lg bg-info-bg p-5">
         <p class="text-h2 text-n900">{{ score }} מתוך {{ questions.length }} נכונות</p>
-        <p v-if="passed" class="mt-2 text-body-l text-n800">{{ passText }}</p>
-        <p v-else class="mt-2 text-body-l text-n800">
-          כדי לעבור צריך לפחות {{ needed }} תשובות נכונות. ליד כל שאלה מופיעים ההסבר והשיעור שכדאי לחזור אליו. אחר כך נסו שוב.
+        <p class="mt-2 text-body-l text-n800">
+          ליד כל שאלה מופיעים ההסבר והשיעור שכדאי לחזור אליו. אפשר לנסות שוב מתי שרוצים, והציון האחרון הוא זה שנשמר.
         </p>
         <div class="mt-4 flex flex-wrap gap-3">
           <a
-            v-if="passed && nextHref"
+            v-if="nextHref"
             :href="nextHref"
             class="inline-flex min-h-11 items-center rounded-md bg-turquoise px-5 text-body-m font-semibold text-navy transition-colors duration-fast ease-out hover:bg-teal-deep hover:text-n0"
           >
@@ -119,8 +122,8 @@ const lessonHref = (id: string) => `/lessons/${id.replace(".", "-")}/`;
           </button>
         </div>
       </div>
-      <p v-else-if="passedBefore" class="mb-6 rounded-md bg-success-bg p-3 text-body-m text-n800">
-        כבר עברתם את הבדיקה הזו. אפשר לענות שוב לחזרה; התוצאה לא תנעל את השלב הבא.
+      <p v-else-if="before" class="mb-6 rounded-md bg-info-bg p-3 text-body-m text-n800">
+        הציון האחרון שלכם בבדיקה הזו: {{ before.score }} מתוך {{ before.total }}. אפשר לענות שוב; הציון החדש יחליף אותו.
       </p>
     </div>
 

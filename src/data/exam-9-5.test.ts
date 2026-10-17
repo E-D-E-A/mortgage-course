@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CLOSED, OPEN, PASS_PERCENT, SECTION_IDS } from "./exam-9-5.ts";
+import { CLOSED, OPEN, SECTION_IDS } from "./exam-9-5.ts";
 
 describe("the final exam (unit 9.5)", () => {
   it("has unique question ids, each in a known section", () => {
@@ -24,7 +24,8 @@ describe("the final exam (unit 9.5)", () => {
     for (const q of OPEN) expect(q.lines).toBeGreaterThanOrEqual(3);
   });
 
-  it("proposes a pass mark of 80 percent, which is a proposal and not a rule", () => {
-    expect(PASS_PERCENT).toBe(80);
+  it("has no pass mark: the module exports the questions and sections only", async () => {
+    const mod = await import("./exam-9-5.ts");
+    expect(Object.keys(mod).sort()).toEqual(["CLOSED", "OPEN", "SECTION_IDS"]);
   });
 });

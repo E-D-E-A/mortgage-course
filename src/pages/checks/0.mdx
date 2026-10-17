@@ -243,7 +243,7 @@ export const questions = [
 
 זו הבדיקה של כל שלב 0: {questions.length} שאלות, מאחוז ועד עקום התשואות. עונים על כולן, ואז לוחצים ״סיימתי — לבדיקה״.
 
-- כדי לעבור צריך לפחות 80% תשובות נכונות. מי שעובר פותח את שלב 1.
+- הבדיקה מציגה את הציון בלבד: כמה תשובות נכונות מתוך {questions.length}. אין ציון עובר, ושום שלב לא ננעל, ואפשר לנסות שוב.
 - אחרי הבדיקה, ליד כל שאלה מופיעים התשובה הנכונה, ההסבר והשיעור שכדאי לחזור אליו. אפשר לנסות שוב כמה פעמים שרוצים.
 - בחלק מהשאלות צריך מחשבון. בתשובה מספרית כותבים רק ספרות, עם פסיקים או בלעדיהם.
 
@@ -253,4 +253,4 @@ export const questions = [
 
 <StageCheck client:load stage={0} questions={questions} nextHref={isBuilt("1.1") ? lessonHref("1.1") : "/"} nextLabel={isBuilt("1.1") ? "לשלב 1" : "למפת הקורס (שלב 1 בכתיבה)"} />
 
-{/* Internal note: numbers come from scripts/lessons/check-0.ts → data/lessons/check-0.json, rechecked by checks/independent_check.py with the stage-0 lessons' kinds. The scoring and the pass record are src/components/StageCheck.vue; the lock on stage 1 is src/components/StageLock.astro. */}
+{/* Internal note: numbers come from scripts/lessons/check-0.ts → data/lessons/check-0.json, rechecked by checks/independent_check.py with the stage-0 lessons' kinds. The scoring and the saved last score are src/components/StageCheck.vue. */}

@@ -2,7 +2,7 @@
  * Lesson 4.12 — how a bank prices. The tower of a bank's rate is a structure,
  * not a price list: nobody has given the course the size of any layer, so the
  * layers' sizes below are the course's teaching numbers, shown as such. The
- * only figures a source gave are the spread numbers of a banker (Tobi Zamir,
+ * only figures a source gave are the spread numbers of a banker (a field banker,
  * 2026-08-05: a clerk opens at 0.7–0.8 where 0.5 is allowed; FK-H-071, field
  * knowledge awaiting Eylon, a single source, units not stated). The lesson reads
  * them as percentage points of spread, labels that as an assumption, and asks
@@ -37,7 +37,7 @@ export default function lesson412(): LessonData {
   b.given("pred.anchor", "4");
   b.given("pred.allowed", "0.5");
   b.given("pred.opened", "0.8");
-  // Tobi said "0.7–0.8"; the lesson computes with the top of the range and says so.
+  // The field banker said "0.7–0.8"; the lesson computes with the top of the range and says so.
   b.given("pred.opened_low", "0.7");
   b.given("pred.months", "300");
   b.calc("pred.gap", { op: "minus", a: "pred.opened", b: "pred.allowed" });
