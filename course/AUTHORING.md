@@ -157,7 +157,7 @@ A lesson that needs a **new interactive illustration**: write it as `src/compone
 
 ## Sources and reliability (brief §9)
 
-`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב` · `שאלה פתוחה` (a question no source answered; says who it waits for, with no internal list name).
+`<Sources>` kinds: `עובדה מאומתת` · `החלטה של Mogi` · `ידע מהשטח` · `מחקר / הצעה` · `הנחת חישוב` · `לא אומת` · `ידע מתמטי כללי` · `ידע כלכלי כללי` (how money and banks work in general, no figures) · `בדיקת חישוב` · `ממקור משני` (the claim rests on reputable secondary sources: a bank page, a law-firm or consumer guide, an article; say the kind in the text: אתר הבנק / מאמר / מדריך. It was not checked against the official text, so never call it official or "נבדק מול ההוראה"; shown with a distinct blue-tinted label) · `שאלה פתוחה` (a question no source answered; says who it waits for, with no internal list name).
 
 **Choice components shuffle.** `ChoiceExercise`, `Prediction` and the stage-check questions show their options in an order fixed by a seeded hash of the exercise id (the same on server and browser); `correct` and the saved answer keep meaning the position the author wrote, so keys never change. Position therefore gives nothing away, so balance the **length** and plausibility of the options: the right one is not the longest more than about a third of the time. `ordered` keeps the written order for options that form a scale.
 

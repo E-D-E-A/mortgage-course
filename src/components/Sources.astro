@@ -2,7 +2,7 @@
 // The lesson's sources. Every claim in the course is one of the brief's six kinds,
 // and the kind is always named next to the source.
 interface Source {
-  kind: "עובדה מאומתת" | "החלטה של Mogi" | "ידע מהשטח" | "מחקר / הצעה" | "הנחת חישוב" | "לא אומת" | "ידע מתמטי כללי" | "ידע כלכלי כללי" | "בדיקת חישוב" | "שאלה פתוחה";
+  kind: "עובדה מאומתת" | "החלטה של Mogi" | "ידע מהשטח" | "מחקר / הצעה" | "הנחת חישוב" | "לא אומת" | "ידע מתמטי כללי" | "ידע כלכלי כללי" | "בדיקת חישוב" | "שאלה פתוחה" | "ממקור משני";
   text: string;
   /** Formulas or spreadsheet code, shown left to right after the text. Never an id or a file path (pnpm check:refs). */
   code?: string[];
@@ -16,7 +16,7 @@ const { items } = Astro.props as { items: Source[] };
   {
     items.map((s) => (
       <li class="my-3 flex flex-wrap items-baseline gap-2 text-body-m text-n700">
-        <span class="rounded-pill bg-n100 px-3 py-0.5 text-caption font-semibold text-n700">{s.kind}</span>
+        <span class:list={["rounded-pill px-3 py-0.5 text-caption font-semibold", s.kind === "ממקור משני" ? "border border-info bg-info-bg text-n800" : "bg-n100 text-n700"]}>{s.kind}</span>
         {s.href ? (
           <a href={s.href} class="text-navy underline">
             {s.text}
