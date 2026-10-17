@@ -18,7 +18,8 @@ import { scenarioFrom } from "../../src/lib/calc/sensitivity.ts";
 import type { Fact, LessonData } from "../build-data.ts";
 import { reasonsFact } from "./_constraints-facts.ts";
 import { frCount, frFront, frNeverCount, frPick, frReach, frReachExact, given } from "./_s8c-facts.ts";
-import { difference, mixFact, tableFact } from "./_sensitivity-facts.ts";
+import { engTableFact } from "./_stage8b-facts.ts";
+import { difference, mixFact } from "./_sensitivity-facts.ts";
 
 export const WEIGHT_SETS: Record<string, number[]> = { pay: [60, 20, 20], total: [20, 60, 20], exp: [20, 20, 60], even: [1, 1, 1] };
 
@@ -30,7 +31,7 @@ export default function lesson815(): LessonData {
   const base = SCENARIOS.base;
   const stress = SCENARIOS.stress;
   const cands = mixCandidates();
-  const table = tableFact("cand.table", cands, base, stress);
+  const table = engTableFact("cand.table", cands, base, stress);
   push(table);
   const t = Object.fromEntries((table.value as { id: string; first: string; total: string; rise: string }[]).map((r) => [r.id, r]));
 
@@ -65,9 +66,8 @@ export default function lesson815(): LessonData {
 
   // Hand-sized comparisons for the explanation and the exercises.
   const mix = (id: string) => ({ tracks: cands.find((c) => c.id === id)!.tracks, scenario: base });
-  const mixS = (id: string) => ({ tracks: cands.find((c) => c.id === id)!.tracks, scenario: stress });
   for (const id of ["m01", "m03", "m06", "m07", "m08", "m09"]) {
-    push(mixFact(`v.${id}.first`, mix(id), "first"), mixFact(`v.${id}.total`, mix(id), "total"), mixFact(`v.${id}.stress_max`, mixS(id), "max"));
+    push(mixFact(`v.${id}.first`, mix(id), "first"), mixFact(`v.${id}.total`, mix(id), "total"));
   }
   push(
     difference("d.m01_m03.first", byId("v.m01.first"), byId("v.m03.first")),

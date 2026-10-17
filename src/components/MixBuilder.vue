@@ -663,3 +663,12 @@ const yearRows = computed(() => {
     </template>
   </div>
 </template>
+
+<style>
+/* The sticky three-number box covers the bottom of the screen on a phone: a focused control is scrolled above it. */
+@media (max-width: 639px) {
+  html {
+    scroll-padding-bottom: 6rem;
+  }
+}
+</style>
