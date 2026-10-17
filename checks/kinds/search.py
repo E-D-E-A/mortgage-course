@@ -89,7 +89,7 @@ _memo = {}
 
 
 def calculate(i, c):
-    key = (c["id"], i["base_inflation"], i["base_anchor"], i["stress_inflation"], i["stress_prime"], i["stress_anchor"])
+    key = (c["id"], tuple(map(tuple, c["tracks"])), i["base_inflation"], i["base_anchor"], i["stress_inflation"], i["stress_prime"], i["stress_anchor"])
     if key in _memo:
         return _memo[key]
     flat = {"tracks": len(c["tracks"]), "block_months": 12, "rounding": "statement"}
