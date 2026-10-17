@@ -28,6 +28,9 @@ export default function lesson828(): LessonData {
   add("o", OVERSPENT, ["feasible"]);
   // The same positioning, weights that care most about the exposure (10, 20, 70): who wins then.
   facts.push(ws8Fact("x.winner_id", POSITIONED, "winner_id", [10, 20, 70]), ws8Fact("x.winner:first", POSITIONED, "winner:first", [10, 20, 70]), ws8Fact("x.winner:exposure", POSITIONED, "winner:exposure", [10, 20, 70]));
+  // Another bank (c) and weights that care most about the exposure (10, 10, 80): the exercise that needs the learner's own sheet.
+  const BANK_C: Choice = { ...POSITIONED, bank: "c" };
+  for (const w of ["feasible", "winner_id", "winner:first"]) facts.push(ws8Fact(`y.${w}`, BANK_C, w, [10, 10, 80]));
   // The rows of the efficient front, with their measures: the page's table.
   const r = runWorkshop(POSITIONED, WS_WEIGHTS);
   for (const row of r.rows.filter((x) => x.efficient)) {

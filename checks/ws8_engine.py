@@ -78,20 +78,23 @@ def track_payments(kind, amount, rate, months, scenario, reset):
 # * `mix_payments` מחבר את ההחזרים של המסלולים, חודש אחרי חודש. מסלול שנגמר לא מוסיף כלום.
 # * שלושת המדדים (שיעורים 3.8, 3.9 ו־8.8): **ההחזר הראשון**, **סך התשלומים** בתרחיש הבסיס, ו**החשיפה**:
 #   כמה ההחזר הגבוה ביותר בתרחיש הלחץ עולה על ההחזר הראשון. כולם "קטן יותר טוב".
+# * בהחזר הגבוה ביותר לא סופרים את התשלום האחרון שסוגר את היתרה: הוא מכיל את העיגולים של כל החודשים שלפניו (כמה שקלים), והם לא עניין של ריבית.
+#   במקומו נספר התשלום שהיה אמור להיות, כלומר התשלום של החודש הקודם (`projected=True`). ההחזר הראשון וסך התשלומים נשארים כפי ששולמו בפועל.
 
 # %%
-def mix_payments(tracks, scenario, reset):
+def mix_payments(tracks, scenario, reset, projected=False):
     longest = max(t["months"] for t in tracks)
     flows = [track_payments(t["kind"], t["amount"], t["rate"], t["months"], scenario, reset) for t in tracks]
+    if projected:  # בחודש האחרון נספר התשלום שהיה אמור להיות, לא התשלום שסוגר את היתרה
+        flows = [f[:-1] + [f[-2]] if len(f) >= 2 else f for f in flows]
     return [sum((f[m] for f in flows if m < len(f)), Decimal(0)) for m in range(longest)]
 
 
 def measures(tracks, base, stress, reset):
     base_pay = mix_payments(tracks, base, reset)
-    stress_pay = mix_payments(tracks, stress, reset)
     first = base_pay[0]
     total = sum(base_pay, Decimal(0))
-    exposure = max(stress_pay) - first
+    exposure = max(mix_payments(tracks, stress, reset, projected=True)) - first
     return [first, total, exposure]
 
 

@@ -335,6 +335,21 @@ def build(kind, F):
         ws[f"A{r}"].font = font(color=t["n800"])
         ws[f"A{r}"].alignment = Alignment(wrap_text=False)
 
+    # an input outside its range cascades through 66 rows, so the green cells refuse it
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    def validate(cell, **kw):
+        dv = DataValidation(allow_blank=False, showErrorMessage=True, errorTitle="ערך לא תקין", **kw)
+        ws.add_data_validation(dv)
+        dv.add(cell)
+
+    validate("B18", type="decimal", operator="between", formula1="0", formula2="500000", error="הון עצמי נוסף: מספר בין 0 ל־500,000")
+    validate("B19", type="whole", operator="between", formula1="0", formula2="1", error="0 (לא) או 1 (כן)")
+    validate("B20", type="whole", operator="between", formula1="0", formula2="1", error="0 (לא) או 1 (כן)")
+    validate("B21", type="list", formula1='"a,b,c,d"', error="בנק: a, b, c או d")
+    for cell in ("B22", "B23", "B24"):
+        validate(cell, type="whole", operator="between", formula1="0", formula2="100", error="משקולת: מספר שלם בין 0 ל־100")
+
     # sample offer, checked against the estimate
     offer = case["offer"]
     oc = "F"
@@ -374,11 +389,22 @@ def build(kind, F):
         ws[f"F{r}"].number_format = money
         ws[f"E{r}"].font = font(color=t["n800"])
     ws.column_dimensions["E"].width = 34
+    f13 = ws["F13"].value
     if not solution:
-        for r in range(13, 19):
+        # F13 stays as the worked example; the other five are the learner's
+        hints = {
+            14: "אותו חישוב כמו ב־F13, אבל עם הריביות של ההצעה (F9 עד F11) במקום המחירון",
+            15: "הצעה פחות אומדן: =F14-F13. מינוס אומר שההצעה זולה מהאומדן",
+            16: "אותו חישוב כמו ב־F13 בלי ROUND, כפול מספר החודשים",
+            17: "אותו חישוב כמו ב־F16, עם הריביות של ההצעה",
+            18: "הצעה פחות אומדן: =F17-F16",
+        }
+        for r in range(14, 19):
             ws[f"F{r}"].value = None
             ws[f"F{r}"].fill = fill(t["n100"])
             ws[f"F{r}"].border = box
+            ws[f"F{r}"].comment = Comment(hints[r], "Mogi")
+        ws["F13"].comment = Comment("דוגמה: ההחזר הראשון של האומדן. לכל מסלול: ROUND(-PMT(ריבית מהמחירון/1200, חודשים, סכום), 2); אין חלק, אין החזר", "Mogi")
 
     if not solution:
         notes = {
@@ -418,7 +444,7 @@ def build(kind, F):
         ("המועמד שנבחר", f"='מנוע'!{A['winner']}", F["p.winner_id"]["value"], None),
         ("ההחזר הראשון של הנבחר", f"='מנוע'!{A['w_first']}", F["p.winner:first"]["value"], 0.05),
         ("סך התשלומים של הנבחר", f"='מנוע'!{A['w_total']}", F["p.winner:total"]["value"], 6),
-        ("החשיפה של הנבחר", f"='מנוע'!{A['w_expo']}", F["p.winner:exposure"]["value"], 10),
+        ("החשיפה של הנבחר", f"='מנוע'!{A['w_expo']}", F["p.winner:exposure"]["value"], 0.05),
     ]
     for k, cid in enumerate(IDS):
         items.append((f"נפסלו: {IDS_HE[cid]}", f"='מנוע'!$B${72 + k}", F[f"p.reject:{cid}"]["value"], 0))
@@ -429,25 +455,25 @@ def build(kind, F):
     for k, (label, formula, expected, tol) in enumerate(items):
         r = 5 + k
         chk[f"A{r}"] = label
-        chk[f"B{r}"] = formula if solution else None
+        chk[f"B{r}"] = formula
         chk[f"C{r}"] = num(expected) if isinstance(expected, (int, float)) or re.fullmatch(r"-?\d+(\.\d+)?", str(expected)) else expected
         if tol is not None:
-            chk[f"D{r}"] = f'=IF(ISNUMBER(B{r}),B{r}-C{r},"")' if solution else None
+            chk[f"D{r}"] = f'=IF(ISNUMBER(B{r}),B{r}-C{r},"")'
             chk[f"E{r}"] = tol
-            chk[f"F{r}"] = f'=IF(ISNUMBER(D{r}),IF(ABS(D{r})<=E{r},"✓","✗"),"")' if solution else None
+            chk[f"F{r}"] = f'=IF(ISNUMBER(D{r}),IF(ABS(D{r})<=E{r},"✓","✗"),"✗")'
         else:
-            chk[f"F{r}"] = f'=IF(B{r}=C{r},"✓","✗")' if solution else None
+            chk[f"F{r}"] = f'=IF(B{r}=C{r},"✓","✗")'
         for col in "BCD":
             chk[f"{col}{r}"].number_format = "#,##0.00" if tol not in (0, None) else "0"
     last = 5 + len(items)
-    chk[f"A{last + 1}"] = "הגיליון מקרב את המנוע: הוא מחשב החזר מדויק (בלי עיגול כל ריבית חודשית), והמנוע מעגל כל חודש לאגורה. בסך התשלומים הפער עד כמה שקלים. בחשיפה הפער עד כעשרה שקלים, כי במנוע התשלום האחרון סוגר את היתרה, והוא גבוה בכמה שקלים מהתשלום הקבוע. הבחירה של התמהיל לא מושפעת."
+    chk[f"A{last + 1}"] = "הגיליון מקרב את המנוע: הוא מחשב החזר מדויק (בלי עיגול כל ריבית חודשית), והמנוע מעגל כל חודש לאגורה. בסך התשלומים הפער עד כמה שקלים, כי במנוע התשלום האחרון סוגר את היתרה והוא שונה בכמה שקלים מהקבוע. בחשיפה אין פער של ממש, כי המנוע לא סופר את התשלום האחרון בהחזר הגבוה. הבחירה של התמהיל לא מושפעת."
     chk[f"A{last + 1}"].font = font(size=10, color=t["n600"])
-    chk[f"A{last + 2}"] = f'=IF(COUNTIF(F5:F{last - 1},"✗")=0,"✓ הכול בטווח","✗ יש פערים: בדקו את הנוסחאות או את הקלט")' if solution else "מלאו את הרשת, ואז כאן יופיע ✓."
+    chk[f"A{last + 2}"] = f'=IF(COUNTIF(F5:F{last - 1},"✗")=0,"✓ הכול בטווח","✗ יש פערים: בדקו את הנוסחאות או את הקלט")'
     chk[f"A{last + 2}"].font = font(bold=True, color=navy)
 
-    instructions(wb, kind, t, font, L, HEAD, FIRST, LAST)
+    instructions(wb, kind, t, font, L, HEAD, FIRST, LAST, f13)
     wb.properties.title = "מנוע קטן לבחירת תמהיל — סדנה 8.28"
-    wb.properties.creator = "Mogi course (scripts/build-engine-workshop.py)"
+    wb.properties.creator = "Mogi"
     return wb, (L, HEAD, FIRST, LAST, A)
 
 
@@ -461,7 +487,7 @@ def grid_ids(F):
     return [f"g{f}-{p}-{100 - f - p}" for f in range(0, 101, step) for p in range(0, 101 - f, step)]
 
 
-def instructions(wb, kind, t, font, L, HEAD, FIRST, LAST):
+def instructions(wb, kind, t, font, L, HEAD, FIRST, LAST, f13):
     ws = wb.create_sheet("הוראות")
     ws.sheet_view.rightToLeft = True
     ws.column_dimensions["A"].width = 120
@@ -471,16 +497,17 @@ def instructions(wb, kind, t, font, L, HEAD, FIRST, LAST):
         ("p", MARK),
         ("p", "הגיליון ״מנוע״ מחזיק את התיק, את הבחירות שלכם (תאים ירוקים), את ארבעת הבנקים, את הכללים, ובסוף את הרשת: שורה לכל מועמד, בלי שום מספר שהוקלד ביד בנוסחאות."),
         ("h", "הצעדים"),
-        ("p", "1 — מיצוב: בתאים B18 עד B21 בחרו הון עצמי נוסף, סגירת הלוואת הרכב, הורה וכנס. ההלוואה, שיעור המימון והכנסה הפנויה מתעדכנים (שורות 45 עד 56)."),
+        ("p", "1 — מיצוב: בתאים B18 עד B21 בחרו הון עצמי נוסף, סגירת הלוואת הרכב, הורה ובנק. ההלוואה, שיעור המימון והכנסה הפנויה מתעדכנים (שורות 45 עד 56)."),
         ("p", f"2 — תזרים: בכל שורה של הרשת, ההחזר הראשון של כל מסלול (עמודות {cs('hf')} עד {cs('hv')}) הוא ROUND(-PMT(ריבית/1200, חודשים, סכום), 2). סך התשלומים הוא ההחזר הלא־מעוגל כפול החודשים, וההחזר הגבוה בלחץ מחושב מחדש אחרי שהריבית עולה."),
-        ("p", f"3 — חיפוש: הרשת היא כל התמהילים בצעדים של 10 אחוזים (66). אין להוסיף שורות: מרחב החיפוש הוא מה שנבדק."),
+        ("p", f"3 — חיפוש: הרשת היא כל התמהילים בצעדים של 10 אחוזים (66). אין להוסיף שורות: מרחב החיפוש הוא מה שנבדק. שורת הרשת הראשונה ({FIRST}) מלאה בכל העמודות כדוגמה. עמדו על כותרת של עמודה כדי לקרוא מה היא עושה (בכותרות עם הערה), העתיקו את השורה למטה עד שורה {LAST}, ובדקו שהתוצאות בשורות 59 עד 69 התמלאו."),
         ("p", f"4 — אילוצים: עשר עמודות ({cs('x_sum_equals_loan')} עד {cs('x_client_target_ratio')}) של 1 (נשבר) או 0 (נשמר). מועמד אפשרי כשאין בו אף 1. הסיבות מסוכמות בשורות 72 עד 81."),
         ("p", f"5 — חזית יעילה: עמודה {cs('dom')} סופרת כמה מועמדים אפשריים לא גרועים בשום מדד ומשופרים באחד. מועמד אפשרי שאף אחד לא שולט עליו הוא יעיל."),
         ("p", f"6 — בחירה: מנרמלים כל מדד בין אפשריים (0 הטוב, 1 הגרוע), ממוצע משוקלל לפי המשקולות בתאים B22 עד B24 (להדגמה). הציון הנמוך מנצח."),
         ("p", "7 — הסבר: בשורות 84 עד 86, הניסוח נבנה ממספרי הגיליון. מודל שפה לעולם לא מחשב."),
-        ("p", "8 — בדיקה מול הצעת בנק: בתאים E4 עד F18 יש הצעה לדוגמה של בנק בדוי. האומדן הוא המחירון של הבנק; ההצעה היא מה שהוא כתב. הפער נמדד בהחזר הראשון ובסך התשלומים."),
+        ("p", "8 — בדיקה מול הצעת בנק: בתאים E4 עד F11 יש הצעה לדוגמה של בנק בדוי. האומדן הוא המחירון של הבנק; ההצעה היא מה שהוא כתב. הפער נמדד בהחזר הראשון ובסך התשלומים."),
+        ("p", ("התא F13 מלא כדוגמה, ו־F14 עד F18 ריקים: מלאו אותם בעצמכם. F13 הוא ההחזר הראשון של האומדן: " + f13 + ". ב־F14 אותו חישוב עם ריביות ההצעה (F9 עד F11), F15 הוא F14 פחות F13, ו־F16 עד F18 הם אותו דבר לסך התשלומים: בלי ROUND, כפול מספר החודשים.") if kind == "template" else "התאים F13 עד F18 מלאים: אומדן, הצעה והפער בהחזר הראשון ובסך התשלומים."),
         ("h", "הלשונית ״בדיקה״"),
-        ("p", "היא משווה את הגיליון למנוע של הקורס לקלט ההתחלתי. הסבילות היא כמה שקלים, כי הגיליון לא מעגל כל ריבית חודשית."),
+        ("p", "היא משווה את הגיליון למנוע של הקורס לקלט ההתחלתי. הסבילות היא כמה שקלים, כי הגיליון לא מעגל כל ריבית חודשית. בתבנית היא מתעדכנת בזמן שאתם ממלאים: עמודה C היא התוצאות של המנוע, כך שאפשר להציץ בה בסוף, וכשהכול מתאים יופיע ✓ בתחתית."),
         ("h", "Excel ו־Google Sheets"),
         ("p", "בחלק מההגדרות האזוריות מפרידים בין ארגומנטים בנקודה־פסיק (;). הגיליון משתמש בפונקציות PMT, SUMPRODUCT, COUNTIFS ו־INDEX: הכול קיים גם ב־Google Sheets."),
         ("p", "שינוי בחירה ישנה את התוצאות, וגם את הבדיקה: היא נכונה לקלט ההתחלתי בלבד."),
@@ -759,7 +786,7 @@ def verify(solution, F):
             if (got["B62"].value if winner else "אין מועמד אפשרי") != (winner["id"] if winner else "אין מועמד אפשרי"):
                 problems.append(f"{name}: winner differs: sheet {got['B62'].value}, engine {winner and winner['id']}")
     print(f"  largest gap, sheet against the engine: first payment {worst['first']}, total {worst['total']}, exposure {worst['expo']}")
-    if worst["first"] > Decimal("0.05") or worst["total"] > 6 or worst["expo"] > 10:
+    if worst["first"] > Decimal("0.05") or worst["total"] > 6 or worst["expo"] > Decimal("0.05"):
         problems.append(f"gap larger than the tolerance of the check tab: {worst}")
     return problems
 
