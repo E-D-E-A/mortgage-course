@@ -66,7 +66,7 @@ export interface ReleaseNumbers {
 }
 
 export function releaseChecklist(n: ReleaseNumbers) {
-  const FIELD = "ידע מהשטח · ממתין לאישור אילון";
+  const FIELD = "ידע מהשטח · ממתין לאישור מומחה";
   const UNVERIFIED = "לא אומת · לפי תעתיק של הצוות להוראה 451, ממתין לבדיקה מול ההוראה";
   return [
     {

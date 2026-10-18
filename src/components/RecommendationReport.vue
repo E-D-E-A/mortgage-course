@@ -38,7 +38,7 @@ interface Section {
 interface CheckItem {
   id: string;
   text: string;
-  /** Kind and source of the claim, shown small ("ידע מהשטח · ממתין לאישור אילון"). */
+  /** Kind and source of the claim, shown small ("ידע מהשטח · ממתין לאישור מומחה"). */
   source?: string;
 }
 interface CheckGroup {

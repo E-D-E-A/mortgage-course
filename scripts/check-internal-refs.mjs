@@ -24,8 +24,11 @@ const RULES = [
   ["file name", /[\w\-]+\.(?:md|ts|tsx|mdx|pdf|json|mjs|py|vtt)(?![\w])/i],
   ["הבריף", /הבריף/],
   ["מפת הקורס מבטיחה", /מפת הקורס מבטיחה/],
-  ["ברשימה לאילון", /ברשימה לאילון/],
-  ["שאלה לאילון", /שאלה לאילון/],
+  // No real person's name in learner-visible text (decided 2026-10-18); roles only: מומחה השטח, הצוות, בנקאי בשטח.
+  ["real name (אילון)", /(?<![א-ת])[ובלמשכה]{0,3}אילון(?![א-ת])/],
+  ["real name (עדן)", /(?<!גן )(?<![א-ת])[ובלמשכה]{0,3}עדן(?![א-ת])/],
+  ["real name (דביר)", /(?<![א-ת])[ובלמשכה]{0,3}דביר(?![א-ת])/],
+  ["real name (Latin)", /\b(?:Eylon|Eden|Dvir|Amit)\b/],
   ["LibreOffice", /LibreOffice/i],
   ["טבלת האותיות של הקורס", /טבלת האותיות של הקורס/],
   ["האתר חסום בסביבה", /האתר חסום בסביבה/],
@@ -58,6 +61,10 @@ addDir("checks");
 if (existsSync(dist + "glossary/index.html")) pages.push(["glossary", dist + "glossary/index.html"]);
 if (existsSync(dist + "index.html")) pages.push(["home", dist + "index.html"]);
 
+// Subtitles are spoken text: the same rules apply to public/video/*.he.vtt.
+const vttDir = new URL("../public/video/", import.meta.url).pathname;
+const vtts = existsSync(vttDir) ? readdirSync(vttDir).filter((f) => f.endsWith(".he.vtt")) : [];
+
 const stageOf = (key) => {
   const m = key.match(/^lessons\/(\d+)-|^checks\/(\d+)$/);
   return m ? `stage ${m[1] ?? m[2]}` : "site (home, glossary)";
@@ -83,11 +90,25 @@ for (const [key, file] of pages) {
   if (lines.length && !quiet) console.error(`✗ ${key}/index.html (${lines.length})\n${lines.join("\n")}`);
 }
 
+const NAME_RULES = RULES.filter(([name]) => name.startsWith("real name"));
+let vttTotal = 0;
+for (const f of vtts) {
+  const text = readFileSync(vttDir + f, "utf8");
+  for (const [name, re] of NAME_RULES) {
+    for (const m of text.matchAll(new RegExp(re.source, "g"))) {
+      vttTotal++;
+      const a = Math.max(0, m.index - 40);
+      console.error(`✗ public/video/${f} [${name}] …${text.slice(a, m.index + m[0].length + 40).replace(/\s+/g, " ")}…`);
+    }
+  }
+}
+total += vttTotal;
+
 const order = [...perStage.keys()].sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
 if (total) {
-  console.error(`\ncheck:refs: ${total} learner-visible internal references in ${pages.length} pages.`);
+  console.error(`\ncheck:refs: ${total} learner-visible internal references in ${pages.length} pages (${vttTotal} in subtitles).`);
   for (const s of order) console.error(`  ${s}: ${perStage.get(s)}`);
   console.error(`  by kind: ${[...perRule].map(([k, v]) => `${k} ${v}`).join(", ")}`);
   process.exit(1);
 }
-console.log(`check:refs: ${pages.length} pages, no learner-visible internal reference.`);
+console.log(`check:refs: ${pages.length} pages, no learner-visible internal reference, no real name (${vtts.length} subtitle files checked).`);

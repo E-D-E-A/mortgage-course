@@ -132,7 +132,7 @@ export const KIND_INFO: Record<ThresholdKind, KindInfo> = {
   field_hypothesis: {
     name: "השערה מהשטח",
     crossing: "לא ידוע מה משתנה בבנק כשחוצים אותו",
-    label: "ידע מהשטח ממקור יחיד, לא נבדק; ממתין לאישור אילון",
+    label: "ידע מהשטח ממקור יחיד, לא נבדק; ממתין לאישור מומחה",
     whoSets: "אף אחד לא קבע: טענה של איש מקצוע, שלא נבדקה",
   },
   course_example: {
