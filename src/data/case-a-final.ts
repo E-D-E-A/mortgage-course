@@ -41,7 +41,7 @@ export const DOC_MARK = "מסמך לדוגמה";
 
 /** One sentence for the personal-data point, said once (brief of stage 9). */
 export const DATA_NOTE =
-  "תיק אמיתי מכיל נתונים אישיים, ואסור לקרוא בו מסמך לפני שכל החותמים נתנו הסכמה בכתב. תיק הקורס בדוי, ושום מסמך בו אינו אמיתי.";
+  "תיק אמיתי מכיל נתונים אישיים, ולפי הכלל של Mogi אין לקרוא בו מסמך של לקוח לפני שהסכמתו החתומה רשומה ביומן. תיק הקורס בדוי, ושום מסמך בו אינו אמיתי.";
 
 /**
  * What the family needs for living each month, shekels. A TEACHING ASSUMPTION of the file (lesson 4.6 says the
