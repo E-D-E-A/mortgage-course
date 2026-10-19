@@ -202,7 +202,7 @@ function reset() {
       <button type="button" class="mt-2 min-h-11 min-w-11 px-2 text-body-m text-navy underline" @click="reset">איפוס</button>
     </div>
     <p v-if="chosen === 'wait' && edgeOpen" class="mt-2 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="status">
-      נשארו בדיוק 18 תשלומים. לפי התעתיק הכלל הוא ״מעל 18״, אבל ב־18 בדיוק זו שאלה פתוחה (שיעור 4.2): בנק עשוי עדיין לספור את ההלוואה, והיחס שמוצג כאן אינו בטוח. עם {{ monthsLeft - 17 }} חודשי המתנה נשארים 17 והכלל ברור.
+      נשארו בדיוק 18 תשלומים. הנוסח הרשמי של הוראה 329 (נספח א׳) מדבר על התחייבות שיתרתה עולה על 18 חודשים, ולכן הלוואה שנשארו לה בדיוק 18 אינה נספרת (שיעור 4.2). מה שבנק עושה בפועל בקצה הזה לא נבדק. עם {{ monthsLeft - 17 }} חודשי המתנה נשארים 17 והיא בוודאות מחוץ לחישוב.
     </p>
     <p v-if="errorText" class="mt-2 rounded-md bg-warning-bg p-3 text-body-m text-n800" role="alert">{{ errorText }}</p>
 
@@ -227,7 +227,7 @@ function reset() {
     <ul class="list-reset mt-1 flex flex-wrap gap-x-4 gap-y-1 text-caption text-n700" aria-label="מקרא">
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-n300"></span>יחס ההחזר היום</li>
       <li class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-teal-deep"></span>אחרי המנוף</li>
-      <li class="flex items-center gap-2"><span class="inline-block h-3 w-0 border-s-2 border-dashed border-navy"></span>קווים לדוגמה (30%, 35% השערות; 40% סף הון; 50% מגבלה: לא אומתו)</li>
+      <li class="flex items-center gap-2"><span class="inline-block h-3 w-0 border-s-2 border-dashed border-navy"></span>קווים לדוגמה (30% ו־35% השערות; 40% סף הון ו־50% מגבלה, לפי הוראה 329)</li>
     </ul>
 
     <!-- Gain against cost -->
@@ -289,7 +289,7 @@ function reset() {
     </div>
 
     <p v-if="wallText.length" class="mt-3 rounded-md border-s-4 border-danger bg-danger-bg p-3 text-body-m text-n900" role="alert">
-      <strong>לא אפשרי:</strong> המנוף חוצה מגבלה (לפי תעתיק הצוות להוראה 329, לא אומת): {{ wallText.join("; ") }}.
+      <strong>לא אפשרי:</strong> המנוף חוצה מגבלה (נקרא מהנוסח הרשמי של בנק ישראל, הוראה 329, גרסת 02/2026): {{ wallText.join("; ") }}.
     </p>
     <p v-else-if="p.after.aboveCapital && outcome.moved" class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800">היחס עדיין מעל 40%, סף ההון לדוגמה.</p>
     <p class="mt-3 text-body-m text-n800"><strong class="text-n900">מתי לא כדאי:</strong> {{ whenNot[chosen] }}</p>

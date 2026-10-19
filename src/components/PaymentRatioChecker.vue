@@ -175,7 +175,7 @@ const kindLabel: Record<ObligationKind, string> = { loan: "הלוואה", leasin
         </div>
         <p class="mt-1 text-caption text-n600">
           {{ reasonText[verdicts[i].reason] }}
-          <span v-if="o.kind !== 'rent' && !o.unknown && o.months === 18"> — ב־18 בדיוק זו שאלה פתוחה; לפי התעתיק היא לא נספרת.</span>
+          <span v-if="o.kind !== 'rent' && !o.unknown && o.months === 18"> — ב־18 בדיוק היא לא נספרת: הנוסח הרשמי של הוראה 329 מדבר על יתרה שעולה על 18 חודשים.</span>
         </p>
       </li>
     </ul>

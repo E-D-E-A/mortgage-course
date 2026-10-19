@@ -26,22 +26,26 @@
  *
  * ── The numbers, and how sure we are of them ─────────────────────────────
  *
- * Directive 329 of the Bank of Israel, "מגבלות למתן הלוואות לדיור". None of it
- * was read in the directive itself: the official sites are blocked in the
- * course's environment. The team's transcription is Brain page 7503881 (J-090,
- * updated 2026-10-08); search summaries of versions 11 and 12 and of the
- * English text say the same (research/notes/official-sources.md, section 1).
+ * Directive 329 of the Bank of Israel, "מגבלות למתן הלוואות לדיור". Read in
+ * the official text (version 12 of 08/02/2026, circular 2840), sections 2, 5,
+ * 6, 7, 8 and Annex A; see research/final/answered-from-official-text.md.
  *
  *   financing ratio   ≤ 75% only home · ≤ 70% replacement home · ≤ 50% a further home
  *                     ≤ 50% a loan for any purpose (the base rule; a 2025 relief
  *                     is read two ways in the summaries, so the course does not use it)
  *   payment ratio     a bank does not approve a loan whose ratio "exceeds" 50%:
- *                     exactly 50.00% is allowed (Brain, ENG-223 research)
+ *                     exactly 50.00% is allowed (section 5)
  *   capital threshold above 40% the bank gives the loan a 100% risk weight —
- *                     not a ban (Brain 7503881; the summaries cite Directive 203)
- *   variable share    at most two-thirds of the loan at a rate that can change,
- *                     so at least a third fixed. Two-thirds exactly, not 66.66%:
- *                     the check is variable × 3 ≤ loan × 2, with no rounding
+ *                     not a ban (section 6)
+ *   variable share    section 7 says the variable part "אינו עולה על 66.66%" of the
+ *                     loan. The course reads that as two-thirds exactly, so at least
+ *                     a third fixed: the check is variable × 3 ≤ loan × 2, no rounding.
+ *                     Read to the letter, 66.66% would make exactly two thirds
+ *                     illegal, yet the Bank's own uniform basket 2 (Directive 451,
+ *                     Addendum 5) is one third each of two variable kinds and one
+ *                     fixed kind, i.e. two thirds variable, so 66.66% is the
+ *                     rounded two-thirds. A mix between 66.66% and 66.67% is the
+ *                     only case where the two readings differ.
  *   term              at most 30 years to the final repayment
  *
  * Amounts are shekels as strings or Decimals; percents are strings ("75").
