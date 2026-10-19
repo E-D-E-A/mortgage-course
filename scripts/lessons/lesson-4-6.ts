@@ -7,8 +7,8 @@
  *
  * The family and every living-budget figure are INVENTED for teaching: the
  * course has no source for what a "reasonable" living budget is, and says so.
- * The 50% and 40% payment-ratio lines are the team's transcription of
- * Directive 329 (Brain 7503881, 2026-10-08), not checked against it.
+ * The 50% and 40% payment-ratio lines were read from the official text of
+ * Directive 329, version 12 (02/2026, sections 5 and 6), on 2026-10-19.
  */
 import { LTV_CEILINGS, PTI_CAPITAL_THRESHOLD, PTI_LIMIT } from "../../src/lib/calc/regulation.ts";
 import type { Fact, LessonData } from "../build-data.ts";
@@ -105,7 +105,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "4.6",
     title: "תקציב מחיה סביר",
-    note: "The family and every living-budget figure are invented for teaching; the course has no source for a reasonable living budget. 50% and 40% are the team's transcription of Directive 329. Amounts invented.",
+    note: "The family and every living-budget figure are invented for teaching; the course has no source for a reasonable living budget. 50% and 40% were read from the official text of Directive 329, version 02/2026. Amounts invented.",
     facts,
   };
 }

@@ -58,7 +58,7 @@
         price: num(fact("a.price")), equity: num(fact("a.equity")), gift: num(fact("a.gift")), loan: num(fact("a.loan")),
         i1: num(fact("a.income_1")), i2: num(fact("a.income_2")), rec: num(fact("a.recognised")),
         car: num(fact("a.car_payment")), carMonths: pl(fact("a.car_months")),
-        disp: num(fact("a.disposable_now")), dispAfter: num(fact("a.disposable_after")), drop: pl(fact("a.until_drop")), dropAlt: pl(fact("a.until_drop_alt")),
+        disp: num(fact("a.disposable_now")), dispAfter: num(fact("a.disposable_after")), drop: pl(fact("a.until_drop")), 
         max50: num(fact("a.max50")), max40: num(fact("a.max40")),
         ltv: pl(fact("a.ltv")), room: num(fact("a.ltv_room")), low: num(fact("a.low_value")), ltvLow: pl(fact("a.ltv_low")),
         minFixed: num(fact("a.min_fixed")),
@@ -81,15 +81,15 @@
         [40, 45, "אין עדיין מסלולים, תמהיל או הצעה."],
         [47, 55, `ביחד ${V.rec} ₪. הלוואת הרכב נשארו לה יותר מ־18.`],
         [55, 64, `לכן היא נספרת: ${V.disp} ₪ הכנסה פנויה.`],
-        [64, 73, `בעוד ${V.drop} או ${V.dropAlt} תשלומים היא כבר לא נספרת.`],
+        [64, 73, `בעוד ${V.drop} תשלומים היא כבר לא נספרת.`],
         [73, 82, `אז ההכנסה הפנויה: ${V.dispAfter} ₪.`],
-        [82, 87, "על הקצה של 18 בדיוק: שאלה פתוחה."],
+        [82, 87, "גם כשנשארים בדיוק 18: היא כבר לא נספרת."],
         [89, 97, `ההחזר הגבוה ביותר, בתקרה של 50%: ${V.max50} ₪.`],
         [97, 106, `בסף ההון של 40%: ${V.max40} ₪.`],
         [106, 111, "מעל התקרה אסור. מעל הסף מותר, והבנק מחזיק יותר הון."],
-        [111, 116, "שניהם לפי תיעוד הצוות. לא אומת."],
+        [111, 116, "שניהם נקראו מהנוסח הרשמי."],
         [116, 127, "מדיניות כל בנק מעל זה: לא אומת."],
-        [129, 137, `שיעור המימון: ${V.ltv}%. התקרה: 75%, לא אומת.`],
+        [129, 137, `שיעור המימון: ${V.ltv}%. התקרה: 75%, מהנוסח הרשמי.`],
         [137, 146, `מקום של ${V.room} ₪ של הלוואה, לפני הקו.`],
         [146, 156, `שמאות של ${V.low} ₪, מתחת למחיר: ${V.ltvLow}%.`],
         [156, 163, "מודדים מול הנמוך מהשניים? לא אומת. שאלה פתוחה."],
@@ -211,17 +211,17 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           txt(bx - wCounted / 2, by + 30, `${V.drop} תשלומים נספרים`, 20, { w: 700, fill: "#fff", o: ob });
           txt(bx - bw + (bw - wCounted) / 2, by + 30, "18 האחרונים: לא נספרים", 18, { fill: C.n700, o: ob });
           txt(640, by + 90, `${V.carMonths} תשלומים נשארו`, 20, { fill: C.n600, o: ob });
-          txt(640, by + 118, "לפי התעתיק (״מעל 18״); 18 בדיוק: שאלה פתוחה", 16, { fill: C.n600, o: ob });
+          txt(640, by + 118, "״עולה על 18״: בדיוק 18 לא נספר", 16, { fill: C.n600, o: ob });
           const o4 = after(t, S.disp, 27, o);
           eqn(640, 508, `${V.disp} → ${V.dispAfter}`, 40, { fill: C.teal, o: o4 });
-          txt(640, 548, `אחרי ${V.drop} או ${V.dropAlt} תשלומים ההכנסה הפנויה עולה`, 20, { fill: C.n700, o: o4 });
+          txt(640, 548, `אחרי ${V.drop} תשלומים ההכנסה הפנויה עולה`, 20, { fill: C.n700, o: o4 });
         }
         // Scene 4 — the largest payment: a ban and a threshold
         if (inScene(t, S.lines)) {
           const o = vis(t, S.lines);
           txt(640, 118, "ההחזר הגבוה ביותר", 40, { w: 700, o });
           txt(640, 156, `הכנסה פנויה ${V.disp} ₪`, 22, { fill: C.n600, o });
-          txt(640, 186, "הקווים לפי תיעוד הצוות של הוראה 329 · לא אומת", 16, { fill: C.n600, o });
+          txt(640, 186, "הקווים נקראו מהנוסח הרשמי של הוראה 329", 16, { fill: C.n600, o });
           const L = 1080, R = 200, top = 250, h = 70;
           const X = (v) => L - (v / Number(fact("a.max50")) / 1.2) * (L - R);
           const lim40 = Number(fact("a.max40")), lim50 = Number(fact("a.max50"));
@@ -251,7 +251,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           [74, 75, 76, 77].forEach((v) => txt(X(v), y + 40, `${v}%`, 18, { fill: C.n600, o, ltr: true }));
           txt(640, y + 76, "הציר לא מתחיל באפס", 16, { fill: C.n600, o });
           el("line", { x1: X(75), x2: X(75), y1: y - 80, y2: y + 20, stroke: C.navy, "stroke-width": 3, opacity: o });
-          txt(X(75), y - 96, "התקרה: 75% (לא אומת)", 22, { w: 700, o });
+          txt(X(75), y - 96, "התקרה: 75% (נוסח רשמי)", 22, { w: 700, o });
           txt(640, 160, "אין עדיין שמאות, ולכן המחיר והשמאות הם אותו מספר", 18, { fill: C.n600, o });
           const a = after(t, S.ltv, 2, o);
           el("circle", { cx: X(Number(V.ltv)), cy: y, r: 11, fill: C.teal, opacity: a });
@@ -283,21 +283,21 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
           });
           el("line", { x1: loanX, x2: loanX, y1: 210, y2: 450, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 6", opacity: o });
           txt(loanX, 200, `ההלוואה: ${V.loan}`, 22, { w: 700, o, ltr: true });
-          txt(640, 480, "הציר לא מתחיל באפס · סף ההון 40% (לא אומת) מול ההלוואה הנדרשת", 18, { fill: C.n600, o });
+          txt(640, 480, "הציר לא מתחיל באפס · סף ההון 40% מול ההלוואה הנדרשת", 18, { fill: C.n600, o });
           txt(640, 520, "בריבית גבוהה יותר, אותו החזר מספיק להלוואה קטנה יותר", 22, { w: 700, fill: C.n700, o: after(t, S.carry, 27, o) });
         }
         // Scene 7 — the page, line by line
         if (inScene(t, S.sheet)) {
           const o = vis(t, S.sheet);
           txt(640, 118, "דף של שבע שורות", 40, { w: 700, o });
-          txt(640, 152, "הגבולות לפי תיעוד הצוות · לא אומת", 18, { fill: C.n600, o });
+          txt(640, 152, "הגבולות נקראו מהנוסח הרשמי של הוראה 329", 18, { fill: C.n600, o });
           const rows = [
             ["הכנסה פנויה והלוואת הרכב", "נספרת"],
-            ["החזר: התקרה (לא אומת)", "בפנים"],
-            ["החזר: סף ההון (לא איסור, לא אומת)", "תלוי בהנחה"],
-            ["שיעור מימון: תקרה (לא אומת)", "בפנים, מקום קטן"],
-            ["החלק המשתנה: תקרה (לא אומת)", `לפחות ${V.minFixed} ₪ קבוע`],
-            ["תקופה: תקרה (לא אומת)", "עד 30 שנה"],
+            ["החזר: התקרה", "בפנים"],
+            ["החזר: סף ההון (לא איסור)", "תלוי בהנחה"],
+            ["שיעור מימון: תקרה", "בפנים, מקום קטן"],
+            ["החלק המשתנה: תקרה", `לפחות ${V.minFixed} ₪ קבוע`],
+            ["תקופה: תקרה", "עד 30 שנה"],
             ["מדיניות כל בנק", "לא אומת"],
           ];
           rows.forEach((r, i) => {

@@ -5,9 +5,9 @@
   for each time t (seconds) and photographs the page. render(t) depends only on t.
   Every number comes from data/lessons/4-11.json (the term card's two payments,
   the appraisal card's two measures, and the number of cards per group). The 75%
-  ceiling is the team's transcription of Directive 329, not read in the source,
-  and the "lower of price and appraisal" rule is a search summary of 2026-10-10,
-  so the scene marks both "לא אומת". The cue lines (window.cues) are the
+  ceiling was read from the official text of Directive 329 (version 02/2026), and
+  the "lower of price and appraisal" rule is a search summary of 2026-10-10,
+  so the scene marks only that one "לא אומת". The cue lines (window.cues) are the
   narration script, one line each.
 -->
 <html lang="he" dir="rtl">
@@ -167,7 +167,7 @@
           // ceiling line
           const oc = after(t, S.ltv, 3, o);
           el("line", { x1: X(75), x2: X(75), y1: 160, y2: 440, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "10 7", opacity: oc });
-          txt(X(75), 148, "תקרה 75% (לא אומת)", 24, { w: 700, o: oc });
+          txt(X(75), 148, "תקרה 75% (נוסח רשמי)", 24, { w: 700, o: oc });
           rows.forEach((r) => {
             const or = after(t, S.ltv, r.from, o);
             const w = (X(0) - X(r.v)) * ease((t - S.ltv[0] - r.from) / 3);

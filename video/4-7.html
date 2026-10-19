@@ -14,8 +14,8 @@
   3. The same payment on two incomes: the repayment ratio moves; the 50% limit (not verified).
   4. The bank's four answers, per the team's research; what decides between them is not known.
   5. The clock keeps running during underwriting (invented dates).
-  Claim labels: the four answers, the 24 days and the 50% are the team's Brain transcription,
-  "לא אומת"; incomes and dates are a teaching example.
+  Claim labels: the 24 days and the 50% were read from the official texts (2026-10-19); the four
+  answers are the team's research, "לא אומת"; incomes and dates are a teaching example.
 -->
 <html lang="he" dir="rtl">
   <head>
@@ -99,8 +99,8 @@
         [51, 59, `אותה הלוואה, אותו החזר: ${num(V.pay)} ₪.`],
         [59, 68, `על המוצהר: יחס החזר של ${V.rD}%.`],
         [68, 77, `על המאומת: ${V.rR}%. אותו החזר, הכנסה אחרת.`],
-        [77, 80.5, `${V.cap}% היא מגבלת בנק ישראל (לא אומת).`],
-        [80.5, 84.5, `${V.cap40}%: סף ההון, לפי תיעוד הצוות (לא אומת).`],
+        [77, 80.5, `${V.cap}% היא מגבלת בנק ישראל.`],
+        [80.5, 84.5, `${V.cap40}%: סף ההון, לא איסור.`],
         [86, 94, "לבנק ארבע תשובות, לפי מחקר הצוות."],
         [94, 102, "ממשיך, מבקש עוד מסמכים, משנה תנאים או מבטל."],
         [102, 111, "מה מכריע ביניהן? אין לנו מקור."],
@@ -108,7 +108,7 @@
         [123, 131, `האישור ביום 0. הרצפה: ${V.W} יום.`],
         [131, 139, `המסמכים נשלחו ביום ${V.docs}.`],
         [139, 146, `החיתום הסתיים ביום ${V.fin}: נשארו ${V.left} ימים.`],
-        [146, 151.5, "התאריכים בדויים. הכללים לפי תעתיק; לא אומת."],
+        [146, 151.5, "התאריכים בדויים. הכללים נקראו מהנוסח הרשמי."],
       ];
 
       window.render = (t) => {
@@ -174,10 +174,10 @@
           el("line", { x1: X(V.cap), x2: X(V.cap), y1: y - 40, y2: y + 12, stroke: C.navy, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oC });
           txt(X(V.cap), y - 122, `${V.cap}%`, 28, { w: 700, ltr: true, o: oC });
           txt(X(V.cap), y - 92, "מגבלת בנק ישראל", 20, { w: 600, o: oC });
-          txt(X(V.cap), y - 66, "לפי תעתיק של הצוות; לא אומת", 17, { fill: C.n600, o: oC });
+          txt(X(V.cap), y - 66, "נקרא מהנוסח הרשמי של בנק ישראל", 17, { fill: C.n600, o: oC });
           const oH = at(t, 80.5, o);
           el("line", { x1: X(V.cap40), x2: X(V.cap40), y1: y - 100, y2: y + 12, stroke: C.warn, "stroke-width": 3, "stroke-dasharray": "8 6", opacity: oH });
-          txt(X(V.cap40) + 80, y - 110, `${V.cap40}% · סף ההון (לפי הצוות; לא אומת)`, 19, { w: 600, fill: C.warn, o: oH });
+          txt(X(V.cap40) + 80, y - 110, `${V.cap40}% · סף ההון (משקל סיכון 100%)`, 19, { w: 600, fill: C.warn, o: oH });
           txt(640, 560, "יחס החזר = ההחזר חלקי ההכנסה, כפול 100. מה בנק מסוים עושה בפועל — לא ידוע.", 19, { fill: C.n600, o: at(t, 68, o) });
         }
 
@@ -226,7 +226,7 @@
           mark(V.docs, true, "המסמכים נשלחו", "", 131);
           mark(V.fin, false, "החיתום הסתיים", `נשארו ${V.left} ימים`, 139, C.teal);
           mark(V.W, true, `סוף ${V.W} הימים`, dw(V.end), 123);
-          txt(640, 500, "אין הוראה שקובעת כמה זמן מותר לחיתום. לפי תעתיק של הצוות; לא אומת.", 20, { fill: C.n600, o: at(t, 146, o) });
+          txt(640, 500, "24 ימים הם רצפה. ההוראה לא קובעת כמה זמן מותר לחיתום.", 20, { fill: C.n600, o: at(t, 146, o) });
           txt(640, 540, "התאריכים בדויים: דוגמה לימודית.", 18, { fill: C.n600, o });
         }
       };

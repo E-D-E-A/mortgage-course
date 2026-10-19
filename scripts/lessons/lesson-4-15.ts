@@ -75,8 +75,7 @@ export default function lesson(): LessonData {
   // ── The income side: the 18-month rule on the car loan ──
   const dispNow = add(disposable("a.disposable_now", recognised.value as string, [CAR]));
   add(untilDrop("a.until_drop", 26));
-  // If "exactly 18 left" still counted (the open edge, lesson 4.2), the drop would come one payment later.
-  add(givenRaw("a.until_drop_alt", 9));
+  // Exactly 18 left is not counted (Directive 329, Annex A: "יתרת תקופתה עולה על 18 חודשים"): the loan stops counting after 26 - 18 = 8 payments.
   const dispAfter = add(disposable("a.disposable_after", recognised.value as string, []));
   const max50 = add(maxPayment("a.max50", dispNow.value as string, "50"));
   const max40 = add(maxPayment("a.max40", dispNow.value as string, "40"));

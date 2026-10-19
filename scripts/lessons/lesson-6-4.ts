@@ -50,7 +50,7 @@ export interface Pulled {
 export const MORTGAGE_TRACK = { fixed: 3, variable: 2 } as const;
 const MINI_TERM = 60;
 const MIX_POINTS = "10";
-const WAIT = 9; // 17 payments left: the rule is clear (at exactly 18 the transcription leaves it open, lesson 4.2)
+const WAIT = 9; // 17 payments left: below the line under any reading (at exactly 18 the official text already says the loan is not counted)
 
 export function pulled(equityStep: string): Pulled[] {
   return [
@@ -164,7 +164,7 @@ export default function lesson(): LessonData {
   lev("l.short.qualifying", A, "qualifying", shorter);
   add(difference("l.short.rise", get("l.short.ratio"), get("a.ratio")));
   add(difference("l.short.saving", get("a.total"), get("l.short.total")));
-  // The wait costs no shekels. After 7 months 19 payments are left and the loan still counts; after 8, exactly 18 (open in lesson 4.2); after 9, 17.
+  // The wait costs no shekels. After 7 months 19 payments are left and the loan still counts; after 8, exactly 18 (not counted: the rule says "more than 18 months"); after 9, 17.
   add(given("in.wait", WAIT));
   lev("l.wait.months_left", A, "months_left", { lever: "wait", months: WAIT });
   for (const months of [7, 8]) {

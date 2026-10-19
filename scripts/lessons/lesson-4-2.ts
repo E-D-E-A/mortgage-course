@@ -114,7 +114,7 @@ export default function lesson42(): LessonData {
   add(disposable("ex2.answer", "16000", ex2));
   add(disposable("ex2.err_both", "16000", ex2.map((o) => ({ ...o, monthsLeft: 40 }))));
   // 3: case A — payments until the car loan stops counting; the "18 or more" mistake.
-  // The question avoids the edge (exactly 18, an open question): after how many payments are 17 left?
+  // The question avoids the edge (exactly 18 left, which is not counted): after how many payments are 17 left?
   add({ id: "ex3.answer", kind: "hh_days_left", inputs: { window_days: 26, used_days: 17 }, value: 9 });
   add(untilDrop("ex3.err_edge", 26));
   // 4: rent that goes on after the purchase.

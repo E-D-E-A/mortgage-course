@@ -101,8 +101,8 @@
       const ROWS = [
         { id: "ltv", label: "שיעור מימון", show: () => `${lr(String(L.ltv.actual)+"%")}`, lim: "עד 75%" },
         { id: "pti", label: "יחס החזר", show: () => `${lr(String(L.pti.actual)+"%")}`, lim: "עד 50%" },
-        { id: "capital", label: "קו ההון", show: () => `${lr(String(L.capital.actual)+"%")}`, lim: "מעל 40% — מותר" },
-        { id: "variable", label: "ריבית משתנה", show: () => `${lr(String(V.share)+"%")}`, lim: "עד שני שלישים" },
+        { id: "capital", label: "קו ההון", show: () => `${lr(String(L.capital.actual)+"%")}`, lim: "מעל 40% — מותר, קו הון" },
+        { id: "variable", label: "ריבית משתנה", show: () => `${lr(String(V.share)+"%")}`, lim: "עד 66.66%" },
         { id: "term", label: "תקופה", show: () => `${L.term.actual} חודשים`, lim: "עד 360 חודשים" },
       ];
 
@@ -200,7 +200,7 @@
           const o = vis(t, S.end);
           txt(640, 250, "ריאלי: בנק אחד נותן אותו, בחוק", 52, { w: 700, o });
           txt(640, 340, "ומה שלא ידוע — שואלים", 44, { fill: C.n700, o: after(t, S.end, 1.5, o) });
-          txt(640, 470, "הריביות וההצעות בשיעור הן של הקורס, להמחשה. הקווים לפי תעתיק הצוות, לא אומת.", 22, { fill: C.n500, o: after(t, S.end, 8, o) });
+          txt(640, 470, "הריביות וההצעות בשיעור הן של הקורס, להמחשה. הקווים לפי הוראה 329, נקרא מהנוסח הרשמי.", 22, { fill: C.n500, o: after(t, S.end, 8, o) });
         }
       };
 

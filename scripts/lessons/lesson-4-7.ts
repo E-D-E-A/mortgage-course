@@ -10,11 +10,11 @@
  * assessments, 84,000 and 96,000 a year, ÷ 12) are lesson 4.1's numbers,
  * repeated here as given inputs.
  *
- * Rules, none verified against the source document:
- *  - 50% payment ratio limit (Directive 329, via the team's Brain notes; lesson 4.4).
+ * Rules (read from the official texts on 2026-10-19):
+ *  - 50% payment ratio limit (Directive 329 v02/2026 section 5; lesson 4.4).
  *  - 40% and 35% are NOT rules: they are demonstration caps ("numbers for
  *    illustration"), not any bank's policy and not a Mogi decision.
- *  - 24 days (Directive 451 §4ג(א)(4), as the team transcribed it; lesson 1.8).
+ *  - 24 days, a floor; 12 when no new lien (Directive 451 v07/2023 §4ג(א)(4), §4ג(ז); lesson 1.8).
  * The dates are invented teaching dates.
  */
 import type { LessonData } from "../build-data.ts";
@@ -150,7 +150,7 @@ export default function lesson47(): LessonData {
   return {
     lesson: "4.7",
     title: "חיתום: איך הבנק בודק",
-    note: "Case B (אבי ומיכל): incomes from lesson 4.1, mix from the case sketch; caps of 40% and 35% are demonstration numbers, not rules or policy. Dates invented. The 50% limit and the 24 days are the team's transcription, not verified.",
+    note: "Case B (אבי ומיכל): incomes from lesson 4.1, mix from the case sketch; caps of 40% and 35% are demonstration numbers, not rules or policy. Dates invented. The 50% limit and the 24 days were read from the official texts (Directive 329, version 02/2026; Directive 451, version 07/2023).",
     facts,
   };
 }

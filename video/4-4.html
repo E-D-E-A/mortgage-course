@@ -3,7 +3,7 @@
   Video scene for lesson 4.4 — "ארבעה איסורים וקו הון".
   Rendered frame by frame by scripts/render-video.mjs: it calls window.render(t)
   for each time t (seconds) and photographs the page. render(t) depends only on t.
-  Every number comes from data/lessons/4-4.json. The five lines of Directive 329 are the team's Brain transcription (page 7503881, 2026-10-08), not checked against the directive, so the scene marks them "לא אומת".
+  Every number comes from data/lessons/4-4.json. The five lines of Directive 329 were read from the official text (version 02/2026) on 2026-10-19.
   The subtitle cues (window.cues) carry the explanatory sentences — the narration script.
 -->
 <html lang="he" dir="rtl">
@@ -96,7 +96,7 @@
         [114, 123, `עודף של ${shek(V.varOver)}. זה איסור שנחצה.`],
         [123, 133, `התקופה: ${V.termYears} שנה. בדיוק על הקו.`],
         [135, 144, "מתקנים קו אחד, ובודקים שוב את כולם."],
-        [144, 151, "הכול לפי תיעוד הצוות; לא אומת."],
+        [144, 151, "הכול נקרא מהנוסח הרשמי של בנק ישראל."],
       ];
 
       const ROWS = [
@@ -128,7 +128,7 @@
           const o = vis(t, S.title);
           txt(640, 290, "ארבעה איסורים וקו הון", 80, { w: 700, o });
           txt(640, 365, "הוראה 329 של בנק ישראל", 36, { fill: C.n600, o });
-          txt(640, 430, "לפי תיעוד הצוות · לא אומת · נכון ל־2026-10-09", 24, { fill: C.n500, o: after(t, S.title, 5, o, 0.8) });
+          txt(640, 430, "נקרא מהנוסח הרשמי · גרסת 02/2026", 24, { fill: C.n500, o: after(t, S.title, 5, o, 0.8) });
         }
         // Scene 2 — the five lines
         if (inScene(t, S.lines)) {
@@ -146,7 +146,7 @@
             el("rect", { x: 70, y: y - 22, width: 230, height: 46, rx: 23, fill: col, opacity: oi });
             txt(185, y + 9, tag, 21, { fill: C.navy, o: oi, w: 600 });
           });
-          txt(640, 560, "קו ההון (40%): לא אומת", 20, { fill: C.n500, o: after(t, S.lines, 32, o) });
+          txt(640, 560, "קו ההון (40%): משקל סיכון 100%, לא איסור", 20, { fill: C.n500, o: after(t, S.lines, 32, o) });
         }
         // Scene 3 — a family against the five lines
         if (inScene(t, S.family)) {
@@ -176,7 +176,7 @@
           const o = vis(t, S.end);
           txt(640, 250, "ארבעה איסורים, וקו אחד של הון", 52, { w: 700, o });
           txt(640, 340, "מתקנים קו אחד — ובודקים שוב את כולם", 34, { fill: C.n700, o: after(t, S.end, 1.5, o) });
-          txt(640, 470, "לפי תיעוד הצוות, נכון ל־2026-10-09. לא אומת מול ההוראה.", 22, { fill: C.n500, o: after(t, S.end, 8, o) });
+          txt(640, 470, "נקרא מהנוסח הרשמי של בנק ישראל, הוראה 329, גרסת 02/2026.", 22, { fill: C.n500, o: after(t, S.end, 8, o) });
         }
       };
 

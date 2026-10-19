@@ -4,9 +4,8 @@
  * page and the video read data/lessons/4-4.json, and checks/kinds/regulation.py
  * (with ltv.py and common.py) recomputes each one.
  *
- * The limits are the team's transcription of Directive 329 (Brain 7503881,
- * J-090, updated 2026-10-08), matched by search summaries of the directive;
- * not checked against the directive itself. All amounts are invented teaching
+ * The limits were read from the official text of Directive 329, version 12
+ * (02/2026, sections 2, 4, 5, 6, 7, 8), on 2026-10-19. All amounts are invented teaching
  * numbers; no case of the course appears here.
  */
 import Decimal from "decimal.js";

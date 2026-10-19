@@ -6,8 +6,8 @@
  * common.py) recomputes each one.
  *
  * The two directive numbers (50% and 40% payment ratio) and the financing
- * ceilings are the team's transcription of Directive 329 (Brain 7503881,
- * 2026-10-08), not checked against the directive. Every bank-policy number in
+ * ceilings were read from the official text of Directive 329, version 12
+ * (02/2026, sections 2, 5, 6), on 2026-10-19. Every bank-policy number in
  * this lesson is INVENTED for teaching ("בנק א׳"): the course knows of no
  * published bank policy line, and says so. Amounts are invented.
  */
@@ -95,7 +95,7 @@ export default function lesson(): LessonData {
   return {
     lesson: "4.5",
     title: "שלושה סוגי מספרים",
-    note: "The directive numbers are the team's transcription, not checked against the directive. Every bank-policy number here is invented for teaching. Amounts invented.",
+    note: "The directive numbers (50%, 40%, 75/70/50, two thirds, 30 years) were read from the official text of Directive 329, version 02/2026. Every bank-policy number here is invented for teaching. Amounts invented.",
     facts,
   };
 }

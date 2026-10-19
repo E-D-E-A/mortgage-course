@@ -208,6 +208,8 @@ export default function lesson78(): LessonData {
     ltv("v.ltv_old", money("old.balance"), money("case.value")),
     maxLoan("v.max_any", money("case.value"), "any_purpose"),
     given("v.any_pct", "50"),
+    given("v.any_ext_pct", "70"),
+    given("v.any_ext_cap", moneyString(new Decimal(200000))),
   );
   push(difference("v.room", byId("v.max_any"), byId("b.top_loan")));
 

@@ -5,8 +5,8 @@
   for each time t (seconds) and photographs the page. render(t) depends only on t.
   Every number comes from data/lessons/4-10.json (the payment-to-income card's
   example and the count of open questions per card). The 40% and 50% lines are
-  the team's transcription of Directive 329 and search summaries, not read in the
-  source, so the scene marks them "לא אומת". The cue lines (window.cues) are the
+  read from the official text of Directive 329 (version 02/2026) on 2026-10-19, so
+  the scene marks them as the official text. The cue lines (window.cues) are the
   narration script, one line each.
 -->
 <html lang="he" dir="rtl">
@@ -63,11 +63,11 @@
         [43, 50, `משפחה עם הכנסה פנויה של ${V.disposable}.`],
         [50, 57, `תשלום חדש של ${V.payment}: יחס החזר ${V.ratio}%.`],
         [57, 66, `${V.capital}%: סף הון. מעליו הבנק מחזיק יותר הון.`],
-        [66, 74, `${V.cap}%: תקרה. מעליה אין אישור. שניהם: לא אומת.`],
+        [66, 74, `${V.cap}%: תקרה. מעליה אין אישור. שני הקווים: מהנוסח הרשמי.`],
         [74, 83, "ומה זה עושה לריבית שמקבלים? לא ידוע."],
         [83, 91, "כרטיס טוב אומר גם את זה."],
         [93, 101, "לכל סף יש סימון של סוג המקור."],
-        [101, 109, "לא אומת: כלל רשמי שעוד לא נקרא במקור."],
+        [101, 109, "נקרא מהנוסח הרשמי, או: לא אומת, כלל שעוד לא נקרא במקור."],
         [109, 117, "ידע מהשטח: מה שאיש מקצוע אמר, עם שם ותאריך."],
         [117, 127, "ושאלה פתוחה: מה שאף מקור לא נתן."],
         [129, 137, "תשעה כרטיסים על הלקוח."],
@@ -106,7 +106,8 @@
         "מה הלקוח באמת יכול לשנות בו?", "כמה השינוי עולה ללקוח?", "דוגמה מספרית", "איך האלגוריתם משתמש בו?",
       ];
       const KINDS = [
-        { name: "לא אומת", ex: "כלל רשמי שהועתק או נקרא בתקציר", c: C.n300 },
+        { name: "עובדה מאומתת", ex: "נקרא מהנוסח הרשמי של בנק ישראל", c: C.mint },
+        { name: "לא אומת", ex: "כלל שהועתק או נקרא בתקציר", c: C.n300 },
         { name: "ידע מהשטח", ex: "איש מקצוע אמר, עם שם ותאריך", c: C.tq2 },
         { name: "החלטה של Mogi", ex: "הצוות הכריע, עם מי ומתי", c: C.teal },
         { name: "הנחת חישוב", ex: "מספר להמחשה, לא נתון", c: C.n200 },
@@ -156,11 +157,11 @@
           const o3 = after(t, S.pti, 15, o);
           el("line", { x1: X(Number(V.capital)), x2: X(Number(V.capital)), y1: Y - 62, y2: Y + H + 10, stroke: C.navy, "stroke-width": 3, opacity: o3 });
           txt(X(Number(V.capital)), Y - 70, `סף הון ${V.capital}%`, 24, { w: 700, o: o3, fill: C.navy });
-          txt(X(Number(V.capital)), Y + H + 34, "לא אומת", 20, { o: o3, fill: C.n600 });
+          txt(X(Number(V.capital)), Y + H + 34, "נוסח רשמי", 20, { o: o3, fill: C.n600 });
           const o4 = after(t, S.pti, 23, o);
           el("line", { x1: X(Number(V.cap)), x2: X(Number(V.cap)), y1: Y - 62, y2: Y + H + 10, stroke: C.navy, "stroke-width": 3, opacity: o4 });
           txt(X(Number(V.cap)), Y - 70, `תקרה ${V.cap}%`, 24, { w: 700, o: o4, fill: C.navy });
-          txt(X(Number(V.cap)), Y + H + 34, "לא אומת", 20, { o: o4, fill: C.n600 });
+          txt(X(Number(V.cap)), Y + H + 34, "נוסח רשמי", 20, { o: o4, fill: C.n600 });
           // The family's point
           const o5 = after(t, S.pti, 9, o);
           const px = X(Number(V.ratio));
@@ -176,10 +177,10 @@
           const o = vis(t, S.labels);
           txt(640, 105, "לכל סף: סימון של סוג המקור", 40, { w: 700, o });
           KINDS.forEach((k, i) => {
-            const oi = after(t, S.labels, 1 + i * 6, o);
+            const oi = after(t, S.labels, 1 + i * 5, o);
             const y = 160 + i * 78;
             el("rect", { x: 900, y, width: 280, height: 56, rx: 28, fill: k.c, opacity: oi, stroke: C.n300 });
-            txt(1040, y + 38, k.name, 28, { w: 700, o: oi, fill: i === 2 ? C.n0 : C.navy });
+            txt(1040, y + 38, k.name, 28, { w: 700, o: oi, fill: k.name === "החלטה של Mogi" ? C.n0 : C.navy });
             txt(870, y + 38, k.ex, 28, { anchor: "start", o: oi, fill: C.n700 });
           });
         }
