@@ -154,7 +154,7 @@ const crossed = computed(() => {
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
-        <span class="text-caption font-semibold text-n600">שמאות, אם תהיה נמוכה מהמחיר (מודדים מול הנמוך מהשניים; לא אומת)</span>
+        <span class="text-caption font-semibold text-n600">שמאות, אם תהיה נמוכה מהמחיר (מודדים מול הנמוך מהשניים; נקרא מהנוסח הרשמי)</span>
         <input v-model.number="value" type="range" min="2100000" :max="price" step="5000" />
         <span class="text-body-l font-semibold text-n900"><span class="ltr">{{ money(value) }}</span></span>
       </label>
