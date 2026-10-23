@@ -289,7 +289,7 @@ function reset() {
     </div>
 
     <p v-if="wallText.length" class="mt-3 rounded-md border-s-4 border-danger bg-danger-bg p-3 text-body-m text-n900" role="alert">
-      <strong>לא אפשרי:</strong> המנוף חוצה מגבלה (נקרא מהנוסח הרשמי של בנק ישראל, הוראה 329, גרסת 02/2026): {{ wallText.join("; ") }}.
+      <strong>לא אפשרי:</strong> המנוף חוצה מגבלה (נקרא מהנוסח הרשמי של בנק ישראל, הוראה 329, גרסת 06/2026): {{ wallText.join("; ") }}.
     </p>
     <p v-else-if="p.after.aboveCapital && outcome.moved" class="mt-3 rounded-md bg-n50 p-3 text-body-m text-n800">היחס עדיין מעל 40%, סף ההון לדוגמה.</p>
     <p class="mt-3 text-body-m text-n800"><strong class="text-n900">מתי לא כדאי:</strong> {{ whenNot[chosen] }}</p>

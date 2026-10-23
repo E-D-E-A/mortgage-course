@@ -579,7 +579,7 @@ const yearRows = computed(() => {
               </p>
             </li>
           </ul>
-          <p v-if="check.lines.length" class="mt-2 text-caption text-n600">חמשת הקווים של הוראה 329 (נקרא מהנוסח הרשמי של בנק ישראל, גרסת 02/2026, סעיפים 2, 5, 6, 7 ו־8). מעל קו ההון אינו איסור.</p>
+          <p v-if="check.lines.length" class="mt-2 text-caption text-n600">חמשת הקווים של הוראה 329 (נקרא מהנוסח הרשמי של בנק ישראל, גרסת 06/2026, סעיפים 2, 5, 6, 7 ו־8). מעל קו ההון אינו איסור.</p>
         </div>
       </template>
     </div>

@@ -114,13 +114,13 @@ export const KIND_INFO: Record<ThresholdKind, KindInfo> = {
   regulatory_limit: {
     name: "מגבלה רגולטורית",
     crossing: "אסור: הבנק לא מאשר (הוראה 329)",
-    label: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיפים 2, 5, 7, 8)",
+    label: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיפים 2, 5, 7, 8)",
     whoSets: "בנק ישראל, בהוראה 329; זהה בכל הבנקים",
   },
   capital_threshold: {
     name: "סף הון",
     crossing: "מותר, אבל משקל הסיכון של ההלוואה הוא 100% והבנק מחזיק יותר הון כנגדה",
-    label: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 6). כמה זה עולה לבנק ומה הוא עושה בגלל זה: לא אומת",
+    label: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 6). כמה זה עולה לבנק ומה הוא עושה בגלל זה: לא אומת",
     whoSets: "בנק ישראל, בהוראה 329 (משקל סיכון 100%)",
   },
   bank_policy: {
@@ -147,11 +147,11 @@ export const KIND_INFO: Record<ThresholdKind, KindInfo> = {
 export const EXAMPLE_THRESHOLDS: Threshold[] = [
   { id: "pti.30", metric: "pti", kind: "course_example", percent: "30", label: "30% יחס החזר", source: "הנחת חישוב: דוגמה של הקורס (30%–35%), והמספרים לבדיקה" },
   { id: "pti.35", metric: "pti", kind: "course_example", percent: "35", label: "35% יחס החזר", source: "הנחת חישוב: דוגמה של הקורס (30%–35%), והמספרים לבדיקה" },
-  { id: "pti.40", metric: "pti", kind: "capital_threshold", percent: PTI_CAPITAL_THRESHOLD, label: "סף ההון: 40% יחס החזר", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 6)" },
-  { id: "pti.50", metric: "pti", kind: "regulatory_limit", percent: PTI_LIMIT, label: "המגבלה: 50% יחס החזר", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 5)" },
+  { id: "pti.40", metric: "pti", kind: "capital_threshold", percent: PTI_CAPITAL_THRESHOLD, label: "סף ההון: 40% יחס החזר", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 6)" },
+  { id: "pti.50", metric: "pti", kind: "regulatory_limit", percent: PTI_LIMIT, label: "המגבלה: 50% יחס החזר", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 5)" },
   { id: "ltv.40", metric: "ltv", kind: "field_hypothesis", percent: "40", label: "40% מימון", source: "בנקאי בשטח, 5 באוגוסט 2026; מקור יחיד, לא נבדק" },
   { id: "ltv.60", metric: "ltv", kind: "field_hypothesis", percent: "60", label: "60% מימון", source: "בנקאי בשטח, 5 באוגוסט 2026; מקור יחיד, לא נבדק" },
-  { id: "ltv.75", metric: "ltv", kind: "regulatory_limit", percent: LTV_CEILINGS.only_home, label: "התקרה: 75% מימון (דירה יחידה)", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 2)" },
+  { id: "ltv.75", metric: "ltv", kind: "regulatory_limit", percent: LTV_CEILINGS.only_home, label: "התקרה: 75% מימון (דירה יחידה)", source: "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 2)" },
 ];
 
 /** The lines of one metric, lowest first. */

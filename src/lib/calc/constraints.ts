@@ -265,7 +265,7 @@ export const CONSTRAINTS: Constraint[] = [
     id: "ltv",
     family: "law",
     labelHe: "שיעור מימון עד התקרה",
-    ruleHe: "ההלוואה אינה עולה על התקרה של סוג העסקה באחוז משווי הנכס. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 2).",
+    ruleHe: "ההלוואה אינה עולה על התקרה של סוג העסקה באחוז משווי הנכס. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 2).",
     check(c) {
       const l = regLine(c, "ltv");
       if (!l) return ceilingCheck("ltv", "law", "percent", null, ZERO, false, null);
@@ -276,7 +276,7 @@ export const CONSTRAINTS: Constraint[] = [
     id: "pti",
     family: "law",
     labelHe: "יחס החזר עד 50%",
-    ruleHe: "יחס ההחזר אינו עולה על 50%. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 5).",
+    ruleHe: "יחס ההחזר אינו עולה על 50%. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 5).",
     check(c) {
       const l = regLine(c, "pti");
       if (!l) return ceilingCheck("pti", "law", "percent", null, new Decimal(50), false, null);
@@ -287,7 +287,7 @@ export const CONSTRAINTS: Constraint[] = [
     id: "variable_share",
     family: "law",
     labelHe: "לפחות שליש בריבית קבועה",
-    ruleHe: "החלק בריבית שיכולה להשתנות אינו עולה על שני שלישים מההלוואה. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 7).",
+    ruleHe: "החלק בריבית שיכולה להשתנות אינו עולה על שני שלישים מההלוואה. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 7).",
     check(c) {
       const m = measures(c);
       const l = regLine(c, "variable");
@@ -301,7 +301,7 @@ export const CONSTRAINTS: Constraint[] = [
     id: "term",
     family: "law",
     labelHe: "עד 30 שנה",
-    ruleHe: "התקופה של המסלול הארוך ביותר אינה עולה על 30 שנה. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 8).",
+    ruleHe: "התקופה של המסלול הארוך ביותר אינה עולה על 30 שנה. נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 8).",
     check(c) {
       const months = new Decimal(Math.max(...c.tracks.map((t) => t.months)));
       const limit = new Decimal(MAX_TERM_MONTHS);

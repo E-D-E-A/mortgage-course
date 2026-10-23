@@ -27,7 +27,9 @@
  * ── The numbers, and how sure we are of them ─────────────────────────────
  *
  * Directive 329 of the Bank of Israel, "מגבלות למתן הלוואות לדיור". Read in
- * the official text (version 12 of 08/02/2026, circular 2840), sections 2, 5,
+ * the official text (version 13 of 30.6.2026, circular 2852; its only text change
+ * from version 12 is the definition of "הלוואה לדיור"; circular 2840 sets the
+ * Annex A changes), sections 2, 5,
  * 6, 7, 8 and Annex A; see research/final/answered-from-official-text.md.
  *
  *   financing ratio   ≤ 75% only home · ≤ 70% replacement home · ≤ 50% a further home

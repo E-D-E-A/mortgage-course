@@ -40,7 +40,7 @@ const money = (d: Decimal.Value) =>
     .replace("-", "−")
     .replace(/\s₪/, "\u00a0₪");
 const payments = (n: number) => (n === 1 ? "תשלום אחד" : `${n} תשלומים`);
-const LIMIT_KIND = "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיפים 2, 5, 7 ו־8)";
+const LIMIT_KIND = "נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיפים 2, 5, 7 ו־8)";
 const pct = (d: Decimal.Value) => `${percentString(d)}%`;
 
 const recognised = computed(() => props.incomes.reduce((s, x) => s.plus(x), new Decimal(0)));
@@ -95,7 +95,7 @@ const lines = computed(() => [
   {
     id: "pti40",
     title: "יחס החזר: סף ההון",
-    kind: `סף ההון (${PTI_CAPITAL_THRESHOLD}%): נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, סעיף 6)`,
+    kind: `סף ההון (${PTI_CAPITAL_THRESHOLD}%): נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיף 6)`,
     tone: (termOver.value ? "warn" : fits40.value ? "ok" : "warn") as Tone,
     status: termOver.value ? "לא נבדק" : fits40.value ? "מתחת לסף" : "מעל הסף: מותר, והבנק מחזיק יותר הון",
     text: termOver.value
@@ -105,7 +105,7 @@ const lines = computed(() => [
   {
     id: "car",
     title: "הלוואת הרכב וכלל 18 החודשים",
-    kind: "כלל 18 החודשים: נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 02/2026, נספח א׳, הוצאה קבועה היא התחייבות ש״יתרתה עולה על 18 חודשים״); להוריד מההכנסה: החלטה של Mogi",
+    kind: "כלל 18 החודשים: נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, נספח א׳, הוצאה קבועה היא התחייבות ש״יתרתה עולה על 18 חודשים״); להוריד מההכנסה: החלטה של Mogi",
     tone: (verdict.value.placement === "income" ? "warn" : "ok") as Tone,
     status: verdict.value.placement === "income" ? "נספרת" : "לא נספרת",
     text:
@@ -150,7 +150,7 @@ const crossed = computed(() => {
 <template>
   <div class="my-6 rounded-lg border border-n200 bg-n0 p-4 shadow-sm sm:p-5">
     <p class="text-caption text-n600">
-      נועם ושירה, רק עם הנתונים של התיק: מחיר <span class="ltr">{{ money(price) }}</span>, הון עצמי <span class="ltr">{{ money(equity) }}</span>, הכנסות נטו <span class="ltr">{{ money(incomes[0]) }}</span> ו־<span class="ltr">{{ money(incomes[1]) }}</span>. אין להם עדיין מסלולים או הצעה. הריבית והתקופה הן הנחה של הקורס, לא הצעה. הגבולות נקראו מהנוסח הרשמי של הוראה 329 (גרסת 02/2026).
+      נועם ושירה, רק עם הנתונים של התיק: מחיר <span class="ltr">{{ money(price) }}</span>, הון עצמי <span class="ltr">{{ money(equity) }}</span>, הכנסות נטו <span class="ltr">{{ money(incomes[0]) }}</span> ו־<span class="ltr">{{ money(incomes[1]) }}</span>. אין להם עדיין מסלולים או הצעה. הריבית והתקופה הן הנחה של הקורס, לא הצעה. הגבולות נקראו מהנוסח הרשמי של הוראה 329 (גרסת 06/2026).
     </p>
     <div class="mt-3 grid gap-4 sm:grid-cols-2">
       <label class="flex flex-col gap-1">
