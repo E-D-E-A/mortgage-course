@@ -1,6 +1,7 @@
 """Voice-over TRIAL (not part of the site): Hebrew narration with Azure AI Speech.
 
   python3 scripts/tts-trial/synthesize.py <cues.json> <outDir> <voice> [<voice> ...]
+  python3 scripts/tts-trial/synthesize.py --cartesia-voices   (Hebrew voices on Cartesia)
 
 For each voice: one request per subtitle cue (so each sentence's length is known
 exactly), then the full narration track <outDir>/<voice>.wav and the time map
@@ -122,7 +123,47 @@ RATE = 24000
 FORMAT = "riff-24khz-16bit-mono-pcm"
 
 
+# Cartesia: a voice is "cartesia:<voice id>" (text with the niqqud dictionary) or
+# "cartesia-plain:<voice id>" (the same text with the niqqud removed), so both can
+# be heard side by side. Key from CARTESIA_API_KEY; model from CARTESIA_MODEL.
+CARTESIA = "https://api.cartesia.ai"
+CARTESIA_VERSION = "2025-04-16"
+
+
+def cartesia_request(path, body=None):
+    req = urllib.request.Request(CARTESIA + path, data=None if body is None else json.dumps(body).encode("utf-8"),
+                                 headers={"X-API-Key": os.environ["CARTESIA_API_KEY"], "Cartesia-Version": CARTESIA_VERSION,
+                                          "Content-Type": "application/json", "User-Agent": "mogi-course-tts-trial"})
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or attempt == 4:
+                raise RuntimeError(f"Cartesia HTTP {e.code}: {e.read()[:300].decode('utf-8', 'replace')}") from None
+            time.sleep(10 * (attempt + 1))
+
+
+def synthesize_cartesia(voice, text, path):
+    kind, voice_id = voice.split(":", 1)
+    if kind == "cartesia-plain":
+        text = re.sub("[\u0591-\u05C7]", "", text)
+    pcm = cartesia_request("/tts/bytes", {
+        "model_id": os.environ.get("CARTESIA_MODEL", "sonic-3"), "transcript": text, "language": "he",
+        "voice": {"mode": "id", "id": voice_id},
+        "output_format": {"container": "raw", "encoding": "pcm_s16le", "sample_rate": RATE}})
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(pcm)
+
+
+def cartesia_voices():
+    for v in json.loads(cartesia_request("/voices?limit=100&language=he")).get("data", []):
+        print(v["id"], v.get("name"), "|", (v.get("description") or "")[:80])
+
+
 def synthesize(voice, text, path):
+    if voice.startswith("cartesia"):
+        return synthesize_cartesia(voice, text, path)
     region = os.environ["AZURE_SPEECH_REGION"]
     req = urllib.request.Request(
         f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1",
@@ -186,6 +227,8 @@ def timeline(cues, durations, old_duration):
 
 
 def main():
+    if sys.argv[1:] == ["--cartesia-voices"]:
+        return cartesia_voices()
     cues_path, out_dir, *voices = sys.argv[1:]
     data = json.load(open(cues_path, encoding="utf-8"))
     cues = data["cues"]
@@ -196,10 +239,11 @@ def main():
     for voice in voices:
         pcm, durations = [], []
         for i, text in enumerate(texts):
-            path = os.path.join(out_dir, f"{voice}.{i + 1:02d}.wav")
+            path = os.path.join(out_dir, f"{voice.replace(':', '_')}.{i + 1:02d}.wav")
             if not os.path.exists(path):
                 synthesize(voice, text, path)
-                time.sleep(3.2)  # Free F0 tier: at most 20 requests a minute
+                # Azure's free F0 tier: at most 20 requests a minute.
+                time.sleep(0.5 if voice.startswith("cartesia") else 3.2)
             frames = read_pcm(path)
             pcm.append(frames)
             durations.append(len(frames) / 2 / RATE)
@@ -210,9 +254,9 @@ def main():
             track += b"\0\0" * (round(start * RATE) - len(track) // 2)
             track += frames
         track += b"\0\0" * (round(total * RATE) - len(track) // 2)
-        with wave.open(os.path.join(out_dir, f"{voice}.wav"), "wb") as w:
+        with wave.open(os.path.join(out_dir, f"{voice.replace(':', '_')}.wav"), "wb") as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(bytes(track))
-        json.dump({"duration": total, "map": tmap, "cues": new_cues}, open(os.path.join(out_dir, f"{voice}.timeline.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        json.dump({"duration": total, "map": tmap, "cues": new_cues}, open(os.path.join(out_dir, f"{voice.replace(':', '_')}.timeline.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         text_chars = sum(len(s) for s in texts)
         ssml_chars = sum(len(ssml(voice, s)) for s in texts)
         report[voice] = {"speech_seconds": round(sum(durations), 2), "video_seconds": round(total, 2), "text_chars": text_chars, "ssml_chars": ssml_chars,
