@@ -110,8 +110,12 @@ def spoken(text):
 
 
 def ssml(voice, text):
-    return (f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="he-IL">'
-            f'<voice name="{voice}">{escape(text)}</voice></speak>')
+    body = escape(text)
+    if not voice.startswith("he-IL-"):
+        # A multilingual voice reads Hebrew only when told the text is Hebrew.
+        body = f'<lang xml:lang="he-IL">{body}</lang>'
+    return (f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="he-IL">'
+            f'<voice name="{voice}">{body}</voice></speak>')
 
 
 RATE = 24000
