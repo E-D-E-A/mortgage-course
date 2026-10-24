@@ -83,13 +83,21 @@ export async function refreshSession(refresh: string, cfg: AuthConfig, fetchImpl
   return body.access_token && body.refresh_token ? { access: body.access_token, refresh: body.refresh_token } : null;
 }
 
+/** The logo files the sign-in page and the tab icon use. They hold no course content. */
+const PUBLIC_BRAND_FILES = new Set([
+  "/brand/mogi-logo.png",
+  "/brand/mogi-course-icon.svg",
+  "/brand/mogi-course-favicon-64.png",
+  "/brand/mogi-course-favicon-180.png",
+]);
+
 /** Paths anyone may load: the sign-in page and what it needs. Everything else is gated. */
 export function isPublicPath(pathname: string): boolean {
   return (
     pathname === "/login/" ||
     pathname === "/login" ||
     pathname.startsWith("/auth/") ||
-    pathname === "/brand/mogi-logo.png" ||
+    PUBLIC_BRAND_FILES.has(pathname) ||
     // The Heebo font files, so the sign-in page is in the brand's font. Fonts hold no course content.
     (pathname.startsWith("/_astro/") && /\.(woff2?)$/.test(pathname))
   );
