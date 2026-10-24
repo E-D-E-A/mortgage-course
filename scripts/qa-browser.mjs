@@ -185,7 +185,7 @@ for (const stage of stages) {
   const gate = createServer(async (req, res) => {
     const url = req.url.split("?")[0];
     const cookie = req.headers.cookie ?? "";
-    const publicPath = url === "/login/" || url.startsWith("/auth/") || url.startsWith("/brand/mogi-") || (url.startsWith("/_astro/") && /\.woff2?$/.test(url));
+    const publicPath = url === "/login/" || url.startsWith("/auth/") || url.startsWith("/brand/mogi-") || url === "/manifest.webmanifest" || (url.startsWith("/_astro/") && /\.woff2?$/.test(url));
     if (url === "/auth/session" && req.method === "GET") {
       sessionCalls++;
       const b = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");

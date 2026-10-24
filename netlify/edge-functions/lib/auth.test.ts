@@ -85,7 +85,7 @@ describe("helpers", () => {
     expect(isPublicPath("/login/")).toBe(true);
     expect(isPublicPath("/auth/callback/")).toBe(true);
     expect(isPublicPath("/_astro/heebo-hebrew-400-normal.woff2")).toBe(true);
-    for (const p of ["/brand/mogi-logo.png", "/brand/mogi-course-icon.svg", "/brand/mogi-course-favicon-64.png", "/brand/mogi-course-favicon-180.png"]) {
+    for (const p of ["/brand/mogi-logo.png", "/brand/mogi-course-icon.svg", "/brand/mogi-course-favicon-64.png", "/manifest.webmanifest", "/brand/mogi-course-apple-touch-180.png", "/brand/mogi-course-app-192.png", "/brand/mogi-course-app-512.png", "/brand/mogi-course-app-maskable-512.png"]) {
       expect(isPublicPath(p)).toBe(true);
     }
     for (const p of ["/", "/lessons/0-3/", "/_astro/index.js", "/_astro/main.css", "/video/0-3.mp4", "/glossary/", "/brand/other.svg", "/brand/mogi-course-stacked-mogi.svg", "/brand/mogi-course-logo.zip"]) {

@@ -83,12 +83,17 @@ export async function refreshSession(refresh: string, cfg: AuthConfig, fetchImpl
   return body.access_token && body.refresh_token ? { access: body.access_token, refresh: body.refresh_token } : null;
 }
 
-/** The logo files the sign-in page and the tab icon use. They hold no course content. */
+/** The logo files, the app icons and the manifest. The sign-in page, the tab and the install prompt load them
+ *  before anyone is signed in (a manifest request carries no cookie). They hold no course content. */
 const PUBLIC_BRAND_FILES = new Set([
+  "/manifest.webmanifest",
   "/brand/mogi-logo.png",
   "/brand/mogi-course-icon.svg",
   "/brand/mogi-course-favicon-64.png",
-  "/brand/mogi-course-favicon-180.png",
+  "/brand/mogi-course-apple-touch-180.png",
+  "/brand/mogi-course-app-192.png",
+  "/brand/mogi-course-app-512.png",
+  "/brand/mogi-course-app-maskable-512.png",
 ]);
 
 /** Paths anyone may load: the sign-in page and what it needs. Everything else is gated. */
