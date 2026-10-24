@@ -257,7 +257,8 @@ def main():
         with wave.open(os.path.join(out_dir, f"{voice.replace(':', '_')}.wav"), "wb") as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(bytes(track))
         json.dump({"duration": total, "map": tmap, "cues": new_cues}, open(os.path.join(out_dir, f"{voice.replace(':', '_')}.timeline.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-        text_chars = sum(len(s) for s in texts)
+        # What was sent: cartesia-plain sends the text without niqqud.
+        text_chars = sum(len(re.sub("[֑-ׇ]", "", s) if voice.startswith("cartesia-plain") else s) for s in texts)
         ssml_chars = sum(len(ssml(voice, s)) for s in texts)
         report[voice] = {"speech_seconds": round(sum(durations), 2), "video_seconds": round(total, 2), "text_chars": text_chars, "ssml_chars": ssml_chars,
                          "words": sum(len(c[2].split()) for c in cues)}
