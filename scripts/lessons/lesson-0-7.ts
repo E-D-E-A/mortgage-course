@@ -166,7 +166,9 @@ export default function lesson07(): LessonData {
     // What the lesson says about the real index. Data, not computed; all from
     // research/notes/official-sources.md §7 (search summaries of CBS pages,
     // 2026-10-09, not yet read from the pages) and Brain page 7831553 (2026-08-03).
-    // Base year and main groups were since read from the CBS API (see below).
+    // Checked 2026-10-31 against CBS itself: release calendar (15th, 18:30; 14:00
+    // rule), press release 326/2026 (Sep 2026 CPI; housing via rent), price
+    // monthly table 2.1 (ten main groups), API (base 2024). Only "1999" is open.
     given("cbs.day", "15"),
     given("cbs.time", "18:30"),
     given("cbs.early_time", "14:00"),
