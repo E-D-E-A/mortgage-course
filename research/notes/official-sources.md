@@ -281,7 +281,8 @@ Quotes as returned in the summaries (from the index, not checked against the PDF
 **Checked against the CBS open-data API, 2026-10-31** (api.cbs.gov.il reachable; www.cbs.gov.il pages and the definition PDF still could not be read: plain requests got an empty reply or JS-only shells, and the site refused the automated browser):
 - Series 120010 (CPI general): base «2024 ממוצע». **Confirmed: base 2024 average = 100.** Latest values: Sep 2026 105.3 (−0.5% m/m, +1.6% y/y); Aug 2026 105.8 (+0.7%, +1.5% y/y), matching the summary above; Jul 2026 105.1.
 - Catalog subject 37 («לפי קבוצות צריכה ראשיות»): food excl. fruit and vegetables; fruit and vegetables; housing; dwelling maintenance; furniture and household equipment; clothing and footwear; health; education, culture and entertainment; transport and communication; miscellaneous (plus a "food incl. fruit and vegetables" aggregate). **Confirmed: ten main groups.**
-- The September 2026 CPI is published (it is in the series); its exact release date, the 15th/18:30 rule, the 14:00 early-release rule, rent-based housing and the 1999 exclusion remain unverified.
+- Definition PDF (a1_1_h.pdf), supplied by the user 2026-10-31: one page, "1.1 הגדרת מדד המחירים לצרכן", created 2023-02-21. **Confirmed:** the fixed-basket definition (quoted in the lesson) and that the basket is set from the household expenditure survey (2021 survey, base 2022 in that version, now superseded by base 2024 per the API). It says nothing on release times, rent or the 1999 exclusion.
+- The September 2026 CPI is published (it is in the series); its exact release date, the 15th/18:30 rule, the 14:00 early-release rule, rent-based housing and the 1999 exclusion remain unverified. The English release calendar (Release-Calendar.aspx) and the September 2026 press release answer with a page that fills in by JavaScript, so their content could not be read from here.
 
 ---
 
