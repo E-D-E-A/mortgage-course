@@ -11,7 +11,9 @@
  *   - CAR_PAYOFF: what the lender would ask today to close the car loan. Invented (the
  *     26 payments of 1,450 add up to 37,700; the payoff here is lower, as a closing
  *     usually is — the course does not know how a lender prices an early closing).
- *   - BORROWER_INCOME: a parent's net monthly income, if the parent joins as a borrower.
+ *   - BORROWER_INCOME: the parent's RECOGNISED monthly income if the parent joins as a borrower: per
+ *     directive 329 Appendix A §1.3 (read 2026-10-31), at most half the disposable income of a first-degree
+ *     relative who acquires no rights in the property, even if they sign as a borrower.
  *     Invented; the parent's own obligations are not modelled.
  *
  * The 40% line used as the TARGET is the course's example threshold (lesson 6.2), the
