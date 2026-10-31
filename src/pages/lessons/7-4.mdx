@@ -63,7 +63,7 @@ export const predictionOptions = [
 
 <Section kind="סרטון">
 
-## המבחן של §15א: שני מספרים לכל הלוואה קיימת
+## המבחן של סעיף 15א: שני מספרים לכל הלוואה קיימת
 
 </Section>
 
@@ -88,7 +88,7 @@ export const predictionOptions = [
 
 <Section kind="ההסבר">
 
-## המבחן של §15א: שני מספרים
+## המבחן של סעיף 15א: שני מספרים
 
 </Section>
 
@@ -133,13 +133,13 @@ export const predictionOptions = [
 
 </Section>
 
-המחשבון בודק הצעה חדשה מול הלוואה קיימת. בהלוואה הראשונה, תיק ג׳, יש מסלול אחד; בשנייה, בדויה לגמרי, שלושה. הוא מראה את שלוש השאלות זו לצד זו: מבחן §15א, ההחזר החודשי, וסך השקלים. עמלת הפירעון בו היא **קלט** (בשיעור 7.2 מחשבים אותה); העלויות של ההלוואה החדשה בדויות.
+המחשבון בודק הצעה חדשה מול הלוואה קיימת. בהלוואה הראשונה, תיק ג׳, יש מסלול אחד; בשנייה, בדויה לגמרי, שלושה. הוא מראה את שלוש השאלות זו לצד זו: מבחן סעיף 15א, ההחזר החודשי, וסך השקלים. עמלת הפירעון בו היא **קלט** (בשיעור 7.2 מחשבים אותה); העלויות של ההלוואה החדשה בדויות.
 
 <RefinanceCalculator
   client:visible
   presets={PRESETS}
   initial="case_c"
-  note="דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. המבחן לפי הוראה 451 §15א (נקרא מהנוסח הרשמי)."
+  note="דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. המבחן לפי הוראה 451 סעיף 15א (נקרא מהנוסח הרשמי)."
 />
 
 נסו את אלה, בהלוואה של תיק ג׳. ההצעה הראשונה היא של בנק ב׳: {p("n.rate_b")}% ל־{p("b.months")} חודשים, כלומר בדיוק מה שנשאר:
@@ -176,7 +176,7 @@ export const predictionOptions = [
         <th class="py-2 pe-3 text-start font-semibold">סך כל התשלומים (עם עלויות הכניסה)</th>
         <th class="py-2 pe-3 text-start font-semibold">חיסכון בסך הכול</th>
         <th class="py-2 pe-3 text-start font-semibold">הריבית הכוללת החזויה</th>
-        <th class="py-2 pe-3 text-start font-semibold">המבחן של §15א</th>
+        <th class="py-2 pe-3 text-start font-semibold">המבחן של סעיף 15א</th>
       </tr>
     </thead>
     <tbody>
@@ -217,7 +217,7 @@ export const predictionOptions = [
     <li class="rounded-lg border border-n200 bg-n0 p-4 shadow-sm">
       <p class="font-semibold text-n900">{o.name}: {p(`${o.id === "b" ? "n.rate_b" : o.id === "c" ? "n.rate_b" : "n.rate_d"}`)}%, {p(`${o.id}.months`)} חודשים</p>
       <dl class="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-body-m text-n700">
-        <dt>המבחן של §15א</dt><dd class="text-end font-semibold text-n900">{verdict(`${o.id}.worth`)} (<span class="ltr">{p(`${o.id}.rate`)}%</span>)</dd>
+        <dt>המבחן של סעיף 15א</dt><dd class="text-end font-semibold text-n900">{verdict(`${o.id}.worth`)} (<span class="ltr">{p(`${o.id}.rate`)}%</span>)</dd>
         <dt>חיסכון בסך הכול (מינוס: משלמים יותר)</dt><dd class="text-end font-semibold text-n900"><span class="ltr">{formatShekels(f.raw(`${o.id}.saving`))}</span></dd>
         <dt>ההחזר החודשי</dt><dd class="text-end"><span class="ltr">{formatShekels(f.raw(`${o.id}.first`))}</span></dd>
         <dt>נמוך מהיום ב־</dt><dd class="text-end"><span class="ltr">{formatShekels(f.raw(`${o.id}.gap`))}</span></dd>
@@ -260,7 +260,7 @@ export const predictionOptions = [
 כדי להריץ את המבחן על הלוואה אמיתית צריך נתונים מהמלווה הנוכחי. שלושה דברים:
 - **<Term t="דוח יתרות לסילוק" client:visible lesson="7.4">דוח יתרות לסילוק</Term>:** מסמך של המלווה הנוכחי שמראה כמה חייבים בכל מסלול, ומה צריך לשלם כדי לסגור אותו ביום מסוים. בדוגמה: היתרה, העמלה ומספר התשלומים שנשארו. הצוות רושם אותו כמסמך שמבקשים במחזור, אבל הרשימה נכתבה כידע כללי ולא נבדקה (לא אומת). בטופס הציבורי של אחד הבנקים כתוב שכדאי להכין אותו מראש (כפי שתועד אצל הצוות; לא נבדק מחדש מול האתר). איך דוח כזה מציג יתרה במסלול צמוד ואיך הוא מעגל: לא ידוע (שאלה פתוחה).
 - **<Term t="מכתב כוונות" client:visible lesson="7.4">מכתב כוונות</Term>:** מכתב של המלווה הנוכחי, כשההלוואה החדשה מוכנה להתחיל: מה הוא דורש כדי לשחרר את השעבוד שלו, ועד מתי. הסכום שבו תקף עד תאריך שכתוב במכתב; אחריו הוא משתנה, כי הריבית, המדד והעמלה זזים. יש לו נוסח בהוראה 451 (תוספת 3; נקרא מהנוסח הרשמי שהנוסח קיים, לא נבדק תוכנו). לפי התעתיק של הצוות, החובה לתת אותו היא בחוק הבנקאות (שירות ללקוח): לא אומת; שאלה לעורך הדין. כדאי לאשר את הסכום הסופי סמוך להעברה.
-- **שני המספרים של §15א, בכתב.** הבנק נותן אותם לפי בקשה, עד פעמיים בשנה, בלי עמלה, למי שלא מקבל מידע ביישום האינטרנטי (ראו למעלה).
+- **שני המספרים של סעיף 15א, בכתב.** הבנק נותן אותם לפי בקשה, עד פעמיים בשנה, בלי עמלה, למי שלא מקבל מידע ביישום האינטרנטי (ראו למעלה).
 
 העמלה תלויה בתאריך: ב־7.3 ראיתם שאותה הלוואה יכולה לעלות הרבה פחות ביום אחר, למשל ב<Term t="תחנת יציאה" client:visible lesson="2.7">תחנת יציאה</Term> של מסלול משתנה, ושיש <Term t="הודעה מוקדמת" client:visible lesson="7.3">הודעה מוקדמת</Term>. לכן מריצים את המבחן על התאריך שבו באמת תפרעו, ולא על היום.
 
@@ -334,7 +334,7 @@ export const predictionOptions = [
     `הריבית של ההלוואה החדשה באמת נמוכה יותר (${p("c.rate")}%), אבל היא נגמרת רק אחרי הרבה יותר חודשים, ועלויות הכניסה משולמות מהכיס. סך התשלומים בכל זאת גבוה.`,
   ]}
 >
-  סך התשלומים אם נשארים: {f.shekels("stay.total")}. אם עוברים לבנק ג׳: {f.shekels("c.total")} בהלוואה, ועוד {f.shekels("n.costs")} עלויות כניסה, ביחד {f.shekels("c.switch_total")}. ההפרש: {f.shekels("c.extra")} יותר. ובכל זאת המבחן של §15א עובר ({p("c.rate")}% מול {p("old.rate1")}%): הריבית באמת נמוכה, אבל ההלוואה ארוכה בהרבה.
+  סך התשלומים אם נשארים: {f.shekels("stay.total")}. אם עוברים לבנק ג׳: {f.shekels("c.total")} בהלוואה, ועוד {f.shekels("n.costs")} עלויות כניסה, ביחד {f.shekels("c.switch_total")}. ההפרש: {f.shekels("c.extra")} יותר. ובכל זאת המבחן של סעיף 15א עובר ({p("c.rate")}% מול {p("old.rate1")}%): הריבית באמת נמוכה, אבל ההלוואה ארוכה בהרבה.
 </PredictionReveal>
 
 <Section kind="כלי לראש">
@@ -460,7 +460,7 @@ P + X: <M>{n("ex2.balance")} + {n("ex2.fee")} = {n("ex2.answer")}</M>. {f.shekel
 </NumericExercise>
 
 <Solution for="7.4-3">
-אם עוברים: <M>{n("d.total")} + {n("n.costs")} = {n("d.switch_total")}</M>. אם נשארים: {f.shekels("stay.total")}. ההפרש: {f.shekels("d.extra")} יותר, וזה גם כשההחזר החודשי נמוך יותר. (והמבחן של §15א לא עובר כאן: {p("d.rate")}% מול {p("old.rate1")}%.)
+אם עוברים: <M>{n("d.total")} + {n("n.costs")} = {n("d.switch_total")}</M>. אם נשארים: {f.shekels("stay.total")}. ההפרש: {f.shekels("d.extra")} יותר, וזה גם כשההחזר החודשי נמוך יותר. (והמבחן של סעיף 15א לא עובר כאן: {p("d.rate")}% מול {p("old.rate1")}%.)
 </Solution>
 
 <ChoiceExercise
@@ -533,11 +533,11 @@ P + X: <M>{n("ex2.balance")} + {n("ex2.fee")} = {n("ex2.answer")}</M>. {f.shekel
     { text: "המבחן של ההלוואה כולה קובע, כי הוא כולל הכול ואין צורך לבדוק כל מסלול", feedback: "הוא כולל הכול, ובגלל זה הוא יכול להסתיר מסלולים שלא כדאי למחזר. לכן הבנק מחשב גם לכל מסלול." },
   ]}
 >
-  בהלוואה בת שלושה מסלולים, שני המספרים של §15א חושבו לכל מסלול ולהלוואה כולה, מול הצעה חדשה בריבית {p("t3.amount_rate")}% (במחשבון, ההלוואה השנייה). מה נכון?
+  בהלוואה בת שלושה מסלולים, שני המספרים של סעיף 15א חושבו לכל מסלול ולהלוואה כולה, מול הצעה חדשה בריבית {p("t3.amount_rate")}% (במחשבון, ההלוואה השנייה). מה נכון?
 </ChoiceExercise>
 
 <Callout title="חמש שאלות על מחזור">
-<p><strong>מה זה?</strong> החלפה של הלוואה קיימת בהלוואה חדשה. לפי הוראה 451 §15א (נקרא מהנוסח הרשמי), לכל הלוואה קיימת יש שני מספרים: הריבית הכוללת החזויה שלה, ושיעור הריבית לצרכי השוואה, שכולל את מה שעולה לצאת ממנה. ההוראה אומרת שאם השני גבוה מהריבית הכוללת החזויה של ההצעה החדשה, ״קיימת כדאיות כלכלית לביצוע המחזור״.</p>
+<p><strong>מה זה?</strong> החלפה של הלוואה קיימת בהלוואה חדשה. לפי הוראה 451 סעיף 15א (נקרא מהנוסח הרשמי), לכל הלוואה קיימת יש שני מספרים: הריבית הכוללת החזויה שלה, ושיעור הריבית לצרכי השוואה, שכולל את מה שעולה לצאת ממנה. ההוראה אומרת שאם השני גבוה מהריבית הכוללת החזויה של ההצעה החדשה, ״קיימת כדאיות כלכלית לביצוע המחזור״.</p>
 <p><strong>למה זה קיים?</strong> כדי שמי ששוקל מחזור יהיה מול מספר אחד שכולל את מחיר היציאה, ולא רק מול ההחזר החדש.</p>
 <p><strong>איך זה עובד?</strong> מחפשים את הריבית שמסבירה את התשלומים שנשארו כשהם ״קונים״ את החוב, עם העמלה ובלעדיה (IRR, בחזקת 12). אחר כך משווים להצעה.</p>
 <p><strong>איך זה משפיע עליכם?</strong> המבחן משווה מחיר, ולא אומר כמה שקלים תשלמו בסך הכול, ולא כמה זמן עד שהמחזור מחזיר את עצמו. הלוואה חדשה ארוכה יכולה לעבור אותו ובכל זאת לעלות יותר בשקלים.</p>
@@ -550,7 +550,7 @@ P + X: <M>{n("ex2.balance")} + {n("ex2.fee")} = {n("ex2.answer")}</M>. {f.shekel
 
 </Section>
 
-- **שני מספרים להלוואה קיימת (§15א, נקרא מהנוסח הרשמי):** ריבית כוללת חזויה (בלי עמלה) ושיעור ריבית לצרכי השוואה (עם עמלת הפירעון). לכל מסלול ולהלוואה כולה, על התקופה שנשארה.
+- **שני מספרים להלוואה קיימת (סעיף 15א, נקרא מהנוסח הרשמי):** ריבית כוללת חזויה (בלי עמלה) ושיעור ריבית לצרכי השוואה (עם עמלת הפירעון). לכל מסלול ולהלוואה כולה, על התקופה שנשארה.
 - **הכיוון:** העמלה **מתווספת** לחוב שמסלקים, ולכן שיעור הריבית לצרכי השוואה **נמוך** מהריבית הכוללת החזויה. הוא הרף שההצעה החדשה צריכה לעבור.
 - **המשפט של הרגולטור:** כשהוא גבוה מהריבית הכוללת החזויה של ההצעה החדשה, כדאי כלכלית. שוויון — המשפט שותק.
 - **תשלום נמוך יותר אינו חיסכון כולל.** ההחזר, המחיר והשקלים הם שלוש שאלות. הארכת התקופה מורידה את ההחזר ויכולה להעלות את סך התשלומים, גם כשהמבחן עובר.
@@ -579,4 +579,4 @@ P + X: <M>{n("ex2.balance")} + {n("ex2.fee")} = {n("ex2.answer")}</M>. {f.shekel
   ]}
 />
 
-{/* Internal note: numbers come from src/lib/calc/refinance.ts (on metrics.ts and offers.ts; the fee from earlyrepay.ts, lesson 7.2's module, as an input) via scripts/lessons/lesson-7-4.ts and _refinance-facts.ts and data/lessons/7-4.json, rechecked by checks/kinds/refinance.py and metrics.py. Illustration: src/components/RefinanceCalculator.vue with src/data/refinance-examples.ts. Invented banks and costs: refinance-examples.ts. Video: video/7-4.html. No field knowledge in this lesson (the claims are the team's transcription of §15א and the Order). */}
+{/* Internal note: numbers come from src/lib/calc/refinance.ts (on metrics.ts and offers.ts; the fee from earlyrepay.ts, lesson 7.2's module, as an input) via scripts/lessons/lesson-7-4.ts and _refinance-facts.ts and data/lessons/7-4.json, rechecked by checks/kinds/refinance.py and metrics.py. Illustration: src/components/RefinanceCalculator.vue with src/data/refinance-examples.ts. Invented banks and costs: refinance-examples.ts. Video: video/7-4.html. No field knowledge in this lesson (the claims are the team's transcription of סעיף 15א and the Order). */}

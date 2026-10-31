@@ -116,7 +116,7 @@ export const mapRows = [
 
 </Section>
 
-המסלול של עדי וירון הוא קבוע, ולכן חלה עליו <Term t="עמלת היוון" client:visible lesson="7.2">עמלת היוון</Term> (שיעור 7.2). לפי הצו, פירעון ביום שינוי הריבית עולה רק עמלה תפעולית (§4(3)). במסלול קבוע אין יום כזה, ולכן אין <Term t="תחנת יציאה" client:visible lesson="7.3">תחנת יציאה</Term>, ואין לאן לחכות כדי להיפטר מהעמלה. הם נתנו <Term t="הודעה מוקדמת" client:visible lesson="7.3">הודעה מוקדמת</Term> {f.plain("fee.notice_days")} יום לפני הפירעון, בתוך החלון של הצו, ולכן אין עמלת אי־הודעה. ההלוואה לא צמודה, ולכן אין עמלת מדד.
+המסלול של עדי וירון הוא קבוע, ולכן חלה עליו <Term t="עמלת היוון" client:visible lesson="7.2">עמלת היוון</Term> (שיעור 7.2). לפי הצו, פירעון ביום שינוי הריבית עולה רק עמלה תפעולית (סעיף 4(3)). במסלול קבוע אין יום כזה, ולכן אין <Term t="תחנת יציאה" client:visible lesson="7.3">תחנת יציאה</Term>, ואין לאן לחכות כדי להיפטר מהעמלה. הם נתנו <Term t="הודעה מוקדמת" client:visible lesson="7.3">הודעה מוקדמת</Term> {f.plain("fee.notice_days")} יום לפני הפירעון, בתוך החלון של הצו, ולכן אין עמלת אי־הודעה. ההלוואה לא צמודה, ולכן אין עמלת מדד.
 
 העמלה נולדת מחשבון אחד עם שני ערכים: **A**, הריבית הממוצעת של היום ({f.plain("avg.today")}% אפקטיבית לשנה), ו־**C**, הממוצעת ביום שההלוואה ניתנה ({f.plain("avg.grant")}%). שניהם ערכים שהצוות קרא ב־2 באוגוסט 2026, ושניהם לא אומתו. ושימו לב לטעות הקלאסית: הריבית החוזית היא 5.90%, וכל אחד מהממוצעים **אפקטיבי**. 5.90% חוזית הם {f.plain("rate.contract_eff")}% אפקטיבית, ומי שמערבב ביניהם טועה בעמלה.
 
@@ -130,7 +130,7 @@ export const mapRows = [
 <details class="my-4 rounded-md border border-n200 bg-n0 p-4 text-body-m text-n700">
   <summary class="min-h-11 cursor-pointer py-2.5 font-semibold text-n900">מה הייתם אמורים לראות</summary>
   <ol class="mt-2 list-decimal space-y-1 ps-6">
-    <li>הנוסחה הראשונה נותנת {f.shekels("fee.v1")}, והשנייה {f.shekels("fee.v2")}. הבנק גובה את הנמוכה: {f.shekels("fee.lower")}. ההפחתה לפי ותק היא {f.plain("fee.reduction")}% (§8(ב) בצו: שלוש שנים או יותר, ופחות מחמש), והעמלה אחריה {f.shekels("fee.discount")}. עם העמלה התפעולית, {f.shekels("fee.operational")} פעם אחת, הסך הוא {f.shekels("fee.total")}.</li>
+    <li>הנוסחה הראשונה נותנת {f.shekels("fee.v1")}, והשנייה {f.shekels("fee.v2")}. הבנק גובה את הנמוכה: {f.shekels("fee.lower")}. ההפחתה לפי ותק היא {f.plain("fee.reduction")}% (סעיף 8(ב) בצו: שלוש שנים או יותר, ופחות מחמש), והעמלה אחריה {f.shekels("fee.discount")}. עם העמלה התפעולית, {f.shekels("fee.operational")} פעם אחת, הסך הוא {f.shekels("fee.total")}.</li>
     <li>יום לפני שלוש שנים מלאות ההפחתה היא {f.plain("fee.early_reduction")}%, והעמלה גדלה ל־{f.shekels("fee.early_total")}.</li>
     <li>נוספת עמלת אי־הודעה, {f.plain("fee.no_notice_pct")}% מהסכום שנפרע, כלומר {f.shekels("fee.no_notice")}, והסך הוא {f.shekels("fee.no_notice_total")}.</li>
   </ol>
@@ -149,8 +149,8 @@ export const mapRows = [
     <tbody>
       <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">תשלומים ששולמו, ונשארו</td><td class="py-2 pe-3"><span class="ltr">{f.plain("fee.paid")} · {f.plain("fee.remaining")}</span></td></tr>
       <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">חוב ביום הפירעון</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.balance")}</span></td></tr>
-      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה ראשונה (§3(3))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v1")}</span></td></tr>
-      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה שנייה (§3(4))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v2")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה ראשונה (סעיף 3(3))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v1")}</span></td></tr>
+      <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">נוסחה שנייה (סעיף 3(4))</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.v2")}</span></td></tr>
       <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">הנמוכה משתיהן</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.lower")}</span></td></tr>
       <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">אחרי הפחתה של <span class="ltr">{f.plain("fee.reduction")}%</span> לפי ותק</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.discount")}</span></td></tr>
       <tr class="border-b border-n100"><td class="py-2 pe-3 font-semibold text-n900">עמלה תפעולית, פעם אחת</td><td class="py-2 pe-3"><span class="ltr whitespace-nowrap">{f.shekelsExact("fee.operational")}</span></td></tr>
@@ -195,7 +195,7 @@ export const mapRows = [
       ))}
     </tbody>
   </table>
-  <p class="mt-2 text-caption text-n600">{MARK} הרף: {f.plain("old.rate1")}% (שיעור הריבית לצרכי השוואה של ההלוואה הקיימת). המבחן לפי הוראה 451 §15א (נקרא מהנוסח הרשמי). הבנקים, הריביות והתקופות בדויים. הפער מחושב על הערכים המדויקים, ולכן הוא עשוי להיות שונה ב־0.01 ממה שמתקבל מהערכים המעוגנים.</p>
+  <p class="mt-2 text-caption text-n600">{MARK} הרף: {f.plain("old.rate1")}% (שיעור הריבית לצרכי השוואה של ההלוואה הקיימת). המבחן לפי הוראה 451 סעיף 15א (נקרא מהנוסח הרשמי). הבנקים, הריביות והתקופות בדויים. הפער מחושב על הערכים המדויקים, ולכן הוא עשוי להיות שונה ב־0.01 ממה שמתקבל מהערכים המעוגנים.</p>
 </div>
 
 שני בנקים עוברים, ואחד לא. אבל המבחן הוא **מבחן ריבית בלבד**, וההמשך מראה מה הוא לא רואה.
@@ -249,7 +249,7 @@ export const mapRows = [
   client:visible
   presets={PRESETS}
   initial="case_c"
-  note="דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. המבחן לפי הוראה 451 §15א (נקרא מהנוסח הרשמי)."
+  note="דוגמה לימודית — נתוני הלקוח והריביות להמחשה בלבד; אינם הצעת בנק או נתוני שוק עדכניים. המבחן לפי הוראה 451 סעיף 15א (נקרא מהנוסח הרשמי)."
 />
 
 נסו שלוש משימות במחשבון, בהלוואה של תיק ג׳:
@@ -671,7 +671,7 @@ export const mapRows = [
     { kind: "הנחת חישוב", text: "תיק ג׳, הבנקים, ההצעות, ריבית ותקופה של ההלוואה הנפרדת לתוספת, עלויות הכניסה, ההכנסות והשווי של הנכס: בדויים. ההלוואות החדשות מלוות את החוב ועמלת היציאה, והתוספת מעל זה. תאריך הפירעון, 2 באוגוסט 2026, הוא הנחת חישוב שמשחזרת את הדוגמה של הצוות." },
     { kind: "לא אומת", text: `ההלוואה של תיק ג׳ והעמלה עליה הן הדוגמה המחושבת של הצוות (חוב של ${f.shekels("fee.balance")}, עמלה של ${f.shekels("fee.total")}). כללי הצו נקראו מהנוסח הרשמי (שיעורים 7.1 עד 7.3). ערכי A ו־C, ${p("avg.today")}% ו־${p("avg.grant")}% אפקטיביים, הם ערכים שהצוות קרא ב־2 באוגוסט 2026. ממתין לבדיקה מול הצו ומול הפרסום של בנק ישראל.`, date: "2026-08-02" },
     { kind: "עובדה מאומתת", text: "המבחן של סעיף 15א להוראה 451: שיעור הריבית לצרכי השוואה מול הריבית הכוללת החזויה של ההלוואה החדשה. נקרא מהנוסח הרשמי של בנק ישראל (גרסה 22, 07/2023).", href: "https://www.boi.org.il/media/utld2tgp/451.pdf", date: "2026-10-31" },
-    { kind: "עובדה מאומתת", text: "צו הבנקאות (פירעון מוקדם של הלוואה לדיור), התשס״ב־2002: שתי הנוסחאות והנמוכה מביניהן (§3(3)–(5)), תחנת יציאה (§4(3)), ההפחתות (§8(ב)), עמלה תפעולית עד 60 ₪ (§3(1)). נקרא מהנוסח המשולב שבאתר בנק ישראל.", href: "https://www.boi.org.il/media/qy5cow0l/116.pdf", date: "2026-10-31" },
+    { kind: "עובדה מאומתת", text: "צו הבנקאות (פירעון מוקדם של הלוואה לדיור), התשס״ב־2002: שתי הנוסחאות והנמוכה מביניהן (סעיף 3(3)–(5)), תחנת יציאה (סעיף 4(3)), ההפחתות (סעיף 8(ב)), עמלה תפעולית עד 60 ₪ (סעיף 3(1)). נקרא מהנוסח המשולב שבאתר בנק ישראל.", href: "https://www.boi.org.il/media/qy5cow0l/116.pdf", date: "2026-10-31" },
     { kind: "עובדה מאומתת", text: `כלל אותו נכס: נקרא מהנוסח הרשמי של בנק ישראל (חוזר 2840 מ־08/02/2026, סעיף 9): ההחזר על הלוואה קיימת על אותו נכס נספר ליחס ההחזר אם מועד פירעונה עולה על ${p("rule.months")} חודשים. בנוסח של חוזר 2840 התחילה היא 1.7.2026; המועד 1 באוקטובר 2026 (חוזר 2852, תעתיק של הצוות) לא נקרא: לא אומת.`, date: "2026-10-19" },
     { kind: "עובדה מאומתת", text: `נקרא מהנוסח הרשמי של בנק ישראל (הוראה 329, גרסת 06/2026, סעיפים 4, 5, 6 ו־10א): יחס החזר עד ${p("lim.pti")}% (סעיף 5, ומעליו אסור לאשר), קו הון ב־${p("lim.capital")}% (סעיף 6: משקל סיכון מלא, לא איסור), תקרה של ${p("v.any_pct")}% להלוואה שאינה לרכישה, שבנק רשאי להרחיב עד ${p("v.any_ext_pct")}% כשהחלק מעל ${p("v.any_pct")}% אינו עולה על ${f.shekels("v.any_ext_cap")} (סעיף 10א). נקראו גרסה 12 מ־08/02/2026 וגרסה 13 מ־30.6.2026, שבה השתנתה רק ההגדרה של ״הלוואה לדיור״; עדכונים מאוחרים יותר, אם יש, לא נקראו.`, date: "2026-10-19" },
     { kind: "ידע מהשטח", text: "מחזור פנימי: פתיחה מחדש של המשכנתא באותו בנק כשתנאי השוק השתפרו, אפשר להציע תמהיל חדש והבנק בוחן מחדש. מומחה השטח, 27 ביולי 2026. ממתין לאישור מומחה.", date: "2026-07-27" },
