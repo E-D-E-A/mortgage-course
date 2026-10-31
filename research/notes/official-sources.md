@@ -278,6 +278,11 @@ Quotes as returned in the summaries (from the index, not checked against the PDF
 
 **Not verified:** the August figures need a direct read before they are quoted in the course; the current housing weight.
 
+**Checked against the CBS open-data API, 2026-10-31** (api.cbs.gov.il reachable; www.cbs.gov.il pages and the definition PDF still could not be read: plain requests got an empty reply or JS-only shells, and the site refused the automated browser):
+- Series 120010 (CPI general): base «2024 ממוצע». **Confirmed: base 2024 average = 100.** Latest values: Sep 2026 105.3 (−0.5% m/m, +1.6% y/y); Aug 2026 105.8 (+0.7%, +1.5% y/y), matching the summary above; Jul 2026 105.1.
+- Catalog subject 37 («לפי קבוצות צריכה ראשיות»): food excl. fruit and vegetables; fruit and vegetables; housing; dwelling maintenance; furniture and household equipment; clothing and footwear; health; education, culture and entertainment; transport and communication; miscellaneous (plus a "food incl. fruit and vegetables" aggregate). **Confirmed: ten main groups.**
+- The September 2026 CPI is published (it is in the series); its exact release date, the 15th/18:30 rule, the 14:00 early-release rule, rent-based housing and the 1999 exclusion remain unverified.
+
 ---
 
 ## 8. Licensing of paid mortgage advisory

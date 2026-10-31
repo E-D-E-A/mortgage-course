@@ -166,6 +166,7 @@ export default function lesson07(): LessonData {
     // What the lesson says about the real index. Data, not computed; all from
     // research/notes/official-sources.md §7 (search summaries of CBS pages,
     // 2026-10-09, not yet read from the pages) and Brain page 7831553 (2026-08-03).
+    // Base year and main groups were since read from the CBS API (see below).
     given("cbs.day", "15"),
     given("cbs.time", "18:30"),
     given("cbs.early_time", "14:00"),
@@ -175,6 +176,9 @@ export default function lesson07(): LessonData {
     given("cbs.house_prices_out", "1999"),
     given("cbs.base_year", "2024"),
     given("cbs.data_date", "2026-10-09"),
+    // Read from the CBS open-data API (api.cbs.gov.il), 2026-10-31: series 120010
+    // base "2024 ממוצע"; catalog subject 37 (main consumption groups).
+    given("cbs.checked_date", "2026-10-31"),
 
     // Prediction: an index from 120 to 126.
     points("prediction.points", "120", "126"),
